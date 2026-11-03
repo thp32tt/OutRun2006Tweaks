@@ -1,0 +1,80 @@
+{
+  "task_id": "CONVERSION-DXVK-00025",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "79d1ad6a56d6aa655c8e17fe9ae94b7f3347e59f",
+  "result_sha": "4394b69096fa529cfef90eaa06001442da3272ba",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-DIRECTGPU-EVIDENCE-TRUST-GATE",
+  "summary": "Hardened the DXVK runtime analyzer so apparent host-owned DirectGPU frames cannot become a promotion-grade ACTIVE verdict unless exact-build source/backend identity is verified, package-integrity evidence is verified, host/import bridge generations agree, the host-owned direct path is active, and DirectFrames>0. Incomplete or unverified evidence fails closed with explicit blockers; host/import generation mismatch has its own status.",
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    "tools/Test-VROneClickContract.ps1"
+  ],
+  "source_commits": [
+    "4394b69096fa529cfef90eaa06001442da3272ba"
+  ],
+  "review": {
+    "architecture": "This task only changes post-session evidence classification. It composes previously separate CONVERSION-DXVK-00015 bridge telemetry, CONVERSION-DXVK-00019 exact-build identity and CONVERSION-DXVK-00021 package-integrity evidence into one promotion-evidence trust gate.",
+    "lifetime_sync": "Host/import generation mismatch is now an explicit evidence blocker. The underlying producer/consumer resource lifetime, fences, ACK ordering and bridge implementation are unchanged.",
+    "stereo_correctness": "No renderer, WVP, HUD/menu, recenter or visual path changed.",
+    "performance": "No game/host hot-path code changed. Trust evaluation happens only in the post-session analyzer.",
+    "adversarial": "Synthetic directFrames>0 cases prove that incomplete identity, unverified package integrity and mismatched bridge generations cannot emit DXVK_HOST_OWNED_DIRECTGPU_ACTIVE."
+  },
+  "behavior_verified": [
+    "Trusted fixture with matching session/build/preflight identity, PackageIntegrity.Verified=true, matching host/import generation, host-owned path active and DirectFrames=240 emits DXVK_HOST_OWNED_DIRECTGPU_ACTIVE and DxvkDirectEvidenceTrusted=true.",
+    "DirectFrames=240 with incomplete identity emits DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED and blockers BUILD_IDENTITY_UNVERIFIED plus PACKAGE_INTEGRITY_EVIDENCE_MISSING.",
+    "DirectFrames=240 with PackageIntegrity.Verified=false emits DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED and blocker PACKAGE_INTEGRITY_NOT_VERIFIED.",
+    "DirectFrames=240 with host bridge generation 12345 and game import generation 54321 emits DXVK_HOST_GENERATION_MISMATCH and blocker HOST_IMPORT_GENERATION_MISMATCH.",
+    "Concrete build identity mismatch retains higher-precedence DXVK_BUILD_IDENTITY_MISMATCH and remains untrusted."
+  ],
+  "regression_revalidation": [
+    "VR-DXVK-D3D9EX-SHARED-HANDLE-001: remains OPEN_USER_RUNTIME_VERIFIED_FAILURE; this task changes only evidence trust/classification.",
+    "Host-owned transport runtime success remains Quest3/VDXR-gated. DxvkDirectEvidenceTrusted=true is a prerequisite for promotion-grade evidence, not proof of visual parity, pacing recovery or startup/recenter correctness.",
+    "VR-STARTUP-WHITE-001 and protected stereo/frame-stability invariants are unaffected because no production runtime rendering/transport source changed."
+  ],
+  "evidence": [
+    "C0 recovered GitHub HEAD 79d1ad6a56d6aa655c8e17fe9ae94b7f3347e59f, AGENTS.md, review index/Sets 06-10, QUEUE_CONTROLLER_CONTRACT.md, automation state, CONVERSION-DXVK-00023 and regression ledger. N100/local clone was not used.",
+    "C1 found a remaining evidence-classification gap: CONVERSION-DXVK-00019 fail-closed concrete identity mismatch, but directFrames>0 with incomplete identity/package evidence could still report DXVK_HOST_OWNED_DIRECTGPU_ACTIVE; generation mismatch also lacked status precedence.",
+    "Backend Conversion Gate 36480684112 PASS on exact source SHA 4394b69096fa529cfef90eaa06001442da3272ba. Expanded analyzer behavior test PASSed along with one-click behavior, package integrity, DXVK analyzer/provider, host-owned synchronization contract, pinned acquisition, Win32 build and binary verification.",
+    "Build 36480692985 PASS on exact source SHA 4394b69096fa529cfef90eaa06001442da3272ba.",
+    "OpenXR VR architecture 36480693052 PASS on exact source SHA 4394b69096fa529cfef90eaa06001442da3272ba across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36480692977 PASS on exact source SHA 4394b69096fa529cfef90eaa06001442da3272ba.",
+    "PC Fast 36480684092 skipped as required for scheduled automation.",
+    "Backend artifact 10996063812 digest sha256:8b56d54178dd8e117ca23ff8d16fe11b7cab58d77084300cc7dbd0ab4308b833.",
+    "OpenXR host artifact 10995903347 digest sha256:25ec648f74cf88c2cce893f26d381c5598878aba05ae76aa64905d1c16aab8a3.",
+    "HUD inspector artifact 10996123769 digest sha256:3d5de2b8c178b76cb5e7e125a4c999ad762a49fc3aa65e0c910a87179763edd9.",
+    "Issue #14 implementation comment 5878085011 and validation comment 5878190430 record the production transaction."
+  ],
+  "completed_work_items": [
+    "DXVK-DIRECTGPU-EVIDENCE-TRUST-GATE"
+  ],
+  "blocked_runtime_items": [
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY",
+    "DXVK-EXACT-BUILD-VISUAL-PARITY-GATE"
+  ],
+  "next_action": "Run the next exact-build Quest 3/VDXR DXVK candidate. Only treat DirectGPU transport/pacing data as promotion-grade when DxvkDirectEvidenceTrusted=true. Then separately require materially reduced fallback use, same-scene pacing recovery from the prior ~33.44 ms gameplay interval, and no startup/stereo/HUD/menu/recenter/visual regression before any promotion.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36480684112,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36480692985,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36480693052,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36480692977,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36480684092,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 10996063812,
+    "backend_gate_artifact_digest": "sha256:8b56d54178dd8e117ca23ff8d16fe11b7cab58d77084300cc7dbd0ab4308b833",
+    "openxr_host_artifact_id": 10995903347,
+    "openxr_host_artifact_digest": "sha256:25ec648f74cf88c2cce893f26d381c5598878aba05ae76aa64905d1c16aab8a3",
+    "hud_inspector_artifact_id": 10996123769,
+    "hud_inspector_artifact_digest": "sha256:3d5de2b8c178b76cb5e7e125a4c999ad762a49fc3aa65e0c910a87179763edd9"
+  },
+  "recorded_at_kst": "2026-09-29T05:46:00+09:00"
+}

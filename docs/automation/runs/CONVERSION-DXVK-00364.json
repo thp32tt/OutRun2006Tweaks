@@ -1,0 +1,176 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00364",
+  "production_id": "CONVERSION-DXVK-00364",
+  "event_id": "CONVERSION-DXVK-00364-E004",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "1c92b0c753fb3344680a8e72703c8f0d308eb347",
+  "initial_material_sha": "cba7ee5ad6ac76c3c36064cad595e5df3172fb16",
+  "repair_sha": "7461a9089c30a71810e827ed070a7a3d4d5a3295",
+  "result_sha": "467937f9be4c350ea158f2b083e674372676d62d",
+  "validation_bearing_result_sha": "467937f9be4c350ea158f2b083e674372676d62d",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "work_item": "DXVK_F119_CANONICAL_CONTROL_FLOW_0x18394E_TO_0x18398E",
+  "summary": "Exact-decoded the validated F118 canonical window 0x0018394E..0x0018398E as 27 contiguous complete instructions. Proved internal branch targets 0x00183959 and 0x0018396B, carried external targets 0x0018399B/0x001839B5/0x001839CD plus inherited 0x001839D2/0x00183B6F fail-closed, found no direct rel32 CALLs in the capture, and ended on exact instruction boundary 0x0018398E. The initial material SHA failed canonical evidence due proof-wiring contamination; two bounded repair commits culminated in exact-SHA canonical and Backend Conversion Gate success at 467937f9be4c350ea158f2b083e674372676d62d.",
+  "review_lenses": {
+    "architecture": "Analyzer/test-only control-flow proof on isolated vr-dxvk-r71-disasm; runtime renderer/backend implementation paths and other backend lanes were not modified.",
+    "ownership_lifetime": "No runtime resource ownership, Reset/device-loss, shared-handle, synchronization, producer/consumer generation or ACK behavior changed; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, per-eye projection, HUD, marker, recenter, presentation or visual path changed; Quest 3/VDXR runtime correctness is not claimed.",
+    "performance": "Offline static analyzer/test work only; no runtime hot path, draw count, copy/wait or frame-pacing behavior changed.",
+    "adversarial": "Fail-before/pass-after chain exposed cross-wired/undefined proof predicates before accepting the final exact-SHA analyzer result; unresolved forward-target debt remains fail-closed."
+  },
+  "evidence": {
+    "changed_paths": [
+      "tools/analyze_outrun_exe.py",
+      "tools/test_dxvk_continuation_93_control_flow.py"
+    ],
+    "result_commit_message": "dxvk: fix continuation 93 exact analyzer path [AUTO:CONVERSION-DXVK-00364]",
+    "material_result_sha": "467937f9be4c350ea158f2b083e674372676d62d",
+    "material_tree_sha": "25e1a3047ae89122e819b086c41368a074a0d973",
+    "analyzer_blob_sha": "a171fdea8bdddd6489367ac1e733c5589f201fe6",
+    "test_blob_sha": "1bde789c9ece37ff3e6557b251cc5364c00061a9",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "proof_status": "EXACT_18394E_TO_18398E_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "predecessor_status": "EXACT_EXE_18394E_TO_18398E_PROVENANCE_CAPTURED",
+    "start_rva": "0x0018394E",
+    "capture_end_rva": "0x0018398E",
+    "instruction_count": 27,
+    "internal_branch_targets": [
+      "0x00183959",
+      "0x0018396B"
+    ],
+    "external_forward_targets": [
+      "0x0018399B",
+      "0x001839B5",
+      "0x001839CD"
+    ],
+    "inherited_unresolved_forward_targets": [
+      "0x001839D2",
+      "0x00183B6F"
+    ],
+    "unresolved_forward_targets": [
+      "0x0018399B",
+      "0x001839B5",
+      "0x001839CD",
+      "0x001839D2",
+      "0x00183B6F"
+    ],
+    "direct_rel32_call_count": 0,
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_CAPTURE_BOUNDARY_ONLY",
+    "call_semantics": "NO_DIRECT_REL32_CALLS_IN_CAPTURE_FUNCTION_SEMANTICS_UNRESOLVED",
+    "ownership_effect": "NONE",
+    "fail_before": {
+      "sha": "cba7ee5ad6ac76c3c36064cad595e5df3172fb16",
+      "dxvk_canonical_disassembly_evidence_run_id": 37191526226,
+      "conclusion": "failure"
+    },
+    "exact_head_validation": {
+      "head_sha": "467937f9be4c350ea158f2b083e674372676d62d",
+      "dxvk_canonical_disassembly_evidence": {
+        "run_id": 37191770135,
+        "job_id": 111405292827,
+        "conclusion": "success",
+        "artifact_id": 11298594421,
+        "artifact_digest": "sha256:466287be43e8bcc62fceb140fa608761e443920841f49e1f12b2a3a7d730fd60"
+      },
+      "backend_conversion_gate": {
+        "run_id": 37191770103,
+        "job_id": 111405292912,
+        "conclusion": "success",
+        "backend_disassembly_contract": "success",
+        "win32_configure": "success",
+        "win32_build": "success",
+        "binary_verification": "success",
+        "artifact_upload": "success",
+        "artifact_id": 11298528331,
+        "artifact_digest": "sha256:3f77a8344e8cb202d0b79bb28f03e6b5951a2df8d47556b519152c7ca26f84d3"
+      }
+    },
+    "issue14_change_comment_id": 5978509879,
+    "issue14_implementation_validation_comment_ids": [
+      5978495242,
+      5978509879
+    ],
+    "issue14_implementation_validation_comment_id": 5978495242
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT, detected and corrected a concurrent stale queue-dispatch reconciliation that had overwritten the current explicit E004 rollover metadata. ATTEMPT remains 1/3 because the current rollover is not a retry. F119 material and validation-bearing SHA are unchanged."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed the F118 durable frontier and current 00364 diff. Confirmed the bounded F119 objective: exact-decode 0x0018394E..0x0018398E, preserve unresolved-target debt, and make no runtime semantic promotion."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Material chain cba7ee5ad6ac76c3c36064cad595e5df3172fb16 -> 7461a9089c30a71810e827ed070a7a3d4d5a3295 -> 467937f9be4c350ea158f2b083e674372676d62d adds F119 exact instruction/branch proof plus regression coverage and repairs analyzer proof wiring."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 37191770135/111405292827 SUCCESS and Backend Conversion Gate 37191770103/111405292912 SUCCESS, including backend disassembly contract, Win32 configure/build, binary verification and artifact upload. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material result 467937f9be4c350ea158f2b083e674372676d62d is published on vr-dxvk-r71-disasm with exact marker [AUTO:CONVERSION-DXVK-00364]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static analyzer/test disassembly proof only; no runtime DXVK payload, selector, deployment content or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "Durable run record and lane state persist the authoritative E004 rollover dispatch, validation-bearing SHA 467937f9be4c350ea158f2b083e674372676d62d, exact-SHA gate evidence, RUNTIME_VALIDATION=UNTESTED, and the exact next raw-frontier action. The stale concurrent E005 queue bookkeeping is superseded only at metadata level."
+    }
+  },
+  "blocker": null,
+  "next_action": "Capture the exact canonical 64-byte raw frontier 0x0018398E..0x001839CE from the validated F119 instruction boundary. Carry unresolved target debt [0x0018399B,0x001839B5,0x001839CD,0x001839D2,0x00183B6F] fail-closed, resolve targets only on exact instruction boundaries, and keep function/render/HUD/runtime semantics unresolved.",
+  "exact_next_action": "Capture the exact canonical 64-byte raw frontier 0x0018398E..0x001839CE from the validated F119 instruction boundary. Carry unresolved target debt [0x0018399B,0x001839B5,0x001839CD,0x001839D2,0x00183B6F] fail-closed, resolve targets only on exact instruction boundaries, and keep function/render/HUD/runtime semantics unresolved.",
+  "validated_at_kst": "2026-10-04T18:23:42+09:00",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00364",
+    "event_id": "CONVERSION-DXVK-00364-E004",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "prior_controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00363",
+    "event_id": "CONVERSION-DX11-00363-E005",
+    "event_type": "retry",
+    "attempt": "1/3"
+  },
+  "run_record_commit_sha": "d5b9e1fc6c407b2b07f7549b93e5322802b49852",
+  "dispatch_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DX11-00363",
+      "event_id": "CONVERSION-DX11-00363-E005",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DXVK-00364",
+      "event_id": "CONVERSION-DXVK-00364-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "reason": "The newest explicit user rollover message is authoritative: TASK/PRODUCTION CONVERSION-DXVK-00364, EVENT CONVERSION-DXVK-00364-E004, EVENT_TYPE=rollover, ATTEMPT=1/3, CHAT_ROLLOVER=3. Rollover is not a retry. The concurrent queue reconciliation at f67b633e0f12452c1c40847b173e33cd87110239 is superseded for dispatch bookkeeping only; material/result SHA and exact-SHA validation evidence remain unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt"
+}

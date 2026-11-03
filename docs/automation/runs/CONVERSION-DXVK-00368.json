@@ -1,0 +1,235 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00368",
+  "production_id": "CONVERSION-DXVK-00368",
+  "event_id": "CONVERSION-DXVK-00368-E004",
+  "event_type": "retry",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "79f701d008ca5667db2d29d980348eab89a241d2",
+  "initial_material_sha": "02cf191c3357124ed769412520d97be49349bf78",
+  "result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+  "validation_bearing_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "work_item": "DXVK_F121_CONTINUATION_94_EXACT_CONTROL_FLOW_WITH_CUT_EDGE",
+  "summary": "Exact-decodes 21 complete canonical x86 instructions from F120 0x0018398E..0x001839CE, proving complete-instruction prefix end 0x001839CD. Internal branch target 0x001839B5 is exact; inherited 0x0018399B and 0x001839B5 are resolved on exact instruction boundaries. Trailing 0x001839CD:8B is an explicit verifier-gated incomplete cut edge and remains mandatory overlap. Remaining unresolved target debt is [0x001839CD,0x001839D2,0x00183B6F]. No function/render/HUD/runtime semantics or ownership promotion.",
+  "repair_history": [
+    {
+      "sha": "02cf191c3357124ed769412520d97be49349bf78",
+      "validation": "DXVK Canonical Disassembly Evidence 37194340925 / job 111412953885 FAILED at static disassembly contract",
+      "failure": "DXVK continuation 94 has no cut edge but proof end 0x001839CD != capture end 0x001839CE",
+      "diagnosis": "Custom OVERLAP_* naming did not satisfy the repository's modern explicit cut-edge contract.",
+      "disposition": "Superseded by minimal contract repair; canonical instruction bytes/control-flow table unchanged."
+    },
+    {
+      "sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+      "repair": "Use verifier-mandated INCOMPLETE_RVA/INCOMPLETE_BYTES and gate proven status on incomplete_matches plus capture_edge_matches.",
+      "validation": "PASS"
+    }
+  ],
+  "review_lenses": {
+    "architecture": "DXVK analyzer/test-only frontier advancement on isolated vr-dxvk-r71-disasm; no vr-d3d9ex-focus or runtime renderer edit.",
+    "ownership_lifetime": "No runtime resources, shared handles, synchronization, Reset/device-loss, generation or ACK ownership changed.",
+    "stereo_correctness": "No WVP, per-eye projection, HUD, marker, recenter or presentation path changed; HMD correctness remains unclaimed.",
+    "performance": "Static disassembly evidence only; no runtime draw/copy/wait/pacing path changed.",
+    "adversarial": "Independent x86 decode of exact F120 bytes established a 63-byte complete prefix and exposed the trailing 0x8B cut edge; repository verifier rejected the first noncanonical cut-edge declaration, and the repair adopted its mandatory evidence contract without weakening validation."
+  },
+  "evidence": {
+    "changed_paths": [
+      "tools/analyze_outrun_exe.py",
+      "tools/test_dxvk_continuation_94_control_flow.py"
+    ],
+    "commit_message": "dxvk: bind continuation 94 cut-edge contract [AUTO:CONVERSION-DXVK-00368]",
+    "material_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+    "material_tree_sha": "178d53c2211d8beced8e018cb4d05088474d8077",
+    "analyzer_blob_sha": "865df83f6e1c64b811feec790aac175a538279d6",
+    "test_blob_sha": "4487734d7ccc17d9771e8cf216983af85263600e",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "proof_status": "EXACT_18398E_TO_1839CD_CONTROL_FLOW_WITH_1839CD_OVERLAP_PROVEN",
+    "predecessor_status": "EXACT_EXE_18398E_TO_1839CE_PROVENANCE_CAPTURED",
+    "start_rva": "0x0018398E",
+    "complete_instruction_end_rva": "0x001839CD",
+    "capture_end_rva": "0x001839CE",
+    "instruction_count": 21,
+    "branches": [
+      {
+        "rva": "0x00183992",
+        "target": "0x001839B5"
+      },
+      {
+        "rva": "0x00183999",
+        "target": "0x001839B5"
+      },
+      {
+        "rva": "0x001839AD",
+        "target": "0x001839B5"
+      }
+    ],
+    "resolved_predecessor_targets": [
+      "0x0018399B",
+      "0x001839B5"
+    ],
+    "unresolved_forward_targets": [
+      "0x001839CD",
+      "0x001839D2",
+      "0x00183B6F"
+    ],
+    "direct_rel32_call_count": 0,
+    "incomplete_cut_edge": {
+      "rva": "0x001839CD",
+      "bytes": "8b",
+      "incomplete_matches": true,
+      "capture_edge_matches": true
+    },
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_MANDATORY_OVERLAP_ONLY",
+    "ownership_effect": "NONE",
+    "initial_failed_canonical_run": {
+      "run_id": 37194340925,
+      "job_id": 111412953885,
+      "sha": "02cf191c3357124ed769412520d97be49349bf78",
+      "conclusion": "failure"
+    },
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37194452649,
+      "job_id": 111413293550,
+      "conclusion": "success",
+      "exact_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+      "artifact_id": 11300053730,
+      "artifact_digest": "sha256:490186bad899d92a1a312c29e1704c841f71d7757a21d427dc7fc15825990efc"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37194452597,
+      "job_id": 111413293538,
+      "conclusion": "success",
+      "exact_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11300760473,
+      "artifact_digest": "sha256:3e765b7842f69f455896ded954e1bbef0941445faa9978c66ce1744751cb7e65"
+    },
+    "issue14_change_comment_id": 5978936164
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read current branch HEAD 79f701d008ca5667db2d29d980348eab89a241d2, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, regression knowledge/history, 00366 run record, recent commits and score SSOT. No existing 00368 material found."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected 00366 durable next action: exact-decode complete instructions from F120, preserving trailing 0x1839CD:8B as fail-closed overlap. Canonical bytes independently decoded to 21 complete instructions ending at 0x1839CD."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Initial 02cf191c added F121 exact instruction/branch/debt proof. Static contract exposed missing modern cut-edge naming; repair 334a7537 adopted INCOMPLETE_RVA/INCOMPLETE_BYTES and required incomplete_matches/capture_edge_matches without changing decoded bytes/control flow."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Initial exact-SHA Canonical Evidence 37194340925 failed contract as recorded. Repaired exact-SHA 334a7537 passed DXVK Canonical Disassembly Evidence 37194452649/111413293550 and Backend Conversion Gate 37194452597/111413293538, including Win32 build/binary/artifact. No HMD/game test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing result 334a7537fdd86cfbddeb6f85aaccb6956c7abb42 published with exact marker [AUTO:CONVERSION-DXVK-00368] and no CI-skip. Issue #14 comment 5978936164 records change, repair and validation."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static analyzer/test canonical control-flow evidence only; no runtime DXVK payload, selector, deployment content or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "Schema-2 durable record remains COMPLETE. Retry E004/ATTEMPT 2/3 inspected failure-context Backend Conversion Gate 37194340957 and confirmed it belongs to superseded initial SHA 02cf191c. Repair/result SHA 334a7537 already passes exact-SHA Canonical Evidence 37194452649 and Backend Conversion Gate 37194452597. No material work was repeated; RUNTIME_VALIDATION=UNTESTED remains."
+    }
+  },
+  "blocker": null,
+  "exact_next_action": "Capture the next canonical raw frontier starting at 0x001839CD with mandatory overlap byte 0x8B inherited from F121. Require overlap equality, carry unresolved target debt [0x001839CD,0x001839D2,0x00183B6F] fail-closed, record exact bytes/raw rel32 census only, and do not promote function/render/HUD/runtime semantics.",
+  "next_action": "Capture the next canonical raw frontier starting at 0x001839CD with mandatory overlap byte 0x8B inherited from F121. Require overlap equality, carry unresolved target debt [0x001839CD,0x001839D2,0x00183B6F] fail-closed, record exact bytes/raw rel32 census only, and do not promote function/render/HUD/runtime semantics.",
+  "validated_at_kst": "2026-10-04T19:14:57+09:00",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DXVK-00368",
+    "production_id": "CONVERSION-DXVK-00368",
+    "event_id": "CONVERSION-DXVK-00368-E004",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
+  },
+  "run_record_commit_sha": "67670cceb1518f3b7f3c8575ec50b7862d7ccba5",
+  "chat_rollover": 2,
+  "dispatch_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DX11-00367",
+      "event_id": "CONVERSION-DX11-00367-E003",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "controller_dispatch": {
+        "task_id": "CONVERSION-DXVK-00368",
+        "production_id": "CONVERSION-DX11-00367",
+        "event_id": "CONVERSION-DX11-00367-E003",
+        "event_type": "retry",
+        "attempt": "1/3",
+        "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
+      }
+    },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00368",
+      "production_id": "CONVERSION-DXVK-00368",
+      "event_id": "CONVERSION-DXVK-00368-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER"
+    },
+    "reason": "Newest explicit user rollover metadata supersedes the earlier automatic queue-dispatch bookkeeping. Rollover is not a retry; ATTEMPT remains 1/3. Material and validation-bearing result SHA remain unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "retry_resume": {
+    "attempt": "2/3",
+    "event_id": "CONVERSION-DXVK-00368-E004",
+    "resumed_from": "FAILURE_CONTEXT",
+    "resolution": {
+      "failure_context_run_id": 37194340957,
+      "failure_context_job_id": 111412953606,
+      "failed_exact_sha": "02cf191c3357124ed769412520d97be49349bf78",
+      "failure_step": "Verify backend disassembly contract",
+      "failure_signature": "DXVK continuation 94 has no cut edge but proof end 0x001839CD != capture end 0x001839CE",
+      "root_cause": "The trailing canonical byte 0x8B at 0x001839CD was modeled with custom OVERLAP_* names, so the repository modern continuation verifier did not recognize it as the mandatory incomplete cut edge.",
+      "repair_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+      "repair_scope": [
+        "tools/analyze_outrun_exe.py",
+        "tools/test_dxvk_continuation_94_control_flow.py"
+      ],
+      "repair_contract": "INCOMPLETE_RVA/INCOMPLETE_BYTES + incomplete_matches + capture_edge_matches",
+      "canonical_evidence_run_id": 37194452649,
+      "canonical_evidence_conclusion": "success",
+      "backend_conversion_gate_run_id": 37194452597,
+      "backend_conversion_gate_conclusion": "success",
+      "disposition": "SUPERSEDED_REPAIRED_AND_VALIDATED",
+      "repeated_material_work": false
+    },
+    "result_sha_unchanged": true,
+    "validation_bearing_result_sha_unchanged": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "retry_history": [
+    {
+      "event_id": "CONVERSION-DXVK-00368-E004",
+      "event_type": "retry",
+      "attempt": "2/3",
+      "status": "CLOSED_ALREADY_REPAIRED",
+      "failure_context_run_id": 37194340957,
+      "failed_sha": "02cf191c3357124ed769412520d97be49349bf78",
+      "repair_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}

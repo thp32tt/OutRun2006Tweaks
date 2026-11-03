@@ -1,0 +1,58 @@
+{
+  "task_id": "CONVERSION-DXVK-00047",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "59c7ce65430723de5a322fec030bfb4c26ba5829",
+  "result_sha": "4aa21f88eb5016cb3f6cfd35810f088bb780d953",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "L2-PERF-001-DXVK-HOST-BUDGET-RANKING",
+  "summary": "Added a gated diagnostic ranking of the largest DXVK host capture/commit-copy/render/xrEndFrame P95 stage and reconciled L2-PERF-001 to HMD evidence pending without changing runtime performance policy.",
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    "docs/VR_WORK_QUEUE.json"
+  ],
+  "source_commit": {
+    "sha": "4aa21f88eb5016cb3f6cfd35810f088bb780d953",
+    "message": "Rank DXVK host frame-budget stage [AUTO:CONVERSION-DXVK-00047]",
+    "validation_bearing": true,
+    "ci_skip": false
+  },
+  "behavior_verified": [
+    "Host dominant-stage ranking is emitted only when DxvkPerformanceEvidenceReady=true.",
+    "Ranking compares MaxP95Observed for CAPTURE, COMMIT_COPY, RENDER and XR_END_FRAME.",
+    "The synthetic hosted PERFORMANCE fixture selects XR_END_FRAME at 7.0 ms.",
+    "When performance evidence is incomplete the dominant-stage field remains empty and P95 remains null.",
+    "L2-PERF-001 is NEED_HMD_TEST; automated evidence must not remove the intentional F30 hold-copy pair."
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36553813262,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36553817870,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36553817881,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36553817871,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36553813260,
+    "pc_fast_result": "SKIPPED"
+  },
+  "scope": "Analyzer/test/queue only; no renderer, DXVK provider, DirectGPU synchronization, hold CopyResource count, wait/Flush policy, OpenXR submission, cadence or draw behavior changed.",
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5888091541,
+    "issue_14_validation_comment_id": 5888177724
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_REVIEW_F30_RUNTIME_EVIDENCE_BOUNDARY",
+    "C2_IMPLEMENT_HOST_BUDGET_RANKING",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C6_STATE"
+  ],
+  "blocker": "No runtime optimization target is authorized until exact-build Quest3/VDXR PERFORMANCE evidence satisfies DxvkPerformanceEvidenceReady=true.",
+  "next_action": "Run exact-build Quest3/VDXR DXVK PERFORMANCE. Use DxvkHostDominantBudgetStage/P95 together with producer fence/backpressure counters; change the intentional hold-copy pair only if measured commit/copy cost is material.",
+  "recorded_at_kst": "2026-09-29T19:15:09+09:00"
+}

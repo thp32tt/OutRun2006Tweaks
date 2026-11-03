@@ -1,0 +1,222 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00406",
+  "production_id": "CONVERSION-DXVK-00406",
+  "event_id": "CONVERSION-DXVK-00406-E003",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "5eb131f86bbec3e05154c32b2ec3eb1580c8d578",
+  "material_result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+  "validation_bearing_result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+  "result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+  "work_item": "DXVK_F139_CANONICAL_CONTROL_FLOW_0x183BC0_TO_0x183BFE",
+  "summary": "Exact-decoded the F138 0x00183BC0 canonical raw frontier through the last complete instruction at 0x00183BFC, proving 19 contiguous instructions. Internal JNE 0x00183BDE->0x00183BE4 is proven on an exact instruction boundary; external short branches 0x00183BE2->0x00183C27 and 0x00183BFC->0x00183C10 are carried as unresolved forward-target debt. Indirect CALL sites 0x00183BD3/0x00183BF1 remain semantically unresolved, raw rel32 census remains empty, and 0x00183BFE:ff 76 is preserved as the mandatory next overlap.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/test_dxvk_continuation_103_control_flow.py",
+    "tools/test_extract_dxvk_canonical_window.py",
+    ".github/workflows/dxvk-disasm-evidence.yml"
+  ],
+  "material_commit_messages": [
+    "dxvk: prove canonical 0x183bc0 control flow [AUTO:CONVERSION-DXVK-00406]",
+    "test(dxvk): guard F139 canonical control flow [AUTO:CONVERSION-DXVK-00406]",
+    "test(dxvk): advance frontier discovery to F139 cut [AUTO:CONVERSION-DXVK-00406]",
+    "ci(dxvk): gate F139 control-flow proof [AUTO:CONVERSION-DXVK-00406]"
+  ],
+  "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "static_evidence": {
+    "provenance_status": "EXACT_EXE_183BC0_TO_183C00_PROVENANCE_CAPTURED",
+    "control_flow_status": "EXACT_183BC0_TO_183BFE_CONTROL_FLOW_WITH_183BFE_CUT_EDGE_PROVEN",
+    "predecessor_status": "EXACT_183B83_TO_183BC0_CONTROL_FLOW_WITH_183BC0_CUT_EDGE_PROVEN",
+    "start_boundary_status": "F138_EXACT_183BC0_RAW_FRONTIER_CONSUMED_WITH_FULL_OVERLAP",
+    "start_rva": "0x00183BC0",
+    "prefix_end_rva": "0x00183BFE",
+    "capture_end_rva": "0x00183C00",
+    "instruction_count": 19,
+    "branch_targets": [
+      {
+        "branch_rva": "0x00183BDE",
+        "target_rva": "0x00183BE4",
+        "scope": "INTERNAL_EXACT_INSTRUCTION_BOUNDARY"
+      },
+      {
+        "branch_rva": "0x00183BE2",
+        "target_rva": "0x00183C27",
+        "scope": "EXTERNAL_UNRESOLVED_FORWARD_TARGET"
+      },
+      {
+        "branch_rva": "0x00183BFC",
+        "target_rva": "0x00183C10",
+        "scope": "EXTERNAL_UNRESOLVED_FORWARD_TARGET"
+      }
+    ],
+    "branch_targets_match": true,
+    "internal_branch_targets_on_exact_boundaries": true,
+    "inherited_unresolved_forward_targets": [],
+    "unresolved_forward_targets": [
+      "0x00183C10",
+      "0x00183C27"
+    ],
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "indirect_call_rvas": [
+      "0x00183BD3",
+      "0x00183BF1"
+    ],
+    "indirect_call_semantics": "UNRESOLVED",
+    "trailing_overlap_rva": "0x00183BFE",
+    "trailing_overlap_bytes": "ff 76",
+    "next_overlap_required": true,
+    "semantic_promotion": "NONE",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_MANDATORY_OVERLAP_ONLY",
+    "ownership_effect": "NONE",
+    "next_frontier_capture": {
+      "rva_start": "0x00183BFE",
+      "rva_end_exclusive": "0x00183C3E",
+      "length": 64,
+      "frontier_basis": "INCOMPLETE_RVA",
+      "frontier_continuation_id": 103,
+      "bytes_hex": "ff 76 10 57 ff 35 5c bc 98 00 ff 15 4c 61 59 00 eb d0 83 4e 08 ff 89 3e 89 7e 04 ff 05 44 bc 98 00 8b 46 10 83 08 ff 8b c6 5e 5f c3 55 8b ec 51 51 8b 4d 08 8b 41 08 53 56 8b 71 10 57 33 db eb",
+      "source_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7"
+    }
+  },
+  "local_validation": {
+    "environment": "N100 auxiliary access unavailable because the connected Remote Desktop Commander monthly tool-call quota was exhausted; device remains connected and this is not a source/CI blocker.",
+    "current_material_sha_local_validation": "NOT_PERFORMED",
+    "authority_note": "GitHub Actions exact-SHA validation is completion authority for this static DXVK work item."
+  },
+  "validation": {
+    "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+    "exact_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37279109889,
+      "job_id": 111662765838,
+      "conclusion": "success",
+      "continuation_window_tests": "6/6 PASS",
+      "f137_control_flow_tests": "8/8 PASS",
+      "f139_control_flow_tests": "8/8 PASS",
+      "extractor_tests": "39/39 PASS",
+      "analyzer_status": "SUCCESS",
+      "artifact_id": 11331318040,
+      "artifact_digest": "sha256:dbfaeff46b4b5ee69c95f1d00653ed3463ddc53eaed561094a4655f210272f15"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37279109854,
+      "job_id": 111662764755,
+      "conclusion": "success",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11331304087,
+      "artifact_digest": "sha256:15ad365c64a5d89eb3823852d251502708671c9c84740ac5c626f7770b10b7e3"
+    },
+    "runtime_validation": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered the current GitHub branch HEAD, AGENTS.md, backend review index, queue-controller contract, conversion-lane state, prior 00405 run record and Issue #14 ledger. Selected the durable F139 successor without modifying vr-d3d9ex-focus."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected only F139 exact control-flow proof over canonical 0x00183BC0..0x00183BFE, preserving external forward-target debt, indirect-call semantic quarantine and the trailing incomplete FF 76 cut."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added continuation 103 canonical provenance/control-flow proof, focused F139 regression coverage, frontier discovery advance and explicit DXVK canonical Actions coverage. All four material commits include [AUTO:CONVERSION-DXVK-00406] and no CI-skip directive."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 37279109889/111662765838 SUCCESS (6/6 continuation, 8/8 F137, 8/8 F139, 39/39 extractor, canonical analyzer success); Backend Conversion Gate 37279109854/111662764755 SUCCESS including Win32 Release build, dinput8.dll verification and artifact upload. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material SHA 818328d689f1ea6a858531d5b607b88f7388cdf7 is published on vr-dxvk-r71-disasm and contains the full F139 implementation/test/gate state."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static canonical disassembly/provenance/tool/test/workflow change only; no runtime DXVK payload, selector, deployment content or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "Durable run record, Issue #14 ledger comment 5990303647 and branch-local conversion state persist the F139 result, exact-SHA validation, successor frontier and RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "issue14_comment_id": 5990303647,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DXVK-00406",
+    "production_id": "CONVERSION-DXVK-00406",
+    "event_id": "CONVERSION-DXVK-00406-E003",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_ROLLOVER",
+    "material_result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+    "validation_bearing_result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+    "runtime_validation": "UNTESTED"
+  },
+  "follow_on_frontier": {
+    "next_action_kind": "DXVK_F140_CANONICAL_OVERLAP_PROVENANCE_0x183BFE_TO_0x183C3E",
+    "start_rva": "0x00183BFE",
+    "capture_end_rva": "0x00183C3E",
+    "probe_len": 64,
+    "required_complete_first_instruction_prefix": "ff 76",
+    "canonical_first_bytes": "ff 76 10",
+    "inherited_unresolved_forward_targets": [
+      "0x00183C10",
+      "0x00183C27"
+    ],
+    "semantic_promotion": "NONE",
+    "ownership_effect": "NONE",
+    "runtime_validation": "UNTESTED"
+  },
+  "exact_next_action": "Use the exact canonical 64-byte frontier capture 0x00183BFE..0x00183C3E to build F140 raw overlap provenance. Consume the inherited ff 76 cut only as the complete instruction once its full bytes are proven, carry unresolved forward targets 0x00183C10/0x00183C27 fail-closed, preserve raw rel32 census and any new trailing cut, and do not promote indirect-call/function/render/HUD/runtime semantics.",
+  "recorded_at_kst": "2026-10-05T16:47:44+09:00",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "dispatch_metadata_correction": {
+    "corrected_from": {
+      "task_id": "CONVERSION-DXVK-00406",
+      "production_id": "CONVERSION-DXVK-00406",
+      "event_id": "CONVERSION-DXVK-00406-E001",
+      "event_type": "dispatch",
+      "attempt": "1/3",
+      "source": "CURRENT_USER_DISPATCH",
+      "material_result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+      "validation_bearing_result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+      "runtime_validation": "UNTESTED"
+    },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00406",
+      "production_id": "CONVERSION-DXVK-00406",
+      "event_id": "CONVERSION-DXVK-00406-E003",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+      "validation_bearing_result_sha": "818328d689f1ea6a858531d5b607b88f7388cdf7",
+      "runtime_validation": "UNTESTED"
+    },
+    "authority": "LATEST_EXPLICIT_USER_DISPATCH",
+    "reason": "CONVERSION-DXVK-00406-E003 is a chat rollover, not a retry. ATTEMPT remains 1/3. Completed F139 material/result SHA, exact-SHA validation evidence, successor frontier, and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true,
+    "reconciled_at_kst": "2026-10-05T16:53:00+09:00"
+  },
+  "reconciled_at_kst": "2026-10-05T16:53:00+09:00"
+}

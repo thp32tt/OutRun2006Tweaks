@@ -1,0 +1,73 @@
+{
+  "task_id": "CONVERSION-DXVK-00101",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 1,
+  "base_sha": "a28e6c2423fff871b0f76a3af7e73342319a6b45",
+  "result_sha": "85936507d864ce0e5063d4e3f4b63135c31e35f3",
+  "validation_bearing_result_sha": "85936507d864ce0e5063d4e3f4b63135c31e35f3",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R122_C2CTESTSLIPSTREAM_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04/F13 for the single exact C2CTestSlipstream caller 0xBD32E. The pre-existing right-side AddSpriteSpacing correction is preserved, while the immediate next-draw ScreenHud owner now derives from GameSemantic::ClassifyCriticalProducer(CallerRva) and compile-time fails closed if that exact caller leaves the canonical ScreenHud producer range. No producer range or unrelated HUD/world/stereo path was widened.",
+  "evidence": [
+    "0xBD32E lies inside the canonical C2CTestSlipstream SCREEN_HUD range 0xBD2E0-0xBD360.",
+    "hooks_uiscaling.cpp preserves AddSpriteSpacing((int*)(ctx.esp + 4), false) before arming the next draw with the shared producer-map result.",
+    "render_semantics.hpp compile-time asserts ClassifyCriticalProducer(0x000BD32E) == RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires the exact R122 callback/marker and rejects regression to the legacy spacing-only callback.",
+    "Validation-bearing source result 85936507d864ce0e5063d4e3f4b63135c31e35f3 contains [AUTO:CONVERSION-DXVK-00101] and no CI-skip directive.",
+    "Backend Conversion Gate workflow #320 is the latest vr-dxvk-r71-disasm run for commit 8593650 and the branch workflow badge reports passing.",
+    "Build 36646674960 PASS.",
+    "OpenXR VR architecture 36646675095 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36646675031 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push workflow #67 is the current 8593650 run and the branch badge reports passing; PR workflow #68 / run 36646674956 PASS.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "85936507d864ce0e5063d4e3f4b63135c31e35f3",
+      "message": "vr: route slipstream HUD through shared producer map [AUTO:CONVERSION-DXVK-00101]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_workflow_number": 320,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_evidence": "Latest workflow page entry is commit 8593650; branch badge=passing",
+    "build_run_id": 36646674960,
+    "build_result": "PASS",
+    "openxr_run_id": 36646675095,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36646675031,
+    "hud_result": "PASS",
+    "hosted_package_push_workflow_number": 67,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_workflow_number": 68,
+    "hosted_package_pr_run_id": 36646674956,
+    "hosted_package_pr_result": "PASS"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5901180071,
+    "validation_comment_id": 5901325351
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_GOALTIME_EXACT_EDGES",
+    "after": "PARTIAL_PLUS_C2CTESTSLIPSTREAM_EXACT_EDGE",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded C2CTestSlipstream F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "Continue F13 only with another independently proven canonical producer family. The three exact C2CDontLoseGF warning HUD callsites 0xBD397/0xBD414/0xBD472 are a bounded next candidate; preserve their existing spacing behavior, do not widen shared producer ranges, and keep runtime validation separate."
+}

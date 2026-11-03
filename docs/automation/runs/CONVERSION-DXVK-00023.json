@@ -1,0 +1,81 @@
+{
+  "task_id": "CONVERSION-DXVK-00023",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "c44a36d7405a7af6e54ace5fb4e35e4d470ae9d6",
+  "result_sha": "45e13a807c2deea6d66987331a9ca5dc32bf19a5",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-ONE-CLICK-BEHAVIORAL-CI",
+  "summary": "Closed Set 09 F35 for the DXVK one-click path by adding executable behavior tests for preflight identity/slot precedence/provider metadata and launcher target-lock, and by extending the existing selector transaction test with a successful dxvk-safe post-selection root-attestation path. Structural text checks remain, but the critical DXVK one-click identity/mutation boundaries are now behavior-tested.",
+  "changed_paths": [
+    "tools/Test-OutRunVROneClickBehavior.ps1",
+    "tools/Test-BackendSelectorTransaction.ps1",
+    "tools/Test-VROneClickContract.ps1",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "review": {
+    "architecture": "The task adds CI behavior coverage around existing one-click/preflight/selector production code; it does not alter production launch/selection behavior.",
+    "ownership_lifetime": "Existing selector transaction rollback remains authoritative for partial mutation. New successful selection coverage verifies post-mutation root attestation is embedded into the prepared session.",
+    "stereo_correctness": "No renderer/stereo/HUD/menu/effect path changed.",
+    "performance": "No runtime hot path changed; tests execute only in hosted CI.",
+    "adversarial": "Fixtures deliberately re-seal package hashes before slot/provider/package mismatch cases so the intended identity gate, not the preceding package-integrity gate, is what rejects each case. Target-lock uses throwing stubs to prove rejection happens before selector/preflight/runner execution."
+  },
+  "behavior_verified": [
+    "Valid synthetic dxvk-safe package passes actual Test-OutRunVROneClickPreflight.ps1 with PackageIntegrity.Verified=true and matching target SlotPayload.",
+    "Resealed target slot with mismatched dinput8.dll is rejected by One-click slot payload mismatch rather than package-integrity mismatch.",
+    "Resealed BUILD_INPUTS IntegrationSha mismatch is rejected by Package source mismatch.",
+    "Resealed DXVK_D3D9_SHA256 metadata mismatch is rejected by DXVK provider hash gate.",
+    "Invoke-OutRunVROneClick.ps1 rejects wrong backend before stub preflight/selector/runner can execute.",
+    "Invoke-OutRunVROneClick.ps1 rejects wrong variant before stub preflight/selector/runner can execute.",
+    "Successful dxvk-safe selector execution persists matching dinput8/host/d3d9 ROOT_PAYLOAD_ATTESTATION.json, embeds that attestation in CURRENT_VR_SESSION.json, and leaves multiviewpatcher.dll absent.",
+    "Existing selector behavior test still proves injected post-attestation failure restores prior mutable root state and records pre-session failure evidence."
+  ],
+  "regression_revalidation": [
+    "VR_BACKEND_100_REVIEW_SET_09:F35 is closed for the DXVK one-click path only; no cross-backend closure claim is made.",
+    "VR-DXVK-D3D9EX-SHARED-HANDLE-001 remains OPEN_USER_RUNTIME_VERIFIED_FAILURE because no Quest3/VDXR game run occurred.",
+    "Startup/stereo/frame-stability runtime invariants are unaffected because no production renderer/host/selector/launcher behavior changed."
+  ],
+  "evidence": [
+    "C0 recovered GitHub HEAD c44a36d7405a7af6e54ace5fb4e35e4d470ae9d6, AGENTS.md, 100-review index/Set09/Set10, QUEUE_CONTROLLER_CONTRACT.md, automation state, CONVERSION-DXVK-00021 and production/runtime ledgers. N100/local clone was not used.",
+    "Set 09 F35 was the highest-priority remaining DXVK software-only validation gap after F34 closure; host-owned transport success remains BLOCKED_RUNTIME.",
+    "Backend Conversion Gate 36475255748 PASS on exact source SHA 45e13a807c2deea6d66987331a9ca5dc32bf19a5. New 'Test DXVK one-click behavior' PASS, one-click structure PASS, package integrity PASS, analyzer/provider/synchronization contracts PASS, pinned acquisition PASS, Win32 build and binary verification PASS.",
+    "Build 36475262987 PASS on exact source SHA 45e13a807c2deea6d66987331a9ca5dc32bf19a5.",
+    "OpenXR VR architecture 36475262975 PASS on exact source SHA 45e13a807c2deea6d66987331a9ca5dc32bf19a5 across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36475262962 PASS on exact source SHA 45e13a807c2deea6d66987331a9ca5dc32bf19a5.",
+    "PC Fast 36475255833 skipped as required for scheduled automation.",
+    "Backend artifact 10993776318 digest sha256:0a7ca2b0402c411a14e1020558da3c76e0186276feacabd79d98409c0775f52a.",
+    "OpenXR host artifact 10993052394 digest sha256:1369757d561022ea44d35f7bd6d6646b36f8dbd4cb464441f9e3710771e368dc.",
+    "HUD inspector artifact 10992848157 digest sha256:f0b475f251565e70879a7f9bb52e9c2a050b9520b58305f50663214e74285732.",
+    "Issue #14 implementation comment 5877344739 and validation comment 5877447944 record the production transaction."
+  ],
+  "completed_work_items": [
+    "DXVK-ONE-CLICK-BEHAVIORAL-CI"
+  ],
+  "blocked_runtime_items": [
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY",
+    "DXVK-EXACT-BUILD-VISUAL-PARITY-GATE"
+  ],
+  "next_action": "DXVK software-only one-click F34/F35 gaps are now closed on this branch. The highest-priority DXVK verdict remains an exact-build Quest 3/VDXR runtime test. Require PackageIntegrity.Verified=true and BuildIdentityVerified=true, then evaluate DxvkHostDirectPathActive, DirectFrames, fallbacks, same-scene XR pacing and visual/startup/recenter regressions before any promotion.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36475255748,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36475262987,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36475262975,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36475262962,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36475255833,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 10993776318,
+    "backend_gate_artifact_digest": "sha256:0a7ca2b0402c411a14e1020558da3c76e0186276feacabd79d98409c0775f52a",
+    "openxr_host_artifact_id": 10993052394,
+    "openxr_host_artifact_digest": "sha256:1369757d561022ea44d35f7bd6d6646b36f8dbd4cb464441f9e3710771e368dc",
+    "hud_inspector_artifact_id": 10992848157,
+    "hud_inspector_artifact_digest": "sha256:f0b475f251565e70879a7f9bb52e9c2a050b9520b58305f50663214e74285732"
+  },
+  "recorded_at_kst": "2026-09-29T04:59:00+09:00"
+}

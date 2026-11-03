@@ -1,0 +1,102 @@
+{
+  "task_id": "CONVERSION-DXVK-00133",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 1,
+  "base_sha": "fa0fc50548ba520c01057061a6989df91e2184a0",
+  "result_sha": "f98502b17e47f6bbd82688e2e6d36013b4917698",
+  "validation_bearing_result_sha": "f98502b17e47f6bbd82688e2e6d36013b4917698",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R138_TARGET_65860_EXACT_CALL_ALIGNMENT",
+  "summary": "Completed the bounded exact-EXE instruction-alignment proof for guarded-GF target B. CI verifies a contiguous manually reviewed prefix at 0x65860, exact byte identity, function-start guess 0x65860, and an instruction-aligned CALL at 0x65874 resolving to 0x285A0 in .text. This is provenance only: helper semantics remain UNRESOLVED, ownership_effect remains NONE, and all five guarded GF hooks remain spacing-only.",
+  "evidence": [
+    "CONVERSION-DXVK-00131 established target B 0x65860 with raw outbound candidate 0x65874->0x285A0 but explicitly left instruction alignment unproven.",
+    "Result commit f98502b17e47f6bbd82688e2e6d36013b4917698 adds the exact-byte/manual-decode alignment guard and verifier markers without changing runtime renderer, transport or semantic ownership.",
+    "OutRun EXE HUD Inspector CI 36722279530 PASS. static-exe-analysis printed known_call_sites=9/9 and guarded_gf_targets=3/3.",
+    "Exact analyzer output: gf_target_alignment=0x00065860 status=EXACT_PREFIX_CALL_ALIGNMENT_PROVEN start_guess=0x00065860 layout_contiguous=True bytes_match=True call=0x00065874 target=0x000285A0 target_section=.text semantic_effect=UNRESOLVED.",
+    "HUD analysis artifact 11101835396 digest sha256:aacce22f2102692b5b8e7e84a29d04a524135ee900c7bcb09756568d625bb7b1.",
+    "HUD inspector game artifact 11102316120 digest sha256:fe28bfdee726e45338f510c63b72963c988616427b13bbd245af7775530ae902.",
+    "Backend Conversion Gate 36722273623 PASS; artifact 11101701392 digest sha256:5d983c7f5d8e97a355cf62525c48f4e1fa4e3145ea9a4dbb68661349d9e4feb6.",
+    "Build 36722279550 PASS; main artifact 11101526343 digest sha256:d1f0924a3b87220a93b5010df208c345a842cab27783940563347e40c465ee21.",
+    "OpenXR VR architecture 36722279557 PASS across all six jobs.",
+    "VR Hosted Test Package push 36722273546 PASS; artifact 11102511195 digest sha256:49c0b59650248f76f4897e2358b5e5a6bea00544cc75faab4aed43a99d6c2ebb.",
+    "VR Hosted Test Package PR 36722279551 PASS; artifact 11102051439 digest sha256:fa5bfa0210c40f09ec316d9275fee2ccec79908b4fd8c2ebd335ad79550354a1.",
+    "VR PC Fast Test Build 36722273641 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00133.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "f98502b17e47f6bbd82688e2e6d36013b4917698",
+      "message": "vr: prove guarded GF target B call alignment [AUTO:CONVERSION-DXVK-00133]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "target_b_alignment_proof": {
+    "entry_rva": "0x00065860",
+    "status": "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN",
+    "function_start_guess_rva": "0x00065860",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "aligned_call_rva": "0x00065874",
+    "decoded_call_target_rva": "0x000285A0",
+    "call_target_section": ".text",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "validation": {
+    "backend_conversion_gate_run_id": 36722273623,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11101701392,
+    "backend_conversion_gate_artifact_digest": "sha256:5d983c7f5d8e97a355cf62525c48f4e1fa4e3145ea9a4dbb68661349d9e4feb6",
+    "build_run_id": 36722279550,
+    "build_result": "PASS",
+    "build_artifact_id": 11101526343,
+    "build_artifact_digest": "sha256:d1f0924a3b87220a93b5010df208c345a842cab27783940563347e40c465ee21",
+    "openxr_run_id": 36722279557,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36722279530,
+    "hud_result": "PASS",
+    "hud_analysis_artifact_id": 11101835396,
+    "hud_analysis_artifact_digest": "sha256:aacce22f2102692b5b8e7e84a29d04a524135ee900c7bcb09756568d625bb7b1",
+    "hud_game_artifact_id": 11102316120,
+    "hud_game_artifact_digest": "sha256:fe28bfdee726e45338f510c63b72963c988616427b13bbd245af7775530ae902",
+    "hosted_package_push_run_id": 36722273546,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_push_artifact_id": 11102511195,
+    "hosted_package_push_artifact_digest": "sha256:49c0b59650248f76f4897e2358b5e5a6bea00544cc75faab4aed43a99d6c2ebb",
+    "hosted_package_pr_run_id": 36722279551,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_pr_artifact_id": 11102051439,
+    "hosted_package_pr_artifact_digest": "sha256:fa5bfa0210c40f09ec316d9275fee2ccec79908b4fd8c2ebd335ad79550354a1",
+    "pc_fast_run_id": 36722273641,
+    "pc_fast_result": "SKIPPED"
+  },
+  "review_lenses": {
+    "architecture": "Exact-EXE alignment proof stays isolated in analyzer/verifier tooling; backend activation and transport are unchanged.",
+    "ownership": "All five guarded GF hooks remain spacing-only; semantic_effect is UNRESOLVED and ownership_effect is NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification or stereo render policy changed.",
+    "performance": "No game/host runtime hot path or telemetry was added.",
+    "adversarial": "The proof fails closed on reviewed byte drift, non-contiguous layout, entry-guess mismatch, E8 position/opcode drift, decoded target drift or unmapped target section."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_GUARDED_GF_TARGET_FUNCTION_FINGERPRINT_CENSUS",
+    "after": "PARTIAL_PLUS_TARGET_65860_EXACT_CALL_ALIGNMENT",
+    "runtime_claim": false
+  },
+  "blocker": "Instruction alignment for 0x65874->0x285A0 is now proven, but the helper at 0x285A0 has not been semantically identified and this does not establish immediate next-draw or ScreenHud ownership. Target C at 0x65970 and the true entry/context around 0x653C0 remain unresolved.",
+  "next_action": "Keep all five guarded GF hooks spacing-only. Continue a later bounded F13 task with instruction-aligned control-flow proof for target C 0x65970 and its outbound targets 0x28460/0x28320/0x28800, then independently resolve the true entry/context around 0x653C0. Keep runtime validation separate from hosted CI."
+}

@@ -1,0 +1,93 @@
+{
+  "task_id": "CONVERSION-DXVK-00083",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 0,
+  "base_sha": "a7d18f2e3df2da2815ff655a550b7c3202292e00",
+  "result_sha": "4c847161ee0e931ac50a74263c5b92a67e47e715",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_STEREO_FACADE_MODULARIZATION_PHASE13_R23",
+  "summary": "Completed F04 phase 13 by extracting the unchanged R23/R25 recovery, first-seed and final Present ownership body into include-free stereo_renderer_r23_overlay.inc and changing the default production stereo facade to compose R22 plus the R23/R26/R29-R34 overlays directly. Historical R23 and later wrappers remain compatibility/build-graph owners; diagnostic comparison branches are unchanged. Startup-white/recovery verifier ownership moved to the overlay without changing runtime logic.",
+  "evidence": [
+    "CONVERSION-DXVK-00081 explicitly left R23 -> R22 as the next bounded F04 source-graph candidate.",
+    "Base a7d18f2e3df2da2815ff655a550b7c3202292e00 stereo_renderer_r23.cpp content from namespace OutRunVRStereo through EOF equals result stereo_renderer_r23_overlay.inc after CRLF/LF and terminal-newline normalization: 863 lines / 38472 characters.",
+    "Architecture verification now checks stereo_renderer_r23.cpp only for R22 + overlay compatibility composition and checks R23 recovery/first-seed/final-Present startup-white invariants directly in stereo_renderer_r23_overlay.inc.",
+    "Backend Conversion Gate 36618459844 PASS on exact result SHA, including queue/baseline/one-click/package integrity/DXVK behavior/disassembly/facade phase-13/semantic/session/shared-handle/host-owned-transport/pinned-acquisition/SAFE/recenter checks plus Win32 build, binary verification, and artifact upload.",
+    "Build 36618466282 PASS.",
+    "OpenXR VR architecture 36618466378 PASS across host-x64 and all five Win32 game/comparison jobs.",
+    "OutRun EXE HUD Inspector CI 36618466292 PASS after rerunning only build-hud-inspector. Its first attempt failed during actions/checkout because external/xxHash could not connect to github.com:443; no source/build step had run. The retry on unchanged source passed checkout/configure/build/staging/artifact upload. static-exe-analysis passed on the original attempt.",
+    "VR Hosted Test Package 36618466398 (PR) PASS and 36618459912 (push) PASS.",
+    "VR PC Fast Test Build 36618459778 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d9/stereo_pipeline.cpp",
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py",
+    "tools/verify_vr_r32_review.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "4c847161ee0e931ac50a74263c5b92a67e47e715",
+      "message": "Extract R23 stereo recovery overlay from production facade [AUTO:CONVERSION-DXVK-00083]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36618459844,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36618466282,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36618466378,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36618466292,
+    "hud_result": "PASS",
+    "hud_initial_infrastructure_failure": "actions/checkout external/xxHash fetch failed to connect to github.com:443; failed job only rerun on unchanged source",
+    "hosted_package_pr_run_id": 36618466398,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36618459912,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36618459778,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5897033854,
+    "issue_14_validation_comment_id": 5897150392
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "note": "Source-graph and verifier ownership changed only. Exact-source equivalence, startup-white structural checks, hosted compile/architecture/package guards passed. No runtime-visible correctness or performance claim is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C0_READ_AGENTS_REVIEW_INDEX_QUEUE_CONTRACT_AND_STATE",
+    "C1_CONFIRM_F04_PHASE13_FROM_PRIOR_NEXT_ACTION",
+    "C2_EXTRACT_R23_OVERLAY_AND_FLATTEN_STEREO_FACADE",
+    "C3_EXACT_SOURCE_EQUIVALENCE_PASS",
+    "C3_STARTUP_WHITE_AND_RECOVERY_GUARD_OWNER_MOVED_TO_OVERLAY",
+    "C4_VALIDATION_BEARING_RESULT_COMMIT",
+    "C5_EXACT_SHA_AUTOMATION_VALIDATION_PASS",
+    "C5_HUD_INFRASTRUCTURE_RETRY_PASS",
+    "C6_STATE"
+  ],
+  "automatic_repairs_used": 0,
+  "infrastructure_retries": 1,
+  "blocker": "No software blocker remains for F04 phase 13. Runtime correctness remains unverified because no Quest3/VDXR or in-game test was performed.",
+  "next_action": "Treat the next deeper stereo historical include edge R22 -> R21 as a separate bounded F04 task. Preserve StateBlock/shadow-state/reset/startup/recovery invariants and diagnostic comparison paths, require exact-SHA automated validation, and do not claim runtime correctness without Quest3/VDXR evidence."
+}

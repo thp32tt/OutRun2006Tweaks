@@ -1,0 +1,86 @@
+{
+  "task_id": "CONVERSION-DXVK-00037",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "36a98f334916d10e9698130e21a69d0b34d0b907",
+  "result_sha": "ebb37652f034746fa1c264133e9f5063fdb6e39e",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "L1-VIS-002-SKYGLOW-PRE-HUD-COMPOSITE",
+  "summary": "Moved stereo SkyGlow additive composite to the first recognized HUD/non-world XYZRHW boundary so glow no longer overlays already-drawn UI at Present. Added applied/pre-HUD-attempt epochs and fail-dark behavior for failed pre-HUD attempts. Preserved blur source selection and intensity.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_semantic_catalog.py"
+  ],
+  "source_commits": [
+    "f8be7a46f00c5dbe1f281098a2c042bc5647b937",
+    "ebb37652f034746fa1c264133e9f5063fdb6e39e"
+  ],
+  "failure_context": {
+    "initial_validation_run_id": 36514602393,
+    "failure": "Verify VR semantic catalog failed with UnboundLocalError because the new SkyGlow marker block used r30_source before it was initialized.",
+    "repair_commit": "ebb37652f034746fa1c264133e9f5063fdb6e39e",
+    "repair": "Moved the existing R30 source load before the SkyGlow contract checks. No production SkyGlow behavior changed by the repair.",
+    "final_validation_run_id": 36514745469,
+    "final_result": "PASS"
+  },
+  "behavior_verified": [
+    "R30ApplyStereoSkyGlow records R30SkyGlowAppliedEpoch on successful stereo glow application.",
+    "R30CompositeSkyGlowBeforeHud records R30SkyGlowPreHudAttemptEpoch before capture/apply.",
+    "Non-world XYZRHW path invokes R30CompositeSkyGlowBeforeHud before the draw.",
+    "Recognized HUD screen-space path invokes R30CompositeSkyGlowBeforeHud before the draw.",
+    "Present fallback requires both AppliedEpoch and PreHudAttemptEpoch to differ from the current PresentEpoch.",
+    "Reset clears scene-capture, applied and pre-HUD-attempt epochs.",
+    "Horizontal blur still writes reduced from temp; optional vertical pass writes temp from reduced; composite source remains the most recently produced texture.",
+    "Composite strength remains 0.38."
+  ],
+  "protected_invariants": [
+    "CONVERSION-DXVK-00035 exact queue HUD/WORLD_BILLBOARD c64 ownership remains present.",
+    "VR-R50-WORLD-STEREO-PRESERVE-001 requires HMD revalidation.",
+    "No generic ScreenOverlay2D ownership widening.",
+    "No DXVK provider/transport/OpenXR/cadence change."
+  ],
+  "evidence": [
+    "C0 recovered current GitHub HEAD 36a98f334916d10e9698130e21a69d0b34d0b907, AGENTS.md, review index, queue contract/state, CONVERSION-DXVK-00035, regression registry and Issues #13/#14. N100/local clone was not used.",
+    "Issue #13 already contained stable regression key DX9EX-SKYGLOW-HUD-COMPOSITE-ORDER-001 with the same bounded cause and user visual symptoms.",
+    "Current DXVK stereo_renderer_r30.cpp had the same ordering defect: pre-HUD capture but additive R30ApplyStereoSkyGlow at Present.",
+    "Backend Conversion Gate 36514745469 PASS on exact source SHA ebb37652f034746fa1c264133e9f5063fdb6e39e.",
+    "Build 36514749636 PASS on exact source SHA ebb37652f034746fa1c264133e9f5063fdb6e39e.",
+    "OpenXR VR architecture 36514749555 PASS across all six jobs on exact source SHA.",
+    "HUD Inspector 36514749597 PASS on exact source SHA.",
+    "PC Fast 36514745299 skipped as required for scheduled automation.",
+    "Backend artifact 11010856059 digest sha256:d9e43ca9b66ff61565f1b4669e0bfc458ef909a7b052b3e5963881ea338a6f76.",
+    "OpenXR host artifact 11009359452 digest sha256:fe3d7e2e23e6880e6de97243d890183161f3fe85bc9134c531ec2c90e25a2d49.",
+    "HUD Inspector artifact 11010806209 digest sha256:4debb469bccfc3ed74e57a2a2673fff48ebbe8d1f533cb1b8588f252b63109dd.",
+    "Issue #14 implementation comment 5882728019 and validation comment 5882815529 record the transaction."
+  ],
+  "completed_work_items": [
+    "L1-VIS-002-SKYGLOW-PRE-HUD-COMPOSITE"
+  ],
+  "blocked_runtime_items": [
+    "L1-VIS-002-SKYGLOW-QUEST3-VDXR-VALIDATION",
+    "L1-VIS-001-R51-WHITE-HUD-QUEST3-VDXR-VALIDATION",
+    "VR-R50-WORLD-STEREO-PRESERVE-001-REVALIDATION"
+  ],
+  "next_action": "Quest3/VDXR exact-build CORRECTNESS test of ebb37652f034746fa1c264133e9f5063fdb6e39e. Verify sky/cloud detail and haze, HUD/menu opacity, cumulative white-HUD behavior from CONVERSION-DXVK-00035, protected road/background/vehicle stereo, startup and recenter. Do not tune SkyGlow strength unless ordering passes but brightness remains wrong.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36514745469,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36514749636,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36514749555,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36514749597,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36514745299,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 11010856059,
+    "backend_gate_artifact_digest": "sha256:d9e43ca9b66ff61565f1b4669e0bfc458ef909a7b052b3e5963881ea338a6f76",
+    "openxr_host_artifact_id": 11009359452,
+    "openxr_host_artifact_digest": "sha256:fe3d7e2e23e6880e6de97243d890183161f3fe85bc9134c531ec2c90e25a2d49",
+    "hud_inspector_artifact_id": 11010806209,
+    "hud_inspector_artifact_digest": "sha256:4debb469bccfc3ed74e57a2a2673fff48ebbe8d1f533cb1b8588f252b63109dd"
+  },
+  "recorded_at_kst": "2026-09-29T12:01:00+09:00"
+}

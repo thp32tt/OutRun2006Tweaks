@@ -1,0 +1,98 @@
+{
+  "task_id": "CONVERSION-DXVK-00093",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 0,
+  "base_sha": "d5ee3c0bb29177d8a7bae1a4d4e2f900c9dd32a2",
+  "result_sha": "31b510e2ea678ba834fa36285e6f213beb0aa30b",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_STEREO_FACADE_MODULARIZATION_PHASE18_CLOSURE",
+  "summary": "Closed Set 01 F04 at the software/source-graph level after a bounded five-lens review. Added fail-closed guards that pin the default production stereo facade to exactly one canonical stereo_renderer.cpp floor (R9 over stereo_renderer_r7.inc), reject historical R13-R34 wrapper re-entry below that floor, and keep Safe/C1/C2/R26-HUD diagnostic owners isolated. Updated the review index and durable closure review. No runtime rendering source was changed.",
+  "evidence": [
+    "Production include-graph lens: default stereo_pipeline.cpp directly composes r13_bridge.hpp + stereo_renderer.cpp + include-free R13/R20/R21/R22/R23/R26/R29-R34 overlays and contains no historical stereo_renderer_rNN.cpp wrapper.",
+    "Translation-unit lens: cmake.toml/CMakeLists.txt retain R70 production ownership on stereo_pipeline.cpp while legacy owners are HEADER_FILE_ONLY after R70 ownership is applied.",
+    "Diagnostic lens: Safe/C1/C2/R26-HUD comparison TUs intentionally retain historical chains behind explicit comparison branches; phase-18 guard rejects those diagnostic owners from the production branch.",
+    "Verifier lens: canonical stereo_renderer.cpp must include stereo_renderer_r7.inc exactly once, expose R9 structural markers, and contain no R13-R34 wrapper include; proven-baseline verification adds P11_R70_STEREO_CANONICAL_BASE_FLOOR.",
+    "Regression lens: canonical R9/R7 is intentionally not flattened; no Reset/Present/draw/transport/HUD/cadence/OpenXR runtime policy changed.",
+    "Backend Conversion Gate 36635766920 PASS on exact result SHA.",
+    "Build 36635771317 PASS.",
+    "OpenXR VR architecture 36635771313 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36635771206 PASS.",
+    "VR Hosted Test Package 36635771345 (PR) PASS and 36635767082 (push) PASS.",
+    "VR PC Fast Test Build 36635767045 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py",
+    "docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md",
+    "docs/reviews/VR_BACKEND_F04_CLOSURE_20260930.md"
+  ],
+  "source_commits": [
+    {
+      "sha": "31b510e2ea678ba834fa36285e6f213beb0aa30b",
+      "message": "Close F04 stereo facade structure debt [AUTO:CONVERSION-DXVK-00093]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36635766920,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36635771317,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36635771313,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36635771206,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36635771345,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36635767082,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36635767045,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5899657316,
+    "issue_14_validation_comment_id": 5899785953
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_01:F04",
+    "before": "OPEN",
+    "after": "CLOSED_SOFTWARE_SOURCE_GRAPH",
+    "runtime_claim": false
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001",
+      "VR-DXVK-D3D9EX-SHARED-HANDLE-001"
+    ],
+    "note": "F04 closure is structural only. Existing runtime-visible regressions and DXVK performance/DirectGPU verdicts remain HMD-gated."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C0_READ_AGENTS_REVIEW_INDEX_QUEUE_CONTRACT_AND_STATE",
+    "C1_F04_CLOSURE_REVIEW_INCLUDE_GRAPH",
+    "C1_F04_CLOSURE_REVIEW_TRANSLATION_UNIT_OWNERSHIP",
+    "C1_F04_CLOSURE_REVIEW_DIAGNOSTIC_ISOLATION",
+    "C1_F04_CLOSURE_REVIEW_VERIFIER_COVERAGE",
+    "C1_F04_CLOSURE_REVIEW_REGRESSION_BOUNDARY",
+    "C2_ADD_F04_CANONICAL_BASE_CLOSURE_GUARDS",
+    "C3_EXACT_SHA_AUTOMATION_VALIDATION_PASS",
+    "C4_VALIDATION_BEARING_RESULT_COMMIT",
+    "C6_STATE"
+  ],
+  "automatic_repairs_used": 0,
+  "infrastructure_retries": 0,
+  "blocker": "No software blocker remains for F04. Runtime-visible DXVK DirectGPU/performance correctness remains unverified because no Quest3/VDXR or in-game test was performed.",
+  "next_action": "Do not continue facade flattening below canonical stereo_renderer.cpp/R9/R7. The highest-priority remaining DXVK evidence gap is an exact-build Quest3/VDXR runtime test of the host-owned DirectGPU path and same-scene PERFORMANCE pacing. Automated software changes should not guess at copy/wait/cadence tuning without that evidence; if no HMD evidence is available, select a separate independent non-runtime DXVK finding from the remaining review sets."
+}

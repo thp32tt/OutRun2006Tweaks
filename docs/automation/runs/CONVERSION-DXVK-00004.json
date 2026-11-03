@@ -1,0 +1,49 @@
+{
+  "task_id": "CONVERSION-DXVK-00004",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "chat_rollover": 5,
+  "base_sha": "718aca2486857ae51da4e7797b1c5b3b9f38cb8f",
+  "result_sha": "f66e49fb170e685a852960c6bddd481734b34609",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "Recovered and continued the DXVK conversion chain without repeating completed work. F12, F01/F03, F06 and F07 remain closed. F15 is now also closed at the shared semantic-contract layer: SpacePolicy can represent ProjectedWorldMarker2D and ProjectedScreenEffect2D, the runtime RenderScope bridge is constexpr/static-asserted, HUD naming and the semantic verifier understand both classes, and no existing producer range was reclassified without new exact producer evidence. Exact-SHA Backend Conversion Gate 36397508347 passed on f66e49fb170e685a852960c6bddd481734b34609. No HMD/in-game runtime test was performed.",
+  "selected_work_item": "VR-BACKEND-F15-PROJECTED-SEMANTIC-EXPRESSIVENESS",
+  "evidence": [
+    "Recovered prior checkpoint ca2f312e16f23df24411c5bcd7171df2a26a3350; F12 and F01/F03 were already complete and were not repeated.",
+    "cf22ab5f52d51e1534e0cc77860e135b924d7ef6 through 8e79023010437940add6f944e1e00bcba37fc957 added selector transaction snapshot/restore plus Test-BackendSelectorTransaction.ps1 and gated that behavior test.",
+    "7cc3122551fdaf9dcb4ba0780c20f07d07060ff8 repaired the rollback CI harness without changing runtime rendering ownership.",
+    "8942b91615bcdc1cdd1933095ceb0104b6042a57 and 98f48acfb7ff5144f02fd232fedfaab4971a4460 preserve the transaction backup when rollback itself fails and guard that recovery contract.",
+    "992bc5a9b2101874e4fa787f9575d74bb064309f and d3b8ca75792a15e35bde98c239c7bf9ab7549db0 persist selector pre-session failures for process guard, pending-log archival, transaction snapshot, source resolution, and mutation/session setup with logs/_selector_failures plus root-sidecar fallback.",
+    "1515beef2d0c4f7b9b02c379f99def9181c5ad55 through 8f8595d0c2cc6db80afd89f0108b02438dd4e10e persist one-click PREFLIGHT failures before session creation, add root-sidecar fallback, and invalidate stale VR_ONE_CLICK_PREFLIGHT.json before a new validation.",
+    "Backend Conversion Gate 36396768691 on exact SHA 8f8595d0c2cc6db80afd89f0108b02438dd4e10e PASS: queue/baseline, one-click structure plus selector rollback diagnostic behavior test, disassembly/semantic gates, DXVK analyzer regression, pinned acquisition, Win32 configure/build, binary verification, and artifact upload all succeeded.",
+    "Artifact 10958453229: backend-autovalidated-vr-dxvk-r71-disasm-8f8595d0c2cc6db80afd89f0108b02438dd4e10e; digest sha256:eb0664bf837afe314b67f32d077626fdeee551988c8c1fccade8efcda5873f76.",
+    "Issue #14 comments 5866103349 and 5866197825 record the CHAT_DIRECT F06 hardening and F07 pre-session diagnostic production changes. The earlier 98f48ac gate was cancelled only because newer same-branch commits superseded it; the final exact-SHA gate above passed.",
+    "No N100 clone/worktree was used. No Quest 3, VDXR, HMD, or in-game runtime/visual validation was performed.",
+    "f66e49fb170e685a852960c6bddd481734b34609 closes Set 04 F15 expressiveness only: shared SpacePolicy gained ProjectedWorldMarker2D/ProjectedScreenEffect2D and a constexpr bridge to existing runtime RenderScope classes; the 25 reviewed producer ranges were deliberately left unchanged.",
+    "Backend Conversion Gate 36397508347 on exact SHA f66e49fb170e685a852960c6bddd481734b34609 PASS: queue/baseline, one-click contract/behavior, disassembly, semantic catalog including F15 projected-policy checks, DXVK analyzer regression, pinned acquisition, Win32 configure/build, binary verification and artifact upload succeeded.",
+    "Artifact 10958817307: backend-autovalidated-vr-dxvk-r71-disasm-f66e49fb170e685a852960c6bddd481734b34609; digest sha256:fc71b3fe4a6b2b9bbcf2a4f8f4638e15c2942989f6e3c0869255eccde72f1ed9.",
+    "Issue #14 comment 5866319287 records the F15 production semantic-contract change. No producer ownership was broadened and no runtime regression status changed."
+  ],
+  "completed_work_items": [
+    "DXVK-F12-DEVICE-RECREATION-REATTESTATION-RECOVERED",
+    "ONECLICK-F01-F03-PAYLOAD-IDENTITY-STRUCTURAL-SEAL",
+    "ONECLICK-F06-TRANSACTIONAL-ROLLBACK-BEHAVIOR-SEALED",
+    "ONECLICK-F07-PRESESSION-FAILURE-DIAGNOSTICS-SEALED",
+    "VR-BACKEND-F15-PROJECTED-SEMANTIC-EXPRESSIVENESS-SEALED"
+  ],
+  "open_work_items": [
+    "ONECLICK-S09-F31-F32-LAUNCH-HOST-DIAGNOSTIC-SURVIVABILITY",
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY",
+    "DXVK-CLEAN-PERFORMANCE-PROFILE"
+  ],
+  "next_action": "Next bounded software-only item is S09 F31/F32 launch-exception and stuck-host diagnostic survivability. Keep that separate from the already closed pre-session F07 boundary. DXVK clean performance profiling also remains open. Multiview promotion and any runtime-success claim remain blocked until exact-build Quest 3/VDXR two-pass visual parity is tested.",
+  "workflow_run_id": 36397508347,
+  "workflow_job_id": 108847539416,
+  "artifact_id": 10958817307,
+  "artifact_digest": "sha256:fc71b3fe4a6b2b9bbcf2a4f8f4638e15c2942989f6e3c0869255eccde72f1ed9",
+  "recovered_f12_workflow_run_id": 36392744533,
+  "recovered_f12_artifact_id": 10956634929,
+  "recorded_at": "2026-09-28T17:34:23+09:00"
+}

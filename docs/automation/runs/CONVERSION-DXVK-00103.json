@@ -1,0 +1,76 @@
+{
+  "task_id": "CONVERSION-DXVK-00103",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "98dc6483e38efb4e1959572731b01147ad590f65",
+  "result_sha": "ba8fc12252d1cfd1b48eede91e6e9035556c9dec",
+  "validation_bearing_result_sha": "ba8fc12252d1cfd1b48eede91e6e9035556c9dec",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R123_C2CDONTLOSEGF_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04/F13 for the three exact C2CDontLoseGF warning-HUD callsites 0xBD397/0xBD414/0xBD472. Existing right-side sprite-spacing correction is preserved, while immediate next-draw ScreenHud ownership derives from GameSemantic::ClassifyCriticalProducer(CallerRva) and compile-time fails closed if any exact caller leaves the canonical ScreenHud range. The generic spacing-only right callback was removed because these were its only remaining users. No producer range, world/stereo path or unrelated HUD family was widened.",
+  "evidence": [
+    "All three callsites lie inside canonical C2CDontLoseGF SCREEN_HUD range 0xBD360-0xBD500 in disasm_render_contract.hpp and the mechanically mirrored analyzer catalog.",
+    "hooks_uiscaling.cpp preserves AddSpriteSpacing((int*)(ctx.esp + 4), false) before the shared producer-map ownership handoff.",
+    "render_semantics.hpp compile-time asserts 0xBD397, 0xBD414 and 0xBD472 classify as RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires all three exact R123 template instantiations and rejects any remaining put_scroll_AdjustPositionRight legacy callback.",
+    "The same bounded pattern passed prior DX11 automation, but this DXVK result was independently validated on its own exact SHA.",
+    "Validation-bearing source result ba8fc12252d1cfd1b48eede91e6e9035556c9dec contains [AUTO:CONVERSION-DXVK-00103] and no CI-skip directive.",
+    "Backend Conversion Gate 36648733028 PASS; artifact 11069079363 digest sha256:f7667aacd47f635053822dc4e8028405ef7fed33577115b8fcc615c2ce708265.",
+    "Build 36648737728 PASS.",
+    "OpenXR VR architecture 36648737758 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36648737770 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push 36648732997 PASS and PR 36648737809 PASS.",
+    "VR PC Fast Test Build 36648732982 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "ba8fc12252d1cfd1b48eede91e6e9035556c9dec",
+      "message": "vr: route GF warning HUD through shared producer map [AUTO:CONVERSION-DXVK-00103]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36648733028,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11069079363,
+    "backend_conversion_gate_artifact_digest": "sha256:f7667aacd47f635053822dc4e8028405ef7fed33577115b8fcc615c2ce708265",
+    "build_run_id": 36648737728,
+    "build_result": "PASS",
+    "openxr_run_id": 36648737758,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36648737770,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36648732997,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36648737809,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36648732982,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5901433319,
+    "validation_comment_id": 5901503145
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_C2CTESTSLIPSTREAM_EXACT_EDGE",
+    "after": "PARTIAL_PLUS_C2CDONTLOSEGF_EXACT_EDGES",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded C2CDontLoseGF F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "Continue F13 only with another independently proven canonical producer family. Exact DispGearPosition/REV callsites 0xB9096/0xB90B3/0xB90F6 are a bounded candidate already validated on the DX11 lane; preserve their existing spacing behavior, do not widen shared producer ranges, and keep runtime validation separate."
+}

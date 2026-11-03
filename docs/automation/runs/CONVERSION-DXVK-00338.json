@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00338",
+  "production_id": "CONVERSION-DXVK-00338",
+  "event_id": "CONVERSION-DXVK-00338-E002",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "3963636327ec5e81feab774e1abcbe87547eafa4",
+  "result_sha": "9fc81f856d45413284586afe778b10585c98f9c7",
+  "validation_bearing_result_sha": "9fc81f856d45413284586afe778b10585c98f9c7",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "work_item": "DXVK_F105_CANONICAL_CONTROL_FLOW_0x183799_TO_0x1837D5",
+  "summary": "Exact-decoded 18 complete canonical instructions from the validated continuation_86 overlap at 0x00183799 through the 0x001837D5 cut edge. Proved three direct conditional branches, both raw rel32 candidates as aligned direct CALLs, exhaustive raw-call census, exact byte/layout continuity and predecessor overlap lineage. Preserved unresolved forward targets 0x001837E1/0x001837E4 fail-closed and the trailing FF 35 5C BC bytes at 0x001837D5 as the next mandatory overlap; function/render/HUD/runtime semantics remain unresolved.",
+  "review_lenses": {
+    "architecture": "Analyzer/test-only exact canonical control-flow evidence on isolated vr-dxvk-r71-disasm; no other backend lane modified.",
+    "ownership_lifetime": "No resource ownership, Reset, shared-handle, synchronization, fence, ACK or generation behavior changed; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD, marker, recenter, presentation or runtime visual behavior changed; runtime correctness is not claimed.",
+    "performance": "Offline analyzer/static evidence only; no runtime hot path, copies, waits, draws or frame-pacing behavior changed.",
+    "adversarial": "Proof fail-closes on exact predecessor provenance, mandatory overlap lineage, contiguous instruction bytes, direct branch/call targets, exhaustive raw-call census, exact cut-edge geometry and inherited unresolved-forward-target debt."
+  },
+  "evidence": {
+    "changed_paths": [
+      "tools/analyze_outrun_exe.py",
+      "tools/test_dxvk_continuation_86_control_flow.py"
+    ],
+    "material_commit_message": "dxvk: prove canonical 0x183799 control flow [AUTO:CONVERSION-DXVK-00338]",
+    "material_result_sha": "9fc81f856d45413284586afe778b10585c98f9c7",
+    "material_blob_sha": "3a17aee5197a88163a3f313210e40233ac9872f3",
+    "test_blob_sha": "334d559a9e45cb975fc8a92a20369b31ac418285",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "predecessor_provenance_status": "EXACT_EXE_183799_TO_1837D9_PROVENANCE_CAPTURED",
+    "control_flow_status": "EXACT_183799_TO_1837D5_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "start_rva": "0x00183799",
+    "prefix_end_rva": "0x001837D5",
+    "instruction_count": 18,
+    "direct_branches": [
+      "0x001837B5->0x001837E1",
+      "0x001837C4->0x001837E4",
+      "0x001837D3->0x001837E4"
+    ],
+    "direct_rel32_calls": [
+      "0x001837B7->0x0018377D",
+      "0x001837CB->0x001837E8"
+    ],
+    "raw_call_census_matches": true,
+    "unresolved_forward_targets": [
+      "0x001837E1",
+      "0x001837E4"
+    ],
+    "incomplete_rva": "0x001837D5",
+    "incomplete_bytes": "ff 35 5c bc",
+    "capture_edge_matches": true,
+    "local_rollover_validation": {
+      "py_compile": "success",
+      "targeted_raw_and_control_unittest": "5/5 pass",
+      "dxvk_unittest": "12/12 pass",
+      "backend_disassembly_contract": "success",
+      "canonical_analyzer_rc": 0,
+      "git_diff_check": "success"
+    },
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37168052607,
+      "job_id": 111335077259,
+      "conclusion": "success",
+      "exact_sha": "9fc81f856d45413284586afe778b10585c98f9c7",
+      "artifact_id": 11289707385,
+      "artifact_digest": "sha256:64d04ed998743251a157fdff80dfc9288fce09d1d535cf68743ea03a899363d5"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37168052597,
+      "job_id": 111335077311,
+      "conclusion": "success",
+      "exact_sha": "9fc81f856d45413284586afe778b10585c98f9c7",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11290412621,
+      "artifact_digest": "sha256:b1e24a880aef3f811e9d9a55a005a263cec42f19f0d9ed8e77f1f1cf7c6c1aa4"
+    },
+    "issue14_material_comment_id": 5975389021,
+    "issue14_validation_comment_id": 5975415812,
+    "semantic_promotion": "BOUNDED_CONTROL_FLOW_CALL_AND_CAPTURE_EDGE_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD 3963636327ec5e81feab774e1abcbe87547eafa4, branch-local lane state and durable 00336 record. Rollover preserved ATTEMPT=1/3. N100 retained the already-created 00338 material commit object; implementation was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected the branch-authoritative next action from 00336: exact-decode only complete canonical instructions from validated continuation_86 0x00183799..0x001837D9, prove aligned direct control flow, preserve trailing partial bytes and forward-target debt fail-closed."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Material result 9fc81f856d45413284586afe778b10585c98f9c7 adds exact continuation_86 instruction/branch/CALL proof, cut-edge preservation, analyzer report/guard wiring and regression tests."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Canonical EXE sha256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3 passed rollover local py_compile, targeted tests, DXVK unittest suite, backend disassembly contract and analyzer RC=0. Exact material SHA passed DXVK Canonical Disassembly Evidence 37168052607/111335077259 and Backend Conversion Gate 37168052597/111335077311 including Win32 build, binary verification and artifact upload. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material result 9fc81f856d45413284586afe778b10585c98f9c7 is published on vr-dxvk-r71-disasm with exact marker [AUTO:CONVERSION-DXVK-00338] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static canonical disassembly/analyzer/test evidence only; no runtime payload, selector, transport, deployment content or package identity changed. CI build artifacts are validation evidence, not HMD runtime validation."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "This schema-2 durable record captures the exact validated material SHA and current rollover dispatch. The following lane-state bookkeeping commit advances latest_durable_task to CONVERSION-DXVK-00338 while RESULT_SHA remains the validation-bearing material commit and RUNTIME_VALIDATION remains UNTESTED."
+    }
+  },
+  "blocker": null,
+  "next_action": "Capture the mandatory 64-byte canonical overlap at 0x001837D5..0x00183815 from the F105 cut edge. Require exact F105 predecessor proof plus inherited unresolved targets 0x001837E1/0x001837E4 fail-closed, then exact-decode only after provenance validation; keep function/render/HUD/runtime semantics unresolved.",
+  "exact_next_action": "Capture the mandatory 64-byte canonical overlap at 0x001837D5..0x00183815 from the F105 cut edge. Require exact F105 predecessor proof plus inherited unresolved targets 0x001837E1/0x001837E4 fail-closed, then exact-decode only after provenance validation; keep function/render/HUD/runtime semantics unresolved.",
+  "validated_at_kst": "2026-10-04T10:30:56+09:00",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00338",
+    "event_id": "CONVERSION-DXVK-00338-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "rollover_is_retry": false,
+  "material_origin_dispatch": {
+    "production_id": "CONVERSION-DX11-00337",
+    "event_id": "CONVERSION-DX11-00337-E003",
+    "event_type": "rollover",
+    "attempt": "1/3"
+  },
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt"
+}

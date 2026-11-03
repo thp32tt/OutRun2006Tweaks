@@ -1,0 +1,111 @@
+{
+  "task_id": "CONVERSION-DXVK-00137",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "c213dbac63d6255c24add7dccad6d596118f4307",
+  "result_sha": "72e8002cc2b578a2a2340ea130c68489193ff7e3",
+  "validation_bearing_result_sha": "72e8002cc2b578a2a2340ea130c68489193ff7e3",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "ISSUE_81_DXVK_P0_MENU_GAMEPLAY_CADENCE_SPLIT",
+  "summary": "Completed the analyzer-only P0 follow-up to the 2026-09-30 DXVK HMD performance failure. R23 pipeline cadence is split into pure MENU, pure GAMEPLAY, and MIXED_OR_UNKNOWN windows; mixed transition windows are excluded from phase averages, the legacy all-window XR-Hz remains compatibility-only, and repeated pure-gameplay cadence >=1.5x display period emits DXVK_GAMEPLAY_CADENCE_DEGRADED. No renderer, transport, cadence-control, copy, or OpenXR runtime policy changed.",
+  "repair_history": [
+    {
+      "repair_iteration": 1,
+      "result_sha": "a1764a8afa52b0143224aad2e17c6bf19e6080d2",
+      "validation_run_id": 36730773070,
+      "automation_validation": "FAIL",
+      "reason": "First within-attempt result was invalid: Backend Conversion Gate exposed a PowerShell parser failure caused by source corruption. This did not increment the controller ATTEMPT."
+    },
+    {
+      "repair_iteration": 2,
+      "result_sha": "72e8002cc2b578a2a2340ea130c68489193ff7e3",
+      "validation_run_id": 36731657965,
+      "automation_validation": "PASS",
+      "reason": "Corrected GitHub source passed the exact-SHA Backend Conversion Gate and all required companion gates. Controller ATTEMPT remains 1/3."
+    }
+  ],
+  "evidence": [
+    "GitHub Issue #81 records tested source d7017310 with ~90 Hz menu windows but ~29.57-31.52 ms gameplay XR intervals; the aggregate ~43 Hz metric masked the gameplay failure.",
+    "The corrected analyzer classifies R23 windows from actualSubmits first and requestedLayer second, so phase selection is explicit rather than inferred from frame time.",
+    "The regression fixture proves one pure MENU window, two pure GAMEPLAY windows, and one mixed transition window; the mixed window is excluded from pure phase averages.",
+    "Backend Conversion Gate 36731657965 PASS on exact result 72e8002c: queue/baseline, package integrity, DXVK one-click, backend disassembly, facade/semantic checks, DXVK analyzer, Test-AnalyzeOutRunVRSession.ps1, host-owned transport contract, DXVK acquisition/reactivation, recenter contract, Win32 configure/build, binary verification, and artifact upload all passed.",
+    "Build 36731664102 PASS, OpenXR VR architecture 36731664089 PASS, OutRun EXE HUD Inspector CI 36731664200 PASS, VR Hosted Test Package push 36731657753 PASS and PR 36731664483 PASS on the same result SHA.",
+    "Backend Gate artifact 11104434718: backend-autovalidated-vr-dxvk-r71-disasm-72e8002cc2b578a2a2340ea130c68489193ff7e3, digest sha256:148e8befc5d083bed27f091fd64e1a5cb47a1d89527581063a4c071e21738438.",
+    "Controller ATTEMPT remains 1/3 as supplied by the queue request; the superseded source repair was handled inside the same attempt."
+  ],
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    "docs/automation/runs/CONVERSION-DXVK-00137.json"
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36731657965,
+    "backend_conversion_gate_result": "PASS",
+    "build_run_id": 36731664102,
+    "build_result": "PASS",
+    "openxr_run_id": 36731664089,
+    "openxr_result": "PASS",
+    "hud_inspector_run_id": 36731664200,
+    "hud_inspector_result": "PASS",
+    "hosted_package_push_run_id": 36731657753,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36731664483,
+    "hosted_package_pr_result": "PASS",
+    "artifact_id": 11104434718,
+    "artifact_digest": "sha256:148e8befc5d083bed27f091fd64e1a5cb47a1d89527581063a4c071e21738438",
+    "backend_conversion_gate_artifact_id": 11104434718,
+    "backend_conversion_gate_artifact_digest": "sha256:148e8befc5d083bed27f091fd64e1a5cb47a1d89527581063a4c071e21738438",
+    "build_artifact_id": 11104349166,
+    "build_artifact_digest": "sha256:c3085b3da6bf9070b5cf22bf360850972e0c4ceb2a747b45e2995051962be99a",
+    "hud_analysis_artifact_id": 11105676828,
+    "hud_analysis_artifact_digest": "sha256:3636d9dcf0d0b454b56e904a8f5aecc74f9692917fa8d46368c9ab8a5ad127d4",
+    "hud_game_artifact_id": 11105357728,
+    "hud_game_artifact_digest": "sha256:1a5853068effed091ff777077491ef3459dfea66fb7caeccd6ae7196bfab70b9",
+    "hosted_package_push_artifact_id": 11104609175,
+    "hosted_package_push_artifact_digest": "sha256:57e19263f424377a6b7e3d1e150a0a211b364032432fa8c0e408d5b01a6654c6",
+    "hosted_package_pr_artifact_id": 11104679758,
+    "hosted_package_pr_artifact_digest": "sha256:923bc2cc8bc94f3bad9384b5bc06d14a34dba4b2f1a0ccd4c455f13c01dcbecf",
+    "pc_fast_run_id": 36731657594,
+    "pc_fast_result": "SKIPPED"
+  },
+  "source_commits": [
+    {
+      "sha": "a1764a8afa52b0143224aad2e17c6bf19e6080d2",
+      "message": "vr: split DXVK menu and gameplay cadence analysis [AUTO:CONVERSION-DXVK-00137]",
+      "role": "superseded_failed_result",
+      "validation_bearing": false,
+      "validation_result": "FAIL"
+    },
+    {
+      "sha": "72e8002cc2b578a2a2340ea130c68489193ff7e3",
+      "message": "vr: repair DXVK phase cadence analyzer [AUTO:CONVERSION-DXVK-00137]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "validation_result": "PASS"
+    }
+  ],
+  "runtime_claim": "NONE",
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Use the phase-separated analyzer on the next exact-build Quest3/VDXR DXVK session. The prior <=30 FPS gameplay/runtime blocker remains active until a later runtime-path or pacing change is HMD-tested; this analyzer-only task does not clear it.",
+  "cadence_contract": {
+    "classification_priority": [
+      "actualSubmits",
+      "requestedLayer_fallback"
+    ],
+    "phases": [
+      "MENU",
+      "GAMEPLAY",
+      "MIXED_OR_UNKNOWN"
+    ],
+    "mixed_window_policy": "EXCLUDE_FROM_PURE_PHASE_AVERAGES",
+    "minimum_pure_gameplay_windows_for_degraded_flag": 2,
+    "degraded_interval_to_display_period_ratio": 1.5,
+    "legacy_aggregate_scope": "LEGACY_ALL_PIPELINE_WINDOWS_DO_NOT_USE_FOR_PHASE_HEALTH",
+    "runtime_claim": false
+  }
+}

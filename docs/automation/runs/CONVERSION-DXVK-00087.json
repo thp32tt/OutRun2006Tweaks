@@ -1,0 +1,91 @@
+{
+  "task_id": "CONVERSION-DXVK-00087",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 0,
+  "base_sha": "979624a7655abcf1c2fa70d146ac44b3b0f33b53",
+  "result_sha": "109cab14d8f9560179d14dc1a8f1a5bb69e25f67",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_STEREO_FACADE_MODULARIZATION_PHASE15_R21",
+  "summary": "Completed F04 phase 15 by extracting the unchanged R21 host-freshness, soft-suspend and fail-closed Present-boundary body into include-free stereo_renderer_r21_overlay.inc and changing the default production stereo facade to compose R20 plus the R21/R22/R23/R26/R29-R34 overlays directly. Historical R21 and later wrappers remain compatibility/build-graph owners; diagnostic comparison branches are unchanged. Host-freshness verifier ownership moved to the overlay without changing runtime logic.",
+  "evidence": [
+    "CONVERSION-DXVK-00085 explicitly left R21 -> R20 as the next bounded F04 source-graph candidate.",
+    "Base 979624a7655abcf1c2fa70d146ac44b3b0f33b53 stereo_renderer_r21.cpp content from namespace OutRunVRStereo through EOF equals result stereo_renderer_r21_overlay.inc after CRLF/LF and terminal-newline normalization: 294 lines / 12527 characters.",
+    "Architecture/OpenXR/R32 review verification now checks R21 host freshness, soft-suspend, fail-closed, R20 prerequisite and disabled-first invariants directly in stereo_renderer_r21_overlay.inc while the historical wrapper is checked for R20 + overlay composition.",
+    "Backend Conversion Gate 36624883784 PASS on exact result SHA, including queue/baseline/one-click/package integrity/DXVK behavior/disassembly/facade phase-15/semantic/session/shared-handle/host-owned-transport/pinned-acquisition/SAFE/recenter checks plus Win32 build, binary verification, and artifact upload.",
+    "Build 36624892841 PASS.",
+    "OpenXR VR architecture 36624893038 PASS across host-x64 and all five Win32 game/comparison jobs.",
+    "OutRun EXE HUD Inspector CI 36624892759 PASS; static-exe-analysis and build-hud-inspector both PASS.",
+    "VR Hosted Test Package 36624892990 (PR) PASS and 36624883723 (push) PASS.",
+    "VR PC Fast Test Build 36624883721 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d9/stereo_pipeline.cpp",
+    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "src/vr/d3d9/stereo_renderer_r21_overlay.inc",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py",
+    "tools/verify_vr_r32_review.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "109cab14d8f9560179d14dc1a8f1a5bb69e25f67",
+      "message": "Extract R21 host freshness overlay from production facade [AUTO:CONVERSION-DXVK-00087]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36624883784,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36624892841,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36624893038,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36624892759,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36624892990,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36624883723,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36624883721,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5897920439,
+    "issue_14_validation_comment_id": 5898071279
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "note": "Source-graph and verifier ownership changed only. Exact-source equivalence, R21 host-freshness/soft-suspend/fail-closed structural checks, hosted compile/architecture/package guards passed. No runtime-visible correctness or performance claim is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C0_READ_AGENTS_REVIEW_INDEX_QUEUE_CONTRACT_AND_STATE",
+    "C1_CONFIRM_F04_PHASE15_FROM_PRIOR_NEXT_ACTION",
+    "C2_EXTRACT_R21_OVERLAY_AND_FLATTEN_STEREO_FACADE",
+    "C3_EXACT_SOURCE_EQUIVALENCE_PASS",
+    "C3_R21_HOST_FRESHNESS_GUARD_OWNER_MOVED_TO_OVERLAY",
+    "C4_VALIDATION_BEARING_RESULT_COMMIT",
+    "C5_EXACT_SHA_AUTOMATION_VALIDATION_PASS",
+    "C6_STATE"
+  ],
+  "automatic_repairs_used": 0,
+  "infrastructure_retries": 0,
+  "blocker": "No software blocker remains for F04 phase 15. Runtime correctness remains unverified because no Quest3/VDXR or in-game test was performed.",
+  "next_action": "Treat the next deeper stereo historical include edge R20 -> R13 as a separate bounded F04 task. Preserve relaxed bootstrap/depth-stencil baseline/runtime-eligibility and startup/recovery invariants and diagnostic comparison paths, require exact-SHA automated validation, and do not claim runtime correctness without Quest3/VDXR evidence."
+}

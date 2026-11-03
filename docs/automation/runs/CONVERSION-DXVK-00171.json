@@ -1,0 +1,136 @@
+{
+  "task_id": "CONVERSION-DXVK-00171",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 2,
+  "controller_attempt": "2/3",
+  "base_sha": "6625f65c23d01103490e14d7f002734d92150cba",
+  "result_sha": "147b1a7e3a3c56aa5396fa49b633383fb5b2458d",
+  "validation_bearing_result_sha": "147b1a7e3a3c56aa5396fa49b633383fb5b2458d",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R171_8BD20_BOUNDED_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DXVK-00169 captured exact 0x8BD20 provenance from two independently aligned callers and explicitly left instruction boundaries, function-entry identity, semantics and ownership unresolved. Its durable next_action names a fresh 0x8BD20 decode as the next independent F13 unit.",
+  "summary": "ATTEMPT=2 reconciliation: controller failure context Backend Conversion Gate 36776935359 was a superseded pre-job cancellation on intermediate SHA 4e07c94e, not a code/test failure. The next exact descendant validation-bearing result 147b1a7e already owns successful Backend Conversion Gate 36776994299 plus Build, HUD Inspector, OpenXR 6/6 and Hosted Package PASS. This retry fixes the durable record so the controller can identify that successful exact result without rerunning the obsolete cancelled workflow.",
+  "evidence": [
+    "ATTEMPT=2 direct inspection: Backend Conversion Gate 36776935359 ran on intermediate SHA 4e07c94e5a4dc210aee7682f1f4e008f7cf1fd7e, was created 2026-09-30T21:03:47Z, cancelled at 21:04:19Z, and had total_count=0 jobs. No validation step executed or failed.",
+    "The superseding result commit 147b1a7e3a3c56aa5396fa49b633383fb5b2458d was created at 21:04:15Z and its exact push-triggered Backend Conversion Gate 36776994299 started at 21:04:18Z and completed SUCCESS at 21:09:54Z.",
+    "Backend Conversion Gate 36776994299 job 110097309836 PASS completed queue automation contract, HMD baseline, one-click structure/integrity, DXVK behavior, backend disassembly, renderer facade, semantic catalog, DXVK analyzer/shared-handle/transport/pinned-acquisition/reactivation/recenter checks, Win32 configure/build, binary verification and artifact upload.",
+    "Backend Conversion Gate 36776994299 artifact 11125344897 backend-autovalidated-vr-dxvk-r71-disasm-147b1a7e3a3c56aa5396fa49b633383fb5b2458d digest sha256:13b92559b16aa02dcd8af21e952ed8f71b19e1447d4f5bb4a9b112b301e798c6.",
+    "Exact result 147b1a7e also passed Build 36776998896, OutRun EXE HUD Inspector CI 36776998921, OpenXR VR architecture 36776999333 (6/6 jobs), and VR Hosted Test Package 36776998950.",
+    "HUD static-exe-analysis job 110097337432 emitted EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN with layout_contiguous=True, bytes_match=True, branches=True, terminal_shape=True, padding=True, next_anchor=True; function_entry remains UNRESOLVED and ownership_effect remains NONE.",
+    "No Quest 3 / VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00171.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "04c4434a8ecfe4973aaedba5ce9fd38b18852127",
+      "message": "vr: prove bounded 0x8BD20 control-flow window [AUTO:CONVERSION-DXVK-00171]",
+      "role": "implementation_initial",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "85c2e85309c89364ad0e6731b28338d95a622c1a",
+      "message": "vr: correct 0x8BD20 terminal row guard [AUTO:CONVERSION-DXVK-00171]",
+      "role": "implementation_repair",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "4e07c94e5a4dc210aee7682f1f4e008f7cf1fd7e",
+      "message": "test: gate 0x8BD20 bounded routine proof [AUTO:CONVERSION-DXVK-00171]",
+      "role": "static_contract",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "147b1a7e3a3c56aa5396fa49b633383fb5b2458d",
+      "message": "docs: record CONVERSION-DXVK-00171 validation candidate [AUTO:CONVERSION-DXVK-00171]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "proof_contract": {
+    "target_rva": "0x0008BD20",
+    "body_end_rva": "0x0008BD3C",
+    "branch_target_rva": "0x0008BD39",
+    "padding_end_rva": "0x0008BD40",
+    "next_code_rva": "0x0008BD40",
+    "expected_status": "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. No renderer, DXVK provider, selector, package policy, transport or backend activation behavior changed.",
+    "ownership": "The proof is bounded to exact instruction/control-flow shape; ScreenHud/world/render ownership is not inferred.",
+    "stereo_correctness": "No WVP, projection, eye submission, HUD/world classification, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The proof fails closed unless predecessor dual-call provenance is exact, instruction bytes are contiguous and exact, both short branches land at 0x8BD39, both RETs are present, four INT3 padding bytes match, and the next-code anchor begins at 0x8BD40."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_CALLEE_8BD20_EXACT_PROVENANCE",
+    "after": "PARTIAL_PLUS_8BD20_BOUNDED_CONTROL_FLOW_PROVEN",
+    "runtime_claim": false
+  },
+  "blocker": "Function-entry identity still requires evidence before 0x8BD20 or equivalent structural proof. Higher-level callee semantics and all render/HUD ownership remain unresolved. The separate 0x182194 callee is untouched.",
+  "next_action": "ATTEMPT=2 reconciliation complete. Do not rerun obsolete cancelled Backend Conversion Gate 36776935359. RESULT_SHA remains 147b1a7e with exact Backend Conversion Gate 36776994299 PASS. Future independent F13 work may prove the 0x8BD20 structural function-entry boundary or capture/decode 0x182194; runtime remains UNTESTED.",
+  "validation": {
+    "result_sha": "147b1a7e3a3c56aa5396fa49b633383fb5b2458d",
+    "automation_validation": "PASS",
+    "build_run_id": 36776998896,
+    "build_result": "PASS",
+    "build_binary_artifact_id": 11127165026,
+    "build_binary_artifact_digest": "sha256:cb0ca1dae17e8a5c0a2ec48732874b095685f8c57b00fbc518e7d1bf2c7dd73d",
+    "hud_inspector_run_id": 36776998921,
+    "hud_inspector_result": "PASS",
+    "hud_static_analysis_job_id": 110097337432,
+    "hud_analysis_artifact_id": 11124864494,
+    "hud_analysis_artifact_digest": "sha256:5494e8366379355d6585848ae6ef877d75f9df5899493c26da4b10803e66e1b7",
+    "proof_status": "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN",
+    "openxr_run_id": 36776999333,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "openxr_host_artifact_id": 11125154386,
+    "openxr_host_artifact_digest": "sha256:740f13f59698b96ec1b9d6e530c1ab6f7181f73df213ae7fb2ab74ba3362bd95",
+    "hosted_package_run_id": 36776998950,
+    "hosted_package_result": "PASS",
+    "hosted_package_artifact_id": 11127030443,
+    "hosted_package_artifact_digest": "sha256:b3ccf359023d6cdb71167ec7518775d24154864b60d1a1cf98fe89c711e0c083",
+    "runtime_validation": "UNTESTED",
+    "backend_conversion_gate_run_id": 36776994299,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_job_id": 110097309836,
+    "backend_conversion_gate_artifact_id": 11125344897,
+    "backend_conversion_gate_artifact_digest": "sha256:13b92559b16aa02dcd8af21e952ed8f71b19e1447d4f5bb4a9b112b301e798c6"
+  },
+  "retry_reconciliation": {
+    "failure_context_run_id": 36776935359,
+    "failure_context_head_sha": "4e07c94e5a4dc210aee7682f1f4e008f7cf1fd7e",
+    "failure_context_conclusion": "CANCELLED_SUPERSEDED_BEFORE_JOB_START",
+    "failure_context_job_count": 0,
+    "failure_context_created_utc": "2026-09-30T21:03:47Z",
+    "failure_context_updated_utc": "2026-09-30T21:04:19Z",
+    "superseding_result_sha": "147b1a7e3a3c56aa5396fa49b633383fb5b2458d",
+    "superseding_gate_run_id": 36776994299,
+    "superseding_gate_conclusion": "SUCCESS",
+    "superseding_gate_job_id": 110097309836,
+    "contract_interpretation": "QUEUE_CONTROLLER_CONTRACT: a same-branch run cancelled before any step starts because a newer push superseded it is not an automatic-validation failure; validate the unchanged source through the exact descendant instead of retrying the cancelled run.",
+    "source_change_required_for_attempt_2": false,
+    "bookkeeping_defect_fixed": "ATTEMPT=1 durable record omitted the successful exact Backend Conversion Gate 36776994299 even though RESULT_SHA 147b1a7e owned it."
+  }
+}

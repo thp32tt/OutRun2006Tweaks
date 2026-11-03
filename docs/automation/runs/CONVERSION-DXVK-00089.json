@@ -1,0 +1,90 @@
+{
+  "task_id": "CONVERSION-DXVK-00089",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 0,
+  "base_sha": "37256604dc4f79bf2f2103df75b3d57964c01736",
+  "result_sha": "20396e6af3fa24ff0442079f4b8178b05e1a26ec",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_STEREO_FACADE_MODULARIZATION_PHASE16_R20",
+  "summary": "Completed F04 phase 16 by extracting the unchanged R20 relaxed-bootstrap, depth/stencil baseline and runtime-eligibility body into include-free stereo_renderer_r20_overlay.inc and changing the default production stereo facade to compose R13 + runtime_eligibility.hpp plus the R20/R21/R22/R23/R26/R29-R34 overlays directly. Historical R20 and later wrappers remain compatibility/build-graph owners; diagnostic comparison branches are unchanged. R20 bootstrap verifier ownership moved to the overlay without changing runtime logic.",
+  "evidence": [
+    "CONVERSION-DXVK-00087 explicitly left R20 -> R13 as the next bounded F04 source-graph candidate.",
+    "Base 37256604dc4f79bf2f2103df75b3d57964c01736 stereo_renderer_r20.cpp content from namespace OutRunVRStereo through EOF equals result stereo_renderer_r20_overlay.inc after CRLF/LF and terminal-newline normalization: 303 lines / 12346 characters.",
+    "Architecture/OpenXR/baseline verification now checks R20 relaxed-bootstrap, depth/stencil baseline, runtime-eligibility and disabled-first invariants directly in stereo_renderer_r20_overlay.inc while the historical wrapper is checked for R13 + runtime_eligibility + overlay composition.",
+    "Backend Conversion Gate 36627696449 PASS on exact result SHA, including queue/baseline/one-click/package integrity/DXVK behavior/disassembly/facade phase-16/semantic/session/shared-handle/host-owned-transport/pinned-acquisition/SAFE/recenter checks plus Win32 build, binary verification, and artifact upload.",
+    "Build 36627701464 PASS.",
+    "OpenXR VR architecture 36627701525 PASS across host-x64 and all five Win32 game/comparison jobs.",
+    "OutRun EXE HUD Inspector CI 36627701481 PASS; static-exe-analysis and build-hud-inspector both PASS.",
+    "VR Hosted Test Package 36627701522 (PR) PASS and 36627696359 (push) PASS.",
+    "VR PC Fast Test Build 36627696413 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d9/stereo_pipeline.cpp",
+    "src/vr/d3d9/stereo_renderer_r20.cpp",
+    "src/vr/d3d9/stereo_renderer_r20_overlay.inc",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "20396e6af3fa24ff0442079f4b8178b05e1a26ec",
+      "message": "Extract R20 bootstrap overlay from production facade [AUTO:CONVERSION-DXVK-00089]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36627696449,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36627701464,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36627701525,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36627701481,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36627701522,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36627696359,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36627696413,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5898383394,
+    "issue_14_validation_comment_id": 5898502459
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "note": "Source-graph and verifier ownership changed only. Exact-source equivalence, R20 bootstrap/depth-stencil/runtime-eligibility structural checks, hosted compile/architecture/package guards passed. No runtime-visible correctness or performance claim is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C0_READ_AGENTS_REVIEW_INDEX_QUEUE_CONTRACT_AND_STATE",
+    "C1_CONFIRM_F04_PHASE16_FROM_PRIOR_NEXT_ACTION",
+    "C2_EXTRACT_R20_OVERLAY_AND_FLATTEN_STEREO_FACADE",
+    "C3_EXACT_SOURCE_EQUIVALENCE_PASS",
+    "C3_R20_BOOTSTRAP_DEPTH_RUNTIME_ELIGIBILITY_GUARD_OWNER_MOVED_TO_OVERLAY",
+    "C4_VALIDATION_BEARING_RESULT_COMMIT",
+    "C5_EXACT_SHA_AUTOMATION_VALIDATION_PASS",
+    "C6_STATE"
+  ],
+  "automatic_repairs_used": 0,
+  "infrastructure_retries": 0,
+  "blocker": "No software blocker remains for F04 phase 16. Runtime correctness remains unverified because no Quest3/VDXR or in-game test was performed.",
+  "next_action": "Treat the next deeper stereo historical include edge R13 -> stereo_renderer.cpp as a separate bounded F04 task. Preserve R13 safety/ACK/MRT hardening and base R9 startup/stereo invariants and diagnostic comparison paths, require exact-SHA automated validation, and do not claim runtime correctness without Quest3/VDXR evidence."
+}

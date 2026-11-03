@@ -1,0 +1,101 @@
+{
+  "task_id": "CONVERSION-DXVK-00063",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 3,
+  "chat_rollover": 2,
+  "base_sha": "e6e8a29dfbe1c9e69588846639e4741da216eb0c",
+  "result_sha": "d3cdeb3b8e53c7a9cb6359137e1db128e4ff1692",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_D3D9EX_FACADE_MODULARIZATION_PHASE3",
+  "summary": "Removed the top-level production D3D9Ex facade edge to ex_device_upgrade_r15.cpp by extracting the R15 implementation body into an include-free overlay. Compatibility/build-graph ownership remains available through ex_device_upgrade_r15.cpp. Verifier ownership drift exposed by the extraction was repaired without runtime-source behavior changes.",
+  "evidence": [
+    "tools/verify_vr_facade_modularization.py PASS in Backend Conversion Gate and rejects reintroduction of the production ex_device_pipeline.cpp -> ex_device_upgrade_r15.cpp edge.",
+    "Initial implementation 0a14589f7aeea5f7484b519041908492532f86d0 exposed stale verifier ownership in the proven-baseline checks; a9b4ddb24e2a503b089fc1df424b7d9050887c0d retargeted those checks to the R15 overlay/current facade.",
+    "OpenXR on a9b4ddb24e2a503b089fc1df424b7d9050887c0d exposed additional architecture/R32 verifier ownership drift; d3cdeb3b8e53c7a9cb6359137e1db128e4ff1692 retargeted R13/R23/R15 implementation checks to their overlays.",
+    "Backend Conversion Gate 36583754063 PASS on exact result SHA, including Win32 build and binary verification.",
+    "Build 36583762624 PASS on exact result SHA.",
+    "OpenXR VR architecture 36583762752 PASS across host-x64, production game-x86, C1, C2, R26 safe-draw, and R26+HUD jobs.",
+    "OutRun EXE HUD Inspector CI 36583762665 PASS for static EXE analysis and inspector build.",
+    "VR Hosted Test Package 36583762629 (PR) PASS and 36583753778 (push) PASS on exact result SHA.",
+    "VR PC Fast Test Build 36583753744 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed.",
+    "The R15 implementation body from the pre-extraction parent matches the final overlay implementation body exactly after newline normalization from namespace OutRunVRStereo onward."
+  ],
+  "changed_paths": [
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d9/ex_device_pipeline.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r15.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r15_overlay.inc",
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_r32_review.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "0a14589f7aeea5f7484b519041908492532f86d0",
+      "message": "Extract R15 Ex overlay from production facade [AUTO:CONVERSION-DXVK-00063]",
+      "role": "implementation",
+      "ci_skip": false
+    },
+    {
+      "sha": "a9b4ddb24e2a503b089fc1df424b7d9050887c0d",
+      "message": "Align proven baseline with R15 Ex overlay ownership [AUTO:CONVERSION-DXVK-00063]",
+      "role": "verifier_repair_1",
+      "ci_skip": false
+    },
+    {
+      "sha": "d3cdeb3b8e53c7a9cb6359137e1db128e4ff1692",
+      "message": "Align architecture guards with extracted overlays [AUTO:CONVERSION-DXVK-00063]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36583754063,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36583762624,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36583762752,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36583762665,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36583762629,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36583753778,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36583753744,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5892333447,
+    "issue_14_repair_comment_id": 5892426691,
+    "issue_14_validation_comment_id": 5892640086,
+    "issue_14_prior_validation_comment_id": 5892636215
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "note": "Changed source-graph ownership and verifier ownership only. Hosted builds and binary/architecture guards passed; no runtime-visible invariant is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER_CHAT_ROLLOVER",
+    "C1_SELECT_F04_PHASE3",
+    "C2_EXTRACT_R15_OVERLAY_AND_FLATTEN_EX_FACADE",
+    "C3_REPAIR_STALE_VERIFIER_OWNERSHIP",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C4_5_LEDGER",
+    "C6_STATE"
+  ],
+  "blocker": "No software blocker remains for F04 phase 3. Full F04 remains open because deeper D3D9Ex R14/R13/base and stereo versioned include chains are still physically nested.",
+  "next_action": "Continue F04 only as another bounded, independently build-verified structural step; prefer the least runtime-sensitive remaining D3D9Ex or stereo include edge. Do not combine whole-chain rewrites or claim runtime correctness without Quest3/VDXR evidence.",
+  "initial_result_sha": "0a14589f7aeea5f7484b519041908492532f86d0"
+}

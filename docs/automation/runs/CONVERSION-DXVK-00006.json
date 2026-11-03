@@ -1,0 +1,60 @@
+{
+  "task_id": "CONVERSION-DXVK-00006",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "e028d57727e986b5f3609f95347128e52d25878d",
+  "result_sha": "f6e98496c236244c608a5e0d0ac9fe723b87dd96",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "ONECLICK-S09-F33-COLLECTOR-FAILURE-RESULT-PRECEDENCE",
+  "summary": "Continued the same DXVK automation task from the durable F31/F32 checkpoint and closed Set 09 F33 without repeating completed work. Run-OutRunVRTest.ps1 now treats diagnostic collection as secondary: host teardown, launch/wait, and game exit failures retain process-result precedence, while collector exceptions/nonzero results propagate only when the primary run succeeded. Collector failure details are persisted separately in COLLECTOR_FAILURE.json so they do not overwrite RUNNER_FAILURE.json. The Windows regression test forces a collector exception after a launch failure and verifies the original runner failure remains authoritative; it also statically gates game-exit precedence. Backend Conversion Gate 36400113895 passed on exact SHA f6e98496c236244c608a5e0d0ac9fe723b87dd96. No renderer/provider ownership, vr-d3d9ex-focus, N100 clone/worktree, HMD, Quest 3, VDXR, or in-game visual validation was used.",
+  "changed_paths": [
+    "tools/Run-OutRunVRTest.ps1",
+    "tools/Collect-OutRunVRLogs.ps1",
+    "tools/Test-RunOutRunVRFailureDiagnostics.ps1",
+    "tools/Test-VROneClickContract.ps1"
+  ],
+  "source_commits": [
+    "77c2ae423047ee5460d38bdfce4565d0c7a0f48a",
+    "01fdad3cad9d635ec7db75b67238d9fabdc42198",
+    "dfc02f6c73490dd05f316a039dcdbf61cd75a8a0",
+    "614e75fec1016acb74cd013d7e85cc9568b3ef87",
+    "b0ae61d7f0eb930d252caafe3b9b9db603d44ee9",
+    "f6e98496c236244c608a5e0d0ac9fe723b87dd96"
+  ],
+  "evidence": [
+    "C0 recovered branch HEAD e028d57727e986b5f3609f95347128e52d25878d plus AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, VR automation/state files, Set 09/10 review docs, prior CONVERSION-DXVK-00004 checkpoint, regression knowledge and Issue #14. F06/F07/F15 were already closed and were not repeated.",
+    "Set 09 S09-R01/F31 documented that Start-Process exceptions bypassed post-game host wait and collector invocation; S09-R03/F32 documented that a host surviving forced teardown threw before collector invocation.",
+    "Run-OutRunVRTest.ps1 now stores GAME_LAUNCH_OR_WAIT or HOST_TEARDOWN failure evidence in the active session, restores environment first, performs diagnostic collection, and only then propagates the original failure.",
+    "Collect-OutRunVRLogs.ps1 -Emergency allows a stuck-process snapshot but marks LogBoundary=emergency-snapshot-running-process and EmergencySnapshot=true, does not delete copied source logs/captures, and does not rotate CURRENT_VR_SESSION.json or prepare a next session.",
+    "Test-RunOutRunVRFailureDiagnostics.ps1 behavior-tests an invalid executable Start-Process failure and verifies collection occurred before failure propagation. It also behavior-tests emergency collection is non-destructive, preserves the current session, emits the emergency manifest and creates exactly one ZIP.",
+    "Backend Conversion Gate 36399100147 PASS on exact SHA b0ae61d7f0eb930d252caafe3b9b9db603d44ee9: queue/baseline checks, one-click contract including F31/F32 behavior test, disassembly contract, semantic catalog, DXVK analyzer regression, pinned acquisition, Win32 configure/build, binary verification and artifact upload all succeeded.",
+    "Artifact 10959399294: backend-autovalidated-vr-dxvk-r71-disasm-b0ae61d7f0eb930d252caafe3b9b9db603d44ee9; digest sha256:123aa95c1ca383376293d68499a82178bbd0a7a9f0d600a59207bc38ed4a9e5c.",
+    "Issue #14 production ledger comment 5866525494 records the source transaction. No N100 clone/worktree, HMD, Quest 3, VDXR or in-game visual validation was used.",
+    "Set 09 S09-R04/F33 showed that collector status was checked before saved runner/game failures, allowing diagnostic collection failure to obscure the primary process result.",
+    "Run-OutRunVRTest.ps1 now catches collector exceptions/nonzero status, records COLLECTOR_FAILURE.json with PrimaryFailure binding, then propagates HOST_TEARDOWN, GAME_LAUNCH_OR_WAIT, or GAME_EXIT before collector failure.",
+    "Test-RunOutRunVRFailureDiagnostics.ps1 forces a collector exception after an invalid-executable launch failure and verifies RUNNER_FAILURE.json remains GAME_LAUNCH_OR_WAIT while COLLECTOR_FAILURE.json records DIAGNOSTIC_COLLECTION; source-order gating keeps game exit ahead of collector status.",
+    "Backend Conversion Gate 36400113895 PASS on exact SHA f6e98496c236244c608a5e0d0ac9fe723b87dd96: one-click behavior contract including F33, disassembly/semantic contracts, DXVK analyzer regression, pinned acquisition, Win32 configure/build, binary verification, and artifact upload all succeeded.",
+    "Artifact 10960415770: backend-autovalidated-vr-dxvk-r71-disasm-f6e98496c236244c608a5e0d0ac9fe723b87dd96; digest sha256:035d26ee030930ae88d8dc5133481369ba4fd3dedb2db73a37de48de7a2b0e1a."
+  ],
+  "completed_work_items": [
+    "ONECLICK-S09-F31-GAME-LAUNCH-EXCEPTION-DIAGNOSTIC-SURVIVABILITY",
+    "ONECLICK-S09-F32-STUCK-HOST-EMERGENCY-DIAGNOSTIC-SURVIVABILITY",
+    "ONECLICK-S09-F33-COLLECTOR-FAILURE-RESULT-PRECEDENCE"
+  ],
+  "open_work_items": [
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY",
+    "DXVK-CLEAN-PERFORMANCE-PROFILE"
+  ],
+  "next_action": "F31/F32/F33 diagnostic-survivability and failure-precedence work is complete at automated behavior/build level. The remaining DXVK gates are exact-build Quest 3/VDXR two-pass visual parity and a clean performance profile. Until hardware runtime evidence exists, keep RUNTIME_VALIDATION=UNTESTED and do not promote DXVK multiview.",
+  "workflow_run_id": 36400113895,
+  "workflow_job_id": 108856049120,
+  "artifact_id": 10960415770,
+  "artifact_digest": "sha256:035d26ee030930ae88d8dc5133481369ba4fd3dedb2db73a37de48de7a2b0e1a",
+  "recorded_at": "2026-09-28T18:00:16+09:00",
+  "chat_rollover": 3,
+  "rollover_2_recovery": "Recovered from GitHub after exact-SHA validation completed; verified result SHA b0ae61d7f0eb930d252caafe3b9b9db603d44ee9, Backend Conversion Gate 36399100147 PASS, artifact 10959399294, and review-index closure. No completed implementation was repeated.",
+  "last_recovered_at": "2026-09-28T17:49:00+09:00",
+  "rollover_3_recovery": "Recovered the durable F31/F32 checkpoint from GitHub, selected the still-open bounded F33 item, implemented collector-failure result precedence directly on vr-dxvk-r71-disasm, and validated exact SHA f6e98496c236244c608a5e0d0ac9fe723b87dd96 with Backend Conversion Gate 36400113895 PASS."
+}

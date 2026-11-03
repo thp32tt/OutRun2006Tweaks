@@ -1,0 +1,67 @@
+{
+  "task_id": "CONVERSION-DXVK-00049",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "d02d503be92549ee6be9c97830c3113b406c3100",
+  "result_sha": "77e587e61f62aef9a5e8723b36d29da889946a17",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "VR-R51-RANK-ANCHOR-PROPAGATION-001-DXVK-PROJECTED-DRAW-EVIDENCE",
+  "summary": "Sealed the current DXVK R57/R68 projected rival-rank provenance chain and made final-draw reachability machine-readable from existing bounded draw fingerprints, then moved the stale validation item to HMD-only validation.",
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    "tools/verify_vr_semantic_catalog.py",
+    "docs/VR_WORK_QUEUE.json"
+  ],
+  "source_commit": {
+    "sha": "77e587e61f62aef9a5e8723b36d29da889946a17",
+    "message": "Seal DXVK projected rank evidence [AUTO:CONVERSION-DXVK-00049]",
+    "validation_bearing": true,
+    "ci_skip": false
+  },
+  "prior_evidence": {
+    "legacy_candidate_branch": "vr-d3d9ex-candidate/RANK-ANCHOR-SIDECAR-20260924",
+    "legacy_candidate_sha": "bdfcea9b40d461fb6f043a9f5da73b61332d2570",
+    "legacy_validation_run_id": 36009907829,
+    "legacy_validation_result": "PASS",
+    "note": "Historical DX9Ex sidecar evidence only; not ported because current DXVK R57/R68 ProjectedWorldMarker2D path supersedes it."
+  },
+  "behavior_verified": [
+    "Static verifier requires exact Calc3D2D return-site 0xBAEE7 recovery into RankMarkerProjectedInfo.",
+    "Static verifier requires ProjectedWorldMarker2D producer scope for both rank producer paths and SpriteNode carriage of the projected marker.",
+    "Static verifier requires queue CurrentQueueProjectedMarker carriage and R57/R68 per-eye projected-marker path with rank head correction.",
+    "Session analyzer accepts final rank projected-marker reachability only from an exact PROJECTED_WORLD_MARKER_2D draw fingerprint with marker=1.",
+    "Hosted regression fixture proves RankProjectedMarkerDrawEvidenceAvailable=true for exactly one such final-draw fingerprint.",
+    "No runtime visual placement logic was changed."
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36556618686,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36556625592,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36556625659,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36556625603,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36556619650,
+    "pc_fast_result": "SKIPPED"
+  },
+  "scope": "Analyzer/test/static-verifier/queue only; no rank placement math, renderer draw ownership, DXVK provider, DirectGPU transport, OpenXR submission, cadence, copy/wait policy or runtime visual behavior changed.",
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5888503562,
+    "issue_14_validation_comment_id": 5888586478
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_REVIEW_STALE_RANK_ANCHOR_VALIDATION",
+    "C2_IMPLEMENT_PROJECTED_DRAW_EVIDENCE_GATE",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C6_STATE"
+  ],
+  "blocker": "Visual vehicle attachment and head-rotation behavior still require exact-build Quest3/VDXR validation.",
+  "next_action": "Quest3/VDXR exact-build DXVK CORRECTNESS. Require RankProjectedMarkerDrawEvidenceAvailable=true, then verify rival 1st/2nd/3rd/4th+ markers stay attached to vehicles while the protected road/background/vehicle stereo remains correct. If telemetry is positive but placement fails, debug per-eye projected delta math rather than generic HUD ownership.",
+  "recorded_at_kst": "2026-09-29T19:43:00+09:00"
+}

@@ -17,6 +17,7 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "vr/d3d9/dxvk_provider_probe.hpp"
 
 namespace Settings
 {
@@ -711,8 +712,14 @@ namespace OutRunVRD3D9ExUpgrade
                 auto classicFallback = [&]() -> HRESULT
                 {
                     *params = originalParams;
-                    return fallback_->CreateDevice(adapter, type, focusWindow,
-                        behaviorFlags, params, device);
+                    const HRESULT fallbackHr = fallback_->CreateDevice(
+                        adapter, type, focusWindow, behaviorFlags, params, device);
+                    if (SUCCEEDED(fallbackHr) && device && *device)
+                    {
+                        OutRunVR::Dxvk::LogProviderCensus(
+                            *device, "create-device-classic");
+                    }
+                    return fallbackHr;
                 };
 
                 // A wrapper may outlive a failed first Ex promotion attempt.
@@ -791,6 +798,8 @@ namespace OutRunVRD3D9ExUpgrade
 
                     *device = static_cast<IDirect3DDevice9*>(deviceEx);
                     UpdateCompatPresentationState(*device, params);
+                    OutRunVR::Dxvk::LogProviderCensus(
+                        *device, "create-device-ex");
                     if (!FirstUpgradeLogged.exchange(true))
                     {
                         spdlog::info(

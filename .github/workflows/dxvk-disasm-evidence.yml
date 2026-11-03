@@ -1,0 +1,122 @@
+name: DXVK Canonical Disassembly Evidence
+
+on:
+  push:
+    branches:
+      - vr-dxvk-r71-disasm
+    paths:
+      - 'tools/analyze_outrun_exe.py'
+      - 'tools/verify_vr_backend_disasm_contract.py'
+      - 'tools/verify_dxvk_continuation_window.py'
+      - 'tools/test_extract_dxvk_canonical_window.py'
+      - 'tools/test_dxvk_continuation_102_control_flow.py'
+      - 'tools/test_dxvk_continuation_103_control_flow.py'
+      - 'tools/test_dxvk_continuation_104_control_flow.py'
+      - 'tools/test_dxvk_continuation_105_control_flow.py'
+      - 'tools/test_verify_dxvk_continuation_window.py'
+      - 'tools/extract_dxvk_canonical_window.py'
+      - '.github/workflows/dxvk-disasm-evidence.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: dxvk-disasm-evidence-${{ github.sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-exe-evidence:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    env:
+      CANONICAL_EXE_SHA256: 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
+    steps:
+      - name: Checkout exact source SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Verify static disassembly contract
+        shell: pwsh
+        run: python tools/verify_vr_backend_disasm_contract.py
+
+      - name: Verify DXVK continuation evidence regression tests
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_verify_dxvk_continuation_window.py' -v
+
+      - name: Verify F137 control-flow regression
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_dxvk_continuation_102_control_flow.py' -v
+
+      - name: Verify F139 control-flow regression
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_dxvk_continuation_103_control_flow.py' -v
+
+      - name: Verify F141 control-flow regression
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_dxvk_continuation_104_control_flow.py' -v
+
+      - name: Verify F143 control-flow regression
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_dxvk_continuation_105_control_flow.py' -v
+
+      - name: Verify canonical window extractor
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_extract_dxvk_canonical_window.py' -v
+
+      - name: Download canonical OutRun executable
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force analysis-input | Out-Null
+          Invoke-WebRequest `
+            -Uri 'https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE' `
+            -OutFile analysis-input/OR2006C2C.EXE
+
+      - name: Verify canonical executable identity
+        shell: pwsh
+        run: |
+          $actualHash = (Get-FileHash analysis-input/OR2006C2C.EXE -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expectedHash = $env:CANONICAL_EXE_SHA256.ToLowerInvariant()
+          if ($actualHash -ne $expectedHash) {
+            throw "Canonical OutRun executable SHA256 mismatch: expected=$expectedHash actual=$actualHash"
+          }
+          Write-Host "CANONICAL_EXE_SHA256=$actualHash"
+
+      - name: Capture next canonical DXVK frontier window
+        shell: pwsh
+        run: |
+          python tools/extract_dxvk_canonical_window.py `
+            --exe analysis-input/OR2006C2C.EXE `
+            --frontier-source tools/analyze_outrun_exe.py `
+            --length 64 `
+            --expected-sha256 $env:CANONICAL_EXE_SHA256 `
+            --source-sha "${{ github.sha }}" `
+            --out analysis-output/DXVK_CANONICAL_FRONTIER_NEXT.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-Content analysis-output/DXVK_CANONICAL_FRONTIER_NEXT.json
+
+      - name: Analyze canonical executable
+        shell: pwsh
+        run: |
+          python tools/analyze_outrun_exe.py `
+            --exe analysis-input/OR2006C2C.EXE `
+            --out-dir analysis-output
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Record exact evidence identity
+        shell: pwsh
+        run: |
+          $exeHash = (Get-FileHash analysis-input/OR2006C2C.EXE -Algorithm SHA256).Hash.ToLowerInvariant()
+          "SOURCE_SHA=${{ github.sha }}" | Set-Content analysis-output/DXVK_DISASM_EVIDENCE_IDENTITY.txt
+          "CANONICAL_EXE_SHA256=$exeHash" | Add-Content analysis-output/DXVK_DISASM_EVIDENCE_IDENTITY.txt
+          Get-Content analysis-output/DXVK_DISASM_EVIDENCE_IDENTITY.txt
+
+      - name: Upload exact-SHA disassembly evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: dxvk-disasm-evidence-${{ github.sha }}
+          path: analysis-output/
+          if-no-files-found: error
+          retention-days: 14

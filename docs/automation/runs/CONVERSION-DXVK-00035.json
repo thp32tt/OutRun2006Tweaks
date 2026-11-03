@@ -1,0 +1,75 @@
+{
+  "task_id": "CONVERSION-DXVK-00035",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "1bd18bc4431e308691f4d79f6882228080f74b7e",
+  "result_sha": "82029d12159fbaf2a386a0c66da288beeba678a9",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "L1-VIS-001-R51-C64-EXACT-QUEUE-OWNERSHIP",
+  "summary": "Bridged exact mode-2 sprite-queue ownership into the c64/WVP classification boundary without widening generic queue HUD ownership. This directly addresses the R51 telemetry mismatch where exact HUD semantics reached R30 draw ownership but never reached the earlier renderer bypass.",
+  "changed_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/game/outrun_renderer.cpp",
+    "tools/verify_vr_semantic_catalog.py"
+  ],
+  "root_cause_evidence": {
+    "prior_runtime_sha": "8d21824f9502b3354fae679972a90868a0cce562",
+    "prior_observation": "semanticHudAccepted=93681 while semanticOverlayBypass=0; protected world stereo remained correct.",
+    "code_ordering": "ConsumeForDraw() uses CurrentQueueExactScope from experiment mode >=2, but generic EffectiveScope() uses CurrentQueueExactScope only from mode >=3. Production mode is 2, so helper CurrentScope overwrite can hide exact HUD ownership at c64 while later draw ownership remains exact.",
+    "bounded_claim": "This is sufficient to explain the telemetry ownership-lifetime gap. It is not sufficient to claim the HMD visual defect fixed."
+  },
+  "behavior_verified": [
+    "ResolveWvpUploadScope mode 2 returns exact ScreenHud.",
+    "ResolveWvpUploadScope mode 2 returns exact WorldBillboard.",
+    "ResolveWvpUploadScope mode 2 returns exact ProjectedWorldMarker2D.",
+    "ResolveWvpUploadScope mode 2 does not promote generic ScreenOverlay2D when no exact queue owner exists.",
+    "Mode 1 does not expose exact queue ownership early.",
+    "Renderer c64 path uses EffectiveWvpUploadScope while generic EffectiveScope and R30 draw classification remain unchanged."
+  ],
+  "protected_invariants": [
+    "VR-R50-WORLD-STEREO-PRESERVE-001 requires HMD revalidation.",
+    "No producer range was widened.",
+    "Generic ScreenOverlay2D is not promoted to ScreenHud by this mode-2 c64 path.",
+    "Vehicle-rank world anchor metadata is not fabricated or claimed fixed."
+  ],
+  "evidence": [
+    "C0 recovered GitHub HEAD 1bd18bc4431e308691f4d79f6882228080f74b7e, AGENTS.md, review index, QUEUE_CONTROLLER_CONTRACT.md, VR queue, regression registry/history, and Issues #13/#14. N100/local clone was not used.",
+    "L1-VIS-001 was the highest-priority DXVK-runnable visual item after runtime-blocked performance work was skipped.",
+    "Backend Conversion Gate 36506475246 PASS on exact source SHA 82029d12159fbaf2a386a0c66da288beeba678a9. The semantic catalog verifier passed the new c64 exact-queue ownership/non-promotion contract and all existing DXVK gates; Win32 binary verification PASS.",
+    "Build 36506479302 PASS on exact source SHA 82029d12159fbaf2a386a0c66da288beeba678a9.",
+    "OpenXR VR architecture 36506479284 PASS on exact source SHA 82029d12159fbaf2a386a0c66da288beeba678a9 across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36506479286 PASS on exact source SHA 82029d12159fbaf2a386a0c66da288beeba678a9.",
+    "PC Fast 36506475347 skipped as required for scheduled automation.",
+    "Backend artifact 11006774198 digest sha256:3931dbb425cbf53e6043b8eb5553067a3283f714b1d686b21e0ce04bc8e9b246.",
+    "OpenXR host artifact 11007855471 digest sha256:22ba155cf1a32c916edf1119191b2877876cfe587230cb28a9c657f14734d3db.",
+    "HUD inspector game artifact 11007776104 digest sha256:897ad48f7243cbd79832912f8761a413dfc22bbb1ccb50903f192c8e10947385.",
+    "Issue #14 implementation comment 5881696664 and validation comment 5881769632 record the production transaction."
+  ],
+  "blocked_runtime_items": [
+    "L1-VIS-001-R51-WHITE-HUD-QUEST3-VDXR-VALIDATION",
+    "VR-R50-WORLD-STEREO-PRESERVE-001-REVALIDATION",
+    "VR-R51-VEHICLE-RANK-ANCHOR-001"
+  ],
+  "next_action": "Quest3/VDXR exact-build test of 82029d12159fbaf2a386a0c66da288beeba678a9. Require semanticOverlayBypass>0 for exact queue HUD, verify white/6th/6/menu/YES-NO convergence and head-lock removal, preserve R50 road/background/vehicle stereo, and separately evaluate rival-rank anchoring. Do not widen generic queue HUD ownership if the runtime result fails.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36506475246,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36506479302,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36506479284,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36506479286,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36506475347,
+    "pc_fast_result": "SKIPPED",
+    "backend_artifact_id": 11006774198,
+    "backend_artifact_digest": "sha256:3931dbb425cbf53e6043b8eb5553067a3283f714b1d686b21e0ce04bc8e9b246",
+    "openxr_host_artifact_id": 11007855471,
+    "openxr_host_artifact_digest": "sha256:22ba155cf1a32c916edf1119191b2877876cfe587230cb28a9c657f14734d3db",
+    "hud_inspector_game_artifact_id": 11007776104,
+    "hud_inspector_game_artifact_digest": "sha256:897ad48f7243cbd79832912f8761a413dfc22bbb1ccb50903f192c8e10947385"
+  },
+  "recorded_at_kst": "2026-09-29T10:15:00+09:00"
+}

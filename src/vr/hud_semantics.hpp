@@ -4,14 +4,11 @@
 #include <array>
 #include <cstdint>
 
+#include "game/disasm_render_contract.hpp"
+
 namespace OutRunVRHudSemantics
 {
-    enum class SpacePolicy : std::uint8_t
-    {
-        Unknown,
-        ScreenHud,
-        WorldBillboard
-    };
+    using SpacePolicy = OutRunVR::DisasmContract::SpacePolicy;
 
     struct SemanticInfo
     {
@@ -34,15 +31,12 @@ namespace OutRunVRHudSemantics
         {
         case SpacePolicy::ScreenHud: return "SCREEN_HUD";
         case SpacePolicy::WorldBillboard: return "WORLD_BILLBOARD";
+        case SpacePolicy::ProjectedWorldMarker2D:
+            return "PROJECTED_WORLD_MARKER_2D";
+        case SpacePolicy::ProjectedScreenEffect2D:
+            return "PROJECTED_SCREEN_EFFECT_2D";
         default: return "UNKNOWN";
         }
-    }
-
-    constexpr bool InRange(
-        std::uint32_t value, std::uint32_t begin,
-        std::uint32_t end) noexcept
-    {
-        return value >= begin && value < end;
     }
 
     constexpr SemanticInfo UnknownInfo() noexcept
@@ -50,73 +44,21 @@ namespace OutRunVRHudSemantics
         return { "", "UNKNOWN", SpacePolicy::Unknown };
     }
 
-    // Semantic ranges are deliberately based on the already-shipped
-    // hooks_uiscaling.cpp reverse-engineering instead of D3D primitive-count
-    // guesses. Screen HUD remains zero-disparity/common-centre VR content.
-    // World-attached rival/heart markers remain true stereo billboards.
+    // Runtime classification delegates to the backend-neutral disassembly
+    // contract. The exact EXE identity gate remains in hud_inspector.cpp, so
+    // this centralization does not broaden which callers are trusted at runtime.
     constexpr SemanticInfo ClassifyCaller(std::uint32_t callRva) noexcept
     {
-        // HAM attached-heart draw; anchored by HeartDisp_PulseAngle=0x05B43A.
-        if (InRange(callRva, 0x05B300, 0x05B700))
-            return { "HeartDisp_car_heart", "WORLD_HEART", SpacePolicy::WorldBillboard };
-
-        // Original UIScaling girlfriend/control-icon helpers.
-        if (InRange(callRva, 0x060900, 0x061100))
-            return { "ctrl_icon_work", "HUD_CTRL_ICON", SpacePolicy::ScreenHud };
-
-        // C2C mission HUD anchors present in the original UI-scaling fixes.
-        if (InRange(callRva, 0x081A00, 0x081B00))
-            return { "C2C_Fruit", "HUD_FRUIT", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x081B00, 0x081C00))
-            return { "C2C_Heart", "HUD_HEART_TOTAL", SpacePolicy::ScreenHud };
-
-        if (InRange(callRva, 0x096A80, 0x096D00))
-            return { "C2CSpeechBubble", "HUD_GF_SPEECH", SpacePolicy::ScreenHud };
-
-        if (InRange(callRva, 0x0B9000, 0x0B9200))
-            return { "DispGearPosition", "HUD_GEAR_REV", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0B9E00, 0x0BA100))
-            return { "DispRank", "HUD_RANK", SpacePolicy::ScreenHud };
-
-        // sub_4BAD20: position markers projected from rival-car world position.
-        if (InRange(callRva, 0x0BAD20, 0x0BB320))
-            return { "RankMarker/sub_4BAD20", "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard };
-
-        if (InRange(callRva, 0x0BBA00, 0x0BBC00))
-            return { "DispTempHeartNum", "HUD_TEMP_HEART", SpacePolicy::ScreenHud };
-
-        if (InRange(callRva, 0x0BD2E0, 0x0BD360))
-            return { "C2CTestSlipstream", "HUD_SLIPSTREAM", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0BD360, 0x0BD500))
-            return { "C2CDontLoseGF", "HUD_GF_WARNING", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0BD900, 0x0BE100))
-            return { "GhostGap", "HUD_GHOST", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0BE300, 0x0BEA40))
-            return { "DispTimeAttack2D", "HUD_TIME_ATTACK", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0BEA40, 0x0BEB20))
-            return { "NaviPub_DispTimeAttackGoal", "HUD_GOAL_TIME", SpacePolicy::ScreenHud };
-
-        // NaviPub_Disp interleaves Rival and Heart groups, so keep the known
-        // sub-ranges split instead of classifying the whole function as one HUD.
-        if (InRange(callRva, 0x0BEB60, 0x0BEBC0) ||
-            InRange(callRva, 0x0BEC50, 0x0BECA0))
-            return { "NaviPub_Disp_Rival", "HUD_RIVAL", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0BEBC0, 0x0BEC50) ||
-            InRange(callRva, 0x0BECA0, 0x0BED20))
-            return { "NaviPub_Disp_Heart", "HUD_HEART_TOTAL", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0BED20, 0x0BEE80))
-            return { "NaviPub_Disp", "HUD_NAV_GENERIC", SpacePolicy::ScreenHud };
-
-        if (InRange(callRva, 0x0FC800, 0x0FC8A0))
-            return { "C2CSpeechBubbleGF_RankEmoji", "HUD_RANK_EMOJI", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0FC8A0, 0x0FC900))
-            return { "C2CSpeechBubbleGF_RankText", "HUD_RANK_TEXT", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0FC900, 0x0FCC00) ||
-            InRange(callRva, 0x0FCD80, 0x0FD080) ||
-            InRange(callRva, 0x0FD560, 0x0FD680) ||
-            InRange(callRva, 0x0FE860, 0x0FE900))
-            return { "C2CSpeechBubbleGF", "HUD_GF_SPEECH", SpacePolicy::ScreenHud };
-
+        for (const auto& range :
+             OutRunVR::DisasmContract::CriticalProducerRanges)
+        {
+            if (callRva >= range.begin && callRva < range.end)
+                return {
+                    range.area,
+                    range.semantic,
+                    static_cast<SpacePolicy>(range.policy)
+                };
+        }
         return UnknownInfo();
     }
 

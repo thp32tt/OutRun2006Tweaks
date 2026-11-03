@@ -1,0 +1,77 @@
+{
+  "task_id": "CONVERSION-DXVK-00109",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "0ba8637138ab9f51da80aefb61737eba63c26bf3",
+  "result_sha": "04eefd8275d2606833390d770cf7dd45d3f4130f",
+  "validation_bearing_result_sha": "04eefd8275d2606833390d770cf7dd45d3f4130f",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R126_PUTGHOSTGAPINFO_SUB_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04/F13 for the single exact PutGhostGapInfo_sub/GhostGap HUD callsite 0xBDAE8. Existing XMM0 float conditional left/right sprite-spacing behavior is preserved, immediate next-draw ScreenHud ownership now derives from GameSemantic::ClassifyCriticalProducer(CallerRva), and a compile-time assertion fails closed if the exact caller leaves the canonical ScreenHud range. The four GhostGap ForceLeft/ForceRight callsites remain unchanged. No producer range, world/stereo path or unrelated HUD family was widened.",
+  "evidence": [
+    "Exact caller 0xBDAE8 lies inside canonical GhostGap SCREEN_HUD range 0xBD900-0xBE100 in disasm_render_contract.hpp and the mechanically mirrored analyzer catalog.",
+    "hooks_uiscaling.cpp preserves the XMM0 float value==4.0f left/right decision and AddSpriteSpacing(val,left) before the shared producer-map ownership handoff.",
+    "render_semantics.hpp compile-time asserts 0xBDAE8 classifies as RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires the exact R126 template instantiation and rejects regression to the prior spacing-only 0x4BDAE8 callback.",
+    "The four GhostGap ForceLeft/ForceRight sites remain unchanged to keep this task bounded and require separate provenance.",
+    "The same bounded pattern passed DX11 CONVERSION-DX11-00106, but this DXVK result was independently validated on its own exact SHA.",
+    "Validation-bearing source result 04eefd8275d2606833390d770cf7dd45d3f4130f contains [AUTO:CONVERSION-DXVK-00109] and no CI-skip directive.",
+    "Backend Conversion Gate 36653669422 PASS; artifact 11071268417 digest sha256:ca1cfa8fc4f6e2f0be2fc34c7fdc5bca55d098709de58c67887d1beea5893600.",
+    "Build 36653673508 PASS.",
+    "OpenXR VR architecture 36653673594 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36653673502 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push 36653669445 PASS and PR 36653673463 PASS.",
+    "VR PC Fast Test Build 36653669565 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "04eefd8275d2606833390d770cf7dd45d3f4130f",
+      "message": "vr: route ghost gap sub HUD through shared producer map [AUTO:CONVERSION-DXVK-00109]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36653669422,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11071268417,
+    "backend_conversion_gate_artifact_digest": "sha256:ca1cfa8fc4f6e2f0be2fc34c7fdc5bca55d098709de58c67887d1beea5893600",
+    "build_run_id": 36653673508,
+    "build_result": "PASS",
+    "openxr_run_id": 36653673594,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36653673502,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36653669445,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36653673463,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36653669565,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5902060930,
+    "validation_comment_id": 5902120160
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_PUTGHOSTGAPINFO_EXACT_EDGE",
+    "after": "PARTIAL_PLUS_PUTGHOSTGAPINFO_SUB_EXACT_EDGE",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded PutGhostGapInfo_sub F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "Continue F13 with the remaining four bounded GhostGap ForceLeft/ForceRight callsites 0xBE045/0xBE083/0xBE0A5/0xBE067 as one coherent sub-family if exact semantics remain canonical. Preserve existing spacing-state transitions, do not widen shared producer ranges, and keep runtime validation separate."
+}

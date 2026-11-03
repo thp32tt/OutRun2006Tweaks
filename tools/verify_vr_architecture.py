@@ -26,20 +26,34 @@ required = [
     "src/vr/runtime_eligibility.hpp",
     "src/vr/game/outrun_renderer.cpp",
     "src/vr/game/outrun_renderer_r13.cpp",
+    "src/vr/game/outrun_renderer_r13_overlay.inc",
     "src/vr/game/outrun_renderer_r23.cpp",
+    "src/vr/game/outrun_renderer_r23_overlay.inc",
     "src/vr/game/outrun_renderer_r29.cpp",
     "src/vr/d3d9/stereo_renderer.cpp",
     "src/vr/d3d9/stereo_renderer_r13.cpp",
+    "src/vr/d3d9/stereo_renderer_r13_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r20.cpp",
+    "src/vr/d3d9/stereo_renderer_r20_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "src/vr/d3d9/stereo_renderer_r21_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r22.cpp",
+    "src/vr/d3d9/stereo_renderer_r22_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
+    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "src/vr/d3d9/stereo_renderer_r26_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "src/vr/d3d9/stereo_renderer_r29_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r31_overlay.inc",
     "src/vr/d3d9/ex_device_upgrade.cpp",
     "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r13_overlay.inc",
     "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc",
     "src/vr/d3d9/r13_bridge.hpp",
     "src/vr/d3d9/vr_pass_policy.hpp",
     "src/vr/ipc/protocol.hpp",
@@ -142,7 +156,7 @@ require(
     "UnsafeSingleExecution",
 )
 require(
-    "src/vr/game/outrun_renderer_r13.cpp",
+    "src/vr/game/outrun_renderer_r13_overlay.inc",
     "R13FragileEffectNeedsZeroDisparity",
     "D3DRS_ALPHABLENDENABLE",
     "D3DRS_ZWRITEENABLE",
@@ -165,7 +179,7 @@ require(
     "R29InvalidateRendererStateAfterExternalRestore",
 )
 require(
-    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r31_overlay.inc",
     "GetR28VerifiedProjection",
     "projectionGeneration != generation",
     "BeginStateBlockDestR31",
@@ -179,7 +193,7 @@ require(
 # any write route that cannot be mirrored. A lower-mip fallback must copy that
 # exact level rather than relying on UpdateTexture's level-zero dirty rules.
 r14 = require(
-    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc",
     "std::unordered_map<IDirect3DTexture9*, R14EntryPtr>",
     "TextureReleaseDestR14",
     "InstallManagedResourceCompatR14",
@@ -218,7 +232,7 @@ settings = require(
 # writes are serviced from D3D render callbacks; recovery pose warmup keeps the
 # stock camera/WVP visible until the next-frame authoritative seed is accepted.
 renderer_r23 = require(
-    "src/vr/game/outrun_renderer_r23.cpp",
+    "src/vr/game/outrun_renderer_r23_overlay.inc",
     "R23RenderThreadCleanupRequested",
     "R23RequestFailClosedCleanup",
     "R23ServiceRenderThreadCleanup",
@@ -234,29 +248,72 @@ if installer_start >= 0 and installer_end > installer_start:
     if "RestoreCullingCamera()" in worker:
         raise SystemExit("R23 installer thread must not mutate live camera/projection memory")
 
-# R20-R23 installation must fail fast and publish READY only after disabled-first
+# R13/R20-R23 installation must fail fast and publish READY only after disabled-first
 # hook transactions are enabled.
 require(
+    "src/vr/d3d9/stereo_renderer_r13.cpp",
+    "#include \"r13_bridge.hpp\"",
+    "#include \"stereo_renderer.cpp\"",
+    "#include \"stereo_renderer_r13_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r13_overlay.inc",
+    "R13InstallState",
+    "R13OverlayReady",
+    "R13EnsureAckState",
+    "R13ReadGpuCompletedFrame",
+    "R13ForceMonoShadow",
+    "R13CaptureDrawTimeEffect",
+    "R13UnsafeTransitionFrames",
+    "InlineHook::StartDisabled",
+    "single-execution MRT/occlusion fallback",
+)
+require(
     "src/vr/d3d9/stereo_renderer_r20.cpp",
+    "#include \"stereo_renderer_r13.cpp\"",
+    "#include \"../runtime_eligibility.hpp\"",
+    "#include \"stereo_renderer_r20_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r20_overlay.inc",
     "R20InstallState",
     "using State = OutRunVR::RuntimeEligibility::InstallState",
     "State::Pending",
     "State::Failed",
+    "R20StereoEligibilityGate",
+    "R20DepthHistorySafeForInitialSeed",
+    "R20AcceptVerifiedBaseline",
     "InlineHook::StartDisabled",
 )
 require(
     "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "#include \"stereo_renderer_r20.cpp\"",
+    "#include \"stereo_renderer_r21_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r21_overlay.inc",
     "R21InstallState",
+    "R21HostStatus::SoftSuspend",
+    "R21ReadHostFreshness",
+    "R21ApplyHostFailClosedAtPresent",
+    "R21HostFailClosed",
     "IsFailed(R20InstallState)",
     "InlineHook::StartDisabled",
 )
 require(
     "src/vr/d3d9/stereo_renderer_r22.cpp",
+    "#include \"stereo_renderer_r21.cpp\"",
+    "#include \"stereo_renderer_r22_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r22_overlay.inc",
     "R22InstallState",
     "R22ShadowState",
+    "R22StateBlockTrackingReliable",
     "R22SetScissorRectHook",
     "R22SetRenderStateHook",
     "R22PrimeShadowState",
+    "R22ResetBaselineTracking",
     "InlineHook::StartDisabled",
     "per-draw GetViewport/GetScissorRect/GetRenderState eliminated",
 )
@@ -267,6 +324,10 @@ require(
 require(
     "src/vr/d3d9/stereo_renderer_r23.cpp",
     "#include \"stereo_renderer_r22.cpp\"",
+    "#include \"stereo_renderer_r23_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
     "R23InstallState",
     "IsFailed(R22InstallState)",
     "R23RecoveryNeedsBaseline",
@@ -301,7 +362,7 @@ if "EnsureStereoResources(device)" in install_body:
     )
 
 r23_startup = require(
-    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
     "R23 is the final effective Present owner in the layered hook chain.",
     "if (SUCCEEDED(hr) && !StereoResourcesReady)",
     "EnsureStereoResources(device)",
@@ -423,7 +484,7 @@ require(
     "SAFE modes stuck in the default direct-only path",
 )
 require(
-    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "src/vr/d3d9/stereo_renderer_r26_overlay.inc",
     "R37DepthDisabledFragileOverlay",
     "R13EffectSnapshot effect = R13CaptureDrawTimeEffect",
     "unknown state fails closed",
@@ -435,7 +496,7 @@ require(
     "VR R26+HUD SAFE TEST",
 )
 require(
-    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_overlay.inc",
     "state.depthTestEnabled &&",
     "state.rhwDepthEvidence",
 )

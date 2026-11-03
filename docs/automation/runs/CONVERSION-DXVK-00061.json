@@ -1,0 +1,72 @@
+{
+  "task_id": "CONVERSION-DXVK-00061",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "47486e273be1641724d1c58026b0713a7081ea19",
+  "result_sha": "6c46bd6aa111e84781bdebca2fa25e232ff3490b",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_RENDERER_FACADE_MODULARIZATION_PHASE2",
+  "summary": "Removed the next historical renderer .cpp include edge: production R29 now composes base + R13 overlay + R23/R27/R28 overlay directly instead of including outrun_renderer_r23.cpp. Safe/diagnostic R23 ownership remains available through a compatibility wrapper.",
+  "evidence": [
+    "tools/verify_vr_facade_modularization.py PASS in Backend Conversion Gate and rejects reintroduced R13/R23 versioned .cpp nesting.",
+    "Backend Conversion Gate 36577007581 PASS on exact result SHA, including Win32 build and binary verification.",
+    "Build 36577017102 PASS on exact result SHA.",
+    "OpenXR VR architecture 36577016752 PASS across host-x64, production game-x86, C1, C2, R26 safe-draw, and R26+HUD jobs.",
+    "OutRun EXE HUD Inspector CI 36577016670 PASS for static EXE analysis and inspector build.",
+    "VR PC Fast Test Build 36577007513 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/vr/game/outrun_renderer_r23.cpp",
+    "src/vr/game/outrun_renderer_r29.cpp",
+    "src/vr/game/outrun_renderer_r23_overlay.inc",
+    "tools/verify_vr_facade_modularization.py",
+    ".github/workflows/vr-openxr.yml"
+  ],
+  "source_commit": {
+    "sha": "6c46bd6aa111e84781bdebca2fa25e232ff3490b",
+    "message": "Flatten R29 renderer ownership through R23 overlay [AUTO:CONVERSION-DXVK-00061]",
+    "validation_bearing": true,
+    "ci_skip": false
+  },
+  "validation": {
+    "backend_conversion_gate_run_id": 36577007581,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36577017102,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36577016752,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36577016670,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36577007513,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5891514350,
+    "issue_14_validation_comment_id": 5891673479
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-WHITE-HUD-DIPLOPIA-001",
+      "VR-R50-VEHICLE-RANK-ANCHOR-001"
+    ],
+    "note": "Changed renderer source-graph ownership only; deterministic builds/markers passed, but no runtime-visible protected invariant is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_SELECT_F04_PHASE2",
+    "C2_EXTRACT_R23_OVERLAY_AND_FLATTEN_R29",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C4_5_LEDGER",
+    "C6_STATE"
+  ],
+  "blocker": "No software blocker remains for renderer F04 phase 2. Full F04 remains open because stereo and D3D9Ex versioned include chains are still physically nested.",
+  "next_action": "Continue F04 only as another bounded, independently build-verified structural step; prefer the least runtime-sensitive remaining chain. Do not combine stereo/Ex whole-chain rewrites or claim runtime correctness without Quest3/VDXR evidence."
+}

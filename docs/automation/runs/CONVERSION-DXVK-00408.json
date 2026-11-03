@@ -1,0 +1,242 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00408",
+  "production_id": "CONVERSION-DXVK-00408",
+  "event_id": "CONVERSION-DXVK-00408-E008",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "initial_observed_head": "9b627cf92d20dbd6ef6d332f74f6146766e3a7a4",
+  "base_sha": "9b627cf92d20dbd6ef6d332f74f6146766e3a7a4",
+  "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+  "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+  "result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+  "work_item": "DXVK_F141_CANONICAL_CONTROL_FLOW_0x183BFE_TO_0x183C3D",
+  "summary": "Exact-decoded the validated F140 canonical window through 0x00183C3D. The F140 ff 76 cut is consumed only as complete ff 76 10; 26 contiguous complete instructions are pinned; inherited 0x00183C10/0x00183C27 forward-target debt is resolved only on exact current instruction boundaries; the 0x00183C0E->0x00183BE0 short-JMP backedge is proven on an exact predecessor instruction boundary; unresolved forward-target debt becomes empty; and 0x00183C3D:eb remains the next mandatory overlap. The 0x00183C08 indirect call and function/render/HUD/runtime semantics remain unresolved; ownership is unchanged.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/test_dxvk_continuation_104_control_flow.py",
+    "tools/test_extract_dxvk_canonical_window.py",
+    ".github/workflows/dxvk-disasm-evidence.yml"
+  ],
+  "material_commit_messages": [
+    "dxvk: prove canonical 0x183bfe control flow [AUTO:CONVERSION-DXVK-00408]",
+    "test(dxvk): guard F141 canonical control flow [AUTO:CONVERSION-DXVK-00408]",
+    "test(dxvk): advance frontier discovery to F141 cut [AUTO:CONVERSION-DXVK-00408]",
+    "ci(dxvk): gate F141 control-flow proof [AUTO:CONVERSION-DXVK-00408]",
+    "fix(dxvk): pin F141 inherited target literals [AUTO:CONVERSION-DXVK-00408]",
+    "fix(dxvk): pin F141 resolved forward debt [AUTO:CONVERSION-DXVK-00408]",
+    "fix(dxvk): gate F141 predecessor boundary [AUTO:CONVERSION-DXVK-00408]"
+  ],
+  "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "static_evidence": {
+    "provenance_status": "EXACT_EXE_183BFE_TO_183C3E_PROVENANCE_CAPTURED",
+    "control_flow_status": "EXACT_183BFE_TO_183C3D_CONTROL_FLOW_WITH_183C3D_CUT_EDGE_PROVEN",
+    "predecessor_status": "EXACT_183BC0_TO_183BFE_CONTROL_FLOW_WITH_183BFE_CUT_EDGE_PROVEN",
+    "start_boundary_status": "F140_EXACT_183BFE_RAW_FRONTIER_CONSUMED_WITH_FULL_OVERLAP",
+    "start_rva": "0x00183BFE",
+    "prefix_end_rva": "0x00183C3D",
+    "capture_end_rva": "0x00183C3E",
+    "probe_len": 64,
+    "instruction_count": 26,
+    "predecessor_cut_bytes": "ff 76",
+    "required_overlap_instruction": "ff 76 10",
+    "inherited_unresolved_forward_targets": [
+      "0x00183C10",
+      "0x00183C27"
+    ],
+    "resolved_predecessor_targets": [
+      "0x00183C10",
+      "0x00183C27"
+    ],
+    "remaining_predecessor_targets": [],
+    "branch_targets": [
+      "0x00183C0E->0x00183BE0"
+    ],
+    "predecessor_branch_targets_on_exact_boundaries": true,
+    "unresolved_forward_targets": [],
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "indirect_call_rvas": [
+      "0x00183C08"
+    ],
+    "indirect_call_semantics": "UNRESOLVED",
+    "trailing_overlap_rva": "0x00183C3D",
+    "trailing_overlap_bytes": "eb",
+    "next_overlap_required": true,
+    "semantic_promotion": "NONE",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_MANDATORY_OVERLAP_ONLY",
+    "call_semantics": "INDIRECT_CALL_183C08_TARGET_AND_EFFECT_UNRESOLVED_NO_REL32_CALLS_IN_F141_PREFIX",
+    "ownership_effect": "NONE"
+  },
+  "validation": {
+    "automation_validation": "PASS",
+    "automation_validation_detail": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+    "exact_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37283908451,
+      "job_id": 111678158420,
+      "conclusion": "success",
+      "static_disassembly_contract": "success",
+      "continuation_regressions": "success",
+      "f137_control_flow_regression": "success",
+      "f139_control_flow_regression": "success",
+      "f141_control_flow_regression": "success",
+      "canonical_window_extractor_tests": "success",
+      "canonical_exe_identity": "success",
+      "canonical_extractor": "success",
+      "analyzer_status": "SUCCESS",
+      "artifact_id": 11333676610,
+      "artifact_digest": "sha256:b453af3a3c7ae257e174e4150135f81e7eec0b7d028d43eb5ca19ea5046294c4"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37283908436,
+      "job_id": 111678158476,
+      "conclusion": "success",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11333977033,
+      "artifact_digest": "sha256:2646dd30435a5e22b5402753b77f84e0b02d625ff8ecc751635155964c19287f"
+    },
+    "superseded_same_attempt_failures": [
+      {
+        "sha": "c52c8ce301a95634dd0c0cdd33acf58b875ebe9e",
+        "run_id": 37283550506,
+        "reason": "static inherited forward-target literal contract not explicit enough"
+      },
+      {
+        "sha": "edf0cb788d273ece99148e365704bef1d3346c17",
+        "run_id": 37283735529,
+        "reason": "predecessor-boundary boolean not directly consumed by final fail-closed proven gate"
+      }
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered the already-complete F141 material/validation result and C6 state from GitHub SSOT. E008/CHAT_ROLLOVER=5 is a conversation rollover, not a retry; ATTEMPT remains 1/3 and no completed material work was repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected only the durable F141 successor over the validated F140 canonical window: exact complete-instruction control-flow proof through 0x00183C3D, inherited target resolution only on exact boundaries, predecessor backedge proof, semantic quarantine preserved."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Published F141 analyzer proof, focused continuation_104 regression, frontier extractor advancement, CI gate, and same-attempt fail-closed repairs. All material commits contain [AUTO:CONVERSION-DXVK-00408] and no material commit uses CI-skip."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 37283908451/111678158420 SUCCESS and Backend Conversion Gate 37283908436/111678158476 SUCCESS, including canonical EXE/analyzer/frontier evidence plus Win32 configure/build/binary verification and artifact upload. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material SHA bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb is published on vr-dxvk-r71-disasm and contains the final fail-closed F141 predecessor-boundary gate."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static canonical disassembly/proof/test/CI change only; no runtime DXVK payload, selector, deployment content or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "Durable run record, Issue #14 ledger comment 5991041220, and branch-local conversion state are reconciled to E008/CHAT_ROLLOVER=5 while preserving bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb as material/validation-bearing SHA, exact-SHA SUCCESS evidence, F142 successor, ATTEMPT=1/3 and RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "issue14_comment_id": 5991041220,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DXVK-00408",
+    "production_id": "CONVERSION-DXVK-00408",
+    "event_id": "CONVERSION-DXVK-00408-E008",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 5,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_ROLLOVER",
+    "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+    "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+    "runtime_validation": "UNTESTED"
+  },
+  "follow_on_frontier": {
+    "next_action_kind": "DXVK_F142_CANONICAL_OVERLAP_PROVENANCE_0x183C3D_TO_0x183C7D",
+    "start_rva": "0x00183C3D",
+    "capture_end_rva": "0x00183C7D",
+    "probe_len": 64,
+    "inherited_cut_bytes": "eb",
+    "required_overlap_completion": "COMPLETE_SHORT_JMP_MUST_BE_PROVEN_FROM_F142_CAPTURE_BEFORE_CONSUMPTION",
+    "inherited_unresolved_forward_targets": [],
+    "semantic_promotion": "NONE",
+    "ownership_effect": "NONE",
+    "runtime_validation": "UNTESTED"
+  },
+  "exact_next_action": "Build F142 exact raw canonical overlap provenance from 0x00183C3D for a 64-byte window through 0x00183C7D. Consume the inherited 0x00183C3D:eb only after the complete short-JMP instruction is proven from overlap, carry any direct-control-flow debt fail-closed, preserve any new trailing cut, and keep indirect-call/function/render/HUD/runtime semantics unresolved.",
+  "recorded_at_kst": "2026-10-05T17:35:23+09:00",
+  "chat_rollover": 5,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "rollover_metadata_correction": {
+    "corrected_from": {
+      "event_id": "CONVERSION-DXVK-00408-E006",
+      "event_type": "rollover",
+      "chat_rollover": 4,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "issue14_comment_id": 5990984470
+    },
+    "corrected_to": {
+      "event_id": "CONVERSION-DXVK-00408-E002",
+      "event_type": "rollover",
+      "chat_rollover": 2,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+      "issue14_comment_id": 5991038473
+    },
+    "authority": "CURRENT_EXPLICIT_USER_ROLLOVER",
+    "reason": "The current user supplied E002/CHAT_ROLLOVER=2 and the queue-grace-period resume reason. This correction changes bookkeeping only; material/validation-bearing SHA, completed F141 evidence, ATTEMPT=1/3, and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true,
+    "reconciled_at_kst": "2026-10-05T17:38:00+09:00"
+  },
+  "reconciled_at_kst": "2026-10-05T17:43:00+09:00",
+  "dispatch_metadata_correction": {
+    "corrected_from": {
+      "task_id": "CONVERSION-DXVK-00408",
+      "production_id": "CONVERSION-DXVK-00408",
+      "event_id": "CONVERSION-DXVK-00408-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "runtime_validation": "UNTESTED"
+    },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00408",
+      "production_id": "CONVERSION-DXVK-00408",
+      "event_id": "CONVERSION-DXVK-00408-E008",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 5,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "runtime_validation": "UNTESTED"
+    },
+    "authority": "LATEST_EXPLICIT_USER_DISPATCH",
+    "reason": "CONVERSION-DXVK-00408-E008 is the latest explicit user rollover. CHAT_ROLLOVER=5; rollover_is_retry=false; ATTEMPT remains 1/3. Completed F141 material/result SHA, exact-SHA validation evidence, and F142 successor are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true,
+    "reconciled_at_kst": "2026-10-05T17:43:00+09:00"
+  }
+}

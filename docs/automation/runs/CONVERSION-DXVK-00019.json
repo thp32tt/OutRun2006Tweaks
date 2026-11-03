@@ -1,0 +1,116 @@
+{
+  "task_id": "CONVERSION-DXVK-00019",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 2,
+  "base_sha": "fad2588a3d6c2cbd6c1138694daf7d41044da9ad",
+  "result_sha": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-RUNTIME-EVIDENCE-EXACT-BUILD-IDENTITY-GATE",
+  "summary": "Added an exact-build identity gate to the automatic runtime analyzer. DXVK runtime evidence now cross-checks session_manifest SourceSha/Backend against packaged BUILD_INPUTS and one-click preflight SourceSha/ResolvedBackend before allowing a source-specific success interpretation. Concrete mismatches fail closed even if host-owned bridge/directFrames telemetry appears successful; missing optional evidence is classified as incomplete rather than fabricated into a mismatch.",
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    "tools/Test-VROneClickContract.ps1"
+  ],
+  "source_commits": [
+    "f4b6dbc39aa9590dd68e1a23623abc381c7b3487",
+    "ffebc679e30c0f742953c02e7b961f79ead6ea37"
+  ],
+  "review": {
+    "architecture": "Collector already copies BUILD_INPUTS.json and VR_ONE_CLICK_PREFLIGHT.json into the session directory before Analyze-OutRunVRSession.ps1 runs. The missing layer was analyzer-side correlation with session identity.",
+    "lifetime_sync": "No transport resource, run generation, producer/consumer ACK or GPU lifetime code changed.",
+    "stereo_correctness": "No WVP/stereo/HUD/menu/visual path changed; this task changes only evidence attribution.",
+    "performance": "No runtime hot-path code changed. Identity parsing occurs after the game/host session during collection/analyzer execution.",
+    "adversarial": "A synthetically successful host-owned DirectGPU fixture with mismatched source identity must report DXVK_BUILD_IDENTITY_MISMATCH instead of DXVK_HOST_OWNED_DIRECTGPU_ACTIVE. Incomplete legacy/manual metadata must not be mislabeled as mismatch."
+  },
+  "failure_context": {
+    "initial_validation_run_id": 36465739251,
+    "failure": "PowerShell Set-StrictMode error: '$backend' was read by identity-derived flags before session Backend and BuildIdentity variables were initialized.",
+    "classification": "NEW_TEST_ORDERING_DEFECT_ONLY",
+    "repair_commit": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+    "repair": "Moved complete session/build/preflight identity calculation before identity flags and status precedence. No runtime/transport code was changed.",
+    "final_validation_run_id": 36465995809,
+    "final_result": "PASS",
+    "repeat_policy": "The failing SHA was not rerun unchanged."
+  },
+  "behavior_verified": [
+    "MATCH fixture: session SourceSha/Backend, BUILD_INPUTS IntegrationSha/LaunchBackend and one-click preflight SourceSha/ResolvedBackend agree; BuildIdentityComplete=true and BuildIdentityVerified=true.",
+    "MISMATCH fixture: apparent host-owned direct path with DirectFrames=240 is overridden by DXVK_BUILD_IDENTITY_MISMATCH when package/session source identity disagrees.",
+    "Mismatch issue codes identify session/build-input, session/preflight and build-input/preflight source/backend disagreement independently.",
+    "INCOMPLETE fixture: absent optional package/preflight metadata yields DXVK_BUILD_IDENTITY_INCOMPLETE without fabricating BuildIdentityMismatch.",
+    "One-click structural contract verifies collector/analyzer exact-build identity markers remain present."
+  ],
+  "regression_revalidation": [
+    "VR-DXVK-D3D9EX-SHARED-HANDLE-001: remains OPEN_USER_RUNTIME_VERIFIED_FAILURE. This task only prevents future runtime evidence from being attributed to the wrong exact build.",
+    "Host-owned transport runtime success remains Quest3/VDXR-gated; BuildIdentityVerified=true is necessary evidence quality but not a transport success condition by itself.",
+    "VR-STARTUP-WHITE-001, VR-R50/R51 world stereo and frame-stability protected invariants are unaffected because runtime rendering/transport source was not changed."
+  ],
+  "evidence": [
+    "C0 recovered GitHub HEAD, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, VR automation state, CONVERSION-DXVK-00017 and Issue #13/#14. N100/local clone was not used.",
+    "Collector source confirms BUILD_INPUTS.json and VR_ONE_CLICK_PREFLIGHT.json are copied into the active session directory before Analyze-OutRunVRSession.ps1 runs; uploaded ZIP therefore already contains the identity evidence required for cross-checking.",
+    "Initial Backend Conversion Gate 36465739251 failed only in the new PowerShell behavior fixture due to variable ordering; existing DXVK analyzer/provider and one-click tests passed before that failure.",
+    "Backend Conversion Gate 36465995809 PASS on exact source SHA ffebc679e30c0f742953c02e7b961f79ead6ea37, including identity MATCH/MISMATCH/INCOMPLETE behavior tests, one-click identity contract, DXVK host-owned synchronization contract, pinned provider acquisition, Win32 build and binary verification.",
+    "Build 36466003756 PASS on exact source SHA ffebc679e30c0f742953c02e7b961f79ead6ea37.",
+    "OpenXR VR architecture 36466003736 PASS on exact source SHA ffebc679e30c0f742953c02e7b961f79ead6ea37 across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36466003758 PASS on exact source SHA ffebc679e30c0f742953c02e7b961f79ead6ea37.",
+    "PC Fast 36465995852 skipped as required for scheduled automation.",
+    "Backend artifact 10989054992 digest sha256:58abdbbb7fb246a3efcea72cd657897c1b835b3005d50801848e6409abe6ab9b.",
+    "OpenXR host artifact 10988833973 digest sha256:11a17f23221eb3f8a5668a8558fd2500b2694fe10b22748a1d7885d9424b6dbd.",
+    "HUD inspector game artifact 10989189598 digest sha256:085ed959243bbf033368238ee5ab82c7d20d1d5c20e1c3e29accfe6dee381edb.",
+    "Issue #14 implementation comment 5876111577 and validation comment 5876294226 record the production/validation transaction.",
+    "Controller ATTEMPT=2 supplied stale failure context run 36465739251. Direct comparison confirmed that failure belongs to f4b6dbc3; its repaired descendant ffebc679 passed Backend Conversion Gate 36465995809 with the previously failing behavior step plus synchronization contract, Win32 build and binary verification all successful. Per C0 skip-unchanged rule, source work was not repeated."
+  ],
+  "completed_work_items": [
+    "DXVK-RUNTIME-EVIDENCE-EXACT-BUILD-IDENTITY-GATE"
+  ],
+  "blocked_runtime_items": [
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY",
+    "DXVK-EXACT-BUILD-VISUAL-PARITY-GATE"
+  ],
+  "next_action": "On the next Quest 3/VDXR DXVK run, require BuildIdentityVerified=true before using DirectGPU/pacing telemetry as exact-SHA evidence. Then require DxvkHostDirectPathActive=true, DirectFrames>0, materially reduced fallbacks, pacing recovery from the prior ~33.44 ms gameplay interval, and no startup/stereo/HUD/menu/recenter regression. If BuildIdentityMismatch=true, fix the package/session identity first and do not close the runtime regression.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36465995809,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36466003756,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36466003736,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36466003758,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36465995852,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 10989054992,
+    "backend_gate_artifact_digest": "sha256:58abdbbb7fb246a3efcea72cd657897c1b835b3005d50801848e6409abe6ab9b",
+    "openxr_host_artifact_id": 10988833973,
+    "openxr_host_artifact_digest": "sha256:11a17f23221eb3f8a5668a8558fd2500b2694fe10b22748a1d7885d9424b6dbd",
+    "hud_inspector_artifact_id": 10989189598,
+    "hud_inspector_artifact_digest": "sha256:085ed959243bbf033368238ee5ab82c7d20d1d5c20e1c3e29accfe6dee381edb"
+  },
+  "recorded_at_kst": "2026-09-29T03:44:00+09:00",
+  "controller_retry_reconciliation": {
+    "status": "SUPERSEDED_FAILURE_CONTEXT",
+    "received_attempt": "2/3",
+    "supplied_failure_run_id": 36465739251,
+    "supplied_failure_head_sha": "f4b6dbc39aa9590dd68e1a23623abc381c7b3487",
+    "supplied_failure_signature": "Test runtime shared-handle failure classification failed because Analyze-OutRunVRSession.ps1 evaluated identity-derived flags before session/backend identity initialization under PowerShell Set-StrictMode.",
+    "already_repaired_by_sha": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+    "replacement_success_run_id": 36465995809,
+    "replacement_success_result": "PASS",
+    "replacement_success_evidence": [
+      "Test runtime shared-handle failure classification PASS",
+      "Verify DXVK host-owned transport synchronization contract PASS",
+      "Build Win32 PASS",
+      "Verify binary exists PASS",
+      "Build workflow 36466003756 PASS",
+      "OpenXR VR architecture 36466003736 PASS",
+      "HUD Inspector 36466003758 PASS"
+    ],
+    "action_taken": "No source or test logic was repeated or changed in controller attempt 2 because the supplied failure context was already repaired and exact-SHA validated. Only this durable reconciliation record was updated.",
+    "result_sha_unchanged": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED"
+  }
+}

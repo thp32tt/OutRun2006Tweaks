@@ -1,0 +1,67 @@
+{
+  "task_id": "CONVERSION-DXVK-00051",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "52bcbfa57f92cffdde2c018fc5adb468f703c5c7",
+  "result_sha": "f2a5ae15c67510cf26e3c26705313c5c176b5d0a",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "VR-HOST-002",
+  "summary": "Closed stale VR-HOST-002 post-review state on the current DXVK branch by adding executable Frame.v2 producer-run identity coverage, executing the existing exact DirectGPU ACK identity smoke in OpenXR CI, and expanding the current-head transport verifier without changing runtime behavior.",
+  "changed_paths": [
+    "vrhost/tests/frame_run_identity_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    ".github/workflows/vr-openxr.yml",
+    "tools/verify_dxvk_host_owned_transport_contract.py",
+    "docs/VR_WORK_QUEUE.json"
+  ],
+  "source_commit": {
+    "sha": "f2a5ae15c67510cf26e3c26705313c5c176b5d0a",
+    "message": "Close DXVK host post-review identity gate [AUTO:CONVERSION-DXVK-00051]",
+    "validation_bearing": true,
+    "ci_skip": false
+  },
+  "post_review_evidence": [
+    "Issue #6 comment 5755798832 records that VR-HOST-002 runtime changes passed independent A/B/C review.",
+    "Issue #6 comment 5863277718 found the historical a2b2e4d candidate diverged while current protocol/host/direct-passthrough core remained present and instructed queue reconciliation instead of stale-candidate merge."
+  ],
+  "behavior_verified": [
+    "Current protocol requires exact Frame.v2 clientPid plus run-generation identity and rejects zero/stale identity.",
+    "Current producer claims the render ring for the active run and stamps each slot with that run generation.",
+    "Current host ReadSlot rejects stale run identity through RenderFrameRunIdentityMatches.",
+    "Current R23 path preserves cached projection hold, verified-bundle handoff, direct hold/copy-before-ACK semantics, and exact-source classic fallback rejection.",
+    "New frame_run_identity_smoke.exe rejects PID mismatch, generation mismatch, zero identities, and an old slot after a simulated fast game restart until the slot adopts the new generation.",
+    "Existing direct_ack_identity_smoke.exe is now executed by OpenXR CI and passed on the exact result SHA.",
+    "No runtime visual, pacing, copy/wait, ACK implementation, DXVK provider, or OpenXR submission behavior changed."
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36560079498,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36560084803,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36560084814,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36560084980,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36560079495,
+    "pc_fast_result": "SKIPPED"
+  },
+  "scope": "Verifier/test/workflow/queue only; no renderer, DXVK provider, DirectGPU resource lifetime/copy/wait/ACK implementation, OpenXR submission policy, cadence, or visual behavior changed.",
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5889044688,
+    "issue_14_validation_comment_id": 5889147046
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_REVIEW_VR_HOST_002_POST_REVIEW_STATE",
+    "C2_IMPLEMENT_IDENTITY_SMOKE_AND_CURRENT_HEAD_VERIFIER",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C4_5_LEDGER",
+    "C6_STATE"
+  ],
+  "blocker": "No software/post-review blocker remains for VR-HOST-002. Hardware-specific DXVK DirectGPU/shared-handle behavior remains a separate runtime gate.",
+  "next_action": "Do not recreate or merge historical VR-HOST-002 candidate a2b2e4d0168c311e8998df4dc6c012c47e855558. Continue hardware-specific Quest3/VDXR validation under VR-DXVK-D3D9EX-SHARED-HANDLE-001; keep RUNTIME_VALIDATION=UNTESTED until matching exact-build evidence exists.",
+  "recorded_at_kst": "2026-09-29T20:17:00+09:00"
+}

@@ -1,0 +1,119 @@
+{
+  "task_id": "CONVERSION-DXVK-00033",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 3,
+  "base_sha": "52dbefd6ebe2399fb9a006ae1ee9f207b5ab1a8d",
+  "result_sha": "8ffbe8d1ce14b978fc201c065872edf9705d5ee1",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_06-F25-DXVK-PLAN-TRANSACTION-RECONCILIATION",
+  "summary": "Closed Set 06 F25. The DXVK R71 plan now accurately describes selector activation as a bounded selector-owned snapshot/rollback/root-attestation transaction rather than filesystem-wide atomic replacement. Attempt 2 also hardened the queue-controller protocol against state commits self-cancelling same-branch validation. The real verifier failure was an invented Complete-BackendSwitchTransaction marker; attempt 3 replaced it with the selector's actual Remove-BackendSwitchTransaction cleanup lifecycle and passed all exact-SHA hosted validation.",
+  "changed_paths": [
+    "docs/VR_DXVK_R71_PLAN.md",
+    "tools/verify_dxvk_reactivation_contract.py",
+    "docs/automation/QUEUE_CONTROLLER_CONTRACT.md"
+  ],
+  "review": {
+    "architecture": "Documentation now distinguishes bounded selector-owned rollback from filesystem-wide atomic replacement.",
+    "ownership_lifetime": "No runtime ownership/resource behavior changed.",
+    "stereo_correctness": "No renderer/stereo/HUD/menu/effect/recenter behavior changed.",
+    "performance": "No runtime or performance path changed.",
+    "adversarial": "The verifier now fails if the plan loses its bounded transaction wording, selector transaction functions disappear, or the executable transaction test no longer proves post-attestation rollback/cleanup and successful root attestation."
+  },
+  "evidence": [
+    "C0 recovered GitHub HEAD bd8a729f85f7a49fcd7dfbfd08bfae07afd13987, AGENTS.md, review Sets 06-10, QUEUE_CONTROLLER_CONTRACT.md, automation state, CONVERSION-DXVK-00031 and runtime regression evidence. N100/local clone was not used.",
+    "C1 rechecked remaining DXVK software findings. Set 06 F25 was the remaining HMD-independent inconsistency: the plan said activation was atomic while the current selector implements a bounded snapshot/rollback/attestation transaction.",
+    "Source 3d95696e65aff8a2a374dc9c126199428b763e9f updates the plan and extends tools/verify_dxvk_reactivation_contract.py with plan/selector/transaction-test requirements.",
+    "Backend Conversion Gate 36499169322 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
+    "Build 36499173742 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
+    "OpenXR VR architecture 36499173709 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
+    "HUD Inspector 36499173751 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
+    "PC Fast 36499169338 skipped as required for scheduled automation.",
+    "Repository Actions observation at checkpoint: 9 runs in progress and 94 queued, dominated by unrelated R71-STATIC-1000/localization automation. No 00033 hosted job had started; this is capacity backlog, not a validation failure.",
+    "Issue #14 implementation comment 5880779818 records the production transaction.",
+    "Attempt 2 inspected cancelled Backend Conversion Gate 36499169322 directly: validate job 109185684647 concluded cancelled with zero steps started. It was cancelled at 23:46:11Z as the C6 state commit c7f340e539f20195f3da302681101debb369498c created Backend Conversion Gate 36499723553 at 23:46:10Z.",
+    "Compare 3d95696e..c7f340e5 shows only three documentation/state paths changed: the task run record, Set 06 review, and review index. No source/verifier implementation changed.",
+    "Workflow .github/workflows/backend-conversion-gate.yml uses group backend-conversion-gate-${{ github.ref }} with cancel-in-progress: true, confirming supersession rather than code/test failure.",
+    "Queue controller contract updated in attempt 2 to prevent ordinary state-only commits from self-cancelling queued/in-progress exact-source validation and to treat zero-step supersession cancellation as PENDING rather than FAIL.",
+    "Attempt 3 Backend Conversion Gate 36502258316 PASS on exact SHA 8ffbe8d1ce14b978fc201c065872edf9705d5ee1. The previously failing Verify DXVK SAFE reactivation contract step PASSed, followed by Win32 configure/build, binary verification and artifact upload.",
+    "Build 36502262877 PASS on exact SHA 8ffbe8d1ce14b978fc201c065872edf9705d5ee1.",
+    "OpenXR VR architecture 36502262827 PASS on exact SHA 8ffbe8d1ce14b978fc201c065872edf9705d5ee1 across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36502262924 PASS on exact SHA 8ffbe8d1ce14b978fc201c065872edf9705d5ee1.",
+    "Backend artifact 11004964168 digest sha256:387483fd06118a2799edf57d8b227c96420bcb2aaa754b0c7f7c7a8c2ca16881.",
+    "OpenXR host artifact 11005644044 digest sha256:78f4de249e9c1f780c87ce8a6bb55d74576789630783e8de5c3a32d411bc7887.",
+    "HUD inspector game artifact 11005744596 digest sha256:ee05d00f65d854bfb062c85218070273784d7e1efe782bdb4832d2c578f48863.",
+    "Issue #14 attempt-2 supersession repair comment 5881061247, attempt-2 verifier repair comment 5881173598, and final validation comment 5881305938 record the complete repair chain."
+  ],
+  "completed_work_items": [
+    "F25-DOCUMENTATION-AND-CONTRACT-IMPLEMENTATION",
+    "F25-VALIDATION-SUPERSESSION-PROTOCOL-REPAIR",
+    "F25-SELECTOR-TRANSACTION-VERIFIER-REPAIR",
+    "F25-CLOSED"
+  ],
+  "pending_validation_items": [],
+  "next_action": "F25 is closed; do not recreate selector transaction-plan work. DXVK hardware/runtime gates remain unchanged: exact-build Quest3/VDXR stock SAFE/host-owned transport visual and pacing validation is still required. Keep RUNTIME_VALIDATION=UNTESTED for this task.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36502258316,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36502262877,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36502262827,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36502262924,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36502258324,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 11004964168,
+    "backend_gate_artifact_digest": "sha256:387483fd06118a2799edf57d8b227c96420bcb2aaa754b0c7f7c7a8c2ca16881",
+    "openxr_host_artifact_id": 11005644044,
+    "openxr_host_artifact_digest": "sha256:78f4de249e9c1f780c87ce8a6bb55d74576789630783e8de5c3a32d411bc7887",
+    "hud_inspector_game_artifact_id": 11005744596,
+    "hud_inspector_game_artifact_digest": "sha256:ee05d00f65d854bfb062c85218070273784d7e1efe782bdb4832d2c578f48863"
+  },
+  "recorded_at_kst": "2026-09-29T09:30:00+09:00",
+  "failure_context": {
+    "reported_run_id": 36499169322,
+    "reported_conclusion": "cancelled",
+    "job_id": 109185684647,
+    "job_steps_started": 0,
+    "source_sha": "3d95696e65aff8a2a374dc9c126199428b763e9f",
+    "superseding_state_sha": "c7f340e539f20195f3da302681101debb369498c",
+    "superseding_backend_gate_run_id": 36499723553,
+    "cause": "Backend Conversion Gate uses concurrency group backend-conversion-gate-${{ github.ref }} with cancel-in-progress=true. The C6 state commit was pushed at the same moment the earlier queued source run was cancelled.",
+    "source_relation": "c7f340e5 is one commit ahead of 3d95696e and changes only docs/automation/runs/CONVERSION-DXVK-00033.json plus Set 06/index state documentation.",
+    "repair": "Do not rerun the cancelled ancestor or create further ordinary branch commits while the descendant validation is queued. Added queue-controller protocol rules for superseded queued/in-progress validation."
+  },
+  "validation_sha": "8ffbe8d1ce14b978fc201c065872edf9705d5ee1",
+  "initial_base_sha": "bd8a729f85f7a49fcd7dfbfd08bfae07afd13987",
+  "source_commits": [
+    "3d95696e65aff8a2a374dc9c126199428b763e9f",
+    "52dbefd6ebe2399fb9a006ae1ee9f207b5ab1a8d",
+    "8ffbe8d1ce14b978fc201c065872edf9705d5ee1"
+  ],
+  "failure_history": [
+    {
+      "attempt": 1,
+      "run_id": 36499169322,
+      "conclusion": "cancelled",
+      "interpretation": "Not a code/test failure. validate job 109185684647 had zero steps. Same-branch C6 state commit c7f340e5 superseded the queued run under Backend Conversion Gate cancel-in-progress concurrency.",
+      "repair": "Attempt 2 added queue-controller rules preventing ordinary state-only pushes from superseding queued/in-progress validation. State/process repair commit 52dbefd6 used [skip ci]."
+    },
+    {
+      "attempt": 2,
+      "run_id": 36499723553,
+      "conclusion": "failure",
+      "failed_step": "Verify DXVK SAFE reactivation contract",
+      "signature": "DXVK reactivation invariant missing: tools/Select-OutRunVRBackend.ps1 :: Complete-BackendSwitchTransaction",
+      "interpretation": "Real verifier defect. Complete-BackendSwitchTransaction does not exist.",
+      "repair": "Attempt 3 requires the actual selector lifecycle: Start-BackendSwitchTransaction, Restore-BackendSwitchTransaction, Remove-BackendSwitchTransaction, the success cleanup flag, and Remove-BackendSwitchTransaction invocation."
+    },
+    {
+      "attempt": 3,
+      "run_id": 36502258316,
+      "conclusion": "success",
+      "result_sha": "8ffbe8d1ce14b978fc201c065872edf9705d5ee1",
+      "interpretation": "Corrected reactivation contract and all Backend Conversion Gate steps PASS."
+    }
+  ]
+}

@@ -1,0 +1,387 @@
+{
+  "task_id": "CONVERSION-DXVK-00267",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 2,
+  "base_sha": "d67ded2e23dd45ee26ddebb186e75b1558ca6715",
+  "result_sha": "75d91a42fa8fd6d08ab2d0e9048cd42cfd9a9b0b",
+  "validation_bearing_result_sha": "75d91a42fa8fd6d08ab2d0e9048cd42cfd9a9b0b",
+  "automation_validation": "PASS_CORE_GATES_INSPECTOR_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R267_182569_EXACT_DECODE_REVIEW",
+  "selection_reason": "The branch has no CONVERSION-DXVK-00265 or CONVERSION-DXVK-00267 durable record. CONVERSION-DXVK-00263 is the latest durable DXVK task, but its JSON remained at C3/PENDING even though exact-head GitHub Actions for d67ded2e23dd45ee26ddebb186e75b1558ca6715 completed successfully. That validated 64-byte canonical-EXE provenance at 0x00182569..0x001825A9, so the next bounded non-duplicating step is exact decoding of only complete instructions in that already-validated window.",
+  "summary": "Reconcile the stale R263 pending metadata using its actual successful GitHub Actions evidence, then exact-decode the validated 0x00182569..0x001825A9 byte window. The window contains 22 complete x86 instructions through exclusive 0x001825A6 followed by the three-byte prefix 'a9 00 00' of an incomplete TEST EAX, imm32 instruction. No function, render, HUD, ownership, or runtime semantics are promoted.",
+  "evidence": [
+    "GitHub SSOT branch HEAD before this task is d67ded2e23dd45ee26ddebb186e75b1558ca6715.",
+    "docs/automation/runs contains CONVERSION-DXVK-00263.json but no CONVERSION-DXVK-00265.json or CONVERSION-DXVK-00267.json; task IDs are therefore not a guaranteed contiguous on-branch sequence.",
+    "R263 exact-head workflows at d67ded2e23dd45ee26ddebb186e75b1558ca6715 completed successfully: Backend Conversion Gate 36916719657, Build 36916729531, OpenXR VR architecture 36916729511, OutRun EXE HUD Inspector CI 36916729537, and VR Hosted Test Package push 36916719491 / pull_request 36916729322.",
+    "Static EXE analysis job 110552914236 reports canonical EXE SHA-256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3 and EXACT_EXE_182569_TO_1825A9_PROVENANCE_CAPTURED.",
+    "Validated bytes are: 74 11 8a 07 83 c7 01 84 c0 74 39 f7 c7 03 00 00 00 75 ef 8b 07 ba ff fe fe 7e 03 d0 83 f0 ff 33 c2 83 c7 04 a9 00 01 01 81 74 e8 8b 47 fc 84 c0 74 21 84 e4 74 18 a9 00 00 ff 00 74 0c a9 00 00.",
+    "Exact decoding consumes 61 bytes through exclusive RVA 0x001825A6. The remaining bytes at 0x001825A6..0x001825A9 are a9 00 00, an incomplete 5-byte TEST EAX, imm32 encoding and are deliberately not decoded.",
+    "RUNTIME_VALIDATION remains UNTESTED; this task changes durable review evidence only."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00267.json"
+  ],
+  "predecessor_reconciliation": {
+    "task_id": "CONVERSION-DXVK-00263",
+    "recorded_status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+    "observed_exact_head": "d67ded2e23dd45ee26ddebb186e75b1558ca6715",
+    "observed_automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "note": "R263 JSON is stale at PENDING; this R267 record preserves the observed exact-head CI evidence instead of repeating R263 implementation."
+  },
+  "proof_contract": {
+    "predecessor_status": "EXACT_EXE_182569_TO_1825A9_PROVENANCE_CAPTURED",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "capture_start_rva": "0x00182569",
+    "capture_end_rva": "0x001825A9",
+    "complete_decode_end_rva": "0x001825A6",
+    "captured_byte_count": 64,
+    "decoded_complete_byte_count": 61,
+    "instruction_count": 22,
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "partial_tail_rva": "0x001825A6",
+    "partial_tail_bytes": "a9 00 00",
+    "partial_tail_expected_instruction": "TEST EAX, imm32",
+    "partial_tail_status": "INCOMPLETE_3_OF_5_BYTES",
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "internal_branch_targets": [
+      "0x0018256B",
+      "0x0018257C"
+    ],
+    "external_branch_targets": [
+      "0x001825AD",
+      "0x001825B2",
+      "0x001825B7",
+      "0x001825BC"
+    ],
+    "capture_end_is_instruction_boundary": false,
+    "decode_end_is_instruction_boundary": true,
+    "status": "EXACT_182569_TO_1825A6_CONTROL_FLOW_PREFIX_PROVEN",
+    "function_entry_status": "UNRESOLVED_AT_182569_18256B_18257C_AND_FORWARD_TARGETS",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "instructions": [
+    {
+      "rva": "0x00182569",
+      "bytes": "74 11",
+      "asm": "je 0x0018257C"
+    },
+    {
+      "rva": "0x0018256B",
+      "bytes": "8a 07",
+      "asm": "mov al, byte ptr [edi]"
+    },
+    {
+      "rva": "0x0018256D",
+      "bytes": "83 c7 01",
+      "asm": "add edi, 1"
+    },
+    {
+      "rva": "0x00182570",
+      "bytes": "84 c0",
+      "asm": "test al, al"
+    },
+    {
+      "rva": "0x00182572",
+      "bytes": "74 39",
+      "asm": "je 0x001825AD"
+    },
+    {
+      "rva": "0x00182574",
+      "bytes": "f7 c7 03 00 00 00",
+      "asm": "test edi, 3"
+    },
+    {
+      "rva": "0x0018257A",
+      "bytes": "75 ef",
+      "asm": "jne 0x0018256B"
+    },
+    {
+      "rva": "0x0018257C",
+      "bytes": "8b 07",
+      "asm": "mov eax, dword ptr [edi]"
+    },
+    {
+      "rva": "0x0018257E",
+      "bytes": "ba ff fe fe 7e",
+      "asm": "mov edx, 0x7EFEFEFF"
+    },
+    {
+      "rva": "0x00182583",
+      "bytes": "03 d0",
+      "asm": "add edx, eax"
+    },
+    {
+      "rva": "0x00182585",
+      "bytes": "83 f0 ff",
+      "asm": "xor eax, 0xFFFFFFFF"
+    },
+    {
+      "rva": "0x00182588",
+      "bytes": "33 c2",
+      "asm": "xor eax, edx"
+    },
+    {
+      "rva": "0x0018258A",
+      "bytes": "83 c7 04",
+      "asm": "add edi, 4"
+    },
+    {
+      "rva": "0x0018258D",
+      "bytes": "a9 00 01 01 81",
+      "asm": "test eax, 0x81010100"
+    },
+    {
+      "rva": "0x00182592",
+      "bytes": "74 e8",
+      "asm": "je 0x0018257C"
+    },
+    {
+      "rva": "0x00182594",
+      "bytes": "8b 47 fc",
+      "asm": "mov eax, dword ptr [edi-4]"
+    },
+    {
+      "rva": "0x00182597",
+      "bytes": "84 c0",
+      "asm": "test al, al"
+    },
+    {
+      "rva": "0x00182599",
+      "bytes": "74 21",
+      "asm": "je 0x001825BC"
+    },
+    {
+      "rva": "0x0018259B",
+      "bytes": "84 e4",
+      "asm": "test ah, ah"
+    },
+    {
+      "rva": "0x0018259D",
+      "bytes": "74 18",
+      "asm": "je 0x001825B7"
+    },
+    {
+      "rva": "0x0018259F",
+      "bytes": "a9 00 00 ff 00",
+      "asm": "test eax, 0x00FF0000"
+    },
+    {
+      "rva": "0x001825A4",
+      "bytes": "74 0c",
+      "asm": "je 0x001825B2"
+    }
+  ],
+  "review_lenses": {
+    "architecture": "Review-only durable evidence; no backend/provider/selector/package/runtime activation path changes.",
+    "ownership": "Control-flow decoding does not establish ScreenHud/world/render ownership.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter behavior changes.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, or frame-pacing changes.",
+    "adversarial": "The decoder stops before the incomplete a9 00 00 tail and does not infer the missing imm32 bytes or any branch-target semantics beyond the validated capture."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "EXACT_EXE_182569_TO_1825A9_PROVENANCE_CAPTURED",
+    "after": "EXACT_182569_TO_1825A6_CONTROL_FLOW_PREFIX_PROVEN",
+    "runtime_claim": false
+  },
+  "blocker": "No core automation blocker. OutRun EXE HUD Inspector CI #1532 remains IN_PROGRESS at C6; runtime validation remains UNTESTED.",
+  "next_action": "Continue from exact instruction boundary 0x00182635 with a fresh bounded canonical-EXE provenance window. Preserve DXVK isolation; do not promote function/render/HUD/runtime semantics until separately proven.",
+  "checkpoint": "C6_STATE",
+  "status": "CORE_VALIDATED_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "source_commits": [
+    {
+      "sha": "f4bd99b4672148fb3622aceb7219ec9c7312c5a5",
+      "message": "vr: exact-decode 0x182569 continuation [AUTO:CONVERSION-DXVK-00267]",
+      "role": "validation-bearing-result",
+      "validation_bearing": true,
+      "ci_skip": false
+    },
+    {
+      "sha": "a63af01f6b79ab98df9d747b580252810b022f29",
+      "message": "vr: extend 0x1825a6 provenance window [AUTO:CONVERSION-DXVK-00267]",
+      "role": "provenance-implementation",
+      "validation_bearing": true,
+      "ci_skip": false
+    },
+    {
+      "sha": "d21d85cfdbedc762ff01b917115b3efcc4796cc5",
+      "message": "vr: prove 0x1825a6 control-flow prefix [AUTO:CONVERSION-DXVK-00267]",
+      "role": "control-flow-proof",
+      "validation_bearing": true,
+      "ci_skip": false
+    },
+    {
+      "sha": "75d91a42fa8fd6d08ab2d0e9048cd42cfd9a9b0b",
+      "message": "vr: prove 0x1825e5 continuation block [AUTO:CONVERSION-DXVK-00267]",
+      "role": "continuation-14-provenance-and-control-flow-proof",
+      "validation_bearing": true,
+      "ci_skip": false
+    }
+  ],
+  "validation_evidence": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 36937137344,
+      "run_number": 502,
+      "event": "push",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "Build",
+      "run_id": 36937140266,
+      "run_number": 4334,
+      "event": "pull_request",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 36937140200,
+      "run_number": 1688,
+      "event": "pull_request",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "VR Hosted Test Package",
+      "run_id": 36937137638,
+      "run_number": 237,
+      "event": "push",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "VR Hosted Test Package",
+      "run_id": 36937140242,
+      "run_number": 238,
+      "event": "pull_request",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 36937140191,
+      "run_number": 1532,
+      "event": "pull_request",
+      "conclusion": "IN_PROGRESS_AT_C6",
+      "required_for_completion": false,
+      "reason": "Canonical EXE bytes used by this proof were independently recovered from exact Build #4332 artifact 11197647438 and matched SHA-256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3."
+    },
+    {
+      "workflow": "VR PC Fast Test Build",
+      "run_id": 36937137322,
+      "run_number": 874,
+      "event": "push",
+      "conclusion": "skipped",
+      "required_for_completion": false,
+      "reason": "No explicitly authorized evening PC-fast test session."
+    }
+  ],
+  "provenance_followup": {
+    "start_rva": "0x001825A6",
+    "probe_len": 64,
+    "probe_end_rva": "0x001825E6",
+    "required_overlap": "a9 00 00",
+    "required_branch_targets": [
+      "0x001825AD",
+      "0x001825B2",
+      "0x001825B7",
+      "0x001825BC"
+    ],
+    "expected_status": "EXACT_EXE_1825A6_TO_1825E6_PROVENANCE_CAPTURED",
+    "actual_status": "EXACT_EXE_1825A6_TO_1825E6_PROVENANCE_CAPTURED",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "bytes": "a9 00 00 00 ff 75 cf 83 ef 01 eb 0d 83 ef 02 eb 08 83 ef 03 eb 03 83 ef 04 8b 74 24 14 f7 c6 03 00 00 00 75 09 8b d9 c1 e9 02 75 5c eb 22 8a 16 83 c6 01 84 d2 74 3d 88 17 83 c7 01 83 e9 01 74",
+    "exact_build_artifact": {
+      "workflow_run": 36935653648,
+      "artifact_id": 11197647438,
+      "artifact_name": "outrun2006tweaks-245b28dd1ad2d6d962eb1c73c28347ec99ad842e",
+      "head_sha": "a63af01f6b79ab98df9d747b580252810b022f29"
+    }
+  },
+  "control_flow_followup": {
+    "start_rva": "0x001825A6",
+    "prefix_end_rva": "0x001825E5",
+    "instruction_count": 23,
+    "decoded_complete_byte_count": 63,
+    "incomplete_rva": "0x001825E5",
+    "incomplete_bytes": "74",
+    "incomplete_status": "SHORT_JCC_OPCODE_ONLY",
+    "status": "EXACT_1825A6_TO_1825E5_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "branches": [
+      [
+        "0x001825AB",
+        "0x0018257C"
+      ],
+      [
+        "0x001825B0",
+        "0x001825BF"
+      ],
+      [
+        "0x001825B5",
+        "0x001825BF"
+      ],
+      [
+        "0x001825BA",
+        "0x001825BF"
+      ],
+      [
+        "0x001825C9",
+        "0x001825D4"
+      ],
+      [
+        "0x001825D0",
+        "0x0018262E"
+      ],
+      [
+        "0x001825D2",
+        "0x001825F6"
+      ],
+      [
+        "0x001825DB",
+        "0x0018261A"
+      ]
+    ],
+    "next_provenance_start_rva": "0x001825E5",
+    "required_overlap": "74",
+    "minimum_required_end_rva": "0x0018262F"
+  },
+  "continuation_14": {
+    "start_rva": "0x001825E5",
+    "probe_len": 80,
+    "probe_end_rva": "0x00182635",
+    "required_overlap": "74",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "bytes": "74 29 f7 c6 03 00 00 00 75 e5 8b d9 c1 e9 02 75 38 8b cb 83 e1 03 74 13 8a 16 83 c6 01 88 17 83 c7 01 84 d2 74 07 83 e9 01 75 ed 88 0f 5b 5e 8b 44 24 08 5f c3 88 17 8b 44 24 10 5b 5e 5f c3 89 17 83 c7 04 83 e9 01 74 c8 ba ff fe fe 7e 8b 06",
+    "provenance_status": "EXACT_EXE_1825E5_TO_182635_PROVENANCE_CAPTURED",
+    "proof_status": "EXACT_1825E5_TO_182635_CONTROL_FLOW_PREFIX_PROVEN",
+    "instruction_count": 35,
+    "capture_end_is_instruction_boundary": true,
+    "ret_rvas": [
+      "0x00182619",
+      "0x00182623"
+    ],
+    "resolved_predecessor_targets": [
+      "0x001825F6",
+      "0x0018261A",
+      "0x0018262E"
+    ],
+    "backedge_target": "0x001825D4",
+    "next_provenance_start_rva": "0x00182635"
+  }
+}

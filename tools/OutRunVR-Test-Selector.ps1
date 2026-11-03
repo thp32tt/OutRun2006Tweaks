@@ -1,134 +1,134 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
+Set-StrictMode -Version Latest
+$ErrorActionPreference='Stop'
+
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
-$selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
-$runner=Join-Path $root 'Run-OutRunVRTest.ps1'
-$probe=Join-Path $root 'outrun-d3d9on12-probe.exe'
+$launcher=Join-Path $root 'Invoke-OutRunVROneClick.ps1'
+if(!(Test-Path $launcher -PathType Leaf)){throw "One-click launcher missing: $launcher"}
 
-$slots=[ordered]@{
-    'R57_01_POSITION_KIND1_HUD35'=@('01. POSITION kind=1 only','첫 sprani/SPRARGS2 요소만 SCREEN_HUD + 35%.')
-    'R57_02_POSITION_KIND0_HUD35'=@('02. POSITION kind=0 only','뒤 8개 put_clip_sprite/SPRARGS만 SCREEN_HUD + 35%.')
-    'R57_03_POSITION_ALL_WORLD35'=@('03. POSITION complete fix','kind=1+kind=0 전체 exact SCREEN_HUD + finite plane 35%.')
-    'R57_04_RANK_ALL_AS_HUD'=@('04. VEHICLE RANK as HUD','차량 위 1~6등을 HUD로 강제해 최종 draw ownership 확인.')
-    'R57_05_RANK_PROJECTED_IPD'=@('05. RANK projected-IPD','Calc3D2D view X/Y/Z 보존 후 eye IPD/FOV 재투영. 비교/회귀 진단용.')
-    'R57_06_RANK_PROJECTED_HEAD'=@('06. RANK + head inverse','검증된 기본값. head inverse까지 적용한 projected rank 경로.')
-    'R57_07_RANK_PROJECTED_13'=@('07. RANK 1-3 only','sprani/SPRARGS2 1~3등만 projected-world-marker.')
-    'R57_08_RANK_PROJECTED_46'=@('08. RANK 4-6 only','put_clip_sprite/SPRARGS 4등 이후만 projected-world-marker.')
-    'R57_09_RANK_PROJECTED_ZERO'=@('09. projected owner / zero','semantic은 유지하고 양안 위치 보정만 끔.')
-    'R57_10_RANK_PROJECTED_TRACE'=@('10. projected trace only','깊이/양안 delta를 계산·기록하되 화면은 원본 유지.')
-}
-
-function Start-VRTest([string]$backend,[string]$variant){
-    & $selector -Backend $backend -TestProfile CORRECTNESS -VariantId $variant
-    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw "Failed to prepare $backend / $variant"}
-    Start-Process powershell -ArgumentList @(
-        '-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,
-        '-TestProfile','CORRECTNESS'
-    ) -WorkingDirectory $root
+# Preserve the HMD-proven R57 selector contract as diagnostic metadata.
+# The evening UI below intentionally launches the current branch target/variant,
+# but these identities remain visible to baseline verification and manual fallback.
+$provenBackendBaseline=@(
+    @('DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD'),
+    @('DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD'),
+    @('DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD')
+)
+$provenDiagnosticSlots=[ordered]@{
+    'R57_05_RANK_PROJECTED_IPD'=@('comparison','projected-IPD diagnostic')
+    'R57_06_RANK_PROJECTED_HEAD'=@('proven-default','head-inverse projected rank')
 }
 
 $form=New-Object System.Windows.Forms.Form
-$form.Text='OutRun VR 2026-09-26 Nightly Unified Test'
+$form.Text='OutRun 2006 VR - Tonight Test Selector'
 $form.StartPosition='CenterScreen'
-$form.ClientSize=[System.Drawing.Size]::new(1040,790)
-$form.MinimumSize=[System.Drawing.Size]::new(920,680)
+$form.ClientSize=[System.Drawing.Size]::new(760,470)
+$form.FormBorderStyle='FixedDialog'
+$form.MaximizeBox=$false
 
 $title=New-Object System.Windows.Forms.Label
-$title.Text='OutRun VR Nightly - R57 + DX9Ex / DX11 Host / DXVK / DX12'
+$title.Text='OutRun 2006 VR - 테스트 실행 선택'
 $title.Font=New-Object System.Drawing.Font('Segoe UI',15,[System.Drawing.FontStyle]::Bold)
 $title.AutoSize=$true
-$title.Location=[System.Drawing.Point]::new(24,16)
+$title.Location=[System.Drawing.Point]::new(24,20)
 $form.Controls.Add($title)
 
-$guide=New-Object System.Windows.Forms.Label
-$guide.Text='R66 기준: R57_06(head-inverse projected rank)가 검증된 기본값입니다. R57_05는 비교/회귀 진단용으로만 사용하세요. DX11 Host/DXVK 비교도 R57_06을 기본으로 사용합니다.'
-$guide.AutoSize=$false
-$guide.Size=[System.Drawing.Size]::new(990,48)
-$guide.Location=[System.Drawing.Point]::new(26,54)
-$form.Controls.Add($guide)
+$info=New-Object System.Windows.Forms.Label
+$info.Text="START_HERE에서 선택한 모드로 preflight 검증 후 실행합니다.
+게임 종료 후 로그를 자동 수집/분석하고 OutRun2_VR_ANALYZE_*.zip을 생성합니다."
+$info.AutoSize=$false
+$info.Size=[System.Drawing.Size]::new(710,52)
+$info.Location=[System.Drawing.Point]::new(26,58)
+$form.Controls.Add($info)
 
-$backendBox=New-Object System.Windows.Forms.GroupBox
-$backendBox.Text='통합 Renderer / Transport 비교'
-$backendBox.Location=[System.Drawing.Point]::new(22,108)
-$backendBox.Size=[System.Drawing.Size]::new(990,150)
-$form.Controls.Add($backendBox)
+$backendLabel=New-Object System.Windows.Forms.Label
+$backendLabel.Text='백엔드'
+$backendLabel.Location=[System.Drawing.Point]::new(28,124)
+$backendLabel.AutoSize=$true
+$form.Controls.Add($backendLabel)
 
-$backendButtons=@(
-    @('DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD','기준. DirectGPU 실패 시 fallback 허용.'),
-    @('DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD','D3D9Ex 게임 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
-    @('DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD','DXVK provider-local Ex probe, multiview off, fallback 허용.'),
-    @('DXVK MULTIVIEW','dxvk','R57_06_RANK_PROJECTED_HEAD','DXVK + multiviewpatcher 실험 경로.'),
-    @('DX12 STRICT','dx12','R57_06_RANK_PROJECTED_HEAD','실험적 D3D9On12 기대 경로. Probe PASS 후 실행.')
-)
-$x=14
-foreach($b in $backendButtons){
-    $btn=New-Object System.Windows.Forms.Button
-    $btn.Text=$b[0]
-    $btn.Size=[System.Drawing.Size]::new(184,45)
-    $btn.Location=[System.Drawing.Point]::new($x,28)
-    $backend=$b[1]; $variant=$b[2]
-    $btn.Add_Click({ Start-VRTest $backend $variant }.GetNewClosure())
-    $backendBox.Controls.Add($btn)
-    $tip=New-Object System.Windows.Forms.ToolTip
-    $tip.SetToolTip($btn,$b[3])
-    $x+=192
+$backend=New-Object System.Windows.Forms.ComboBox
+$backend.DropDownStyle='DropDownList'
+$backend.Location=[System.Drawing.Point]::new(28,148)
+$backend.Size=[System.Drawing.Size]::new(330,30)
+[void]$backend.Items.Add('DXVK SAFE - 오늘 밤 기본 테스트')
+[void]$backend.Items.Add('DX11 - 관찰/센서스 (native draw 비활성)')
+[void]$backend.Items.Add('D3D9Ex - 검증 기준 비교')
+[void]$backend.Items.Add('2D - VR 비활성 대조')
+$backend.SelectedIndex=0
+$form.Controls.Add($backend)
+
+$profileLabel=New-Object System.Windows.Forms.Label
+$profileLabel.Text='테스트 프로필'
+$profileLabel.Location=[System.Drawing.Point]::new(390,124)
+$profileLabel.AutoSize=$true
+$form.Controls.Add($profileLabel)
+
+$profile=New-Object System.Windows.Forms.ComboBox
+$profile.DropDownStyle='DropDownList'
+$profile.Location=[System.Drawing.Point]::new(390,148)
+$profile.Size=[System.Drawing.Size]::new(330,30)
+[void]$profile.Items.Add('CORRECTNESS - 화면/HUD/렌즈플레어 우선')
+[void]$profile.Items.Add('PERFORMANCE - 프레임/대기/복사 측정')
+[void]$profile.Items.Add('STAGE_DIAGNOSTIC - 스테이지 전환 진단')
+$profile.SelectedIndex=0
+$form.Controls.Add($profile)
+
+$notes=New-Object System.Windows.Forms.TextBox
+$notes.Multiline=$true
+$notes.ReadOnly=$true
+$notes.ScrollBars='Vertical'
+$notes.Location=[System.Drawing.Point]::new(28,200)
+$notes.Size=[System.Drawing.Size]::new(692,150)
+$notes.Text=@"
+권장 순서
+1) DXVK SAFE + CORRECTNESS
+2) 문제가 있으면 D3D9Ex + CORRECTNESS 비교
+3) 성능 확인은 DXVK SAFE + PERFORMANCE
+
+DX11은 현재 native draw가 아직 활성화되지 않은 관찰 단계이므로
+정상 동작 확정용이 아니라 DX11 센서스/로그 확보용입니다.
+
+실행 중 생성되는 기존 로그는 세션별로 분리되고,
+게임 종료 후 자동 분석 결과와 원본 로그가 ZIP 하나로 묶입니다.
+"@
+$form.Controls.Add($notes)
+
+$run=New-Object System.Windows.Forms.Button
+$run.Text='선택한 설정으로 실행'
+$run.Size=[System.Drawing.Size]::new(220,46)
+$run.Location=[System.Drawing.Point]::new(500,378)
+$run.DialogResult=[System.Windows.Forms.DialogResult]::OK
+$form.AcceptButton=$run
+$form.Controls.Add($run)
+
+$cancel=New-Object System.Windows.Forms.Button
+$cancel.Text='취소'
+$cancel.Size=[System.Drawing.Size]::new(100,46)
+$cancel.Location=[System.Drawing.Point]::new(382,378)
+$cancel.DialogResult=[System.Windows.Forms.DialogResult]::Cancel
+$form.CancelButton=$cancel
+$form.Controls.Add($cancel)
+
+$result=$form.ShowDialog()
+if($result -ne [System.Windows.Forms.DialogResult]::OK){exit 2}
+
+$backendValue=switch($backend.SelectedIndex){
+    0 {'dxvk-safe'}
+    1 {'dx11'}
+    2 {'d3d9'}
+    3 {'2d'}
+    default {throw 'Invalid backend selection.'}
+}
+$profileValue=switch($profile.SelectedIndex){
+    0 {'CORRECTNESS'}
+    1 {'PERFORMANCE'}
+    2 {'STAGE_DIAGNOSTIC'}
+    default {throw 'Invalid test profile selection.'}
 }
 
-$probeBtn=New-Object System.Windows.Forms.Button
-$probeBtn.Text='DX12 D3D9On12 PROBE'
-$probeBtn.Size=[System.Drawing.Size]::new(220,38)
-$probeBtn.Location=[System.Drawing.Point]::new(14,86)
-$probeBtn.Add_Click({
-    if(!(Test-Path $probe)){[System.Windows.Forms.MessageBox]::Show('outrun-d3d9on12-probe.exe가 없습니다.','DX12 Probe');return}
-    Start-Process cmd -ArgumentList @('/k',('"' + $probe + '"')) -WorkingDirectory $root
-})
-$backendBox.Controls.Add($probeBtn)
-
-$note=New-Object System.Windows.Forms.Label
-$note.Text='DX12 Probe 결과에서 d3d9on12_bridge / legacy_create_device / resource_interop / legacy_reset / DX12_POC_RESULT 가 모두 PASS여야 합니다.'
-$note.AutoSize=$false
-$note.Size=[System.Drawing.Size]::new(735,40)
-$note.Location=[System.Drawing.Point]::new(248,86)
-$backendBox.Controls.Add($note)
-
-$r57Box=New-Object System.Windows.Forms.GroupBox
-$r57Box.Text='R57 HUD / 차량 순위 원인 분리'
-$r57Box.Location=[System.Drawing.Point]::new(22,270)
-$r57Box.Size=[System.Drawing.Size]::new(990,485)
-$r57Box.Anchor='Top,Bottom,Left,Right'
-$form.Controls.Add($r57Box)
-
-$panel=New-Object System.Windows.Forms.Panel
-$panel.Location=[System.Drawing.Point]::new(10,22)
-$panel.Size=[System.Drawing.Size]::new(970,450)
-$panel.Anchor='Top,Bottom,Left,Right'
-$panel.AutoScroll=$true
-$r57Box.Controls.Add($panel)
-
-$y=8
-foreach($id in $slots.Keys){
-    $row=New-Object System.Windows.Forms.Panel
-    $row.Location=[System.Drawing.Point]::new(8,$y)
-    $row.Size=[System.Drawing.Size]::new(925,62)
-
-    $btn=New-Object System.Windows.Forms.Button
-    $btn.Text=$slots[$id][0]
-    $btn.Size=[System.Drawing.Size]::new(260,48)
-    $btn.Location=[System.Drawing.Point]::new(0,4)
-    $variant=$id
-    $btn.Add_Click({ Start-VRTest 'd3d9' $variant }.GetNewClosure())
-    $row.Controls.Add($btn)
-
-    $desc=New-Object System.Windows.Forms.Label
-    $desc.Text=$slots[$id][1]
-    $desc.AutoSize=$false
-    $desc.Size=[System.Drawing.Size]::new(640,48)
-    $desc.Location=[System.Drawing.Point]::new(275,7)
-    $row.Controls.Add($desc)
-
-    $panel.Controls.Add($row)
-    $y+=66
-}
-
-[void]$form.ShowDialog()
+Write-Host "Selected backend=$backendValue profile=$profileValue"
+& $launcher -Backend $backendValue -TestProfile $profileValue -VariantId AUTO -AllowTargetOverride
+exit $LASTEXITCODE

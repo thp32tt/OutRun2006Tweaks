@@ -1,0 +1,129 @@
+{
+  "task_id": "CONVERSION-DXVK-00129",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "231b7df1bcb51386adc165d1862cac266c55b749",
+  "initial_source_sha": "b1dc6ce1e2b1ddeaf634c4078cc13542e68ad3ab",
+  "result_sha": "b6dfd2c281a6fbadb1d15c0bd3fc930b90d75961",
+  "validation_bearing_result_sha": "b6dfd2c281a6fbadb1d15c0bd3fc930b90d75961",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R136_GUARDED_GF_RAW_REL32_TARGET_CENSUS",
+  "summary": "Extended the exact-upstream-EXE guarded GF provenance census to decode raw E8 rel32 call candidates from each guarded hook's first 24 bytes and record mapped target RVAs/sections plus known-target names. The exact analyzer output reduces the raw candidates to three recurring unknown .text targets: 0x653C0, 0x65860 and 0x65970. This remains byte-level evidence only and does not prove instruction alignment, call effect, or ScreenHud ownership; all five guarded hooks remain spacing-only.",
+  "evidence": [
+    "CONVERSION-DXVK-00127 found no already-known HUD/sprite direct CALL within +/-0x80 of any of the five guarded GF speech/heart hooks.",
+    "Initial source b1dc6ce1e2b1ddeaf634c4078cc13542e68ad3ab added raw E8 rel32 candidate decoding/output and the verifier contract.",
+    "Backend Conversion Gate 36716595123 failed only at Verify backend disassembly contract because the verifier required a quoted Raw E8 rel32 candidates literal that does not exist verbatim in analyzer source.",
+    "Repair result b6dfd2c281a6fbadb1d15c0bd3fc930b90d75961 changed only that verifier marker; analyzer logic and runtime source were unchanged.",
+    "Backend Conversion Gate 36716746552 PASS on b6dfd2c281a6fbadb1d15c0bd3fc930b90d75961; artifact 11096323412 digest sha256:e09918f8c6fddefed5f635555836b2f0cb0f89469c7d99ab3435f65b1440509c.",
+    "Build 36716753993 PASS.",
+    "OutRun EXE HUD Inspector CI 36716753839 PASS; known_call_sites=9/9 and guarded_gf_provenance=5/5.",
+    "HUD analysis artifact 11096871838 digest sha256:b2e46d9fdb589a1734c9062416f1c1b938dc73e9198e119dc0f64c197d7d8dd6.",
+    "HUD inspector game artifact 11096064490 digest sha256:98d4935015b8da83e218750367e144061dcf9a2b711ecdaafaba32b94600f28c.",
+    "OpenXR VR architecture 36716753855 PASS across all six jobs.",
+    "VR Hosted Test Package push 36716746523 PASS; artifact 11096542888 digest sha256:7c7a6a9222eb9b5c766953b75acaa6abf35d4ac7a5c0133900b041b1f34c4c1b.",
+    "VR Hosted Test Package PR 36716753889 PASS.",
+    "VR PC Fast Test Build 36716746563 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00129.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "b1dc6ce1e2b1ddeaf634c4078cc13542e68ad3ab",
+      "message": "vr: resolve guarded GF raw rel32 targets [AUTO:CONVERSION-DXVK-00129]",
+      "role": "initial_source",
+      "validation_bearing": false,
+      "ci_skip": false,
+      "validation_result": "FAIL",
+      "failure_run_id": 36716595123,
+      "failure_step": "Verify backend disassembly contract",
+      "repair": "Require the actual unquoted Raw E8 rel32 candidates analyzer marker instead of an invented quoted literal."
+    },
+    {
+      "sha": "b6dfd2c281a6fbadb1d15c0bd3fc930b90d75961",
+      "message": "vr: fix raw rel32 verifier marker [AUTO:CONVERSION-DXVK-00129]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "raw_rel32_census": [
+    {
+      "hook_rva": "0x000FD591",
+      "candidates": [
+        {"call_rva": "0x000FD591", "target_rva": "0x000653C0", "known_target": null, "target_section": ".text"}
+      ]
+    },
+    {
+      "hook_rva": "0x000FD5CD",
+      "candidates": [
+        {"call_rva": "0x000FD5DC", "target_rva": "0x00065860", "known_target": null, "target_section": ".text"}
+      ]
+    },
+    {
+      "hook_rva": "0x000FD60C",
+      "candidates": [
+        {"call_rva": "0x000FD60F", "target_rva": "0x000653C0", "known_target": null, "target_section": ".text"},
+        {"call_rva": "0x000FD616", "target_rva": "0x00065970", "known_target": null, "target_section": ".text"}
+      ]
+    },
+    {
+      "hook_rva": "0x000FD652",
+      "candidates": [
+        {"call_rva": "0x000FD661", "target_rva": "0x00065860", "known_target": null, "target_section": ".text"}
+      ]
+    },
+    {
+      "hook_rva": "0x000FE8B1",
+      "candidates": [
+        {"call_rva": "0x000FE8B1", "target_rva": "0x000653C0", "known_target": null, "target_section": ".text"}
+      ]
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36716746552,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11096323412,
+    "backend_conversion_gate_artifact_digest": "sha256:e09918f8c6fddefed5f635555836b2f0cb0f89469c7d99ab3435f65b1440509c",
+    "build_run_id": 36716753993,
+    "build_result": "PASS",
+    "openxr_run_id": 36716753855,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36716753839,
+    "hud_result": "PASS",
+    "hud_analysis_artifact_id": 11096871838,
+    "hud_analysis_artifact_digest": "sha256:b2e46d9fdb589a1734c9062416f1c1b938dc73e9198e119dc0f64c197d7d8dd6",
+    "hud_game_artifact_id": 11096064490,
+    "hud_game_artifact_digest": "sha256:98d4935015b8da83e218750367e144061dcf9a2b711ecdaafaba32b94600f28c",
+    "hosted_package_push_run_id": 36716746523,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_artifact_id": 11096542888,
+    "hosted_package_artifact_digest": "sha256:7c7a6a9222eb9b5c766953b75acaa6abf35d4ac7a5c0133900b041b1f34c4c1b",
+    "hosted_package_pr_run_id": 36716753889,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36716746563,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5911540313,
+    "repair_comment_id": 5911559228,
+    "validation_comment_id": 5911679164
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_GUARDED_GF_EXE_PROVENANCE_CENSUS_NO_NEAR_KNOWN_CALLS",
+    "after": "PARTIAL_PLUS_GUARDED_GF_RAW_REL32_TARGET_CENSUS",
+    "runtime_claim": false
+  },
+  "blocker": "Raw E8 rel32 decoding identifies three recurring .text target RVAs but does not prove that every candidate is an instruction-aligned CALL or establish each target's semantic effect. That proof remains required before any ScreenHud ownership change.",
+  "next_action": "Keep all five guarded hooks spacing-only. In a later bounded F13 task, identify functions 0x653C0, 0x65860 and 0x65970 and prove instruction alignment/effect using exact disassembly provenance before considering any ScreenHud handoff. Keep runtime validation distinct from hosted CI."
+}

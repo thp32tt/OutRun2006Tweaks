@@ -9,6 +9,7 @@
 
 #include "hook_mgr.hpp"
 #include "game_addrs.hpp"
+#include "vr/d3d9/dxvk_provider_probe.hpp"
 
 namespace OutRunVRDeviceProbe
 {
@@ -53,6 +54,9 @@ namespace OutRunVRDeviceProbe
                 const HRESULT exHr = device->QueryInterface(
                     __uuidof(IDirect3DDevice9Ex), reinterpret_cast<void**>(&deviceEx));
                 const bool isEx = SUCCEEDED(exHr) && deviceEx;
+
+                OutRunVR::Dxvk::LogProviderCensus(
+                    device, "startup-observer");
 
                 LUID adapterLuid{};
                 bool luidValid = false;

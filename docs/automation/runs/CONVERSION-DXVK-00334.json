@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00334",
+  "production_id": "CONVERSION-DXVK-00334",
+  "event_id": "CONVERSION-DXVK-00334-E002",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "594008d25d29aeb5cd778ec5000fdf655e639ad4",
+  "result_sha": "ad08aa836d63cdec2363b3e03e2c08ab108550ca",
+  "validation_bearing_result_sha": "ad08aa836d63cdec2363b3e03e2c08ab108550ca",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "work_item": "DXVK_F103_EXACT_DECODE_0x18375A_TO_0x183799_CAPTURE_EDGE",
+  "summary": "Exact-decoded 26 complete canonical instructions from validated continuation_85 0x0018375A through 0x00183799. Four direct conditional branches land on exact internal instruction boundaries 0x00183772/0x00183793, both raw rel32 candidates are aligned direct CALLs, and the lone 0x39 byte at 0x00183799 remains a mandatory-overlap cut. No function/render/HUD/runtime semantics were promoted.",
+  "review_lenses": {
+    "architecture": "Analyzer-only canonical control-flow evidence on isolated vr-dxvk-r71-disasm; no other backend lane was modified.",
+    "ownership_lifetime": "No resource ownership, Reset, shared-handle, synchronization, fence, ACK or generation behavior changed; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, per-eye projection, HUD, marker, recenter, presentation or visual runtime behavior changed; runtime visual correctness is not claimed.",
+    "performance": "Offline analyzer/static evidence only; no runtime hot path, copy, wait, draw or frame-pacing behavior changed.",
+    "adversarial": "Proof fail-closes on exact predecessor provenance/control-flow status, exact byte/instruction contiguity, branch/call displacement decoding, exhaustive raw-call census, exact internal target boundaries and the mandatory incomplete capture-edge byte."
+  },
+  "evidence": {
+    "changed_paths": [
+      "tools/analyze_outrun_exe.py"
+    ],
+    "material_commit_message": "dxvk: prove canonical 0x18375a control flow [AUTO:CONVERSION-DXVK-00334]",
+    "material_blob_sha": "64c75d007100e893d3942eea0da44bf8af9e10c6",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "predecessor_provenance_status": "EXACT_EXE_18375A_TO_18379A_PROVENANCE_CAPTURED",
+    "control_flow_status": "EXACT_18375A_TO_183799_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "start_rva": "0x0018375A",
+    "prefix_end_rva": "0x00183799",
+    "capture_end_rva": "0x0018379A",
+    "instruction_count": 26,
+    "validated_branches": [
+      "0x0018375D->0x00183772",
+      "0x00183768->0x00183772",
+      "0x00183784->0x00183793",
+      "0x0018378D->0x00183793"
+    ],
+    "validated_rel32_calls": [
+      "0x00183760->0x001836AC",
+      "0x0018376C->0x001818A4"
+    ],
+    "unresolved_forward_targets": [],
+    "incomplete_edge": "0x00183799:39",
+    "continuation_status": "INCOMPLETE_OPCODE_39_AT_183799_REQUIRES_OVERLAP",
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37165158270,
+      "job_id": 111326455053,
+      "conclusion": "success",
+      "exact_sha": "ad08aa836d63cdec2363b3e03e2c08ab108550ca",
+      "artifact_id": 11289411632,
+      "artifact_digest": "sha256:794068ba4ff44a69a75b886bfc13f51b418e1fcd3923be1c017a3795ef2e196d"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37165158259,
+      "job_id": 111326455078,
+      "conclusion": "success",
+      "exact_sha": "ad08aa836d63cdec2363b3e03e2c08ab108550ca",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11289621294,
+      "artifact_digest": "sha256:42d15f8a36904091755aa4b47d7b67d5c4bf2e9c836a3ba3e24fd54b0d497497"
+    },
+    "regression_history_check": {
+      "intended_changed_path": "tools/analyze_outrun_exe.py",
+      "direct_risk_path_matches": 0,
+      "direct_problem_history_matches": 0,
+      "new_runtime_regression_key_created": false
+    },
+    "issue14_material_comment_id": 5975007370,
+    "issue14_validation_comment_id": 5975035083,
+    "semantic_promotion": "BOUNDED_CONTROL_FLOW_CALL_AND_CAPTURE_EDGE_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub branch authority from HEAD ad08aa836d63cdec2363b3e03e2c08ab108550ca and prior durable 00332 state. Confirmed 00334 material commit already existed, no 00334 run record existed, and rollover did not increment ATTEMPT."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Recovered the already-selected 00334 frontier from the material commit and Issue #14: exact-decode validated continuation_85 while preserving the trailing 0x39 as mandatory overlap and keeping semantics quarantined."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Material result ad08aa836d63cdec2363b3e03e2c08ab108550ca adds continuation_85 exact instruction metadata plus fail-closed control-flow/call/capture-edge proof, analyzer report binding, telemetry and failure guard."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact SHA ad08aa836d63cdec2363b3e03e2c08ab108550ca passed DXVK Canonical Disassembly Evidence 37165158270/111326455053 and Backend Conversion Gate 37165158259/111326455078, including backend disassembly contract, Win32 configure/build, binary verification and artifact upload. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material result ad08aa836d63cdec2363b3e03e2c08ab108550ca is published on vr-dxvk-r71-disasm with exact marker [AUTO:CONVERSION-DXVK-00334] and no CI-skip directive. Issue #14 records material and final validation."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static canonical disassembly/control-flow proof only; no runtime payload, selector, transport, deployment content or package identity changed. Hosted package work is supplemental and is not runtime validation."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "This schema-2 task record and the immediately following branch-local lane-state bookkeeping commit persist completion separately from the validation-bearing result. RESULT_SHA remains ad08aa836d63cdec2363b3e03e2c08ab108550ca and RUNTIME_VALIDATION remains UNTESTED."
+    }
+  },
+  "blocker": null,
+  "next_action": "Capture a conservative mandatory-overlap canonical raw window beginning at 0x00183799 so the trailing 0x39 instruction can be completed. Carry forward-target debt fail-closed and keep function/render/HUD/runtime semantics unresolved.",
+  "exact_next_action": "Capture a conservative mandatory-overlap canonical raw window beginning at 0x00183799 so the trailing 0x39 instruction can be completed. Carry forward-target debt fail-closed and keep function/render/HUD/runtime semantics unresolved.",
+  "validated_at_kst": "2026-10-04T09:34:15+09:00",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00334",
+    "event_id": "CONVERSION-DXVK-00334-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "material_origin_dispatch": {
+    "production_id": "CONVERSION-DX11-00333",
+    "event_id": "CONVERSION-DX11-00333-E002",
+    "event_type": "retry",
+    "attempt": "1/3"
+  },
+  "rollover_is_retry": false
+}
