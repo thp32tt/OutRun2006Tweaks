@@ -636,6 +636,18 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/core/transport.hpp"
 	"src/vr/debug/hud_inspector.cpp"
 	"src/vr/hud_semantics.hpp"
+	"src/vr/d3d11/fixed_function_pipeline.cpp"
+	"src/vr/d3d11/live_game_frame_bridge.cpp"
+	"src/vr/d3d11/native_backend.cpp"
+	"src/vr/d3d11/native_game_stereo_submission.cpp"
+	"src/vr/d3d11/native_shared_eye_ring.cpp"
+	"src/vr/d3d11/pipeline_translation.cpp"
+	"src/vr/d3d11/resource_translation.cpp"
+	"src/vr/d3d11/runtime_census.cpp"
+	"src/vr/d3d11/startup_census.cpp"
+	"src/vr/d3d11/state_translation.cpp"
+	"src/vr/d3d11/surface_mirror.cpp"
+	"src/vr/d3d11/triangle_fan_index_buffer.cpp"
 	"src/vr/d3d9/device_probe.cpp"
 	"src/vr/d3d9/ex_device_upgrade.cpp"
 	"src/vr/d3d9/ex_device_upgrade_r13.cpp"
@@ -735,6 +747,9 @@ target_link_libraries(outrun2006tweaks PUBLIC
 	Setupapi.lib
 	Crypt32.lib
 	d3dcompiler.lib
+	d3d11.lib
+	dxgi.lib
+	dxguid.lib
 )
 
 target_link_options(outrun2006tweaks PUBLIC
@@ -761,3 +776,15 @@ set_target_properties(outrun2006tweaks PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO
 		"${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 )
+# Isolated DX11 native transport GPU WARP test.
+set(dx11_native_transport_probe_SOURCES
+    "tools/dx11_native_transport_probe.cpp"
+    "src/vr/d3d11/native_shared_eye_ring.cpp"
+    "src/vr/d3d11/native_game_stereo_submission.cpp"
+)
+add_executable(dx11_native_transport_probe)
+target_sources(dx11_native_transport_probe PRIVATE ${dx11_native_transport_probe_SOURCES})
+target_compile_features(dx11_native_transport_probe PUBLIC cxx_std_20)
+target_compile_options(dx11_native_transport_probe PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_native_transport_probe PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_native_transport_probe PUBLIC d3dcompiler.lib d3d11.lib dxgi.lib dxguid.lib)

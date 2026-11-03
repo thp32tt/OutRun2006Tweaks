@@ -393,7 +393,10 @@ link-libraries = [
     "Winmm.lib",
     "Setupapi.lib",
     "Crypt32.lib",
-    "d3dcompiler.lib"
+    "d3dcompiler.lib",
+    "d3d11.lib",
+    "dxgi.lib",
+    "dxguid.lib"
 ]
 
 [target.outrun2006tweaks.properties]
@@ -405,3 +408,16 @@ LIBRARY_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
+
+# Isolated Focus-based DX11 native transport WARP test.
+[target.dx11_native_transport_probe]
+type = "executable"
+sources = [
+    "tools/dx11_native_transport_probe.cpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxgi.lib", "dxguid.lib"]

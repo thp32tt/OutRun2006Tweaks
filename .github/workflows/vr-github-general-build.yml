@@ -2,7 +2,7 @@ name: VR GitHub General Test Build
 
 on:
   push:
-    branches: [ vr-d3d9ex-focus ]
+    branches: [ vr-dx11-focus-rebase-20261103 ]
     paths:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
@@ -104,6 +104,16 @@ jobs:
         run: |
           cmake --build build-general/game --config Release --target outrun2006tweaks --parallel 4
           if($LASTEXITCODE -ne 0){throw 'game build failed'}
+
+      - name: Verify DX11 native GPU transport on WARP
+        shell: pwsh
+        run: |
+          cmake --build build-general/game --config Release --target dx11_native_transport_probe --parallel 2
+          if($LASTEXITCODE -ne 0){throw "DX11 transport build failed"}
+          $probe=Get-ChildItem build-general/game -Recurse -Filter dx11_native_transport_probe.exe | Select-Object -First 1
+          if(!$probe){throw "DX11 transport probe missing"}
+          & $probe.FullName
+          if($LASTEXITCODE -ne 0){throw "DX11 WARP probe failed"}
 
       - name: Configure and build x64 OpenXR host
         shell: pwsh
