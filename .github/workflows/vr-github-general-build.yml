@@ -24,6 +24,7 @@ on:
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'src/vr/core/transport.hpp'
+      - 'src/vr/game/disasm_render_contract.hpp'
       - 'src/vr/d3d11/**'
       - 'tools/dx11_native_transport_probe.cpp'
 
