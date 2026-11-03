@@ -231,6 +231,17 @@ jobs:
           test "$pushed" = 1
           echo "HD_SOURCE_104_COMMITTED"
 
+      - name: Dispatch HD completion and A/B multi-atlas after verified source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSET_BRANCH: korean-localization-recovery-20260928
+        run: |
+          set -euo pipefail
+          gh workflow run outrun-hd-korean-completion.yml --ref "$ASSET_BRANCH"
+          gh workflow run outrun-ab-multi-atlas.yml --ref "$ASSET_BRANCH"
+          echo "HD_COMPLETION_DISPATCHED"
+
       - name: Summary
         if: always()
         run: |
