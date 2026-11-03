@@ -48,3 +48,5 @@
 - `outrun-hd-korean-completion.yml`의 **Nanum 폰트 fallback 워크플로는 커밋 `9244bbbab3b5052787a84912fe4eb5b0ad45a0a9`에서 퇴역**: Push/스케줄 트리거 제거, 수동 실행도 DDS를 생성하지 않는다. 과거 실행 artifact는 고품질 A/B 채택 대상이 아니다.
 - 신규 GitHub 전용 빠른 안전 CI `outrun-ab-multi-atlas-safety-tests.yml`: [41631295554](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41631295554) SUCCESS, 합성/겹침/경계/경로/폰트 금지 등 **9/9 합성 회귀 테스트 PASS**. 최신 471개 PNG 전체 DDS 재빌드는 별도 다중 아틀라스 Actions 완료 및 QA artifact 재검증 전까지 **UNTESTED/HOLD**.
 - Portainer 재배포나 게임 설치를 요청할 단계가 아니다. C1/C3 독립 시각검수와 실제 게임 테스트는 여전히 UNTESTED. 기존 104-DDS v3 백업과 원본을 덮어쓰지 않는다.
+
+- **20:56 KST 안전한 단일 아틀라스 추가 시도:** Q047 `AD720950`의 기존 검증 원본 DDS SHA `141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f`와 원본 HD PNG SHA `3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c`에 대응하는 `FLIPY`만 커밋 `cffc05e19008984675c0376a0137441bd5ff2a49`에서 추가했다. GitHub fast safety [41631547584](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41631547584) **10/10 PASS**. 실제 Q047 DDS 출력·재디코드·ZIP 결정성은 다중 아틀라스 본 빌드 artifact가 나와야 확인할 수 있으므로 아직 PASS가 아니다.
