@@ -349,8 +349,6 @@ void Overlay::init()
 	void ServerNotifications_Init();
 	ServerNotifications_Init();
 
-	void UpdateCheck_Init();
-	UpdateCheck_Init();
 }
 
 void Overlay::init_imgui()
@@ -1146,7 +1144,6 @@ bool Overlay::settings_read()
 	NotifyOnlineEnable = ini.Get("Notifications", "OnlineEnable", NotifyOnlineEnable);
 	NotifyOnlineUpdateTime = ini.Get("Notifications", "OnlineUpdateTime", NotifyOnlineUpdateTime);
 	NotifyHideMode = ini.Get("Notifications", "HideMode", NotifyHideMode);
-	NotifyUpdateCheck = ini.Get("Notifications", "CheckForUpdates", NotifyUpdateCheck);
 
 	ChatMode = ini.Get("Chat", "ChatMode", ChatMode);
 	ChatFontSize = ini.Get("Chat", "FontSize", ChatFontSize);
@@ -1174,7 +1171,6 @@ bool Overlay::settings_write()
 	ini.Set("Notifications", "OnlineEnable", NotifyOnlineEnable);
 	ini.Set("Notifications", "OnlineUpdateTime", NotifyOnlineUpdateTime);
 	ini.Set("Notifications", "HideMode", NotifyHideMode);
-	ini.Set("Notifications", "CheckForUpdates", NotifyUpdateCheck);
 
 	ini.Set("Chat", "ChatMode", ChatMode);
 	ini.Set("Chat", "FontSize", ChatFontSize);

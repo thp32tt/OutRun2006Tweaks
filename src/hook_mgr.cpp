@@ -7,11 +7,21 @@
 
 namespace
 {
-    bool IsVrHookDescription(std::string_view description) noexcept
+    // All VR-specific hooks, including those in the shared hooks_*.cpp files,
+    // must be skipped when VR is disabled for this process.
+    constexpr bool IsVrHookDescription(std::string_view description) noexcept
     {
         return description.starts_with("OpenXRVR") ||
-            description.starts_with("OpenXVRR");
+            description.starts_with("OpenXVRR") ||
+            description.starts_with("VR");
     }
+
+    static_assert(IsVrHookDescription("OpenXRVRD3D9ExUpgrade"));
+    static_assert(IsVrHookDescription("VRDriverSeatRenderTest"));
+    static_assert(IsVrHookDescription("VRDriverSeatVehicleScaleRenderHook"));
+    static_assert(IsVrHookDescription("VRLensFlareProjected2D"));
+    static_assert(IsVrHookDescription("VRHudQueueSemanticBridge"));
+    static_assert(!IsVrHookDescription("UIScaling"));
 
     bool VrHooksEnabledForProcess() noexcept
     {
