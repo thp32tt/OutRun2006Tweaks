@@ -1,0 +1,115 @@
+name: DX11 Focus Release Baseline Hybrid
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-dx11-native-r71
+    paths:
+      - '.github/workflows/dx11-focus-baseline-package.yml'
+      - 'Start-OutRun*.cmd'
+      - 'OutRun2006Tweaks.ini'
+      - 'docs/DX11_FOCUS_BASELINE.md'
+
+permissions:
+  contents: read
+
+jobs:
+  focus-base-with-opt-in-dx11:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify checked out DX11 native source
+        shell: pwsh
+        run: |
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'Wrong DX11 checkout' }
+          if (!(Test-Path src/vr/d3d11/native_backend.cpp)) { throw 'DX11 backend missing' }
+          if (!(Test-Path src/vr/d3d11/live_game_frame_bridge.cpp)) { throw 'DX11 live bridge missing' }
+          if (Test-Path src/overlay/update_check.cpp) { throw 'Obsolete updater is still present' }
+
+      - name: Retrieve exact verified Focus runtime
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://github.com/thp32tt/OutRun2006Tweaks/releases/download/v0.01/OutRun2_VR_v0.01_Beta.zip'
+          $expected = '66e6b8cfdea6bbe28d45778d9663466ba0d212c0e6027b518ec3800db9f50959'
+          Invoke-WebRequest -Uri $url -OutFile focus.zip
+          $actual = (Get-FileHash focus.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $expected) { throw "Focus release SHA256 mismatch: $actual" }
+          Expand-Archive focus.zip -DestinationPath focus-extract
+          foreach ($name in @('dinput8.dll','outrun-vr-host.exe','Start-OutRun.cmd','Start-OutRun-VR.cmd','OutRun2006Tweaks.ini','SOURCE_SHA.txt')) {
+            if (!(Test-Path "focus-extract/$name")) { throw "Focus release missing $name" }
+          }
+          if ((Get-Content focus-extract/SOURCE_SHA.txt -Raw).Trim() -ne '5d68d900deeccc003c4c8bf0e5eb46614eaa3302') {
+            throw 'Focus source identity mismatch'
+          }
+          Write-Host "VERIFIED_FOCUS_BASE_SHA256=$actual"
+
+      - name: Configure DX11 native Win32 independently
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON
+          if ($LASTEXITCODE -ne 0) { throw 'DX11 CMake configure failed' }
+
+      - name: Apply pinned VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          foreach ($file in @('build-game/_deps/safetyhook-build/src/safetyhook.vcxproj',
+                              'build-game/_deps/zydis-build/Zydis.vcxproj',
+                              'build-game/_deps/zydis-build/zycore/Zycore.vcxproj')) {
+            if (!(Test-Path $file)) { throw "Dependency missing: $file" }
+            (Get-Content $file) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content $file
+          }
+          Set-Content build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build experimental DX11 DLL
+        shell: pwsh
+        run: |
+          cmake --build build-game --config Release --target outrun2006tweaks
+          if ($LASTEXITCODE -ne 0) { throw 'DX11 DLL compilation failed' }
+
+      - name: Build experimental DX11 OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          if ($LASTEXITCODE -ne 0) { throw 'DX11 host configure failed' }
+          cmake --build build-host --config Release --target outrun-vr-host
+          if ($LASTEXITCODE -ne 0) { throw 'DX11 host compilation failed' }
+
+      - name: Assemble exact Focus base with isolated DX11 candidate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $dst = 'DX11_FOCUS_BASE'
+          New-Item -ItemType Directory -Force "$dst/Focus_Base","$dst/DX11_Experimental" | Out-Null
+          Copy-Item focus-extract/* $dst -Recurse -Force
+          Copy-Item focus-extract/dinput8.dll "$dst/Focus_Base/dinput8.dll"
+          Copy-Item focus-extract/outrun-vr-host.exe "$dst/Focus_Base/outrun-vr-host.exe"
+          $dll = Get-ChildItem build-game -Filter dinput8.dll -Recurse |
+            Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          $hostExe = Get-ChildItem build-host -Filter outrun-vr-host.exe -Recurse | Select-Object -First 1
+          if (-not $dll -or -not $hostExe) { throw 'DX11 candidate binaries missing' }
+          Copy-Item $dll.FullName "$dst/DX11_Experimental/dinput8.dll"
+          Copy-Item $hostExe.FullName "$dst/DX11_Experimental/outrun-vr-host.exe"
+          Copy-Item Start-OutRun.cmd,Start-OutRun-VR.cmd,Start-OutRun-DX11-Experimental.cmd,Start-OutRun-Focus.cmd "$dst/" -Force
+          Copy-Item docs/DX11_FOCUS_BASELINE.md "$dst/DX11_FOCUS_BASELINE.md"
+          @(
+            'DEFAULT=VERIFIED_DX9EX_FOCUS_RELEASE'
+            'FOCUS_SHA=5d68d900deeccc003c4c8bf0e5eb46614eaa3302'
+            'FOCUS_RELEASE_ZIP_SHA256=66e6b8cfdea6bbe28d45778d9663466ba0d212c0e6027b518ec3800db9f50959'
+            "DX11_SOURCE_SHA=$env:GITHUB_SHA"
+            'DX11_HMD_RUNTIME=UNTESTED'
+          ) | Set-Content "$dst/INTEGRATION_PROVENANCE.txt" -Encoding ascii
+          New-Item -ItemType Directory -Force output | Out-Null
+          Compress-Archive -Path "$dst/*" -DestinationPath output/DX11_FOCUS_BASE_HYBRID.zip -Force
+          Get-FileHash output/DX11_FOCUS_BASE_HYBRID.zip -Algorithm SHA256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DX11-FOCUS-BASE-HYBRID
+          path: output/DX11_FOCUS_BASE_HYBRID.zip
+          if-no-files-found: error
