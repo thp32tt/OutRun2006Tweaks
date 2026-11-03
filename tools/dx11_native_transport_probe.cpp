@@ -22,13 +22,19 @@ namespace
     using OutRunVR::Core::FrameAck;
     using OutRunVR::Core::TransportIdentity;
 
-    using ConsumerAckSignature =
-        void (OutRunVR::Core::IFrameConsumer::*)(const FrameAck&) noexcept;
-    static_assert(
-        std::is_same_v<
-            decltype(&OutRunVR::Core::IFrameConsumer::acknowledge),
-            ConsumerAckSignature>,
-        "R117 consumer ACK contract must carry exact FrameAck identity");
+    // The Focus consumer ABI intentionally stays frameId-only while the
+    // isolated D3D11 ring validates full FrameAck ownership on retire.
+    using FocusConsumerAckSignature =
+        void (OutRunVR::Core::IFrameConsumer::*)(std::uint64_t) noexcept;
+    static_assert(std::is_same_v<
+        decltype(&OutRunVR::Core::IFrameConsumer::acknowledge),
+        FocusConsumerAckSignature>,
+        "Focus frameId ACK ABI must not change during DX11 migration");
+    static_assert(!OutRunVR::Core::TransportIdentityValid(
+        TransportIdentity{}), "DX11 identity requires nonzero process epoch");
+    static_assert(!OutRunVR::Core::TransportAckIdentityMatches(
+        FrameAck{}, TransportIdentity{}),
+        "DX11 ring must reject an unbound acknowledgement");
 
     void require(bool condition, const char* message)
     {
