@@ -252,12 +252,14 @@ struct PlayerCallback {
     QueueCount immediate{},after{};
     std::uint64_t epoch=0;
     explicit PlayerCallback(EVWORK_CAR* player) noexcept {
-        const auto* camera=Game::camera();
+        // 49F3E0 can run during startup before camera/game events exist.
+        // Defer ALL Game::camera/pl_car() access until runtime gates pass.
         epoch=OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch();
-        admitted=Settings::VREnabled&&Settings::VRQuestCockpitV2Enabled&&
-            epoch!=0&&player&&player==Game::pl_car()&&
-            camera&&camera->cam_mode_34A==1&&
-            !OutRunVR::QuestCockpitV2::InSceneEffect()&&IsPlayableCarGameplay();
+        if(!Settings::VREnabled||!Settings::VRQuestCockpitV2Enabled||
+           !player||!epoch||!IsPlayableCarGameplay()||
+           OutRunVR::QuestCockpitV2::InSceneEffect())return;
+        const auto* camera=Game::camera();
+        admitted=player==Game::pl_car()&&camera&&camera->cam_mode_34A==1;
         if(!admitted)return;
         immediate=CaptureBefore(Game::s_ImmDrawBuffer);
         after=CaptureBefore(Game::s_AftDrawBuffer);
@@ -311,14 +313,14 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
     }
     Pending& pending=PendingStack[PendingDepth++];
     pending={};
-    const auto* cam=Game::camera();
+    // Material calls also happen during loading; never obtain event/camera
+    // pointers before original playable-game and verified-frame gates.
     const auto epoch=OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch();
-    const bool eligible=Settings::VREnabled&&
-        Settings::VRQuestCockpitV2Enabled&&
-        Settings::VRQuestCockpitV2GlassEnabled&&IsPlayableCarGameplay()&&
-        epoch!=0&&cam&&cam->cam_mode_34A==1&&
-        !OutRunVR::QuestCockpitV2::InSceneEffect()&&Game::pl_car();
-    if(!eligible)return;
+    if(!Settings::VREnabled||!Settings::VRQuestCockpitV2Enabled||
+       !Settings::VRQuestCockpitV2GlassEnabled||!IsPlayableCarGameplay()||
+       !epoch||OutRunVR::QuestCockpitV2::InSceneEffect())return;
+    const auto* cam=Game::camera();
+    if(!cam||cam->cam_mode_34A!=1||!Game::pl_car())return;
     const bool owner=PlayerDepth>0||HasDeferredOwner(ctx,epoch);
     if(!owner)return;
     // PC retail 4048F2/4048F5 material provenance: ESI points to the
