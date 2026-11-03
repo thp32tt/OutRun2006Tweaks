@@ -13,10 +13,19 @@ spec.loader.exec_module(mod)
 
 class LightControllerTests(unittest.TestCase):
     def test_self_test_constants(self):
-        self.assertEqual(mod.WORKFLOW,"outrun-ab-imagegen-native.yml")
+        self.assertEqual(mod.WORKFLOW,"outrun-ab-multi-atlas.yml")
         self.assertTrue(mod.EXPECTED_SHA.fullmatch("1"*40))
         self.assertFalse(mod.EXPECTED_SHA.fullmatch("1"*39))
         self.assertFalse(mod.EXPECTED_SHA.fullmatch("../x"*10))
+
+    def test_query_targets_only_asset_branch_runs(self):
+        runs={"workflow_runs":[{"id":1,"status":"completed","conclusion":"success",
+                                "head_sha":"f"*40,"html_url":"https://github.com/example/run"}]}
+        with patch.object(mod,"api_call",return_value=runs) as api:
+            latest=mod.latest_qa_run("fake-token")
+        self.assertEqual(latest["head_sha"],"f"*40)
+        self.assertIn("branch=korean-localization-recovery-20260928",api.call_args.args[0])
+        self.assertIn("outrun-ab-multi-atlas.yml",api.call_args.args[0])
 
     def test_reject_unsafe_api_path(self):
         for path in ("https://attacker", "/https://attacker", "\\evil", "relative"):
