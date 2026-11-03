@@ -13,6 +13,7 @@
 #include "vr/game/quest_cockpit_v2_occupant.hpp"
 #include "vr/game/quest_cockpit_v2_visibility.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
+#include "vr/game/quest_cockpit_v2_glass_hook.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -51,7 +52,8 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2GlassEnabled;
+    extern Setting<float> VRQuestCockpitV2GlassBrightness;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -166,6 +168,272 @@ static bool IsPlayableCarGameplay() noexcept
         Game::game_start_progress_code && *Game::game_start_progress_code == 65;
 }
 
+// Live Quest mode1 player glass hook, no PMT file writes. The player
+// producer runs inside 49F3E0, whereas 404901 is an ordinary flush material
+// consumer that can run later. Capturing only the current thread-local scope
+// would miss deferred entries; broad material-pointer matching would tint
+// traffic cars/world. Preserve an exact, bounded original queue identity.
+namespace QuestCockpitGlassLive {
+struct Token {
+    const DrawEntry* entry=nullptr;
+    std::uint32_t id=0;
+    const CullingNode* node=nullptr;
+    std::uint64_t epoch=0;
+};
+struct QueueCount { int before=-1; DrawBuffer* buffer=nullptr; };
+struct Pending {float* alpha=nullptr; float original=0;};
+inline thread_local std::array<Token,1024> Tokens{};
+inline thread_local std::size_t TokenCount=0;
+inline thread_local bool TooMany=false;
+inline thread_local unsigned PlayerDepth=0;
+inline thread_local std::array<Pending,16> PendingStack{};
+inline thread_local unsigned PendingDepth=0,OverflowDepth=0;
+inline thread_local unsigned LogCount=0;
+
+// Never dereference a guessed register, PMT pointer or game stack address.
+// Windows memory may be committed but EXECUTE_ONLY/guarded or unmapped.
+static bool Memory(const void* p,std::size_t length,bool write=false) noexcept {
+    if(!p || !length)return false;
+    MEMORY_BASIC_INFORMATION mbi{};
+    if(VirtualQuery(p,&mbi,sizeof(mbi))!=sizeof(mbi) ||
+       mbi.State!=MEM_COMMIT || (mbi.Protect&PAGE_GUARD) ||
+       (mbi.Protect&PAGE_NOACCESS))return false;
+    const auto prot=mbi.Protect&0xFFu;
+    bool readable=(prot==PAGE_READONLY||prot==PAGE_READWRITE||
+        prot==PAGE_WRITECOPY||prot==PAGE_EXECUTE_READ||
+        prot==PAGE_EXECUTE_READWRITE||prot==PAGE_EXECUTE_WRITECOPY);
+    bool writable=(prot==PAGE_READWRITE||prot==PAGE_WRITECOPY||
+        prot==PAGE_EXECUTE_READWRITE||prot==PAGE_EXECUTE_WRITECOPY);
+    const auto paddr=reinterpret_cast<std::uintptr_t>(p);
+    const auto base=reinterpret_cast<std::uintptr_t>(mbi.BaseAddress);
+    return readable&&(!write||writable)&&paddr>=base&&
+        length<=mbi.RegionSize && paddr-base<=mbi.RegionSize-length;
+}
+static void OnNewNativeFrame() noexcept {
+    // This prevents stale queue slot reuse across frames; current material
+    // updates must have completed/restored before the next frame.
+    TokenCount=0;TooMany=false;
+}
+static QueueCount CaptureBefore(DrawBuffer* q) noexcept {
+    QueueCount out{};
+    if(!Memory(q,sizeof(DrawBuffer)))return out;
+    const int count=q->NumBuffers_0,limit=q->MaxBuffers_4;
+    if(count<0||limit<=0||limit>16384||count>limit)return out;
+    out.buffer=q;out.before=count;return out;
+}
+static void CaptureAfter(const QueueCount& before,std::uint64_t epoch) noexcept {
+    if(!epoch||TooMany||before.before<0||!before.buffer||
+       !Memory(before.buffer,sizeof(DrawBuffer)))return;
+    const DrawBuffer* q=before.buffer;
+    const int count=q->NumBuffers_0;
+    if(count<before.before||count>q->MaxBuffers_4||count>16384||
+       !Memory(q->BufferPtrs_10,
+           static_cast<std::size_t>(count)*sizeof(DrawEntry*)))return;
+    for(int i=before.before;i<count;++i){
+        const DrawEntry* e=q->BufferPtrs_10[i];
+        if(!Memory(e,sizeof(DrawEntry)))continue;
+        // Original PC DrawEntry is 0x3C; +0x38 is the queued object ID.
+        // The cull node pointer and ID detect slot reuse in the same frame.
+        std::uint32_t id=0;
+        std::memcpy(&id,reinterpret_cast<const char*>(e)+0x38,sizeof(id));
+        if(!id||id==0xffffffffu)continue;
+        bool seen=false;
+        for(std::size_t j=0;j<TokenCount;++j)
+            if(Tokens[j].entry==e&&Tokens[j].epoch==epoch){seen=true;break;}
+        if(seen)continue;
+        if(TokenCount==Tokens.size()){
+            TooMany=true;TokenCount=0;return;
+        }
+        Tokens[TokenCount++]={e,id,e->CullNode_18,epoch};
+    }
+}
+struct PlayerCallback {
+    bool admitted=false;
+    QueueCount immediate{},after{};
+    std::uint64_t epoch=0;
+    explicit PlayerCallback(EVWORK_CAR* player) noexcept {
+        const auto* camera=Game::camera();
+        epoch=OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch();
+        admitted=Settings::VREnabled&&Settings::VRQuestCockpitV2Enabled&&
+            epoch!=0&&player&&player==Game::pl_car()&&
+            camera&&camera->cam_mode_34A==1&&
+            !OutRunVR::QuestCockpitV2::InSceneEffect()&&IsPlayableCarGameplay();
+        if(!admitted)return;
+        immediate=CaptureBefore(Game::s_ImmDrawBuffer);
+        after=CaptureBefore(Game::s_AftDrawBuffer);
+        ++PlayerDepth;
+    }
+    ~PlayerCallback() noexcept {
+        if(!admitted)return;
+        // Persist exact descriptor pointers only, never borrow the vehicle
+        // scope for unrelated draws after the callback unwinds.
+        CaptureAfter(immediate,epoch);
+        CaptureAfter(after,epoch);
+        --PlayerDepth;
+    }
+    PlayerCallback(const PlayerCallback&)=delete;
+    PlayerCallback& operator=(const PlayerCallback&)=delete;
+};
+static bool HasDeferredOwner(const SafetyHookContext& ctx,
+    std::uint64_t epoch) noexcept
+{
+    if(TooMany||!TokenCount||!epoch)return false;
+    const std::uintptr_t regs[]{
+        ctx.eax,ctx.ebx,ctx.ecx,ctx.edx,ctx.esi,ctx.edi,ctx.ebp};
+    const auto valueInContext=[&](std::uintptr_t addr) noexcept {
+        for(auto value:regs)if(value==addr)return true;
+        // Original draw_404700 retains a queue-entry pointer on its stack.
+        // Compare pointer VALUES only, never guessed descriptor field offsets.
+        if(Memory(reinterpret_cast<const void*>(ctx.esp),32*sizeof(std::uint32_t))){
+            const auto* words=reinterpret_cast<const std::uint32_t*>(ctx.esp);
+            for(unsigned i=0;i<32;++i)
+                if(static_cast<std::uintptr_t>(words[i])==addr)return true;
+        }
+        return false;
+    };
+    for(std::size_t i=0;i<TokenCount;++i){
+        const auto& t=Tokens[i];
+        if(t.epoch!=epoch||!Memory(t.entry,sizeof(DrawEntry))||
+           t.node!=t.entry->CullNode_18)continue;
+        std::uint32_t currentId=0;
+        std::memcpy(&currentId,
+            reinterpret_cast<const char*>(t.entry)+0x38,sizeof(currentId));
+        if(currentId!=t.id)continue;
+        if(valueInContext(reinterpret_cast<std::uintptr_t>(t.entry)))
+            return true;
+    }
+    return false;
+}
+static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
+    if(PendingDepth>=PendingStack.size()){
+        if(OverflowDepth<1024u)++OverflowDepth;
+        return;
+    }
+    Pending& pending=PendingStack[PendingDepth++];
+    pending={};
+    const auto* cam=Game::camera();
+    const auto epoch=OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch();
+    const bool eligible=Settings::VREnabled&&
+        Settings::VRQuestCockpitV2Enabled&&
+        Settings::VRQuestCockpitV2GlassEnabled&&IsPlayableCarGameplay()&&
+        epoch!=0&&cam&&cam->cam_mode_34A==1&&
+        !OutRunVR::QuestCockpitV2::InSceneEffect()&&Game::pl_car();
+    if(!eligible)return;
+    const bool owner=PlayerDepth>0||HasDeferredOwner(ctx,epoch);
+    if(!owner)return;
+    // PC retail 4048F2/4048F5 material provenance: ESI points to the
+    // relocated 0x3C-byte PmtObject; EDX to its indexed 0x58 PmtMaterial.
+    // A source mismatch cannot grant material ownership.
+    const auto* object=reinterpret_cast<const std::uint32_t*>(ctx.esi);
+    const auto* material=reinterpret_cast<const std::uint32_t*>(ctx.edx);
+    if(!Memory(object,0x3C)||!Memory(material,0x58))return;
+    const auto* materials=reinterpret_cast<const std::uint8_t*>(object[0x34/4]);
+    const auto* colors=reinterpret_cast<std::uint8_t*>(object[0x38/4]);
+    const auto* info=reinterpret_cast<const std::uint8_t*>(object[0x18/4]);
+    if(!Memory(info,0x34))return;
+    std::uint32_t nMaterials=0,nColors=0;
+    std::memcpy(&nMaterials,info+0x2c,4);
+    std::memcpy(&nColors,info+0x30,4);
+    if(!nMaterials||nMaterials>1024||!nColors||nColors>1024||
+       !Memory(materials,static_cast<std::size_t>(nMaterials)*0x58)||
+       !Memory(colors,static_cast<std::size_t>(nColors)*0x48))return;
+    const auto matptr=reinterpret_cast<std::uintptr_t>(material);
+    const auto base=reinterpret_cast<std::uintptr_t>(materials);
+    if(matptr<base||matptr-base>=static_cast<std::size_t>(nMaterials)*0x58||
+       (matptr-base)%0x58!=0)return;
+    const auto ci=material[0],attr=material[1];
+    if(ci>=nColors)return;
+    // Translate the PMT blend nibbles through the original PC retail
+    // table at VA 0x61E784.  The on-device GetRenderState(19/20)
+    // *before* 408C80 still belongs to the prior material: never use it
+    // as proof for the material being installed.
+    const auto* blend=reinterpret_cast<const std::uint32_t*>(
+        Module::exe_ptr<std::uint8_t>(0x21E784));
+    if(!Memory(blend,16*sizeof(std::uint32_t)))return;
+    const unsigned src=(attr>>8)&15u,dst=(attr>>12)&15u;
+    const bool selected=OutRunVR::QuestCockpitV2::Glass::Blend(
+        attr,blend[src],blend[dst]);
+    auto* rgba=reinterpret_cast<float*>(colors+ci*0x48);
+    if(!Memory(rgba,16,true))return;
+    const bool diffuse=OutRunVR::QuestCockpitV2::Glass::GlassDiffuse(
+        rgba[0],rgba[1],rgba[2],rgba[3]);
+    bool unique=diffuse&&selected;
+    if(unique){
+        for(std::uint32_t j=0;j<nMaterials;++j){
+            if(materials+j*0x58==reinterpret_cast<const std::uint8_t*>(material))
+                continue;
+            std::uint32_t other=0;
+            std::memcpy(&other,materials+j*0x58,4);
+            if(other==ci){unique=false;break;}
+        }
+    }
+    DWORD alphaBlend=FALSE;
+    const auto* device=Game::D3DDevice_ptr?*Game::D3DDevice_ptr:nullptr;
+    const bool alphaPass=device &&
+        SUCCEEDED(device->GetRenderState(D3DRS_ALPHABLENDENABLE,&alphaBlend)) &&
+        alphaBlend!=FALSE;
+    if(!OutRunVR::QuestCockpitV2::Glass::Admit(
+        true,true,true,true,true,true,true,owner,alphaPass,
+        selected,diffuse,unique))return;
+    const float original=rgba[3];
+    const float brightness=Settings::VRQuestCockpitV2GlassBrightness.get();
+    const float target=OutRunVR::QuestCockpitV2::Glass::AlphaFromBrightness(brightness);
+    if(!std::isfinite(target)||std::fabs(original-target)<.00001f)return;
+    pending={rgba+3,original};
+    rgba[3]=target;
+    if(Settings::VRTelemetry&&++LogCount<=24u)
+        spdlog::info("VR COCKPIT GLASS LIVE: epoch={} owner={} material={:p} "
+            "originalAlpha={:.4f} appliedAlpha={:.4f} brightness={:.1f} "
+            "restore=after_original_408C80 QuestWindowMesh=UNTESTED",
+            epoch,PlayerDepth?"player-callback":"matched-queue",
+            static_cast<const void*>(material),original,target,brightness);
+}
+static void OnMaterialAfter(SafetyHookContext&) noexcept {
+    if(OverflowDepth){--OverflowDepth;return;}
+    if(!PendingDepth)return;
+    Pending pending=PendingStack[--PendingDepth];
+    PendingStack[PendingDepth]={};
+    if(pending.alpha&&Memory(pending.alpha,sizeof(float),true))
+        *pending.alpha=pending.original;
+}
+} // namespace QuestCockpitGlassLive
+
+class QuestCockpitV2GlassRuntimeHook final : public Hook {
+    inline static SafetyHookMid MaterialBefore{},MaterialAfter{};
+public:
+    std::string_view description() override {
+        return "VRQuestCockpitV2GlassRuntimeHook";
+    }
+    bool validate() override {
+        // Hooks install at startup. F11 glass toggle itself is LIVE; it does
+        // not require a restart once the experimental cockpit is enabled.
+        return Settings::VREnabled&&Settings::VRQuestCockpitV2Enabled;
+    }
+    bool apply() override {
+        constexpr std::array<std::uint8_t,6> sig{
+            0x52,0xE8,0x79,0x43,0x00,0x00};
+        const auto* p=Module::exe_ptr<std::uint8_t>(0x4901);
+        if(!QuestCockpitGlassLive::Memory(p,sig.size())||
+           !std::equal(sig.begin(),sig.end(),p)){
+            spdlog::warn("VR COCKPIT GLASS: original 404901 PMT call mismatch; no hook");
+            return false;
+        }
+        // At 404901 PUSH EDX; at 404902 CALL 408C80; 404907 is the
+        // first instruction after the original material state is consumed.
+        auto after=safetyhook::create_mid(Module::exe_ptr(0x4907),
+            QuestCockpitGlassLive::OnMaterialAfter);
+        if(!after)return false;
+        auto before=safetyhook::create_mid(Module::exe_ptr(0x4901),
+            QuestCockpitGlassLive::OnMaterialBefore);
+        if(!before)return false;
+        MaterialAfter=std::move(after);
+        MaterialBefore=std::move(before);
+        return true;
+    }
+    static QuestCockpitV2GlassRuntimeHook instance;
+};
+QuestCockpitV2GlassRuntimeHook QuestCockpitV2GlassRuntimeHook::instance;
+
 // Original retail PC frame-render clock: distinct from Present and XR.
 class QuestCockpitV2NativeFrameProbe final : public Hook
 {
@@ -180,10 +448,16 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         OutRunVR::QuestCockpitV2::NativeFrameTrace().OnFrameEnter(
             OutRunVR::QuestCockpitV2::NextVerifiedNativeEpoch());
+        QuestCockpitGlassLive::OnNewNativeFrame();
     }
     static void OnFrameEnd(SafetyHookContext&)
     {
         OutRunVR::QuestCockpitV2::NativeFrameTrace().OnFrameEnd();
+    }
+    static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
+    {
+        QuestCockpitGlassLive::PlayerCallback scope(player);
+        PlayerCallbackHook.ccall<void>(player);
     }
     static void __cdecl OnPlayerCallback(EVWORK_CAR* player)
     {
@@ -201,7 +475,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
             !NativeFrameTrace().Active() || !IsPlayableCarGameplay() ||
             !player) {
-            PlayerCallbackHook.ccall<void>(player);
+            CallOriginalPlayerWithGlassScope(player);
             return;
         }
         const EvWorkCamera* camera=Game::camera();
@@ -214,7 +488,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             xr && xr->valid && xr->poseSequence!=0,
             InSceneEffect(),F0CallbackActive);
         if(!admitted){
-            PlayerCallbackHook.ccall<void>(player);
+            CallOriginalPlayerWithGlassScope(player);
             return;
         }
         // The original Quest computes C from immutable B0/F0 BEFORE
@@ -225,7 +499,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         std::memcpy(b0.data(),&player->matrix_B0,sizeof(Matrix));
         std::memcpy(f0.data(),&player->matrix_F0,sizeof(Matrix));
         if(!ComputeBodyCorrection(b0,f0,C)){
-            PlayerCallbackHook.ccall<void>(player);
+            CallOriginalPlayerWithGlassScope(player);
             return;
         }
         // Reentrancy blocked; both F0 and TLS owner restored in reverse
@@ -253,7 +527,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 "nativeFrame={} xrPose={} identityScoped=1 unwindRestore=1 "
                 "QuestFullFrameEquivalence=UNTESTED",
                 trace,NativeFrameTrace().ActiveEpoch(),xr->poseSequence);
-        PlayerCallbackHook.ccall<void>(player);
+        CallOriginalPlayerWithGlassScope(player);
     }
     template<std::size_t N>
     static bool MatchOriginalRva(int rva,
@@ -276,7 +550,8 @@ public:
         return "QuestCockpitV2NativeFrameProbe";
     }
     bool validate() override {
-        return Settings::VREnabled && Settings::VRCockpitFrameProbe;
+        return Settings::VREnabled &&
+            (Settings::VRCockpitFrameProbe||Settings::VRQuestCockpitV2Enabled);
     }
     bool apply() override {
         // Prologue bytes were extracted from the user's owned canonical PC

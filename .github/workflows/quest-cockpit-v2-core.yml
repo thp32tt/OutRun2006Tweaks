@@ -7,6 +7,8 @@ on:
       - '.github/workflows/quest-cockpit-v2-core.yml'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
       - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
+      - 'src/vr/game/quest_cockpit_v2_glass_hook.hpp'
+      - 'tools/tests/quest_cockpit_v2_glass_hook_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_seat.hpp'
       - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_occupant.hpp'
@@ -68,6 +70,10 @@ jobs:
             tools/tests/quest_cockpit_v2_occupant_smoke.cpp \
             -o /tmp/quest-v2-occupant
           /tmp/quest-v2-occupant
+      - name: Build live glass hook opacity and strict ownership tests
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic             tools/tests/quest_cockpit_v2_glass_hook_smoke.cpp             -o /tmp/quest-cockpit-glass
+          /tmp/quest-cockpit-glass
       - name: Reversible glass tint brightness ON/OFF synthetic tests
         run: python3 -m unittest discover -s tools/tests -p test_quest_cockpit_glass.py -v
       - name: Reject removed legacy hooks and unsafe defaults

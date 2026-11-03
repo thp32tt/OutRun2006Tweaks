@@ -50,3 +50,23 @@ game may load a packed bank instead of loose PMTs; then changing a
 loose file will NOT change the visible windshield. It is NOT a live
 F11 setting or verified Quest 3 visual pass. The VR render path and
 default FFB/graphics settings remain unchanged.
+
+2026-11-03 EXPERIMENTAL LIVE glass material hook (user request: replace PMT editing):
+F11 > Settings > VR > QuestCockpitV2GlassEnabled (OFF default),
+QuestCockpitV2GlassBrightness (0-100, default 75). Uses validated retail
+404901 PUSH EDX/CALL 408C80, 404907 paired after-material restoration.
+The original user's PC player callback 49F3E0 captures the immediate
+render scope and original DrawBuffer entries enqueued by that callback.
+Deferred materials require exact saved DrawEntry address/ID/visible-node
+identity among current native frame x86 registers/stack; ambiguous owner
+fails closed. Only original mode1 gameplay, player, alpha-blended
+dark-gray colour (0.55 or 0.425 +/- .001) with original translated
+src/dst D3D9 blend and unshared color table can modify alpha, restoring
+the raw original float directly after material application. World, HUD,
+water, other cars and 2D views must remain unchanged. NO PMT/EXE
+disk modification, optional offline model editor is now obsolete.
+This is EXPLICITLY NOT yet physical Quest3 glass mesh/pixel proof:
+Windows full build + HMD verify must confirm original ESI/EDX pointers,
+DrawEntry provenance and visible front/side polygons. A skipped candidate
+is preferable to broad world tint. No live material hook is installed
+when QuestCockpitV2Enabled=false.
