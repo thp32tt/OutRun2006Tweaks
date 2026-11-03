@@ -75,7 +75,7 @@ async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str
     pages: dict[str, Page] = {}
     registry_changed = False
     for slot in reg.slots:
-        if slot.url and not is_project_scoped_chat_url(slot.url):
+        if slot.url and not is_project_scoped_chat_url(slot.url, slot.name):
             log.warning("discarding cross-project/stale slot URL slot=%s url=%s", slot.name, slot.url)
             slot.url = None
             slot.last_assistant_hash = None
@@ -122,7 +122,7 @@ async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str
     # Put each tab on its own persisted chat URL or a clean ChatGPT home page.
     for slot in reg.slots:
         page = pages[slot.name]
-        target = slot.url or BASE_URL
+        target = slot.url or slot_project_home(slot.name)
         try:
             if not page.url or page.url == "about:blank" or page.url.rstrip("/") != target.rstrip("/"):
                 await page.goto(target, wait_until="domcontentloaded", timeout=60000)
@@ -141,7 +141,7 @@ async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str
 
 async def slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
     page = pages.get(slot.name)
-    if slot.url and not is_project_scoped_chat_url(slot.url):
+    if slot.url and not is_project_scoped_chat_url(slot.url, slot.name):
         log.warning("discarding non-project slot URL slot=%s url=%s", slot.name, slot.url)
         slot.url = None
         slot.last_assistant_hash = None
@@ -149,18 +149,18 @@ async def slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot)
     if page is None or page.is_closed():
         page = await context.new_page()
         pages[slot.name] = page
-        await page.goto(slot.url or BASE_URL, wait_until="domcontentloaded", timeout=60000)
-    elif REQUIRE_PROJECT_URL and not is_configured_project_url(page.url):
+        await page.goto(slot.url or slot_project_home(slot.name), wait_until="domcontentloaded", timeout=60000)
+    elif REQUIRE_PROJECT_URL and not is_slot_project_url(page.url, slot.name):
         log.warning("slot tab escaped configured project; restoring slot=%s url=%s", slot.name, page.url)
-        target = slot.url if slot.url and is_project_scoped_chat_url(slot.url) else BASE_URL
-        if target == BASE_URL:
+        target = slot.url if slot.url and is_project_scoped_chat_url(slot.url, slot.name) else slot_project_home(slot.name)
+        if target == slot_project_home(slot.name):
             slot.url = None
             slot.last_assistant_hash = None
             slot.last_assistant_change_at = None
         await page.goto(target, wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_timeout(700)
     elif not slot.url and "/c/local-chatgpt" in page.url.lower():
-        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+        await page.goto(slot_project_home(slot.name), wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_timeout(700)
     return page
 
@@ -174,7 +174,7 @@ async def recover_slot_composer(context: BrowserContext, pages: dict[str, Page],
     log.warning("composer missing slot=%s retry_visible=%s url=%s; refreshing once", slot.name, retry is not None, page.url)
 
     # Recovery 1: reload the same persisted conversation once.
-    target = slot.url if slot.url and is_project_scoped_chat_url(slot.url) else BASE_URL
+    target = slot.url if slot.url and is_project_scoped_chat_url(slot.url, slot.name) else slot_project_home(slot.name)
     try:
         await page.goto(target, wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_timeout(1500)
@@ -203,7 +203,7 @@ async def recover_slot_composer(context: BrowserContext, pages: dict[str, Page],
     # composer. The caller will send the full role prompt, and a new durable URL
     # will replace the stale one after successful send.
     try:
-        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+        await page.goto(slot_project_home(slot.name), wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_timeout(1500)
         if await first_visible(page, INPUT_SELECTORS, total_wait_ms=5000) is not None:
             slot.url = None
@@ -231,13 +231,15 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
     slot.last_assistant_change_at = None
     slot.last_watchdog_at = None
     slot.watchdog_resumes_since_schedule = 0
-    await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+    await page.goto(slot_project_home(slot.name), wait_until="domcontentloaded", timeout=60000)
     await page.wait_for_timeout(700)
     return page
 
 
 def prompt_for_slot(slot: Slot, phase: str) -> str:
     """UW2 uses exactly one human-readable sentence; other lanes unchanged."""
+    if CONTROLLER_MODE == "conversion" and MODEL2_AUTODEV_ENABLED and slot.name == "C":
+        return "모델2 VR 개발 계속진행해"
     if CONTROLLER_MODE == "conversion" and UW2_WEB_PORT_ENABLED and slot.name == "C":
         return "웹포팅 개발 계속진행해"
     if CONTROLLER_MODE == "conversion":
@@ -256,7 +258,7 @@ def prompt_for_slot(slot: Slot, phase: str) -> str:
             "C": "localization_C.md",
         }
         default_prompt = "localization_A.md"
-    context_prefix = (GAME_MOD_CONTEXT + "\n\n") if (CONTROLLER_MODE == "conversion" and not (UW2_WEB_PORT_ENABLED and slot.name == "C")) else ""
+    context_prefix = (GAME_MOD_CONTEXT + "\n\n") if (CONTROLLER_MODE == "conversion" and not ((UW2_WEB_PORT_ENABLED or MODEL2_AUTODEV_ENABLED) and slot.name == "C")) else ""
     if CONTROLLER_MODE == "conversion" and VR_CONTINUOUS_30M_ENABLED:
         if slot.name in {"A", "C"}:
             return context_prefix + queue_dynamic_prefix() + read_prompt(
@@ -296,8 +298,8 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         return slot.last_watchdog_at or slot.last_sent_at or ""
 
     for idx, slot in sorted(candidates, key=watch_key):
-        if CONTROLLER_MODE == "conversion" and UW2_WEB_PORT_ENABLED and slot.name == "C":
-            # Dedicated simple loop owns UW2; legacy watchdog must never inject prompts.
+        if CONTROLLER_MODE == "conversion" and (UW2_WEB_PORT_ENABLED or MODEL2_AUTODEV_ENABLED) and slot.name == "C":
+            # Dedicated simple C loop owns Model2/UW2; legacy watchdog must never inject prompts.
             continue
         if slot.watchdog_resumes_since_schedule >= WATCHDOG_MAX_RESUMES_PER_RUN:
             continue
