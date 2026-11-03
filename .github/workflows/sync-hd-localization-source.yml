@@ -1,84 +1,148 @@
-name: Sync HD localization source
+name: Sync all pinned HD localization source DDS
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - korean-localization-clean
+      - korean-localization-recovery-20260928
     paths:
-      - .github/workflows/sync-hd-localization-source.yml
-  workflow_dispatch:
+      - ".github/workflows/sync-hd-localization-source.yml"
+      - "localization/automation_inputs/hd_original_png_source_plan.json"
 
 permissions:
   contents: write
+  actions: write
+
+concurrency:
+  group: outrun-hd-source-sync
+  cancel-in-progress: false
 
 jobs:
   sync-hd-source:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
-      - name: Checkout localization branch
+      - name: Checkout only the pinned source plan and HD source destination
         uses: actions/checkout@v4
         with:
-          ref: korean-localization-clean
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
           fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/sync-hd-localization-source.yml
+            /localization/automation_inputs/hd_original_png_source_plan.json
+            /localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
 
-      - name: Download and verify canonical HD source DDS
+      - name: Download all 104 active HD DDS from the pinned upstream commit and SHA-verify
         shell: bash
+        env:
+          SOURCE_REPO: Sonic-TV/OR2006Sprites
+          SOURCE_COMMIT: a95efe01d1f136514cef94b0d9e9fd61df021754
+          SOURCE_PLAN: localization/automation_inputs/hd_original_png_source_plan.json
+          DEST_ROOT: localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
         run: |
           set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, pathlib, urllib.parse, urllib.request
 
-          SOURCE_REPO="Sonic-TV/OR2006Sprites"
-          SOURCE_COMMIT="a95efe01d1f136514cef94b0d9e9fd61df021754"
-          DEST_ROOT="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load"
+          source_repo=os.environ["SOURCE_REPO"]
+          source_commit=os.environ["SOURCE_COMMIT"]
+          plan_path=pathlib.Path(os.environ["SOURCE_PLAN"])
+          dest_root=pathlib.Path(os.environ["DEST_ROOT"])
+          plan=json.loads(plan_path.read_text(encoding="utf-8"))
+          entries=plan.get("entries")
+          if not isinstance(entries,list):
+              raise SystemExit("SOURCE_PLAN_ENTRIES_MISSING")
+          targets={}
+          for row in entries:
+              target=row.get("target")
+              expected=row.get("original_dds_sha256")
+              if not isinstance(target,str) or not target.startswith("textures/load/") or ".." in pathlib.PurePosixPath(target).parts:
+                  raise SystemExit("UNSAFE_SOURCE_TARGET:"+str(target))
+              if not isinstance(expected,str) or len(expected)!=64:
+                  raise SystemExit("INVALID_SOURCE_SHA:"+target)
+              prior=targets.setdefault(target,expected)
+              if prior!=expected:
+                  raise SystemExit("CONFLICTING_SOURCE_SHA:"+target)
+          if len(targets)!=104:
+              raise SystemExit(f"ACTIVE_HD_SOURCE_TARGET_COUNT_CHANGED:{len(targets)}")
 
-          printf '%s\n' \
-            '42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352|spr_etc_xst/D6DC1380_256x64.dds' \
-            '5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635|spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds' \
-            '5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67|spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds' \
-            '65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813|spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds' \
-            '61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15|spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds' \
-            '2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481|spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds' \
-            '6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc|spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds' \
-            '821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0|spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds' \
-            '3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099|spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds' \
-            'bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364|spr_sprani_selector_cvt_Exst/411827E_512x512.dds' \
-            'a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036|spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds' \
-            'f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e|spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds' \
-            '177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05|spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds' \
-            '46051db8d7ae08a3c010f29371724109e7cdb61e17590c2b983a5130a8ae501d|spr_font_xst/6B8ED9DA_256x128.dds' \
-            > /tmp/hd_sources.txt
+          verified=[]
+          for n,(target,expected) in enumerate(sorted(targets.items()),1):
+              rel=target.removeprefix("textures/load/")
+              encoded=urllib.parse.quote(rel,safe="/")
+              url=f"https://raw.githubusercontent.com/{source_repo}/{source_commit}/Release/{encoded}"
+              req=urllib.request.Request(url,headers={"User-Agent":"OutRun-HD-localization-source-sync"})
+              with urllib.request.urlopen(req,timeout=90) as response:
+                  raw=response.read()
+              actual=hashlib.sha256(raw).hexdigest()
+              if actual!=expected:
+                  raise SystemExit(f"UPSTREAM_SHA_MISMATCH:{target}:{actual}:{expected}")
+              dest=dest_root/target
+              if dest.is_symlink():
+                  raise SystemExit("REFUSE_SYMLINK_SOURCE:"+target)
+              if dest.is_file():
+                  old=hashlib.sha256(dest.read_bytes()).hexdigest()
+                  if old!=expected:
+                      raise SystemExit(f"EXISTING_SOURCE_SHA_CONFLICT:{target}:{old}:{expected}")
+              else:
+                  dest.parent.mkdir(parents=True,exist_ok=True)
+                  dest.write_bytes(raw)
+              if hashlib.sha256(dest.read_bytes()).hexdigest()!=expected:
+                  raise SystemExit("SOURCE_WRITE_READBACK_MISMATCH:"+target)
+              verified.append({"target":target,"sha256":expected,"bytes":len(raw)})
+              print(f"HD_SOURCE_OK {n:03d}/104 {target} {expected}")
 
-          while IFS='|' read -r expected rel; do
-            dest="$DEST_ROOT/$rel"
-            mkdir -p "$(dirname "$dest")"
-            url="https://raw.githubusercontent.com/$SOURCE_REPO/$SOURCE_COMMIT/Release/$rel"
-            echo "Downloading $rel"
-            curl --fail --location --retry 4 --retry-delay 2 "$url" -o "$dest"
-            printf '%s  %s\n' "$expected" "$dest" | sha256sum --check --strict
-          done < /tmp/hd_sources.txt
+          info={
+              "schema":"outrun.hd-source-pinned-upstream.v2",
+              "package":"OR2-HD-GUI-v0.25.10a",
+              "upstream_repo":source_repo,
+              "upstream_commit":source_commit,
+              "active_target_count":len(verified),
+              "source_plan":str(plan_path),
+              "source_plan_sha256":hashlib.sha256(plan_path.read_bytes()).hexdigest(),
+              "verification":"All active localization DDS are byte downloaded from the pinned upstream commit and SHA256-matched to hd_original_png_source_plan.json before commit.",
+              "runtime_validation":"UNTESTED",
+              "files":verified,
+          }
+          dest_root.mkdir(parents=True,exist_ok=True)
+          (dest_root/"SOURCE_INFO.json").write_text(
+              json.dumps(info,ensure_ascii=False,sort_keys=True,indent=2)+"\n",
+              encoding="utf-8")
+          print("HD_SOURCE_COMPLETE_104")
+          PY
 
-          mkdir -p "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
-          printf '%s\n' \
-            '{' \
-            '  "package": "OR2-HD-GUI-v0.25.10a.zip",' \
-            '  "package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",' \
-            '  "pack_version": "Oct-2025-a",' \
-            '  "upstream_repo": "Sonic-TV/OR2006Sprites",' \
-            '  "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",' \
-            '  "scope": "13 HD graphics rework source DDS + 1 separated font-pipeline DDS",' \
-            '  "verification": "Every destination DDS is SHA-256 verified before commit."' \
-            '}' \
-            > "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/SOURCE_INFO.json"
-
-      - name: Commit synchronized HD sources
+      - name: Commit only SHA-exact HD source bytes to the asset branch
         shell: bash
+        env:
+          ASSET_BRANCH: korean-localization-recovery-20260928
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
+          git add --sparse localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
           if git diff --cached --quiet; then
-            echo "HD source already synchronized."
+            echo "HD_SOURCE_104_ALREADY_SYNCHRONIZED"
             exit 0
           fi
-          git commit -m "localization: sync canonical HD GUI source DDS"
-          git push origin HEAD:korean-localization-clean
+          git diff --cached --check
+          git commit -m "assets(localization): sync all 104 SHA-pinned HD source DDS"
+          pushed=0
+          for attempt in 1 2 3 4; do
+            if git push origin "HEAD:$ASSET_BRANCH"; then
+              pushed=1
+              break
+            fi
+            git fetch origin "$ASSET_BRANCH"
+            git rebase "origin/$ASSET_BRANCH"
+          done
+          test "$pushed" = 1
+          echo "HD_SOURCE_104_COMMITTED"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "Pinned upstream: Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754"
+          echo "Expected active HD DDS: 104"
+          echo "The hd_source push automatically triggers outrun-ab-multi-atlas.yml."
