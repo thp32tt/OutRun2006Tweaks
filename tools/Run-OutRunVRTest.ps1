@@ -326,6 +326,12 @@ if($QuestCockpitV2 -eq 'ON'){
         '-VR.QuestCockpitV2FullCar=true',
         '-VR.QuestCockpitV2HideDriver=true',
         '-VR.QuestCockpitV2RawB0Camera=false',
+        # Quest and PC guest both load the SAME per-model mode1 table. Do not
+        # carry prior hand-tuned -0.35/-0.18 camera shifts from user.ini.
+        '-VR.QuestCockpitV2SeatBack=0.0',
+        '-VR.QuestCockpitV2SeatDown=0.0',
+        '-VR.QuestCockpitV2SeatRight=0.0',
+        '-VR.QuestCockpitV2GlassReflectionOff=true',
         '-VR.QuestCockpitV2OccupantCorrection=true',
         ('-VR.QuestCockpitV2OccupantLod0=' + $(if($QuestCockpitV2Lod0 -eq 'ON'){'true'}else{'false'})),
         ('-VR.QuestCockpitV2F0RenderScope=' + $(if($QuestCockpitV2F0 -eq 'ON'){'true'}else{'false'})),

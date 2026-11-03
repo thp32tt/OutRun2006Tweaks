@@ -144,9 +144,9 @@ namespace Settings
         "EXPERIMENTAL Quest mode1 per-car original table cockpit, opt-in only; restart required." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
-    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.35f,
+    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.0f,
         "Native camera-relative seat backward shift in game units, without B0 recalc. F11 live.",Range<float>{0.f,1.2f} };
-    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.18f,
+    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.0f,
         "Native camera-relative seat down shift in game units. F11 live.",Range<float>{0.f,0.8f} };
     Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
         "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
@@ -162,6 +162,8 @@ namespace Settings
         "Experimental LIVE player-scoped dark glass tint hook. No PMT file edits. Only original native mode1 player render/verified queue entries; OFF leaves all original GPU states. Default OFF." };
     Setting<float> VRQuestCockpitV2GlassBrightness{ "VR", "QuestCockpitV2GlassBrightness", 75.0f,
         "Live cockpit glass tint brightness, 0=dark (alpha .90), 100=clear (alpha .10). Not HDR/exposure; F11 edit is immediate without restart. Unproven Quest3 window mesh parity.", Range<float>{ 0.0f, 100.0f } };
+    Setting<bool> VRQuestCockpitV2GlassReflectionOff{ "VR", "QuestCockpitV2GlassReflectionOff", true,
+        "Cockpit-only live reflection suppression for verified player dark glass PMT materials: specular plus shader mode 4/5 and environment texture stages. Restore PMT bytes after original setup. Does not globally disable car/world cubemap. Default ON." };
     Setting<bool> VRQuestCockpitV2GlassHidden{ "VR", "QuestCockpitV2GlassHidden", false,
         "Experimental F11 glass-clear mode: zero diffuse RGB and alpha only for player-owned verified tinted material during original application, restore immediately. Separate reflection passes may remain." };
     Setting<bool> VRQuestCockpitV2HideDriver{ "VR", "QuestCockpitV2HideDriver", true,

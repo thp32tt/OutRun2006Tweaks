@@ -95,3 +95,36 @@ when QuestCockpitV2Enabled=false.
   Review actual binocular world-sky source and culling A/B captures
   before changing world render paths.
 - RUNTIME_VISUAL_VALIDATION=UNTESTED for new changes, Windows CI needed.
+
+2026-11-03 QUEST REA ORIGINAL PER-MODEL SEAT + PLAYER GLASS REFLECTION:
+
+Quest ELF race_camera_eye_look_485590 at 0x119275C..0x1192790
+consumes per-car model records (30 * 36 bytes; 15 distinct anchors);
+PC original 485590 uses the same live initialized 0x818BB0 model
+table. The earlier cockpit defaults SeatBack=0.35, SeatDown=0.18 were
+arbitrary offsets, NOT original Quest seat measurements. Set both to
+0.0 and force the dedicated cockpit launcher to ignore stale saved
+offsets. Verify actual per-car LIVE table and signed car index, keep
+native car swing, blend and ground clipping. B0 double transform
+remains retired. Custom F11 back/down/right controls remain explicit
+optional user tuning, never claimed as original APK coordinates.
+
+Quest native run_game camera override can conditionally substitute a
+captured XYZ when Quest toggle and guestState == 0x10, but the true
+captured XYZ origin/provider isn't verified on the user's PC;
+NO invented value is copied into Windows camera. HMD position parity
+is NOT proven by identical PC/Quest model table.
+
+PC 408F90 (material shader flags bit 19..22 mode 4 normal cube /
+mode 5 environment texture, bit0 specular) and 409430 layer
+environment flags (0x02/0x08/0x80) are distinct from diffuse alpha.
+New F11 QuestCockpitV2GlassReflectionOff=true masks these ORIGINAL
+reflection paths ONLY during proven player-owned glass material
+408C80 state application, zeroes specular/emissive colours, restores
+original PMT RGBA and flags by 404907. F11 GlassHidden additionally
+zeros diffuse/ambient and alpha (record[17]=-1) to reduce
+reflections in tinted pane. Original player/car/track/world cubemaps
+are NOT globally disabled. A physically separate unclassified
+reflection-only mesh/pass may remain; that requires exact mesh ID
+and HMD visual probe, not guessed skip. Runtime HMD validation
+remains UNTESTED.

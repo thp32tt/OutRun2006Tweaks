@@ -52,7 +52,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff;
     extern Setting<float> VRQuestCockpitV2SeatBack,VRQuestCockpitV2SeatDown,VRQuestCockpitV2SeatRight;
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
@@ -182,7 +182,14 @@ struct Token {
     std::uint64_t epoch=0;
 };
 struct QueueCount { int before=-1; DrawBuffer* buffer=nullptr; };
-struct Pending {float* rgba=nullptr; std::array<float,4> saved{};};
+struct Pending {
+    float* rgba=nullptr;
+    std::array<float,18> saved{};
+    std::uint32_t* materialFlags=nullptr;
+    std::uint32_t savedMaterialFlags=0;
+    std::array<std::uint32_t*,3> layers{};
+    std::array<std::uint32_t,3> savedLayers{};
+};
 inline thread_local std::array<Token,1024> Tokens{};
 inline thread_local std::size_t TokenCount=0;
 inline thread_local bool TooMany=false;
@@ -319,7 +326,9 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
     const auto epoch=OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch();
     if(!Settings::VREnabled||!Settings::VRQuestCockpitV2Enabled||
        (!Settings::VRQuestCockpitV2GlassEnabled &&
-        !Settings::VRQuestCockpitV2GlassHidden)||!IsPlayableCarGameplay()||
+        !Settings::VRQuestCockpitV2GlassHidden &&
+        !Settings::VRQuestCockpitV2GlassReflectionOff)||
+        !IsPlayableCarGameplay()||
        !epoch||OutRunVR::QuestCockpitV2::InSceneEffect())return;
     const auto* cam=Game::camera();
     if(!cam||cam->cam_mode_34A!=1||!Game::pl_car())return;
@@ -380,35 +389,71 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
         true,true,true,true,true,true,true,owner,alphaPass,
         selected,diffuse,unique))return;
     const bool hide=Settings::VRQuestCockpitV2GlassHidden;
+    const bool noReflection=Settings::VRQuestCockpitV2GlassReflectionOff||hide;
+    const bool tint=Settings::VRQuestCockpitV2GlassEnabled;
     const float brightness=Settings::VRQuestCockpitV2GlassBrightness.get();
     const float target=hide?0.f:
         OutRunVR::QuestCockpitV2::Glass::AlphaFromBrightness(brightness);
-    if(!std::isfinite(target)||
-       (!hide&&std::fabs(rgba[3]-target)<.00001f))return;
+    if(!std::isfinite(target))return;
+    if(!hide&&!noReflection&&(!tint||std::fabs(rgba[3]-target)<.00001f))
+        return;
+    // Original PC 408F90: reflection is NOT just diffuse alpha; material
+    // flags bit0 enable specular, fixed shader modes 4/5 bind cubemaps,
+    // 409430 layer bits 0x02/0x08/0x80 bind environment texture stages.
+    // Patch only the exact material during original 408C80 state install.
+    // Device state/cache then contains NON-reflective shader for the draw;
+    // restore original data at 404907 before any later material.
+    auto* writableMaterial=const_cast<std::uint32_t*>(material);
+    if(!Memory(rgba,18*sizeof(float),true))return;
+    if(noReflection&&!Memory(writableMaterial,0x58,true))return;
     pending.rgba=rgba;
-    std::memcpy(pending.saved.data(),rgba,4*sizeof(float));
+    std::memcpy(pending.saved.data(),rgba,18*sizeof(float));
+    if(noReflection) {
+        pending.materialFlags=writableMaterial+1;
+        pending.savedMaterialFlags=writableMaterial[1];
+        writableMaterial[1]=OutRunVR::QuestCockpitV2::Glass::
+            RemoveGlassReflectionFlags(writableMaterial[1]);
+        for(std::size_t i=0;i<3;++i) {
+            // PmtMaterial layer[i] at +08 + i*0x14, flags at +00.
+            auto* layer=writableMaterial+2+i*5;
+            pending.layers[i]=layer;
+            pending.savedLayers[i]=*layer;
+            *layer=OutRunVR::QuestCockpitV2::Glass::
+                RemoveGlassReflectionLayer(*layer);
+        }
+        OutRunVR::QuestCockpitV2::Glass::
+            SuppressGlassReflectionColours(rgba,hide);
+    }
     if(hide) {
-        // ONE/INVSRCALPHA blending requires zero *RGB* as well as alpha,
-        // otherwise a dirt/reflection-like colour can remain visible.
-        // Keep all original shader and draw calls for safety.
+        // One/InvSrcAlpha may otherwise retain RGB; all D3DMATERIAL9
+        // diffuse/ambient/specular/emissive become zero. Keep geometry
+        // and original material draws, no guessed reflection mesh skip.
         rgba[0]=rgba[1]=rgba[2]=rgba[3]=0.f;
-    } else {
+    } else if(tint) {
         rgba[3]=target;
     }
     if(Settings::VRTelemetry&&++LogCount<=24u)
         spdlog::info("VR COCKPIT GLASS LIVE: epoch={} owner={} material={:p} "
-            "originalAlpha={:.4f} appliedAlpha={:.4f} hidden={} brightness={:.1f} "
+            "originalAlpha={:.4f} appliedAlpha={:.4f} hidden={} "
+            "reflectionOff={} originalShaderMode={} brightness={:.1f} "
             "restore=after_original_408C80 QuestWindowMesh=UNTESTED",
             epoch,PlayerDepth?"player-callback":"matched-queue",
-            static_cast<const void*>(material),pending.saved[3],target,hide,brightness);
+            static_cast<const void*>(material),pending.saved[3],
+            rgba[3],hide,noReflection,(attr>>19)&15u,brightness);
 }
 static void OnMaterialAfter(SafetyHookContext&) noexcept {
     if(OverflowDepth){--OverflowDepth;return;}
     if(!PendingDepth)return;
     Pending pending=PendingStack[--PendingDepth];
     PendingStack[PendingDepth]={};
-    if(pending.rgba&&Memory(pending.rgba,4*sizeof(float),true))
-        std::memcpy(pending.rgba,pending.saved.data(),4*sizeof(float));
+    if(pending.materialFlags&&Memory(pending.materialFlags,sizeof(std::uint32_t),true))
+        *pending.materialFlags=pending.savedMaterialFlags;
+    for(std::size_t i=0;i<pending.layers.size();++i) {
+        if(pending.layers[i]&&Memory(pending.layers[i],sizeof(std::uint32_t),true))
+            *pending.layers[i]=pending.savedLayers[i];
+    }
+    if(pending.rgba&&Memory(pending.rgba,18*sizeof(float),true))
+        std::memcpy(pending.rgba,pending.saved.data(),18*sizeof(float));
 }
 } // namespace QuestCockpitGlassLive
 
@@ -637,12 +682,39 @@ static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
                 "preserving native camera and using offset-only seat");
         }
     }
+    // Quest ELF 119275C..1192790 copies original model[0..2] into both
+    // eye/look temporary vectors. The retail PC 485590 already performs
+    // the same operation, then original eye_swing/view_blend/ground clip.
+    // VERIFY the initialized LIVE 30x36-byte table but NEVER reapply
+    // model->B0 or treat those game units as OpenXR metres.
+    const auto* car=Game::pl_car();
+    if(!car)return false;
+    const int model=static_cast<int>(
+        static_cast<std::int8_t>(car->car_kind_11));
+    constexpr std::size_t kTableBytes=30u*36u;
+    const auto* table=Module::exe_ptr<const std::uint8_t>(0x418BB0);
+    if(!QuestCockpitGlassLive::Memory(table,kTableBytes))return false;
+    OutRunVR::QuestCockpitV2::Vec3 verifiedOriginalSeat{};
+    if(!OutRunVR::QuestCockpitV2::OriginalModeOneAnchor(
+        table,kTableBytes,model,verifiedOriginalSeat))return false;
+    static thread_local std::uint32_t loggedModels=0;
+    if(Settings::VRTelemetry&&model>=0&&model<30&&
+       (loggedModels&(1u<<model))==0u) {
+        loggedModels|=1u<<model;
+        spdlog::info("VR QUEST REA SEAT: model={} nativeAnchorXYZ=({:.4f},{:.4f},{:.4f}) "
+            "source=PC_live_818BB0/Quest_119275C overlay=none",
+            model,verifiedOriginalSeat.x,verifiedOriginalSeat.y,
+            verifiedOriginalSeat.z);
+    }
+    const float back=Settings::VRQuestCockpitV2SeatBack.get();
+    const float down=Settings::VRQuestCockpitV2SeatDown.get();
+    const float right=Settings::VRQuestCockpitV2SeatRight.get();
+    if(back==0.f&&down==0.f&&right==0.f)
+        return false; // exact original per-car camera, nothing staged
     return OutRunVR::QuestCockpitV2::NativeSeatOffset(
         {camera->cam_pos_F8.x,camera->cam_pos_F8.y,camera->cam_pos_F8.z},
         {camera->look_pos_104.x,camera->look_pos_104.y,camera->look_pos_104.z},
-        Settings::VRQuestCockpitV2SeatBack.get(),
-        Settings::VRQuestCockpitV2SeatDown.get(),
-        Settings::VRQuestCockpitV2SeatRight.get(),result);
+        back,down,right,result);
 }
 class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static constexpr int PlayerCarRva=0x69764, RobotRva=0x114E60;

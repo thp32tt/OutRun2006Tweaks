@@ -31,6 +31,36 @@ inline float AlphaFromBrightness(float percent) noexcept {
     if(percent>100.f)percent=100.f;
     return .90f-.008f*percent;
 }
+// PC original material_408c80 sets shader mode through bits 19..22;
+// mode 4 = normal cubemap, mode 5 = environment reflection texture.
+// Original 408F90 separately enables SPECULAR on bit 0.
+// Only call after player+glass ownership is independently proven.
+inline constexpr std::uint32_t RemoveGlassReflectionFlags(
+    std::uint32_t flags) noexcept {
+    const auto mode=(flags>>19)&15u;
+    flags &= ~std::uint32_t{1}; // D3DRS_SPECULARENABLE OFF
+    if(mode==4u||mode==5u)
+        flags &= ~(std::uint32_t{15}<<19); // no reflection fixed shader
+    return flags; // preserve all other render state / blend / depth flags
+}
+// Original 409430 layer env reflection modes: 0x02, 0x08, 0x80.
+// Keep normal diffuse texture and filters; never touch world materials.
+inline constexpr std::uint32_t RemoveGlassReflectionLayer(
+    std::uint32_t flags) noexcept {
+    return flags & ~std::uint32_t{0x8au};
+}
+inline void SuppressGlassReflectionColours(float* record18,
+    bool removeGlass) noexcept {
+    if(!record18)return;
+    if(removeGlass) {
+        for(unsigned i=0;i<16;++i)record18[i]=0.f;
+        // Original 410DD0 computes combiner alpha from record[17].
+        record18[17]=-1.f;
+    } else {
+        // Specular and emissive channels are distinct from diffuse tint.
+        for(unsigned i=8;i<16;++i)record18[i]=0.f;
+    }
+}
 inline bool Admit(bool vr,bool cockpit,bool enabled,bool gameplay,
     bool nativeEpoch,bool mode1,bool notEffect,bool owner,bool alphaBlend,
     bool materialBlend,bool diffuse,bool uniqueColor) noexcept
