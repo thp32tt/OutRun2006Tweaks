@@ -70,3 +70,28 @@ Windows full build + HMD verify must confirm original ESI/EDX pointers,
 DrawEntry provenance and visible front/side polygons. A skipped candidate
 is preferable to broad world tint. No live material hook is installed
 when QuestCockpitV2Enabled=false.
+
+2026-11-03 cockpit default fixes from user's HMD capture:
+- Event work tokens: driver=ROB01/362, passenger=ROB02/363, BOTH
+  observed in original PC 514E60 while driving, W*C applied to both.
+  New cockpit normal policy hides only ROB01 visual draw, preserves
+  original PC ROB02 animated matrix + scoped forced-visible LOD0.
+  Neither role is touched at GOAL.
+- User saw raw B0 violent shake; raw B0 table override is now
+  disabled even when old F11/user.ini flag is ON. Native original
+  Quest/PC 30x36 per-car camera stays authoritative. Bounded relative
+  seat calibration default back .35, down .18, right 0 game units,
+  all exposed in F11. Recenter still belongs to OpenXR.
+- QuestCockpitV2GlassHidden is the optional live original-model
+  *material* suppressor, strict player/glass owner only; zeroes
+  RGBA temporarily including RGB to handle source blend ONE.
+  Independent shader/reflective geometry removal not yet verified.
+- 1.7GB verbose log and 75ms+ frame dips: normal cockpit launcher
+  disables Telemetry, CockpitFrameProbe and FileLogging; DIAG retains
+  all original evidence collection and crash dumps.
+- Sky flicker remains separately UNRESOLVED: uploaded run explicitly
+  sets SkyGlowFactor=0, so don't claim the SkyGlow fix or that turning
+  it off helps. Avoid global stage culling force-off due to FPS cost.
+  Review actual binocular world-sky source and culling A/B captures
+  before changing world render paths.
+- RUNTIME_VISUAL_VALIDATION=UNTESTED for new changes, Windows CI needed.

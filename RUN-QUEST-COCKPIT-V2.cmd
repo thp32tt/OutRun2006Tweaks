@@ -7,6 +7,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Run-OutRunVRTest.ps1" 
 set "ERRORCODE=%ERRORLEVEL%"
 echo.
 echo Test finished with code %ERRORCODE%.
-echo Send logs from the logs folder and any OUTRUNVR_LAUNCH_ERROR.txt.
+echo For detailed logs, use RUN-QUEST-COCKPIT-V2-DIAG.cmd; normal play disables multi-GB tracing.
 pause
 exit /b %ERRORCODE%

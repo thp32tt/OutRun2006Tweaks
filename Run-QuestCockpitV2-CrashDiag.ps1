@@ -40,6 +40,7 @@ try{
     Write-Host "Release marker present: $(Test-Path -LiteralPath (Join-Path $root 'VR_RELEASE_VERSION.txt'))"
     $launchArgs=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,
             '-TestProfile','CORRECTNESS','-QuestCockpitV2ReleaseParity','ON',
+            '-QuestCockpitV2Diagnostics','ON',
             '-QuestCockpitV2','OFF')
     switch($Test){
       1 {Write-Host 'CONTROL: No cockpit hooks; diagnostic file logging ON'}

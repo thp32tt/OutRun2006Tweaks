@@ -5,6 +5,7 @@ param(
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Lod0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2ReleaseParity = 'OFF',
+    [ValidateSet('OFF','ON')][string]$QuestCockpitV2Diagnostics = 'OFF',
     [ValidateSet('EX','CLASSIC')][string]$QuestCockpitV2DeviceMode = 'EX',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
@@ -323,17 +324,20 @@ if($QuestCockpitV2 -eq 'ON'){
     $gameArgs += @(
         '-VR.QuestCockpitV2Enabled=true',
         '-VR.QuestCockpitV2FullCar=true',
-        '-VR.QuestCockpitV2HideDriver=false',
+        '-VR.QuestCockpitV2HideDriver=true',
         '-VR.QuestCockpitV2RawB0Camera=false',
         '-VR.QuestCockpitV2OccupantCorrection=true',
         ('-VR.QuestCockpitV2OccupantLod0=' + $(if($QuestCockpitV2Lod0 -eq 'ON'){'true'}else{'false'})),
         ('-VR.QuestCockpitV2F0RenderScope=' + $(if($QuestCockpitV2F0 -eq 'ON'){'true'}else{'false'})),
-        '-VR.CockpitFrameProbe=true',
-        '-VR.Telemetry=true',
-        '-FileLogging=true'
+        # Normal cockpit play must not generate the 1.7 GB per-draw log
+        # observed in the user's November 3 single HMD session.
+        # The explicit crash DIAG launcher still requests these logs.
+        ('-VR.CockpitFrameProbe=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'})),
+        ('-VR.Telemetry=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'})),
+        ('-FileLogging=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'}))
     )
-    $env:OUTRUN_VR_FILE_LOG='1'
-    Write-Host 'QuestCockpitV2 experimental original-mode1: enabled for THIS launch only.'
+    $env:OUTRUN_VR_FILE_LOG=if($QuestCockpitV2Diagnostics -eq 'ON'){'1'}else{'0'}
+    Write-Host "QuestCockpitV2 mode1 active; detailed diagnostics=$QuestCockpitV2Diagnostics."
 }
 if($backend -ne '2d'){
     # Match v0.01 Beta explicit VR entrypoint. A release VERSION marker
@@ -384,7 +388,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "cockpitVehicleScale=$CockpitVehicleScale"
     "cockpitCameraBasis=$cockpitEffectiveBasis"
     "cockpitGlassProbeOpacity=$CockpitGlassProbeOpacity"
-    "cockpitGlassActualTransparency=NOT_IMPLEMENTED"
+    "cockpitGlassActualTransparency=LIVE_SCOPED_RGB_ALPHA_AND_OFF_EXPERIMENT"
     "gpuLabTransparency=$GpuLabTransparency"
     "gpuLabReflection=$GpuLabReflection"
     "gpuLabSkyGlow=$GpuLabSkyGlow"
@@ -401,6 +405,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "vrLaunchExplicit=$($backend -ne '2d')"
     "cockpitReleaseParity=$QuestCockpitV2ReleaseParity"
     "cockpitDeviceMode=$QuestCockpitV2DeviceMode"
+    "cockpitDiagnostics=$QuestCockpitV2Diagnostics"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
