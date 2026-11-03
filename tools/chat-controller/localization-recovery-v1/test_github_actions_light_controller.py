@@ -13,7 +13,7 @@ spec.loader.exec_module(mod)
 
 class LightControllerTests(unittest.TestCase):
     def test_self_test_constants(self):
-        self.assertEqual(mod.WORKFLOW,"outrun-korean-github-compute.yml")
+        self.assertEqual(mod.WORKFLOW,"outrun-ab-imagegen-native.yml")
         self.assertTrue(mod.EXPECTED_SHA.fullmatch("1"*40))
         self.assertFalse(mod.EXPECTED_SHA.fullmatch("1"*39))
         self.assertFalse(mod.EXPECTED_SHA.fullmatch("../x"*10))
