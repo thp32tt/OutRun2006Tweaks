@@ -26,6 +26,13 @@ ORIENTATIONS={
 }
 
 def sha(b):return hashlib.sha256(b).hexdigest()
+
+def imported_candidate(root,row):
+ p=root/row["_candidate_rel"]
+ return p.is_file() and not p.is_symlink()
+
+def preview_name(target):
+ return "PREVIEW_"+PurePosixPath(target).stem+"_"+sha(target.encode("utf-8"))[:16]+".png"
 def good_path(path):
  p=PurePosixPath(path)
  return isinstance(path,str) and path.startswith("textures/load/") and p.suffix==".dds" and "\\" not in path and ":" not in path and ".." not in p.parts and len(p.parts) in (4,5) and (len(p.parts)==4 or p.parts[2] in ("Keyboard","PlayStation","Switch","Xbox")) and all(re.fullmatch(r"[A-Za-z0-9_.-]+",x) for x in p.parts)
@@ -99,7 +106,7 @@ def process_atlas(raw,rows,repo,orientation):
  for row in sorted(rows,key=lambda r:(r["_bbox"][1],r["_bbox"][0],r["roi_id"])):
   rid=row["roi_id"]
   path=repo/row["_candidate_rel"]
-  if not path.is_file() or path.is_symlink():
+  if not imported_candidate(repo,row):
    holds.append({"roi_id":rid,"reason":"AB_PNG_NOT_YET_IMPORTED"});continue
   try:
    (x0,y0,x1,y1)=row["_bbox"]
@@ -164,40 +171,44 @@ def build(root,out):
  groups=load_cross(root/CROSS)
  archive={};admitted=[];holds=[];unavailable=0;sha_conflicts=0
  for target,rows in sorted(groups.items()):
-  imported=sum((root/r["_candidate_rel"]).is_file() for r in rows)
+  imported_rows=[r for r in rows if imported_candidate(root,r)]
+  imported=len(imported_rows)
   if not imported:continue
   path=root/ORIGINAL/target
   if not path.is_file() or path.is_symlink():
    unavailable+=imported
-   holds.append({"target":target,"reason":"SOURCE_DDS_UNAVAILABLE_IN_GITHUB","rows":imported})
+   holds.append({"target":target,"reason":"SOURCE_DDS_UNAVAILABLE_IN_GITHUB","rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]})
    continue
   hashes={r["source_dds_sha256"] for r in rows}
   if len(hashes)!=1 or path.stat().st_size>80*1024*1024:
-   holds.append({"target":target,"reason":"SOURCE_DDS_SHA_AMBIGUOUS_OR_TOO_BIG","rows":imported});continue
+   holds.append({"target":target,"reason":"SOURCE_DDS_SHA_AMBIGUOUS_OR_TOO_BIG","rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]});continue
   raw=path.read_bytes()
   if sha(raw)!=next(iter(hashes)):
    sha_conflicts+=imported
-   holds.append({"target":target,"reason":"SOURCE_DDS_SHA_MISMATCH","rows":imported});continue
+   holds.append({"target":target,"reason":"SOURCE_DDS_SHA_MISMATCH","rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]});continue
   ident=PurePosixPath(target).stem.split("_")[0]
   orientation=ORIENTATIONS.get(ident)
   if not orientation:
-   holds.append({"target":target,"reason":"NATIVE_ORIENTATION_UNVERIFIED","rows":imported});continue
+   holds.append({"target":target,"reason":"NATIVE_ORIENTATION_UNVERIFIED","rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]});continue
   try:
    binary,readable,painted,local_holds=process_atlas(raw,rows,root,orientation)
    if painted:
     archive[target]=binary
     thumb=readable.copy()
     thumb.thumbnail((1536,1536),Image.Resampling.LANCZOS)
-    thumb.save(out/("PREVIEW_"+ident+".png"),format="PNG")
+    thumb.save(out/preview_name(target),format="PNG")
     admitted.append({"target":target,"origin_sha256":sha(raw),"dds_sha256":sha(binary),
                      "orientation":orientation,"painted":painted,
-                     "holds":local_holds[:100]})
+                     "holds":local_holds})
    else:
     holds.append({"target":target,"reason":"IMPORTED_ROI_ALL_HELD",
-                  "rows":imported,"details":local_holds[:30]})
+                  "rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows],"details":local_holds})
   except (OSError,ValueError,OverflowError) as exc:
-   holds.append({"target":target,"reason":str(exc)[:130],"rows":imported})
- imported_total=sum((root/r["_candidate_rel"]).is_file() for rows in groups.values() for r in rows)
+   holds.append({"target":target,"reason":str(exc)[:130],"rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]})
+ imported_total=sum(imported_candidate(root,r) for rows in groups.values() for r in rows)
+ pending_import_holds=[{"roi_id":r["roi_id"],"target":target,"reason":"AB_PNG_NOT_YET_IMPORTED"}
+  for target,rows in sorted(groups.items()) for r in rows if not imported_candidate(root,r)]
+ if len(pending_import_holds)!=954-imported_total:raise ValueError("PENDING_IMPORT_HOLD_COUNT_MISMATCH")
  report={"schema":"outrun.ab-imagegen-multi-atlas.v1",
          "release_approved":False,"runtime_validation":"UNTESTED","visual_qa":"REVIEW_REQUIRED",
          "source":"A/B original ImageGen PNG only, no font fallback",
@@ -206,7 +217,7 @@ def build(root,out):
          "native_dds_generated":len(archive),
          "translated_roi_generated":sum(len(v["painted"]) for v in admitted),
          "source_dds_missing_rows":unavailable,"source_sha_conflict_rows":sha_conflicts,
-         "generated":admitted,"holds":holds}
+         "generated":admitted,"holds":holds,"pending_import_holds":pending_import_holds}
  with zipfile.ZipFile(out/ZIPNAME,"w") as z:
   for path,dds in sorted(archive.items()):zput(z,path,dds)
   zput(z,"TEST_ONLY_MANIFEST.json",json.dumps({

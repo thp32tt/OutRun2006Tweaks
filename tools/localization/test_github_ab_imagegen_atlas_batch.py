@@ -76,6 +76,21 @@ class MultiAtlasTest(unittest.TestCase):
   self.assertTrue(m.good_path("textures/load/PlayStation/spr_etc_xst/D6DC1380_256x64.dds"))
   for v in ("../../exfil.dds","textures/load/spr_etc_xst/../bad.dds","textures/load/a/b.png","textures/load/X/spr_a/b.dds"):
    self.assertFalse(m.good_path(v))
+ def test_preview_names_are_unique_per_controller_variant(self):
+  base="textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+  variants=[base]+[base.replace("textures/load/","textures/load/"+platform+"/") for platform in ("PlayStation","Switch","Xbox")]
+  names=[m.preview_name(path) for path in variants]
+  self.assertEqual(len(set(names)),len(variants))
+  self.assertTrue(all(name.startswith("PREVIEW_39229D64_") and name.endswith(".png") for name in names))
+ def test_imported_candidate_rejects_missing_or_symlink(self):
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d)
+   row={"_candidate_rel":"candidate.png"}
+   self.assertFalse(m.imported_candidate(root,row))
+   make_candidate(root/"candidate.png")
+   self.assertTrue(m.imported_candidate(root,row))
+   (root/"alias.png").symlink_to(root/"candidate.png")
+   self.assertFalse(m.imported_candidate(root,{"_candidate_rel":"alias.png"}))
  def test_no_font_regeneration(self):
   s=src.read_text()
   for term in ("ImageFont","truetype(","draw.text(","font_path"):
