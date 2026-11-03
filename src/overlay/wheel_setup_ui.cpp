@@ -1370,6 +1370,11 @@ namespace
                     "Legacy DirectInput wheel setup. Use this page for compatibility-mode input bindings and force feedback.");
             }
 
+            // Inform users of the actual output owner: SDL can provide
+            // multiple wheel INPUT devices, but wheel FFB is delivered
+            // exclusively through the one selected DirectInput COM output.
+            // This is a real visible UI contract, not a dummy linker marker.
+            ImGui::TextDisabled("Single-owner wheel FFB: DirectInput COM only");
             const auto& devices = gReader.devices();
             if (ImGui::Button("Refresh Devices"))
                 gReader.refresh_devices();
