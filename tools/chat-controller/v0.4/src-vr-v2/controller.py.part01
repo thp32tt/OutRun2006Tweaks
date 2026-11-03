@@ -533,18 +533,43 @@ def is_configured_project_url(url: Optional[str]) -> bool:
     return parsed.path == prefix or parsed.path.startswith(prefix + "/") or parsed.path.startswith(prefix + "-")
 
 
-def is_project_scoped_chat_url(url: Optional[str]) -> bool:
-    """Hard guard: persisted chats must belong to the configured ChatGPT project."""
-    return is_persistable_chat_url(url) and is_configured_project_url(url)
+def slot_project_home(slot_name: Optional[str] = None) -> str:
+    """Never navigate C into the OutRun project in Model 2 mode."""
+    if CONTROLLER_MODE == "conversion" and MODEL2_AUTODEV_ENABLED and slot_name == "C":
+        return MODEL2_PROJECT_URL if MODEL2_SCOPE_READY else "about:blank"
+    return BASE_URL
 
 
-async def wait_for_chat_url(page: Page, timeout_sec: int = 30) -> Optional[str]:
+def is_slot_project_url(url: Optional[str], slot_name: Optional[str] = None) -> bool:
+    """Strict distinct-project ownership; A/B use OutRun, Model2 C its own ID."""
+    if CONTROLLER_MODE == "conversion" and MODEL2_AUTODEV_ENABLED and slot_name == "C":
+        if not MODEL2_SCOPE_READY or not url:
+            return False
+        try:
+            parsed = urllib.parse.urlparse(url)
+        except Exception:
+            return False
+        if parsed.scheme != "https" or parsed.netloc.lower() not in {"chatgpt.com", "www.chatgpt.com"}:
+            return False
+        prefix = f"/g/{MODEL2_PROJECT_ID}"
+        return (parsed.path == prefix or parsed.path.startswith(prefix + "/")
+                or parsed.path.startswith(prefix + "-"))
+    return is_configured_project_url(url)
+
+
+def is_project_scoped_chat_url(url: Optional[str], slot_name: Optional[str] = None) -> bool:
+    """Persist only a chat that belongs to this slot's ChatGPT project."""
+    return is_persistable_chat_url(url) and is_slot_project_url(url, slot_name)
+
+
+async def wait_for_chat_url(page: Page, timeout_sec: int = 30,
+                            slot_name: Optional[str] = None) -> Optional[str]:
     deadline = time.time() + timeout_sec
     while time.time() < deadline:
-        if is_project_scoped_chat_url(page.url):
+        if is_project_scoped_chat_url(page.url, slot_name):
             return page.url
         await page.wait_for_timeout(500)
-    return page.url if is_project_scoped_chat_url(page.url) else None
+    return page.url if is_project_scoped_chat_url(page.url, slot_name) else None
 
 
 async def previous_run_still_busy(page: Page, reg: Registry) -> bool:
