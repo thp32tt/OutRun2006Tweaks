@@ -122,6 +122,13 @@ int main() {
     assert(ResolveOriginalCockpitWork(0x1100,0x1000,true,0x1100,false)==Slot::None);
     assert(ResolveOriginalCockpitWork(0x1000,0x1000,false,0x1100,true)==Slot::None);
     assert(ResolveOriginalCockpitWork(0x1200,0x1000,true,0x1100,true)==Slot::None);
+    using R=CockpitOccupantRender;
+    assert(SelectCockpitOccupantRender(Slot::Driver362,true,true,true,true)==R::SuppressDriver);
+    assert(SelectCockpitOccupantRender(Slot::Passenger363,true,true,true,true)==R::OriginalPassengerForceVisible);
+    assert(SelectCockpitOccupantRender(Slot::Driver362,true,false,true,true)==R::Original);
+    assert(SelectCockpitOccupantRender(Slot::Passenger363,true,false,true,true)==R::Original);
+    assert(SelectCockpitOccupantRender(Slot::None,true,true,true,true)==R::Original);
+    assert(SelectCockpitOccupantRender(Slot::Driver362,false,true,true,true)==R::Original);
     // Duplicate/ambiguous tokens are rejected rather than assigning a role.
     assert(ResolveOriginalCockpitWork(0x1000,0x1000,true,0x1000,true)==Slot::None);
     const Matrix eye=Identity;

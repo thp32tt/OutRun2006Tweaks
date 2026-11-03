@@ -117,7 +117,11 @@ jobs:
           assert "DumpType" in diag and "finally" in diag
           assert 'CockpitFrameProbe = false' in ini
           assert 'QuestCockpitV2Enabled = false' in ini
-          assert 'QuestCockpitV2HideDriver = false' in ini
+          assert 'QuestCockpitV2HideDriver = true' in ini
+          assert 'QuestCockpitV2PassengerVisible = true' in ini
+          assert 'QuestCockpitV2GlassHidden = false' in ini
+          assert 'OriginalPassengerForceVisible' in hook
+          assert 'NativeSeatOffset(' in hook
           assert 'QuestCockpitV2RawB0Camera = false' in ini
           assert 'QuestCockpitV2OccupantCorrection = false' in ini
           assert 'QuestCockpitV2OccupantLod0 = false' in ini
@@ -144,8 +148,8 @@ jobs:
           assert 'sample.matrixF0=preF0->matrixF0' in hook
           assert 'else if(ActivePreF0Snapshot)' in hook
           assert 'ScopedOriginalPlayerF0 scope(' in hook
-          assert '!Settings::VRQuestCockpitV2RawB0Camera)return false' in hook
-          assert 'kOriginalModelTableRva=0x418BB0' in hook
+          assert 'RawB0Camera is retired' in hook
+          assert 'NativeSeatOffset(' in hook
           assert 'QuestCockpitV2CameraPose(camera,pose)' in hook
           assert 'OriginalModeOneAnchor(table,kTableSize,model,anchor)' in hook
           print('QuestCockpitV2 isolated-core contract PASS')

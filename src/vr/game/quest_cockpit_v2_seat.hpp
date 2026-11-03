@@ -60,6 +60,26 @@ inline bool SeatPoseFromCar(const Matrix& carB0,Vec3 local,
     destination=tmp;
     return true;
 }
+// Apply an additive POST-original-camera offset, NEVER a second raw B0
+// transform of the model's 30x36 mode1 seat anchor. Keep original swing,
+// blend and view direction. Camera offset is in native game coordinates.
+inline bool NativeSeatOffset(Vec3 eye,Vec3 look,float back,float down,
+                             float right,SeatPose& output) noexcept {
+    if(!Finite(eye)||!Finite(look)||!std::isfinite(back)||
+       !std::isfinite(down)||!std::isfinite(right)||
+       back<0.f||back>1.2f||down<0.f||down>0.8f||
+       std::fabs(right)>0.6f)return false;
+    const double dx=double(look.x)-eye.x,dz=double(look.z)-eye.z;
+    const double norm=std::hypot(dx,dz);
+    if(!std::isfinite(norm)||norm<1.e-5)return false;
+    const float fx=static_cast<float>(dx/norm),fz=static_cast<float>(dz/norm);
+    const Vec3 shift{-fx*back+fz*right,-down,-fz*back-fx*right};
+    SeatPose candidate{};
+    candidate.eye={eye.x+shift.x,eye.y+shift.y,eye.z+shift.z};
+    candidate.look={look.x+shift.x,look.y+shift.y,look.z+shift.z};
+    if(!Finite(candidate.eye)||!Finite(candidate.look))return false;
+    output=candidate;return true;
+}
 // Deterministic, game-frame-only owner gate (no old camera offset/session
 // caching): native view1, gameplay, original verified player, and world pass.
 inline bool TrialEligible(bool requested,bool vrEnabled,bool gameplay,

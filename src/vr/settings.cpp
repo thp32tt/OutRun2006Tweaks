@@ -143,7 +143,13 @@ namespace Settings
     Setting<bool> VRQuestCockpitV2Enabled{ "VR", "QuestCockpitV2Enabled", false,
         "EXPERIMENTAL Quest mode1 per-car original table cockpit, opt-in only; restart required." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
-        "Unsafe developer A/B: add raw B0+table override to original mode1 camera. Native game already calculates seat position. Default OFF; restart required." };
+        "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
+    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.35f,
+        "Native camera-relative seat backward shift in game units, without B0 recalc. F11 live.",Range<float>{0.f,1.2f} };
+    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.18f,
+        "Native camera-relative seat down shift in game units. F11 live.",Range<float>{0.f,0.8f} };
+    Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
+        "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,
         "Experimental original player ROB01 display model W*C correction. Exact original 514E60 hook, native frame and XR pose gated; F0 whole-frame parity remains unverified. Default OFF." };
     Setting<bool> VRQuestCockpitV2OccupantLod0{ "VR", "QuestCockpitV2OccupantLod0", false,
@@ -156,8 +162,12 @@ namespace Settings
         "Experimental LIVE player-scoped dark glass tint hook. No PMT file edits. Only original native mode1 player render/verified queue entries; OFF leaves all original GPU states. Default OFF." };
     Setting<float> VRQuestCockpitV2GlassBrightness{ "VR", "QuestCockpitV2GlassBrightness", 75.0f,
         "Live cockpit glass tint brightness, 0=dark (alpha .90), 100=clear (alpha .10). Not HDR/exposure; F11 edit is immediate without restart. Unproven Quest3 window mesh parity.", Range<float>{ 0.0f, 100.0f } };
-    Setting<bool> VRQuestCockpitV2HideDriver{ "VR", "QuestCockpitV2HideDriver", false,
-        "UNVERIFIED driver selection: original PC driver and heroine arrays have identical values. Default OFF until actual event/role owner is proved." };
+    Setting<bool> VRQuestCockpitV2GlassHidden{ "VR", "QuestCockpitV2GlassHidden", false,
+        "Experimental F11 glass-clear mode: zero diffuse RGB and alpha only for player-owned verified tinted material during original application, restore immediately. Separate reflection passes may remain." };
+    Setting<bool> VRQuestCockpitV2HideDriver{ "VR", "QuestCockpitV2HideDriver", true,
+        "Hide only original event 362 driver visual draw in mode1 race; passenger 363 and GOAL unaffected. Default ON." };
+    Setting<bool> VRQuestCockpitV2PassengerVisible{ "VR", "QuestCockpitV2PassengerVisible", true,
+        "Keep exact event 363 passenger original PC robot matrix; force visible LOD0 inside only its synchronous draw to avoid missing near-seat model. Default ON." };
 	Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
 		"Isolated QuestCockpitV2 diagnostic: collects original player B0/F0 and bounded Present correlation. The native game-frame owner is unverified; this does not activate cockpit. Requires restart." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,

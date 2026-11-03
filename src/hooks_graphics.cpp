@@ -52,7 +52,8 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2GlassEnabled;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible;
+    extern Setting<float> VRQuestCockpitV2SeatBack,VRQuestCockpitV2SeatDown,VRQuestCockpitV2SeatRight;
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
@@ -181,7 +182,7 @@ struct Token {
     std::uint64_t epoch=0;
 };
 struct QueueCount { int before=-1; DrawBuffer* buffer=nullptr; };
-struct Pending {float* alpha=nullptr; float original=0;};
+struct Pending {float* rgba=nullptr; std::array<float,4> saved{};};
 inline thread_local std::array<Token,1024> Tokens{};
 inline thread_local std::size_t TokenCount=0;
 inline thread_local bool TooMany=false;
@@ -317,7 +318,8 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
     // pointers before original playable-game and verified-frame gates.
     const auto epoch=OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch();
     if(!Settings::VREnabled||!Settings::VRQuestCockpitV2Enabled||
-       !Settings::VRQuestCockpitV2GlassEnabled||!IsPlayableCarGameplay()||
+       (!Settings::VRQuestCockpitV2GlassEnabled &&
+        !Settings::VRQuestCockpitV2GlassHidden)||!IsPlayableCarGameplay()||
        !epoch||OutRunVR::QuestCockpitV2::InSceneEffect())return;
     const auto* cam=Game::camera();
     if(!cam||cam->cam_mode_34A!=1||!Game::pl_car())return;
@@ -377,26 +379,36 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
     if(!OutRunVR::QuestCockpitV2::Glass::Admit(
         true,true,true,true,true,true,true,owner,alphaPass,
         selected,diffuse,unique))return;
-    const float original=rgba[3];
+    const bool hide=Settings::VRQuestCockpitV2GlassHidden;
     const float brightness=Settings::VRQuestCockpitV2GlassBrightness.get();
-    const float target=OutRunVR::QuestCockpitV2::Glass::AlphaFromBrightness(brightness);
-    if(!std::isfinite(target)||std::fabs(original-target)<.00001f)return;
-    pending={rgba+3,original};
-    rgba[3]=target;
+    const float target=hide?0.f:
+        OutRunVR::QuestCockpitV2::Glass::AlphaFromBrightness(brightness);
+    if(!std::isfinite(target)||
+       (!hide&&std::fabs(rgba[3]-target)<.00001f))return;
+    pending.rgba=rgba;
+    std::memcpy(pending.saved.data(),rgba,4*sizeof(float));
+    if(hide) {
+        // ONE/INVSRCALPHA blending requires zero *RGB* as well as alpha,
+        // otherwise a dirt/reflection-like colour can remain visible.
+        // Keep all original shader and draw calls for safety.
+        rgba[0]=rgba[1]=rgba[2]=rgba[3]=0.f;
+    } else {
+        rgba[3]=target;
+    }
     if(Settings::VRTelemetry&&++LogCount<=24u)
         spdlog::info("VR COCKPIT GLASS LIVE: epoch={} owner={} material={:p} "
-            "originalAlpha={:.4f} appliedAlpha={:.4f} brightness={:.1f} "
+            "originalAlpha={:.4f} appliedAlpha={:.4f} hidden={} brightness={:.1f} "
             "restore=after_original_408C80 QuestWindowMesh=UNTESTED",
             epoch,PlayerDepth?"player-callback":"matched-queue",
-            static_cast<const void*>(material),original,target,brightness);
+            static_cast<const void*>(material),pending.saved[3],target,hide,brightness);
 }
 static void OnMaterialAfter(SafetyHookContext&) noexcept {
     if(OverflowDepth){--OverflowDepth;return;}
     if(!PendingDepth)return;
     Pending pending=PendingStack[--PendingDepth];
     PendingStack[PendingDepth]={};
-    if(pending.alpha&&Memory(pending.alpha,sizeof(float),true))
-        *pending.alpha=pending.original;
+    if(pending.rgba&&Memory(pending.rgba,4*sizeof(float),true))
+        std::memcpy(pending.rgba,pending.saved.data(),4*sizeof(float));
 }
 } // namespace QuestCockpitGlassLive
 
@@ -613,37 +625,24 @@ static bool QuestCockpitV2Active(const EvWorkCamera* camera) noexcept {
 }
 static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
     OutRunVR::QuestCockpitV2::SeatPose& result) noexcept {
-    if(!QuestCockpitV2Active(camera) ||
-       !Settings::VRQuestCockpitV2RawB0Camera)return false;
-    // Original Quest and PC native mode1 camera already consume the
-    // original per-model seat table plus swing/blend. A second B0-derived
-    // projection drops that motion and may double-transform or jitter.
-    // Raw B0 is intentionally OFF unless explicitly selected for A/B.
-    const EVWORK_CAR* car=Game::pl_car();
-    if(!car)return false;
-    // Original native camera uses the initialized LIVE table VA 0x818BB0,
-    // not the ROM source VA 0x5BA4E0 (BSS is zero on disk).
-    constexpr std::uintptr_t kOriginalModelTableRva=0x418BB0;
-    constexpr std::size_t kTableSize=30u*36u;
-    const auto* table=Module::exe_ptr<const std::uint8_t>(
-        kOriginalModelTableRva);
-    MEMORY_BASIC_INFORMATION info{};
-    if(!table || VirtualQuery(table,&info,sizeof(info))!=sizeof(info) ||
-       info.State!=MEM_COMMIT || (info.Protect & (PAGE_GUARD|PAGE_NOACCESS)) ||
-       reinterpret_cast<std::uintptr_t>(table)+kTableSize>
-           reinterpret_cast<std::uintptr_t>(info.BaseAddress)+info.RegionSize)
-        return false;
-    using namespace OutRunVR::QuestCockpitV2;
-    const int model=static_cast<int>(car->car_kind_11);
-    Vec3 anchor{};
-    if(!OriginalModeOneAnchor(table,kTableSize,model,anchor))return false;
-    Matrix b0{};
-    static_assert(sizeof(Matrix)==sizeof(D3DMATRIX));
-    std::memcpy(b0.data(),&car->matrix_B0,sizeof(b0));
-    SeatPose pose{};
-    if(!SeatPoseFromCar(b0,anchor,pose))return false;
-    pose.model=static_cast<std::uint8_t>(model);
-    result=pose;return true;
+    if(!QuestCockpitV2Active(camera)||!camera)return false;
+    // The Quest and original PC mode1 camera already apply the original
+    // per-car 30x36 camera ROM record, swing and interpolation. Never
+    // transform that camera a second time with car B0 (HMD shake).
+    if(Settings::VRQuestCockpitV2RawB0Camera){
+        static bool warned=false;
+        if(!warned){
+            warned=true;
+            spdlog::warn("VR COCKPIT: RawB0Camera is retired; "
+                "preserving native camera and using offset-only seat");
+        }
+    }
+    return OutRunVR::QuestCockpitV2::NativeSeatOffset(
+        {camera->cam_pos_F8.x,camera->cam_pos_F8.y,camera->cam_pos_F8.z},
+        {camera->look_pos_104.x,camera->look_pos_104.y,camera->look_pos_104.z},
+        Settings::VRQuestCockpitV2SeatBack.get(),
+        Settings::VRQuestCockpitV2SeatDown.get(),
+        Settings::VRQuestCockpitV2SeatRight.get(),result);
 }
 class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static constexpr int PlayerCarRva=0x69764, RobotRva=0x114E60;
@@ -706,7 +705,6 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         // is not safe; let original guest render without probing these.
         if (!robot || !Settings::VREnabled ||
             !Settings::VRQuestCockpitV2Enabled ||
-            !Settings::VRQuestCockpitV2OccupantCorrection ||
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
             !NativeFrameTrace().Active() || InSceneEffect() ||
             !IsPlayableCarGameplay()) {
@@ -721,6 +719,28 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
         const auto slot=ExactOriginalCockpitOccupant(robot);
+        const bool racing=Game::current_mode &&
+            (*Game::current_mode==STATE_GAME ||
+             (*Game::current_mode==STATE_START &&
+              Game::game_start_progress_code &&
+              *Game::game_start_progress_code==65));
+        const auto action=SelectCockpitOccupantRender(
+            slot,QuestCockpitV2Active(camera),racing,
+            Settings::VRQuestCockpitV2HideDriver,
+            Settings::VRQuestCockpitV2PassengerVisible);
+        if(action==CockpitOccupantRender::SuppressDriver)return;
+        if(action==CockpitOccupantRender::OriginalPassengerForceVisible){
+            // The attached HMD trace shows BOTH 362 and 363 W*C applied
+            // yet neither character visible. Keep passenger's original PC
+            // animation/world matrix; force only its near-seat visible LOD0.
+            ScopedOriginalOccupantLod0 passengerVisible(true);
+            RobotHook.ccall<void>(robot);
+            return;
+        }
+        if(!Settings::VRQuestCockpitV2OccupantCorrection) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
         const bool exact=slot!=OriginalOccupantSlot::None;
         const bool enabled=Settings::VRQuestCockpitV2OccupantCorrection;
         static thread_local unsigned ownerSamples=0;
@@ -2778,7 +2798,8 @@ class DisableStageCulling : public Hook
         // Force visible and LOD0 only inside exact original player ROB draw.
         // Native mesh[0] existence and queue capacity checks remain intact.
         if(quest_occupant_lod0_pc_verified &&
-           Settings::VRQuestCockpitV2OccupantLod0 &&
+           (Settings::VRQuestCockpitV2OccupantLod0 ||
+            Settings::VRQuestCockpitV2PassengerVisible) &&
            OutRunVR::QuestCockpitV2::OriginalOccupantLod0Active() &&
            !OutRunVR::QuestCockpitV2::InSceneEffect() &&
            ctx.esp != 0) {

@@ -39,6 +39,16 @@ int main(){
     rotate[4]=std::numeric_limits<float>::quiet_NaN();
     assert(!SeatPoseFromCar(rotate,{0,0,0},p));
     assert(near(before.eye.x,p.eye.x));
+    SeatPose offset{};
+    assert(NativeSeatOffset({0,1,0},{0,1,10},.35f,.18f,0,offset));
+    assert(near(offset.eye.z,-.35f)&&near(offset.eye.y,.82f));
+    assert(near(offset.look.z,9.65f)&&near(offset.look.y,.82f));
+    assert(NativeSeatOffset({3,1,4},{13,1,4},.35f,.18f,.1f,offset));
+    assert(near(offset.eye.x,2.65f)&&near(offset.eye.z,3.9f));
+    const auto beforeOffset=offset;
+    assert(!NativeSeatOffset({0,0,0},{0,0,0},.35f,.18f,0,offset));
+    assert(near(offset.eye.x,beforeOffset.eye.x));
+    assert(!NativeSeatOffset({0,0,0},{0,0,1},3.f,.18f,0,offset));
     assert(TrialEligible(true,true,true,1,false,true));
     assert(!TrialEligible(true,true,true,2,false,true));
     assert(!TrialEligible(true,true,true,1,true,true));

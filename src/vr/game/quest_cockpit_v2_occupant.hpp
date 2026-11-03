@@ -104,6 +104,23 @@ inline const ScopedPreF0SnapshotData* MatchOriginalPreF0(
 enum class OriginalOccupantSlot : std::uint16_t {
     None=0, Driver362=362, Passenger363=363
 };
+// HMD trace confirmed original ROB01/362 and ROB02/363 player tokens in
+// the same render frame. Suppression is ONLY the driver's visual draw;
+// GOAL, NPCs, and the passenger preserve native display calls.
+enum class CockpitOccupantRender : std::uint8_t {
+    Original=0, SuppressDriver=1, OriginalPassengerForceVisible=2
+};
+inline CockpitOccupantRender SelectCockpitOccupantRender(
+    OriginalOccupantSlot slot,bool modeOne,bool racing,
+    bool hideDriver,bool keepPassenger) noexcept
+{
+    if(!modeOne||!racing)return CockpitOccupantRender::Original;
+    if(slot==OriginalOccupantSlot::Driver362&&hideDriver)
+        return CockpitOccupantRender::SuppressDriver;
+    if(slot==OriginalOccupantSlot::Passenger363&&keepPassenger)
+        return CockpitOccupantRender::OriginalPassengerForceVisible;
+    return CockpitOccupantRender::Original;
+}
 inline OriginalOccupantSlot ResolveOriginalCockpitWork(
     std::uintptr_t currentWork, std::uintptr_t driverWork,
     bool driverOriginalDisplay, std::uintptr_t passengerWork,
