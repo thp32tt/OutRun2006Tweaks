@@ -24,7 +24,7 @@ services:
     environment:
       TZ: Asia/Seoul
       OUTRUN_GITOPS_HOME: /data/gitops
-      OUTRUN_GITOPS_POLL_SECONDS: "${OUTRUN_GITOPS_POLL_SECONDS:-3600}"
+      OUTRUN_GITOPS_POLL_SECONDS: "${OUTRUN_GITOPS_POLL_SECONDS:-900}"
       # Optional fine-grained GitHub Actions:Read and write PAT.
       # Without it the Docker only observes; GitHub cron/push still runs QA.
       OUTRUN_GITHUB_ACTIONS_TOKEN: "${OUTRUN_GITHUB_ACTIONS_TOKEN:-}"
