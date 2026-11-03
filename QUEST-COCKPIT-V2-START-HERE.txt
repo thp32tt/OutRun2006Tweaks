@@ -10,7 +10,7 @@ Source branch: vr-quest-cockpit-v2 (NOT v0.01-beta release)
 6. Use F12 to recenter. Test menu, mode 0, mode 1, mode 2, race, goal; report which screen is wrong.
 7. Attach logs from logs/ and OUTRUNVR_LAUNCH_ERROR.txt only when debugging; normal game defaults have cockpit and telemetry OFF.
 
-Note: Original APK mode-1 table contains 30 car records but 15 distinct XYZ values, repeated for i and i+15. This experimental PCVR port reads the unchanged original game's table. Player-car full-body is enabled in mode1. Quest ARM64 W*C occupant correction is enabled only in the dedicated experimental CMD. It targets original player ROB01 work at exact PC RVA 0x114E60, and scope-restores the work matrix after the original robot draw. No camera override or driver hiding. Driver hiding is OFF because the PC driver/heroine character tables are identical and do not prove role. The extra raw B0 camera is OFF and is only for unsafe developer A/B. Render-frame->OpenXR stereo equivalence and Quest3 visual stability are NOT YET verified. No original APK file is distributed.
+CURRENT POLICY (2026-11-04): The stock 30x36 mode-1 camera table has only 15 distinct XYZ anchors, but the second Quest VR 30x296 profile table has 30 independently indexed records. Mode 1 applies the Quest-profile-minus-stock-anchor translation once inside the original camera-matrix callback; original simulation camera fields are restored. Exact original PC ROB01/362 (driver) is hidden during a race, while ROB02/363 (passenger) is retained with original W*C correction and scoped LOD0 visibility. Both are unchanged at GOAL, and all other actors retain original rendering. Full player-car geometry remains enabled. Raw B0 camera is retired due to HMD shaking. Quest3 visual/sky parity remains UNTESTED. No original APK file is distributed.
 
 OPTIONAL CAR F0 TEST (higher risk, separate script): RUN-QUEST-COCKPIT-V2-F0.cmd. This additionally stages original car F0=identity across the synchronous, exact-original 0x49F3E0 player car display wrapper, and always restores F0 afterwards; it is NOT full Quest render_frame ownership. The standard RUN-QUEST-COCKPIT-V2.cmd keeps F0 staging OFF. Use the ordinary script first and compare with the F0 variant only if safe. RUNTIME_VALIDATION=UNTESTED.
 
@@ -74,14 +74,16 @@ when QuestCockpitV2Enabled=false.
 2026-11-03 cockpit default fixes from user's HMD capture:
 - Event work tokens: driver=ROB01/362, passenger=ROB02/363, BOTH
   observed in original PC 514E60 while driving, W*C applied to both.
-  New cockpit normal policy hides only ROB01 visual draw, preserves
-  original PC ROB02 animated matrix + scoped forced-visible LOD0.
+  New cockpit normal policy hides only ROB01 visual draw. ROB02
+  keeps its original animation, receives the same scoped W*C correction,
+  and retains visible LOD0 through both corrected and fallback paths.
   Neither role is touched at GOAL.
 - User saw raw B0 violent shake; raw B0 table override is now
-  disabled even when old F11/user.ini flag is ON. Native original
-  Quest/PC 30x36 per-car camera stays authoritative. Bounded relative
-  seat calibration default back .35, down .18, right 0 game units,
-  all exposed in F11. Recenter still belongs to OpenXR.
+  disabled even when old F11/user.ini flag is ON. Native 30x36
+  view1 camera remains the basis, but the independent 30x296 Quest VR
+  profile delta is enabled by the dedicated launcher. SeatBack/Down/
+  Right default to 0 game units; F11 can tune them explicitly.
+  Recenter still belongs to OpenXR.
 - QuestCockpitV2GlassHidden is the optional live original-model
   *material* suppressor, strict player/glass owner only; zeroes
   RGBA temporarily including RGB to handle source blend ONE.
@@ -89,11 +91,14 @@ when QuestCockpitV2Enabled=false.
 - 1.7GB verbose log and 75ms+ frame dips: normal cockpit launcher
   disables Telemetry, CockpitFrameProbe and FileLogging; DIAG retains
   all original evidence collection and crash dumps.
-- Sky flicker remains separately UNRESOLVED: uploaded run explicitly
-  sets SkyGlowFactor=0, so don't claim the SkyGlow fix or that turning
-  it off helps. Avoid global stage culling force-off due to FPS cost.
-  Review actual binocular world-sky source and culling A/B captures
-  before changing world render paths.
+- Sky flicker remains UNRESOLVED on Quest3: the cockpit launcher
+  already sets SkyGlowFactor=0, so changing the sky-glow postprocess
+  is not a demonstrated fix. The DirectGPU deferred-frame path now
+  avoids overwriting previously safe stereo with pre-Present mono.
+  This repairs a real metadata lifetime inconsistency, not proof of
+  fully fixing original two-layer sky/alpha/culling flash.
+  Avoid global stage culling force-off due to FPS cost; a same-frame
+  binocular sky capture is needed for final visual attribution.
 - RUNTIME_VISUAL_VALIDATION=UNTESTED for new changes, Windows CI needed.
 
 2026-11-03 QUEST REA ORIGINAL PER-MODEL SEAT + PLAYER GLASS REFLECTION:
