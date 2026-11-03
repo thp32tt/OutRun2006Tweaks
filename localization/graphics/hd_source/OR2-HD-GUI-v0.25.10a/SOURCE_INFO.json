@@ -1,9 +1,639 @@
 {
-  "package": "OR2-HD-GUI-v0.25.10a.zip",
-  "package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-  "pack_version": "Oct-2025-a",
-  "upstream_repo": "Sonic-TV/OR2006Sprites",
+  "active_target_count": 104,
+  "files": [
+    {
+      "bytes": 16777344,
+      "sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Keyboard/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Keyboard/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Keyboard/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "fb7bb0dc0842547cb52d5d9290d21c009149400e4ec2ec17322da0c411f7f2bc",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/PlayStation/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "68ae256333e45edf6504169f33dcd93c41855bbd3d86f2212f298b2c3a98ee67",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/PlayStation/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "f039f935c899b222c8532584e0d79bb286c55a99c2f69df45342711298e1be05",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/PlayStation/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "2735d0dc7873226085a37b19ccb5c57b6b4e589186cb74ff8d61502234084d4f",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/PlayStation/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/PlayStation/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "1fa47bdb02c6c8eb1a74b9cf700e2b7d24f70ec2fa2262d843618bd505ec771c",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Switch/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Switch/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "234b03ef02c7f5184ae35a280cfe7eb01c2e4fdfdd722737f54bb87b7cf58256",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Switch/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Switch/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Switch/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "6fe91b81c15ea740ae3d54d10b4479a7ac1bd554942c51ab9483d9e2ea53a011",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Xbox/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Xbox/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "e22210f12977306c9412a266f8d57cee20ad5cce6507f2d8e8902a93a4f1fcf3",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Xbox/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "53c30fcce6578e411ccd7b5aafb29f5d1c4c09121cb84047576011f4a627cc39",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Xbox/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/Xbox/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+    },
+    {
+      "bytes": 65664,
+      "sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_etc_xst/D6DC1380_256x64.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds"
+    },
+    {
+      "bytes": 2097280,
+      "sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds"
+    },
+    {
+      "bytes": 22369776,
+      "sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "bytes": 1048704,
+      "sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
+    },
+    {
+      "bytes": 1048704,
+      "sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
+    },
+    {
+      "bytes": 2097280,
+      "sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds"
+    },
+    {
+      "bytes": 262272,
+      "sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds"
+    },
+    {
+      "bytes": 4194432,
+      "sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds"
+    },
+    {
+      "bytes": 67108992,
+      "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+    },
+    {
+      "bytes": 4194432,
+      "sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds"
+    },
+    {
+      "bytes": 4194432,
+      "sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "2a02471fe95e0c4253cf72ec58423cb9d16ae074e3012418716e88e75e2a2a80",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds"
+    },
+    {
+      "bytes": 2097280,
+      "sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+      "source_kind": "UPSTREAM_HISTORY_SHA_EXACT:c1f5cc77ad44b48c19d63be595d2dfa984aeaced",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds"
+    },
+    {
+      "bytes": 4194432,
+      "sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds"
+    },
+    {
+      "bytes": 4194432,
+      "sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "source_kind": "EXISTING_HD_SOURCE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds"
+    },
+    {
+      "bytes": 33554560,
+      "sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "225afde209bf8439884d59eba001f7cb6615b030fcd61c6f5d666a26eb319071",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
+    },
+    {
+      "bytes": 524416,
+      "sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds"
+    },
+    {
+      "bytes": 4194432,
+      "sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds"
+    },
+    {
+      "bytes": 2097280,
+      "sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds"
+    },
+    {
+      "bytes": 4194432,
+      "sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds"
+    },
+    {
+      "bytes": 8388736,
+      "sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds"
+    },
+    {
+      "bytes": 16777344,
+      "sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds"
+    },
+    {
+      "bytes": 1048704,
+      "sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
+      "source_kind": "PINNED_UPSTREAM_RELEASE_SHA_EXACT",
+      "target": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds"
+    }
+  ],
+  "package": "OR2-HD-GUI-v0.25.10a",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun.hd-source-pinned-resolver.v3",
+  "source_plan": "localization/automation_inputs/hd_original_png_source_plan.json",
+  "source_plan_sha256": "2ce5c6cb68404cffc26792c90bf971509efd6f3e0118373402b30313648b78dc",
+  "unresolved": [],
+  "unresolved_count": 0,
   "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
-  "scope": "13 HD graphics rework source DDS + 1 separated font-pipeline DDS",
-  "verification": "Every destination DDS is SHA-256 verified before commit."
+  "upstream_repo": "Sonic-TV/OR2006Sprites",
+  "verified_count": 104
 }
