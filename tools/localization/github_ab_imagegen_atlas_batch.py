@@ -63,7 +63,7 @@ def native_image(b):
      struct.unpack_from("<I",b,28)[0]!=1 or
      struct.unpack_from("<IIII",b,92)!=MASKS or
      b[84:88]!=bytes(4) or len(b)!=128+width*height*4):
-  raise ValueError("DDS_NOT_32_BGRA_MIP1")
+  raise ValueError("DDS_NOT_32_BGRA_MIP1:"+json.dumps({"size":[width,height],"mip":struct.unpack_from("<I",b,28)[0],"pf_size":struct.unpack_from("<I",b,76)[0],"pf_flags":struct.unpack_from("<I",b,80)[0],"depth":struct.unpack_from("<I",b,88)[0],"masks":list(struct.unpack_from("<IIII",b,92)),"payload":len(b)-128},separators=(",",":")))
  with Image.open(io.BytesIO(b)) as im:
   image=im.convert("RGBA")
  if image.size!=(width,height) or image.tobytes("raw","BGRA")!=b[128:]:
