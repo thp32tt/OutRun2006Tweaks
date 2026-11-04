@@ -6,6 +6,7 @@
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_table_fog.hpp"
 #include "native_game_raw_fvf_fog_visual.hpp"
+#include "native_game_raw_clipping_visual.hpp"
 #include "native_game_fvf_fog_dispatch.hpp"
 #include "live_game_sm3_user_clip.hpp"
 #include "live_game_fixed_clip.hpp"
@@ -1246,6 +1247,7 @@ struct OutputCapture {
     bool nativeSrgbWrite = false; // Live FVF RT0 encoding; independent of sampler decode.
     bool nativeSpecularAdd = false; // FVF vertex SPECULAR RGB added after source stage0/1 texture cascade.
     bool rawFogVisualMismatch = false; // Only for a fog-omitting opt-in RAW tile; NEVER a full game frame.
+    bool rawClippingVisualMismatch = false; // D3D9 CLIPPING=FALSE: separately isolated RAW tile only.
     NativeSm3TableFog nativeTableFog{}; // Authenticated live FVF Z/W fog RGB output.
     bool additiveBlend = false; // D3D9 ONE/ONE
     bool sourceAlphaAddBlend = false; // D3D9 SRCALPHA/ONE
@@ -1380,6 +1382,7 @@ struct State {
     std::uint64_t rawPreviewRecoveredLogged = 0u;
     std::uint64_t rawZeroRgbRetiredLogged = 0u;
     std::uint64_t rawFogVisualBypasses = 0u;
+    std::uint64_t rawClippingVisualBypasses = 0u;
     std::uint64_t rawClearCaptureInvalidations = 0u;
     std::uint64_t rawSurfaceWriteCaptureInvalidations = 0u;
     NativeRawSourceProbeSchedule rawSourceProbe;
@@ -2892,8 +2895,17 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        !clip || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame))
+        !GameNativeSrgbDraw::admit(srgbWrite, fullFrame))
         return false;
+    // CLIPPING=FALSE changes visible raster coverage. D3D11 cannot disable
+    // homogeneous clipping, but the explicitly opted-in RAW preview may
+    // show the imperfect native geometry in a separately owned tile.
+    // The real D3D9 Draw remains authoritative; never certify full-frame.
+    const auto clippingMode = native_game_clipping_mode(
+        clip, env_raw_visual_opt_in());
+    if (clippingMode == NativeGameClippingMode::Reject) return false;
+    output.rawClippingVisualMismatch =
+        clippingMode == NativeGameClippingMode::RawDiagnostic;
     // The original game's inert NONE/NONE fog equations remain fully safe.
     // For ACTUAL active FVF fog, a deliberately incomplete GPU RAW tile may
     // display approximate no-fog RGB only after bounded original source state
@@ -5770,12 +5782,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             }
         }
     }
-    // The native rasterizer always performs homogeneous clipping. Source
-    // CLIPPING=FALSE cannot be silently treated as ordinary D3D11 clipping.
-    if (clipping != TRUE) {
+    // The native rasterizer always clips homogeneous coordinates. Retain
+    // exact admission for source CLIPPING=TRUE; an authenticated FALSE may
+    // reach only the explicitly opted-in, incomplete RAW GPU preview.
+    // Unknown D3D9 values never become accepted source state.
+    const auto clippingMode = native_game_clipping_mode(
+        clipping, env_raw_visual_opt_in());
+    if (clippingMode == NativeGameClippingMode::Reject) {
         ++s.liveSm3StateRejectReasons[2];
         return false;
     }
+    const bool rawClippingOmitted =
+        clippingMode == NativeGameClippingMode::RawDiagnostic;
     NativeSm3UserClip userClip{};
     if (clipPlanes != 0u) {
         D3DCAPS9 clipCaps{};
@@ -7572,6 +7590,19 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // An otherwise successful RAW no-fog Draw cannot certify complete
     // source-frame color parity or full-native game/VR publication.
     if (rawFogOmitted) liveBatch.abort();
+    // Any source CLIPPING=FALSE GPU output is *incomplete diagnostic*
+    // geometry. Record the real submitted Draw for RAW PRE/POST capture
+    // but prohibit a composited main-frame or OpenXR source promotion.
+    if (rawClippingOmitted) {
+        liveBatch.abort();
+        const auto bypasses = ++s.rawClippingVisualBypasses;
+        if (bypasses <= 3u || bypasses % 1024u == 0u)
+            spdlog::warn(
+                "DX11_VISUAL_MISMATCH_CLIPPING path=SM3 bypass_count={} "
+                "source_ordinal={} source_clipping=0 RAW_TILE_ONLY "
+                "full_frame=REJECTED original_D3D9_unchanged=1",
+                bypasses, sourceOrdinal);
+    }
     submitted = true;
     return true;
     } catch (...) {
@@ -9235,6 +9266,19 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                     "full_frame=REJECTED original_D3D9_unchanged=1",
                     bypasses, sourceOrdinal,
                     output.nativeSpecularAdd ? 1u : 0u);
+        }
+        // FVF game-native geometry with D3D9 CLIPPING=FALSE is safe as a
+        // deliberately imperfect RAW tile only. Even if Draw succeeds,
+        // never publish a full native menu/race frame from these pixels.
+        if (output.rawClippingVisualMismatch && s.issued > issuedBeforeFvf) {
+            s.frameBatch.abort();
+            const auto bypasses = ++s.rawClippingVisualBypasses;
+            if (bypasses <= 3u || bypasses % 1024u == 0u)
+                spdlog::warn(
+                    "DX11_VISUAL_MISMATCH_CLIPPING path=FVF bypass_count={} "
+                    "source_ordinal={} source_clipping=0 RAW_TILE_ONLY "
+                    "full_frame=REJECTED original_D3D9_unchanged=1",
+                    bypasses, sourceOrdinal);
         }
     } catch (...) {
         // If allocation or translation throws after one native Draw, do not

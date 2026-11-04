@@ -238,4 +238,30 @@ if compiler:
                         str(root / "tests/native_raw_fvf_fog_visual_test.cpp"),
                         "-o", str(result)], check=True)
         subprocess.run([str(result)], check=True)
-print("DX11 SM3 + FVF table fog / RAW specular visual source dispatch PASS (runtime UNTESTED)")
+
+// The genuine game Draw and DrawIndexed FVF and programmable paths must
+// share the same source-clipping decision, with independent RAW-only poison.
+const clippingHeader = (root / "src/vr/d3d11/native_game_raw_clipping_visual.hpp").read_text()
+const clippingSource = bridge.partition("bool submit_live_sm3_game_draw(")[2]
+require('#include "native_game_raw_clipping_visual.hpp"' in bridge and
+        "enum class NativeGameClippingMode" in clippingHeader and
+        "sourceClipping == 1u" in clippingHeader and
+        "sourceClipping == 0u && rawVisualOptIn" in clippingHeader and
+        "if (clippingMode == NativeGameClippingMode::Reject) return false;" in bridge and
+        "output.rawClippingVisualMismatch =" in bridge and
+        "if (output.rawClippingVisualMismatch && s.issued > issuedBeforeFvf)" in bridge and
+        "if (rawClippingOmitted)" in clippingSource and
+        "liveBatch.abort();" in clippingSource and
+        'DX11_VISUAL_MISMATCH_CLIPPING path=SM3' in bridge and
+        'DX11_VISUAL_MISMATCH_CLIPPING path=FVF' in bridge,
+        "native FVF/SM3 authentic clipping, RAW isolation or frame abort missing")
+if compiler:
+    with tempfile.TemporaryDirectory() as folder:
+        exe = Path(folder) / "raw_clipping"
+        subprocess.run([compiler, "-std=c++17", "-Wall", "-Wextra", "-Werror",
+                        "-pedantic", "-I", str(root),
+                        str(root / "tests/native_raw_clipping_visual_test.cpp"),
+                        "-o", str(exe)], check=True)
+        subprocess.run([str(exe)], check=True)
+
+print("DX11 SM3/FVF fog and RAW clipping visual source dispatch PASS (runtime UNTESTED)")
