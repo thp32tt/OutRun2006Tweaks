@@ -1,0 +1,67 @@
+name: OutRun HD QA Chat Rework Protocol (no browser)
+on:
+  push:
+    branches: [localization-controller-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-hd-chat-rework-ci.yml"
+      - "tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/test_github_chat_rework_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework"
+      - "tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh"
+      - "tools/chat-controller/localization-recovery-v1/docker-compose.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chat-protocol-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: localization-controller-recovery-20260928
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
+            tools/chat-controller/localization-recovery-v1/test_github_chat_rework_controller.py
+            tools/chat-controller/localization-recovery-v1/controller_png_attach.py
+            tools/chat-controller/localization-recovery-v1/text_roi_queue.py
+            tools/chat-controller/localization-recovery-v1/tile_batch_queue.py
+            tools/chat-controller/localization-recovery-v1/tile_orientation_policy.py
+            tools/chat-controller/localization-recovery-v1/docker-compose.yml
+            tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework
+            tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install protocol test dependencies (no Chromium/GPU/Docker)
+        run: python -m pip install --disable-pip-version-check Pillow==11.3.0 playwright==1.63.0 pyyaml
+      - name: Compile Python controller and test source-bound C1 decisions
+        run: |
+          python -m py_compile tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
+          python -m unittest discover -s tools/chat-controller/localization-recovery-v1 -p test_github_chat_rework_controller.py -v
+      - name: Verify opt-in VNC compose and no competing persistent Chrome profile
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          p=Path("tools/chat-controller/localization-recovery-v1")
+          services=yaml.safe_load((p/"docker-compose.yml").read_text())["services"]
+          assert set(services)=={"outrun-chat-controller-localization-recovery","outrun-chat-qa-rework"}
+          watch=services["outrun-chat-controller-localization-recovery"]
+          chat=services["outrun-chat-qa-rework"]
+          assert watch["build"]["dockerfile"]=="Dockerfile.gitops"
+          assert float(watch["cpus"])<=0.1
+          assert chat["profiles"]==["chat-rework"]
+          assert chat["build"]["dockerfile"]=="Dockerfile.chat-rework"
+          assert float(chat["cpus"])<=0.65
+          assert "OUTRUN_GITHUB_CONTENTS_TOKEN" in chat["environment"]
+          assert "OUTRUN_REWORK_VNC_PASSWORD" in chat["environment"]
+          assert len(chat.get("ports",[]))==1
+          assert "browser-rework-profile" in (p/"github_chat_rework_controller.py").read_text()
+          assert "source_dds_sha256" in (p/"github_chat_rework_controller.py").read_text()
+          assert (p/"entrypoint.chat-rework.sh").read_text().startswith("#!/usr/bin/env bash")
+          print("REWORK_OPT_IN_AND_SHA_QA_GATES_PASS")
+          PY
