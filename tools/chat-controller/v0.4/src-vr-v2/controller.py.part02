@@ -236,6 +236,37 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
     return page
 
 
+async def hard_replace_slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
+    """At the 60m ceiling, abandon a frozen old tab and open a new project chat.
+
+    Never wait indefinitely for the old renderer's close acknowledgement.
+    Preserve the controller's on-disk queue/registry; only this slot's UI
+    owner is replaced. If a browser-wide hang blocks new_page too, let the
+    existing controller watchdog restart/recover the persistent profile.
+    """
+    old = pages.get(slot.name)
+    if old is not None:
+        try:
+            if not old.is_closed():
+                await asyncio.wait_for(old.close(run_before_unload=False), timeout=4.0)
+        except Exception as exc:
+            log.warning("hard 60m slot=%s abandoned frozen tab: %s", slot.name, type(exc).__name__)
+    page = await asyncio.wait_for(context.new_page(), timeout=20.0)
+    pages[slot.name] = page
+    slot.url = None
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = None
+    slot.last_watchdog_at = None
+    slot.watchdog_resumes_since_schedule = 0
+    # C always opens Model2's own real project, never OutRun's A/B home.
+    target = slot_project_home(slot.name)
+    await asyncio.wait_for(
+        page.goto(target, wait_until="domcontentloaded", timeout=30000), timeout=35.0
+    )
+    await page.wait_for_timeout(500)
+    return page
+
+
 def prompt_for_slot(slot: Slot, phase: str) -> str:
     """UW2 uses exactly one human-readable sentence; other lanes unchanged."""
     if CONTROLLER_MODE == "conversion" and MODEL2_AUTODEV_ENABLED and slot.name == "C":
