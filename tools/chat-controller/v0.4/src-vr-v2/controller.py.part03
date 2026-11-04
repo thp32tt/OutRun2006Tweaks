@@ -2647,6 +2647,160 @@ async def uw2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: d
                   uw2_simple=state, queue=q)
     return True
 
+async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime) -> bool:
+    """Independent Model 2 VR C: own ChatGPT project, 30m minimum between sends.
+
+    The existing OutRun A/DX11 controller does not own C's project, prompts or
+    GitHub task IDs. A missing/different project URL fails closed, never falls
+    back to OutRun. Never interrupt an active generation.
+    """
+    if not MODEL2_AUTODEV_ENABLED or (CONVERSION_ONLY_SLOT and CONVERSION_ONLY_SLOT != "C"):
+        return False
+    if not MODEL2_SCOPE_READY or not AUTO_SEND:
+        write_runtime(status="model2_project_url_required",
+                      last_action="Model2 C disabled until a real distinct MODEL2_PROJECT_URL is configured")
+        return False
+
+    state = q.setdefault("model2_simple", {})
+    if now.minute in MODEL2_SCHEDULE_MINUTES:
+        window = now.replace(second=0, microsecond=0).isoformat()
+        if state.get("last_sent_window") != window:
+            state["pending_window"] = window
+    pending = str(state.get("pending_window") or "")
+    if pending == state.get("last_sent_window"):
+        state.pop("pending_window", None)
+        pending = ""
+    if pending:
+        try:
+            scheduled_at = datetime.fromisoformat(pending)
+        except ValueError:
+            state.pop("pending_window", None)
+            pending = ""
+        else:
+            if (now - scheduled_at).total_seconds() >= 1800:
+                state.pop("pending_window", None)
+                pending = ""
+
+    last_sent = _parse_iso(state.get("last_sent_at"))
+    send_age = (now - last_sent).total_seconds() if last_sent else None
+    if send_age is not None and send_age < MODEL2_CONTINUE_MIN_SECONDS:
+        return False
+    if not pending and send_age is None:
+        return False
+
+    reg = load_registry(now)
+    slot = next((x for x in reg.slots if x.name == "C"), None)
+    if slot is None:
+        write_runtime(status="model2_slot_missing", last_action="C slot missing")
+        return False
+    guard = send_guard_reason(reg, slot, now)
+    if guard:
+        write_runtime(status="model2_send_guard", last_action=f"C send delayed: {guard}")
+        return False
+
+    if state.get("fresh_chat_required"):
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        state["fresh_chat_required"] = False
+        state["bootstrap_complete"] = False
+        state.pop("response_sha", None)
+        state.pop("response_observed_at", None)
+        state.pop("response_before_send_sha", None)
+        save_queue_state(q)
+        save_registry(reg)
+    else:
+        page = await slot_page(context, pages, slot)
+        if slot.url and (await detect_conversation_limit(page)
+                         or await first_visible(page, RETRY_SELECTORS, total_wait_ms=300) is not None):
+            page = await replace_with_fresh_slot_page(context, pages, slot)
+            state["bootstrap_complete"] = False
+            state.pop("response_sha", None)
+            state.pop("response_observed_at", None)
+            state.pop("response_before_send_sha", None)
+            save_queue_state(q)
+            save_registry(reg)
+
+    if await detect_busy(page):
+        write_runtime(status="model2_busy", last_action="C still generating, do not interrupt")
+        return False
+    if not await ensure_logged_in(page):
+        write_runtime(status="model2_login_required", last_action="C login required")
+        return False
+    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1300) is None:
+        page = await recover_slot_composer(context, pages, slot, page)
+        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=2500) is None:
+            write_runtime(status="model2_composer_missing", last_action="C composer unavailable")
+            return False
+
+    # This mandatory guard is checked immediately before calling send_message.
+    if not is_slot_project_url(page.url, "C"):
+        write_runtime(status="model2_wrong_project_blocked",
+                      last_action="C page is not in its dedicated Model2 project")
+        return False
+    if await detect_rate_limit(page) or await detect_limit(page):
+        mark_rate_limit(reg, datetime.now(TZ), "model2-vr-c")
+        return False
+
+    response = await last_assistant_text(page)
+    current_sha = stable_hash(response) if response else ""
+    if current_sha and current_sha != state.get("response_sha"):
+        state["response_sha"] = current_sha
+        state["response_observed_at"] = now.isoformat()
+        save_queue_state(q)
+    observed_at = _parse_iso(state.get("response_observed_at"))
+    stable = bool(current_sha and observed_at
+                  and (now - observed_at).total_seconds() >= MODEL2_RESPONSE_STABLE_SECONDS)
+    # Do not send into a partly generated response even at the half-hour.
+    if current_sha and not stable:
+        return False
+    response_ready = bool(
+        send_age is not None and current_sha and stable
+        and current_sha != state.get("response_before_send_sha")
+    )
+    if not pending and not response_ready:
+        return False
+
+    bootstrap = not state.get("bootstrap_complete")
+    prompt = (
+        "이 채팅은 Daytona USA / Sega Model 2 Emulator OpenXR 네이티브 VR 자동개발 전용입니다. "
+        "GitHub thp32tt/Model2VR-tools@main의 docs/automation/MODEL2_VR_AUTODEV_MASTER_PLAN.md를 읽고 "
+        "실제 32비트 D3D9 게임 드로우에서 64비트 OpenXR 양안 렌더링까지 연속 소스 구현을 진행하세요. "
+        "비공개 역분석 자료는 thp32tt/Model2VR-analysis-private에만 유지하고 OutRun 및 웹포팅은 수정하지 마세요. "
+        "한 명령에서 여러 연결 기능 구현에 집중하고, 검증만 반복하거나 작은 한 커밋으로 종료하지 마세요. "
+        "20분 이상 실제 개발을 목표로 하되 대기로 시간을 채우지 마세요."
+        if bootstrap else "모델2 VR 개발 계속진행해"
+    )
+    sent = await send_message(page, prompt)
+    if sent != "sent":
+        write_runtime(status="model2_send_retry", last_action=f"C send deferred: {sent}")
+        return False
+
+    sent_at = datetime.now(TZ)
+    if not slot.url:
+        new_url = await wait_for_chat_url(page, timeout_sec=8, slot_name="C")
+        if new_url:
+            slot.url = new_url
+    note_successful_request(reg, sent_at, "C")
+    slot.runs += 1
+    slot.last_sent_at = sent_at.isoformat()
+    slot.last_result = "model2_bootstrap_sent" if bootstrap else "model2_continue_sent"
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = sent_at.isoformat()
+    slot.watchdog_resumes_since_schedule = 0
+    save_registry(reg)
+    state["last_sent_at"] = sent_at.isoformat()
+    state["bootstrap_complete"] = True
+    state["response_before_send_sha"] = current_sha or None
+    if pending:
+        state["last_sent_window"] = pending
+        state.pop("pending_window", None)
+    state["last_send_reason"] = "bootstrap" if bootstrap else ("response_complete" if response_ready else "schedule_fallback")
+    state["continuations_sent"] = int(state.get("continuations_sent") or 0) + 1
+    save_queue_state(q)
+    write_runtime(status="model2_running", last_action=f"Model2 C: {state['last_send_reason']} sent in its own project",
+                  model2_simple=state, queue=q)
+    return True
+
+
 async def conversion_send_lane_task(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -2657,6 +2811,8 @@ async def conversion_send_lane_task(
 ) -> bool:
     """Dispatch a normal conversion lane; UW2 uses the minimal chat loop."""
     now = datetime.now(TZ)
+    if MODEL2_AUTODEV_ENABLED and slot_name == "C":
+        return await model2_simple_cycle(context, pages, q, now)
     if UW2_WEB_PORT_ENABLED and slot_name == "C":
         return await uw2_simple_cycle(context, pages, q, now)
     if not vr_scheduled_dispatch_due(q, slot_name, now):
