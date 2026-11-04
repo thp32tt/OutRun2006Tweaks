@@ -143,13 +143,13 @@ namespace Settings
     Setting<bool> VRQuestCockpitV2Enabled{ "VR", "QuestCockpitV2Enabled", false,
         "EXPERIMENTAL Quest mode1 car camera + 30-car native VR seat profile; opt-in only; restart required." };
     Setting<bool> VRQuestCockpitV2NativeSeatProfile{ "VR", "QuestCockpitV2NativeSeatProfile", true,
-        "Quest native 30-car cockpit-profile seat XYZ (0x5B2F68) replaces PC view1 anchor by a camera-basis delta. Avoids raw-B0 HMD shake. F11 A/B OFF restores original view1; experimental cockpit only." };
+        "Quest native 30-car profile XYZ is inserted before original mode1 swing/blend/ground clamp. Signed SeatDown (negative=up) calibrates PCVR height. F11 OFF restores original view1." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
     Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.0f,
-        "Optional additive backward tuning AFTER Quest native VR seat profile in game units. F11 live.",Range<float>{0.f,1.2f} };
-    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.0f,
-        "Optional additive downward tuning AFTER Quest native VR seat profile in game units. F11 live.",Range<float>{0.f,0.8f} };
+        "Signed mode1 seat depth: positive = back, negative = forward. F11 live; game units.",Range<float>{-1.2f,1.2f} };
+    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", -0.38f,
+        "Signed mode1 seat height: NEGATIVE = UP, positive = down. Default -0.38 raises the low Quest-profile eye. F11 live; game units.",Range<float>{-1.0f,0.8f} };
     Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
         "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,

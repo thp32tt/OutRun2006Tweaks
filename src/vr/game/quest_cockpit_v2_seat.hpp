@@ -60,6 +60,8 @@ inline bool OriginalQuestVrProfileAnchor(
     return true;
 }
 
+// HMD feedback: positive mode1 local Z moves eye rearward; positive
+// SeatDown moves it downward. Both offsets are now signed in F11.
 // Runtime-safe PC bridge: substitute the Quest profile as the ORIGINAL
 // mode-1 camera input before race_camera_eye_look_485590 performs eye swing,
 // view blend/snap and the ground-height clamp. This is the phase used by the
@@ -69,14 +71,14 @@ inline bool NativeVrProfileInputAnchor(
     Vec3& destination) noexcept {
     if (!Finite(questProfile) || !std::isfinite(extraBack) ||
         !std::isfinite(extraDown) || !std::isfinite(extraRight) ||
-        extraBack < 0.f || extraBack > 1.2f ||
-        extraDown < 0.f || extraDown > 0.8f ||
+        std::fabs(extraBack) > 1.2f ||
+        extraDown < -1.0f || extraDown > 0.8f ||
         std::fabs(extraRight) > 0.6f)
         return false;
     const Vec3 candidate{
         questProfile.x + extraRight,
         questProfile.y - extraDown,
-        questProfile.z - extraBack
+        questProfile.z + extraBack
     };
     if (!Finite(candidate) || std::fabs(candidate.x) > 5.f ||
         std::fabs(candidate.y) > 5.f || std::fabs(candidate.z) > 5.f)
@@ -104,8 +106,8 @@ inline bool NativeVrProfilePose(
         !Finite(originalAnchor)||!Finite(questProfile)||
         !std::isfinite(extraBack)||!std::isfinite(extraDown)||
         !std::isfinite(extraRight)||
-        extraBack<0.f||extraBack>1.2f||
-        extraDown<0.f||extraDown>0.8f||
+        std::fabs(extraBack)>1.2f||
+        extraDown< -1.0f||extraDown>0.8f||
         std::fabs(extraRight)>0.6f)return false;
     const double dx=double(nativeLook.x)-nativeEye.x;
     const double dz=double(nativeLook.z)-nativeEye.z;
@@ -170,7 +172,7 @@ inline bool NativeSeatOffset(Vec3 eye,Vec3 look,float back,float down,
                              float right,SeatPose& output) noexcept {
     if(!Finite(eye)||!Finite(look)||!std::isfinite(back)||
        !std::isfinite(down)||!std::isfinite(right)||
-       back<0.f||back>1.2f||down<0.f||down>0.8f||
+       std::fabs(back)>1.2f||down< -1.0f||down>0.8f||
        std::fabs(right)>0.6f)return false;
     const double dx=double(look.x)-eye.x,dz=double(look.z)-eye.z;
     const double norm=std::hypot(dx,dz);

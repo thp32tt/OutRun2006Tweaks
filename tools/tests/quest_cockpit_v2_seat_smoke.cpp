@@ -121,10 +121,23 @@ int main(){
         questXYZ[0],.1f,.1f,.05f,inputAnchor));
     assert(near(inputAnchor.x,-.303f));
     assert(near(inputAnchor.y,.527f));
-    assert(near(inputAnchor.z,-.490f));
+    assert(near(inputAnchor.z,-.290f));
+    // Previously the F11 range could not cross zero and the cockpit eye
+    // was trapped below the dashboard. Negative down must raise it.
+    assert(NativeVrProfileInputAnchor(
+        questXYZ[0],.25f,-.38f,-.05f,inputAnchor));
+    assert(near(inputAnchor.x,-.403f));
+    assert(near(inputAnchor.y,1.007f));
+    assert(near(inputAnchor.z,-.140f));
+    assert(NativeVrProfileInputAnchor(
+        questXYZ[0],-.25f,.25f,0.f,inputAnchor));
+    assert(near(inputAnchor.y,.377f));
+    assert(near(inputAnchor.z,-.640f));
     const Vec3 inputBefore=inputAnchor;
     assert(!NativeVrProfileInputAnchor(
-        questXYZ[0],-1.f,0.f,0.f,inputAnchor));
+        questXYZ[0],-1.3f,0.f,0.f,inputAnchor));
+    assert(!NativeVrProfileInputAnchor(
+        questXYZ[0],0.f,-1.1f,0.f,inputAnchor));
     assert(near(inputAnchor.x,inputBefore.x));
 
     // No raw B0 is used: the source view1 camera remains the same and

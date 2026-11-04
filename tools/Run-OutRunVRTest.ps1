@@ -327,12 +327,10 @@ if($QuestCockpitV2 -eq 'ON'){
         '-VR.QuestCockpitV2HideDriver=true',
         '-VR.QuestCockpitV2RawB0Camera=false',
         '-VR.QuestCockpitV2NativeSeatProfile=true',
-        # Quest APK uses a SECOND original 30x296 VR profile table at
-        # PE 0x5B2F68, distinct from native 30x36 view1 camera anchors.
-        # Use the original profile-vs-view1 delta once; no stale tuning.
-        '-VR.QuestCockpitV2SeatBack=0.0',
-        '-VR.QuestCockpitV2SeatDown=0.0',
-        '-VR.QuestCockpitV2SeatRight=0.0',
+        # Do not override seat tuning on the command line: F11 must be
+        # able to edit it and preserve OutRun2006Tweaks.user.ini values.
+        # SeatDown negative lifts the eye; SeatBack positive moves rearward.
+        # Newly installed default SeatDown=-0.38, independent of OpenXR recenter.
         '-VR.QuestCockpitV2GlassReflectionOff=true',
         '-VR.QuestCockpitV2OccupantCorrection=true',
         ('-VR.QuestCockpitV2OccupantLod0=' + $(if($QuestCockpitV2Lod0 -eq 'ON'){'true'}else{'false'})),
