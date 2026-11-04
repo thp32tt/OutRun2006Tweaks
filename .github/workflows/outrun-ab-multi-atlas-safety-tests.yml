@@ -6,6 +6,8 @@ on:
     paths:
       - ".github/workflows/outrun-ab-multi-atlas-safety-tests.yml"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
+      - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/test_hd_strict_qa.py"
       - "tools/localization/test_github_ab_imagegen_atlas_batch.py"
 
 permissions:
@@ -26,6 +28,8 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             tools/localization/github_ab_imagegen_atlas_batch.py
+            tools/localization/hd_strict_qa.py
+            tools/localization/test_hd_strict_qa.py
             tools/localization/test_github_ab_imagegen_atlas_batch.py
       - uses: actions/setup-python@v5
         with:
@@ -33,4 +37,6 @@ jobs:
       - name: Install Pillow only; no fonts, Docker, N100 or paid APIs
         run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
       - name: Verify overlapping ROI HOLD, per-target preview identity and native DDS
-        run: python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
+        run: |
+          python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
+          python -m unittest discover -s tools/localization -p test_hd_strict_qa.py -v
