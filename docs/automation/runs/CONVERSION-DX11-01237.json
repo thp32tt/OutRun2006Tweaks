@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01237",
+  "production_id": "CONVERSION-DX11-01237",
+  "event_id": "CONVERSION-DX11-01237-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "db925eddeb35c60f6c6be54b8067c6302eb77698",
+  "result_sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+  "material_implementation_sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+  "material_result_sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+  "validation_bearing_result_sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+  "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+  "feature_identity_note": "Continuation of existing FVF solid-raster pixel-neutral Draw and exact game-frame source-ordinal feature, not an independently scored milestone.",
+  "classification": "A_EXISTING_FEATURE_PROJECTIVE_HOMOGENEOUS_ZERO_AREA_CONTINUATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 0,
+  "score_note": "Same inherited FVF feature as 01230..01236; neither this correction nor CI/readback/C6/retry is independently scored. AI2 GitHub scoreboard stays 2578 at confirmation, AI1 separate.",
+  "full_dx11_renderer_complete": false,
+  "game_hmd_rendering_proven": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_fvf_clipped_draw.hpp",
+    "tests/native_raw_fvf_user_clip_capture_test.cpp"
+  ],
+  "implementation": "Extend authentic live D3D9 FVF solid triangle no-pixel source classification from identical homogeneous screen corners to exact projective XY/W corner coincidence with distinct positive W/Z. Double-precision cross-products of original float source XY and W avoid tolerance-based loss of real thin geometry. Preserve existing live_game_frame_bridge.cpp native Draw/DrawIndexed -> GameNativeFrameBatch.absorb_empty_source_draw ordinal continuity and original D3D9 game rendering; clip/eye boundary, wire/point raster, approximate coordinate and invalid topology stay on real GPU/fallback route.",
+  "source_and_repair_commits": [
+    {
+      "sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+      "kind": "MATERIAL_CXX_SOURCE_AND_REGRESSION",
+      "summary": "Projective FVF solid triangle source-raster no-op proof plus distinct-W positive and thin/wire/point negative C++ regressions."
+    }
+  ],
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41907852896,
+      "sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41907852976,
+      "sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41907864082,
+      "sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41907864030,
+      "sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41907852821,
+      "sha": "1c3ca85ffe8f868400c3281e33eff0f6deec00df",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "acceptance_results": {
+    "original_fvf_projective_noop": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_fvf_clipped_draw.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp"
+      ],
+      "notes": "DX11 Fast exact SHA compiled/tested; not real game pixels."
+    },
+    "authentic_source_ordinals": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_frame_batch.hpp"
+      ],
+      "notes": "Existing source path consumes only mathematically proven no-pixel Draw ordinals; no HMD proof."
+    },
+    "full_five_gate": {
+      "status": "PASS_EXACT_SHA",
+      "notes": "Five unchanged GitHub Actions completed successfully at material result SHA."
+    }
+  },
+  "runtime_evidence": null,
+  "runtime_note": "No physical original-game desktop Draw/Present evidence or Quest3/VDXR HMD test at this exact material SHA. RUNTIME_VALIDATION=UNTESTED; no native game frame parity/renderer promotion claim.",
+  "c6_note": "Bookkeeping commit only, after unchanged material SHA five-Gate pass. [skip ci] belongs only to C6 and never to the validation-bearing material commit."
+}
