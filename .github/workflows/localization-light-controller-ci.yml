@@ -71,7 +71,9 @@ jobs:
           assert "OUTRUN_GITHUB_CONTENTS_TOKEN" in browser["environment"]
           assert "OUTRUN_REWORK_VNC_PASSWORD" in browser["environment"]
           assert len(browser.get("ports",[]))==1
-          assert "browser-rework-profile" in (base/"github_chat_rework_controller.py").read_text()
+          assert "connect_over_cdp" in (base/"github_chat_rework_controller.py").read_text()
+          assert "--remote-debugging-address=127.0.0.1" in (base/"entrypoint.chat-rework.sh").read_text()
+          assert "--user-data-dir=/data/hd-rework/browser-rework-profile" in (base/"entrypoint.chat-rework.sh").read_text()
           dockerfile=(base/"Dockerfile.gitops").read_text()
           assert "pip install" not in dockerfile
           assert "github_actions_light_controller.py" in dockerfile
