@@ -13,6 +13,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageOps, UnidentifiedImageError
 CROSS="localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
 ORIGINAL="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
 CANDIDATES="localization/automation_inputs/candidate_outputs"
+SOURCE_PLAN="localization/automation_inputs/hd_original_png_source_plan.json"
 ZIPNAME="OUTRUN_AB_IMAGEGEN_MULTI_ATLAS_TEST_ONLY.zip"
 MASKS=(0x00ff0000,0x0000ff00,0x000000ff,0xff000000)
 MASKS_RGBA=(0x000000ff,0x0000ff00,0x00ff0000,0xff000000)
@@ -65,6 +66,59 @@ def load_cross(path):
   groups[target].append(r)
  return groups
 
+def load_pinned_orientations(repo, groups):
+ """Only use orientation from exact SHA-pinned HD source plan.
+
+ Plan original-PNG orientation is metadata evidence, NOT visual signoff. The
+ native DDS must independently match the SHA in both plan and crosswalk.
+ """
+ plan=json.loads((repo/SOURCE_PLAN).read_text(encoding="utf-8"))
+ entries=plan.get("entries")
+ if not isinstance(entries,list) or len(entries)!=104:
+  raise ValueError("HD_ORIENTATION_PLAN_NOT_104")
+ pins={}
+ for entry in entries:
+  target=entry.get("target")
+  direction=entry.get("orientation")
+  original=entry.get("original_dds_sha256")
+  png=entry.get("original_png_sha256")
+  if target in pins or not good_path(target):
+   raise ValueError("HD_ORIENTATION_PLAN_DUPLICATE_OR_UNSAFE_PATH")
+  if direction not in ("NORMAL","FLIPY") or not isinstance(original,str) or not re.fullmatch(r"[0-9a-f]{64}",original):
+   raise ValueError("HD_ORIENTATION_PLAN_UNPINNED")
+  if not isinstance(png,str) or not re.fullmatch(r"[0-9a-f]{64}",png):
+   raise ValueError("HD_ORIENTATION_PNG_SHA_MISSING")
+  pins[target]={"orientation":direction,"sha256":original}
+ if set(pins)!=set(groups):
+  raise ValueError("HD_ORIENTATION_PLAN_TARGETS_DIFFER_FROM_CROSSWALK")
+ for target,rows in groups.items():
+  if any(r["source_dds_sha256"]!=pins[target]["sha256"] for r in rows):
+   raise ValueError("HD_ORIENTATION_PLAN_DDS_SHA_CONFLICT:"+target)
+  ident=PurePosixPath(target).stem.split("_")[0]
+  if ident in ORIENTATIONS and ORIENTATIONS[ident]!=pins[target]["orientation"]:
+   raise ValueError("HD_ORIENTATION_PLAN_CONFLICT_WITH_PRIOR_PIN:"+target)
+ return {target:item["orientation"] for target,item in pins.items()}
+
+def dominant_container_holds(rows):
+ """Hold coarse boxes spanning multiple smaller text regions.
+
+ Never guess which text should overwrite which. A provably large enclosing
+ box is *excluded*, allowing disjoint smaller boxes to be evaluated safely.
+ """
+ def inside(a,b):
+  a0,a1,a2,a3=a
+  b0,b1,b2,b3=b
+  return a0<=b0 and a1<=b1 and b2<=a2 and b3<=a3 and (a0<b0 or a1<b1 or b2<a2 or b3<a3)
+ def size(b):
+  return (b[2]-b[0])*(b[3]-b[1])
+ held=set()
+ for row in rows:
+  outer=row["_bbox"]
+  children=sum(1 for other in rows if other is not row and
+   inside(outer,other["_bbox"]) and size(outer)>=4*size(other["_bbox"]))
+  if children>=2:held.add(row["roi_id"])
+ return held
+
 def native_image(b):
  if len(b)<128 or b[:4]!=b"DDS " or struct.unpack_from("<I",b,4)[0]!=124:raise ValueError("DDS_HEADER")
  height,width=struct.unpack_from("<II",b,12)
@@ -115,9 +169,12 @@ def process_atlas(raw,rows,repo,orientation):
  readable=native_image(raw)
  if orientation=="FLIPY":readable=ImageOps.flip(readable)
  result=readable.copy();used=[];painted=[];holds=[]
- conflicts=conflicting_rois(rows)
+ containers=dominant_container_holds(rows)
+ conflicts=conflicting_rois([r for r in rows if r["roi_id"] not in containers])
  for row in sorted(rows,key=lambda r:(r["_bbox"][1],r["_bbox"][0],r["roi_id"])):
   rid=row["roi_id"]
+  if rid in containers:
+   holds.append({"roi_id":rid,"reason":"COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD"});continue
   if rid in conflicts:
    holds.append({"roi_id":rid,"reason":"ROI_OVERLAP_NEEDS_MANUAL_QA"});continue
   path=repo/row["_candidate_rel"]
@@ -184,6 +241,7 @@ def build(root,out):
  if out.is_relative_to(root):raise ValueError("OUTPUT_INSIDE_REPO_FORBIDDEN")
  out.mkdir(parents=True,exist_ok=True)
  groups=load_cross(root/CROSS)
+ orientations=load_pinned_orientations(root,groups)
  archive={};admitted=[];holds=[];unavailable=0;sha_conflicts=0
  for target,rows in sorted(groups.items()):
   imported_rows=[r for r in rows if imported_candidate(root,r)]
@@ -201,10 +259,7 @@ def build(root,out):
   if sha(raw)!=next(iter(hashes)):
    sha_conflicts+=imported
    holds.append({"target":target,"reason":"SOURCE_DDS_SHA_MISMATCH","rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]});continue
-  ident=PurePosixPath(target).stem.split("_")[0]
-  orientation=ORIENTATIONS.get(ident)
-  if not orientation:
-   holds.append({"target":target,"reason":"NATIVE_ORIENTATION_UNVERIFIED","rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]});continue
+  orientation=orientations[target]
   try:
    binary,readable,painted,local_holds=process_atlas(raw,rows,root,orientation)
    if painted:
@@ -213,7 +268,7 @@ def build(root,out):
     thumb.thumbnail((1536,1536),Image.Resampling.LANCZOS)
     thumb.save(out/preview_name(target),format="PNG")
     admitted.append({"target":target,"origin_sha256":sha(raw),"dds_sha256":sha(binary),
-                     "orientation":orientation,"painted":painted,
+                     "orientation":orientation,"orientation_evidence":"DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA","painted":painted,
                      "holds":local_holds})
    else:
     holds.append({"target":target,"reason":"IMPORTED_ROI_ALL_HELD",
@@ -244,10 +299,23 @@ def build(root,out):
   if z.testzip() is not None:raise ValueError("ZIP_CRC_BAD")
   for path,dds in archive.items():
    if z.read(path)!=dds:raise ValueError("ZIP_SOURCE_DDS_REENCODE_MISMATCH")
+ reason_counts={}
+ def note(reason,n=1):
+  reason_counts[reason]=reason_counts.get(reason,0)+n
+ for h in holds:
+  if h.get("details"):
+   for local in h["details"]:note(local["reason"])
+  else:note(h["reason"],h.get("rows",1))
+ for g in admitted:
+  for h in g["holds"]:note(h["reason"])
+ for h in pending_import_holds:note(h["reason"])
+ report["hold_roi_reason_counts"]=dict(sorted(reason_counts.items()))
+ if sum(reason_counts.values())+report["translated_roi_generated"]!=report["active_roi_total"]:
+  raise ValueError("ROI_HOLD_COVERAGE_MISMATCH")
  report["zip_sha256"]=sha((out/ZIPNAME).read_bytes())
  (out/"qa_report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2,sort_keys=True)+"\n",encoding="utf-8")
  print(json.dumps({k:report[k] for k in ("active_roi_total","imported_roi_total","native_dds_generated",
-   "translated_roi_generated","source_dds_missing_rows","source_sha_conflict_rows","zip_sha256")},ensure_ascii=False))
+   "translated_roi_generated","source_dds_missing_rows","source_sha_conflict_rows","hold_roi_reason_counts","zip_sha256")},ensure_ascii=False))
  if not archive:raise SystemExit("NO_SAFE_AB_NATIVE_ATLAS_GENERATED")
  return report
 
