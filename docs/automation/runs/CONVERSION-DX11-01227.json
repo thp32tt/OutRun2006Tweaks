@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01227",
+  "production_id": "CONVERSION-DX11-01227",
+  "event_id": "CONVERSION-DX11-01227-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_WVP_EYE_CROSSING_POINT_POLYGON_NATIVE_GPU",
+  "classification": "A_UNFINISHED_FULL_NATIVE_GAME_FRAME_IMPLEMENTATION",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "material_implementation_sha": "990352d66f4250a27fd9d1a29018cf1a6baac91b",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp"
+  ],
+  "implementation": "Extend live original-game FVF D3D9 WVP point-filled polygon path to preserve legitimate W<=0 source geometry, intersect strict positive eye, native frustum and live enabled user clip planes before performing NDC winding/cull; submit actual interpolated SOURCE clip/UV/color/specular/clip-distance vertices to existing real D3D11 POINTLIST GPU path. Source D3D9 Draw/Present/input/FFB remains authoritative and fail-closed.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_WVP_EYE_FRUSTUM_USER_CLIPPED_POLYGON",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_RAW_PRE_POST_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT",
+      "ORIGINAL_D3D9_PRESENT_FALLBACK"
+    ],
+    "integration_path": [
+      "D3D9_GAME_FVF_WVP_VERTEX_AND_INDEX_IA",
+      "EYE_AND_HOMOGENEOUS_POLYGON_CLIP_ATTRIBUTE_INTERPOLATION",
+      "POST_CLIP_CW_CCW_NATIVE_POINTLIST_GPU_DRAW",
+      "GPU_RAW_EVIDENCE_AND_ORIGINAL_GAME_PRESENT_FALLBACK"
+    ],
+    "batch_components": [
+      "NATIVE_FVF_POSITIVE_NEGATIVE_W_EYE_CLIPPING_IMPLEMENTATION",
+      "HOMOGENEOUS_USER_CLIP_DERIVED_ATTRIBUTE_INTERPOLATION",
+      "PROJECTED_POSTCLIP_POLYGON_CULL_AND_REAL_NATIVE_DRAW",
+      "POSITIVE_NEGATIVE_CPP_REGRESSIONS",
+      "FIVE_UNWEAKENED_EXACT_SHA_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual FVF point-filled native D3D11 submit consumes bounded eye/frustum/user-clip intersection vertices with source interpolated VS payloads and final CW/CCW polygon selection; real game visibility untested.",
+      "negative_regression": "Bad IA indexes, nonfinite W, all-zero clip, over-budget generated polygon and fully invisible sources fail closed without partial destination mutation or replacing original D3D9 input/FFB.",
+      "component_integration": "Original D3D9 draw callsite -> live_game_frame_bridge.cpp submit() -> live_game_fvf_point_clip.hpp CPU clipped actual source -> D3D11 dynamic vertex upload and POINTLIST Draw -> diagnostic source pixel capture; tests/vr/dx11_live_fvf_point_cull.cpp."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_CI_PENDING_ONLY. Native game Draw and RAW diagnostic pixel path exist conditionally; no current exact-SHA runtime evidence of native_draws>0 or publishedBackbufferFrames>0 or menu/car/race visible output; HMD remains untested.",
+    "activation_guard_and_fallback": "Explicit DX11 opt-in with original D3D9 game Draw/Present/gamepad/FFB/SkyGlow and protected DX9Ex fallback. Never promote incomplete FVF point geometry or GPU-source output to production native full frame; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Connect authentic D3D9 original-game eye-crossing WVP polygon clip-space geometry, user clipping, postclip culling, and source GPU POINTLIST submission in the unfinished full-resolution native scene pipeline.",
+    "acceptance_items": [
+      {
+        "id": "source_fvf_eye_crossing_native_game_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ORIGINAL_D3D9_FVF_TO_D3D11_NATIVE_GPU_VERTEX_AND_DRAW",
+        "expected_behavior": "Clip valid original game negative-W/zero-W WVP polygon vertices across positive eye/frustum/user planes, preserve genuine source UV/color attributes and submit a valid postclip point polygon via native D3D11."
+      },
+      {
+        "id": "clip_and_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "INVALID_SOURCE_INDEX_CLIP_BUDGET_AND_D3D9_FALLBACK",
+        "expected_behavior": "Reject invalid indices, nonfinite and zero vectors, excessive output or unverifiable clipping before GPU output and leave original D3D9 game Draw, input and fallback unchanged."
+      },
+      {
+        "id": "exact_sha_all_gates",
+        "category": "integrated_validation",
+        "behavior_area": "FIVE_GITHUB_ACTIONS_SOURCE_BUILD_AND_ARCHITECTURE",
+        "expected_behavior": "Five required unchanged GitHub Actions validate one final exact commit SHA; automated CI not promoted to gameplay or Quest3 stereo runtime evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_fvf_eye_crossing_native_game_draw": {
+      "status": "IMPLEMENTED_AWAIT_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ]
+    },
+    "clip_and_game_fallback": {
+      "status": "IMPLEMENTED_AWAIT_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ]
+    },
+    "exact_sha_all_gates": {
+      "status": "PENDING",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ]
+    }
+  },
+  "real_game_draw_blocker": "Missing witnessed matching-binary native GPU Draw and full-frame game output for menu/car/race and native OpenXR stereo.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "After exact-SHA source CI, continue actual full native menu/car/race frame continuity and direct native eye GPU source handoff; preserve DX9Ex fallback and request matching-SHA runtime evidence for any promotion.",
+  "runtime_evidence": null,
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no actual game/Quest3 test performed.",
+  "record_type": "VALIDATION_INPUT_SOURCE_STAGE_NOT_C6",
+  "checkpoint": "C3_CI_PENDING"
+}
