@@ -38,6 +38,17 @@ jobs:
           python-version: "3.12"
       - name: Install protocol test dependencies (no Chromium/GPU/Docker)
         run: python -m pip install --disable-pip-version-check Pillow==11.3.0 playwright==1.63.0 pyyaml
+      - name: Verify entrypoint shell syntax and secure VNC listener lifecycle
+        run: |
+          set -euo pipefail
+          script="tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh"
+          bash -n "$script"
+          grep -q 'HOLD_VNC_PASSWORD_MISSING' "$script"
+          grep -q 'NOVNC_LISTENER_STARTED' "$script"
+          grep -q 'HOLD_GITHUB_CONTENTS_TOKEN_MISSING' "$script"
+          grep -q 'HOLD_CHAT_REWORK_EXITED' "$script"
+          grep -q 'trap .*shutdown' "$script"
+          echo "CHAT_ENTRYPOINT_SHELL_AND_SECURE_VNC_GATES_PASS"
       - name: Compile Python controller and test source-bound C1 decisions
         run: |
           python -m py_compile tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
