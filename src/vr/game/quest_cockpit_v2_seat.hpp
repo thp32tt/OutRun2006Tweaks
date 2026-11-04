@@ -60,25 +60,30 @@ inline bool OriginalQuestVrProfileAnchor(
     return true;
 }
 
-// Verified by original APK callback capture address tracing, 2026-11-05:
-// ARM64 run_game::$_2 at 0x2E17F4..0x2E1808 writes (+0.32Y,+0.55Z)
-// into x19[64] -> android_main's sp+0x64 vector, initialized separately
-// (sp+0x68/+0x6C zero), later consumed by hand/controller view-matrix
-// assembly at 0x2E1BB0..0x2E1D18. This is NOT the 30-car guest profile.
-// The native cockpit source anchor remains the ORIGINAL guest record XYZ.
-// Do not add controller calibration to the camera or the HMD eye pose.
+// Original APK ARM64 verified chained data flow on 2026-11-05:
+//   0x2E14E8 loads x12=[closure+64], guest profile output buffer.
+//   0x2E1598 writes selected guest X to [x12].
+//   0x2E1650 writes guest Y to [x12+4].
+//   0x2E16C4 writes guest Z to [x12+8].
+//   0x2E17F4..0x2E1808 reads Y/Z from this SAME captured output
+//   buffer, adds original ELF rodata pair (+0.32,+0.55) and stores it.
+//   Later 0x2E1BB0..0x2E1D18 uses that updated source vector to form
+//   an eye/hand view matrix; separate controller correction terms exist.
+// This is original per-car camera input data, NOT a generic world
+// HMD translation. Never add the pair again to OpenXR eye matrices.
 inline bool OriginalQuestModeOneInput(Vec3 guestProfile,
                                       Vec3& destination) noexcept {
     if(!Finite(guestProfile) || std::fabs(guestProfile.x)>5.f ||
        std::fabs(guestProfile.y)>5.f ||
        std::fabs(guestProfile.z)>5.f) return false;
-    const Vec3 next=guestProfile;
+    const Vec3 next{guestProfile.x,guestProfile.y+0.319999993f,
+                    guestProfile.z+0.550000012f};
     if(!Finite(next) || std::fabs(next.y)>5.f ||
        std::fabs(next.z)>5.f) return false;
     destination=next;return true;
 }
-// Future source changes must locate the actual native guest camera writer,
-// NOT infer a camera pivot from an unrelated run_game callback.
+// The native guest output buffer receives the car-profile values first;
+// retaining this source-order guard prevents a mistaken double transform.
 // HMD feedback: positive mode1 local Z moves eye rearward; positive
 // SeatDown moves it downward. Both offsets are now signed in F11.
 // Runtime-safe PC bridge: substitute the Quest profile as the ORIGINAL
