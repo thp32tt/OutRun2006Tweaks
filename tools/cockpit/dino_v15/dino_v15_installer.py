@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """V15 Dino cockpit test installer using the previously reviewed v13 PMT serializer."""
 import os,sys,json,hashlib,struct,zlib,pathlib,math
-PAYLOAD_SHA="8a37cc2a04ee0191e175c58ef930d18572973055c79104bab9e39caf9920ace2"
+PAYLOAD_SHA="3ea734229c9e0745d103e854ce949e5e24289a52987773712601837f591de282"
 MODEL_SHA="92b6bc2eab00daffd9269323660937d1160efc379ec019f18fbe163c05509a48"
-MANIFEST_SHA="6d89f0ca7c32dfd1f3e5772f20c65b7a24b06a9696b9ef3c1c03b69c49b99fb7"
+MANIFEST_SHA="04fb781657c42273bae8a3e18f9d5682dfbdb86d62b32defef76eb8c851b4a41"
 MAGIC=b"DINO_V15_LHD_L1\x00"
 V13_SHA="83199d4f62519d8c0d77ed9944926d279832a1f9ee78cf04963d6218211e15ad"
 def sha(b):return hashlib.sha256(b).hexdigest()
@@ -11,7 +11,7 @@ def model_payload(path):
     b=pathlib.Path(path).read_bytes()
     if sha(b)!=PAYLOAD_SHA or not b.startswith(MAGIC):raise ValueError("V15 model SHA/magic mismatch")
     ng,nv,nt=struct.unpack_from("<III",b,len(MAGIC))
-    if (ng,nv,nt)!=(70,27468,51712):raise ValueError("V15 model primitive count mismatch")
+    if (ng,nv,nt)!=(70,21100,38992):raise ValueError("V15 model primitive count mismatch")
     p=zlib.decompress(b[len(MAGIC)+12:]);g=[];o=0
     for _ in range(ng):
         if o+12>len(p):raise ValueError("Truncated V15 payload")
@@ -60,7 +60,15 @@ def patch_v13_source(s):
         struct.pack_into("<4f",co,0,1.,1.,1.,1.)
         struct.pack_into("<4f",co,16,.6,.6,.6,1.)
 '''
-    return s[:a]+material+s[b:]
+    patched=s[:a]+material+s[b:]
+    marker='    encoded=zlib.compress(struct.pack("<4I",n,t,len(S),len(V))+S+V,9)'
+    guarded='''    raw_size=16+len(S)+len(V)
+    if raw_size>=1900000:
+        raise ValueError("DINO_R2_RAW_PMT_SIZE_GUARD: raw PMT %d >= 1900000" % raw_size)
+    encoded=zlib.compress(struct.pack("<4I",n,t,len(S),len(V))+S+V,9)'''
+    if patched.count(marker)!=1:
+        raise ValueError("DINO_R2_SOURCE_DRIFT: PMT compressor target unavailable")
+    return patched.replace(marker,guarded)
 def main():
     home=pathlib.Path(getattr(sys,"_MEIPASS",pathlib.Path(__file__).resolve().parent))
     s=(home/"dino_cockpit_pmt_patch_v13.py").read_text(encoding="utf8")
