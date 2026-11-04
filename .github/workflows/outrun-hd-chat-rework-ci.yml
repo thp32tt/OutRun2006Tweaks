@@ -67,6 +67,11 @@ jobs:
           assert float(watch["cpus"])<=0.1
           assert "profiles" not in chat, "Portainer must deploy chat worker as a default service"
           assert chat["build"]["dockerfile"]=="Dockerfile.chat-rework"
+          image=(p/"Dockerfile.chat-rework").read_text()
+          assert "FROM mcr.microsoft.com/playwright/python:v1.63.0-noble" in image
+          assert "playwright==1.63.0" in image
+          assert "from playwright.async_api import async_playwright" in image
+          assert chat["healthcheck"]["test"][-1].find("6080/vnc.html")>=0
           assert float(chat["cpus"])<=0.65
           assert "OUTRUN_GITHUB_CONTENTS_TOKEN" in chat["environment"]
           assert "OUTRUN_REWORK_VNC_PASSWORD" in chat["environment"]
