@@ -54,6 +54,28 @@ struct NativeRawFvfRaster {
     out.depthClipEnable = depthClipEnable;
     return true;
 }
+// A source-authentic SOLID FVF triangle whose three positive-W positions
+// have exactly the same X/W or Y/W cannot rasterize an area. This proof
+// uses products of the original float components promoted to double:
+// binary32*binary32 fits exactly and is finite in binary64. Unlike an
+// epsilon area test it never erases a thin but genuine road/HUD polygon.
+// Source clip/RS/point/wireframe admission remains the caller's decision.
+[[nodiscard]] inline bool native_raw_fvf_axis_collinear_positive_w(
+    const std::array<std::array<double, 4u>, 3u>& source) noexcept {
+    for (const auto& corner : source) {
+        for (double value : corner)
+            if (!std::isfinite(value)) return false;
+        if (!(corner[3u] > 0.0)) return false;
+    }
+    const auto sameAxis = [&](unsigned axis) noexcept {
+        for (unsigned corner = 1u; corner < 3u; ++corner)
+            if (source[0u][axis] * source[corner][3u] !=
+                source[corner][axis] * source[0u][3u])
+                return false;
+        return true;
+    };
+    return sameAxis(0u) || sameAxis(1u);
+}
 // A source-interior GPU capture center, derived from REAL post-clip triangle
 // vertices. It is a sampling hint only: no CPU point grants pixel evidence.
 struct NativeRawFvfInteriorSample {
@@ -362,8 +384,17 @@ struct NativeRawFvfClipSpan {
             area += a.x * b.y - b.x * a.y;
         }
         if (!std::isfinite(area)) return false;
-        if (std::abs(area) <= 1.0e-12) continue;
-        if (rasterState && rasterState->cull != NativeRawFvfCull::None) {
+        // Solid zero-area triangles cannot touch an RGB sample, but
+        // D3D11 WIREFRAME may emit their actual surviving line edges.
+        // Preserve a GPU capture footprint only with authenticated
+        // wireframe + CULL_NONE; face-culling a degenerate winding is
+        // undefined and never proves a source pixel.
+        const bool lineOnly = std::abs(area) <= 1.0e-12;
+        if (lineOnly && (!rasterState || !rasterState->wireframe ||
+                         rasterState->cull != NativeRawFvfCull::None))
+            continue;
+        if (!lineOnly && rasterState &&
+            rasterState->cull != NativeRawFvfCull::None) {
             // Viewport Y reverses the NDC polygon winding. A negative
             // NDC area is clockwise on the D3D11 screen render target;
             // FrontCounterClockwise reverses the accepted face.
@@ -380,7 +411,8 @@ struct NativeRawFvfClipSpan {
         // homogeneous W and the actual D3D11 scissor/face clipping.
         // Prefer an interior tile only for low-fill diagonal footprints;
         // broad triangles retain their existing rotating GPU source sweep.
-        if (interior && std::abs(area) > largestInteriorArea) {
+        if (interior && (std::abs(area) > largestInteriorArea ||
+                         (lineOnly && !anyVisible))) {
             double loX = (std::numeric_limits<double>::max)();
             double loY = loX;
             double hiX = -loX, hiY = -loX;

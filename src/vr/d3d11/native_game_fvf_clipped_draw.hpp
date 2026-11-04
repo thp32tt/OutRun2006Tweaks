@@ -260,10 +260,22 @@ struct NativeRawFvfScissorClip {
                     const double yb = distances[b][2u] - wb;
                     return xa * wb == xb * wa && ya * wb == yb * wa;
                 };
+                std::array<std::array<double, 4u>, 3u> sourceClip{};
+                for (unsigned corner = 0u; corner < 3u; ++corner) {
+                    const auto& d = distances[corner];
+                    sourceClip[corner] = {{d[0u] - d[6u],
+                                          d[2u] - d[6u], d[4u], d[6u]}};
+                }
+                // Different XY/W positions can still lie EXACTLY along
+                // one homogeneous screen axis (e.g. collapsed road seam).
+                // Only interior solid triangles qualify; all nonzero-area,
+                // wireframe, point-filled and uncertain source geometry
+                // keeps its real native Draw and D3D9 fallback.
                 if (sameScreenCorner(0u, 1u) ||
                     sameScreenCorner(1u, 2u) ||
-                    sameScreenCorner(2u, 0u))
-                    continue; // zero-area source primitive, no color/Z/stencil
+                    sameScreenCorner(2u, 0u) ||
+                    native_raw_fvf_axis_collinear_positive_w(sourceClip))
+                    continue; // proven no color/Z/stencil sample
             }
         }
         bool invisible = false;

@@ -409,6 +409,68 @@ int main() {
         collapsedSource,true,nullptr,&solidNoCull,true));
     collapsedSource.indices=nullptr;
     collapsedSource.indexCount=0u;
+
+    // 01238: three DIFFERENT source vertices may collapse to an exact
+    // vertical or horizontal line after homogeneous W division. Keep these
+    // successful, strictly interior solid Draw ordinals contiguous without
+    // inventing a native GPU color/Z/stencil write; a real wireframe Draw
+    // must still be sampled from its GPU line edges.
+    Vertex axisCollapsed[]{
+        {{.25f,-.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{.5f,.5f,1.f,2.f},{1,1,1,1,1,1}},
+        {{1.f,2.f,2.f,4.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan axisSource{
+        axisCollapsed,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    assert(native_game_fvf_fully_clipped_draw(
+        axisSource,true,nullptr,&solidNoCull,true));
+    assert(!native_game_fvf_fully_clipped_draw(
+        axisSource,true,nullptr,&wireNoCull,true));
+    assert(!native_game_fvf_fully_clipped_draw(
+        axisSource,true,nullptr,&solidNoCull,false));
+    NativeRawDrawExtent axisRaster{};
+    NativeRawFvfInteriorSample axisStroke{};
+    assert(!native_raw_fvf_projected_raster(
+        axisSource,0,0,3440,1440,axisRaster,nullptr,&solidNoCull));
+    assert(native_raw_fvf_projected_raster(
+        axisSource,0,0,3440,1440,axisRaster,nullptr,&wireNoCull,
+        &axisStroke));
+    assert(axisStroke.sparseDiagonal &&
+           axisStroke.pixelX >= axisRaster.left &&
+           axisStroke.pixelX < axisRaster.right &&
+           axisStroke.pixelY >= axisRaster.top &&
+           axisStroke.pixelY < axisRaster.bottom);
+    // One actual float ULP of horizontal separation means a nonzero-area
+    // source triangle. Neither the solid no-op proof nor a tolerance-based
+    // projected-axis comparison may discard this menu/road geometry.
+    axisCollapsed[2].clip[0]=1.00000011920928955078125f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        axisSource,true,nullptr,&solidNoCull,true));
+    axisCollapsed[2].clip[0]=1.f;
+    // Horizontal collapsed source, including an original indexed Draw.
+    for (unsigned c=0;c<3u;++c) {
+        const float w=axisCollapsed[c].clip[3];
+        const float x=axisCollapsed[c].clip[1];
+        axisCollapsed[c].clip[0]=x;
+        axisCollapsed[c].clip[1]=.25f*w;
+    }
+    const std::uint32_t axisIndices[]{0u,1u,2u};
+    axisSource.indices=axisIndices;
+    axisSource.indexCount=3u;
+    assert(native_game_fvf_fully_clipped_draw(
+        axisSource,true,nullptr,&solidNoCull,true));
+    assert(!native_game_fvf_fully_clipped_draw(
+        axisSource,true,nullptr,&wireNoCull,true));
+    // Clip-boundary or invalid eye-plane source must never acquire an
+    // empty certificate from homogeneous axis alignment alone.
+    axisCollapsed[2].clip[0]=4.f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        axisSource,true,nullptr,&solidNoCull,true));
+    axisCollapsed[2].clip[0]=2.f;
+    axisCollapsed[2].clip[3]=0.f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        axisSource,true,nullptr,&solidNoCull,true));
     live_game_frame::GameNativeFrameBatch collapsedBatch{};
     assert(collapsedBatch.absorb_empty_source_draw(0u,true));
     assert(collapsedBatch.absorb_empty_source_draw(1u,true));
