@@ -20,7 +20,8 @@ permissions:
 
 concurrency:
   group: outrun-ab-multi-atlas
-  cancel-in-progress: false
+  # Only the newest asset/code SHA needs full DDS QA. Avoid wasting runners on obsolete commits.
+  cancel-in-progress: true
 
 jobs:
   merge-source-native:
