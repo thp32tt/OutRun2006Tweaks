@@ -132,7 +132,8 @@ jobs:
           for script in ('RUN-QUEST-COCKPIT-V2.cmd',
                          'RUN-QUEST-COCKPIT-V2-F0.cmd',
                          'RUN-QUEST-COCKPIT-V2-LOD0.cmd',
-                          'RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd'):
+                          'RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd',
+                          'RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd'):
               launcher_script=Path(script).read_text(encoding='utf-8')
               assert '-QuestCockpitV2ReleaseParity ON' in launcher_script, script
           assert "'-VR.DirectGpuOnly=true'" in launcher
@@ -149,6 +150,12 @@ jobs:
           assert 'QuestCockpitV2NativeSeatProfile = true' in ini
           r7=Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text(encoding='utf-8')
           assert 'VR SKY PROBE:' in r7
+          r9=Path('src/vr/d3d9/stereo_renderer.cpp').read_text(encoding='utf-8')
+          assert 'MaybeLogCockpitSkyProbe(stereoRequested, composedStereo,' in r9
+          assert 'ProbeCockpitCarMotion(player);' in hook
+          assert 'VR CAR MOTION PROBE:' in hook
+          assert "QuestCockpitV2Interpolation -eq 'OFF'" in launcher
+          assert "'-FramerateInterpolation=false'" in launcher
           assert 'MaybeLogCockpitSkyProbe(stereoRequested,composedStereo,' in r7
           assert 'VRQuestCockpitV2SkyProbe' in settings
           assert "if($QuestCockpitV2SkyProbe -eq 'ON')" in launcher
@@ -160,8 +167,8 @@ jobs:
           assert 'SyncNativeSeatProfile()' in hook
           assert 'SeatTablePatched=true;' in hook
           assert 'OriginalQuestVrProfileAnchor(' in hook
-          assert 'QuestCockpitV2SeatBack = 0.0' in ini
-          assert 'QuestCockpitV2SeatDown = -0.38' in ini
+          assert 'QuestCockpitV2SeatBack = 0.35' in ini
+          assert 'QuestCockpitV2SeatDown = -0.25' in ini
           assert "'-VR.QuestCockpitV2NativeSeatProfile=true'" in launcher
           assert "'-VR.QuestCockpitV2SeatBack=0.0'" not in launcher
           assert "'-VR.QuestCockpitV2SeatDown=0.0'" not in launcher

@@ -146,10 +146,10 @@ namespace Settings
         "Quest native 30-car profile XYZ is inserted before original mode1 swing/blend/ground clamp. Signed SeatDown (negative=up) calibrates PCVR height. F11 OFF restores original view1." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
-    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.0f,
-        "Signed mode1 seat depth: positive = back, negative = forward. F11 live; game units.",Range<float>{-1.2f,1.2f} };
-    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", -0.38f,
-        "Signed mode1 seat height: NEGATIVE = UP, positive = down. Default -0.38 raises the low Quest-profile eye. F11 live; game units.",Range<float>{-1.0f,0.8f} };
+    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.35f,
+        "Signed mode1 seat depth: positive = back, negative = forward. Default +0.35 from the user's HMD-tuned position; not yet exact APK parity.",Range<float>{-1.2f,1.2f} };
+    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", -0.25f,
+        "Signed mode1 seat height: NEGATIVE = UP, positive = down. Default -0.25 is calibrated from HMD user tuning; exact Quest XR pivot parity is not claimed. F11 live; game units.",Range<float>{-1.0f,0.8f} };
     Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
         "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,
@@ -173,7 +173,7 @@ namespace Settings
     Setting<bool> VRQuestCockpitV2PassengerVisible{ "VR", "QuestCockpitV2PassengerVisible", true,
         "Keep exact event 363 passenger original PC robot matrix; force visible LOD0 inside only its synchronous draw to avoid missing near-seat model. Default ON." };
 	Setting<bool> VRQuestCockpitV2SkyProbe{ "VR", "QuestCockpitV2SkyProbe", false,
-        "Experimental bounded sky stereo diagnostics: one aggregate per 90 Presents. Full VR.Telemetry is not required." };
+        "Experimental bounded sky/R9 Present stereo and B0/F0 player-body motion diagnostics, one aggregate per 90 frames/draws. Full VR.Telemetry is not required." };
     Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
 		"Isolated QuestCockpitV2 diagnostic: collects original player B0/F0 and bounded Present correlation. The native game-frame owner is unverified; this does not activate cockpit. Requires restart." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,

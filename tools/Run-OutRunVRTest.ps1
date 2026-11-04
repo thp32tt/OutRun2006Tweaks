@@ -7,6 +7,7 @@ param(
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2ReleaseParity = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Diagnostics = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2SkyProbe = 'OFF',
+    [ValidateSet('ON','OFF')][string]$QuestCockpitV2Interpolation = 'ON',
     [ValidateSet('EX','CLASSIC')][string]$QuestCockpitV2DeviceMode = 'EX',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
@@ -268,6 +269,15 @@ if($QuestCockpitV2ReleaseParity -eq 'ON'){
         '-VR.TransparencySupersampling=false'
     )
 }
+# Isolated cockpit-only A/B: the CORRECTNESS profile normally forces
+# interpolation ON, overriding F11 and masking any comparison of the
+# vehicle B0/local F0 suspension motion against the camera. Remove the
+# profile entry before replacing it; never disable for other test lanes.
+if($QuestCockpitV2 -eq 'ON' -and $QuestCockpitV2Interpolation -eq 'OFF') {
+    $gameArgs=@($gameArgs | Where-Object { $_ -notmatch '^-FramerateInterpolation=' })
+    $gameArgs+= '-FramerateInterpolation=false'
+    Write-Host 'Quest cockpit interpolation A/B: OFF, native 60 Hz simulation/pose comparison.'
+}
 # Device A/B after the no-cockpit release-parity control crashed before the
 # first Present. CLASSIC exercises IDirect3D9::CreateDevice without Ex
 # promotion. Keep fallback transport available; do not promote to release.
@@ -331,7 +341,8 @@ if($QuestCockpitV2 -eq 'ON'){
         # Do not override seat tuning on the command line: F11 must be
         # able to edit it and preserve OutRun2006Tweaks.user.ini values.
         # SeatDown negative lifts the eye; SeatBack positive moves rearward.
-        # Newly installed default SeatDown=-0.38, independent of OpenXR recenter.
+        # New install baseline matches user's latest F11 tuning:
+        # SeatBack=+0.35 / SeatDown=-0.25; saved user.ini wins.
         '-VR.QuestCockpitV2GlassReflectionOff=true',
         '-VR.QuestCockpitV2OccupantCorrection=true',
         ('-VR.QuestCockpitV2OccupantLod0=' + $(if($QuestCockpitV2Lod0 -eq 'ON'){'true'}else{'false'})),

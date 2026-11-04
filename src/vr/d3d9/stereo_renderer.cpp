@@ -949,6 +949,12 @@ namespace OutRunVRStereo
 
 			OutRunVRRenderer::NotifyGamePresent();
 			OutRunVR::Pacing::GamePresentComplete();
+            // The live DX9Ex/R26 renderer uses R9's Present detour;
+            // the legacy R7 PresentDest is bypassed. Keep sky diagnosis
+            // after the actual R9 stereo publish and before frame flags
+            // reset, or SkyProbe=true records exactly zero samples.
+            MaybeLogCockpitSkyProbe(stereoRequested, composedStereo,
+                directTransport, hr);
 			FrameHadDuplicatedDraw = false;
 			FrameHadWorldStereo = false;
 			FrameRightDrawFailed = false;

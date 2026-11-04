@@ -52,7 +52,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff,VRQuestCockpitV2SkyProbe;
     extern Setting<float> VRQuestCockpitV2SeatBack,VRQuestCockpitV2SeatDown,VRQuestCockpitV2SeatRight;
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
@@ -608,6 +608,51 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         OutRunVR::QuestCockpitV2::NativeFrameTrace().OnFrameEnd();
     }
+    // Bounded on-thread observation before optional F0 staging.
+    // Player B0 is the interpolated display basis, F0 is the local
+    // body/suspension basis; the native mode1 camera is a distinct producer.
+    // This does NOT attribute bounce until these deltas are seen on the HMD.
+    static void ProbeCockpitCarMotion(const EVWORK_CAR* player) noexcept
+    {
+        if(!Settings::VRQuestCockpitV2SkyProbe ||
+           !Settings::VRQuestCockpitV2Enabled ||
+           !player || player!=Game::pl_car()) return;
+        const auto* camera=Game::camera();
+        if(!camera || camera->cam_mode_34A!=1) return;
+        const float b0Y=player->matrix_B0._42;
+        const float f0Y=player->matrix_F0._42;
+        const float cameraY=camera->cam_pos_F8.y;
+        if(!std::isfinite(b0Y)||!std::isfinite(f0Y)||
+           !std::isfinite(cameraY))return;
+        static const EVWORK_CAR* lastPlayer=nullptr;
+        static float lastB0Y=0.f,lastF0Y=0.f,lastCameraY=0.f;
+        static float maxB0Delta=0.f,maxF0Delta=0.f,maxCameraDelta=0.f;
+        static unsigned observations=0;
+        if(lastPlayer!=player) {
+            lastPlayer=player;observations=0;
+            maxB0Delta=maxF0Delta=maxCameraDelta=0.f;
+            lastB0Y=b0Y;lastF0Y=f0Y;lastCameraY=cameraY;
+        }
+        const float b0Delta=std::fabs(b0Y-lastB0Y);
+        const float f0Delta=std::fabs(f0Y-lastF0Y);
+        const float cameraDelta=std::fabs(cameraY-lastCameraY);
+        if(b0Delta>maxB0Delta)maxB0Delta=b0Delta;
+        if(f0Delta>maxF0Delta)maxF0Delta=f0Delta;
+        if(cameraDelta>maxCameraDelta)maxCameraDelta=cameraDelta;
+        lastB0Y=b0Y;lastF0Y=f0Y;lastCameraY=cameraY;
+        if(++observations==90u) {
+            spdlog::info(
+                "VR CAR MOTION PROBE: samples=90 maxDeltaB0Y={:.5f} "
+                "maxDeltaF0Y={:.5f} maxDeltaCameraY={:.5f} "
+                "currentB0Y={:.5f} currentF0Y={:.5f} currentCameraY={:.5f} "
+                "f0RenderScope={} (render-only source, not tire physics)",
+                maxB0Delta,maxF0Delta,maxCameraDelta,
+                b0Y,f0Y,cameraY,
+                Settings::VRQuestCockpitV2F0RenderScope.get());
+            observations=0;
+            maxB0Delta=maxF0Delta=maxCameraDelta=0.f;
+        }
+    }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
         QuestCockpitGlassLive::PlayerCallback scope(player);
@@ -621,6 +666,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // This 1-argument cdecl wrapper ends POP ESI; RET. It is
         // the nearest bounded original player-render scope on PC.
         NativeFrameTrace().OnPlayerCallback();
+        ProbeCockpitCarMotion(player);
         // Crash isolation: startup/loading may invoke original 49F3E0
         // before the game camera and XR frame are constructed. Do not
         // dereference either for an OFF / not-yet-gameplay experiment.
