@@ -91,6 +91,39 @@ class HourlyDX11Recovery(unittest.TestCase):
         self.assertFalse(self.tick())
         self.assertEqual(self.sent, [])
 
+    def test_hard_recovery_checked_before_frozen_dx11_ui_probe(self):
+        code = ast.unparse(NODES["vr_continuous_conversion_cycle"])
+        self.assertLess(code.index("vr_unconditional_resume_due(active, now)"),
+                        code.index("await conversion_process_lane(context, pages, q, lane_key)"))
+
+    def test_hard_replace_abandons_failed_tab_close(self):
+        class DeadPage:
+            url = "https://chatgpt.com/g/g-p-old/c/old"
+            def is_closed(self): return False
+            async def close(self, **kwargs): raise TimeoutError("hung renderer")
+        class NewPage:
+            url = "about:blank"
+            async def goto(self, url, **kwargs):
+                self.url = url
+            async def wait_for_timeout(self, ms): return None
+        class Context:
+            async def new_page(self): return NewPage()
+        env = {
+            "BrowserContext": object, "Page": object, "asyncio": asyncio,
+            "slot_project_home": lambda name: "https://chatgpt.com/g/g-p-new-model2/project",
+            "log": SimpleNamespace(warning=lambda *args: None)
+        }
+        load_one(env, "hard_replace_slot_page")
+        slot = SimpleNamespace(name="C", url="old", last_assistant_hash="old",
+                               last_assistant_change_at="old", last_watchdog_at="old",
+                               watchdog_resumes_since_schedule=4)
+        pages = {"C": DeadPage()}
+        new_page = asyncio.run(env["hard_replace_slot_page"](Context(), pages, slot))
+        self.assertIs(pages["C"], new_page)
+        self.assertEqual(new_page.url, "https://chatgpt.com/g/g-p-new-model2/project")
+        self.assertIsNone(slot.url)
+        self.assertEqual(slot.watchdog_resumes_since_schedule, 0)
+
     def test_force_owner_wait_gate_only_before_hard_deadline(self):
         load_one(self.env, "vr_rollover_must_wait_for_owner")
         check = self.env["vr_rollover_must_wait_for_owner"]
