@@ -80,6 +80,11 @@ inline bool TryDrawTwoEyes(IDirect3DDevice9* device,const D3DMATRIX& carWorld,
     if(lastSubmittedDevice==device && lastSubmittedEpoch==snapshot.presentEpoch) {
         originalDepth->Release();originalRt->Release();return false;
     }
+    // A missing or invalid .ovc file must never poison the existing VR frame.
+    // Asset validation and GPU allocation precede the first sidecar depth write.
+    if(!Gpu().EnsureResources(device)) {
+        originalDepth->Release();originalRt->Release();return false;
+    }
     lastSubmittedDevice=device;
     lastSubmittedEpoch=snapshot.presentEpoch;
     bool good=false;
@@ -110,8 +115,15 @@ inline bool TryDrawTwoEyes(IDirect3DDevice9* device,const D3DMATRIX& carWorld,
         const HRESULT rt=device->SetRenderTarget(0,originalRt);
         const HRESULT depth=device->SetDepthStencilSurface(originalDepth);
         const HRESULT viewport=device->SetViewport(&originalViewport);
+        // StateBlock::Apply bypasses regular Set* interception; the last
+        // Apply happened with the right-eye RT bound. Re-prime the lower
+        // raster shadow against the restored original RT before native code
+        // resumes. Unknown live state must fail closed, never reuse stale RT.
+        OutRunVRStereo::R29OwnerInvalidateTrackedRasterShadow();
+        OutRunVRStereo::R29OwnerInvalidateEffectStateCache();
+        const bool rasterReady=OutRunVRStereo::R29OwnerPrimeTrackedRasterShadow(device);
         good=SUCCEEDED(left)&&SUCCEEDED(right)&&SUCCEEDED(rt)&&
-             SUCCEEDED(depth)&&SUCCEEDED(viewport);
+             SUCCEEDED(depth)&&SUCCEEDED(viewport)&&rasterReady;
         if(!good) {
             OutRunVRStereo::R29OwnerMarkRightDrawFailed();
             OutRunVRStereo::R29OwnerArmMonoSafety();
