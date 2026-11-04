@@ -15,6 +15,7 @@ on:
       - 'src/vr/game/quest_cockpit_v2_visibility.hpp'
       - 'RUN-QUEST-COCKPIT-V2-LOD0.cmd'
       - 'RUN-QUEST-COCKPIT-V2-DIAG.cmd'
+      - 'RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd'
       - 'src/vr/d3d9/stereo_renderer_r7.inc'
       - 'src/vr/d3d9/direct_gpu_hold_policy.hpp'
       - 'tools/tests/direct_gpu_hold_smoke.cpp'
@@ -189,7 +190,7 @@ jobs:
             if(Test-Path "tools/$f"){Copy-Item "tools/$f" $pkg}
           }
           if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
-            foreach($item in @('RUN-QUEST-COCKPIT-V2.cmd','RUN-QUEST-COCKPIT-V2-F0.cmd','RUN-QUEST-COCKPIT-V2-LOD0.cmd','RUN-QUEST-COCKPIT-V2-DIAG.cmd','Run-QuestCockpitV2-CrashDiag.ps1','QUEST-COCKPIT-V2-START-HERE.txt')) {
+            foreach($item in @('RUN-QUEST-COCKPIT-V2.cmd','RUN-QUEST-COCKPIT-V2-F0.cmd','RUN-QUEST-COCKPIT-V2-LOD0.cmd','RUN-QUEST-COCKPIT-V2-DIAG.cmd','RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd','Run-QuestCockpitV2-CrashDiag.ps1','QUEST-COCKPIT-V2-START-HERE.txt')) {
               if(!(Test-Path $item)){throw "missing Quest cockpit launcher: $item"}
               Copy-Item $item $pkg
             }
