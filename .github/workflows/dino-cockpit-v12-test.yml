@@ -1,0 +1,82 @@
+name: Dino 246 Cockpit V12 - Isolated VR Test Package
+
+on:
+  push:
+    branches: [ 'test/dino-cockpit-v12-20261104' ]
+    paths:
+      - 'tools/cockpit/dino_v12/**'
+      - '.github/workflows/dino-cockpit-v12-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  package:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check model-only patch bundle
+        shell: pwsh
+        run: |
+          $base="tools/cockpit/dino_v12"
+          $payload=Join-Path $base "Dino246_CabinOnly_v12.dcm"
+          if(!(Test-Path $payload)){throw "Cabin-only payload missing"}
+          $sha=(Get-FileHash -LiteralPath $payload -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($sha -ne "f28857b2d594f05efed56d05cc4c77b94005d27dd152e3c5ceae78de36774fcf"){throw "Wrong model payload SHA"}
+          python -m py_compile (Join-Path $base "dino_cockpit_pmt_patch_v12.py")
+      - name: Build standalone Windows installer
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pyinstaller==6.16.0
+          python -m PyInstaller --noconfirm --clean --onefile --name DinoCockpitV12 tools/cockpit/dino_v12/dino_cockpit_pmt_patch_v12.py
+          if(!(Test-Path "dist/DinoCockpitV12.exe")){throw "Patcher EXE missing"}
+      - name: Combine last successful OpenXR host and latest successful game DLL
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $repo="thp32tt/OutRun2006Tweaks"
+          $general="OutRun2-VR-GITHUB-GENERAL-cbf035bd72d8bfd13080ed5c50822e45cef32457"
+          $newest="outrun2006tweaks-01cd99e3113cb9a8ed662beadab0600efdf4709a"
+          gh run download 41739107842 --repo $repo --name $general --dir stage/general-artifact
+          if($LASTEXITCODE -ne 0){throw "Cannot retrieve successful cockpit general artifact"}
+          $z=Get-ChildItem stage/general-artifact -Recurse -Filter *.zip -File|Select-Object -First 1
+          if(!$z){throw "Cockpit host ZIP missing"}
+          Expand-Archive -LiteralPath $z.FullName -DestinationPath stage/package -Force
+          gh run download 41740057873 --repo $repo --name $newest --dir stage/newest-game
+          if($LASTEXITCODE -ne 0){throw "Cannot retrieve successful latest cockpit game DLL"}
+          $dlls=@(Get-ChildItem stage/newest-game -Recurse -Filter dinput8.dll -File)
+          if($dlls.Count -ne 1){throw "Expected one latest dinput8.dll, found $($dlls.Count)"}
+          $pkg="stage/package"
+          $backend=Join-Path $pkg "backends/d3d9"
+          if(!(Test-Path (Join-Path $backend "outrun-vr-host.exe"))){throw "OpenXR host missing"}
+          Copy-Item $dlls[0].FullName (Join-Path $backend "dinput8.dll") -Force
+          Copy-Item "OutRun2006Tweaks.ini" $pkg -Force
+          "01cd99e3113cb9a8ed662beadab0600efdf4709a" | Set-Content (Join-Path $backend "SOURCE_SHA.txt") -Encoding ascii
+          foreach($name in @("RUN-QUEST-COCKPIT-V2.cmd","RUN-QUEST-COCKPIT-V2-DIAG.cmd")) {
+            if(!(Test-Path (Join-Path $pkg $name))){throw "Cockpit runner missing: $name"}
+          }
+          Copy-Item "dist/DinoCockpitV12.exe" $pkg
+          Copy-Item "tools/cockpit/dino_v12/Dino246_CabinOnly_v12.dcm" $pkg
+          Copy-Item "tools/cockpit/dino_v12/dino_cockpit_pmt_patch_v12.py" $pkg
+          Copy-Item "tools/cockpit/dino_v12/INSTALL-DINO-COCKPIT-V12.cmd" $pkg
+          Copy-Item "tools/cockpit/dino_v12/RESTORE-DINO-COCKPIT-V12.cmd" $pkg
+          Copy-Item "tools/cockpit/dino_v12/README_DINO_V12_TEST_KO.md" $pkg
+          @"
+          TEST=DINO_246_COCKPIT_V12
+          GAME_DLL_SHA=01cd99e3113cb9a8ed662beadab0600efdf4709a
+          VR_HOST_SHA=cbf035bd72d8bfd13080ed5c50822e45cef32457
+          CABIN_TRIANGLES=17506
+          PMT_ORIGINAL_SHA256=1f8dfcb7b875d46bd58f110518c1a8815355162d4412fa4a0d4e2e2301d86284
+          RUNTIME_VALIDATION=UNTESTED
+          "@ | Set-Content (Join-Path $pkg "DINO_V12_BUILD_MANIFEST.txt") -Encoding utf8
+          Compress-Archive -Path "$pkg/*" -DestinationPath "OutRun2_VR_DINO246_COCKPIT_V12_EXPERIMENTAL.zip" -CompressionLevel Optimal -Force
+          if(!(Test-Path "OutRun2_VR_DINO246_COCKPIT_V12_EXPERIMENTAL.zip")){throw "Distribution ZIP missing"}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-Dino246-Cockpit-V12-Test-${{ github.sha }}
+          path: OutRun2_VR_DINO246_COCKPIT_V12_EXPERIMENTAL.zip
+          retention-days: 14
+          if-no-files-found: error
