@@ -33,6 +33,41 @@ services:
       - outrun_chat_localization_recovery_logs:/logs
     stop_grace_period: 20s
 
+
+  # Optional user-deployed browser lane: one authenticated A/B/C1 chat worker.
+  # Enable COMPOSE_PROFILES=chat-rework in Portainer before redeploying.
+  # GitHub remains DDS/QA compute; this is only ChatGPT UI work and file transfer.
+  outrun-chat-qa-rework:
+    profiles: ["chat-rework"]
+    build:
+      context: .
+      dockerfile: Dockerfile.chat-rework
+    pull_policy: build
+    container_name: outrun-chat-qa-rework
+    restart: unless-stopped
+    init: true
+    cpus: 0.65
+    mem_limit: 1800m
+    pids_limit: 128
+    shm_size: 512m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      TZ: Asia/Seoul
+      OUTRUN_REWORK_HOME: /data/hd-rework
+      OUTRUN_REWORK_POLL_SECONDS: "${OUTRUN_REWORK_POLL_SECONDS:-300}"
+      OUTRUN_GITHUB_CONTENTS_TOKEN: "${OUTRUN_GITHUB_CONTENTS_TOKEN:-}"
+      OUTRUN_REWORK_VNC_PASSWORD: "${OUTRUN_REWORK_VNC_PASSWORD:-}"
+      CHATGPT_PROJECT_URL: "${CHATGPT_PROJECT_URL:-https://chatgpt.com/}"
+    volumes:
+      - outrun_chat_localization_recovery_data:/data
+      - outrun_chat_localization_recovery_logs:/logs
+    ports:
+      - "${OUTRUN_REWORK_VNC_BIND:-6084}:6080"
+    stop_grace_period: 30s
+
 volumes:
   outrun_chat_localization_recovery_data:
     name: outrun_chat_localization_recovery_data
