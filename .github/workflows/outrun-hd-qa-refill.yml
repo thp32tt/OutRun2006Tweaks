@@ -8,6 +8,7 @@ on:
     paths: [".github/workflows/outrun-hd-qa-refill.yml"]
 permissions:
   contents: write
+  actions: read
 concurrency:
   group: outrun-hd-qa-refill
   cancel-in-progress: true
