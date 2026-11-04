@@ -352,6 +352,34 @@ int main() {
         faceSrc,true,nullptr,&backCw));
     assert(!native_game_fvf_fully_clipped_draw(
         faceSrc,true,nullptr,&noCull));
+    // 01234-E002: D3D11 RS DepthClipEnable=FALSE retains real out-of-depth
+    // positive-W pixels. Caller flag cannot override bound native RS.
+    Vertex depthOutside[]{
+        {{-.5f,-.5f,2.f,1.f},{1,1,1,1,1,1}},
+        {{ .5f,-.5f,2.f,1.f},{1,1,1,1,1,1}},
+        {{ 0.f, .5f,2.f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan depthSource{
+        depthOutside,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    const NativeRawFvfRaster depthClipDisabled{
+        NativeRawFvfCull::None,false,false,false};
+    assert(native_game_fvf_fully_clipped_draw(depthSource));
+    assert(native_game_fvf_fully_clipped_draw(
+        depthSource,true,nullptr,&noCull));
+    assert(!native_game_fvf_fully_clipped_draw(
+        depthSource,true,nullptr,&depthClipDisabled));
+    assert(!native_game_fvf_fully_clipped_draw(
+        depthSource,false,nullptr,&noCull));
+    for (auto& v:depthOutside) v.clip[2]=-0.25f;
+    assert(native_game_fvf_fully_clipped_draw(
+        depthSource,true,nullptr,&noCull));
+    assert(!native_game_fvf_fully_clipped_draw(
+        depthSource,true,nullptr,&depthClipDisabled));
+    for (auto& v:depthOutside) v.clip[2]=0.5f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        depthSource,true,nullptr,&noCull));
+
     const NativeRawFvfScissorClip allScissor{
         0,0,100,100,0,0,100,100};
     assert(native_game_fvf_fully_clipped_draw(

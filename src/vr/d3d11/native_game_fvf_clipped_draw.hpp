@@ -38,6 +38,12 @@ struct NativeRawFvfScissorClip {
           source.clipDistanceOffset >
               source.vertexStride - 6u * sizeof(float))))
         return false;
+    // Hardware depth clipping can be disabled by the bound D3D11 rasterizer.
+    // Never certify a source Draw as pixel-neutral from Z near/far planes
+    // when EITHER the caller or authenticated native RS says clipping is off.
+    // Original D3D9 Draw and native GPU routing stay authoritative.
+    const bool effectiveDepthClip = depthClipEnable &&
+        (!nativeRaster || nativeRaster->depthClipEnable);
     const std::size_t active = source.indices ? source.indexCount : source.count;
     unsigned corners = 0u;
     std::size_t primitives = 0u;
@@ -179,7 +185,7 @@ struct NativeRawFvfScissorClip {
                 const auto& d = distances[c];
                 if (!(d[6] > 0.0)) { inside = false; break; }
                 for (unsigned p = 0u; p < (scissor ? 17u : 13u); ++p) {
-                    if ((!depthClipEnable && (p == 4u || p == 5u)) ||
+                    if ((!effectiveDepthClip && (p == 4u || p == 5u)) ||
                         (p >= 7u && p < 13u &&
                          !(source.clipDistanceMask & (1u << (p - 7u)))))
                         continue;
@@ -220,7 +226,7 @@ struct NativeRawFvfScissorClip {
         // A polygon whose corners are outside DIFFERENT planes can still
         // cross the game viewport: never discard that actual native Draw.
         for (unsigned plane = 0u; plane < (scissor ? 17u : 13u); ++plane) {
-            if (!depthClipEnable && (plane == 4u || plane == 5u))
+            if (!effectiveDepthClip && (plane == 4u || plane == 5u))
                 continue;
             // Only planes 7..12 are optional D3D9 ClipDistance0..5.
             // Scissor planes 13..16 are independent ACTUAL RS halfspaces.
@@ -244,7 +250,7 @@ struct NativeRawFvfScissorClip {
             for (unsigned corner = 0u; corner < corners; ++corner) {
                 bool inside = true;
                 for (unsigned plane = 0u; plane < (scissor ? 17u : 13u); ++plane) {
-                    if ((!depthClipEnable && (plane == 4u || plane == 5u)) ||
+                    if ((!effectiveDepthClip && (plane == 4u || plane == 5u)) ||
                         (plane >= 7u && plane < 13u &&
                          !(source.clipDistanceMask & (1u << (plane - 7u)))))
                         continue;
@@ -271,7 +277,7 @@ struct NativeRawFvfScissorClip {
                 polygon[corner] = distances[corner];
             for (unsigned plane = 0u;
                  plane < (scissor ? 17u : 13u) && polygonCount; ++plane) {
-                if ((!depthClipEnable && (plane == 4u || plane == 5u)) ||
+                if ((!effectiveDepthClip && (plane == 4u || plane == 5u)) ||
                     (plane >= 7u && plane < 13u &&
                      !(source.clipDistanceMask & (1u << (plane - 7u)))))
                     continue;
