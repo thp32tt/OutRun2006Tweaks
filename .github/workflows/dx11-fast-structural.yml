@@ -45,6 +45,9 @@ on:
       # either its production boundary probe or checked-in C++ fixture changes.
       - 'tools/dx11_game_primitive_span_probe.cpp'
       - 'tests/vr/dx11_live_sm3_native_point_strip_windows.cpp'
+      # Actual FVF point polygon clipping C++ regression changes must
+      # trigger same-SHA Fast, not rely on an older src header commit.
+      - 'tests/vr/dx11_live_fvf_point_cull.cpp'
       # RAW same-Present TARGET Clear ownership and per-Present attempt budget
       # regressions must trigger all required checks at their exact repaired SHA.
       - 'tests/native_raw_source_probe_schedule_test.cpp'
