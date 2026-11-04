@@ -37,7 +37,7 @@
   - `OUTRUN_GITHUB_CONTENTS_TOKEN` (저장소 한정 Contents **Read and write** PAT; 채팅/파일/코드에 절대 출력하지 않음)
   - `OUTRUN_REWORK_VNC_PASSWORD` (별도 강한 VNC 암호; 미설정 시 시작 차단)
   - `CHATGPT_PROJECT_URL` (기존 한글화 ChatGPT 프로젝트 URL, 기본 `https://chatgpt.com/`)
-  - `OUTRUN_REWORK_POLL_SECONDS=300` (옵션; 120~3600초, 기본 5분)
+  - `OUTRUN_REWORK_POLL_SECONDS=600` (옵션; 120~3600초, 기본 10분)
   - `OUTRUN_REWORK_VNC_BIND=6084` (옵션; 포트 충돌 시 다른 포트 사용)
 - 브라우저 컨테이너는 별도 프로필 `/data/hd-rework/browser-rework-profile`을 사용. 최초 실행 후 VNC `http://N100_HOST:6084/vnc.html`에서 **사용자가 직접** ChatGPT 로그인해야 함.
 - 기존 저부하 GitHub 모니터 `outrun-chat-controller-localization-recovery`는 0.1 CPU/96MB로 독립 유지. 브라우저 컨테이너는 필요할 때만 프로필 활성화(최대 0.65 CPU/1800MB).
