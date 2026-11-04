@@ -1,0 +1,38 @@
+name: Dino v15 External Cockpit Build
+
+on:
+  push:
+    branches: [ 'feature/dino-v15-external-cockpit-20261104' ]
+    paths:
+      - 'src/vr/game/dino_external_*.hpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r33.cpp'
+      - 'src/vr/d3d9/ex_device_upgrade_r15.cpp'
+      - 'tools/cockpit/dino_v15_external/**'
+      - 'tests/test_dino_external_*.cpp'
+      - '.github/workflows/dino-v15-external-cockpit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  portable-asset:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict model/CRC/eligibility tests
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_external_sidecar.cpp -o /tmp/test-dino-ovc
+          /tmp/test-dino-ovc
+          python3 -m py_compile tools/cockpit/dino_v15_external/build_sidecar.py
+  windows-headers:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: Verify x86 D3D9Ex sidecar and bridge headers compile
+        shell: cmd
+        run: |
+          cl /nologo /std:c++17 /EHsc /W3 /I. /c tests\test_dino_external_headers.cpp
+          cl /nologo /std:c++17 /EHsc /W3 /I. /c tests\test_dino_external_sidecar.cpp
