@@ -146,7 +146,13 @@ jobs:
           assert 'QuestCockpitV2GlassHidden = false' in ini
           assert 'QuestCockpitV2GlassReflectionOff = true' in ini
           assert 'QuestCockpitV2NativeSeatProfile = true' in ini
-          assert 'NativeVrProfilePose(' in hook
+          # HMD regression 2026-11-04: Quest profile XYZ must be consumed as
+          # the original mode-1 camera input. A post-CalcCameraMatrix delta
+          # sinks the eye toward the floor and amplifies view jitter.
+          assert 'NativeVrProfilePose(' not in hook
+          assert 'NativeVrProfileInputAnchor(' in hook
+          assert 'SyncNativeSeatProfile()' in hook
+          assert 'SeatTablePatched=true;' in hook
           assert 'OriginalQuestVrProfileAnchor(' in hook
           assert 'QuestCockpitV2SeatBack = 0.0' in ini
           assert 'QuestCockpitV2SeatDown = 0.0' in ini
