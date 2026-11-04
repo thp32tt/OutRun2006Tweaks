@@ -329,6 +329,73 @@ int main() {
     edgeSource.indices=nullptr;
     edgeSource.indexCount=0u;
 
+    // 01236: original SOLID FVF source triangles with EXACT coincident
+    // homogeneous screen corners cannot write any native color, depth or
+    // stencil pixel. Accept all original indexed/list/strip/fan IA ordinals,
+    // but never apply the proof to wireframe, point-filled, W=0, boundary,
+    // malformed indices or a merely thin (nonzero-area) game triangle.
+    Vertex collapsed[]{
+        {{-.4f,-.6f,.2f,1.f},{1,1,1,1,1,1}},
+        {{-.4f,-.6f,.8f,1.f},{1,1,1,1,1,1}},
+        {{ .6f, .4f,.5f,1.f},{1,1,1,1,1,1}},
+        {{-.4f,-.6f,.2f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan collapsedSource{
+        collapsed,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    NativeRawFvfRaster solidNoCull{
+        NativeRawFvfCull::None,false,true,false};
+    NativeRawFvfRaster wireNoCull{
+        NativeRawFvfCull::None,false,true,true};
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull)); // no implicit admission
+    assert(native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&wireNoCull,true));
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,false)); // point-filled
+    collapsed[1].clip[0]=-.399f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true)); // thin real pixels
+    collapsed[1].clip[0]=-.4f;
+    collapsed[1].clip[3]=0.f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true)); // camera crossing
+    collapsed[1].clip[3]=1.f;
+    collapsed[2].clip[0]=1.f; // clip-plane contact: normal Draw
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    collapsed[2].clip[0]=.6f;
+    collapsedSource.count=4u;
+    collapsedSource.assembly=NativeRawFvfAssembly::TriangleStrip;
+    assert(native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    collapsedSource.assembly=NativeRawFvfAssembly::TriangleFan;
+    assert(native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    collapsedSource.assembly=NativeRawFvfAssembly::TriangleList;
+    const std::uint32_t collapsedIndices[]{0u,1u,2u,0u,2u,3u};
+    collapsedSource.indices=collapsedIndices;
+    collapsedSource.indexCount=6u;
+    assert(native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    const std::uint32_t corruptCollapsed[]{0u,1u,2u,0u,2u,99u};
+    collapsedSource.indices=corruptCollapsed;
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    collapsedSource.indices=nullptr;
+    collapsedSource.indexCount=0u;
+    live_game_frame::GameNativeFrameBatch collapsedBatch{};
+    assert(collapsedBatch.absorb_empty_source_draw(0u,true));
+    assert(collapsedBatch.absorb_empty_source_draw(1u,true));
+    assert(collapsedBatch.accepts_full(2u));
+    assert(collapsedBatch.accepts_source_draw(2u,true));
+    collapsedBatch.succeeded(false,false);
+    collapsedBatch.record_source_draw(2u);
+    assert(collapsedBatch.submitted==1u &&
+           collapsedBatch.leadingEmptySourceDraws==2u);
+
     // 01235: authenticated one-pixel POINTLIST / point-filled TRIANGLELIST
     // use the same source-authentic clipping and face-cull certificate.
     // Point scissor proof is conservatively expanded by one pixel.

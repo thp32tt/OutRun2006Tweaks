@@ -9250,7 +9250,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                     NativeRawFvfAssembly::TriangleList,
                 offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask},
                 true, output.scissor ? &fullFvfScissor : nullptr,
-                &fullFvfRaster)) {
+                &fullFvfRaster,
+                !output.nativePointFill && !output.nativeWireFill)) {
             if (!s.frameBatch.absorb_empty_source_draw(
                     sourceOrdinal, sameClearedGameTarget))
                 s.frameBatch.abort();

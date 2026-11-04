@@ -25,7 +25,8 @@ struct NativeRawFvfScissorClip {
     NativeRawFvfClipSpan source,
     bool depthClipEnable = true,
     const NativeRawFvfScissorClip* scissor = nullptr,
-    const NativeRawFvfRaster* nativeRaster = nullptr) noexcept {
+    const NativeRawFvfRaster* nativeRaster = nullptr,
+    bool solidTriangleRaster = false) noexcept {
     if (!source.firstClip || source.vertexStride < 4u * sizeof(float) ||
         source.vertexStride > 4096u || source.count == 0u ||
         source.count > 1048576u ||
@@ -215,6 +216,44 @@ struct NativeRawFvfScissorClip {
                         (!front && nativeRaster->cull == NativeRawFvfCull::Back))
                         continue; // proven source-raster no-op
                 }
+            }
+        }
+        // A real game-authored SOLID triangle with two coincident
+        // homogeneous screen positions has zero projected area even when
+        // its vertices carry different Z/UV/color. This is a source-raster
+        // no-op, not a manufactured D3D11 Draw. Restrict the proof to
+        // strictly interior positive-W triangles: any clipping, boundary
+        // contact, wireframe or point-filled polygon keeps the original
+        // GPU submission. Compare the exact affine X+W/Y+W/W values,
+        // without a near-zero area epsilon that could drop thin road/HUD
+        // triangles which still cover a pixel.
+        if (solidTriangleRaster && nativeRaster && !nativeRaster->wireframe &&
+            corners == 3u &&
+            (source.assembly == NativeRawFvfAssembly::TriangleList ||
+             source.assembly == NativeRawFvfAssembly::TriangleStrip ||
+             source.assembly == NativeRawFvfAssembly::TriangleFan)) {
+            bool strictInterior = true;
+            for (unsigned corner = 0u; corner < 3u && strictInterior; ++corner) {
+                const auto& d = distances[corner];
+                if (!(d[6u] > 0.0)) { strictInterior = false; break; }
+                for (unsigned plane = 0u; plane < (scissor ? 17u : 13u); ++plane) {
+                    if ((!effectiveDepthClip && (plane == 4u || plane == 5u)) ||
+                        (plane >= 7u && plane < 13u &&
+                         !(source.clipDistanceMask & (1u << (plane - 7u)))))
+                        continue;
+                    if (!(d[plane] > 0.0)) { strictInterior = false; break; }
+                }
+            }
+            if (strictInterior) {
+                const auto sameScreenCorner = [&](unsigned a, unsigned b) noexcept {
+                    return distances[a][6u] == distances[b][6u] &&
+                           distances[a][0u] == distances[b][0u] &&
+                           distances[a][2u] == distances[b][2u];
+                };
+                if (sameScreenCorner(0u, 1u) ||
+                    sameScreenCorner(1u, 2u) ||
+                    sameScreenCorner(2u, 0u))
+                    continue; // zero-area source primitive, no color/Z/stencil
             }
         }
         bool invisible = false;
