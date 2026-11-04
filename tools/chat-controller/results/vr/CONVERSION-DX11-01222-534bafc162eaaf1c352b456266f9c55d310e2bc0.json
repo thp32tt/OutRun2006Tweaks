@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01222",
+  "production_id": "CONVERSION-DX11-01222",
+  "event_id": "CONVERSION-DX11-01222-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_WIREFRAME_GPU_EDGE_CAPTURE",
+  "classification": "A_UNFINISHED_REAL_GAME_NATIVE_FVF_WIREFRAME_PIXEL_PATH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "165d523b98e0285372c152eea98520f69403951b",
+  "material_implementation_sha": "19bb8ba83c07c0589665bee444c970c4e156ce75",
+  "material_result_sha": "19bb8ba83c07c0589665bee444c970c4e156ce75",
+  "validation_bearing_result_sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_fvf_user_clip_capture_test.cpp"
+  ],
+  "implementation": "Actual opt-in D3D11 native FVF wireframe Draw uses authentic live RS fill, clip user planes and post-clip triangle edge midpoint source anchors for independently tested RAW PRE/POST GPU capture. No full native gameplay frame, DX9Ex fallback replacement, or Quest3 evidence.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SOURCE_AUTHENTIC_FVF_WIREFRAME_CLIP_AND_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_RAW_EDGE_PRE_POST_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT",
+      "ORIGINAL_D3D9_PRESENT_FALLBACK"
+    ],
+    "integration_path": [
+      "ORIGINAL_FVF_D3D9_DRAW_AND_PER_DRAW_RS_FILL",
+      "NATIVE_D3D11_WIREFRAME_AND_SOURCE_USER_CLIPPING",
+      "AUTHENTIC_POST_CLIP_EDGE_PIXEL_SAMPLE",
+      "OPT_IN_NATIVE_GPU_PRE_POST_AND_ORIGINAL_D3D9_PRESENT"
+    ],
+    "batch_components": [
+      "NATIVE_FVF_WIRE_RS_TO_RAW_SAMPLE_INTEGRATION",
+      "HOMOGENEOUS_USER_CLIP_EDGE_PROJECTION",
+      "AUTHENTIC_GPU_PAIR_TILE_CAPTURE",
+      "PORTABLE_POSITIVE_NEGATIVE_REGRESSION",
+      "SOURCE_POLICY_CI_CAUSAL_CORRECTION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable FVF wireframe and genuine indexed triangle/user-plane source geometry calculate distinct actual post-clipped screen-edge GPU copy anchors while retaining existing solid capture.",
+      "negative_regression": "Invalid user clip masks, nonfinite planes, zero homogeneous W, unsupported raster states, absent native RGB GPU delta, and incomplete native full-frame promotion fail closed; original D3D9 game Draw and input/FFB untouched.",
+      "component_integration": "Real game FVF Draw -> live_game_frame_bridge.cpp native D3D11 wire RS -> native_game_raw_visual_diagnostic.hpp -> native_game_raw_fvf_clip_capture.hpp source edge sampler -> real PRE/POST GPU bytes and original D3D9 Present; targeted C++ tests and required exact SHA five workflows."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_ONLY_PENDING. Native RAW PRE/POST source edge selection requires actual GPU pixel, source and Present proof. VISIBLE_FRAME_OUTPUT does NOT mean an observed native full-resolution game frame. No real game/HMD evidence, RUNTIME_VALIDATION=UNTESTED.",
+    "activation_guard_and_fallback": "Requires explicit existing diagnostic DX11 RAW opt-in, source RT/epoch/pixel validity and original D3D9 Present. Full native menu-car-race gameplay not promoted; D3D9 input, FFB, SkyGlow and DX9Ex fallback unchanged; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate authentic FVF wireframe native D3D11 Draw raster edge sampling with original user clip planes and source GPU PRE/POST pixel proof, while protecting production gameplay fallback.",
+    "acceptance_items": [
+      {
+        "id": "fvf_wireframe_raw_gpu_source_edge",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_NATIVE_GPU_RGB_SAMPLING",
+        "expected_behavior": "Real source native wire Draw crop anchors follow three clipped polygon edge midpoints, including indexed and user-clipped FVF triangles, rather than empty solid interiors."
+      },
+      {
+        "id": "source_clip_and_original_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_FALLBACK_AND_SAFE_RASTER",
+        "expected_behavior": "Invalid masks, W zero, nonfinite plane inputs, unknown fill mode and unverifiable GPU pixels do not promote gameplay; D3D9 Draw/input/FFB and DX9Ex unchanged."
+      },
+      {
+        "id": "exact_source_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_WIN32_FAST_BACKEND_OPENXR_HUD",
+        "expected_behavior": "One final validation-bearing SHA passes Fast, Backend, Build, OpenXR, and HUD with strict original source and safety tests."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "fvf_wireframe_raw_gpu_source_edge": {
+      "status": "PENDING_CI"
+    },
+    "source_clip_and_original_game_fallback": {
+      "status": "PENDING_CI"
+    },
+    "exact_source_five_gates": {
+      "status": "PENDING_CI"
+    }
+  },
+  "validation_gate_runs": [],
+  "runtime_evidence": null,
+  "runtime_note": "HMD Quest3/VDXR or real OutRun native DX11 display was not executed. CI does not establish visible full-frame game pass.",
+  "real_game_draw_blocker": "Need actual same-SHA source game live native GPU Draw>0, attributable GPU RGB PRE/POST and full published frame>0 with menu/car/race progression.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Advance real-game FVF/SM3 native source pixels from incomplete RAW GPU diagnostic toward full native game frame, preserve DX9Ex fallback and HMD boundary.",
+  "record_type": "SOURCE_PENDING_CI_CAUSAL_POLICY_REPAIR",
+  "score_note": "This code is partial same DX11 feature; no independent score for pending source, CI retry, record or runtime untested.",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "controller_finalize_reason": "LEGACY_EXACT_SHA_GATE_SUCCESS"
+}
