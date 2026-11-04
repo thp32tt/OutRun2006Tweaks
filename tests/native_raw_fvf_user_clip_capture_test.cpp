@@ -1,4 +1,5 @@
 #include "../src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp"
+#include "../src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -57,4 +58,61 @@ int main() {
     };
     NativeRawFvfClipSpan nearEye{eye,sizeof(Vertex),3u};
     assert(!native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
+    // A real FVF D3DFILL_WIREFRAME Draw colors edge fragments, not the
+    // interior of its source-authentic clipped triangle. Verify that
+    // bound D3D11 wire RS directs the same native PRE/POST GPU copies to
+    // those actual line footprints without modifying solid Draws.
+    Vertex wire[]{
+        {{-0.95f,-0.72f,0.5f,1.f},{-0.95f,1,1,1,1,1}},
+        {{ 0.90f,-0.55f,0.5f,1.f},{ 0.90f,1,1,1,1,1}},
+        {{-0.30f, 0.86f,0.5f,1.f},{-0.30f,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan wireSource{
+        wire,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,1u};
+    NativeRawFvfRaster solidRs{NativeRawFvfCull::None,false,true,false};
+    NativeRawFvfRaster wireRs{NativeRawFvfCull::None,false,true,true};
+    NativeRawFvfInteriorSample solidAnchor{},edgeAnchor{};
+    NativeRawDrawExtent solidRaster{},wireRaster{};
+    assert(native_raw_fvf_projected_raster(
+        wireSource,0,0,3440,1440,solidRaster,nullptr,
+        &solidRs,&solidAnchor));
+    assert(native_raw_fvf_projected_raster(
+        wireSource,0,0,3440,1440,wireRaster,nullptr,
+        &wireRs,&edgeAnchor));
+    assert(solidRaster.left==wireRaster.left &&
+           solidRaster.right==wireRaster.right &&
+           solidRaster.top==wireRaster.top &&
+           solidRaster.bottom==wireRaster.bottom);
+    assert(edgeAnchor.sparseDiagonal &&
+           (edgeAnchor.pixelX != solidAnchor.pixelX ||
+            edgeAnchor.pixelY != solidAnchor.pixelY));
+    NativeRawDualTile gpuWire{};
+    assert(native_raw_fvf_island_dual_draw_tile(
+        wireSource,0,0,3440,1440,3440,1440,512,288,
+        {0,0,3440,1440},0u,gpuWire,&wireRs));
+    assert(edgeAnchor.pixelX >= gpuWire.first.x &&
+           edgeAnchor.pixelX < gpuWire.first.x+512 &&
+           edgeAnchor.pixelY >= gpuWire.first.y &&
+           edgeAnchor.pixelY < gpuWire.first.y+288 &&
+           (!gpuWire.hasSecond ||
+            native_raw_source_tiles_disjoint(
+                gpuWire.first,gpuWire.second,512,288)));
+    // Source user-plane clipping also constrains wireframe edge locations.
+    // Bad clip-plane masks/nonfinite inputs and W=0 remain fail closed.
+    wireSource.clipDistanceMask=3u;
+    assert(native_raw_fvf_projected_raster(
+        wireSource,0,0,3440,1440,wireRaster,nullptr,&wireRs));
+    wire[0].user[1]=std::numeric_limits<float>::quiet_NaN();
+    assert(!native_raw_fvf_projected_raster(
+        wireSource,0,0,3440,1440,wireRaster,nullptr,&wireRs));
+    wire[0].user[1]=1.f;
+    wireSource.clipDistanceMask=0x40u;
+    assert(!native_raw_fvf_projected_raster(
+        wireSource,0,0,3440,1440,wireRaster,nullptr,&wireRs));
+    wireSource.clipDistanceMask=1u;
+    wire[1].clip[3]=0.f;
+    assert(!native_raw_fvf_island_dual_draw_tile(
+        wireSource,0,0,3440,1440,3440,1440,512,288,
+        {0,0,3440,1440},0u,gpuWire,&wireRs));
 }

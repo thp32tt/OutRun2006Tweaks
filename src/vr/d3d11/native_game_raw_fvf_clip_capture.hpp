@@ -24,6 +24,9 @@ struct NativeRawFvfRaster {
     // TRUE for unbound/default D3D11 RS; FALSE omits only z clipping.
     // Hardware always clips x, y and strictly positive homogeneous W.
     bool depthClipEnable = true;
+    // Actual D3D11 wireframe draws color clipped polygon edges rather than
+    // the triangle interior. This guides real GPU PRE/POST sampling only.
+    bool wireframe = false;
 };
 // Map the ACTUALLY bound D3D11 RS cull mode into the capture raster.
 // A null RS object does not mean CULL_NONE: the D3D11 default state is
@@ -377,9 +380,9 @@ struct NativeRawFvfClipSpan {
             const double boxArea = (hiX - loX) * (hiY - loY);
             const double centerX = sumX / static_cast<double>(polygonCount);
             const double centerY = sumY / static_cast<double>(polygonCount);
-            const double x = static_cast<double>(viewportX) +
+            double x = static_cast<double>(viewportX) +
                 (centerX + 1.0) * static_cast<double>(viewportW) * 0.5;
-            const double y = static_cast<double>(viewportY) +
+            double y = static_cast<double>(viewportY) +
                 (1.0 - centerY) * static_cast<double>(viewportH) * 0.5;
             if (!std::isfinite(boxArea) || !std::isfinite(x) ||
                 !std::isfinite(y)) return false;
@@ -422,18 +425,82 @@ struct NativeRawFvfClipSpan {
             }
             const double nearOppositeX = centerX * 0.25 + opposite.x * 0.75;
             const double nearOppositeY = centerY * 0.25 + opposite.y * 0.75;
-            const double ox = static_cast<double>(viewportX) +
+            double ox = static_cast<double>(viewportX) +
                 (nearOppositeX + 1.0) * static_cast<double>(viewportW) * 0.5;
-            const double oy = static_cast<double>(viewportY) +
+            double oy = static_cast<double>(viewportY) +
                 (1.0 - nearOppositeY) * static_cast<double>(viewportH) * 0.5;
             if (!std::isfinite(ox) || !std::isfinite(oy)) return false;
             const double nearFarX = centerX * 0.25 + farthest.x * 0.75;
             const double nearFarY = centerY * 0.25 + farthest.y * 0.75;
-            const double ax = static_cast<double>(viewportX) +
+            double ax = static_cast<double>(viewportX) +
                 (nearFarX + 1.0) * static_cast<double>(viewportW) * 0.5;
-            const double ay = static_cast<double>(viewportY) +
+            double ay = static_cast<double>(viewportY) +
                 (1.0 - nearFarY) * static_cast<double>(viewportH) * 0.5;
             if (!std::isfinite(ax) || !std::isfinite(ay)) return false;
+            if (rasterState && rasterState->wireframe) {
+                // Native FVF wireframe emits pixels on the *post-clipped
+                // edges*. A filled-polygon centroid can be far from every
+                // drawn pixel, especially in a large game menu triangle.
+                // Keep three authentic edge midpoints as the swept GPU
+                // capture anchors; no CPU edge claims a pixel without the
+                // original source/epoch and native PRE/POST RGB proof.
+                std::array<Point,20u> edges{};
+                std::size_t primary = 0u;
+                double longest = -1.0;
+                for (std::size_t e = 0u; e < polygonCount; ++e) {
+                    const auto& a = polygon[e];
+                    const auto& b = polygon[(e + 1u) % polygonCount];
+                    const double dx = (b.x - a.x) * viewportW;
+                    const double dy = (b.y - a.y) * viewportH;
+                    const double length = dx * dx + dy * dy;
+                    if (!std::isfinite(length)) return false;
+                    edges[e] = {(a.x + b.x) * 0.5,
+                                (a.y + b.y) * 0.5,
+                                (a.z + b.z) * 0.5};
+                    if (length > longest) { longest = length; primary = e; }
+                }
+                if (!(longest > 1.0e-12)) continue;
+                // Widely separated native edge samples prevent both GPU
+                // crops from repeatedly falling in the empty interior.
+                std::size_t secondary = primary, tertiary = primary;
+                double farthestEdge = -1.0, thirdSpread = -1.0;
+                const auto pixelDistance2 = [&](std::size_t a,
+                                                 std::size_t b) noexcept {
+                    const double dx = (edges[a].x - edges[b].x) * viewportW;
+                    const double dy = (edges[a].y - edges[b].y) * viewportH;
+                    return dx * dx + dy * dy;
+                };
+                for (std::size_t e = 0u; e < polygonCount; ++e) {
+                    if (e == primary) continue;
+                    const double d = pixelDistance2(primary, e);
+                    if (!std::isfinite(d)) return false;
+                    if (d > farthestEdge) { farthestEdge = d; secondary = e; }
+                }
+                if (secondary == primary) return false;
+                for (std::size_t e = 0u; e < polygonCount; ++e) {
+                    if (e == primary || e == secondary) continue;
+                    const double da = pixelDistance2(primary, e);
+                    const double db = pixelDistance2(secondary, e);
+                    if (!std::isfinite(da) || !std::isfinite(db)) return false;
+                    const double spread = (std::min)(da, db);
+                    if (spread > thirdSpread) { thirdSpread = spread; tertiary = e; }
+                }
+                if (tertiary == primary) return false;
+                const auto screenX = [&](Point p) noexcept {
+                    return static_cast<double>(viewportX) +
+                        (p.x + 1.0) * static_cast<double>(viewportW) * 0.5;
+                };
+                const auto screenY = [&](Point p) noexcept {
+                    return static_cast<double>(viewportY) +
+                        (1.0 - p.y) * static_cast<double>(viewportH) * 0.5;
+                };
+                x = screenX(edges[primary]); y = screenY(edges[primary]);
+                ax = screenX(edges[secondary]); ay = screenY(edges[secondary]);
+                ox = screenX(edges[tertiary]); oy = screenY(edges[tertiary]);
+                if (!std::isfinite(x) || !std::isfinite(y) ||
+                    !std::isfinite(ax) || !std::isfinite(ay) ||
+                    !std::isfinite(ox) || !std::isfinite(oy)) return false;
+            }
             largestInteriorArea = std::abs(area);
             interiorPixelX = x;
             interiorPixelY = y;
@@ -442,8 +509,8 @@ struct NativeRawFvfClipSpan {
             oppositePixelX = ox;
             oppositePixelY = oy;
             // Twice the polygon's area is stored in 'area'.
-            interiorSparseDiagonal = boxArea > 0.0 &&
-                std::abs(area) < boxArea * 0.25;
+            interiorSparseDiagonal = (rasterState && rasterState->wireframe) ||
+                (boxArea > 0.0 && std::abs(area) < boxArea * 0.25);
         }
         anyVisible = true;
         for (std::size_t i = 0u; i < polygonCount; ++i) {

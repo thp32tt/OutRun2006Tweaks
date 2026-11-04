@@ -1223,9 +1223,17 @@ private:
             static_cast<std::uint32_t>(rasterDesc.CullMode),
             rasterDesc.FrontCounterClockwise != FALSE,
             !raster || rasterDesc.DepthClipEnable != FALSE, fvfRaster);
+        // Read the real per-Draw RS fill. D3D11 WIREFRAME emits edge
+        // pixels, not solid interior pixels. Edge-aware FVF guidance is
+        // allowed only with authentic clip-space IA; no FVF geometry
+        // changes and unknown states retain the original GPU sweep.
+        const bool nativeWireframe =
+            raster && rasterDesc.FillMode == D3D11_FILL_WIREFRAME;
+        fvfRaster.wireframe = nativeWireframe;
         bool authenticFvfFootprint = false;
         if (fvfClip.firstClip && knownNativeCull &&
-            (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID)) {
+            (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID ||
+             nativeWireframe)) {
             NativeRawDrawExtent clipped{};
             // Clip the ACTUAL polygon against the physical RT/viewport and
             // live native RS scissor, not only its AABB. A diagonal menu
