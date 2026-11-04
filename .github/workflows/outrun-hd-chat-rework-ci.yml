@@ -47,6 +47,9 @@ jobs:
           grep -q 'NOVNC_LISTENER_STARTED' "$script"
           grep -q 'HOLD_GITHUB_CONTENTS_TOKEN_MISSING' "$script"
           grep -q 'HOLD_CHAT_REWORK_EXITED' "$script"
+          grep -q 'CHROMIUM_LOGIN_WINDOW_READY' "$script"
+          grep -q 'HOLD_VISIBLE_BROWSER_START_FAILED' "$script"
+          grep -q '127.0.0.1:9222/json/version' "$script"
           grep -q 'trap .*shutdown' "$script"
           echo "CHAT_ENTRYPOINT_SHELL_AND_SECURE_VNC_GATES_PASS"
       - name: Compile Python controller and test source-bound C1 decisions
@@ -76,7 +79,9 @@ jobs:
           assert "OUTRUN_GITHUB_CONTENTS_TOKEN" in chat["environment"]
           assert "OUTRUN_REWORK_VNC_PASSWORD" in chat["environment"]
           assert len(chat.get("ports",[]))==1
-          assert "browser-rework-profile" in (p/"github_chat_rework_controller.py").read_text()
+          assert "connect_over_cdp" in (p/"github_chat_rework_controller.py").read_text()
+          assert "--remote-debugging-address=127.0.0.1" in (p/"entrypoint.chat-rework.sh").read_text()
+          assert "--user-data-dir=/data/hd-rework/browser-rework-profile" in (p/"entrypoint.chat-rework.sh").read_text()
           assert "source_dds_sha256" in (p/"github_chat_rework_controller.py").read_text()
           assert (p/"entrypoint.chat-rework.sh").read_text().startswith("#!/usr/bin/env bash")
           print("REWORK_OPT_IN_AND_SHA_QA_GATES_PASS")
