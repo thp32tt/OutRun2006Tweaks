@@ -281,6 +281,65 @@ int main() {
     scissorVertices[2].user[0]=std::numeric_limits<float>::quiet_NaN();
     assert(!native_game_fvf_fully_clipped_draw(
         scissorSource,true,&rightViewport));
+    // 01232: a corner-scissored original FVF triangle can cross EACH
+    // clipping plane, yet lie entirely outside their INTERSECTION.
+    // A single-plane vertex test cannot prove this empty GPU Draw.
+    Vertex cornerOutside[]{
+        {{ 0.6f,-0.6f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{-0.6f, 0.6f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{-0.3f,-0.3f,0.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan cornerSource{
+        cornerOutside,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    const NativeRawFvfScissorClip upperRight{
+        0.0,0.0,100.0,100.0,70,0,100,30};
+    assert(!native_game_fvf_fully_clipped_draw(cornerSource));
+    assert(native_game_fvf_fully_clipped_draw(
+        cornerSource,true,&upperRight));
+    // The identical original IA is still potentially GPU-visible when
+    // one corner reaches the overlap (including via a clipped edge).
+    cornerOutside[2].clip[0]=0.9f;
+    cornerOutside[2].clip[1]=0.9f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        cornerSource,true,&upperRight));
+    cornerOutside[2].clip[0]=-0.3f;
+    cornerOutside[2].clip[1]=-0.3f;
+    const std::uint32_t cornerIndices[]{0u,1u,2u};
+    cornerSource.indices=cornerIndices;
+    cornerSource.indexCount=3u;
+    assert(native_game_fvf_fully_clipped_draw(
+        cornerSource,true,&upperRight));
+    cornerSource.assembly=NativeRawFvfAssembly::LineStrip;
+    assert(native_game_fvf_fully_clipped_draw(
+        cornerSource,true,&upperRight));
+    cornerSource.assembly=NativeRawFvfAssembly::TriangleList;
+    // Independent enabled user ClipDistance planes can also form a
+    // disjoint source polygon even though none excludes all corners.
+    Vertex splitUser[]{
+        {{-0.4f,-0.4f,0.5f,1.f},{ 1,-2,1,1,1,1}},
+        {{ 0.4f,-0.4f,0.5f,1.f},{-2, 1,1,1,1,1}},
+        {{ 0.0f, 0.4f,0.5f,1.f},{-2,-2,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan dualUser{
+        splitUser,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,3u};
+    assert(native_game_fvf_fully_clipped_draw(dualUser));
+    dualUser.clipDistanceMask=1u;
+    assert(!native_game_fvf_fully_clipped_draw(dualUser));
+    dualUser.clipDistanceMask=3u;
+    splitUser[0].user[1]=2.f;
+    assert(!native_game_fvf_fully_clipped_draw(dualUser));
+    splitUser[0].user[1]=-2.f;
+    splitUser[1].user[1]=std::numeric_limits<float>::quiet_NaN();
+    assert(!native_game_fvf_fully_clipped_draw(dualUser));
+    // This is a pixel-neutral SOURCE ordinal, not a synthetic GPU success.
+    live_game_frame::GameNativeFrameBatch cornerBatch{};
+    assert(cornerBatch.absorb_empty_source_draw(0u,true));
+    assert(cornerBatch.accepts_full(1u));
+    cornerBatch.succeeded(true,false);
+    cornerBatch.record_source_draw(1u);
+
     // Even an independent foreign-Z/reversed-Z source command cannot
     // poison a prior real native Draw when its entire IA is pixel-neutral.
     live_game_frame::GameNativeFrameBatch scissorBatch{};

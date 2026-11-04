@@ -165,6 +165,83 @@ struct NativeRawFvfScissorClip {
                 allOutside = allOutside && distances[corner][plane] < 0.0;
             if (allOutside) { invisible = true; break; }
         }
+        if (!invisible) {
+            // Fast path: a source vertex inside every active hardware,
+            // user and scissor plane makes an empty-Draw certificate unsafe.
+            // Most genuine menu/car/race Draws leave here without costly
+            // clipping. A triangle can also cross a visible region with NO
+            // inside vertices; that case needs an exact polygon intersection.
+            bool hasInsideVertex = false;
+            for (unsigned corner = 0u; corner < corners; ++corner) {
+                bool inside = true;
+                for (unsigned plane = 0u; plane < (scissor ? 17u : 13u); ++plane) {
+                    if ((!depthClipEnable && (plane == 4u || plane == 5u)) ||
+                        (plane >= 7u && plane < 13u &&
+                         !(source.clipDistanceMask & (1u << (plane - 7u)))))
+                        continue;
+                    if (distances[corner][plane] < 0.0) {
+                        inside = false;
+                        break;
+                    }
+                }
+                if (inside) { hasInsideVertex = true; break; }
+            }
+            if (hasInsideVertex) return false;
+
+            // An actual source primitive may be outside the INTERSECTION
+            // of two scissor/ClipDistance planes while crossing each plane
+            // individually. Use bounded homogeneous Sutherland-Hodgman
+            // clipping of the original Draw's assembled primitives. Each
+            // signed distance is affine along an original GPU clip edge;
+            // it remains valid for the newly generated intersection points.
+            // Never claim a no-op for a touching/degenerate boundary, W=0
+            // ambiguity, invalid index or numerically uncertain crossing.
+            std::array<std::array<double, 17u>, 24u> polygon{}, clipped{};
+            std::size_t polygonCount = corners;
+            for (unsigned corner = 0u; corner < corners; ++corner)
+                polygon[corner] = distances[corner];
+            for (unsigned plane = 0u;
+                 plane < (scissor ? 17u : 13u) && polygonCount; ++plane) {
+                if ((!depthClipEnable && (plane == 4u || plane == 5u)) ||
+                    (plane >= 7u && plane < 13u &&
+                     !(source.clipDistanceMask & (1u << (plane - 7u)))))
+                    continue;
+                std::size_t nextCount = 0u;
+                auto previous = polygon[polygonCount - 1u];
+                bool previousInside = previous[plane] >= 0.0;
+                for (std::size_t vertex = 0u; vertex < polygonCount; ++vertex) {
+                    const auto& current = polygon[vertex];
+                    const bool currentInside = current[plane] >= 0.0;
+                    if (previousInside != currentInside) {
+                        const double denominator =
+                            previous[plane] - current[plane];
+                        const double fraction = previous[plane] / denominator;
+                        if (!std::isfinite(denominator) ||
+                            denominator == 0.0 || !std::isfinite(fraction) ||
+                            fraction < 0.0 || fraction > 1.0 ||
+                            nextCount >= clipped.size())
+                            return false;
+                        auto& intersection = clipped[nextCount++];
+                        for (unsigned component = 0u; component < 17u; ++component) {
+                            intersection[component] = previous[component] +
+                                fraction * (current[component] - previous[component]);
+                            if (!std::isfinite(intersection[component]))
+                                return false;
+                        }
+                        intersection[plane] = 0.0;
+                    }
+                    if (currentInside) {
+                        if (nextCount >= clipped.size()) return false;
+                        clipped[nextCount++] = current;
+                    }
+                    previous = current;
+                    previousInside = currentInside;
+                }
+                polygonCount = nextCount;
+                polygon.swap(clipped);
+            }
+            invisible = polygonCount == 0u;
+        }
         if (!invisible) return false;
     }
     return true;
