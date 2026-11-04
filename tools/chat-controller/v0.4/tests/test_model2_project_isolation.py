@@ -61,6 +61,39 @@ class Model2ProjectIsolation(unittest.TestCase):
         self.assertEqual(env["slot_project_home"]("C"), "about:blank")
         self.assertFalse(env["is_project_scoped_chat_url"](MODEL_CHAT, "C"))
 
+    def test_real_shared_send_guard_honors_explicit_model2_slot(self):
+        # Regression for the live C 'wrong_project' error: source-level
+        # model2_simple_cycle guard alone is insufficient if send_message()
+        # subsequently hardcodes the configured OutRun project.
+        env = {
+            "CONTROLLER_MODE": "conversion",
+            "MODEL2_AUTODEV_ENABLED": True,
+            "MODEL2_PROJECT_ID": MODEL_ID,
+            "CONFIGURED_PROJECT_ID": OUTRUN_ID,
+            "REQUIRE_PROJECT_URL": True,
+            "Optional": __import__("typing").Optional,
+            "log": SimpleNamespace(error=lambda *args: None, exception=lambda *args: None),
+            "write_runtime": lambda **kw: None,
+            "is_slot_project_url": lambda url, slot_name=None: (
+                (MODEL_ID if slot_name == "C" else OUTRUN_ID) in (url or "")
+            ),
+            "first_visible": lambda *a, **kw: None,
+        }
+        async def not_found(*args, **kw): return None
+        env["first_visible"] = not_found
+        compile_fun(env, "send_message")
+        send = env["send_message"]
+        self.assertEqual(asyncio.run(send(SimpleNamespace(url=MODEL_HOME),
+                                          "test", slot_name="C")), "not_found")
+        self.assertEqual(asyncio.run(send(SimpleNamespace(url=OUTRUN_HOME),
+                                          "test", slot_name="C")), "wrong_project")
+        self.assertEqual(asyncio.run(send(SimpleNamespace(url=OUTRUN_HOME),
+                                          "test")), "not_found")
+        self.assertEqual(asyncio.run(send(SimpleNamespace(url=MODEL_HOME),
+                                          "test")), "wrong_project")
+        self.assertEqual(asyncio.run(send(SimpleNamespace(url=MODEL_HOME),
+                                          "test", slot_name="A")), "wrong_project")
+
     def test_config_switch_disables_webport_and_targets_real_model2(self):
         compose = (ROOT / "docker-compose.portainer-vr.yml").read_text()
         self.assertIn('UW2_WEB_PORT_ENABLED: "false"', compose)
@@ -127,7 +160,8 @@ class Model2ProjectIsolation(unittest.TestCase):
     async def is_busy(self, *args): return self.busy
     async def recover(self, *args): return self.page
     async def get_reply(self, *args): return self.reply
-    async def send(self, page, message):
+    async def send(self, page, message, *, slot_name=None):
+        self.assertEqual(slot_name, "C")
         self.sent.append(message)
         return "sent"
     async def chat_url(self, page, **kwargs): return MODEL_CHAT
