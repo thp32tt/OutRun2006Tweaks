@@ -286,16 +286,23 @@ class ChatBridge:
         self.gh=gh
         self.playwright=playwright
         self.context=None
+        self.browser=None
         self.pages={}
 
     async def ensure_context(self):
+        """Attach only to the already-visible VNC Chromium; never spawn a second profile."""
         if self.context is None:
-            profile=ROOT/"browser-rework-profile"
-            profile.mkdir(parents=True,exist_ok=True)
-            self.context=await self.playwright.chromium.launch_persistent_context(
-                str(profile),headless=False,
-                args=["--no-sandbox","--disable-dev-shm-usage"],
-                viewport={"width":1400,"height":860},accept_downloads=True)
+            # Local-only CDP port is started by entrypoint, never exposed to host.
+            browser=await self.playwright.chromium.connect_over_cdp(
+                "http://127.0.0.1:9222",timeout=30000)
+            if len(browser.contexts)!=1:
+                await browser.close()
+                raise RuntimeError("HOLD_CHROME_CDP_CONTEXT_NOT_EXACTLY_ONE")
+            self.browser=browser
+            self.context=browser.contexts[0]
+            # Reuse first visible tab, so user login goes into actual A/B session.
+            if self.context.pages:
+                self.pages["A"]=self.context.pages[0]
         return self.context
 
     async def bootstrap_login_page(self):
@@ -571,8 +578,10 @@ class ChatBridge:
                 "release_approved":False}
 
     async def close(self):
-        if self.context:
-            await self.context.close()
+        # Disconnect from CDP; keep the visible browser/profile owned by
+        # entrypoint alive so manual ChatGPT login is not interrupted.
+        if self.browser:
+            await self.browser.close()
 
 
 async def run_forever():
