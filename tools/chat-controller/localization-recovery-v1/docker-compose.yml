@@ -46,10 +46,11 @@ services:
     container_name: outrun-chat-qa-rework
     restart: unless-stopped
     init: true
-    cpus: 0.65
-    mem_limit: 1800m
+    # Visible VNC Chromium needs headroom for ChatGPT rendering and image upload.
+    cpus: 1.50
+    mem_limit: 3072m
     pids_limit: 128
-    shm_size: 512m
+    shm_size: 1g
     security_opt:
       - no-new-privileges:true
     cap_drop:
