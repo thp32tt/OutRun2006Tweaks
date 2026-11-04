@@ -348,9 +348,13 @@ def build(root,out):
          "scale_policy":"SOURCE_NATIVE_HD_GLYPH_AND_LINE_BOX_CEILING_NO_UPSCALE",
          "layout_policy":"ORIGINAL_LINE_COUNT_AND_PER_LINE_BBOX_PRESERVED",
          "release_approved":False,"runtime_validation":"UNTESTED","visual_qa":"REVIEW_REQUIRED",
-         "source":"A/B original ImageGen PNG only, no font fallback",
+         "source":"A/B original ImageGen PNG reused first; deterministic pad/reflow/downscale; no font fallback",
+         "salvage_policy":"EXISTING_AB_PIXELS_FIRST_THEN_IMAGEGEN_ONLY_IF_UNSALVAGEABLE_V1",
          "active_roi_total":954,"imported_roi_total":imported_total,
          "c1_preliminary_new_png_count":c1_provisional_count,
+         "deterministic_salvaged_roi":sum(
+             1 for atlas_item in admitted for p in atlas_item["painted"] if p.get("auto_salvage")
+         ),
          "pending_import":954-imported_total,
          "native_dds_generated":len(archive),
          "translated_roi_generated":sum(len(v["painted"]) for v in admitted),
@@ -359,7 +363,7 @@ def build(root,out):
  with zipfile.ZipFile(out/ZIPNAME,"w") as z:
   for path,dds in sorted(archive.items()):zput(z,path,dds)
   zput(z,"TEST_ONLY_MANIFEST.json",json.dumps({
-   "status":"NOT_GAME_APPROVED","source":"A/B ImageGen original PNG",
+   "status":"NOT_GAME_APPROVED","source":"A/B existing ImageGen PNG deterministic salvage first",
    "release_approved":False,"game_runtime":"UNTESTED",
    "hd_quality_gate":"SOURCE_CLEAN_FINAL_STRICT_V2_NOT_VISUALLY_APPROVED",
    "entries":{p:sha(d) for p,d in sorted(archive.items())}},
