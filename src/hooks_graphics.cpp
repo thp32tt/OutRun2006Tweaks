@@ -579,6 +579,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         }
 
         auto* table=Module::exe_ptr<std::uint8_t>(0x418BB0);
+        // Arm rollback BEFORE the first write. If any later row becomes
+        // unwritable, RestoreNativeSeatProfile() must also restore rows
+        // already replaced during this synchronization attempt.
+        SeatTablePatched=true;
         for(std::size_t i=0;i<SeatTableCount;++i) {
             auto* row=table+i*kStride;
             if(!QuestCockpitGlassLive::Memory(row,3u*sizeof(float),true)) {
@@ -588,7 +592,6 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             static_assert(sizeof(injected[i])==3u*sizeof(float));
             std::memcpy(row,&injected[i],3u*sizeof(float));
         }
-        SeatTablePatched=true;
         return true;
     }
     static void OnFrameEnter(SafetyHookContext&)
