@@ -61,12 +61,9 @@ while true; do
     exit 3
   fi
   if [[ -z "${OUTRUN_GITHUB_CONTENTS_TOKEN:-}" ]]; then
-    echo "HOLD_GITHUB_CONTENTS_TOKEN_MISSING: VNC remains available; configure token in Portainer." >&2
-    sleep 60 &
-    wait "$!" || true
-    continue
+    echo "HOLD_GITHUB_CONTENTS_TOKEN_MISSING: opening ChatGPT login window anyway; queue stays paused." >&2
   fi
-  echo "START_CHAT_REWORK_WORKER: GitHub QA queue; no DDS encoding on N100." >&2
+  echo "START_CHAT_REWORK_WORKER: show ChatGPT login window before queue, no DDS encoding on N100." >&2
   set +e
   python -u /opt/outrun/github_chat_rework_controller.py
   rc=$?
