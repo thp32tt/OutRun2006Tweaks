@@ -49,7 +49,7 @@ services:
     # Visible VNC Chromium needs headroom for ChatGPT rendering and image upload.
     cpus: 1.50
     mem_limit: 3072m
-    pids_limit: 128
+    pids_limit: 512
     shm_size: 1g
     security_opt:
       - no-new-privileges:true
