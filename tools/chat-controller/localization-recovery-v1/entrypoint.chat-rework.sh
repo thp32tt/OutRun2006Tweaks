@@ -8,8 +8,15 @@ if [[ -z "${OUTRUN_REWORK_VNC_PASSWORD:-}" ]]; then
   exit 2
 fi
 
+# Keep the former browser profile intact. A dedicated named Docker volume may
+# provide a clean profile for diagnosing a white screen or login failure.
+profile_dir="${OUTRUN_REWORK_BROWSER_PROFILE_DIR:-/data/hd-rework/browser-rework-profile}"
+case "$profile_dir" in
+  /browser-profile|/data/hd-rework/browser-rework-profile) ;;
+  *) echo "HOLD_BROWSER_PROFILE_PATH_INVALID" >&2; exit 2 ;;
+esac
 umask 077
-mkdir -p /data/hd-rework /data/browser-rework-profile /tmp/.X11-unix /logs
+mkdir -p /data/hd-rework "$profile_dir" /tmp/.X11-unix /logs
 if ! x11vnc -storepasswd "${OUTRUN_REWORK_VNC_PASSWORD}" /data/hd-rework/.vncpasswd >/dev/null 2>&1; then
   echo "HOLD_VNC_PASSWORD_FILE_FAILED: Check mounted /data permissions." >&2
   exit 2
@@ -57,7 +64,6 @@ echo "NOVNC_LISTENER_STARTED: container port 6080, host port configured by Compo
 # Acquire an exclusive filesystem lock before touching the shared persistent
 # Chromium profile. flock is kernel-managed and automatically released on death.
 # Never delete cookies, login data, bookmarks, settings, or browser history.
-profile_dir=/data/hd-rework/browser-rework-profile
 mkdir -p "$profile_dir"
 exec 9>"$profile_dir/.outrun-profile-owner.lock"
 if ! flock -n 9; then
@@ -111,7 +117,7 @@ PY
     --disable-features=NetworkServiceSandbox \
     --no-first-run --no-default-browser-check --password-store=basic \
     --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 \
-    --user-data-dir=/data/hd-rework/browser-rework-profile \
+    --user-data-dir="$profile_dir" \
     --new-window "https://chatgpt.com/" \
     >/logs/hd-rework-chromium.log 2>&1 &
   chrome_pid=$!
