@@ -133,31 +133,25 @@
   },
   "feature_contract": {
     "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
-    "goal": "Maintain exact source-authentic game Draw chronology through harmless original zero-area solid FVF triangle commands while preserving native GPU real-pixel and fallback safety.",
+    "goal": "Keep original D3D9 FVF source-frame Draw/DrawIndexed continuity for exactly equal projected homogeneous XY/W solid corners, without losing real native GPU fragments or the unmodified D3D9/FFB fallback.",
     "acceptance_items": [
       {
-        "id": "source_zero_area_ordinals",
+        "id": "original_fvf_projective_noop",
         "category": "end_to_end_behavior",
-        "behavior_area": "ORIGINAL_D3D9_FVF_TO_NATIVE_D3D11_FRAME",
-        "expected_behavior": "Exact source-confirmed strictly interior zero-pixel solid triangles consume original Draw ordinal without fabricated GPU submission, allowing subsequent real game native geometry."
+        "behavior_area": "LIVE_D3D9_FVF_TO_NATIVE_FRAME",
+        "expected_behavior": "Authentiс positive-W unequal source vertex data with identical XY/W screen point consumes only a proven pixel-neutral full-frame source ordinal before subsequent native Draw."
       },
       {
-        "id": "native_ia_primitive_family",
-        "category": "integrated_behavior",
-        "behavior_area": "SOURCE_INDEXED_AND_STRIP_FAN_ASSEMBLY",
-        "expected_behavior": "List/strip/fan/indexed authentic IA, source depth variation and first GPU Draw preserve source ordering."
-      },
-      {
-        "id": "source_real_pixels_fallback",
+        "id": "authentic_source_ordinals",
         "category": "fallback_regression",
-        "behavior_area": "D3D9_REAL_GAME_RENDER_AND_FFB",
-        "expected_behavior": "Wireframe/point fill, near-thin triangle, clip/eye crossing and invalid source indices never qualify as zero-pixel raster; original game paths survive."
+        "behavior_area": "ORIGINAL_D3D9_NATIVE_IA_AND_INPUT",
+        "expected_behavior": "Thin but nonzero polygon, wireframe, point fill, W=0, clip boundary or bad original indexed vertex cannot be discarded and preserves normal native Draw and D3D9/gamepad fallback."
       },
       {
-        "id": "immutable_five_gates",
-        "category": "integrated_validation",
-        "behavior_area": "GITHUB_FAST_BACKEND_BUILD_OPENXR_HUD",
-        "expected_behavior": "Five unchanged mandatory GitHub Actions SUCCESS at exact material SHA; actual gameplay and HMD UNTESTED."
+        "id": "full_five_gate",
+        "category": "integrated_behavior",
+        "behavior_area": "FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Source/test SHA 1c3ca85ffe8f868400c3281e33eff0f6deec00df has five existing required exact-SHA successful GitHub Actions; runtime/HMD observations remain untested."
       }
     ]
   }
