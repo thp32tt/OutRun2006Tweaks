@@ -206,6 +206,7 @@ struct NativeRawFvfClipSpan {
     double maxY = maxX;
     bool anyVisible = false;
     double largestInteriorArea = 0.0;
+    bool haveInteriorAnchor = false;
     double interiorPixelX = 0.0, interiorPixelY = 0.0;
     double alternatePixelX = 0.0, alternatePixelY = 0.0;
     double oppositePixelX = 0.0, oppositePixelY = 0.0;
@@ -432,8 +433,15 @@ struct NativeRawFvfClipSpan {
         // homogeneous W and the actual D3D11 scissor/face clipping.
         // Prefer an interior tile only for low-fill diagonal footprints;
         // broad triangles retain their existing rotating GPU source sweep.
+        // A collinear diagonal has precisely zero signed area, yet a
+        // real D3D11 WIREFRAME Draw still colors its surviving edges.
+        // The old positive-area-only selection left every edge anchor at
+        // {0,0}, so the source-authentic GPU crop could miss the Draw.
+        // Select the first such clipped polygon's genuine edge midpoints,
+        // then prefer a larger nonzero polygon if another one survives.
         if (interior && (std::abs(area) > largestInteriorArea ||
-                         (lineOnly && !anyVisible))) {
+                         ((lineOnly || (rasterState && rasterState->wireframe)) &&
+                          !haveInteriorAnchor))) {
             double loX = (std::numeric_limits<double>::max)();
             double loY = loX;
             double hiX = -loX, hiY = -loX;
@@ -572,6 +580,7 @@ struct NativeRawFvfClipSpan {
                     !std::isfinite(ox) || !std::isfinite(oy)) return false;
             }
             largestInteriorArea = std::abs(area);
+            haveInteriorAnchor = true;
             interiorPixelX = x;
             interiorPixelY = y;
             alternatePixelX = ax;

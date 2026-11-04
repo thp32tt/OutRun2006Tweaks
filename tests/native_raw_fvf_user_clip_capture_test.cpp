@@ -542,6 +542,68 @@ int main() {
         fineIndexedSource,0,0,3440,1440,fineExtent,nullptr,
         &wireNoCull));
 
+    // 01240: a genuine indexed/linear native WIREFRAME triangle may be
+    // EXACTLY diagonal-collinear (signed area zero) while its clipped
+    // line edges still cover native GPU pixels. The original area-only
+    // selector left the edge anchor at (0,0), sampling unrelated RGB.
+    // All three source edge midpoints must be visited; the two synthetic
+    // midpoints between edge anchors are polygon INTERIOR, not wire edges.
+    Vertex diagonalWire[]{
+        {{-.8f,-.6f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ 0.f, 0.f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .8f, .6f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan diagonalSource{
+        diagonalWire,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    NativeRawDrawExtent diagonalExtent{};
+    NativeRawFvfInteriorSample diagonalEdge{};
+    assert(native_raw_fvf_projected_raster(
+        diagonalSource,0,0,3440,1440,diagonalExtent,nullptr,
+        &wireNoCull,&diagonalEdge));
+    assert(diagonalEdge.sparseDiagonal &&
+           diagonalEdge.pixelX>=diagonalExtent.left &&
+           diagonalEdge.pixelX<diagonalExtent.right &&
+           diagonalEdge.pixelY>=diagonalExtent.top &&
+           diagonalEdge.pixelY<diagonalExtent.bottom);
+    NativeRawDualTile diagonalPhases[6]{};
+    for (std::uint32_t phase=0u; phase<6u; ++phase) {
+        assert(native_raw_fvf_island_dual_draw_tile(
+            diagonalSource,0,0,3440,1440,3440,1440,512,288,
+            {0,0,3440,1440},phase,diagonalPhases[phase],&wireNoCull));
+        assert(!diagonalPhases[phase].hasSecond ||
+               native_raw_source_tiles_disjoint(
+                   diagonalPhases[phase].first,
+                   diagonalPhases[phase].second,512,288));
+        if (phase >= 3u) {
+            assert(diagonalPhases[phase].first.x ==
+                   diagonalPhases[phase-3u].first.x &&
+                   diagonalPhases[phase].first.y ==
+                   diagonalPhases[phase-3u].first.y);
+        }
+    }
+    // All original edge anchors are physically distinct for this large
+    // source line; no fabricated CPU pixels can replace PRE/POST GPU delta.
+    assert(diagonalPhases[0].first.x!=diagonalPhases[1].first.x &&
+           diagonalPhases[1].first.x!=diagonalPhases[2].first.x);
+    const std::uint32_t diagonalIndices[]{2u,1u,0u};
+    diagonalSource.indices=diagonalIndices;
+    diagonalSource.indexCount=3u;
+    assert(native_raw_fvf_island_dual_draw_tile(
+        diagonalSource,0,0,3440,1440,3440,1440,512,288,
+        {0,0,3440,1440},0u,diagonalPhases[0],&wireNoCull));
+    const std::uint32_t diagonalBadIndices[]{2u,1u,99u};
+    diagonalSource.indices=diagonalBadIndices;
+    assert(!native_raw_fvf_island_dual_draw_tile(
+        diagonalSource,0,0,3440,1440,3440,1440,512,288,
+        {0,0,3440,1440},0u,diagonalPhases[0],&wireNoCull));
+    diagonalSource.indices=nullptr;
+    diagonalSource.indexCount=0u;
+    for (auto& v : diagonalWire) v.clip[0]=2.f; // truly offscreen
+    assert(!native_raw_fvf_island_dual_draw_tile(
+        diagonalSource,0,0,3440,1440,3440,1440,512,288,
+        {0,0,3440,1440},0u,diagonalPhases[0],&wireNoCull));
+
     // 01235: authenticated one-pixel POINTLIST / point-filled TRIANGLELIST
     // use the same source-authentic clipping and face-cull certificate.
     // Point scissor proof is conservatively expanded by one pixel.

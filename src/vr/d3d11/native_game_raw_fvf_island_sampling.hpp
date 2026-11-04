@@ -144,7 +144,14 @@ namespace outrun::vr::dx11 {
             const NativeRawTileOrigin anchors[8]{
                 centered, farEnd, oppositeEnd, middleFar, middleOpposite,
                 farEnd, oppositeEnd, centered};
-            const auto phase = sourcePhase % 8u;
+            // Solid sparse triangles have interior pixels, so eight
+            // independent interior/sweep phases are useful. WIREFRAME
+            // pixels exist on the authentic clipped edges only: mixing
+            // edge midpoint anchors produces empty interior positions.
+            // Rotate all three proven edge anchors instead, retaining
+            // the native GPU PRE/POST/source-epoch proof unchanged.
+            const bool wireframeEdges = rasterState && rasterState->wireframe;
+            const auto phase = sourcePhase % (wireframeEdges ? 3u : 8u);
             const NativeRawDualTile swept = sampled;
             sampled.first = anchors[phase];
             sampled.hasSecond = false;
