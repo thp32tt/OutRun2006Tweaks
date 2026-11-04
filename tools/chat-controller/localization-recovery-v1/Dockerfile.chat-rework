@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/playwright/python:v1.63.0-noble
 ENV DEBIAN_FRONTEND=noninteractive PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 DISPLAY=:99
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    xvfb x11vnc openbox novnc websockify ca-certificates && \
+    xvfb x11vnc openbox novnc websockify ca-certificates util-linux && \
     rm -rf /var/lib/apt/lists/*
 RUN python -m pip install --no-cache-dir Pillow==11.3.0 playwright==1.63.0 && \
     python -c "from playwright.async_api import async_playwright; from PIL import Image; print('CHAT_REWORK_PYTHON_IMPORTS_OK')"
