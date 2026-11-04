@@ -37,7 +37,7 @@ API = "https://api.github.com/repos/" + REPO
 ROOT = Path(os.getenv("OUTRUN_REWORK_HOME", "/data/hd-rework")).resolve()
 PROJECT_URL = os.getenv("CHATGPT_PROJECT_URL", "https://chatgpt.com/").strip()
 TOKEN = os.getenv("OUTRUN_GITHUB_CONTENTS_TOKEN", "").strip()
-POLL = int(os.getenv("OUTRUN_REWORK_POLL_SECONDS", "300"))
+POLL = int(os.getenv("OUTRUN_REWORK_POLL_SECONDS", "600"))
 CHAT_TASK = re.compile(r"^HDRW-[AB]-[0-9a-f]{20}$")
 HASH = re.compile(r"^[0-9a-f]{64}$")
 MAX_CONTENTS_PNG = 650 * 1024
@@ -515,6 +515,7 @@ class ChatBridge:
             if len(submitted)>=2:
                 break
         progressed=[]
+        c1_sent_this_cycle=0
         tasks_root=ROOT/"tasks"
         for file in sorted(tasks_root.glob("HDRW-*.json"))[:120] if tasks_root.is_dir() else []:
             try:
@@ -530,7 +531,10 @@ class ChatBridge:
                 if status=="AB_SENT":
                     result=await self.collect_producer(updated)
                 elif status=="C1_READY":
+                    if c1_sent_this_cycle>=1:
+                        continue
                     result=await self.submit_c1(updated)
+                    c1_sent_this_cycle+=1
                 elif status=="C1_SENT":
                     result=await self.inspect_c1(updated)
                 else:
