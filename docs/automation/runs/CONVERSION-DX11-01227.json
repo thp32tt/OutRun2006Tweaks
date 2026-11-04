@@ -11,8 +11,8 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:AUTHENTIC_WVP_EYE_CROSSING_POINT_POLYGON_NATIVE_GPU",
   "classification": "A_UNFINISHED_FULL_NATIVE_GAME_FRAME_IMPLEMENTATION",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "material_implementation_sha": "990352d66f4250a27fd9d1a29018cf1a6baac91b",
@@ -88,31 +88,94 @@
   },
   "acceptance_results": {
     "source_fvf_eye_crossing_native_game_draw": {
-      "status": "IMPLEMENTED_AWAIT_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/live_game_fvf_point_clip.hpp",
-        "src/vr/d3d11/live_game_frame_bridge.cpp"
-      ]
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41815982774, Win32 Build 41815990886 SUCCESS on exact final SHA; original native GPU source connected, not witnessed real game runtime."
     },
     "clip_and_game_fallback": {
-      "status": "IMPLEMENTED_AWAIT_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/live_game_fvf_point_clip.hpp",
         "tests/vr/dx11_live_fvf_point_cull.cpp"
-      ]
+      ],
+      "validation_command": "Causal W=0 and invalid homogeneous vector regression repair at db919467, exact Fast 41815982774 and Backend 41815982875 SUCCESS."
     },
     "exact_sha_all_gates": {
-      "status": "PENDING",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
-        ".github/workflows/dx11-fast-structural.yml"
-      ]
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01227.json",
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp"
+      ],
+      "validation_command": "Exact-SHA Fast 41815982774, Backend 41815982875, Build 41815990886, OpenXR 41815990985, HUD 41815990979: all SUCCESS."
     }
   },
   "real_game_draw_blocker": "Missing witnessed matching-binary native GPU Draw and full-frame game output for menu/car/race and native OpenXR stereo.",
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "next_implementation_action": "After exact-SHA source CI, continue actual full native menu/car/race frame continuity and direct native eye GPU source handoff; preserve DX9Ex fallback and request matching-SHA runtime evidence for any promotion.",
   "runtime_evidence": null,
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no actual game/Quest3 test performed.",
-  "record_type": "VALIDATION_INPUT_SOURCE_STAGE_NOT_C6",
-  "checkpoint": "C3_CI_PENDING"
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun 2006 menu/car/race gameplay, native full desktop publication, GPU publishedBackbufferFrames, or Quest3/VDXR HMD test for the 01227 exact source SHA. CI/Build PASS does NOT establish full native game frame or OpenXR visible stereo runtime.",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "material_result_sha": "6c9afbf8d9d5ebb03b039a16acd65366c88c93e6",
+  "validation_bearing_result_sha": "6c9afbf8d9d5ebb03b039a16acd65366c88c93e6",
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41815982774,
+      "sha": "6c9afbf8d9d5ebb03b039a16acd65366c88c93e6",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41815982875,
+      "sha": "6c9afbf8d9d5ebb03b039a16acd65366c88c93e6",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41815990886,
+      "sha": "6c9afbf8d9d5ebb03b039a16acd65366c88c93e6",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41815990985,
+      "sha": "6c9afbf8d9d5ebb03b039a16acd65366c88c93e6",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41815990979,
+      "sha": "6c9afbf8d9d5ebb03b039a16acd65366c88c93e6",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "source_and_repair_commits": [
+    {
+      "sha": "990352d66f4250a27fd9d1a29018cf1a6baac91b",
+      "kind": "MATERIAL_SOURCE_IMPLEMENTATION",
+      "summary": "Real WVP eye/frustum/user clipped FVF POINTLIST native GPU vertices and regressions"
+    },
+    {
+      "sha": "c49ac2d2b1c78940075e7156932419815c319c4e",
+      "kind": "SAME_TASK_CAUSAL_POLICY_GATE_RECORD",
+      "summary": "Pending feature-sized contract with truthful source only state"
+    },
+    {
+      "sha": "db9194676462b12e180d6ef84374613443671815",
+      "kind": "SAME_TASK_CAUSAL_CPP_REGRESSION_REPAIR",
+      "summary": "Valid W=0 source intersection accepted; unprojectable all-zero homogeneous source rejects"
+    },
+    {
+      "sha": "6c9afbf8d9d5ebb03b039a16acd65366c88c93e6",
+      "kind": "SAME_TASK_CAUSAL_EXACT_SHA_GATE_TRIGGER_REPAIR",
+      "summary": "Exact-SHA Fast trigger includes changed C++ point clipping test; five mandatory CI SUCCESS"
+    }
+  ],
+  "score_note": "AI 2 source-stage continuation of unfinished full-native-game-frame FEATURE_ID. C6/CI trigger repair/retry and duplicate result report are +0; AI1 score untouched. Do not invent latest cumulative baseline."
 }
