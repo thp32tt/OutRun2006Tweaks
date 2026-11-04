@@ -169,5 +169,6 @@
       "summary": "Inherited 01223 C6 policy path correction and indexed-strip test expectation repair; exact SHA five required Gates SUCCESS."
     }
   ],
-  "score_note": "AI2 same-task retry/CI repair/C6: +0; no duplicated independent achievement or AI1 change."
+  "score_note": "AI2 same-task retry/CI repair/C6: +0; no duplicated independent achievement or AI1 change.",
+  "checkpoint": "C6_STATE"
 }
