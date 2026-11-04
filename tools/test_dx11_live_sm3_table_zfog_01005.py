@@ -239,8 +239,8 @@ if compiler:
                         "-o", str(result)], check=True)
         subprocess.run([str(result)], check=True)
 
-// The genuine game Draw and DrawIndexed FVF and programmable paths must
-// share the same source-clipping decision, with independent RAW-only poison.
+# The genuine game Draw and DrawIndexed FVF and programmable paths must
+# share the same source-clipping decision, with independent RAW-only poison.
 clipping_header = (root / "src/vr/d3d11/native_game_raw_clipping_visual.hpp").read_text()
 clipping_source = bridge.partition("bool submit_live_sm3_game_draw(")[2]
 require('#include "native_game_raw_clipping_visual.hpp"' in bridge and

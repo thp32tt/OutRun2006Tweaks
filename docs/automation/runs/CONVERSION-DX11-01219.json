@@ -30,9 +30,12 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "REAL_GAME_D3D9_FVF_SM3_DRAW",
       "AUTHENTIC_SOURCE_FOG_REGISTER_READ",
+      "D3D11_NATIVE_DRAW",
       "D3D11_NATIVE_DRAW_RAW_VISUAL_ONLY_IF_OPTED",
+      "VISIBLE_FRAME_OUTPUT",
       "ORIGINAL_D3D9_PRESENT_FALLBACK"
     ],
     "integration_path": [
@@ -57,7 +60,7 @@
       "DX11:REAL_GAME_DRAW"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY. No matching real OutRun game Draw/published GPU frame or Quest3 optical evidence was collected.",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY. VISIBLE_FRAME_OUTPUT refers to original D3D9 Present fallback, NOT to an observed native full-frame publication. No matching real OutRun game Draw/published GPU frame or Quest3 optical evidence was collected.",
     "activation_guard_and_fallback": "Native full-game path remains fail-closed and opt-in; RAW visual mismatch separately opt-in and visibly incomplete. Original D3D9 Draw, input, FFB, renderer and DX9Ex fallback untouched."
   },
   "feature_contract": {

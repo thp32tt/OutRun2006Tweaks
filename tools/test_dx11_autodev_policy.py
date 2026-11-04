@@ -446,3 +446,32 @@ for label, mutate in (
     invalid_01215 = copy.deepcopy(historical_01215)
     mutate(invalid_01215)
     assert validate_task(invalid_01215, p), "01215 partial source-stage evidence bypassed: " + label
+
+# CONVERSION-DX11-01220 causal Backend gate repair: 01219's original
+# source-to-native diagnostic-to-D3D9 Present chain must be canonical,
+# preserve its prior exact-SHA proof, and never claim gameplay/HMD PASS.
+historical_01219 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01219.json").read_text(encoding="utf-8"))
+assert historical_01219["validation_bearing_result_sha"] == "ace197156d4ca0d0e1d2d47e0292e3654b001152"
+assert historical_01219["runtime_validation"] == "UNTESTED"
+assert historical_01219["full_dx11_renderer_complete"] is False
+assert historical_01219["gameplay_test_performed"] is False
+assert historical_01219["hmd_test_performed"] is False
+assert "SOURCE_BUILD_VERIFIED_ONLY" in historical_01219["development_strategy"]["visible_frame_acceptance"]
+assert "original D3D9 Present fallback" in historical_01219["development_strategy"]["visible_frame_acceptance"]
+assert not validate_task(historical_01219, p), validate_task(historical_01219, p)
+for label, mutate in (
+    ("source callsite missing", lambda t: t["development_strategy"]["live_game_draw_path"].remove("LIVE_D3D9_CALLSITE")),
+    ("native Draw missing", lambda t: t["development_strategy"]["live_game_draw_path"].remove("D3D11_NATIVE_DRAW")),
+    ("visible fallback missing", lambda t: t["development_strategy"]["live_game_draw_path"].remove("VISIBLE_FRAME_OUTPUT")),
+    ("source chain reversed", lambda t: t["development_strategy"].update(
+        live_game_draw_path=list(reversed(t["development_strategy"]["live_game_draw_path"])))),
+    ("source file absent", lambda t: t.update(changed_files=["tools/test_dx11_live_sm3_table_zfog_01005.py"])),
+    ("forged gameplay", lambda t: t.update(gameplay_test_performed=True)),
+    ("forged HMD", lambda t: t.update(hmd_test_performed=True)),
+    ("renderer falsely complete", lambda t: t.update(full_dx11_renderer_complete=True)),
+    ("failed exact-SHA", lambda t: t.update(automation_validation="FAIL_EXACT_SHA")),
+):
+    broken_01219 = copy.deepcopy(historical_01219)
+    mutate(broken_01219)
+    assert validate_task(broken_01219, p), "01219 gate repair regression: " + label
