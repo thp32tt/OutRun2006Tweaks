@@ -28,18 +28,21 @@ services:
       CONVERSION_DX11_ENABLED: "true"
       DXVK_FROZEN: "true"
       CONVERSION_DXVK_ENABLED: "false"
-      # C slot repurposed from lens-flare review to authentic UW2 browser porting.
+      # C is no longer UW2 web porting or DX9Ex review.
       CONVERSION_DX9EX_ENABLED: "false"
       DX9EX_REVIEW_ONLY: "true"
-      UW2_WEB_PORT_ENABLED: "true"
-      UW2_GITHUB_REPO: "thp32tt/ai-dev-lab"
-      UW2_TARGET_BRANCH: "uw2-web-port"
-      UW2_SCHEDULE_MINUTES: "0,30"
-      # Low-input UW2: target long implementation batches per instruction.
-      # Do not send another message until >=30 minutes after previous send;
-      # elapsed cooldown is NOT claimed as actual development time.
-      UW2_CONTINUE_MIN_SECONDS: "1800"
-      UW2_RESPONSE_STABLE_SECONDS: "20"
+      UW2_WEB_PORT_ENABLED: "false"
+      # Model2 VR C belongs to its OWN ChatGPT project, never OutRun's.
+      MODEL2_AUTODEV_ENABLED: "true"
+      MODEL2_GITHUB_REPO: "thp32tt/Model2VR-tools"
+      MODEL2_TARGET_BRANCH: "main"
+      # Create a dedicated ChatGPT Project; put its actual home in this stack
+      # environment as MODEL2_PROJECT_URL, e.g. chatgpt.com/g/g-p-.../project.
+      # Empty or same ID as OutRun => C SEND BLOCKED (no unsafe fallback).
+      MODEL2_PROJECT_URL: "${MODEL2_PROJECT_URL:-}"
+      MODEL2_SCHEDULE_MINUTES: "0,30"
+      MODEL2_CONTINUE_MIN_SECONDS: "1800"
+      MODEL2_RESPONSE_STABLE_SECONDS: "30"
       CONVERSION_ONLY_SLOT: ""
       QUEUE_CHECK_SECONDS: "15"
       # GUI Chrome/noVNC stays enabled; only failed tabs are replaced.
@@ -73,9 +76,9 @@ services:
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       # New DX11 production: :30 KST, at most once per hour.
       SCHEDULE_MINUTES: "30"
-      # C sends only the same short sentence, at most once in 30 minutes.
-      # :00/:30 KST fallback plus idle/response observations; never stop busy work.
-      # Actual 20-minute development goal is in the single UW2 master plan.
+      # Model2 C: one initial contextual prompt, then one short continuation
+      # per 30m or later. Do not interrupt a busy worker. Model2 master plan
+      # lives in thp32tt/Model2VR-tools@main and is separate from OutRun.
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
