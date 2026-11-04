@@ -172,7 +172,9 @@ namespace Settings
         "Hide only original event 362 driver visual draw in mode1 race; passenger 363 and GOAL unaffected. Default ON." };
     Setting<bool> VRQuestCockpitV2PassengerVisible{ "VR", "QuestCockpitV2PassengerVisible", true,
         "Keep exact event 363 passenger original PC robot matrix; force visible LOD0 inside only its synchronous draw to avoid missing near-seat model. Default ON." };
-	Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
+	Setting<bool> VRQuestCockpitV2SkyProbe{ "VR", "QuestCockpitV2SkyProbe", false,
+        "Experimental bounded sky stereo diagnostics: one aggregate per 90 Presents. Full VR.Telemetry is not required." };
+    Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
 		"Isolated QuestCockpitV2 diagnostic: collects original player B0/F0 and bounded Present correlation. The native game-frame owner is unverified; this does not activate cockpit. Requires restart." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };

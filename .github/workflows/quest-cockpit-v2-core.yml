@@ -131,7 +131,8 @@ jobs:
           assert "QuestCockpitV2ReleaseParity" in launcher
           for script in ('RUN-QUEST-COCKPIT-V2.cmd',
                          'RUN-QUEST-COCKPIT-V2-F0.cmd',
-                         'RUN-QUEST-COCKPIT-V2-LOD0.cmd'):
+                         'RUN-QUEST-COCKPIT-V2-LOD0.cmd',
+                          'RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd'):
               launcher_script=Path(script).read_text(encoding='utf-8')
               assert '-QuestCockpitV2ReleaseParity ON' in launcher_script, script
           assert "'-VR.DirectGpuOnly=true'" in launcher
@@ -146,6 +147,11 @@ jobs:
           assert 'QuestCockpitV2GlassHidden = false' in ini
           assert 'QuestCockpitV2GlassReflectionOff = true' in ini
           assert 'QuestCockpitV2NativeSeatProfile = true' in ini
+          r7=Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text(encoding='utf-8')
+          assert 'VR SKY PROBE:' in r7
+          assert 'MaybeLogCockpitSkyProbe(stereoRequested,composedStereo,' in r7
+          assert 'VRQuestCockpitV2SkyProbe' in settings
+          assert "if($QuestCockpitV2SkyProbe -eq 'ON')" in launcher
           # HMD regression 2026-11-04: Quest profile XYZ must be consumed as
           # the original mode-1 camera input. A post-CalcCameraMatrix delta
           # sinks the eye toward the floor and amplifies view jitter.

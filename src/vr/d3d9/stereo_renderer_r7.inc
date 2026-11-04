@@ -57,6 +57,8 @@ namespace Settings
 	extern Setting<float> VRWorldScale;
 	extern Setting<float> VRStereoDepth;
 	extern Setting<bool> VRTelemetry;
+    extern Setting<bool> VRQuestCockpitV2Enabled;
+    extern Setting<bool> VRQuestCockpitV2SkyProbe;
 }
 
 #ifndef OUTRUN_VR_BUILD_SHA
@@ -2051,7 +2053,53 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			if(!Settings::VRTelemetry)return;const ULONGLONG now=GetTickCount64();if(now-LastSummaryMs<5000)return;LastSummaryMs=now;const DWORD gamePid=GetCurrentProcessId();const DWORD hostPid=SharedState?SharedState->hostPid:0;spdlog::info("VR identity: gameBuild={} gamePid={} hostPid={} runKey={}-{}",OUTRUN_VR_BUILD_SHA,gamePid,hostPid,hostPid,gamePid);spdlog::info("VR stereo: draws={} world={} ui/effect={} fixedFn={} fixedFnWorld={} offscreenWorld={} classifyFail={} composeOk={} composeFail={} rightFail={} mrtReject={} restoreFail={} poseMismatchFrames={} multiBeginPresent={} maxBeginPerPresent={} poseSeq={} direct[frames={},fallbacks={},fenceTimeout={}] occ[created={},begin={},end={},active={},reject={}] depthSync[fullClear={},bootstrapTry={},bootstrapOk={}] failures[pose={},res={},mrt={},viewport={},classify={},depth={},stencil={},clear={},rightState={},rightWvp={},rightDraw={},restore={},compose={},present={},depthState={},poseMismatch={},offscreen={},occlusion={}]",DuplicatedDraws,WorldStereoDraws,NonWorldDuplicatedDraws,FixedFunctionNonWorldDraws,FixedFunctionWorldStereoDraws,OffscreenVerifiedWorldDraws,WorldClassificationFailures,StereoComposeSuccess,StereoComposeFailure,FrameRightDrawFailed?1:0,MrtRejectedDraws,RestoreFailures,PoseSequenceMismatchFrames,MultiBeginScenePresents,MaxBeginScenesPerPresent,FrameStereoPoseSequence,DirectTransportFrames,DirectTransportFallbacks,DirectTransportFenceTimeouts,OcclusionQueriesCreated,OcclusionQueryBegins,OcclusionQueryEnds,ActiveOcclusionQueries.load(std::memory_order_acquire),OcclusionStereoRejects,FullMainDepthClears,DepthBootstrapAttempts,DepthBootstrapSuccesses,FailureCounts[OutRunVR::StereoFailureMissingLatchedPose],FailureCounts[OutRunVR::StereoFailureResourceUnavailable],FailureCounts[OutRunVR::StereoFailureMrtActive],FailureCounts[OutRunVR::StereoFailureViewportUnavailable],FailureCounts[OutRunVR::StereoFailureWorldClassificationFailed],FailureCounts[OutRunVR::StereoFailureDepthUnsynchronized],FailureCounts[OutRunVR::StereoFailureStencilUnsynchronized],FailureCounts[OutRunVR::StereoFailureClearFailed],FailureCounts[OutRunVR::StereoFailureRightStateFailed],FailureCounts[OutRunVR::StereoFailureRightWvpUploadFailed],FailureCounts[OutRunVR::StereoFailureRightDrawFailed],FailureCounts[OutRunVR::StereoFailureRestoreFailed],FailureCounts[OutRunVR::StereoFailureComposeFailed],FailureCounts[OutRunVR::StereoFailurePresentFailed],FailureCounts[OutRunVR::StereoFailureDepthStateChanged],FailureCounts[OutRunVR::StereoFailurePoseSequenceMismatch],FailureCounts[OutRunVR::StereoFailureOffscreenWorld],FailureCounts[OutRunVR::StereoFailureOcclusionQueryActive]);
 		}
 
-		HRESULT __stdcall PresentDest(IDirect3DDevice9*device,const RECT*sourceRect,const RECT*destRect,HWND destWindowOverride,const RGNDATA*dirtyRegion)
+		// Original 4521C0 sky ownership has not yet been attested in this
+        // rendering lane. Count only fixed-function sky-like classifications
+        // and stereo failure transitions. This is a bounded A/B discriminator,
+        // not a generic per-draw logger; no game GPU state is modified.
+        void MaybeLogCockpitSkyProbe(bool requested,bool composed,
+            bool direct,HRESULT presentHr) noexcept
+        {
+            if (!Settings::VRQuestCockpitV2Enabled ||
+                !Settings::VRQuestCockpitV2SkyProbe) return;
+            static std::uint32_t frames=0,skyFrames=0,badFrames=0;
+            static std::uint32_t rightFailures=0,poisoned=0,depthMissing=0;
+            static std::uint64_t lastSky=0,windowSky=0,windowWorld=0;
+            static std::uint64_t totalPresent=0;
+            static bool sawRequested=false,sawComposed=false,sawDirect=false;
+            ++frames;
+            ++totalPresent;
+            sawRequested |= requested;
+            sawComposed |= composed;
+            sawDirect |= direct;
+            if(FixedFunctionSkyRotationOnlyDraws>lastSky) ++skyFrames;
+            lastSky=FixedFunctionSkyRotationOnlyDraws;
+            if(FrameStereoIncomplete) ++badFrames;
+            if(FrameRightDrawFailed) ++rightFailures;
+            if(FrameFailureReason!=OutRunVR::StereoFailureNone) ++poisoned;
+            if(!RightDepthSynchronized) ++depthMissing;
+            if(frames>=90) {
+                spdlog::info(
+                    "VR SKY PROBE: present={} samples={} skyLikeFrames={} "
+                    "skyLikeDraws={} otherFixedWorldDraws={} incomplete={} "
+                    "rightFailed={} poisoned={} depthUnsynced={} "
+                    "requested={} composed={} direct={} lastFailure={} presentHr={}",
+                    totalPresent,frames,skyFrames,
+                    FixedFunctionSkyRotationOnlyDraws-windowSky,
+                    FixedFunctionWorldStereoDraws-windowWorld,
+                    badFrames,rightFailures,poisoned,depthMissing,
+                    sawRequested,sawComposed,sawDirect,
+                    static_cast<unsigned>(FrameFailureReason),
+                    static_cast<unsigned>(presentHr));
+                frames=skyFrames=badFrames=0;
+                rightFailures=poisoned=depthMissing=0;
+                sawRequested=sawComposed=sawDirect=false;
+                windowSky=FixedFunctionSkyRotationOnlyDraws;
+                windowWorld=FixedFunctionWorldStereoDraws;
+            }
+        }
+
+        HRESULT __stdcall PresentDest(IDirect3DDevice9*device,const RECT*sourceRect,const RECT*destRect,HWND destWindowOverride,const RGNDATA*dirtyRegion)
 		{
 			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
 			const std::uint64_t beginNow=OutRunVRRenderer::GetBeginSceneCallCount(),beginDelta=beginNow>=LastBeginSceneCountAtPresent?beginNow-LastBeginSceneCountAtPresent:0;LastBeginSceneCountAtPresent=beginNow;if(GameplayActive()){if(beginDelta>1)++MultiBeginScenePresents;MaxBeginScenesPerPresent=std::max(MaxBeginScenesPerPresent,beginDelta);}
@@ -2168,6 +2216,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 
 			OutRunVRRenderer::NotifyGamePresent();
 			OutRunVR::Pacing::GamePresentComplete();
+            MaybeLogCockpitSkyProbe(stereoRequested,composedStereo,
+                directTransport,hr);
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};if(++PresentEpoch==0)PresentEpoch=1;return hr;
 		}
 

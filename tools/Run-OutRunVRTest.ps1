@@ -6,6 +6,7 @@ param(
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2ReleaseParity = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Diagnostics = 'OFF',
+    [ValidateSet('OFF','ON')][string]$QuestCockpitV2SkyProbe = 'OFF',
     [ValidateSet('EX','CLASSIC')][string]$QuestCockpitV2DeviceMode = 'EX',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
@@ -345,6 +346,14 @@ if($QuestCockpitV2 -eq 'ON'){
     if($QuestCockpitV2Diagnostics -eq 'ON') { $env:OUTRUN_VR_FILE_LOG='1' }
     else { $env:OUTRUN_VR_FILE_LOG='0' }
     Write-Host "QuestCockpitV2 mode1 active; detailed diagnostics=$QuestCockpitV2Diagnostics."
+    if($QuestCockpitV2SkyProbe -eq 'ON') {
+        # Sky-only bounded evidence, no megabytes per draw.
+        $gameArgs += '-VR.QuestCockpitV2SkyProbe=true'
+        $gameArgs += '-VR.Telemetry=false'
+        $gameArgs += '-FileLogging=true'
+        $env:OUTRUN_VR_FILE_LOG='1'
+        Write-Host 'Quest cockpit SKY PROBE: 90-Present bounded summary; full draw telemetry OFF.'
+    }
 }
 if($backend -ne '2d'){
     # Match v0.01 Beta explicit VR entrypoint. A release VERSION marker
