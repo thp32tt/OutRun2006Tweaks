@@ -6,6 +6,7 @@ param(
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2ReleaseParity = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Diagnostics = 'OFF',
+    [ValidateSet('OFF','ON')][string]$DinoMode1FullCarSwap = 'OFF',
     [ValidateSet('EX','CLASSIC')][string]$QuestCockpitV2DeviceMode = 'EX',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
@@ -347,6 +348,32 @@ if($QuestCockpitV2 -eq 'ON'){
     if($QuestCockpitV2Diagnostics -eq 'ON') { $env:OUTRUN_VR_FILE_LOG='1' }
     else { $env:OUTRUN_VR_FILE_LOG='0' }
     Write-Host "QuestCockpitV2 mode1 active; detailed diagnostics=$QuestCockpitV2Diagnostics."
+}
+if($DinoMode1FullCarSwap -eq 'ON'){
+    if($QuestCockpitV2 -ne 'ON' -or $backend -ne 'd3d9'){
+        throw 'DinoMode1FullCarSwap requires DX9Ex and QuestCockpitV2 ON.'
+    }
+    # Only run the opt-in replacement in a separately cloned game folder.
+    # The source launcher and the original model file are never edited here.
+    $installed = Join-Path $root 'CARS/obj_plcar_dino_pmt.sz'
+    $backup = Join-Path $root 'CARS/obj_plcar_dino_pmt.original-v8.bak'
+    $candidate = Join-Path $root 'DinoV8Build/obj_plcar_dino_pmt.sz'
+    foreach($path in @($installed,$backup,$candidate)){
+        if(-not (Test-Path -LiteralPath $path -PathType Leaf)){
+            throw "Dino V8 test copy requires file: $path"
+        }
+    }
+    $installedHash = (Get-FileHash -LiteralPath $installed -Algorithm SHA256).Hash
+    $candidateHash = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
+    $backupHash = (Get-FileHash -LiteralPath $backup -Algorithm SHA256).Hash
+    if($installedHash -ne $candidateHash -or $backupHash -eq $candidateHash){
+        throw 'Dino V8 original backup / installed model / rebuilt PMT hash guard failed.'
+    }
+    $gameArgs += '-VR.QuestCockpitV2DinoFullCarSwap=true'
+    Write-Host 'Dino basic car native mode1 object16 replacement candidate enabled (HMD UNTESTED).'
+}else{
+    # Clear a stale user.ini option even for no-cockpit/ordinary sessions.
+    $gameArgs += '-VR.QuestCockpitV2DinoFullCarSwap=false'
 }
 if($backend -ne '2d'){
     # Match v0.01 Beta explicit VR entrypoint. A release VERSION marker

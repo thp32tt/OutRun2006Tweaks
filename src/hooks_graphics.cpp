@@ -13,6 +13,7 @@
 #include "vr/game/quest_cockpit_v2_occupant.hpp"
 #include "vr/game/quest_cockpit_v2_visibility.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
+#include "vr/game/dino_mode1_fullcar_swap.hpp"
 #include "vr/game/quest_cockpit_v2_glass_hook.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
@@ -52,7 +53,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2DinoFullCarSwap,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff;
     extern Setting<float> VRQuestCockpitV2SeatBack,VRQuestCockpitV2SeatDown,VRQuestCockpitV2SeatRight;
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
@@ -951,7 +952,28 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(mode);
             OutRunVR::QuestCockpitV2::NativeFrameTrace().OnPlayerCar();
         }
-        if(QuestCockpitV2Active(cam) && Settings::VRQuestCockpitV2FullCar)
+        // Dino's retail 30x296 model layout: body 0x10000 (normal
+        // exterior), mode1-only object 0x10010. The original 0x46AE70
+        // vm==2 draw selects layout+4. Only the exact opt-in basic Dino
+        // may use that native draw, backed by a separately built PMT where
+        // object16 contains source body0 plus the new cabin. Other cars,
+        // camera modes, GOAL, startup, failed pose and stock profiles keep
+        // the previous full-car policy unchanged.
+        const bool cockpit = QuestCockpitV2Active(cam);
+        const auto* eye = (cockpit &&
+            Settings::VRQuestCockpitV2DinoFullCarSwap)
+            ? OutRunVRRenderer::GetLatchedStereoFrameView() : nullptr;
+        const bool dinoMode1 = OutRunVR::DinoMode1::SelectReplacement(
+            Settings::VRQuestCockpitV2DinoFullCarSwap,
+            cockpit,
+            Game::current_mode && *Game::current_mode == STATE_GAME,
+            OutRunVR::QuestCockpitV2::NativeFrameTrace().Active(),
+            eye && eye->valid && eye->poseSequence != 0,
+            static_cast<int>(static_cast<std::int8_t>(car->car_kind_11)),
+            mode);
+        if(dinoMode1)
+            ctx.eax=(ctx.eax & ~0x0000C000u)|0x00008000u;
+        else if(cockpit && Settings::VRQuestCockpitV2FullCar)
             ctx.eax=(ctx.eax & ~0x0000C000u)|0x00004000u;
         if(Settings::VRCockpitFrameProbe && Settings::VRTelemetry &&
            ++TraceCount<=32u){

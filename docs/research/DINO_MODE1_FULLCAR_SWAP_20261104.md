@@ -1,0 +1,8 @@
+# Dino basic car native mode1 full-model replacement (EXPERIMENTAL)
+**Branch:** feature/dino-fullcar-mode1-20261104. **Base:** 01cd99e3113cb9a8ed662beadab0600efdf4709a. **Quest3 HMD:** UNTESTED.
+
+Retail canonical PC EXE record 0x5B0CB8 supplies body object 0x10000 (slot0) and view1 object 0x10010 (slot16). Recovered game vehicle draw 0x46AE70 uses layout+4 specifically when vm=2 and layout+0 when vm=1. The existing V2 PlayerState midhook was globally forcing vm1 to show the original exterior from camera1. This branch adds a separate default-OFF Dino basic opt-in that forces native vm2 in camera1 only while in racing mode with active original game frame and valid stereo pose. All other cars/views and GOAL retain existing vm1/full-car behavior.
+
+**Asset contract:** use the separate, user-owned model conversion package Dino v8 (`build_dino_mode1_fullcar.py`) to duplicate the PMT object0 full shell into slot16, add a new cabin and keep object0..15 unchanged; the load path is a PC-game test-copy file `CARS/obj_plcar_dino_pmt.sz`. Launcher opt-in `-DinoMode1FullCarSwap ON` accepts only installed PMT byte-identical to `DinoV8Build/obj_plcar_dino_pmt.sz` with a differing original backup `CARS/obj_plcar_dino_pmt.original-v8.bak`. Asset and original EXE cannot be redistributed. Manual game copy only; no automatic asset install or global resource swap.
+
+**Validation truth:** mode selector smoke covers gating and negative cases. Actual PMT body+interior v8 builder local synthetic fixture PASS; actual user's Quest PMT 4-triangle clone-graph smoke PASS. PC retail file-loader compatibility, car body and wheel completeness, exact 2-eye render and driver/passenger scene not verified. Existing basic V2 release is unchanged.

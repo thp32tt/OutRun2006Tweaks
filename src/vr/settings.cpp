@@ -158,6 +158,8 @@ namespace Settings
         "EXPERIMENTAL original occupant visible/LOD0 scoped at PC 40501D and verified ROB01/ROB02 W*C draw. Quest view flag unproven. Default OFF." };
     Setting<bool> VRQuestCockpitV2FullCar{ "VR", "QuestCockpitV2FullCar", true,
         "Opt-in experimental player car complete-body render; only mode1." };
+    Setting<bool> VRQuestCockpitV2DinoFullCarSwap{ "VR", "QuestCockpitV2DinoFullCarSwap", false,
+        "EXPERIMENTAL: Dino basic car only, native mode1: use PMT 0x10010 whole-car+interior instead of forcing body mode. Requires verified separate Dino PMT test copy; default OFF." };
     Setting<bool> VRQuestCockpitV2F0RenderScope{ "VR", "QuestCockpitV2F0RenderScope", false,
         "EXPERIMENTAL Quest player F0 identity scope around original PC 49F3E0 car rendering. Enabled only by optional F0 test launcher; original Quest uses full render-frame, not proven equivalent." };
     Setting<bool> VRQuestCockpitV2GlassEnabled{ "VR", "QuestCockpitV2GlassEnabled", false,
