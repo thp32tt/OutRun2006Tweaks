@@ -11,8 +11,8 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:AUTHENTIC_FVF_WIREFRAME_GPU_EDGE_CAPTURE",
   "classification": "A_UNFINISHED_REAL_GAME_NATIVE_FVF_WIREFRAME_PIXEL_PATH",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "full_dx11_renderer_complete": false,
@@ -21,7 +21,7 @@
   "source_base_sha": "165d523b98e0285372c152eea98520f69403951b",
   "material_implementation_sha": "19bb8ba83c07c0589665bee444c970c4e156ce75",
   "material_result_sha": "19bb8ba83c07c0589665bee444c970c4e156ce75",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
   "changed_files": [
     "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
     "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
@@ -92,21 +92,92 @@
   },
   "acceptance_results": {
     "fvf_wireframe_raw_gpu_source_edge": {
-      "status": "PENDING_CI"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41780769589 SUCCESS at exact 534bafc162eaaf1c352b456266f9c55d310e2bc0 (targeted portable FVF wire edge, original indexed/user clip path)"
     },
     "source_clip_and_original_game_fallback": {
-      "status": "PENDING_CI"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "DX11 Fast 41780769589 and Backend 41780769524 SUCCESS at exact 534bafc162eaaf1c352b456266f9c55d310e2bc0; original input/FFB/fallback code untouched"
     },
     "exact_source_five_gates": {
-      "status": "PENDING_CI"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "docs/automation/runs/CONVERSION-DX11-01222.json"
+      ],
+      "validation_command": "Fast 41780769589, Backend 41780769524, Build 41780775609, OpenXR 41780775670, HUD 41780769576: five success on exact 534bafc162eaaf1c352b456266f9c55d310e2bc0"
     }
   },
-  "validation_gate_runs": [],
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41780769589,
+      "sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41780769524,
+      "sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41780775609,
+      "sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41780775670,
+      "sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41780769576,
+      "sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
+      "conclusion": "SUCCESS"
+    }
+  ],
   "runtime_evidence": null,
   "runtime_note": "HMD Quest3/VDXR or real OutRun native DX11 display was not executed. CI does not establish visible full-frame game pass.",
   "real_game_draw_blocker": "Need actual same-SHA source game live native GPU Draw>0, attributable GPU RGB PRE/POST and full published frame>0 with menu/car/race progression.",
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "next_implementation_action": "Advance real-game FVF/SM3 native source pixels from incomplete RAW GPU diagnostic toward full native game frame, preserve DX9Ex fallback and HMD boundary.",
-  "record_type": "SOURCE_PENDING_CI_CAUSAL_POLICY_REPAIR",
-  "score_note": "This code is partial same DX11 feature; no independent score for pending source, CI retry, record or runtime untested."
+  "next_implementation_action": "Controller chooses next independent native DX11 real-game full-frame/SM3/FVF stage; no rerun of verified 01222. Quest3/VDXR game runtime still untested.",
+  "record_type": "C6_RESULT_ONLY",
+  "score_note": "NO ADDITIONAL SCORE: same full-resolution native game frame capability; material implementation, causal CI acceptance repair, five workflow checks, and C6 record comprise one incomplete stage. AI1 unaffected.",
+  "source_and_repair_commits": [
+    {
+      "sha": "19bb8ba83c07c0589665bee444c970c4e156ce75",
+      "kind": "SOURCE_IMPLEMENTATION",
+      "summary": "Authentic FVF wireframe GPU PRE/POST clipped-edge source sampling + source GPU integration and C++ positive/negative regression"
+    },
+    {
+      "sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
+      "kind": "CAUSAL_POLICY_ACCEPTANCE_REPAIR_AND_VALIDATION_BEARING_RESULT",
+      "summary": "Create current task acceptance proof/checkpoint after preexisting 01221 missing-field Fast/Backend policy failure; pass five exact-SHA Actions"
+    }
+  ],
+  "checkpoint": {
+    "source_material_sha": "19bb8ba83c07c0589665bee444c970c4e156ce75",
+    "validation_bearing_exact_sha": "534bafc162eaaf1c352b456266f9c55d310e2bc0",
+    "gate_count": 5,
+    "gate_conclusion": "SUCCESS",
+    "release_status": "BUILD_VERIFIED_ONLY",
+    "runtime_status": "NEED_HMD_TEST",
+    "gameplay_pass_claim": false,
+    "full_native_frame_complete": false
+  }
 }
