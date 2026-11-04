@@ -95,10 +95,10 @@ def patch_v13_source(s):
         '''    struct.pack_into("<15I",S,24,*nq)
     # Root node references mesh0. Mesh0 currently contains the original two
     # primitives: extend its reference to the new third primitive.
-    assert (q[9]-q[8])//8==1 and orig_prims==2
+    assert (q[9]-q[8])//8==1 and (q[10]-q[9])//20==2
     assert u(S0,q[7]+0x28)==0 and u(S0,q[7]+0x20)==0xffffffff
     assert u(S0,q[8])==0 and u(S0,q[8]+4)==2
-    struct.pack_into("<I",S,q[8]+4,orig_prims+1)
+    struct.pack_into("<I",S,q[8]+4,3)
     assert len(shader_records)==nh[9]*nh[11]*24
     assert S[p3:p3+len(shader_records)]==shader_records'''
       ),
