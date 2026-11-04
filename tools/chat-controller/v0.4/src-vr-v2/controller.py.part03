@@ -3735,7 +3735,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     Actions and missing C6 results are never silently archived at 30 minutes.
     """
     active_by_lane = q.setdefault("active_by_lane", {})
-    enabled = (("A", CONVERSION_DX11_ENABLED), ("C", CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED))
+    enabled = (("A", CONVERSION_DX11_ENABLED), ("C", CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED and not MODEL2_AUTODEV_ENABLED))
     for lane_key, allowed in enabled:
         if not allowed or (CONVERSION_ONLY_SLOT and lane_key != CONVERSION_ONLY_SLOT):
             continue
@@ -3787,6 +3787,8 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     write_runtime(
         status="vr_continuous_running",
         last_action="A(DX11 implementation)+C("+(
+            "Model2 VR last sent " + str((q.get("model2_simple") or {}).get("last_sent_at") or "not sent yet")
+            if MODEL2_AUTODEV_ENABLED else
             "UW2 last sent " + str((q.get("uw2_simple") or {}).get("last_sent_at") or "not sent yet")
             if UW2_WEB_PORT_ENABLED else "DX9Ex REVIEW_ONLY"
         )+"), B(DXVK) frozen; active: " +
@@ -3805,7 +3807,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     q = load_queue_state()
     active_by_lane = q.setdefault("active_by_lane", {})
 
-    if DX9EX_REVIEW_ONLY and not UW2_WEB_PORT_ENABLED and int(q.get("dx9ex_review_only_policy_version", 0)) < 1:
+    if DX9EX_REVIEW_ONLY and not UW2_WEB_PORT_ENABLED and not MODEL2_AUTODEV_ENABLED and int(q.get("dx9ex_review_only_policy_version", 0)) < 1:
         retired = q.setdefault("retired_lane_tasks", [])
         old_c = active_by_lane.pop("C", None)
         if isinstance(old_c, dict):
@@ -3895,12 +3897,38 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             save_registry(reg)
         save_queue_state(q)
 
+    # Stop prior UW2 C dispatch and migrate only C to the separate Model2 home.
+    # Preserve historical UW2 source/records; A DX11 is not reset or migrated.
+    if MODEL2_AUTODEV_ENABLED and not q.get("model2_simple_initialized"):
+        old_c = active_by_lane.pop("C", None)
+        if isinstance(old_c, dict):
+            q.setdefault("retired_lane_tasks", []).append({
+                **old_c, "retired_lane": "C", "retired_at": now.isoformat(),
+                "retired_reason": "C switched to independent Model2 VR project",
+            })
+        q.setdefault("vr_scheduled_dispatch_windows", {}).pop("C", None)
+        q.setdefault("vr_continuous_last_dispatch_at", {}).pop("C", None)
+        q["uw2_autodev_stopped_at"] = now.isoformat()
+        state = q.setdefault("model2_simple", {})
+        state.clear()
+        state["fresh_chat_required"] = True
+        state["bootstrap_complete"] = False
+        q["model2_simple_initialized"] = True
+        reg = load_registry(now)
+        c_slot = next((x for x in reg.slots if x.name == "C"), None)
+        if c_slot is not None:
+            c_slot.url = None
+            c_slot.last_result = "model2_ready" if MODEL2_SCOPE_READY else "model2_project_required"
+            c_slot.completed_tasks_in_chat = 0
+            save_registry(reg)
+        save_queue_state(q)
+
     # Reconcile across the previous DX11-only deployment without losing C
     # task identity. Park B before per-lane processing, even if B was active.
     if reconcile_conversion_lane_freeze(
         q, active_by_lane, now,
         dxvk_frozen=DXVK_FROZEN,
-        dx9ex_enabled=CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED,
+        dx9ex_enabled=CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED and not MODEL2_AUTODEV_ENABLED,
         only_slot=CONVERSION_ONLY_SLOT,
     ):
         save_queue_state(q)
@@ -3919,6 +3947,14 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             })
         q["frozen_lane_tasks"] = frozen[-100:]
         save_queue_state(q)
+
+    if MODEL2_AUTODEV_ENABLED:
+        try:
+            await model2_simple_cycle(context, pages, q, datetime.now(TZ))
+        except Exception as exc:
+            log.warning("Model2 VR C continuation deferred: %s", type(exc).__name__)
+            write_runtime(status="model2_simple_cycle_error",
+                          last_action=f"Model2 C deferred: {type(exc).__name__}")
 
     if UW2_WEB_PORT_ENABLED:
         # C has no TASK_ID and never enters the conversion production queue.
@@ -3942,7 +3978,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             CONVERSION_ACTIVE_LIMIT,
             CONVERSION_DX11_ENABLED,
             CONVERSION_DXVK_ENABLED,
-            CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED,
+            CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED and not MODEL2_AUTODEV_ENABLED,
         ):
             await conversion_send_lane_task(context, pages, q, lane_key)
 
@@ -3986,14 +4022,14 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         CONVERSION_ACTIVE_LIMIT,
         CONVERSION_DX11_ENABLED,
         CONVERSION_DXVK_ENABLED,
-        CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED,
+        CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED and not MODEL2_AUTODEV_ENABLED,
     ):
         await conversion_send_lane_task(context, pages, q, lane_key)
 
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            ("A(DX11 native) + C(" + ("UW2 web port" if UW2_WEB_PORT_ENABLED else "DX9Ex REVIEW_ONLY") + "); B(DXVK frozen); active: ")
+            ("A(DX11 native) + C(" + ("Model2 VR" if MODEL2_AUTODEV_ENABLED else "UW2 web port" if UW2_WEB_PORT_ENABLED else "DX9Ex REVIEW_ONLY") + "); B(DXVK frozen); active: ")
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())
