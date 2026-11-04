@@ -1,0 +1,84 @@
+name: OutRun Chat Rework Real Docker and VNC Startup Smoke
+on:
+  push:
+    branches: [localization-controller-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-chat-rework-real-docker-smoke.yml"
+      - "tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework"
+      - "tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh"
+      - "tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/docker-compose.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: outrun-real-docker-smoke
+  cancel-in-progress: true
+
+jobs:
+  docker-chromium-vnc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: localization-controller-recovery-20260928
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework
+            tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh
+            tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
+            tools/chat-controller/localization-recovery-v1/controller_png_attach.py
+            tools/chat-controller/localization-recovery-v1/text_roi_queue.py
+            tools/chat-controller/localization-recovery-v1/tile_batch_queue.py
+            tools/chat-controller/localization-recovery-v1/tile_orientation_policy.py
+            tools/chat-controller/localization-recovery-v1/docker-compose.yml
+      - name: Build the exact GitOps Portainer browser image
+        working-directory: tools/chat-controller/localization-recovery-v1
+        run: |
+          set -euo pipefail
+          docker build --progress=plain -f Dockerfile.chat-rework -t outrun-chat-qa-smoke:local .
+
+      - name: Start exact resource-constrained service with no GitHub token
+        run: |
+          set -euo pipefail
+          docker run -d --name outrun-chat-qa-smoke --init \
+            --cpus 0.65 --memory 1800m --pids-limit 128 --shm-size 512m \
+            --security-opt no-new-privileges --cap-drop ALL \
+            -e OUTRUN_REWORK_VNC_PASSWORD=ci-local-only-not-real \
+            -e OUTRUN_GITHUB_CONTENTS_TOKEN= \
+            -e CHATGPT_PROJECT_URL=https://chatgpt.com/ \
+            -p 127.0.0.1:16084:6080 \
+            outrun-chat-qa-smoke:local
+
+      - name: Verify HTTP VNC, visible Chromium process, and local-only CDP
+        shell: bash
+        run: |
+          set -uo pipefail
+          for i in $(seq 1 90); do
+            if ! docker inspect -f '{{.State.Running}}' outrun-chat-qa-smoke | grep -q true; then
+              echo "BROWSER_CONTAINER_EXITED"
+              exit 1
+            fi
+            if curl -fsS --max-time 3 http://127.0.0.1:16084/vnc.html -o /dev/null &&
+              docker exec outrun-chat-qa-smoke python -c 'import json,urllib.request; x=json.load(urllib.request.urlopen("http://127.0.0.1:9222/json/version",timeout=3)); assert x["webSocketDebuggerUrl"]' &&
+              docker exec outrun-chat-qa-smoke bash -c "ps aux | grep -E '[/]ms-playwright/.*/chrome|[c]hrome-linux' | grep -v grep" ; then
+              echo "REAL_DOCKER_VISIBLE_CHROMIUM_AND_VNC_PASS"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "REAL_DOCKER_VISIBLE_CHROMIUM_AND_VNC_FAIL"
+          exit 1
+
+      - name: Collect diagnostic logs and chromium executable evidence
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          docker ps -a --filter name=outrun-chat-qa-smoke
+          docker logs --tail 160 outrun-chat-qa-smoke
+          docker exec outrun-chat-qa-smoke bash -lc 'echo "--- Chromium stderr ---"; tail -n 85 /logs/hd-rework-chromium.log; echo "--- Playwright chromium path ---"; python -c "from playwright.sync_api import sync_playwright; p=sync_playwright().start(); print(p.chromium.executable_path); p.stop()"; echo "--- Browser processes ---"; ps aux | grep -Ei "[c]hromium|[c]hrome|[X]vfb|[g]ithub_chat_rework_controller"'
+          docker rm -f outrun-chat-qa-smoke
