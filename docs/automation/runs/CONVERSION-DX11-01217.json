@@ -5,6 +5,7 @@
   "event_id": "CONVERSION-DX11-01217-E001",
   "lane": "DX11",
   "branch": "vr-dx11-native-r71",
+  "target_branch": "vr-dx11-native-r71",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "classification": "A_UNFINISHED_REAL_GAME_NATIVE_SOURCE",
   "status": "COMPLETE_BUILD_VERIFIED",
