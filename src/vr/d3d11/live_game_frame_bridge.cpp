@@ -8545,13 +8545,17 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             reinterpret_cast<IDirect3DDevice9*>(s.sourceGameDevice),
             s.backend.device(), gpuContext, s.backend.color_texture(), s.presents,
             rgbSourceBoundAtDraw,
-            // Only authentic FVF triangles with a pass-through native VS
-            // can supply exact clip-space geometry. Lines, points and
-            // shader-bound SM3 draws retain full-viewport sampling.
+            // The pass-through native FVF VS supplies authentic clip-space
+            // triangles, 1px point and simple line IA. All use the same
+            // bounded native GPU PRE/POST source identity and original
+            // D3D9 Present fallback. Shader-bound SM3 remains unhinted.
             (!vertices.empty() &&
              (topology == D3DPT_TRIANGLELIST ||
               topology == D3DPT_TRIANGLESTRIP ||
-              topology == D3DPT_TRIANGLEFAN))
+              topology == D3DPT_TRIANGLEFAN ||
+              topology == D3DPT_LINELIST ||
+              topology == D3DPT_LINESTRIP ||
+              topology == D3DPT_POINTLIST))
                 ? NativeRawFvfClipSpan{
                       vertices.front().clip, sizeof(NativeVertex),
                       vertices.size(),
@@ -8561,7 +8565,13 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                           ? NativeRawFvfAssembly::TriangleStrip
                           : topology == D3DPT_TRIANGLEFAN
                               ? NativeRawFvfAssembly::TriangleFan
-                              : NativeRawFvfAssembly::TriangleList,
+                              : topology == D3DPT_LINELIST
+                                  ? NativeRawFvfAssembly::LineList
+                                  : topology == D3DPT_LINESTRIP
+                                      ? NativeRawFvfAssembly::LineStrip
+                                      : topology == D3DPT_POINTLIST
+                                          ? NativeRawFvfAssembly::PointList
+                                          : NativeRawFvfAssembly::TriangleList,
                       offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask}
                 : NativeRawFvfClipSpan{});
     }

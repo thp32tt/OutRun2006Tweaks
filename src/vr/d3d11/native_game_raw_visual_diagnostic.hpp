@@ -29,6 +29,7 @@
 #include "native_game_raw_color_write_admission.hpp"
 #include "native_game_raw_fvf_clip_capture.hpp"
 #include "native_game_raw_fvf_island_sampling.hpp"
+#include "native_game_raw_fvf_stroke_sampling.hpp"
 
 namespace outrun::vr::dx11 {
 // Keep genuine GPU RAW pixel locations SOURCE-COINCIDENT with a game
@@ -1230,8 +1231,12 @@ private:
         const bool nativeWireframe =
             raster && rasterDesc.FillMode == D3D11_FILL_WIREFRAME;
         fvfRaster.wireframe = nativeWireframe;
+        const bool nativeStroke =
+            fvfClip.assembly == NativeRawFvfAssembly::LineList ||
+            fvfClip.assembly == NativeRawFvfAssembly::LineStrip ||
+            fvfClip.assembly == NativeRawFvfAssembly::PointList;
         bool authenticFvfFootprint = false;
-        if (fvfClip.firstClip && knownNativeCull &&
+        if (!nativeStroke && fvfClip.firstClip && knownNativeCull &&
             (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID ||
              nativeWireframe)) {
             NativeRawDrawExtent clipped{};
@@ -1256,10 +1261,26 @@ private:
         }
         NativeRawDualTile tiles{};
         const auto drawOrdinal = static_cast<std::uint32_t>(capture_);
+        // Native FVF lines and 1px points are NOT filled triangles: source
+        // clip-space stroke anchors must be computed after actual native
+        // viewport/scissor and enabled ClipDistance clipping. Only real
+        // GPU PRE/POST deltas can subsequently certify visible RGB; a bad
+        // source stroke falls back to the existing whole-viewport sampler.
+        NativeRawDrawExtent strokeRaster{};
+        const bool authenticStroke = nativeStroke && fvfClip.firstClip &&
+            knownNativeCull &&
+            (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID) &&
+            native_raw_fvf_stroke_dual_draw_tile(
+                fvfClip, view.TopLeftX, view.TopLeftY,
+                view.Width, view.Height, src.Width, src.Height,
+                width, height, draw, drawOrdinal, strokeRaster, tiles,
+                &fvfRaster);
+        if (authenticStroke) draw = strokeRaster;
         // Two distant game menu/HUD triangles can have an empty merged
         // raster center. Sample the actual native GPU at both primitive
         // islands; retain the old viewport sweep for unknown source IA.
-        if (!(authenticFvfFootprint &&
+        if (!authenticStroke &&
+            !(authenticFvfFootprint &&
               native_raw_fvf_island_dual_draw_tile(
                   fvfClip, view.TopLeftX, view.TopLeftY,
                   view.Width, view.Height, src.Width, src.Height,

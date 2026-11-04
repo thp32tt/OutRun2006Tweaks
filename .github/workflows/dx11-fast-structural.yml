@@ -108,6 +108,9 @@ jobs:
           /tmp/dx11_raw_dual_tile
           # 01137 real FVF fog RAW-only RGB admission; malformed/missing-state fallback.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tests/native_raw_fvf_fog_visual_test.cpp -o /tmp/dx11_raw_fvf_fog && /tmp/dx11_raw_fvf_fog
+          # 01223: authentic game FVF native line/point GPU PRE/POST capture.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tests/native_raw_fvf_stroke_capture_test.cpp -o /tmp/dx11_raw_fvf_stroke
+          /tmp/dx11_raw_fvf_stroke
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_postpass_coverage_00987.cpp -o /tmp/dx11_eye_coverage_00987 && /tmp/dx11_eye_coverage_00987
           # Source-authored ColorFill -> native stereo GPU fill regression.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_color_fill_01043.cpp -o /tmp/dx11_eye_color_fill_01043 && /tmp/dx11_eye_color_fill_01043

@@ -12,7 +12,8 @@
 #include "native_game_raw_draw_tile.hpp"
 namespace outrun::vr::dx11 {
 enum class NativeRawFvfAssembly : std::uint8_t {
-    TriangleList, TriangleStrip, TriangleFan
+    TriangleList, TriangleStrip, TriangleFan,
+    LineList, LineStrip, PointList
 };
 // Bind source-authentic D3D11 RS face culling to the RAW GPU sampling
 // geometry. This changes only the PRE/POST capture search; the real native
