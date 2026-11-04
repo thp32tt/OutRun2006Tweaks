@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01221",
+  "production_id": "CONVERSION-DX11-01221",
+  "event_id": "CONVERSION-DX11-01221-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_USER_CLIPPED_RAW_GPU_RASTER_CAPTURE",
+  "classification": "A_UNFINISHED_REAL_NATIVE_GAME_DRAW_GPU_CAPTURE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "b0f398f63eceb8ee6c1632e9123f96ae192c8d2b",
+  "material_implementation_sha": "6b1a5fc1198652535c516a343e6cc60b66533972",
+  "material_result_sha": "80d70bc0c90a9f8dafe7a9e0cb3e651c0d9159dc",
+  "validation_bearing_result_sha": "80d70bc0c90a9f8dafe7a9e0cb3e651c0d9159dc",
+  "source_and_repair_commits": [
+    {
+      "sha": "6b1a5fc1198652535c516a343e6cc60b66533972",
+      "kind": "SOURCE_IMPLEMENTATION",
+      "summary": "Forward authentic D3D9 FVF user clip0/clip1 into RAW native GPU PRE/POST polygon and per-island capture guidance; portable C++ positive/negative regression"
+    },
+    {
+      "sha": "2e85fbd1551251fce4d54aa5eb8b828524292b3c",
+      "kind": "CAUSAL_CI_SAFETY_FIX",
+      "summary": "Restore previous W=0/tiny W fail-closed source raster behavior after DX11 Fast 41774288788 negative regression"
+    },
+    {
+      "sha": "80d70bc0c90a9f8dafe7a9e0cb3e651c0d9159dc",
+      "kind": "CAUSAL_CI_COMPILE_FIX_AND_VALIDATION_BEARING_RESULT",
+      "summary": "Propagate D3D9 user-clip mask from supported_game_state into per-Draw OutputCapture; fix Win32 C2065 fixedClip scope and retain clipping regression"
+    }
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_fvf_user_clip_capture_test.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py"
+  ],
+  "implementation": "Source-authentic FVF user clipping distances are interpolated in homogeneous coordinates, clipped to enabled D3D9 user planes and used only to select real native D3D11 GPU PRE/POST sampling tiles for indexed/list/strip/fan Draw. Unknown/poisoned clip inputs and W=0 fail closed; no CPU geometry grants RGB evidence. D3D9 game Draw/Present/input/FFB and DX9Ex fallback remain unchanged. No DXVK changes.",
+  "development_strategy": {
+    "work_class": "source_integration_and_causal_ci_repair",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_VEHICLE_RACE_AUTHENTIC_GPU_CAPTURE",
+    "integration_path": [
+      "LIVE_D3D9_FVF_GETRENDERSTATE_AND_USER_CLIP_PLANES",
+      "NATIVEVERTEX_CLIP0_CLIP1",
+      "D3D11_DRAW_DRAWINDEXED",
+      "AUTHENTIC_USER_CLIPPED_GPU_PRE_POST_REGION",
+      "ORIGINAL_D3D9_PRESENT_AND_FALLBACK"
+    ],
+    "batch_components": [
+      "D3D9_FIXED_CLIP_MASK_CAPTURE",
+      "HOMOGENEOUS_SOURCE_USER_CLIP_PLANES",
+      "PER_PRIMITIVE_INDEXED_GPU_CAPTURE",
+      "PORTABLE_POSITIVE_NEGATIVE_REGRESSION",
+      "CAUSAL_FAST_AND_WIN32_COMPILE_REPAIR"
+    ],
+    "full_gate_plan": "one_final_validation_bearing_exact_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY. No real OutRun full-resolution native published frame, GPU desktop/game image, menu-to-race playthrough or Quest3/VDXR visual evidence.",
+    "activation_guard_and_fallback": "Retains existing explicit RAW incomplete preview gate, source/Present/RT provenance and real native GPU RGB proof. Original D3D9 input/FFB, SkyGlow, DX9Ex fallback and DXVK freeze protected."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Native FVF user-clip-aware PRE/POST RGB capture candidate that follows original game GPU clipping rather than sampling empty clipped polygons.",
+    "acceptance_items": [
+      {
+        "id": "authentic_user_clip_raster_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_GPU_DRAW_CAPTURE",
+        "expected_behavior": "Admitted source FVF user planes affect full-draw and source-indexed per-island RAW GPU capture placement only."
+      },
+      {
+        "id": "safety_and_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_NATIVE_FALLBACK_AND_W_CLIP",
+        "expected_behavior": "Invalid mask, nonfinite/unknown plane, W=0/tiny W and unsound source IA remain fail-closed; no fake RGB or changed D3D9 input/FFB."
+      },
+      {
+        "id": "five_exact_source_gates",
+        "category": "integrated_validation",
+        "behavior_area": "FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "All five mandatory GitHub Actions workflows succeed at validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "authentic_user_clip_raster_capture": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41774979898 at exact 80d70bc0; tools/test_dx11_live_sm3_table_zfog_01005.py and native_raw_fvf_user_clip_capture_test.cpp compiled/ran."
+    },
+    "safety_and_original_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41774979898 SUCCESS after W=0 negative regression and Win32 C2065 corrections; original D3D9 fallback unchanged."
+    },
+    "five_exact_source_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 41774979898; Backend Conversion 41774980002; Build 41774979879; OpenXR 41774980236; HUD Inspector 41774979848: five SUCCESS at exactly 80d70bc0c90a9f8dafe7a9e0cb3e651c0d9159dc."
+    }
+  },
+  "validation_gate_runs": {
+    "DX11 Fast Structural Checks": 41774979898,
+    "Backend Conversion Gate": 41774980002,
+    "Build (Win32 Release)": 41774979879,
+    "OpenXR VR architecture": 41774980236,
+    "OutRun EXE HUD Inspector CI": 41774979848
+  },
+  "build_artifacts": [
+    {
+      "id": 13296448576,
+      "name": "outrun2006tweaks-80d70bc0c90a9f8dafe7a9e0cb3e651c0d9159dc"
+    },
+    {
+      "id": 13296593245,
+      "name": "wheel-source-80d70bc0c90a9f8dafe7a9e0cb3e651c0d9159dc"
+    }
+  ],
+  "runtime_evidence": {
+    "native_game_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "gpu_desktop_frames": "UNTESTED",
+    "gameplay_menu_car_race": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: all five source/build Gates were confirmed, but no local OutRun game, desktop GPU screenshot or Quest 3 optical HMD test was performed; the whole native DX11 renderer is not certified.",
+  "real_game_draw_blocker": "Source clipping-aware GPU sampling is now implemented and built; actual game pixel evidence, menu-to-race gameplay and OpenXR live frame/HMD validation remain outstanding.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Continue remaining full-resolution native game frame menu-to-race source Draw/DrawIndexed GPU Present integration and OpenXR route. Require actual native_draws>0, publishedBackbufferFrames>0 and headset proof before runtime PASS.",
+  "checkpoint": "C6_STATE",
+  "record_type": "C6_RESULT_ONLY",
+  "feature_stage": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "feature_ready": false,
+  "score_change": 0,
+  "score_note": "Same unfinished DX11 full-resolution native game-frame feature as 01220; 01221 material implementation, exact SHA CI, safety/compile repairs, checkpoint and reuse of prior tests are one causally related feature effort; no independent duplicate AI2 point. AI1 unaffected."
+}
