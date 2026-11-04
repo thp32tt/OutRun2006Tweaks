@@ -2,8 +2,11 @@
 // Original D3D9 FVF D3DFILL_POINT must cull its source TRIANGLES before
 // lowering surviving vertex occurrences to D3D11 POINTLIST. D3D11 does not
 // apply face culling to POINTLIST. Preserve this source-only conversion when
-// every input triangle is fully inside the native clip volume; clipped,
-// malformed or unknown source falls back to the original D3D9 Draw.
+// surviving source triangle is fully inside the native clip volume. A whole
+// triangle outside one homogeneous/user plane produces no points and can be
+// omitted; intersecting triangles need new clip-generated corners and keep
+// the original D3D9 fallback. No cull mode (including NONE) bypasses clipping.
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -20,13 +23,13 @@ namespace outrun::vr::dx11::live_game_frame {
     std::uint32_t maxIndices,
     std::vector<std::uint32_t>& destination) noexcept {
     // D3D9: TRIANGLELIST=4, TRIANGLESTRIP=5, CULL_CW=2, CULL_CCW=3.
-    // CULL_NONE keeps the previously established unfiltered native path.
+    // CULL_NONE=1 still requires source clip classification before POINTLIST.
     if (!packed || stride < 4u * sizeof(float) || stride > 4096u ||
         !vertexCount || vertexCount > 1048576u ||
         vertexCount > (std::numeric_limits<std::size_t>::max)() / stride ||
         elements < 3u || elements > 1048576u ||
         (topology != 4u && topology != 5u) ||
-        (cullMode != 2u && cullMode != 3u) ||
+        (cullMode != 1u && cullMode != 2u && cullMode != 3u) ||
         (topology == 4u && elements % 3u != 0u) ||
         (clipDistanceMask & ~0x3fu) ||
         (clipDistanceMask &&
@@ -36,7 +39,11 @@ namespace outrun::vr::dx11::live_game_frame {
     const std::uint32_t triangles =
         topology == 4u ? elements / 3u : elements - 2u;
     if (!triangles || triangles > maxIndices / 3u) return false;
-    struct ScreenVertex { double x{}, y{}; };
+    struct ScreenVertex {
+        double x{}, y{};
+        // Homogeneous left/right/top/bottom/near/far, then six user planes.
+        std::array<double, 12> clipPlane{};
+    };
     const auto* bytes = static_cast<const std::uint8_t*>(packed);
     const auto read = [&](std::uint32_t element, ScreenVertex& out,
                           std::uint32_t& sourceIndex) noexcept {
@@ -46,12 +53,14 @@ namespace outrun::vr::dx11::live_game_frame {
         std::memcpy(clip, bytes + std::size_t{sourceIndex} * stride,
                     sizeof(clip));
         for (float f : clip) if (!std::isfinite(f)) return false;
-        // Projection/scissor crossing changes the set of POINT vertices.
-        // Never approximate the resulting clip-generated source corners.
-        if (!(clip[3] > 0.00001f) ||
-            std::abs(double{clip[0]}) > double{clip[3]} ||
-            std::abs(double{clip[1]}) > double{clip[3]} ||
-            clip[2] < 0.0f || clip[2] > clip[3]) return false;
+        // Positive W is required for authentic perspective and winding.
+        // Do not mistake an eye-plane crossing for a trivially invisible
+        // triangle: only THREE valid vertices can prove outside coverage.
+        if (!(clip[3] > 0.00001f)) return false;
+        const double x = double{clip[0]}, y = double{clip[1]};
+        const double z = double{clip[2]}, w = double{clip[3]};
+        out.clipPlane = {w + x, w - x, w + y, w - y, z, w - z,
+                         0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         if (clipDistanceMask) {
             float distance[6]{};
             std::memcpy(distance,
@@ -59,12 +68,12 @@ namespace outrun::vr::dx11::live_game_frame {
                 sizeof(distance));
             for (unsigned plane = 0u; plane < 6u; ++plane) {
                 if (!(clipDistanceMask & (1u << plane))) continue;
-                if (!std::isfinite(distance[plane]) ||
-                    distance[plane] < 0.0f) return false;
+                if (!std::isfinite(distance[plane])) return false;
+                out.clipPlane[plane + 6u] = double{distance[plane]};
             }
         }
-        out.x = double{clip[0]} / double{clip[3]};
-        out.y = double{clip[1]} / double{clip[3]};
+        out.x = x / w;
+        out.y = y / w;
         return std::isfinite(out.x) && std::isfinite(out.y);
     };
     try {
@@ -82,6 +91,24 @@ namespace outrun::vr::dx11::live_game_frame {
             std::uint32_t ia{}, ib{}, ic{};
             if (!read(first, a, ia) || !read(second, b, ib) ||
                 !read(third, c, ic)) return false;
+            // A triangle wholly outside ANY one source clip plane has no
+            // native point pixels. Only skip it after checking every genuine
+            // source index and finite plane value. A partly clipped triangle
+            // can generate intersection corners: never approximate that
+            // topology as the original three D3D11 POINTLIST vertices.
+            bool triviallyInvisible = false;
+            bool partlyClipped = false;
+            for (unsigned plane = 0u; plane < 12u; ++plane) {
+                if (plane >= 6u &&
+                    !(clipDistanceMask & (1u << (plane - 6u)))) continue;
+                const bool outsideA = a.clipPlane[plane] < 0.0;
+                const bool outsideB = b.clipPlane[plane] < 0.0;
+                const bool outsideC = c.clipPlane[plane] < 0.0;
+                triviallyInvisible |= outsideA && outsideB && outsideC;
+                partlyClipped |= outsideA || outsideB || outsideC;
+            }
+            if (triviallyInvisible) continue;
+            if (partlyClipped) return false;
             const double signedArea =
                 (b.x - a.x) * (c.y - a.y) -
                 (b.y - a.y) * (c.x - a.x);

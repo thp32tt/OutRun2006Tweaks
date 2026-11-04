@@ -7684,44 +7684,28 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
             const OutputCapture& output,
             bool initializeFrame = true) noexcept {
-    // Convert actual FVF TRIANGLESTRIP fill-POINT corner occurrences into
-    // indexed native POINTLIST BEFORE any GPU mutation. Triangle lists and
-    // already expanded real-game fans have the same corner ordering; neither
-    // requires an invented vertex or a deduplicated point cloud. Reject
-    // oversized/invalid late IB entries and preserve the original D3D9 Draw.
+    // Lower game-authored FVF triangle points only after classifying the
+    // ORIGINAL homogeneous and user clip planes, including CULL_NONE.
+    // Whole triangles outside one source plane contribute no point pixels;
+    // crossing triangles require generated clip corners and retain D3D9.
+    // Surviving triangles preserve their source IA occurrences and winding.
+    // Complete the entire CPU plan before allocating/binding native GPU IA.
     std::vector<std::uint32_t> pointIndices;
     if (output.nativePointFill) {
-        if (output.nativeCullMode != D3DCULL_NONE) {
-            // Real D3D9 D3DFILL_POINT culls TRIANGLES before emitting 1px
-            // vertex occurrences. D3D11 POINTLIST skips face culling, so
-            // filter source front/back winding before any native GPU write.
-            // Unknown clipped triangles must stay on original D3D9.
-            if (vertices.size() >
-                    (std::numeric_limits<UINT>::max)() ||
-                !game_fvf_culled_point_indices(
-                    vertices.empty() ? nullptr : vertices.front().clip,
-                    sizeof(NativeVertex), static_cast<UINT>(vertices.size()),
-                    indices, indices ? indexCount :
-                        static_cast<UINT>(vertices.size()),
-                    static_cast<std::uint32_t>(topology),
-                    static_cast<std::uint32_t>(output.nativeCullMode),
-                    offsetof(NativeVertex, clip0),
-                    output.nativeFvfUserClipMask, kMaxIndices, pointIndices))
-                return false;
-            indices = pointIndices.data();
-            indexCount = static_cast<UINT>(pointIndices.size());
-        } else if (topology == D3DPT_TRIANGLESTRIP) {
-            const UINT sourceCount = indices ? indexCount :
-                static_cast<UINT>(vertices.size());
-            if (!game_sm3_expand_polygon_points(
-                    D3DPT_TRIANGLESTRIP, indices, sourceCount,
-                    static_cast<UINT>(vertices.size()), kMaxIndices,
-                    pointIndices)) return false;
-            indices = pointIndices.data();
-            indexCount = static_cast<UINT>(pointIndices.size());
-        } else if (topology != D3DPT_TRIANGLELIST) {
+        if (vertices.size() >
+                (std::numeric_limits<UINT>::max)() ||
+            !game_fvf_culled_point_indices(
+                vertices.empty() ? nullptr : vertices.front().clip,
+                sizeof(NativeVertex), static_cast<UINT>(vertices.size()),
+                indices, indices ? indexCount :
+                    static_cast<UINT>(vertices.size()),
+                static_cast<std::uint32_t>(topology),
+                static_cast<std::uint32_t>(output.nativeCullMode),
+                offsetof(NativeVertex, clip0),
+                output.nativeFvfUserClipMask, kMaxIndices, pointIndices))
             return false;
-        }
+        indices = pointIndices.data();
+        indexCount = static_cast<UINT>(pointIndices.size());
         topology = D3DPT_POINTLIST;
     }
     if (!ensure_pipeline(s, output.nativeWidth, output.nativeHeight)) return false;
