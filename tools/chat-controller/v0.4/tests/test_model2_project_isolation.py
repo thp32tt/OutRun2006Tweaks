@@ -220,6 +220,33 @@ class Model2ProjectIsolation(unittest.TestCase):
         self.assertFalse(self.tick(10, 0, 15))
         self.assertEqual(self.hard_rotations, 1)
 
+    def test_half_hour_followup_does_not_reset_one_hour_chat_deadline(self):
+        self.assertTrue(self.tick(9, 0))
+        initial_start = self.q["model2_simple"]["chat_started_at"]
+        self.assertTrue(self.tick(9, 30))  # ordinary same-chat continuation
+        self.assertEqual(self.q["model2_simple"]["chat_started_at"], initial_start)
+        self.busy = True
+        self.assertTrue(self.tick(10, 0))  # 60m since chat, only 30m since send
+        self.assertEqual(self.hard_rotations, 1)
+        self.assertEqual(self.q["model2_simple"]["last_send_reason"], "60m_hard_new_chat")
+        self.assertNotEqual(self.q["model2_simple"]["chat_started_at"], initial_start)
+        self.assertEqual(len(self.sent), 3)
+
+    def test_prior_v7_queue_migrates_to_chat_age_without_resetting_every_tick(self):
+        self.q["model2_simple"] = {
+            "fresh_chat_required": False, "bootstrap_complete": True,
+            "last_sent_at": datetime(2026, 11, 4, 9, 0, tzinfo=KST).isoformat()
+        }
+        self.slot.url = MODEL_CHAT
+        self.assertFalse(self.tick(9, 31))
+        self.assertEqual(
+            self.q["model2_simple"]["chat_started_at"],
+            self.q["model2_simple"]["last_sent_at"]
+        )
+        self.busy = True
+        self.assertTrue(self.tick(10, 0))
+        self.assertEqual(self.hard_rotations, 1)
+
     def test_hard_new_chat_send_retry_keeps_only_one_new_tab(self):
         self.assertTrue(self.tick(9, 0))
         original_send = self.env["send_message"]
