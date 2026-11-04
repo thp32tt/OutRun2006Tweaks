@@ -26,7 +26,10 @@ def valid(bridge,hook,guard):
       "GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)" in raster,
       "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)" in raster,
       "stencil_equivalent_to_disabled(" in raster,
-      "!clip || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame)" in raster,
+      "GetRenderState(D3DRS_CLIPPING, &clip)" in raster,
+      "const auto clippingMode = native_game_clipping_mode(" in raster,
+      "if (clippingMode == NativeGameClippingMode::Reject) return false;" in raster,
+      "output.rawClippingVisualMismatch =" in raster,
       "GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)" in raster,
       "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)" in raster,
       "native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)" in raster,
@@ -91,6 +94,14 @@ for token, disabled in (
      "native_raw_fvf_fog_visual_unchecked("),
     ("GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)",
      "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceTableFog)"),
+    ("GetRenderState(D3DRS_CLIPPING, &clip)",
+     "GetRenderState(D3DRS_CLIPPING, &fog)"),
+    ("const auto clippingMode = native_game_clipping_mode(",
+     "const auto clippingMode = unchecked_clipping_mode("),
+    ("if (clippingMode == NativeGameClippingMode::Reject) return false;",
+     "if (false) return false;"),
+    ("output.rawClippingVisualMismatch =",
+     "/* lost RAW clipping provenance */ output.rawClippingVisualMismatch ="),
 ):
     assert token in raster
     unsafe = prefix + rasterStart + raster.replace(token, disabled, 1) + rasterEnd + suffix
