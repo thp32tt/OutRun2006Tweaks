@@ -110,6 +110,7 @@ class Model2ProjectIsolation(unittest.TestCase):
 
     def setUp(self):
         self.sent = []
+        self.hard_rotations = 0
         self.busy = False
         self.reply = ""
         self.now = datetime(2026, 11, 4, 9, 0, tzinfo=KST)
@@ -126,12 +127,14 @@ class Model2ProjectIsolation(unittest.TestCase):
             "MODEL2_AUTODEV_ENABLED": True, "MODEL2_SCOPE_READY": True,
             "AUTO_SEND": True, "MODEL2_SCHEDULE_MINUTES": [0, 30],
             "MODEL2_CONTINUE_MIN_SECONDS": 1800, "MODEL2_RESPONSE_STABLE_SECONDS": 30,
+            "MODEL2_HARD_NEW_CHAT_SECONDS": 3600,
             "CONVERSION_ONLY_SLOT": "", "datetime": SimpleNamespace(
                 now=lambda tz: self.now, fromisoformat=datetime.fromisoformat),
             "TZ": KST, "load_registry": lambda now: self.reg,
             "save_registry": lambda x: None, "save_queue_state": lambda x: None,
             "send_guard_reason": lambda *args: None, "slot_page": self.get_page,
             "replace_with_fresh_slot_page": self.replace_page,
+            "hard_replace_slot_page": self.hard_replace_page,
             "detect_conversation_limit": self.no, "first_visible": self.visible,
             "detect_busy": self.is_busy, "ensure_logged_in": self.yes,
             "recover_slot_composer": self.recover, "detect_rate_limit": self.no,
@@ -156,6 +159,9 @@ class Model2ProjectIsolation(unittest.TestCase):
         self.pages["C"] = self.page
         self.slot.url = None
         return self.page
+    async def hard_replace_page(self, *args):
+        self.hard_rotations += 1
+        return await self.replace_page(*args)
     async def visible(self, page, selectors, **kw):
         return None if selectors == ["retry"] else object()
     async def is_busy(self, *args): return self.busy
@@ -198,6 +204,35 @@ class Model2ProjectIsolation(unittest.TestCase):
         self.busy = False
         self.assertTrue(self.tick(9, 31))
         self.assertEqual(self.sent[-1], "모델2 VR 개발 계속진행해")
+
+    def test_one_hour_frozen_busy_forces_new_model2_chat_and_task(self):
+        self.assertTrue(self.tick(9, 0))
+        self.assertFalse(self.tick(9, 59, 59))
+        self.busy = True
+        self.assertTrue(self.tick(10, 0))
+        self.assertEqual(self.hard_rotations, 1)
+        self.assertEqual(len(self.sent), 2)
+        self.assertIn("Model2VR-tools@main", self.sent[-1])
+        self.assertIn("새 세션", self.sent[-1])
+        self.assertEqual(self.q["model2_simple"]["hard_rotation_sent_total"], 1)
+        self.assertEqual(self.q["model2_simple"]["last_send_reason"], "60m_hard_new_chat")
+        self.assertEqual(self.slot.last_result, "model2_60m_new_chat_sent")
+        self.assertFalse(self.tick(10, 0, 15))
+        self.assertEqual(self.hard_rotations, 1)
+
+    def test_hard_new_chat_send_retry_keeps_only_one_new_tab(self):
+        self.assertTrue(self.tick(9, 0))
+        original_send = self.env["send_message"]
+        async def fail_one(page, message, *, slot_name=None):
+            self.env["send_message"] = original_send
+            return "send_failed"
+        self.env["send_message"] = fail_one
+        self.assertFalse(self.tick(10, 0))
+        self.assertEqual(self.hard_rotations, 1)
+        self.assertTrue(self.q["model2_simple"]["hard_rotation_pending"])
+        self.assertTrue(self.tick(10, 0, 15))
+        self.assertEqual(self.hard_rotations, 1)
+        self.assertEqual(self.q["model2_simple"]["hard_rotation_sent_total"], 1)
 
     def test_wrong_project_url_never_sends(self):
         self.page.url = OUTRUN_CHAT
