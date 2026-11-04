@@ -10,21 +10,26 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:AUTHENTIC_D3D9_CLIPPING_RAW_FVF_SM3_NATIVE_DRAW",
   "classification": "A_UNFINISHED_RAW_VISUAL_NATIVE_DRAW_CLIPPING_INTEGRATION",
-  "status": "IN_PROGRESS_GATE_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
   "source_base_sha": "db41d77e55c451dee1a0db9721e364da38f97c97",
-  "material_result_sha": "0a5dd9967766f93a178824db8f29b73c102dd6bc",
-  "validation_bearing_result_sha": "PENDING",
+  "material_result_sha": "8ed8e38ddd056d3ddb39b3a04647cab97c7cc9a0",
+  "validation_bearing_result_sha": "8ed8e38ddd056d3ddb39b3a04647cab97c7cc9a0",
   "score_change": 0,
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_raw_clipping_visual.hpp",
     "tools/test_dx11_live_sm3_table_zfog_01005.py",
-    "tests/native_raw_clipping_visual_test.cpp"
+    "tests/native_raw_clipping_visual_test.cpp",
+    "tools/dx11_autodev_policy.py",
+    "tools/test_dx11_autodev_policy.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
+    "docs/automation/runs/CONVERSION-DX11-01219.json"
   ],
   "implementation": "Connected real game-authored FVF and SM3 Draw/DrawIndexed D3DRS_CLIPPING=FALSE to explicitly opted-in incomplete RAW D3D11 diagnostic tiles. Original source state getter, valid DWORD, native GPU resource and backbuffer admission remain required. The game-authoritative D3D9 Draw/Present/input/FFB and ordinary exact native mode are unchanged. A native RAW clipping mismatch always aborts full-resolution frame publication after GPU draw; SM3 also omits inherited user-clip planes only for its opt-in incomplete RAW tile. Regression exercises valid and invalid clipping source state plus both native submission/abort paths. No actual game/HMD testing.",
   "development_strategy": {
@@ -62,7 +67,7 @@
       "DX11:REAL_GAME_DRAW"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_STAGE_ONLY_GATE_PENDING. LIVE runtime game pixel and HMD output UNTESTED, no full-frame gameplay PASS.",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY. SOURCE native D3D9 FVF/SM3 -> opt-in D3D11 RAW diagnostic Draw routing and original D3D9 Present fallback are code/CI-verified; no matching real-game native published full-resolution frame, game GPU RGB capture, or Quest 3/VDXR optical evidence was measured. Full renderer is NOT complete.",
     "activation_guard_and_fallback": "Requires OUTRUN_DX11_FIRST_GAME_FRAME=1, OUTRUN_DX11_FULL_GAME_FRAME=1, OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC=1; normal path exact and fail-closed, incomplete GPU tile only, original D3D9 Draw/gamepad/FFB/DX9Ex fallback preserved."
   },
   "feature_contract": {
@@ -89,8 +94,47 @@
       }
     ]
   },
-  "acceptance_results": {},
-  "validation_gate_runs": {},
+  "acceptance_results": {
+    "raw_fvf_sm3_clipping_gpu_route": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_clipping_visual.hpp",
+        "tests/native_raw_clipping_visual_test.cpp",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_table_zfog_01005.py; native_raw_clipping_visual_test.cpp portable C++ assertions via DX11 Fast Structural Checks run 41769580274 SUCCESS; Backend Conversion Gate run 41769580277 SUCCESS at exact SHA 8ed8e38ddd056d3ddb39b3a04647cab97c7cc9a0."
+    },
+    "source_owner_and_fullframe_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_clipping_visual.hpp",
+        "tools/test_dx11_first_game_frame_regressions.py",
+        "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
+        "tools/dx11_autodev_policy.py",
+        "tools/test_dx11_autodev_policy.py"
+      ],
+      "validation_command": "python tools/test_dx11_first_game_frame_regressions.py; python tools/test_dx11_main_stencil_clear_game_frame_00781.py; python tools/test_dx11_autodev_policy.py; exact-SHA DX11 Fast Structural Checks 41769580274 SUCCESS and Backend Conversion Gate 41769580277 SUCCESS. No live OutRun game or HMD was run."
+    },
+    "exact_source_ci_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_clipping_visual.hpp",
+        "tests/native_raw_clipping_visual_test.cpp",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "validation_command": "GitHub Actions exact-SHA 8ed8e38ddd056d3ddb39b3a04647cab97c7cc9a0: DX11 Fast Structural Checks 41769580274 SUCCESS; Backend Conversion Gate 41769580277 SUCCESS; Build (Win32 Release) 41769585862 SUCCESS; OpenXR VR architecture 41769585798 SUCCESS; OutRun EXE HUD Inspector CI 41769580368 SUCCESS. Build artifact IDs 13294985016 (DLL package) and 13294975066 (source archive)."
+    }
+  },
+  "validation_gate_runs": {
+    "DX11 Fast Structural Checks": 41769580274,
+    "Backend Conversion Gate": 41769580277,
+    "Build (Win32 Release)": 41769585862,
+    "OpenXR VR architecture": 41769585798,
+    "OutRun EXE HUD Inspector CI": 41769580368
+  },
   "runtime_evidence": {
     "native_game_draw_count": "UNTESTED",
     "native_published_frame_count": "UNTESTED",
@@ -98,11 +142,16 @@
     "gameplay_menu_car_race": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no actual source-matched game launch, live native Draw count, published frame count, GPU desktop pixel or Quest3/VDXR evidence.",
-  "real_game_draw_blocker": "Actual CLIPPING=FALSE source Draw population, GPU tile pixel and full game frame remain UNTESTED; this isolated RAW source admission is not native complete-frame proof.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No source-matched OutRun game launch, live native GPU drawn pixel, playable original menu-to-race, published full-resolution frame, or Quest3 HMD validation. Five exact-SHA CI passes prove source/build regression only.",
+  "real_game_draw_blocker": "The opt-in RAW clipping-disabled FVF/SM3 diagnostics are source/build verified, but actual game authored Draw distribution, native GPU RGB pixels, full-frame publication, and Quest3 stereo remain UNTESTED. R175/00477 remains separate ownership; no duplicate task or score.",
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "next_implementation_action": "On matching source SHA, collect game-authored D3D9 Draw/native GPU RGB evidence with genuine clipping state before deciding next full-frame blocker; preserve DX9Ex fallback and OpenXR isolation.",
-  "checkpoint": "C5_GATE_PENDING",
-  "record_type": "SOURCE_AND_GATE_PENDING",
-  "score_note": "One unfinished DX11 native complete-frame feature. CI repair, same TASK_ID checkpoint, RAW source expansion and retest do not earn duplicate independent achievement points (+0)."
+  "next_implementation_action": "Continue the same full-resolution native game-frame feature using original OutRun D3D9 real Draw -> native D3D11 Draw -> GPU desktop visible pixel evidence, then OpenXR headset; require live native_draws>0/publishedBackbufferFrames>0/gpu_desktop_frames>0 before runtime PASS. Retain fail-closed RAW opt-in and DX9Ex/FFB fallback.",
+  "checkpoint": "C6_STATE",
+  "record_type": "C6_RESULT_ONLY",
+  "score_note": "CONVERSION-DX11-01220 is the same unfinished DX11 full-resolution native game frame feature. Independent feature score_change 0; CI repairs, retries, rollover, FVF RAW clipping source admission, regression tests, and exact-SHA 5 Gates receive +0. AI2 and AI1 scores separate.",
+  "feature_stage": "FEATURE_READY",
+  "feature_ready": true,
+  "last_rollover_event_id": "CONVERSION-DX11-01220-E004",
+  "last_rollover_attempt": "3/3",
+  "chat_rollover_count": 2
 }
