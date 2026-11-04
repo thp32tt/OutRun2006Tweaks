@@ -66,6 +66,7 @@ namespace Settings
 	extern Setting<bool> VRCullingUnionFov;
 	extern Setting<float> VRCullingUnionMarginDegrees;
 	extern Setting<float> VRWorldScale;
+    extern Setting<float> VRStereoDepth;
 	extern Setting<float> VRRotationScale;
 	extern Setting<int> VRMatrixOrder;
 	extern Setting<bool> VRTelemetry;

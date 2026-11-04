@@ -11,6 +11,7 @@ on:
       - 'src/vr/game/quest_cockpit_v2_glass_hook.hpp'
       - 'tools/tests/quest_cockpit_v2_glass_hook_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_seat.hpp'
+      - 'src/vr/game/quest_cockpit_v2_apk_xr_pose.hpp'
       - 'src/vr/game/quest_cockpit_v2_occupant.hpp'
       - 'src/vr/game/quest_cockpit_v2_visibility.hpp'
       - 'RUN-QUEST-COCKPIT-V2-LOD0.cmd'

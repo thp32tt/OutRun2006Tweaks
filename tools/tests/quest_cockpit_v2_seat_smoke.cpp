@@ -1,4 +1,5 @@
 #include "../../src/vr/game/quest_cockpit_v2_seat.hpp"
+#include "../../src/vr/game/quest_cockpit_v2_apk_xr_pose.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstring>
@@ -6,6 +7,38 @@
 using namespace OutRunVR::QuestCockpitV2;
 static bool near(float a,float b) {return std::fabs(a-b)<1.e-4f;}
 int main(){
+    // Original 2D6A60 yaw-only XR origin and 2D6B98 dual-eye source math.
+    // A live Quest HMD is not required to validate the quaternion/eye
+    // algebra and its position recenter invariants.
+    constexpr float halfYaw=.25f;
+    NativePose worldHead{
+        {0.f,std::sin(halfYaw),0.f,std::cos(halfYaw)},
+        {10.f,1.6f,20.f}};
+    NativePose origin{};
+    assert(NativeYawOrigin(worldHead,origin));
+    assert(near(origin.q.x,0.f)&&near(origin.q.y,std::sin(halfYaw)));
+    assert(near(origin.q.z,0.f)&&near(origin.q.w,std::cos(halfYaw)));
+    assert(near(origin.p.x,10.f)&&near(origin.p.y,1.6f));
+    NativePose center{};
+    assert(NativeInverseOriginCompose(origin,worldHead,center));
+    assert(near(center.q.x,0.f)&&near(center.q.y,0.f));
+    assert(near(center.q.z,0.f)&&near(center.q.w,1.f));
+    assert(near(center.p.x,0.f)&&near(center.p.y,0.f));
+    assert(near(center.p.z,0.f));
+    NativePose eyeLeft{},eyeRight{};
+    assert(NativeStereoEye(origin,worldHead,
+        {{0.f,0.f,0.f,1.f},{-.032f,0.f,0.f}},eyeLeft));
+    assert(NativeStereoEye(origin,worldHead,
+        {{0.f,0.f,0.f,1.f},{.032f,0.f,0.f}},eyeRight));
+    assert(near(eyeLeft.p.x,-.032f));
+    assert(near(eyeRight.p.x,.032f));
+    assert(near(eyeLeft.p.y,0.f)&&near(eyeRight.p.z,0.f));
+    assert(near(eyeLeft.q.w,1.f)&&near(eyeRight.q.w,1.f));
+    NativePose invalidNative{};
+    assert(!NativeYawOrigin({{0,0,0,0},{0,0,0}},invalidNative));
+    assert(!NativeStereoEye(origin,worldHead,
+        {{0.f,0.f,0.f,1.f},{std::numeric_limits<float>::quiet_NaN(),0,0}},
+        invalidNative));
     std::array<std::uint8_t,30u*36u> table{};
     for(int i=0;i<30;++i){
         const float v[3]{float((i%15)*-0.01f-0.35f),
