@@ -418,6 +418,16 @@ def validate_task(task: dict, policy: dict) -> list[str]:
                         errors.append("complete feature missing exact validation SHA")
                     if task.get("automation_validation") != "PASS_EXACT_SHA":
                         errors.append("complete feature missing exact-SHA Gate PASS")
+    # Exact-SHA source stages are NOT gameplay/HMD proof. A C6 record with
+    # build-only verification and untested runtime cannot claim that the
+    # renderer or observed game/HMD execution is complete. Preserve the
+    # older partial stages; require actual runtime evidence separately.
+    if (task.get("status") == "COMPLETE_BUILD_VERIFIED"
+            and task.get("runtime_validation") == "UNTESTED"
+            and (task.get("gameplay_test_performed") is True
+                 or task.get("hmd_test_performed") is True
+                 or task.get("full_dx11_renderer_complete") is True)):
+        errors.append("build-only source stage cannot claim gameplay, HMD or full renderer")
     if task.get("runtime_validation") == "PASS" and not task.get("runtime_evidence"):
         errors.append("runtime PASS without actual HMD/game evidence")
     if task.get("automation_validation") == "PASS" and task.get("evidence", {}).get("backend_gate_conclusion") == "failure":
