@@ -1235,7 +1235,7 @@ async def vr_persist_checkpoint(q: dict, active: dict, now: datetime, purpose: s
 
 
 def vr_unconditional_resume_due(active: dict, now: datetime) -> bool:
-    """Hard 40-minute chat ceiling even without a terminal/stop confirmation."""
+    """Hard chat ceiling even without a terminal/stop confirmation."""
     if CONTROLLER_MODE != "conversion" or not VR_UNCONDITIONAL_RESUME_SECONDS:
         return False
     if active.get("phase") != "WAIT_CHAT":
@@ -1257,32 +1257,31 @@ def vr_forced_rollover_due(active: dict, now: datetime) -> bool:
 
 async def vr_checkpoint_and_rollover(context: BrowserContext, pages: dict, q: dict, active: dict, now: datetime) -> bool:
     """Return True if rollover processing consumed this lane poll."""
-    if ((vr_forced_rollover_due(active, now) or vr_unconditional_resume_due(active, now))
-            and vr_lane_schedule_window_due(active.get("slot", "C" if active.get("lane") == "DX9EX" else ""), now)):
-        # Prefer remote checkpoint at 30m; after 40m the local atomic queue
-        # checkpoint wins over indefinite WAIT_CHAT even if GitHub PUT is denied.
+    if vr_forced_rollover_due(active, now) or vr_unconditional_resume_due(active, now):
+        # Hard 60m cutoff is independent of :30 dispatch slots. Retain the
+        # original task ID and a durable local snapshot if GitHub is unavailable.
         remote_saved = await vr_persist_checkpoint(q, active, now, "pre_rollover")
         hard_due = vr_unconditional_resume_due(active, datetime.now(TZ))
         if not remote_saved and not hard_due:
             write_runtime(
                 status="vr_rollover_wait_checkpoint",
-                last_action=f"{active['task_id']} awaiting remote checkpoint before 40m ceiling",
+                last_action=f"{active['task_id']} awaiting remote checkpoint before 60m ceiling",
             )
             return True
         if not remote_saved:
-            active["vr_checkpoint_fallback"] = "LOCAL_ONLY_AFTER_40M"
+            active["vr_checkpoint_fallback"] = "LOCAL_ONLY_AFTER_60M"
             active["vr_checkpoint_fallback_at"] = datetime.now(TZ).isoformat()
             active["vr_checkpoint_fallback_base_sha"] = active.get("base_sha")
             save_queue_state(q)
             write_runtime(
-                status="vr_40m_local_fallback",
+                status="vr_60m_local_fallback",
                 last_action=f"{active['task_id']} local queue saved; GitHub checkpoint failed, forcing fresh chat at 40m",
                 vr_rollover_data_loss_risk="Uncommitted model reasoning may be lost",
                 vr_checkpoint_status="FAILED_LOCAL_FALLBACK",
             )
         else:
             active.pop("vr_checkpoint_fallback", None)
-        reason = "VR_FORCED_40_MINUTE_RESUME" if hard_due else "VR_FORCED_30_MINUTE_ROLLOVER"
+        reason = "VR_FORCED_60_MINUTE_NEW_CHAT" if hard_due else "VR_FORCED_60_MINUTE_NEW_CHAT"
         sent = await queue_rollover_chat(context, pages, active, reason)
         save_queue_state(q)
         if not sent:
@@ -1320,8 +1319,11 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         return False
     vr_forced = CONTROLLER_MODE == "conversion" and reason in {
         "VR_FORCED_30_MINUTE_ROLLOVER", "VR_FORCED_40_MINUTE_RESUME",
+        "VR_FORCED_60_MINUTE_NEW_CHAT",
     }
-    hard_40m = CONTROLLER_MODE == "conversion" and reason == "VR_FORCED_40_MINUTE_RESUME"
+    hard_40m = CONTROLLER_MODE == "conversion" and reason in {
+        "VR_FORCED_40_MINUTE_RESUME", "VR_FORCED_60_MINUTE_NEW_CHAT",
+    }
     if not vr_forced and not rollover_has_confirmed_ui_failure(reason):
         write_runtime(
             status="conversation_rollover_held",
@@ -1371,11 +1373,16 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
 
     old_page = pages.get(slot.name)
     if vr_forced:
-        # At 30m preserve the active worker; by the explicit 40m ceiling a
+        # At 30m preserve the active worker; by the explicit 60m ceiling a
         # permanently busy/crashed renderer must not block this lane forever.
-        owner_busy_or_missing = (
-            old_page is None or old_page.is_closed() or await detect_busy(old_page)
-        )
+        try:
+            owner_busy_or_missing = (
+                old_page is None or old_page.is_closed()
+                or await asyncio.wait_for(detect_busy(old_page), timeout=5)
+            )
+        except Exception:
+            # A frozen Playwright page must not hold the 60m deadline hostage.
+            owner_busy_or_missing = True
         if vr_rollover_must_wait_for_owner(owner_busy_or_missing, hard_40m):
             active["rollover_pending_reason"] = reason
             write_runtime(status="conversation_rollover_owner_wait",
@@ -1386,10 +1393,10 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
             # The next worker must reconcile GitHub HEAD and existing C6 first.
             # Keep TASK_ID stable; the old chat may still finish independently.
             active["forced_owner_recovery_at"] = datetime.now(TZ).isoformat()
-            active["forced_owner_recovery_reason"] = "40m busy/missing chat owner"
+            active["forced_owner_recovery_reason"] = "60m busy/missing chat owner"
             write_runtime(
-                status="vr_40m_forced_owner_recovery",
-                last_action=f"{active['task_id']}: 40m ceiling overrides stale UI busy state",
+                status="vr_60m_forced_owner_recovery",
+                last_action=f"{active['task_id']}: 60m ceiling overrides stale UI busy state",
                 queue=active,
             )
         active.pop("rollover_pending_reason", None)
@@ -1399,7 +1406,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         previous.append(old_url)
     active["previous_chat_urls"] = previous[-20:]
 
-    page = await replace_with_fresh_slot_page(context, pages, slot)
+    page = await hard_replace_slot_page(context, pages, slot) if hard_40m else await replace_with_fresh_slot_page(context, pages, slot)
     if not await ensure_logged_in(page):
         write_runtime(status="login_required", last_action=f"{active['task_id']}: login required after conversation rollover")
         return False
