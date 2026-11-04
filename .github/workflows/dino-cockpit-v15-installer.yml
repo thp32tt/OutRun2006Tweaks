@@ -1,0 +1,30 @@
+name: Dino v15 LHD Textured Cockpit Installer
+on:
+  push:
+    branches: [ 'test/dino-cockpit-v15-textured-20261104' ]
+    paths: [ 'tools/cockpit/dino_v15/**', '.github/workflows/dino-cockpit-v15-installer.yml' ]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-installer:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate V15 installer and source patch
+        shell: pwsh
+        run: |
+          python -m py_compile tools/cockpit/dino_v15/dino_v15_installer.py
+          python -c "import sys;sys.path.insert(0,'tools/cockpit/dino_v15');import dino_v15_installer as m;source=open('tools/cockpit/dino_v13/dino_cockpit_pmt_patch_v13.py',encoding='utf8').read();compile(m.patch_v13_source(source),'v15-patch','exec');print('V15_SOURCE_PATCH_PASS')"
+      - name: Build standalone Windows installer
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pyinstaller==6.16.0
+          python -m PyInstaller --noconfirm --clean --onefile --name DinoCockpitV15 --add-data "tools/cockpit/dino_v13/dino_cockpit_pmt_patch_v13.py;." tools/cockpit/dino_v15/dino_v15_installer.py
+          if(!(Test-Path "dist/DinoCockpitV15.exe")){throw "Missing installer"}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DinoCockpitV15-StandaloneInstaller
+          path: dist/DinoCockpitV15.exe
+          retention-days: 14
+          if-no-files-found: error
