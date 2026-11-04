@@ -22,7 +22,7 @@ MAX_REF_SIDE = 4096
 # ImageGen is a last-resort fallback. Existing A/B pixels are deterministically
 # padded/reflowed/downscaled by hd_strict_qa before any queue item can reach here.
 REGEN_REASONS = (
-    "QA_CANDIDATE_UNREADABLE", "QA_CANDIDATE_INVISIBLE",
+    "QA_CANDIDATE", "QA_CANDIDATE_UNREADABLE", "QA_CANDIDATE_INVISIBLE",
     "QA_CANDIDATE_PNG_GEOMETRY", "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
     "QA_DOWNSCALE_LOST_GLYPHS", "QA_TRANSLATION_TOO_SMALL_TO_READ",
     "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT", "QA_SOURCE_LINE_LAYOUT_UNVERIFIED",
