@@ -41,6 +41,7 @@ novnc_pid=$!
 
 shutdown() {
   trap - INT TERM
+  kill "${chrome_pid:-0}" 2>/dev/null || true
   kill "$novnc_pid" "$vnc_pid" "$openbox_pid" "$xvfb_pid" 2>/dev/null || true
   wait 2>/dev/null || true
 }
@@ -52,6 +53,57 @@ if ! kill -0 "$novnc_pid" 2>/dev/null || ! kill -0 "$vnc_pid" 2>/dev/null; then
   exit 3
 fi
 echo "NOVNC_LISTENER_STARTED: container port 6080, host port configured by Compose (default 6084)." >&2
+
+# Start a genuine visible Chromium window independently of the task queue.
+# The Python A/B/C1 worker connects to THIS SAME browser over local-only CDP,
+# so manually authenticated ChatGPT sessions remain in the correct profile.
+launch_visible_chrome() {
+  local chrome
+  chrome="$(python - <<'PY'
+from playwright.sync_api import sync_playwright
+with sync_playwright() as pw:
+    print(pw.chromium.executable_path)
+PY
+)"
+  if [[ ! -x "$chrome" ]]; then
+    echo "HOLD_CHROMIUM_EXECUTABLE_MISSING: $chrome" >&2
+    return 1
+  fi
+  "$chrome" --no-sandbox --disable-dev-shm-usage --disable-gpu \
+    --no-first-run --no-default-browser-check --password-store=basic \
+    --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 \
+    --user-data-dir=/data/hd-rework/browser-rework-profile \
+    --new-window "https://chatgpt.com/" \
+    >/logs/hd-rework-chromium.log 2>&1 &
+  chrome_pid=$!
+  for _ in $(seq 1 80); do
+    if ! kill -0 "$chrome_pid" 2>/dev/null; then
+      echo "HOLD_CHROMIUM_EXITED: Review /logs/hd-rework-chromium.log." >&2
+      return 1
+    fi
+    if python - <<'PY' >/dev/null 2>&1
+import json, urllib.request
+with urllib.request.urlopen("http://127.0.0.1:9222/json/version",timeout=1) as r:
+    v=json.load(r)
+assert "webSocketDebuggerUrl" in v
+PY
+    then
+      echo "CHROMIUM_LOGIN_WINDOW_READY: DISPLAY=:99; CDP loopback 127.0.0.1:9222; no host CDP port." >&2
+      return 0
+    fi
+    sleep 0.5
+  done
+  echo "HOLD_CHROMIUM_CDP_TIMEOUT: Review /logs/hd-rework-chromium.log." >&2
+  return 1
+}
+
+if ! launch_visible_chrome; then
+  echo "HOLD_VISIBLE_BROWSER_START_FAILED: noVNC remains running for diagnostics." >&2
+  # Avoid claiming the browser is available or consuming tasks. Exit so
+  # Docker restart policy retries; the error is visible in container logs.
+  exit 4
+fi
+
 
 # A missing/invalid GitHub token is a worker HOLD, not a reason to prevent
 # VNC access for initial ChatGPT login and troubleshooting.
