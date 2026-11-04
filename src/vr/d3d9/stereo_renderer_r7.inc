@@ -232,6 +232,10 @@ namespace OutRunVRStereo
 		std::uint64_t FixedFunctionNonWorldDraws = 0;
 		std::uint64_t FixedFunctionWorldStereoDraws = 0;
 		std::uint64_t FixedFunctionSkyRotationOnlyDraws = 0;
+        // Diagnostic only: the original 4521C0 sky may use a
+        // programmable c64 WVP rather than fixed-function XYZ.
+        // This is NOT exact sky source ownership.
+        std::uint64_t ProgrammableDepthOffWorldDraws = 0;
 		bool FirstFixedFunctionWorldLogged = false;
 		bool FirstFixedFunctionSkyRotationLogged = false;
 		std::uint64_t OcclusionQueriesCreated = 0;
@@ -960,7 +964,13 @@ namespace OutRunVRStereo
 				if (!MatrixFinite(eyeWvp)) return EyeBuildResult::FatalError;
 				const D3DMATRIX eyeWvpT = TransposeMatrix(eyeWvp); std::memcpy(state.eyeConstants[eye], &eyeWvpT, sizeof(eyeWvpT));
 			}
-			state.worldStereo = true; state.poseSequence = stereo.poseSequence; return EyeBuildResult::WorldStereo;
+			if (Settings::VRQuestCockpitV2SkyProbe) {
+                DWORD depth=D3DZB_TRUE;
+                if (ReadTrackedRenderState(device,D3DRS_ZENABLE,depth) &&
+                    depth==D3DZB_FALSE)
+                    ++ProgrammableDepthOffWorldDraws;
+            }
+            state.worldStereo = true; state.poseSequence = stereo.poseSequence; return EyeBuildResult::WorldStereo;
 		}
 
 		void InvalidateTrackedRenderStates() noexcept
@@ -2064,7 +2074,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 !Settings::VRQuestCockpitV2SkyProbe) return;
             static std::uint32_t frames=0,skyFrames=0,badFrames=0;
             static std::uint32_t rightFailures=0,poisoned=0,depthMissing=0;
-            static std::uint64_t lastSky=0,windowSky=0,windowWorld=0;
+            static std::uint64_t lastSky=0,windowSky=0,windowWorld=0,windowShaderDepthOff=0;
             static std::uint64_t totalPresent=0;
             static bool sawRequested=false,sawComposed=false,sawDirect=false;
             ++frames;
@@ -2081,12 +2091,13 @@ if(WaitForEventQuery(slot.fence,1,0u))
             if(frames>=90) {
                 spdlog::info(
                     "VR SKY PROBE: present={} samples={} skyLikeFrames={} "
-                    "skyLikeDraws={} otherFixedWorldDraws={} incomplete={} "
+                    "skyLikeDraws={} otherFixedWorldDraws={} shaderDepthOffWorldDraws={} incomplete={} "
                     "rightFailed={} poisoned={} depthUnsynced={} "
                     "requested={} composed={} direct={} lastFailure={} presentHr={}",
                     totalPresent,frames,skyFrames,
                     FixedFunctionSkyRotationOnlyDraws-windowSky,
                     FixedFunctionWorldStereoDraws-windowWorld,
+                    ProgrammableDepthOffWorldDraws-windowShaderDepthOff,
                     badFrames,rightFailures,poisoned,depthMissing,
                     sawRequested,sawComposed,sawDirect,
                     static_cast<unsigned>(FrameFailureReason),
@@ -2096,6 +2107,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 sawRequested=sawComposed=sawDirect=false;
                 windowSky=FixedFunctionSkyRotationOnlyDraws;
                 windowWorld=FixedFunctionWorldStereoDraws;
+                windowShaderDepthOff=ProgrammableDepthOffWorldDraws;
             }
         }
 
