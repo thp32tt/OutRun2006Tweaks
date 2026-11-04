@@ -78,13 +78,30 @@ struct NativeRawFvfScissorClip {
             scissor->left >= scissor->right ||
             scissor->top >= scissor->bottom)
             return false;
-        ndcLeft = 2.0 * (double(scissor->left) - scissor->viewportX) /
+        // A D3D11 aliased one-pixel line and a wireframe triangle can
+        // touch a scissored sample even when its mathematical centreline is
+        // just outside the integer scissor edge. MSAA sample locations and
+        // edge-rounding must not turn a genuine source pixel into an empty
+        // source ordinal. Prove emptiness against a conservatively expanded
+        // ONE-pixel rectangle, but leave the actual bound D3D11 scissor,
+        // viewport, Draw and GPU PRE/POST readback completely unchanged.
+        // The wider test may miss a no-op, never certify a visible Draw.
+        constexpr double kRasterFootprintGuardPixels = 1.0;
+        ndcLeft = 2.0 * (double(scissor->left) -
+                         kRasterFootprintGuardPixels -
+                         scissor->viewportX) /
             scissor->viewportWidth - 1.0;
-        ndcRight = 2.0 * (double(scissor->right) - scissor->viewportX) /
+        ndcRight = 2.0 * (double(scissor->right) +
+                          kRasterFootprintGuardPixels -
+                          scissor->viewportX) /
             scissor->viewportWidth - 1.0;
-        ndcTop = 1.0 - 2.0 * (double(scissor->top) - scissor->viewportY) /
+        ndcTop = 1.0 - 2.0 * (double(scissor->top) -
+                              kRasterFootprintGuardPixels -
+                              scissor->viewportY) /
             scissor->viewportHeight;
-        ndcBottom = 1.0 - 2.0 * (double(scissor->bottom) - scissor->viewportY) /
+        ndcBottom = 1.0 - 2.0 * (double(scissor->bottom) +
+                                 kRasterFootprintGuardPixels -
+                                 scissor->viewportY) /
             scissor->viewportHeight;
         if (!std::isfinite(ndcLeft) || !std::isfinite(ndcRight) ||
             !std::isfinite(ndcTop) || !std::isfinite(ndcBottom) ||

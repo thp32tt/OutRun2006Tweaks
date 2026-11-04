@@ -281,6 +281,54 @@ int main() {
     scissorVertices[2].user[0]=std::numeric_limits<float>::quiet_NaN();
     assert(!native_game_fvf_fully_clipped_draw(
         scissorSource,true,&rightViewport));
+    // 01233: scissor bounds are pixel sample edges, not geometric line
+    // centrelines. A real one-pixel line or wireframe triangle just outside
+    // x=60 can still produce a covered scissored sample. Never consume
+    // such an original D3D9 Draw as a pixel-neutral native frame ordinal.
+    Vertex edgeStrokes[]{
+        {{0.190f,-0.2f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{0.194f, 0.2f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{0.198f, 0.6f,0.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan edgeSource{
+        edgeStrokes,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::LineStrip,offset,0u};
+    const NativeRawFvfScissorClip edgeScissor{
+        0.0,0.0,100.0,100.0,60,0,100,100};
+    assert(!native_game_fvf_fully_clipped_draw(
+        edgeSource,true,&edgeScissor));
+    edgeSource.assembly=NativeRawFvfAssembly::TriangleList;
+    assert(!native_game_fvf_fully_clipped_draw(
+        edgeSource,true,&edgeScissor)); // native wireframe edges
+    const std::uint32_t edgeIb[]{2u,0u,1u};
+    edgeSource.indices=edgeIb;
+    edgeSource.indexCount=3u;
+    assert(!native_game_fvf_fully_clipped_draw(
+        edgeSource,true,&edgeScissor)); // real DrawIndexed
+    // A truly distant source stroke still qualifies as a no-pixel
+    // ordinal; the expanded proof must not disable valid optimization.
+    for (auto& v:edgeStrokes) v.clip[0]=-0.5f;
+    assert(native_game_fvf_fully_clipped_draw(
+        edgeSource,true,&edgeScissor));
+    edgeSource.assembly=NativeRawFvfAssembly::LineStrip;
+    assert(native_game_fvf_fully_clipped_draw(
+        edgeSource,true,&edgeScissor));
+    // The guard only widens raster/scissor proof, never an authenticated
+    // user ClipDistance plane: active clipping remains source-authoritative.
+    for (auto& v:edgeStrokes) { v.clip[0]=0.19f; v.user[0]=-1.f; }
+    edgeSource.clipDistanceMask=1u;
+    assert(native_game_fvf_fully_clipped_draw(
+        edgeSource,true,&edgeScissor));
+    edgeSource.clipDistanceMask=0u;
+    assert(!native_game_fvf_fully_clipped_draw(edgeSource));
+    // Bad native viewport mapping must never become an empty certificate.
+    const NativeRawFvfScissorClip badEdgeScissor{
+        0.0,0.0,0.0,100.0,60,0,100,100};
+    assert(!native_game_fvf_fully_clipped_draw(
+        edgeSource,true,&badEdgeScissor));
+    edgeSource.indices=nullptr;
+    edgeSource.indexCount=0u;
+
     // 01232: a corner-scissored original FVF triangle can cross EACH
     // clipping plane, yet lie entirely outside their INTERSECTION.
     // A single-plane vertex test cannot prove this empty GPU Draw.
