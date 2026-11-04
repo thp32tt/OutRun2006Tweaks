@@ -1,0 +1,5372 @@
+{
+  "active_roi_total": 954,
+  "c1_preliminary_new_png_count": 0,
+  "clean_plate_qa": "MECHANICAL_ALPHA_ONLY_C1_C3_VISUAL_REVIEW_REQUIRED",
+  "generated": [
+    {
+      "dds_sha256": "b9629dedbf122e91a8b7d9efdaca2de1297c07084d69cd932aa674347483482f",
+      "holds": [
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q044_ed694265776308f2"
+        },
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q044_8f2fb4bb6e3a34b0"
+        },
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q044_65bad63fe0353b2b"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q044_7a31403046d4e992"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q044_b2708f0084b065f8"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q044_4384f7339ae91043"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q044_a036a116ad16dcc5"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q044_460dedb1427ef8cb"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q044_7c4b4ca9cd581877"
+        }
+      ],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "painted": [
+        {
+          "candidate_sha256": "a98cf6dbb0d815232ce328e0ca5b08ce90c206aa5da879ce0ceb5baf6125b0d8",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "english": "LOSE",
+          "korean": "패배",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              528,
+              109,
+              635,
+              152
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            517,
+            104,
+            646,
+            157
+          ],
+          "roi_id": "Q044_cdc9fa80e5787778",
+          "source_alpha_occupancy": 0.60509,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              531,
+              109,
+              631,
+              152
+            ]
+          ]
+        },
+        {
+          "candidate_sha256": "36e04d60d596fda925864f9b5ff873cd92d2f4691ddcbd565b68cf5b7e9bd8ef",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "english": "You",
+          "korean": "나",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              1759,
+              193,
+              1897,
+              260
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            1747,
+            188,
+            1909,
+            266
+          ],
+          "roi_id": "Q044_a2128c621609a4bc",
+          "source_alpha_occupancy": 0.55563,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              1763,
+              193,
+              1892,
+              260
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    },
+    {
+      "dds_sha256": "a8577e6ea7357b70360befc72a4c4fe0d17ddfb9111c40ce03c0d03cf206d078",
+      "holds": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_0611724516dae855"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_27fff9d87243a16b"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_e486b1ebd4bf222c"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_23f6bf94b603e6e8"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_e26cf75d44be41e8"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_4413daf457459290"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q047_67f2b358a8d3b480"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q047_b7a27283565db804"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_af0145ebb3f8374e"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_cb84295162aadad2"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_5f2c337e1f58da01"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q047_b08df53b8bfdbadf"
+        }
+      ],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "painted": [
+        {
+          "candidate_sha256": "8f6a18da7ec7acfed4c9a417c444e1b6cb4dbc162ab9890f91231ee7b5da8bd5",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "english": "Symbols",
+          "korean": "기호",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              3757,
+              76,
+              3957,
+              131
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            3739,
+            64,
+            3975,
+            142
+          ],
+          "roi_id": "Q047_df01ba2f24db22df",
+          "source_alpha_occupancy": 0.25478,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              3805,
+              76,
+              3909,
+              131
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    },
+    {
+      "dds_sha256": "02b3fac37be3041c9c776b8de21eb02c0076227c501ceecbbe84bf0055101ba5",
+      "holds": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q215_9994d0de202e2540"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q215_6a613a05d4c984eb"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q215_7be3b2f450b79c10"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q215_03a641c3ed3f616a"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q215_e8c52eec1c265238"
+        }
+      ],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+      "painted": [
+        {
+          "candidate_sha256": "f1fe906fbe88a61ede458b0c44e52674603cef3b2083fe45c74dc5e2d83ed404",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "english": "GOAL E",
+          "korean": "골 E",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              5,
+              191,
+              178,
+              244
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            0,
+            179,
+            197,
+            256
+          ],
+          "roi_id": "Q215_aa9a415b842d2905",
+          "source_alpha_occupancy": 0.24834,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              25,
+              191,
+              158,
+              244
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    }
+  ],
+  "hold_roi_reason_counts": {
+    "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD": 30,
+    "DDS_NOT_32_BGRA_MIP1:{\"size\":[1024,2048],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":2097152}": 3,
+    "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,1024],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":2097152}": 3,
+    "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,128],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":262144}": 1,
+    "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,2048],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":4194304}": 51,
+    "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}": 11,
+    "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,512],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":1048576}": 4,
+    "DDS_NOT_32_BGRA_MIP1:{\"size\":[4096,4096],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":16777216}": 25,
+    "DDS_NOT_32_BGRA_MIP1:{\"size\":[4096,4096],\"mip\":13,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":22369648}": 13,
+    "QA_CANDIDATE_EDGE_CLIP": 16,
+    "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED": 124,
+    "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT": 7,
+    "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE": 108,
+    "QA_TRANSLATION_TOO_SMALL_TO_READ": 1,
+    "ROI_OVERLAP_NEEDS_MANUAL_QA": 553
+  },
+  "holds": [
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q043_342c7aee7b955d19"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q043_f4bbdc9b75dad5ed"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q043_342c7aee7b955d19",
+        "Q043_f4bbdc9b75dad5ed"
+      ],
+      "rows": 2,
+      "target": "textures/load/Keyboard/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_370836955f7d7c71"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_0f9b2cb296721303"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q054_297a75bdfd299a60"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_300ecfebf2d3f9ba"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_aebea8a45337d7b2"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_5142a65cfaa80ab9"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q054_50ce23b02c6aed09"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_cc6352e760ab915f"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q054_cc6352e760ab915f",
+        "Q054_370836955f7d7c71",
+        "Q054_aebea8a45337d7b2",
+        "Q054_5142a65cfaa80ab9",
+        "Q054_50ce23b02c6aed09",
+        "Q054_0f9b2cb296721303",
+        "Q054_300ecfebf2d3f9ba",
+        "Q054_297a75bdfd299a60"
+      ],
+      "rows": 8,
+      "target": "textures/load/Keyboard/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q057_9edbde6c234605be"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q057_9edbde6c234605be"
+      ],
+      "rows": 1,
+      "target": "textures/load/Keyboard/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_604294f7b6503241"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_8845a649913b5ecf"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_1ae7024795abd9d8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_8c2673128986a6c8"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q043_1ae7024795abd9d8",
+        "Q043_604294f7b6503241",
+        "Q043_8845a649913b5ecf",
+        "Q043_8c2673128986a6c8"
+      ],
+      "rows": 4,
+      "target": "textures/load/PlayStation/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q054_b96446df2484294e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_08c520d352b032a0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_c6e2c8d19a16392a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_5dad8f4c4d45d2c5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_c562988da81b25c3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_36654298c628bfa0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_0c4af91114577f10"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_f814af9296b82f30"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_c58a55d1460c3e40"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_9e04b2316116e2d9"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_c70eed1057d7c8e6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_a471884404c55bc3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_9a855b77e7d5119f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_a3a8a4bdf2509340"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_0924909a06e8bf29"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_670b2fe6b77b9efd"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_2356624ce9bada2b"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q054_a3a8a4bdf2509340",
+        "Q054_0c4af91114577f10",
+        "Q054_c6e2c8d19a16392a",
+        "Q054_c70eed1057d7c8e6",
+        "Q054_9e04b2316116e2d9",
+        "Q054_c562988da81b25c3",
+        "Q054_5dad8f4c4d45d2c5",
+        "Q054_c58a55d1460c3e40",
+        "Q054_f814af9296b82f30",
+        "Q054_9a855b77e7d5119f",
+        "Q054_08c520d352b032a0",
+        "Q054_670b2fe6b77b9efd",
+        "Q054_0924909a06e8bf29",
+        "Q054_b96446df2484294e",
+        "Q054_2356624ce9bada2b",
+        "Q054_36654298c628bfa0",
+        "Q054_a471884404c55bc3"
+      ],
+      "rows": 17,
+      "target": "textures/load/PlayStation/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_2d0b076fe8bd6526"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_dacaabfe0dc57dc0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_507d223cb7ab13b9"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_505cd1de7132a8d6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_c08e055e12638cfe"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q057_25a449f39b9e77ef"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_92f6a27ac5007c0a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_f32b407ab881480b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_45f29d15cf40360b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_2bc7c5767adace22"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q057_b585158864df85bc"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q057_505cd1de7132a8d6",
+        "Q057_c08e055e12638cfe",
+        "Q057_507d223cb7ab13b9",
+        "Q057_b585158864df85bc",
+        "Q057_45f29d15cf40360b",
+        "Q057_25a449f39b9e77ef",
+        "Q057_2d0b076fe8bd6526",
+        "Q057_2bc7c5767adace22",
+        "Q057_f32b407ab881480b",
+        "Q057_92f6a27ac5007c0a",
+        "Q057_dacaabfe0dc57dc0"
+      ],
+      "rows": 11,
+      "target": "textures/load/PlayStation/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_587b218d890485f8"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_5e770cc5a4a1bd14"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_466c7fe5a72f8abf"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_6d9319af92f82393"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q140_5e770cc5a4a1bd14",
+        "Q140_587b218d890485f8",
+        "Q140_466c7fe5a72f8abf",
+        "Q140_6d9319af92f82393"
+      ],
+      "rows": 4,
+      "target": "textures/load/PlayStation/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_337727fff753fc09"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_6c35ed05f19acdeb"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_0a943e3cce5355b1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_fd37c94b1d0ba52a"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_b8ca66f25dfe889b"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_d41489aeb701c7cb_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_bb52cce615c0dc6f"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_1606f7a0b5b4de5c"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_a1ece9255a67a707"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_50300de2a30f7e69"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_8480952d3ba1099a"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_88f1a88d372018bc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_d469cc46fce47f3b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_0f80ad9520bd43df"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_efbdd6f78d5379bd"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_14695efcb9b43686_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_0d184fcf391673a4_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_9eec7f0cbb4ce1ac"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_e430b295b9f0aaa2"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_610a003bbc54f7c3"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q205_d469cc46fce47f3b",
+        "Q205_a1ece9255a67a707",
+        "Q205_50300de2a30f7e69",
+        "Q205_b8ca66f25dfe889b",
+        "Q205_0d184fcf391673a4_RB_B",
+        "Q205_14695efcb9b43686_RB_B",
+        "Q205_d41489aeb701c7cb_RB_B",
+        "Q205_1606f7a0b5b4de5c",
+        "Q205_bb52cce615c0dc6f",
+        "Q205_337727fff753fc09",
+        "Q205_0a943e3cce5355b1",
+        "Q205_6c35ed05f19acdeb",
+        "Q205_efbdd6f78d5379bd",
+        "Q205_fd37c94b1d0ba52a",
+        "Q205_e430b295b9f0aaa2",
+        "Q205_9eec7f0cbb4ce1ac",
+        "Q205_8480952d3ba1099a",
+        "Q205_88f1a88d372018bc",
+        "Q205_610a003bbc54f7c3",
+        "Q205_0f80ad9520bd43df"
+      ],
+      "rows": 20,
+      "target": "textures/load/PlayStation/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_13b77386522c01e1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_6692c78faa4ef14e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_a40f8b1296e3d500"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_ff4cb68946ab376b"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q043_a40f8b1296e3d500",
+        "Q043_13b77386522c01e1",
+        "Q043_6692c78faa4ef14e",
+        "Q043_ff4cb68946ab376b"
+      ],
+      "rows": 4,
+      "target": "textures/load/Switch/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q054_09426bbee8a42f69"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_8873997be4cc5a53"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_7244e49cf24251a6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_cc6253f354ae56cc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_4f664f7833192059"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_8cd3e8916dca5dea"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_3d7621408b54db6e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_f42ceca6e96d0831"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_5c2018c95b8a7041"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_5a4eb7c999eaabe4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_67dc43175039bc5e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_eb40f33a1d54b74b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_883b4b9c411f06e0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_43dd5ba6e2850a88"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_4aa8a8b5dbe45cc5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_e60dc2a7c26b40c6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_38b70f155d1a8be0"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q054_43dd5ba6e2850a88",
+        "Q054_3d7621408b54db6e",
+        "Q054_7244e49cf24251a6",
+        "Q054_67dc43175039bc5e",
+        "Q054_5a4eb7c999eaabe4",
+        "Q054_4f664f7833192059",
+        "Q054_cc6253f354ae56cc",
+        "Q054_883b4b9c411f06e0",
+        "Q054_4aa8a8b5dbe45cc5",
+        "Q054_e60dc2a7c26b40c6",
+        "Q054_09426bbee8a42f69",
+        "Q054_8873997be4cc5a53",
+        "Q054_5c2018c95b8a7041",
+        "Q054_f42ceca6e96d0831",
+        "Q054_38b70f155d1a8be0",
+        "Q054_8cd3e8916dca5dea",
+        "Q054_eb40f33a1d54b74b"
+      ],
+      "rows": 17,
+      "target": "textures/load/Switch/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_c7229b9926b666b4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_43d4b0296b784f18"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_163aadb0e00ff6ac"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_ccaefbb8a794ca78"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_41e1741e9e5a692e"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q057_a5690a31cadbf291"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_b08f38e59c274ef2"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_338ba20f4d83ded1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_05a921c3af27f2e7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_86294fdb94d0324c"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q057_cc9e7eedec64ff9b"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q057_41e1741e9e5a692e",
+        "Q057_ccaefbb8a794ca78",
+        "Q057_163aadb0e00ff6ac",
+        "Q057_cc9e7eedec64ff9b",
+        "Q057_05a921c3af27f2e7",
+        "Q057_43d4b0296b784f18",
+        "Q057_a5690a31cadbf291",
+        "Q057_c7229b9926b666b4",
+        "Q057_86294fdb94d0324c",
+        "Q057_338ba20f4d83ded1",
+        "Q057_b08f38e59c274ef2"
+      ],
+      "rows": 11,
+      "target": "textures/load/Switch/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_4094bf4a7746445d"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_4b487384b43b7237"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_3632f2ce8be745cc"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_45491bc18fadf334"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q140_4b487384b43b7237",
+        "Q140_3632f2ce8be745cc",
+        "Q140_45491bc18fadf334",
+        "Q140_4094bf4a7746445d"
+      ],
+      "rows": 4,
+      "target": "textures/load/Switch/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_25a25ea70a7c60bd"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_0ffb5ffc7300a50f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_ccfd6c0c8f718195"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_046fcc0daca43f81"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q205_2dfdfc92141b0901"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q205_5badb049218ba0bf_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_b6aa00a18f71ad22"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q205_95159cc596172155"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_2a7b8657840a415a_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_2e08b6999cc9bd96"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_729a1387a4bb2657"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_69d302fcd79f80ac"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_63550f737b9c4281_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_1ffed26b404f33c4"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_dd0119473200867a"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_26209212d83cf066"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_b51700d09a9cc844_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_d84ad9dcc54a20c0"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_7316bffaeed9564b"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_bf0d812a762a295e"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q205_2dfdfc92141b0901",
+        "Q205_2e08b6999cc9bd96",
+        "Q205_26209212d83cf066",
+        "Q205_b51700d09a9cc844_RB_B",
+        "Q205_5badb049218ba0bf_RB_B",
+        "Q205_63550f737b9c4281_RB_B",
+        "Q205_2a7b8657840a415a_RB_B",
+        "Q205_95159cc596172155",
+        "Q205_b6aa00a18f71ad22",
+        "Q205_0ffb5ffc7300a50f",
+        "Q205_25a25ea70a7c60bd",
+        "Q205_ccfd6c0c8f718195",
+        "Q205_dd0119473200867a",
+        "Q205_046fcc0daca43f81",
+        "Q205_7316bffaeed9564b",
+        "Q205_d84ad9dcc54a20c0",
+        "Q205_729a1387a4bb2657",
+        "Q205_69d302fcd79f80ac",
+        "Q205_bf0d812a762a295e",
+        "Q205_1ffed26b404f33c4"
+      ],
+      "rows": 20,
+      "target": "textures/load/Switch/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_66e0a8f354d61848"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_6d75016bd272e246"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_25d15705129f6077"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_611d77bb8595b600"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q043_25d15705129f6077",
+        "Q043_66e0a8f354d61848",
+        "Q043_6d75016bd272e246",
+        "Q043_611d77bb8595b600"
+      ],
+      "rows": 4,
+      "target": "textures/load/Xbox/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_dbc7cb0f228408e1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_b2ab007aabd76b50"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_a279f212acf0c9d7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_de92d91948ad02fe"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_5122f504ed13121f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_0ba9d51e6b3e10fc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_4deb72a614f7778c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_c971a75baee4cc68"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_8a835074b1d20234"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_09c99df535a2a0b6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_f42e51c61d47c093"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_374e893b42dd4172"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_7c3fa4f9142fea4c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_b855b3dbe586c22e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_06a5b6737a24deae"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_0df0cd0aea8dbcaf"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_513b231adad72457"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q054_374e893b42dd4172",
+        "Q054_b2ab007aabd76b50",
+        "Q054_0ba9d51e6b3e10fc",
+        "Q054_8a835074b1d20234",
+        "Q054_c971a75baee4cc68",
+        "Q054_b855b3dbe586c22e",
+        "Q054_513b231adad72457",
+        "Q054_06a5b6737a24deae",
+        "Q054_0df0cd0aea8dbcaf",
+        "Q054_a279f212acf0c9d7",
+        "Q054_de92d91948ad02fe",
+        "Q054_7c3fa4f9142fea4c",
+        "Q054_4deb72a614f7778c",
+        "Q054_dbc7cb0f228408e1",
+        "Q054_f42e51c61d47c093",
+        "Q054_5122f504ed13121f",
+        "Q054_09c99df535a2a0b6"
+      ],
+      "rows": 17,
+      "target": "textures/load/Xbox/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_704e36c455dff145"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_fd90136dde1519ea"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_4b64dff6b3f931dd"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_947f0577f0e8fc60"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_2c0dad6837bce264"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q057_f18b5157495ad642"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_8fc826efdeb6036c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_226df35e5bc569de"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_d9f4bdf0b9d64ecd"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_e128cce6ff0942c8"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q057_fab4d146403b0244"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q057_2c0dad6837bce264",
+        "Q057_4b64dff6b3f931dd",
+        "Q057_947f0577f0e8fc60",
+        "Q057_fab4d146403b0244",
+        "Q057_d9f4bdf0b9d64ecd",
+        "Q057_226df35e5bc569de",
+        "Q057_f18b5157495ad642",
+        "Q057_fd90136dde1519ea",
+        "Q057_e128cce6ff0942c8",
+        "Q057_8fc826efdeb6036c",
+        "Q057_704e36c455dff145"
+      ],
+      "rows": 11,
+      "target": "textures/load/Xbox/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_810d33f6a864dcc3"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_fcafe4a610214ae2"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q140_a069cf1df56d7388"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_88d5ae34cbed88a3"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q140_88d5ae34cbed88a3",
+        "Q140_fcafe4a610214ae2",
+        "Q140_a069cf1df56d7388",
+        "Q140_810d33f6a864dcc3"
+      ],
+      "rows": 4,
+      "target": "textures/load/Xbox/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_f5593859251b7fdf"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_52459c200912d499"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_577a4b82bb0daaa1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_3d441997a445bf84"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_0c507c4b05c0a7c9"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_93f789db1381be42_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_dd69eb41d034bf00"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_ba5925cb2187264d"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_72a36705bb41bf43"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_dd0d49a4f2287476_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_e3c7a08cadd94345"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_c093ec5f9d5f9946"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_6d64236a1bb8196f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_49a2a730a5ee085f"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q205_3e204dbd69f1fe44"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_6840898fb5ac1323"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_bc8180ea97b10e90_RB_B"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q205_6ef92dce290af897"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_03ce77a9a59b9acd"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_0e672581cf837a7d"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q205_6840898fb5ac1323",
+        "Q205_6d64236a1bb8196f",
+        "Q205_0c507c4b05c0a7c9",
+        "Q205_72a36705bb41bf43",
+        "Q205_dd0d49a4f2287476_RB_B",
+        "Q205_bc8180ea97b10e90_RB_B",
+        "Q205_93f789db1381be42_RB_B",
+        "Q205_dd69eb41d034bf00",
+        "Q205_ba5925cb2187264d",
+        "Q205_577a4b82bb0daaa1",
+        "Q205_f5593859251b7fdf",
+        "Q205_52459c200912d499",
+        "Q205_3e204dbd69f1fe44",
+        "Q205_3d441997a445bf84",
+        "Q205_6ef92dce290af897",
+        "Q205_03ce77a9a59b9acd",
+        "Q205_e3c7a08cadd94345",
+        "Q205_c093ec5f9d5f9946",
+        "Q205_0e672581cf837a7d",
+        "Q205_49a2a730a5ee085f"
+      ],
+      "rows": 20,
+      "target": "textures/load/Xbox/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q012_0909e9d5397ec72e"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q012_0909e9d5397ec72e"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_etc_xst/D6DC1380_256x64.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q032_b179cbea3513c966"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q032_54ebd6389169f84f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q032_87d9ccf1a3e3fc79"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q032_54ebd6389169f84f",
+        "Q032_b179cbea3513c966",
+        "Q032_87d9ccf1a3e3fc79"
+      ],
+      "rows": 3,
+      "target": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q034_a445c566d7d448b1"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q034_a445c566d7d448b1"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q035_85915414047266e6"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q035_85915414047266e6"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q036_d07f28da0732fb06"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q036_d07f28da0732fb06"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q043_04bfe8d3cab59d49"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_6b4d345859625c57"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q043_52b56ee5a55136c7"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q043_6b4d345859625c57",
+        "Q043_04bfe8d3cab59d49",
+        "Q043_52b56ee5a55136c7"
+      ],
+      "rows": 3,
+      "target": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_8c92ae57205ab68a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_452a74043379e7ea"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_6425d2109138a0a6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_0d765b14d3cb7d96"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_3f91f6c614e65f91"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_a38172a1371d1d6c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_71c038f285be8338"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_5f87dc8be5d0fb22"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_9a7a44871d33cdc4"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q046_571c8ff67bb38011"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q046_dba61321cf7c46df"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_10ba6632e1f31585"
+        },
+        {
+          "reason": "QA_TRANSLATION_TOO_SMALL_TO_READ",
+          "roi_id": "Q046_1c32c8310a619ea2"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_bafb49b53be97b5b"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_04f09090b3bc4003"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_4cb6257a5abe3410"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_8aca5cc155e48ab9"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_34bab43a7a71606f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_41f1bf6830e0be2d"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_4e41d0e870b4e6e3"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q046_469dd463f4457ca4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_e32e01957d09461a"
+        },
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q046_b45e1466e6342b9b"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_1aed03d1cf8b7210"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_a7a9e0e694eae316"
+        },
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q046_d10debc727463563"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q046_b577bb70f171fb40"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_c11dd55c0f69ea32"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_343e81afc790e636"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_3bf8ad1051816806"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q046_c28a311899c25247"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q046_3f91f6c614e65f91",
+        "Q046_6425d2109138a0a6",
+        "Q046_71c038f285be8338",
+        "Q046_0d765b14d3cb7d96",
+        "Q046_5f87dc8be5d0fb22",
+        "Q046_dba61321cf7c46df",
+        "Q046_452a74043379e7ea",
+        "Q046_a38172a1371d1d6c",
+        "Q046_e32e01957d09461a",
+        "Q046_469dd463f4457ca4",
+        "Q046_1c32c8310a619ea2",
+        "Q046_9a7a44871d33cdc4",
+        "Q046_571c8ff67bb38011",
+        "Q046_8c92ae57205ab68a",
+        "Q046_04f09090b3bc4003",
+        "Q046_1aed03d1cf8b7210",
+        "Q046_41f1bf6830e0be2d",
+        "Q046_4cb6257a5abe3410",
+        "Q046_34bab43a7a71606f",
+        "Q046_4e41d0e870b4e6e3",
+        "Q046_b577bb70f171fb40",
+        "Q046_c11dd55c0f69ea32",
+        "Q046_10ba6632e1f31585",
+        "Q046_bafb49b53be97b5b",
+        "Q046_c28a311899c25247",
+        "Q046_d10debc727463563",
+        "Q046_343e81afc790e636",
+        "Q046_3bf8ad1051816806",
+        "Q046_8aca5cc155e48ab9",
+        "Q046_a7a9e0e694eae316",
+        "Q046_b45e1466e6342b9b"
+      ],
+      "rows": 31,
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q048_092c557a5055dea0"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q048_06af081464a3219b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q048_579f1becfdd1e5e7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q048_44bd5c9f1b33fad4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q048_311e1098a67b62ba"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q048_51a266d28f13b33f"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q048_9d02d7cfdf108c65"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q048_0bcd4916a1b49d05"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q048_0ce66f077a5751c5"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q048_51a266d28f13b33f",
+        "Q048_44bd5c9f1b33fad4",
+        "Q048_579f1becfdd1e5e7",
+        "Q048_06af081464a3219b",
+        "Q048_092c557a5055dea0",
+        "Q048_9d02d7cfdf108c65",
+        "Q048_311e1098a67b62ba",
+        "Q048_0bcd4916a1b49d05",
+        "Q048_0ce66f077a5751c5"
+      ],
+      "rows": 9,
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q049_6b10a52fadd35e7d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q049_3ba74067b6ccd286"
+        },
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q049_de9a907afba73cc7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q049_0c45ba7ff561045e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q049_6b17c3282ed24d5c"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q049_933dc2d9364976fd"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q049_8aea01d250190d2b"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q049_f4c08c63a50c336a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q049_a47ab4333636e1d8"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q049_3549f00ed08f125a"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q049_d376b4138af8349a"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q049_bab10fa1a1995348"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q049_de9a907afba73cc7",
+        "Q049_3ba74067b6ccd286",
+        "Q049_f4c08c63a50c336a",
+        "Q049_a47ab4333636e1d8",
+        "Q049_933dc2d9364976fd",
+        "Q049_0c45ba7ff561045e",
+        "Q049_6b10a52fadd35e7d",
+        "Q049_3549f00ed08f125a",
+        "Q049_bab10fa1a1995348",
+        "Q049_6b17c3282ed24d5c",
+        "Q049_8aea01d250190d2b",
+        "Q049_d376b4138af8349a"
+      ],
+      "rows": 12,
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q050_7f9cc3cfc5a7f301"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q050_6aff0aa0cafea634"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q050_ca50ce55360635ba"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q050_f559488447c0df63"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q050_f7ff1ecef9b70121"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q050_d76a5d27bb2c6bd6"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q050_f7ff1ecef9b70121",
+        "Q050_7f9cc3cfc5a7f301",
+        "Q050_6aff0aa0cafea634",
+        "Q050_ca50ce55360635ba",
+        "Q050_f559488447c0df63",
+        "Q050_d76a5d27bb2c6bd6"
+      ],
+      "rows": 6,
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q051_d182ab06baaed210"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_17cc55180a097d10"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_8cdb9d244cd8d757"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_4a8f479dbea83acf"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_9953bbddf2606524"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_7b24e891599aae3f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_8c7e0d3b87bc8a0b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_077c03c739fd1bdf"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q051_f4fd8c0c51f8f567"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_8ec1db93e84ba460"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_d101fcb97f3d640e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_a1d7548e0dddeebe"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_ed7b814c9e962086"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_7c2e96e66b11229c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_a12debc77e462078"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_e7b2239e5e609ef0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_4f4aac3336cde097"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_dcb17b73f904a244"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_600f745bebc803a5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_b1b43c6f0f1307b5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_0d236d0d79a87905"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_416002fd46b637ab"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_cf1eb0f81ca6763c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_432c5c0c016ce3cb"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_9304c5b2429309d1"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q051_e50f972c9ab405c8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_bf44216163755c6f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_af1a1911004fd3e3"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q051_3b76b083eacec5d1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_f3f412964382b8cf"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_3c6c6eae646bcdf4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_5bdd087c34ea3f4e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_ed33f286a9061dc7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_28d7d23a577531eb"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_efb8452673be8dbe"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_9f750bfb7dc3f4ac"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_3909d47ba88d6392"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_1c4a497be9e793ca"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_d26351d45045cfe3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_688e58cbd06a33ec"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_1381fab4eb86867c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_d72cf690999e697d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_5f136db6b9702700"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q051_61abf0cd9b10209a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_b3a3a8ac8802c4db"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_f01182fe06b7411b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_a4d20de7d73bdf1e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_622665d42c2ba8f5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_e729eb91931f820e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_8bf3deb8d908799a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_984d6dd0b7883fed"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_c165b62f63c4f86e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_0968fb55c061777e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_5f6146d71aa9b692"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_c5c1e87d053a9081"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_fcd1960dbe7d2922"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_0f50d9f098ed0341"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_9f5f0cdbc888863f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_5fe9f37cbcc4b9fc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_a5265b4d80e789f5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_80bcc9147dafefa0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_b80012a3c1d363f7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_55bb646a0def753f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q051_ee6887dd454add11"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q051_a4d20de7d73bdf1e",
+        "Q051_622665d42c2ba8f5",
+        "Q051_984d6dd0b7883fed",
+        "Q051_efb8452673be8dbe",
+        "Q051_8bf3deb8d908799a",
+        "Q051_e729eb91931f820e",
+        "Q051_bf44216163755c6f",
+        "Q051_f3f412964382b8cf",
+        "Q051_c165b62f63c4f86e",
+        "Q051_cf1eb0f81ca6763c",
+        "Q051_28d7d23a577531eb",
+        "Q051_9f750bfb7dc3f4ac",
+        "Q051_b1b43c6f0f1307b5",
+        "Q051_d72cf690999e697d",
+        "Q051_7b24e891599aae3f",
+        "Q051_432c5c0c016ce3cb",
+        "Q051_e7b2239e5e609ef0",
+        "Q051_8c7e0d3b87bc8a0b",
+        "Q051_d101fcb97f3d640e",
+        "Q051_80bcc9147dafefa0",
+        "Q051_600f745bebc803a5",
+        "Q051_077c03c739fd1bdf",
+        "Q051_7c2e96e66b11229c",
+        "Q051_ed7b814c9e962086",
+        "Q051_dcb17b73f904a244",
+        "Q051_a1d7548e0dddeebe",
+        "Q051_b80012a3c1d363f7",
+        "Q051_9304c5b2429309d1",
+        "Q051_1381fab4eb86867c",
+        "Q051_61abf0cd9b10209a",
+        "Q051_3b76b083eacec5d1",
+        "Q051_a12debc77e462078",
+        "Q051_5f136db6b9702700",
+        "Q051_4f4aac3336cde097",
+        "Q051_416002fd46b637ab",
+        "Q051_3c6c6eae646bcdf4",
+        "Q051_0968fb55c061777e",
+        "Q051_0d236d0d79a87905",
+        "Q051_fcd1960dbe7d2922",
+        "Q051_f01182fe06b7411b",
+        "Q051_d182ab06baaed210",
+        "Q051_5fe9f37cbcc4b9fc",
+        "Q051_f4fd8c0c51f8f567",
+        "Q051_8cdb9d244cd8d757",
+        "Q051_9953bbddf2606524",
+        "Q051_17cc55180a097d10",
+        "Q051_b3a3a8ac8802c4db",
+        "Q051_5bdd087c34ea3f4e",
+        "Q051_ed33f286a9061dc7",
+        "Q051_e50f972c9ab405c8",
+        "Q051_9f5f0cdbc888863f",
+        "Q051_0f50d9f098ed0341",
+        "Q051_5f6146d71aa9b692",
+        "Q051_c5c1e87d053a9081",
+        "Q051_8ec1db93e84ba460",
+        "Q051_4a8f479dbea83acf",
+        "Q051_af1a1911004fd3e3",
+        "Q051_d26351d45045cfe3",
+        "Q051_1c4a497be9e793ca",
+        "Q051_55bb646a0def753f",
+        "Q051_688e58cbd06a33ec",
+        "Q051_a5265b4d80e789f5",
+        "Q051_3909d47ba88d6392",
+        "Q051_ee6887dd454add11"
+      ],
+      "rows": 64,
+      "target": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,1024],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":2097152}",
+      "roi_ids": [
+        "Q052_a59a8c29fba84397",
+        "Q052_94ba15f4940e19ed",
+        "Q052_f24e7bf199654f00"
+      ],
+      "rows": 3,
+      "target": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[4096,4096],\"mip\":13,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":22369648}",
+      "roi_ids": [
+        "Q053_f6bb9f1d4f148346",
+        "Q053_6783160f10e0fead",
+        "Q053_732cf17bbf64e75b",
+        "Q053_219808ea70df894c",
+        "Q053_f640292a13c14a76",
+        "Q053_7ded534034485554",
+        "Q053_0aa372dc301c2d95",
+        "Q053_86f95f3e4f043c57",
+        "Q053_f49faacd5079ee02",
+        "Q053_e25e729c4d4c5848",
+        "Q053_6587c10019e717d5",
+        "Q053_1694bb3b70a1e3d0",
+        "Q053_a59ce2eb9b2d51f5"
+      ],
+      "rows": 13,
+      "target": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q054_aa022a1fbb2de297"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_c999c4651e2ed1a5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_d67657602f8a9656"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_ebe578c5623e4660"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_0074f14b2888ca4a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_177cfa23874fad08"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_bbf628c3b3604a8a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_776a0e04038be7f0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_04a720562160652f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_8c67f9e4490894e8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_2edfbabbfcac2c05"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_9f830c717b379c82"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_100607ee8c2c885a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_9adc0d73e1df0bb5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_e2cd7bfba6d55b27"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q054_85a8ad3334363978"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q054_0074f14b2888ca4a",
+        "Q054_e2cd7bfba6d55b27",
+        "Q054_c999c4651e2ed1a5",
+        "Q054_d67657602f8a9656",
+        "Q054_ebe578c5623e4660",
+        "Q054_8c67f9e4490894e8",
+        "Q054_177cfa23874fad08",
+        "Q054_bbf628c3b3604a8a",
+        "Q054_04a720562160652f",
+        "Q054_100607ee8c2c885a",
+        "Q054_2edfbabbfcac2c05",
+        "Q054_9adc0d73e1df0bb5",
+        "Q054_aa022a1fbb2de297",
+        "Q054_85a8ad3334363978",
+        "Q054_776a0e04038be7f0",
+        "Q054_9f830c717b379c82"
+      ],
+      "rows": 16,
+      "target": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}",
+      "roi_ids": [
+        "Q055_dd5213d64f53d429"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q057_42028aa13c5e8924"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_5c2c079536f9417a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_1c81e01f0616906e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_5c08380b1a8e6f3b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_8c8f9b124f72cca9"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q057_195e848a6da814e9"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_906a0915d1da69f5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_a73af5c28c2a9cde"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_9aadbfaddf88efcf"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_8b5a6b948ea8a357"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_b80de910021f24ee"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_777790b0c2a63246"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_72a9ac1dcacdd95e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_c5b1c4ea8bc0fccc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q057_8f69d136b1ea0c66"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q057_a67374f43b6149e8"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q057_8c8f9b124f72cca9",
+        "Q057_1c81e01f0616906e",
+        "Q057_5c08380b1a8e6f3b",
+        "Q057_a67374f43b6149e8",
+        "Q057_9aadbfaddf88efcf",
+        "Q057_c5b1c4ea8bc0fccc",
+        "Q057_777790b0c2a63246",
+        "Q057_72a9ac1dcacdd95e",
+        "Q057_a73af5c28c2a9cde",
+        "Q057_b80de910021f24ee",
+        "Q057_42028aa13c5e8924",
+        "Q057_5c2c079536f9417a",
+        "Q057_195e848a6da814e9",
+        "Q057_906a0915d1da69f5",
+        "Q057_8f69d136b1ea0c66",
+        "Q057_8b5a6b948ea8a357"
+      ],
+      "rows": 16,
+      "target": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,512],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":1048576}",
+      "roi_ids": [
+        "Q059_0214d1bfb9538a64",
+        "Q059_d6b334ba2a964812",
+        "Q059_c4006a90789c50b0",
+        "Q059_58da97467534c071"
+      ],
+      "rows": 4,
+      "target": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_f9ce6b3e4e60ef34"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_773770af7ce8d02a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_9eea220cd6a7a4ab"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_ceae188bbc8c4af3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_c0ec1551736ece11"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_c8f5068ad89a5b9c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_2aec6ab90b406fd8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_6285c0baec403b3c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_c0aeee0db065202c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_c8e7b9bbc33eab80"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_f2c22b1a30bcae8f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_5244f0171b35a226"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_2d0dbf7feaddcde5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_0c14ba000bb71ba7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_7cce1a9a91ebb4dc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q060_bd509c5bfa15f6b6"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q060_7c43d6d796962b4c"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q060_5244f0171b35a226",
+        "Q060_7cce1a9a91ebb4dc",
+        "Q060_f2c22b1a30bcae8f",
+        "Q060_773770af7ce8d02a",
+        "Q060_c8f5068ad89a5b9c",
+        "Q060_f9ce6b3e4e60ef34",
+        "Q060_c0aeee0db065202c",
+        "Q060_2d0dbf7feaddcde5",
+        "Q060_7c43d6d796962b4c",
+        "Q060_bd509c5bfa15f6b6",
+        "Q060_c8e7b9bbc33eab80",
+        "Q060_0c14ba000bb71ba7",
+        "Q060_9eea220cd6a7a4ab",
+        "Q060_ceae188bbc8c4af3",
+        "Q060_6285c0baec403b3c",
+        "Q060_2aec6ab90b406fd8",
+        "Q060_c0ec1551736ece11"
+      ],
+      "rows": 17,
+      "target": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_ec334afe238fd69e"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q061_112529fb9e9964f7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_d09b126a2b69bc9e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_c1c73f966f0ec18f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_fa3aee16a8174302"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_e2165bef4d5a7678"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_b0158ad1e7fa3f75"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_66dfaa7e327e0c62"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_fa8ed9b5cd1b82de"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_7c72919f43df94b9"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_5cc35796bf17b80e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_ff5ea58817f04868"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_709f706348a901d0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_e2813b06b091e99b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_fd78c902dc83b019"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_4e7b1afaac18ef4c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_7d414e61a6bc6a31"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_e04b8bf5b077aaab"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q061_1c6dfc102ba43c9c"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q061_bff40350adce5040"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q061_1c6dfc102ba43c9c",
+        "Q061_7c72919f43df94b9",
+        "Q061_ff5ea58817f04868",
+        "Q061_66dfaa7e327e0c62",
+        "Q061_fd78c902dc83b019",
+        "Q061_4e7b1afaac18ef4c",
+        "Q061_709f706348a901d0",
+        "Q061_bff40350adce5040",
+        "Q061_ec334afe238fd69e",
+        "Q061_5cc35796bf17b80e",
+        "Q061_e2813b06b091e99b",
+        "Q061_fa8ed9b5cd1b82de",
+        "Q061_e2165bef4d5a7678",
+        "Q061_fa3aee16a8174302",
+        "Q061_e04b8bf5b077aaab",
+        "Q061_b0158ad1e7fa3f75",
+        "Q061_112529fb9e9964f7",
+        "Q061_7d414e61a6bc6a31",
+        "Q061_c1c73f966f0ec18f",
+        "Q061_d09b126a2b69bc9e"
+      ],
+      "rows": 20,
+      "target": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q062_77b81b0abc2938b9"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q062_9d92bca9ea5295b0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q062_3d91f8d09b7fabe4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q062_9471064616483dc0"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q062_bdd51608c09e7e5f"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q062_77b81b0abc2938b9",
+        "Q062_9471064616483dc0",
+        "Q062_bdd51608c09e7e5f",
+        "Q062_3d91f8d09b7fabe4",
+        "Q062_9d92bca9ea5295b0"
+      ],
+      "rows": 5,
+      "target": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q063_a23cdd8f59fc6939"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q063_961450721720e810"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q063_bc1b1d6af87612c1"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q063_a23cdd8f59fc6939",
+        "Q063_961450721720e810",
+        "Q063_bc1b1d6af87612c1"
+      ],
+      "rows": 3,
+      "target": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q065_4796905a3921198b"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q065_1b2f9e3d8eb09bc6"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q065_4796905a3921198b",
+        "Q065_1b2f9e3d8eb09bc6"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[4096,4096],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":16777216}",
+      "roi_ids": [
+        "Q086_cf5c6a0a497b6ce4",
+        "Q086_72f6f42102789a81",
+        "Q086_bac66d798eb23b3d",
+        "Q086_c9bba6352022ab22",
+        "Q086_5b9e8ab56194f979",
+        "Q086_c764dcd00ec81a15",
+        "Q086_0f8a5a5f621f6a9b",
+        "Q086_6370e4e9a71aa2c9",
+        "Q086_09d5a2eb4ec75f6c",
+        "Q086_b992fc73b6a3bc92",
+        "Q086_11895901f9313213",
+        "Q086_8fc0625662b8725f",
+        "Q086_deaf9fd898e08025",
+        "Q086_a5be7489aa680e44",
+        "Q086_9dc7cafdc29ca37c",
+        "Q086_ba5582d4ea3b0947",
+        "Q086_af22aa50497e9e2b",
+        "Q086_045a31ea3bda92ad",
+        "Q086_63903035a9ba4fea",
+        "Q086_efe5f21b303c5b48",
+        "Q086_b666fbc45549afc4",
+        "Q086_9eeb087d3de40205",
+        "Q086_96b50f42b3546c0a",
+        "Q086_22129be3f64aa24d",
+        "Q086_d244d33d9336c6bb"
+      ],
+      "rows": 25,
+      "target": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q089_bc7eeb2a41b011ad"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q089_bc7eeb2a41b011ad"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}",
+      "roi_ids": [
+        "Q092_c3e26b50f325db99",
+        "Q092_ec969d44bfedebe0"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q094_a79e6a0a7584aed4"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q094_d1401e120e386bd1"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q094_70c7ec48b8ef689f"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q094_990d1c9df0e9928d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q094_e97f9b14ce12020c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q094_d7652d4ec4bb37cd"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q094_2f40685fce51179a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q094_eb6629f5cc29cfa1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q094_30ba7b07ed998559"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q094_eb6629f5cc29cfa1",
+        "Q094_2f40685fce51179a",
+        "Q094_30ba7b07ed998559",
+        "Q094_d7652d4ec4bb37cd",
+        "Q094_e97f9b14ce12020c",
+        "Q094_d1401e120e386bd1",
+        "Q094_a79e6a0a7584aed4",
+        "Q094_70c7ec48b8ef689f",
+        "Q094_990d1c9df0e9928d"
+      ],
+      "rows": 9,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_4c3294f9e9264168"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_b1097bc6629c510e"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_01f8a9b45a0303e1"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_13497d0995cb4553"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q095_b69d89272fa52a60"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_33ecaebcda7a82c7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q095_50e8901240df8ca5"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_588b6568a8de7c8f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q095_7930af1fe385424d"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_9f589bc61b1ec38c"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_7df6e5a93ccb7271"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_d1e36e6a4765a908"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_06d2b7de8ed3b74c"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_ba20bdfa91f818d6"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_3f83420414b71418"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q095_70955fb41be5a394"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q095_bb4a4dedf29da3b9"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q095_7930af1fe385424d",
+        "Q095_b69d89272fa52a60",
+        "Q095_70955fb41be5a394",
+        "Q095_13497d0995cb4553",
+        "Q095_bb4a4dedf29da3b9",
+        "Q095_d1e36e6a4765a908",
+        "Q095_01f8a9b45a0303e1",
+        "Q095_33ecaebcda7a82c7",
+        "Q095_b1097bc6629c510e",
+        "Q095_9f589bc61b1ec38c",
+        "Q095_3f83420414b71418",
+        "Q095_ba20bdfa91f818d6",
+        "Q095_588b6568a8de7c8f",
+        "Q095_50e8901240df8ca5",
+        "Q095_4c3294f9e9264168",
+        "Q095_7df6e5a93ccb7271",
+        "Q095_06d2b7de8ed3b74c"
+      ],
+      "rows": 17,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q097_9046d2c60a4714be"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q097_96e9f336e7f8446c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q097_2a795dc0c5b58c43"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q097_fcfb148739388251"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q097_ba81b81a13e85d54"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q097_03f281f5bc62e168"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q097_eafd108f449feccc"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q097_7f88335242f4f3ab"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q097_96e9f336e7f8446c",
+        "Q097_eafd108f449feccc",
+        "Q097_fcfb148739388251",
+        "Q097_ba81b81a13e85d54",
+        "Q097_2a795dc0c5b58c43",
+        "Q097_9046d2c60a4714be",
+        "Q097_7f88335242f4f3ab",
+        "Q097_03f281f5bc62e168"
+      ],
+      "rows": 8,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,128],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":262144}",
+      "roi_ids": [
+        "Q098_5112ccfe2d458ff6"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}",
+      "roi_ids": [
+        "Q099_861e16d020961ed5"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q100_fe82b5a79217c955"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_b8b93b9cee3c7853"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_ac88eeb1ef946033"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_020de691472d57b8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_eaf6592c46210577"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_5b6fcae5650c4de4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_84c26a1be776761c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_bffb98811ed62767"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_31f47653202cf567"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_0ec68698c4ea7f02"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_f9a73c0f2b6b7965"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_c1b92f57af7e776e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q100_a5d22c707b24bca1"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q100_fe82b5a79217c955",
+        "Q100_84c26a1be776761c",
+        "Q100_bffb98811ed62767",
+        "Q100_5b6fcae5650c4de4",
+        "Q100_020de691472d57b8",
+        "Q100_b8b93b9cee3c7853",
+        "Q100_c1b92f57af7e776e",
+        "Q100_31f47653202cf567",
+        "Q100_0ec68698c4ea7f02",
+        "Q100_f9a73c0f2b6b7965",
+        "Q100_a5d22c707b24bca1",
+        "Q100_ac88eeb1ef946033",
+        "Q100_eaf6592c46210577"
+      ],
+      "rows": 13,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q101_fbfd198e1ca19fd7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q101_d562b64cb5ec84ee"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q101_708d588cf9418b68"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q101_14fba2230560a7b6"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q101_1fab381961c8f33b"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q101_e5312f08859b605b"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q101_ce6fc95e42c9cdff"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q101_6d5f1574bc8aa55e"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q101_b524921be8864cda"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q101_829f0c8f0f0de072"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q101_14fba2230560a7b6",
+        "Q101_6d5f1574bc8aa55e",
+        "Q101_ce6fc95e42c9cdff",
+        "Q101_b524921be8864cda",
+        "Q101_1fab381961c8f33b",
+        "Q101_829f0c8f0f0de072",
+        "Q101_d562b64cb5ec84ee",
+        "Q101_e5312f08859b605b",
+        "Q101_708d588cf9418b68",
+        "Q101_fbfd198e1ca19fd7"
+      ],
+      "rows": 10,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}",
+      "roi_ids": [
+        "Q102_b90c27565464daf9",
+        "Q102_293bc908b7eb9ebe"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q103_ee07feec4dca375c"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q103_ee07feec4dca375c"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}",
+      "roi_ids": [
+        "Q104_01e25aa25a681d26"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q106_2542090830592967"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q106_87f43ebe4faec57f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q106_4addcfe292975026"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q106_637d5c496e789cf7"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q106_637d5c496e789cf7",
+        "Q106_87f43ebe4faec57f",
+        "Q106_2542090830592967",
+        "Q106_4addcfe292975026"
+      ],
+      "rows": 4,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q107_b1b56091d26ffdf3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q107_77fd3df65124212e"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q107_b1b56091d26ffdf3",
+        "Q107_77fd3df65124212e"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q111_65868d4ae9a0c723"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_a33a0b15d91aa61b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_e7419005169a5220"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_d6c400ede94057ea"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_b40aa043dc4c3737"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_0cf81ed6b2bfbb0b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_9684be626751292c"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q111_9ee1437b986d35cc"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q111_71cf8062553a9961"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q111_391c45c30f031821"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_64b54ec24aa6664f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_c933a3b7ed546d09"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q111_5cdc8808f3d14492"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_d9274ed8e81bacf5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_367c2226ed993362"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q111_d0b8641741d39217"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q111_0cf81ed6b2bfbb0b",
+        "Q111_367c2226ed993362",
+        "Q111_e7419005169a5220",
+        "Q111_65868d4ae9a0c723",
+        "Q111_d9274ed8e81bacf5",
+        "Q111_64b54ec24aa6664f",
+        "Q111_b40aa043dc4c3737",
+        "Q111_a33a0b15d91aa61b",
+        "Q111_9684be626751292c",
+        "Q111_71cf8062553a9961",
+        "Q111_d0b8641741d39217",
+        "Q111_5cdc8808f3d14492",
+        "Q111_c933a3b7ed546d09",
+        "Q111_9ee1437b986d35cc",
+        "Q111_391c45c30f031821",
+        "Q111_d6c400ede94057ea"
+      ],
+      "rows": 16,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}",
+      "roi_ids": [
+        "Q112_34d7b55a5e6b3ec8"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}",
+      "roi_ids": [
+        "Q116_a9da32ccca1ed48a"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,256],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":524288}",
+      "roi_ids": [
+        "Q119_e9d31b675f66d275",
+        "Q119_470c1b806cd9eecb"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q121_bc6fbba21af3e09a"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q121_ee45cd46f3b02118"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_30667e7a5825aca0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_7025a87c6151b41e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_7d9a094420ad3d79_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q121_e8a6cc531a953cc9_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_5234a9627fec2a76"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q121_e5e8b0c3fe3e4827"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_b0e5eeeba94ae7c8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_9a62ccb58daa23ae"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_24b34af9518cc1ea"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_5d87d98c13296b4b"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q121_bd8408b2d54b6df4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_935a7d6c50e7c4dd_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_60ca27dc3af9dbbe"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_5d28b82190f1600a_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q121_54c91b23a9fe0bcc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_c90a6eea248e3607"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_acfc678988a06403"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_381db566165d2840"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_a9fbb2d93b8b6dbd_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_d7298abca9362259_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q121_ceb2a8173087102c"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q121_c8c40943e3657cc4"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q121_87a498b96e5f222b"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q121_7d604aea11ee8cd5"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q121_1899c0152ffdcde2"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q121_bd8408b2d54b6df4",
+        "Q121_c90a6eea248e3607",
+        "Q121_60ca27dc3af9dbbe",
+        "Q121_54c91b23a9fe0bcc",
+        "Q121_e5e8b0c3fe3e4827",
+        "Q121_5d87d98c13296b4b",
+        "Q121_935a7d6c50e7c4dd_RB_B",
+        "Q121_7d9a094420ad3d79_RB_B",
+        "Q121_a9fbb2d93b8b6dbd_RB_B",
+        "Q121_d7298abca9362259_RB_B",
+        "Q121_5d28b82190f1600a_RB_B",
+        "Q121_e8a6cc531a953cc9_RB_B",
+        "Q121_381db566165d2840",
+        "Q121_bc6fbba21af3e09a",
+        "Q121_5234a9627fec2a76",
+        "Q121_24b34af9518cc1ea",
+        "Q121_30667e7a5825aca0",
+        "Q121_b0e5eeeba94ae7c8",
+        "Q121_7025a87c6151b41e",
+        "Q121_c8c40943e3657cc4",
+        "Q121_acfc678988a06403",
+        "Q121_7d604aea11ee8cd5",
+        "Q121_9a62ccb58daa23ae",
+        "Q121_ee45cd46f3b02118",
+        "Q121_ceb2a8173087102c",
+        "Q121_87a498b96e5f222b",
+        "Q121_1899c0152ffdcde2"
+      ],
+      "rows": 27,
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q128_451d00643f856186"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q128_2b49aae6232f5694"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q128_67a945f48486f805"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q128_1745a6a4106df0b5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q128_bcfc7b75fe02f595"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q128_d57bcd38dd583b9e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q128_c254b8125821eca7"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q128_c254b8125821eca7",
+        "Q128_67a945f48486f805",
+        "Q128_d57bcd38dd583b9e",
+        "Q128_1745a6a4106df0b5",
+        "Q128_2b49aae6232f5694",
+        "Q128_bcfc7b75fe02f595",
+        "Q128_451d00643f856186"
+      ],
+      "rows": 7,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q130_6fae69147274cc15"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q130_3c9b625961e685e9"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q130_1d7bc6cd31914b66"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q130_9c997fefb4fbfcd4"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q130_338cdaf0d79fc84e"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q130_1d7bc6cd31914b66",
+        "Q130_3c9b625961e685e9",
+        "Q130_6fae69147274cc15",
+        "Q130_9c997fefb4fbfcd4",
+        "Q130_338cdaf0d79fc84e"
+      ],
+      "rows": 5,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q132_f4804ab74fdef71d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q132_53698138cb5111c3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q132_9ea5f69b24935739"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q132_020387f32c70c4a3"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q132_9ea5f69b24935739",
+        "Q132_f4804ab74fdef71d",
+        "Q132_020387f32c70c4a3",
+        "Q132_53698138cb5111c3"
+      ],
+      "rows": 4,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q133_2eba9842463a3a26_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q133_d536fabb997f51a3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q133_325b1b11f63545fd_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q133_3d0299d1dd609699"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q133_5d57f032d1f98b12"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q133_c47c389e06722e87"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q133_5ad0c55ee56b81d0"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q133_52b576e3922553ec"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q133_2ea0dcfe351600d6_RB_B"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q133_5ad0c55ee56b81d0",
+        "Q133_c47c389e06722e87",
+        "Q133_52b576e3922553ec",
+        "Q133_2eba9842463a3a26_RB_B",
+        "Q133_325b1b11f63545fd_RB_B",
+        "Q133_2ea0dcfe351600d6_RB_B",
+        "Q133_d536fabb997f51a3",
+        "Q133_3d0299d1dd609699",
+        "Q133_5d57f032d1f98b12"
+      ],
+      "rows": 9,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q135_c2ad0a061355607c"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q135_e3eb8951461f9acb"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q135_2a4a33a28b774ea1"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q135_c6d8d23c8732a8de_RB_B"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q135_f59ca0432f4b2283"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q135_51d48bc0893179d1_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q135_61b333a688bb7aae"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q135_2a4a33a28b774ea1",
+        "Q135_c6d8d23c8732a8de_RB_B",
+        "Q135_51d48bc0893179d1_RB_B",
+        "Q135_c2ad0a061355607c",
+        "Q135_e3eb8951461f9acb",
+        "Q135_61b333a688bb7aae",
+        "Q135_f59ca0432f4b2283"
+      ],
+      "rows": 7,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q137_64b521c49c33d01a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q137_49a7ab972b3d9fc7_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q137_61bbbac3283b424a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q137_8b1ae1ab48712aa0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q137_618cd44e3fcb990b"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q137_8b1ae1ab48712aa0",
+        "Q137_49a7ab972b3d9fc7_RB_B",
+        "Q137_618cd44e3fcb990b",
+        "Q137_64b521c49c33d01a",
+        "Q137_61bbbac3283b424a"
+      ],
+      "rows": 5,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q139_c7b81611ee5859cc"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q139_b23b2a42de81e73c"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q139_b23b2a42de81e73c",
+        "Q139_c7b81611ee5859cc"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q140_629b3efe8d2c5d78"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_e11e13b1aa29c7c7"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_f84092b4aa9efe2c"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_7f614ff9fa5eeacb"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q140_2f00d0ed421bafcc"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q140_7f614ff9fa5eeacb",
+        "Q140_2f00d0ed421bafcc",
+        "Q140_f84092b4aa9efe2c",
+        "Q140_e11e13b1aa29c7c7",
+        "Q140_629b3efe8d2c5d78"
+      ],
+      "rows": 5,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_950cead26227b48b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_43ce699117b7c714"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_3f2666ba3adb8c35"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_4e287a6f6a830a70"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_a3d11ea18b6985f3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_e55cf9340e4e718c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_9f204243ab7cfbc1"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q147_1294325f6a82f164_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_929182370cce50b0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_10a245ded1a9654f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_11745d63e0125933"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q147_a7c1972309dd88bf"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q147_325b96ffe4d80317_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q147_d247498948a01b43"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q147_ec7945b0272a4494_RB_B"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q147_e55cf9340e4e718c",
+        "Q147_4e287a6f6a830a70",
+        "Q147_3f2666ba3adb8c35",
+        "Q147_a7c1972309dd88bf",
+        "Q147_1294325f6a82f164_RB_B",
+        "Q147_325b96ffe4d80317_RB_B",
+        "Q147_ec7945b0272a4494_RB_B",
+        "Q147_d247498948a01b43",
+        "Q147_11745d63e0125933",
+        "Q147_929182370cce50b0",
+        "Q147_9f204243ab7cfbc1",
+        "Q147_a3d11ea18b6985f3",
+        "Q147_10a245ded1a9654f",
+        "Q147_950cead26227b48b",
+        "Q147_43ce699117b7c714"
+      ],
+      "rows": 15,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q154_063fc310b20287c3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q154_7c6a5c11159f61fa"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q154_c77364034f64bc4e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q154_e8a897312260427b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q154_fec84edfb3865d45"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q154_7c6a5c11159f61fa",
+        "Q154_c77364034f64bc4e",
+        "Q154_063fc310b20287c3",
+        "Q154_e8a897312260427b",
+        "Q154_fec84edfb3865d45"
+      ],
+      "rows": 5,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q159_8d365831c4b0e1c2"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q159_6505ccb3e25ce42c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_b660ad663d40011f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_4b22b1948e72262a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_3498574c6edbab95"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q159_90e94cc805b7cc63_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_6038fbd8bf6d0aa2"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_b8b786b1a621508b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_ecd038ade09186f8_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_c19ac35d17040b51"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q159_768bd1cdd8a213b4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_17fa7dfb066752db"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q159_b241de633b0dbc61"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q159_1949bd92935acd84_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q159_a6f886d36ad0155d"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q159_768bd1cdd8a213b4",
+        "Q159_6038fbd8bf6d0aa2",
+        "Q159_6505ccb3e25ce42c",
+        "Q159_90e94cc805b7cc63_RB_B",
+        "Q159_ecd038ade09186f8_RB_B",
+        "Q159_1949bd92935acd84_RB_B",
+        "Q159_8d365831c4b0e1c2",
+        "Q159_3498574c6edbab95",
+        "Q159_b8b786b1a621508b",
+        "Q159_a6f886d36ad0155d",
+        "Q159_b660ad663d40011f",
+        "Q159_17fa7dfb066752db",
+        "Q159_b241de633b0dbc61",
+        "Q159_c19ac35d17040b51",
+        "Q159_4b22b1948e72262a"
+      ],
+      "rows": 15,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[2048,2048],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":4194304}",
+      "roi_ids": [
+        "Q161_53de9255d1000233",
+        "Q161_c4bae570e6e8780a",
+        "Q161_835f21f8b3b20bd1",
+        "Q161_8140a5326af839a7",
+        "Q161_54b6f457507d3066",
+        "Q161_9c1095bac503b8c5",
+        "Q161_af7f7f05c566151f_RB_B",
+        "Q161_3d3133e135f518b1_RB_B",
+        "Q161_351fc9cdb163dae9_RB_B",
+        "Q161_163d8746137615d0_RB_B",
+        "Q161_5edf693621dc45a1_RB_B",
+        "Q161_7f50a1d8ffbcd064_RB_B",
+        "Q161_d413f217f1218b7a_RB_B",
+        "Q161_85450ed07d3da830",
+        "Q161_a0aa6db4d10210d3",
+        "Q161_2ad4d17612e81c03",
+        "Q161_a354bf5e3a7b6177",
+        "Q161_6f783d525f704b09",
+        "Q161_533f9569493fb2fb",
+        "Q161_a0f1b3a49edfa829",
+        "Q161_b6a048101dacac92",
+        "Q161_69ceaa6d71a93a6c",
+        "Q161_092816d9210fd402",
+        "Q161_eea1bc2c7446635e",
+        "Q161_563039872fa7181e",
+        "Q161_73e0b73011bd08af",
+        "Q161_79406ebfad3d5500",
+        "Q161_fa1031c933ff857b",
+        "Q161_c06f8ed4980fa2ef",
+        "Q161_8b1637261d98ebb1",
+        "Q161_c0a1f3822a379fc0",
+        "Q161_c8218cd6556c2d83",
+        "Q161_6b26e2d669ced156",
+        "Q161_269062c9f73b89e2",
+        "Q161_72168a7e71342541",
+        "Q161_623eedb28e9bece8",
+        "Q161_29dfe698b1f2ee7c",
+        "Q161_a6f4d13b268bdb67",
+        "Q161_3935ff67daceaf17",
+        "Q161_7acd346f895eb1fe",
+        "Q161_42f038b9fa20580e",
+        "Q161_df71217914fbbe2a",
+        "Q161_2477321b0942c89b",
+        "Q161_59340de4d748c184",
+        "Q161_5d82b5fcd656adda",
+        "Q161_8429119f1960011e",
+        "Q161_1feedeb0bc9341cc",
+        "Q161_72a382df95bd7d28",
+        "Q161_296f622bed3245f4",
+        "Q161_a23756b65be7f8bc",
+        "Q161_3b5295459e4be3d2"
+      ],
+      "rows": 51,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q163_914fa94078cc01f5"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q163_c70e8fb032d1e989"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_402ba4533b53db18"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_e58994a1ae262943"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_df77a32a516afc6f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_84ffa9b0cceb2281"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_e3caf6e7a4db7ae6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_0aa095493de9c0a5"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q163_d6cd89bd6812b620"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_472431b63b268d17"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_ff950df7f6bfd086"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_ae3bfa9b6542258f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_b8830c18229c838e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_43e0a9554a851699"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_df8383f30730c7ef"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_c50d03fd79443de4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_df45be057de595e6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_4a3c7391ebdcf794"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q163_43248f3a746f1773"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_3f93af0b14a910a5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_e08f1080f8c0cc78"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_c3976cc81f3d362b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_16cd04ef2c1f2106"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q163_390660df779f3446"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q163_ff950df7f6bfd086",
+        "Q163_472431b63b268d17",
+        "Q163_0aa095493de9c0a5",
+        "Q163_c3976cc81f3d362b",
+        "Q163_df77a32a516afc6f",
+        "Q163_16cd04ef2c1f2106",
+        "Q163_d6cd89bd6812b620",
+        "Q163_df45be057de595e6",
+        "Q163_43248f3a746f1773",
+        "Q163_43e0a9554a851699",
+        "Q163_3f93af0b14a910a5",
+        "Q163_914fa94078cc01f5",
+        "Q163_ae3bfa9b6542258f",
+        "Q163_e08f1080f8c0cc78",
+        "Q163_e3caf6e7a4db7ae6",
+        "Q163_e58994a1ae262943",
+        "Q163_c50d03fd79443de4",
+        "Q163_4a3c7391ebdcf794",
+        "Q163_390660df779f3446",
+        "Q163_df8383f30730c7ef",
+        "Q163_b8830c18229c838e",
+        "Q163_c70e8fb032d1e989",
+        "Q163_84ffa9b0cceb2281",
+        "Q163_402ba4533b53db18"
+      ],
+      "rows": 24,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q164_d613714cc9cbe4a2"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q164_d613714cc9cbe4a2"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q172_de7da2dbb5499484"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q172_7040528564141cff"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q172_7040528564141cff",
+        "Q172_de7da2dbb5499484"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_7c7f4928b3047dbc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_9c2afed5e703ce6f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_f2e05596354e1da6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_bd23bf09836a129d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_4b313a1eb9b2f21d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_132c378997161a88"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_f919a129c9c2375b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_f836dac7e61ba985"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_dbe263e64ede236f"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q173_c9a0652083abce51"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_e1919089d76eeeac"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q173_861eef7d0bd821b2"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q173_0f6a916768736fb3"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q173_096f6d8630fb5096"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_a3fee10ab3398102"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_ca8bde6a3337403e"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q173_eda865cd192b5677"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_324cd13f4935bf10"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_a085b1172a900763"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_da8ec03645ac649f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q173_3fe461d0394cc97e"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q173_c9a0652083abce51",
+        "Q173_7c7f4928b3047dbc",
+        "Q173_f2e05596354e1da6",
+        "Q173_324cd13f4935bf10",
+        "Q173_f836dac7e61ba985",
+        "Q173_a3fee10ab3398102",
+        "Q173_132c378997161a88",
+        "Q173_9c2afed5e703ce6f",
+        "Q173_bd23bf09836a129d",
+        "Q173_0f6a916768736fb3",
+        "Q173_3fe461d0394cc97e",
+        "Q173_f919a129c9c2375b",
+        "Q173_ca8bde6a3337403e",
+        "Q173_a085b1172a900763",
+        "Q173_4b313a1eb9b2f21d",
+        "Q173_eda865cd192b5677",
+        "Q173_dbe263e64ede236f",
+        "Q173_096f6d8630fb5096",
+        "Q173_861eef7d0bd821b2",
+        "Q173_da8ec03645ac649f",
+        "Q173_e1919089d76eeeac"
+      ],
+      "rows": 21,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q175_ab2233e8c0cd9020"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q175_a46d37b435d4e249"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q175_624765c18605ae83"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q175_a46d37b435d4e249",
+        "Q175_624765c18605ae83",
+        "Q175_ab2233e8c0cd9020"
+      ],
+      "rows": 3,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q176_2f07831ec55d39c7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q176_54edb9067099ec7e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q176_d9b75816183ff5d6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q176_452b8a5f73a1a851"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q176_452b8a5f73a1a851",
+        "Q176_2f07831ec55d39c7",
+        "Q176_d9b75816183ff5d6",
+        "Q176_54edb9067099ec7e"
+      ],
+      "rows": 4,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q188_15728552125c9660"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q188_4e7272fce9dfd96b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q188_931027062f955eee"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q188_2d4044082d79a38a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q188_d944420df3e4c66d"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q188_90461d9c57f8e527"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q188_4e7272fce9dfd96b",
+        "Q188_2d4044082d79a38a",
+        "Q188_931027062f955eee",
+        "Q188_15728552125c9660",
+        "Q188_d944420df3e4c66d",
+        "Q188_90461d9c57f8e527"
+      ],
+      "rows": 6,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q193_99b35bc369d60cb4"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q193_e1dd5f64c17c4124"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q193_b01644f0b8afb491_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q193_fe6d0e758aa98b86_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q193_6b80ecb03de1f5f0"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q193_ed9b7c69cdee8955"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q193_321d953f979d6b8e"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q193_44f38adfd37a3e63"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q193_97f06b8104c5e70b_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q193_424fbd5c3fcdb81e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q193_e519d8702c5dc77d"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q193_ec75be38118e36d5"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q193_57b3061165d4d6b1"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q193_53d6085638ec9c80"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q193_ed9b7c69cdee8955",
+        "Q193_44f38adfd37a3e63",
+        "Q193_424fbd5c3fcdb81e",
+        "Q193_e1dd5f64c17c4124",
+        "Q193_fe6d0e758aa98b86_RB_B",
+        "Q193_97f06b8104c5e70b_RB_B",
+        "Q193_b01644f0b8afb491_RB_B",
+        "Q193_6b80ecb03de1f5f0",
+        "Q193_321d953f979d6b8e",
+        "Q193_ec75be38118e36d5",
+        "Q193_57b3061165d4d6b1",
+        "Q193_99b35bc369d60cb4",
+        "Q193_53d6085638ec9c80",
+        "Q193_e519d8702c5dc77d"
+      ],
+      "rows": 14,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q195_4ff61f114eb4a1ec"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q195_fcc05936c17d496d"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q195_4ff61f114eb4a1ec",
+        "Q195_fcc05936c17d496d"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q197_2cc525ea6653395c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q197_e1ad4bb86f4df351"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q197_37573e75f895a4fb"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q197_8cd32e5f7463c930"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q197_82735ab03e9b2096"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q197_37573e75f895a4fb",
+        "Q197_82735ab03e9b2096",
+        "Q197_8cd32e5f7463c930",
+        "Q197_e1ad4bb86f4df351",
+        "Q197_2cc525ea6653395c"
+      ],
+      "rows": 5,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q198_df206aa0666f06b2"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q198_cd21290e2d3e81c0"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q198_4849a9316a0d0e2b"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q198_cedc78211c3e35af"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q198_df206aa0666f06b2",
+        "Q198_cd21290e2d3e81c0",
+        "Q198_cedc78211c3e35af",
+        "Q198_4849a9316a0d0e2b"
+      ],
+      "rows": 4,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_6942834bb995a7bf"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_db8e245fa0b72388"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_70b80e4307a54926"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_fd23f4ba1ec80c46"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_69e361a2744de4e2_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_62dc437bd64d2044_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_f8bf2aedd605e317"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_87456a4c46a6f8e3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_00f74091f6b8a70f"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q201_3b7fd48bbb461965"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_69fd0e9614e43659"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q201_6778b69f379bb455"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_9e0c103f9fbaba5a"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q201_6c6074afa1b7d20c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_ef35cf56500abdc3_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q201_9175c8e028851e64_RB_B"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q201_87d395647fa5ff82"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q201_87456a4c46a6f8e3",
+        "Q201_69fd0e9614e43659",
+        "Q201_fd23f4ba1ec80c46",
+        "Q201_ef35cf56500abdc3_RB_B",
+        "Q201_62dc437bd64d2044_RB_B",
+        "Q201_9175c8e028851e64_RB_B",
+        "Q201_69e361a2744de4e2_RB_B",
+        "Q201_6c6074afa1b7d20c",
+        "Q201_3b7fd48bbb461965",
+        "Q201_6778b69f379bb455",
+        "Q201_db8e245fa0b72388",
+        "Q201_6942834bb995a7bf",
+        "Q201_00f74091f6b8a70f",
+        "Q201_f8bf2aedd605e317",
+        "Q201_70b80e4307a54926",
+        "Q201_87d395647fa5ff82",
+        "Q201_9e0c103f9fbaba5a"
+      ],
+      "rows": 17,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_c00f88a7a87e6e19"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_7626b77585666ef0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_c50d5fffffc23a7f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_ce38edd320033b27"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_c42cac247c3c65f9"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_0a26fe0d305514db_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_da350baeddba7ddb"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_4ea01e6106ac6443"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q205_09aa4e1f4651936c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_b84a4e5357e80a87_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_29114a7e4316a7fb"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_e407fc863e6036d5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_10e5e41cecc715df"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q205_5de4cbae50683601"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_b9d2da331ce7f720"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_89fa031d7183c2e9_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_0e3ad8edf0bfe64d_RB_B"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_76580dc038ea7387"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_28b78cfb71a52497"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q205_3f7c30aa1d678c5d"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q205_09aa4e1f4651936c",
+        "Q205_10e5e41cecc715df",
+        "Q205_c42cac247c3c65f9",
+        "Q205_b9d2da331ce7f720",
+        "Q205_0e3ad8edf0bfe64d_RB_B",
+        "Q205_0a26fe0d305514db_RB_B",
+        "Q205_89fa031d7183c2e9_RB_B",
+        "Q205_b84a4e5357e80a87_RB_B",
+        "Q205_4ea01e6106ac6443",
+        "Q205_da350baeddba7ddb",
+        "Q205_7626b77585666ef0",
+        "Q205_c50d5fffffc23a7f",
+        "Q205_c00f88a7a87e6e19",
+        "Q205_ce38edd320033b27",
+        "Q205_28b78cfb71a52497",
+        "Q205_76580dc038ea7387",
+        "Q205_29114a7e4316a7fb",
+        "Q205_e407fc863e6036d5",
+        "Q205_3f7c30aa1d678c5d",
+        "Q205_5de4cbae50683601"
+      ],
+      "rows": 20,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q212_fa46a980b01f234e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_5551ceaee898059d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_14e0c3ca6091ecd4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_630db9e8c21db398"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_c80115885b0cbaa4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_291338bdd2742333"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q212_e8fbad1cf9f20fc5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_423e0cb72a1eed98"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_eb988795d1d577d4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_d44a4c79a86fa848"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_93d0e452d5296cd6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_eece084213157579"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q212_a2eee0f2755cb5d3"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q212_630db9e8c21db398",
+        "Q212_e8fbad1cf9f20fc5",
+        "Q212_5551ceaee898059d",
+        "Q212_a2eee0f2755cb5d3",
+        "Q212_eb988795d1d577d4",
+        "Q212_d44a4c79a86fa848",
+        "Q212_eece084213157579",
+        "Q212_93d0e452d5296cd6",
+        "Q212_423e0cb72a1eed98",
+        "Q212_14e0c3ca6091ecd4",
+        "Q212_291338bdd2742333",
+        "Q212_fa46a980b01f234e",
+        "Q212_c80115885b0cbaa4"
+      ],
+      "rows": 13,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q214_58929d092596d425"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q214_19ba187cb0cf6ab4"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q214_19ba187cb0cf6ab4",
+        "Q214_58929d092596d425"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q217_dccffac670aa640c"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q217_679626dd168ca369"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q217_679626dd168ca369",
+        "Q217_dccffac670aa640c"
+      ],
+      "rows": 2,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q219_c8ba2f8f315ffdac"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q219_c8ba2f8f315ffdac"
+      ],
+      "rows": 1,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q220_e3baa48e811e1c21"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q220_d468894858ea64ae"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q220_5f9b58e045e6007c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q220_3f55ddbfc8b3e699"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q220_19f323d9fbd47a3d"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q220_d4d009ec388f8ac8"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q220_8facf5c4fc322b9c"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q220_8facf5c4fc322b9c",
+        "Q220_19f323d9fbd47a3d",
+        "Q220_3f55ddbfc8b3e699",
+        "Q220_d468894858ea64ae",
+        "Q220_d4d009ec388f8ac8",
+        "Q220_e3baa48e811e1c21",
+        "Q220_5f9b58e045e6007c"
+      ],
+      "rows": 7,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds"
+    },
+    {
+      "reason": "DDS_NOT_32_BGRA_MIP1:{\"size\":[1024,2048],\"mip\":1,\"pf_size\":32,\"pf_flags\":4,\"depth\":0,\"masks\":[0,0,0,0],\"payload\":2097152}",
+      "roi_ids": [
+        "Q222_1afd6ab62902ee9e",
+        "Q222_6d7d3bc7c20f6f78",
+        "Q222_53ece51c3ff7bffc"
+      ],
+      "rows": 3,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q225_13836368f62f8f50"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q225_a29b912085b726e1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q225_32fc1e1c02de992f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q225_084e5c2b38f73d6e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q225_3964c5c25fb1326e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q225_d38bf64bf480091e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q225_8d195a14f15d02ce"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q225_8fea83a4516a7e6e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q225_a86b18f9c1f33370"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q225_32fc1e1c02de992f",
+        "Q225_8fea83a4516a7e6e",
+        "Q225_084e5c2b38f73d6e",
+        "Q225_13836368f62f8f50",
+        "Q225_3964c5c25fb1326e",
+        "Q225_d38bf64bf480091e",
+        "Q225_8d195a14f15d02ce",
+        "Q225_a29b912085b726e1",
+        "Q225_a86b18f9c1f33370"
+      ],
+      "rows": 9,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q226_082b68b9b88afe91"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q226_dd0a561787921ccb"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q226_13649d18fb677dcd"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q226_8d217552ac176753"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q226_289a6e483d329b1c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q226_6cd397ded315829e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q226_17d32be0f1ec1624"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q226_7e7a1b899b288e3d"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q226_8d217552ac176753",
+        "Q226_6cd397ded315829e",
+        "Q226_7e7a1b899b288e3d",
+        "Q226_082b68b9b88afe91",
+        "Q226_13649d18fb677dcd",
+        "Q226_dd0a561787921ccb",
+        "Q226_289a6e483d329b1c",
+        "Q226_17d32be0f1ec1624"
+      ],
+      "rows": 8,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_dd022552c0f0635b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_827e4561afbd5fc1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_0e93c7db2af67ef4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_20e6dcfbb3f28c8c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_eb4b7b6e0899ea62"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_591050b866fc7e75"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_d77bf12bacdd3c86"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_2bd2d4a09f3d17c0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_74ca88b096b4d336"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q227_daa4e54b06c85d30"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_202579d241d5d059"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_50fdfd89e985791b_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q227_6f70b1123b730776"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q227_50fdfd89e985791b_RB_B",
+        "Q227_0e93c7db2af67ef4",
+        "Q227_827e4561afbd5fc1",
+        "Q227_dd022552c0f0635b",
+        "Q227_591050b866fc7e75",
+        "Q227_eb4b7b6e0899ea62",
+        "Q227_202579d241d5d059",
+        "Q227_2bd2d4a09f3d17c0",
+        "Q227_6f70b1123b730776",
+        "Q227_74ca88b096b4d336",
+        "Q227_20e6dcfbb3f28c8c",
+        "Q227_d77bf12bacdd3c86",
+        "Q227_daa4e54b06c85d30"
+      ],
+      "rows": 13,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q228_2091a7c7837eec3e"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q228_0a1c695fc1f912a8"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q228_e7768795d2549af8"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q228_eca1b3afbb557a67"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q228_6a1d77db05265918"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q228_3df4ed65ab58f44f"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q228_648c578b4495751e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q228_3567fada392dfe42"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q228_846de80d92e64cd4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q228_c59d679311eed391"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q228_d5b16dbfa2573c42"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q228_846de80d92e64cd4",
+        "Q228_2091a7c7837eec3e",
+        "Q228_eca1b3afbb557a67",
+        "Q228_d5b16dbfa2573c42",
+        "Q228_e7768795d2549af8",
+        "Q228_648c578b4495751e",
+        "Q228_c59d679311eed391",
+        "Q228_3567fada392dfe42",
+        "Q228_0a1c695fc1f912a8",
+        "Q228_6a1d77db05265918",
+        "Q228_3df4ed65ab58f44f"
+      ],
+      "rows": 11,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_3d0ea0b7713bb599"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_7feed9a108a3640f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_fba753269f08ef69"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_6f818e9df0a40e7a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_a93f095ef375989d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_490c88b055d5cfd8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_67f79e2fc9e342c0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_12fc5d20812de73c"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q230_1a8d3644a0dfc2f3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q230_7884340bad781764"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q230_bc049596ef751d8d"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q230_eb8ba13125bee516"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q230_bb5bc4d95a0846ef"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q230_bc049596ef751d8d",
+        "Q230_12fc5d20812de73c",
+        "Q230_490c88b055d5cfd8",
+        "Q230_7feed9a108a3640f",
+        "Q230_3d0ea0b7713bb599",
+        "Q230_67f79e2fc9e342c0",
+        "Q230_1a8d3644a0dfc2f3",
+        "Q230_a93f095ef375989d",
+        "Q230_eb8ba13125bee516",
+        "Q230_bb5bc4d95a0846ef",
+        "Q230_7884340bad781764",
+        "Q230_6f818e9df0a40e7a",
+        "Q230_fba753269f08ef69"
+      ],
+      "rows": 13,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q231_5fc05a932980a11d_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q231_1912e616e31bc76d"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q231_97037da5143f6af6"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q231_0d324b69b812d575"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q231_0d324b69b812d575",
+        "Q231_5fc05a932980a11d_RB_B",
+        "Q231_97037da5143f6af6",
+        "Q231_1912e616e31bc76d"
+      ],
+      "rows": 4,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q232_be9630b94d548555"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q232_336648675f761144"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q232_3c668d24f7f8a39e"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q232_5fcdb481cac79a0b"
+        },
+        {
+          "reason": "QA_CANDIDATE_EDGE_CLIP",
+          "roi_id": "Q232_10d42dadc204599d"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q232_336648675f761144",
+        "Q232_5fcdb481cac79a0b",
+        "Q232_10d42dadc204599d",
+        "Q232_be9630b94d548555",
+        "Q232_3c668d24f7f8a39e"
+      ],
+      "rows": 5,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_12ffdc7a2d4925b0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_72923a85953611d6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_16f0df6848987484"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_51379f42f1f5f1b6"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_5aea17745f641e09"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_0ba6539ff24c59a8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_dfc30de67f762d29"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_85087cd6916ea2cc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_8ec72a445c1d7bb4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_93d1cb06761f2073"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_effe19c782b6763b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_cfaed6fec02afd92"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q236_0a231e55a5b10267"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q236_6edbc0596d8820a6"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q236_93d1cb06761f2073",
+        "Q236_cfaed6fec02afd92",
+        "Q236_12ffdc7a2d4925b0",
+        "Q236_0ba6539ff24c59a8",
+        "Q236_effe19c782b6763b",
+        "Q236_16f0df6848987484",
+        "Q236_6edbc0596d8820a6",
+        "Q236_0a231e55a5b10267",
+        "Q236_85087cd6916ea2cc",
+        "Q236_8ec72a445c1d7bb4",
+        "Q236_dfc30de67f762d29",
+        "Q236_5aea17745f641e09",
+        "Q236_51379f42f1f5f1b6",
+        "Q236_72923a85953611d6"
+      ],
+      "rows": 14,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q237_2e956f29f0903fe6"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q237_f3a4a8eda36c453d"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q237_b615750944be6209"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q237_3f2ab4dc4b599724"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q237_8d751d1618424e2f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q237_3dd12339c90cbb67"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q237_7b024c76b18aa697"
+        },
+        {
+          "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+          "roi_id": "Q237_ba05487fa85b4b5b"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q237_8d751d1618424e2f",
+        "Q237_b615750944be6209",
+        "Q237_f3a4a8eda36c453d",
+        "Q237_3f2ab4dc4b599724",
+        "Q237_2e956f29f0903fe6",
+        "Q237_7b024c76b18aa697",
+        "Q237_ba05487fa85b4b5b",
+        "Q237_3dd12339c90cbb67"
+      ],
+      "rows": 8,
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds"
+    },
+    {
+      "details": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q241_f3aead3fa521f783"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q241_7157da1bb0c3538d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q241_d600fb2889175d94"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
+      "roi_ids": [
+        "Q241_f3aead3fa521f783",
+        "Q241_7157da1bb0c3538d",
+        "Q241_d600fb2889175d94"
+      ],
+      "rows": 3,
+      "target": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds"
+    }
+  ],
+  "imported_roi_total": 954,
+  "layout_policy": "ORIGINAL_LINE_COUNT_AND_PER_LINE_BBOX_PRESERVED",
+  "legacy_oversize_outputs_rejected": true,
+  "native_dds_generated": 3,
+  "pending_import": 0,
+  "pending_import_holds": [],
+  "release_approved": false,
+  "runtime_validation": "UNTESTED",
+  "scale_policy": "SOURCE_NATIVE_HD_GLYPH_AND_LINE_BOX_CEILING_NO_UPSCALE",
+  "schema": "outrun.ab-imagegen-hd-strict.v2",
+  "source": "A/B original ImageGen PNG only, no font fallback",
+  "source_dds_missing_rows": 0,
+  "source_sha_conflict_rows": 0,
+  "translated_roi_generated": 4,
+  "visual_qa": "REVIEW_REQUIRED",
+  "zip_sha256": "726270942f5ab4bfce103e8b05df9ed379ddba20ef60aec64e14a5262350c3e4"
+}
