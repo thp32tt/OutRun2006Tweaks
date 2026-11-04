@@ -2690,6 +2690,7 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
 
     last_sent = _parse_iso(state.get("last_sent_at"))
     send_age = (now - last_sent).total_seconds() if last_sent else None
+    hard_due = bool(send_age is not None and send_age >= MODEL2_HARD_NEW_CHAT_SECONDS)
     if send_age is not None and send_age < MODEL2_CONTINUE_MIN_SECONDS:
         return False
     if not pending and send_age is None:
@@ -2705,7 +2706,34 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
         write_runtime(status="model2_send_guard", last_action=f"C send delayed: {guard}")
         return False
 
-    if state.get("fresh_chat_required"):
+    if hard_due:
+        # A frozen reply may never expose 'idle'. At exactly 60m, persist
+        # the old owner's URL and abandon that renderer without waiting.
+        # Keep a pending rotation latch on send failure, not a new tab per tick.
+        if not state.get("hard_rotation_pending"):
+            old_url = slot.url or getattr(pages.get("C"), "url", None)
+            history = list(state.get("previous_chat_urls") or [])
+            if old_url and old_url not in history:
+                history.append(old_url)
+            state["previous_chat_urls"] = history[-20:]
+            state["hard_rotation_pending"] = True
+            state["hard_rotation_source_sent_at"] = state.get("last_sent_at")
+            state.pop("hard_rotation_page_ready_for", None)
+            save_queue_state(q)
+        if (state.get("hard_rotation_page_ready_for") != state.get("last_sent_at")
+                or slot.url):
+            page = await hard_replace_slot_page(context, pages, slot)
+            state["hard_rotation_page_ready_for"] = state.get("last_sent_at")
+            state["fresh_chat_required"] = False
+            state["bootstrap_complete"] = False
+            state.pop("response_sha", None)
+            state.pop("response_observed_at", None)
+            state.pop("response_before_send_sha", None)
+            save_registry(reg)
+            save_queue_state(q)
+        else:
+            page = await slot_page(context, pages, slot)
+    elif state.get("fresh_chat_required"):
         page = await replace_with_fresh_slot_page(context, pages, slot)
         state["fresh_chat_required"] = False
         state["bootstrap_complete"] = False
@@ -2726,8 +2754,8 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
             save_queue_state(q)
             save_registry(reg)
 
-    if await detect_busy(page):
-        write_runtime(status="model2_busy", last_action="C still generating, do not interrupt")
+    if not hard_due and await detect_busy(page):
+        write_runtime(status="model2_busy", last_action="C still generating, do not interrupt until 60m")
         return False
     if not await ensure_logged_in(page):
         write_runtime(status="model2_login_required", last_action="C login required")
@@ -2747,7 +2775,8 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
         mark_rate_limit(reg, datetime.now(TZ), "model2-vr-c")
         return False
 
-    response = await last_assistant_text(page)
+    # At the hard ceiling the OLD reply cannot affect new-chat readiness.
+    response = "" if hard_due else await last_assistant_text(page)
     current_sha = stable_hash(response) if response else ""
     if current_sha and current_sha != state.get("response_sha"):
         state["response_sha"] = current_sha
@@ -2756,18 +2785,23 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
     observed_at = _parse_iso(state.get("response_observed_at"))
     stable = bool(current_sha and observed_at
                   and (now - observed_at).total_seconds() >= MODEL2_RESPONSE_STABLE_SECONDS)
-    # Do not send into a partly generated response even at the half-hour.
-    if current_sha and not stable:
+    if not hard_due and current_sha and not stable:
         return False
     response_ready = bool(
         send_age is not None and current_sha and stable
         and current_sha != state.get("response_before_send_sha")
     )
-    if not pending and not response_ready:
+    if not pending and not response_ready and not hard_due:
         return False
 
     bootstrap = not state.get("bootstrap_complete")
+    # New chat has no prior memory; use one short, source-grounded assignment.
     prompt = (
+        "모델2 VR 개발 새 세션. thp32tt/Model2VR-tools@main 최신 HEAD와 "
+        "docs/automation/MODEL2_VR_AUTODEV_MASTER_PLAN.md를 읽고 "
+        "직전 미완료 기능부터 실제 소스를 계속 개발해. "
+        "OutRun·웹포팅은 수정하지 말고 기존 성공 커밋 중복 검증·점수 가산 금지."
+        if hard_due else
         "이 채팅은 Daytona USA / Sega Model 2 Emulator OpenXR 네이티브 VR 자동개발 전용입니다. "
         "GitHub thp32tt/Model2VR-tools@main의 docs/automation/MODEL2_VR_AUTODEV_MASTER_PLAN.md를 읽고 "
         "실제 32비트 D3D9 게임 드로우에서 64비트 OpenXR 양안 렌더링까지 연속 소스 구현을 진행하세요. "
@@ -2789,18 +2823,24 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
     note_successful_request(reg, sent_at, "C")
     slot.runs += 1
     slot.last_sent_at = sent_at.isoformat()
-    slot.last_result = "model2_bootstrap_sent" if bootstrap else "model2_continue_sent"
+    slot.last_result = "model2_60m_new_chat_sent" if hard_due else "model2_bootstrap_sent" if bootstrap else "model2_continue_sent"
     slot.last_assistant_hash = None
     slot.last_assistant_change_at = sent_at.isoformat()
     slot.watchdog_resumes_since_schedule = 0
     save_registry(reg)
     state["last_sent_at"] = sent_at.isoformat()
     state["bootstrap_complete"] = True
+    if hard_due:
+        state["hard_rotation_sent_total"] = int(state.get("hard_rotation_sent_total") or 0) + 1
+        state["hard_rotation_last_at"] = sent_at.isoformat()
+        state.pop("hard_rotation_pending", None)
+        state.pop("hard_rotation_source_sent_at", None)
+        state.pop("hard_rotation_page_ready_for", None)
     state["response_before_send_sha"] = current_sha or None
     if pending:
         state["last_sent_window"] = pending
         state.pop("pending_window", None)
-    state["last_send_reason"] = "bootstrap" if bootstrap else ("response_complete" if response_ready else "schedule_fallback")
+    state["last_send_reason"] = "60m_hard_new_chat" if hard_due else "bootstrap" if bootstrap else ("response_complete" if response_ready else "schedule_fallback")
     state["continuations_sent"] = int(state.get("continuations_sent") or 0) + 1
     save_queue_state(q)
     write_runtime(status="model2_running", last_action=f"Model2 C: {state['last_send_reason']} sent in its own project",
