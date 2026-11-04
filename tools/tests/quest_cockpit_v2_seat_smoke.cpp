@@ -172,7 +172,7 @@ int main(){
     assert(near(profilePose.eye.z,-.145f));
     assert(!NativeVrProfilePose({0.f,.99f,0.f},{0.f,.99f,10.f},
         {-.353f,.99f,-.345f},questXYZ[0],
-        -1.f,0.f,0.f,profilePose));
+        -1.3f,0.f,0.f,profilePose));
     assert(!NativeVrProfilePose({0.f,.99f,0.f},{0.f,.99f,10.f},
         {-.353f,.99f,-.345f},
         {-.353f,std::numeric_limits<float>::quiet_NaN(),-.345f},
