@@ -243,7 +243,8 @@ class Uw2SimpleLoopTest(unittest.TestCase):
     def test_prompt_router_early_return_has_no_extra_text(self):
         node = FUNCS["prompt_for_slot"]
         module = ast.fix_missing_locations(ast.Module(body=[node], type_ignores=[]))
-        env = {"CONTROLLER_MODE": "conversion", "UW2_WEB_PORT_ENABLED": True}
+        env = {"CONTROLLER_MODE": "conversion", "UW2_WEB_PORT_ENABLED": True,
+               "MODEL2_AUTODEV_ENABLED": False}
         exec(compile(module, "<prompt>", "exec"), env)
         self.assertEqual(env["prompt_for_slot"](SimpleNamespace(name="C"), "parallel"), PROMPT)
         self.assertEqual(env["prompt_for_slot"](SimpleNamespace(name="C"), "watchdog"), PROMPT)
@@ -279,7 +280,7 @@ class Uw2SimpleLoopTest(unittest.TestCase):
 
     def test_old_id_dispatch_excluded_when_uw2_is_on(self):
         src = ast.get_source_segment(SRC, FUNCS["vr_continuous_conversion_cycle"])
-        self.assertIn('("C", CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED)', src)
+        self.assertIn('("C", CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED and not MODEL2_AUTODEV_ENABLED)', src)
         self.assertIn('if UW2_WEB_PORT_ENABLED and slot_name == "C":', SRC)
         self.assertNotIn("allocate_lane_production_id", ast.get_source_segment(SRC, FUNCS["uw2_simple_cycle"]))
         self.assertNotIn("queue_rollover_chat", ast.get_source_segment(SRC, FUNCS["uw2_simple_cycle"]))
