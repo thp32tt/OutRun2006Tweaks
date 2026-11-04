@@ -54,11 +54,46 @@ if ! kill -0 "$novnc_pid" 2>/dev/null || ! kill -0 "$vnc_pid" 2>/dev/null; then
 fi
 echo "NOVNC_LISTENER_STARTED: container port 6080, host port configured by Compose (default 6084)." >&2
 
+# Acquire an exclusive filesystem lock before touching the shared persistent
+# Chromium profile. flock is kernel-managed and automatically released on death.
+# Never delete cookies, login data, bookmarks, settings, or browser history.
+profile_dir=/data/hd-rework/browser-rework-profile
+mkdir -p "$profile_dir"
+exec 9>"$profile_dir/.outrun-profile-owner.lock"
+if ! flock -n 9; then
+  echo "HOLD_BROWSER_PROFILE_IN_USE: another instance owns this shared profile; no lockfiles will be deleted." >&2
+  exit 5
+fi
+
+recover_stale_chrome_singletons() {
+  local name lock cleaned=0
+  # Do not modify locks if Chrome is already alive for this profile.
+  if ps -eo args | grep -F -- "--user-data-dir=$profile_dir" | grep -F '/ms-playwright/' | grep -v '[g]rep' >/dev/null 2>&1; then
+    echo "HOLD_BROWSER_PROFILE_HAS_LIVE_CHROMIUM: refusing to remove Singleton files." >&2
+    return 1
+  fi
+  for name in SingletonLock SingletonSocket SingletonCookie; do
+    lock="$profile_dir/$name"
+    # Singleton files are symlinks; never remove a directory or regular data.
+    if [[ -L "$lock" ]]; then
+      rm -- "$lock"
+      cleaned=$((cleaned+1))
+    fi
+  done
+  if [[ -f "$profile_dir/DevToolsActivePort" && ! -L "$profile_dir/DevToolsActivePort" ]]; then
+    rm -- "$profile_dir/DevToolsActivePort"
+  fi
+  echo "BROWSER_PROFILE_STALE_SINGLETON_RECOVERY: removed $cleaned lock symlinks under exclusive profile flock; user data untouched." >&2
+}
+
 # Start a genuine visible Chromium window independently of the task queue.
 # The Python A/B/C1 worker connects to THIS SAME browser over local-only CDP,
 # so manually authenticated ChatGPT sessions remain in the correct profile.
 launch_visible_chrome() {
   local chrome
+  if ! recover_stale_chrome_singletons; then
+    return 1
+  fi
   chrome="$(python - <<'PY'
 from playwright.sync_api import sync_playwright
 with sync_playwright() as pw:
@@ -99,7 +134,10 @@ PY
 
 until launch_visible_chrome; do
   echo "HOLD_VISIBLE_BROWSER_START_FAILED: noVNC remains running; retry in 30 seconds. Review /logs/hd-rework-chromium.log." >&2
-  if [[ -n "${chrome_pid:-}" ]]; then kill "$chrome_pid" 2>/dev/null || true; fi
+  if [[ -n "${chrome_pid:-}" ]]; then
+    kill "$chrome_pid" 2>/dev/null || true
+    wait "$chrome_pid" 2>/dev/null || true
+  fi
   sleep 30 &
   wait "$!" || true
 done
