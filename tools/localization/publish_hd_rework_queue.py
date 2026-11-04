@@ -82,13 +82,23 @@ def put_exact(rel, raw, token, allow_update=False):
     return "VERIFIED_COMMIT"
 
 
-def publish(directory,token):
+def publish(directory,token,report_path=None):
     directory=Path(directory)
     q=json.loads((directory/"queue.json").read_text(encoding="utf-8"))
     if q.get("schema") != "outrun-hd-qa-chat-workqueue-v1" or q.get("release_approved") is not False:
         raise ValueError("NOT_A_FAIL_CLOSED_HD_QA_QUEUE")
     if len(q.get("tasks",[]))>8 or any(not TASK_ID.fullmatch(t.get("task_id","")) for t in q["tasks"]):
         raise ValueError("INVALID_HUMAN_CHAT_BATCH")
+    if report_path:
+        report=Path(report_path).read_bytes()
+        if len(report)>MAX_PNG:
+            raise ValueError("QA_SOURCE_REPORT_TOO_LARGE_FOR_GITHUB_CONTENTS")
+        parsed=json.loads(report)
+        if parsed.get("schema")!="outrun.ab-imagegen-hd-strict.v2":
+            raise ValueError("NON_STRICT_SOURCE_QA_REPORT")
+        if parsed.get("release_approved") is not False:
+            raise ValueError("INVALID_RELEASE_APPROVAL")
+        put_exact("last_report.json",report,token,allow_update=True)
     published=[]
     for task in q["tasks"]:
         ref=task["reference"]
@@ -116,5 +126,6 @@ def publish(directory,token):
 if __name__ == "__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--queue-dir",required=True)
+    p.add_argument("--qa-report",default=None)
     args=p.parse_args()
-    publish(args.queue_dir,os.environ.get("GH_TOKEN",""))
+    publish(args.queue_dir,os.environ.get("GH_TOKEN",""),args.qa_report)
