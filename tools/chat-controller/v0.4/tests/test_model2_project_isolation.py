@@ -78,6 +78,7 @@ class Model2ProjectIsolation(unittest.TestCase):
                 (MODEL_ID if slot_name == "C" else OUTRUN_ID) in (url or "")
             ),
             "first_visible": lambda *a, **kw: None,
+            "INPUT_SELECTORS": ["textarea"],
         }
         async def not_found(*args, **kw): return None
         env["first_visible"] = not_found
