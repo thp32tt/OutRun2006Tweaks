@@ -1,0 +1,14 @@
+# Optional, rate-bounded A/B ImageGen + C1 visual QA browser worker.
+# Isolated from the low-memory GitHub polling container. No DDS processing.
+FROM mcr.microsoft.com/playwright/python:v1.63.0-noble
+ENV DEBIAN_FRONTEND=noninteractive PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 DISPLAY=:99
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    xvfb x11vnc openbox novnc websockify ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+RUN python -m pip install --no-cache-dir Pillow==11.3.0
+WORKDIR /opt/outrun
+COPY github_chat_rework_controller.py controller_png_attach.py /opt/outrun/
+COPY entrypoint.chat-rework.sh /opt/outrun/
+RUN python -m py_compile /opt/outrun/github_chat_rework_controller.py /opt/outrun/controller_png_attach.py && \
+    chmod 0755 /opt/outrun/entrypoint.chat-rework.sh
+ENTRYPOINT ["/opt/outrun/entrypoint.chat-rework.sh"]
