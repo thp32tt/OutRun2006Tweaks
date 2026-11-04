@@ -14,6 +14,8 @@
 #include "vr/game/driver_seat_vehicle_scale.hpp"
 #include "vr/game/driver_seat_occupant.hpp"
 #include "vr/game/cockpit_glass_material_probe.hpp"
+#include "vr/game/dino_external_stereo_bridge.hpp"
+#include "vr/state/state_block_tracker.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -52,6 +54,9 @@ namespace Settings
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
 	extern Setting<bool> VRDriverSeatView;
+    // V15 sidecar remains opt-in; no original game PMT/EXE assets are edited.
+    Setting<bool> VRDinoExternalCockpit{ "VR", "DinoExternalCockpit", false,
+        "Experimental: draw Dino 246 GTS v15 sidecar only during verified stereo driver-seat gameplay; requires Dino246_Cockpit_LHD_v15.ovc in game folder." };
     extern Setting<bool> VRDriverSeatGlassMaterialTrace;
     extern Setting<float> VRDriverSeatVehicleScale;
     extern Setting<float> VRDriverSeatGlassOpacity;
@@ -342,6 +347,55 @@ class VRDriverSeatRenderTest : public Hook
 					camera ? static_cast<std::uint8_t>(camera->cam_mode_34A) : 0xFF);
 			}
 		}
+        // Exact original player-car model-state boundary (EXE+0x69764).
+        // Render only while the native game is inside real gameplay and both
+        // XR eyes/RT+depth are already owned by the existing R29/R33 backend.
+        // Never read model files, create GPU objects or draw in selection.
+        if (Settings::VRDinoExternalCockpit && Settings::VREnabled &&
+            Settings::VRDriverSeatView && Settings::VRStereo &&
+            VRDriverSeatGameplayActive())
+        {
+            auto* player = Game::pl_car();
+            auto* device = Game::D3DDevice();
+            const bool matchingPlayer = player &&
+                reinterpret_cast<EVWORK_CAR*>(ctx.ebx) == player;
+            OutRunVR::DinoSidecar::Gate gate{};
+            gate.optIn = Settings::VRDinoExternalCockpit.get();
+            gate.vr = Settings::VREnabled.get();
+            gate.seat = matchingPlayer &&
+                VRDriverSeatCameraEligible(Game::camera());
+            gate.gameplay = VRDriverSeatGameplayActive();
+            gate.stereo = Settings::VRStereo.get();
+            gate.playerDraw = matchingPlayer;
+            gate.deviceReady = device != nullptr;
+            gate.stateRecording =
+                OutRunVR::State::StateBlockTracker::Recording();
+            gate.carKind = matchingPlayer
+                ? static_cast<unsigned char>(player->car_kind_11) : 255;
+            if (OutRunVR::DinoSidecar::Eligible(gate))
+            {
+                // Retail EXE 0x95D860 is the original, game-owned view matrix,
+                // NOT an HMD projection or a stale mono mirror. The common
+                // R29 owner applies this frame's latched head+eye transform.
+                const auto* nativeView =
+                    Module::exe_ptr<const D3DMATRIX>(0x55D860);
+                const D3DMATRIX nativeWorld = player->matrix_B0;
+                const bool stereoDrawn = OutRunVR::DinoSidecar::TryDrawTwoEyes(
+                    device, nativeWorld, *nativeView, gate,
+                    Settings::VRWorldScale.get(),
+                    Settings::VRStereoDepth.get(),
+                    Settings::VRDriverSeatVehicleScale.get());
+                if (Settings::VRTelemetry)
+                {
+                    static std::atomic<std::uint64_t> tries{0};
+                    const auto n = tries.fetch_add(1,std::memory_order_relaxed)+1;
+                    if(n<=4 || (n&(n-1))==0)
+                        spdlog::info(
+                            "VR DINO SIDECAR: sample={} twoEyes={} owner=playerCar model=1 nativePMT=UNCHANGED",
+                            n, stereoDrawn?1:0);
+                }
+            }
+        }
 		if (!Active() || !Settings::VRDriverSeatFullCar)
 			return;
 		EVWORK_CAR* player = Game::pl_car();
