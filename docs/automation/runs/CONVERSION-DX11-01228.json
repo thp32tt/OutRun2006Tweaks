@@ -33,9 +33,12 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "LIVE_D3D9_FVF_LINE_OR_POINT_CALLSITE",
+      "D3D11_NATIVE_DRAW",
       "ACTUAL_NATIVE_D3D11_DRAW",
       "HOMOGENEOUS_CLIPPED_NATIVE_GPU_PRE_POST_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT",
       "ORIGINAL_GAME_PRESENT_AND_DX9EX_FALLBACK"
     ],
     "integration_path": [
@@ -157,5 +160,12 @@
       "summary": "Eye-crossing line GPU capture and malformed line IA regressions"
     }
   ],
-  "score_note": "Only one independently source-and-exact-CI-verified defect repair +1, score SSOT ai-dev-lab@5d5a0eb5; no CI/C6/retry duplicate score."
+  "score_note": "Only one independently source-and-exact-CI-verified defect repair +1, score SSOT ai-dev-lab@5d5a0eb5; no CI/C6/retry duplicate score.",
+  "c6_gate_identifier_repair": {
+    "task_id": "CONVERSION-DX11-01229",
+    "kind": "CAUSAL_CI_ACCEPTANCE_RECORD_CORRECTION",
+    "reason": "01228 C6-only JSON abbreviated exact stages and post-C6 future Fast policy check rejected the previously validated source; explicitly map actual D3D9 live source -> D3D11 native Draw -> guarded GPU output in canonical stage sequence without asserting runtime success or weakening the validator.",
+    "gameplay_validation": "UNTESTED",
+    "score_change": 0
+  }
 }
