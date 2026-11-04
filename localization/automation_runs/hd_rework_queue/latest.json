@@ -1,0 +1,11 @@
+{
+  "schema": "outrun-hd-qa-chat-workqueue-v1",
+  "policy": "hd-strict-chat-rework-v1-20261104",
+  "status": "WAITING_GITHUB_HD_QA",
+  "source_asset_sha256": null,
+  "hold_count": null,
+  "tasks": [],
+  "release_approved": false,
+  "runtime_validation": "UNTESTED",
+  "message": "GitHub strict QA rebuild will publish SHA-pinned queue with native HD source refs. No chat task has yet been sent."
+}
