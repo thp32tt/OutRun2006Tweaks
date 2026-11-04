@@ -153,7 +153,11 @@ struct NativeRawFvfScissorClip {
         for (unsigned plane = 0u; plane < (scissor ? 17u : 13u); ++plane) {
             if (!depthClipEnable && (plane == 4u || plane == 5u))
                 continue;
-            if (plane >= 7u &&
+            // Only planes 7..12 are optional D3D9 ClipDistance0..5.
+            // Scissor planes 13..16 are independent ACTUAL RS halfspaces.
+            // Applying the user-mask here would silently disable every
+            // scissor exclusion whenever user ClipDistance is off.
+            if (plane >= 7u && plane < 13u &&
                 !(source.clipDistanceMask & (1u << (plane - 7u))))
                 continue;
             bool allOutside = true;
