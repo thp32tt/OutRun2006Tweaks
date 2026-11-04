@@ -54,6 +54,15 @@ jobs:
             localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
             localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
 
+      - name: Read only previous claimed QA ticket IDs from isolated branch
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-qa-queue-20261104
+          path: hd-qa-queue-state
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            localization/automation_runs/hd_rework_queue/state
+
       - name: Prepare pure GitHub Python runner
         uses: actions/setup-python@v5
         with:
@@ -103,7 +112,8 @@ jobs:
           set -euo pipefail
           python tools/localization/hd_rework_queue.py --repo-root . \
             --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
-            --out "$RUNNER_TEMP/qa-rework-queue"
+            --out "$RUNNER_TEMP/qa-rework-queue" \
+            --skip-state-root "$GITHUB_WORKSPACE/hd-qa-queue-state/localization/automation_runs/hd_rework_queue/state"
 
       - name: Publish bounded ticket manifest and original HD PNG references
         if: success()
@@ -113,7 +123,8 @@ jobs:
         run: |
           set -euo pipefail
           python tools/localization/publish_hd_rework_queue.py \
-            --queue-dir "$RUNNER_TEMP/qa-rework-queue"
+            --queue-dir "$RUNNER_TEMP/qa-rework-queue" \
+            --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json"
 
       - name: Preserve QA rework tickets and HD reference evidence
         if: always()
