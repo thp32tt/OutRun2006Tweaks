@@ -22,6 +22,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
+#include "vr/game/quest_cockpit_v2_apk_xr_pose.hpp"
 #include "vr/game/lens_centre_partial_wvp.hpp"
 #include "vr/game/lens_centre_upload_transaction.hpp"
 #include "vr/game/projected_lens_inline_source.hpp"
@@ -69,6 +70,9 @@ namespace Settings
 	extern Setting<int> VRMatrixOrder;
 	extern Setting<bool> VRTelemetry;
 	extern Setting<bool> VRCockpitFrameProbe;
+    extern Setting<bool> VRQuestCockpitV2Enabled;
+    extern Setting<bool> VRQuestCockpitV2ApkNativeCamera;
+    extern Setting<bool> VRQuestCockpitV2NativeSeatProfile;
 	extern Setting<bool> UseNewInput;
 	extern Setting<int> VRFrameCadenceMode;
 	extern Setting<float> VRFrameCadenceTimeoutMs;
@@ -163,6 +167,9 @@ namespace OutRunVRRenderer
 		bool AutoEnableLogged = false;
 
 		D3DMATRIX LatchedHeadInverse{};
+        D3DMATRIX QuestNativeEyeInverse[2]{};
+        std::uint32_t QuestNativeEyePoseSequence=0;
+        bool QuestNativeEyesValid=false;
 		bool LatchedHeadInverseValid = false;
 		LatchedStereoFrame LatchedStereo{};
 		std::uint32_t FrameTelemetryFlags = ClientHookAlive;
@@ -1293,6 +1300,8 @@ namespace OutRunVRRenderer
 			LastGameWvpWriteValid = false;
 			LastGameWvpPoseEpoch = 0;
 			LatchedHeadInverseValid = false;
+            QuestNativeEyesValid=false;
+            QuestNativeEyePoseSequence=0;
 			LatchedStereo = {};
 			LastVerifiedWvpValid = false;
 			LastVerifiedWvpPoseSequence = 0;
@@ -1469,6 +1478,14 @@ namespace OutRunVRRenderer
 				return;
 
 			const bool recenter = RendererRecenterPressed();
+            const auto* questCamera=Game::camera();
+            const bool questNativeMode1=
+                Settings::VREnabled &&
+                Settings::VRQuestCockpitV2Enabled &&
+                Settings::VRQuestCockpitV2ApkNativeCamera &&
+                Settings::VRQuestCockpitV2NativeSeatProfile &&
+                GameRendererIsActive() && questCamera &&
+                questCamera->cam_mode_34A==1;
 			const bool hostChanged = !CenterValid || CenterHostPid != sample.hostPid;
 			const bool referenceSpaceChanged = CenterValid &&
 				CenterReferenceSpaceGeneration != sample.referenceSpaceGeneration;
@@ -1477,6 +1494,22 @@ namespace OutRunVRRenderer
 				// Recenter yaw only. Pitch and roll continue to describe the actual
 				// headset attitude, avoiding a tilted artificial horizon after F10.
 				CenterOrientation = YawOnly(sample.orientation);
+                // Quest XrRig::locate 2D6A60..2D6AD0 derives a yaw-only
+                // recenter origin from xrLocateSpace. This is exact source
+                // quaternion arithmetic, not the unrelated virtual-wheel
+                // controller (+0.32,+0.55,+0.04) pivot.
+                if(questNativeMode1 && sample.positionValid) {
+                    OutRunVR::QuestCockpitV2::NativePose head{
+                        {sample.orientation.x,sample.orientation.y,
+                         sample.orientation.z,sample.orientation.w},
+                        {sample.position.x,sample.position.y,sample.position.z}};
+                    OutRunVR::QuestCockpitV2::NativePose nativeOrigin{};
+                    if(OutRunVR::QuestCockpitV2::NativeYawOrigin(
+                           head,nativeOrigin))
+                        CenterOrientation={
+                            nativeOrigin.q.x,nativeOrigin.q.y,
+                            nativeOrigin.q.z,nativeOrigin.q.w};
+                }
 				CenterPosition = sample.positionValid ? sample.position : Vec3{ 0.0f, 0.0f, 0.0f };
 				CenterPositionValid = sample.positionValid;
 				CenterHostPid = sample.hostPid;
@@ -1518,7 +1551,34 @@ namespace OutRunVRRenderer
 				CenterPositionValid = true;
 			}
 
-			relativeOrientation = ScaleRotation(relativeOrientation, Settings::VRRotationScale);
+			// Native Quest 2D6B98..2D6BFC: inverse(recenter yaw origin)
+            // composed with tracked head, followed by BOTH located eyes.
+            // The gameplay seat input was already patched upstream in
+            // race_camera_eye_look, so do not add its +.32/+55 again here.
+            OutRunVR::QuestCockpitV2::NativePose questOrigin{};
+            OutRunVR::QuestCockpitV2::NativePose questHead{};
+            if(questNativeMode1 && sample.positionValid && CenterPositionValid) {
+                questOrigin={
+                    {CenterOrientation.x,CenterOrientation.y,
+                     CenterOrientation.z,CenterOrientation.w},
+                    {CenterPosition.x,CenterPosition.y,CenterPosition.z}};
+                questHead={
+                    {sample.orientation.x,sample.orientation.y,
+                     sample.orientation.z,sample.orientation.w},
+                    {sample.position.x,sample.position.y,sample.position.z}};
+                OutRunVR::QuestCockpitV2::NativePose relative{};
+                if(OutRunVR::QuestCockpitV2::NativeInverseOriginCompose(
+                       questOrigin,questHead,relative)) {
+                    relativeOrientation={
+                        relative.q.x,relative.q.y,relative.q.z,relative.q.w};
+                    if(Settings::VRPositionalTracking)
+                        relativePosition={
+                            relative.p.x*Settings::VRWorldScale,
+                            relative.p.y*Settings::VRWorldScale,
+                            relative.p.z*Settings::VRWorldScale};
+                }
+            }
+            relativeOrientation = ScaleRotation(relativeOrientation, Settings::VRRotationScale);
 			LatchedHeadInverse = InverseRigid(MatrixFromPose(relativeOrientation, relativePosition));
 			LatchedHeadInverseValid = MatrixFinite(LatchedHeadInverse);
 			LatchedPoseSequence = sample.sequence;
@@ -1536,8 +1596,37 @@ namespace OutRunVRRenderer
 				Vec3 effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
 				if (Settings::VRPositionalTracking && sample.positionValid)
 					effectiveHeadPosition = sample.position;
+                bool questEyePairValid=questNativeMode1 &&
+                    sample.positionValid && CenterPositionValid &&
+                    LatchedHeadInverseValid &&
+                    Settings::VRRotationScale.get()==1.f &&
+                    Settings::VRPositionalTracking &&
+                    Settings::VRStereoDepth.get()==1.f;
 				for (int eye = 0; eye < 2; ++eye)
 				{
+                    if(questEyePairValid) {
+                        const auto& oq=sample.eyeOrientation[eye];
+                        const OutRunVR::QuestCockpitV2::NativePose localEye{
+                            {oq.x,oq.y,oq.z,oq.w},
+                            {sample.eyeOffset[eye][0],
+                             sample.eyeOffset[eye][1],
+                             sample.eyeOffset[eye][2]}};
+                        OutRunVR::QuestCockpitV2::NativePose originalEye{};
+                        if(OutRunVR::QuestCockpitV2::NativeStereoEye(
+                            questOrigin,questHead,localEye,originalEye)) {
+                            const Quat q{
+                                originalEye.q.x,originalEye.q.y,
+                                originalEye.q.z,originalEye.q.w};
+                            const Vec3 p{
+                                originalEye.p.x*Settings::VRWorldScale,
+                                originalEye.p.y*Settings::VRWorldScale,
+                                originalEye.p.z*Settings::VRWorldScale};
+                            QuestNativeEyeInverse[eye]=InverseRigid(
+                                MatrixFromPose(q,p));
+                            questEyePairValid=
+                                MatrixFinite(QuestNativeEyeInverse[eye]);
+                        } else questEyePairValid=false;
+                    }
 					const Quat eyeOrientation = sample.eyeOrientation[eye];
 					LatchedStereo.eyeOrientation[eye][0] = eyeOrientation.x;
 					LatchedStereo.eyeOrientation[eye][1] = eyeOrientation.y;
@@ -1563,6 +1652,9 @@ namespace OutRunVRRenderer
 					LatchedStereo.effectiveEyePosition[eye][1] = effectiveHeadPosition.y + worldEye.y;
 					LatchedStereo.effectiveEyePosition[eye][2] = effectiveHeadPosition.z + worldEye.z;
 				}
+                QuestNativeEyesValid=questEyePairValid;
+                QuestNativeEyePoseSequence=questEyePairValid
+                    ? sample.sequence : 0;
 			}
 
 			const float w = std::clamp(std::fabs(relativeOrientation.w), 0.0f, 1.0f);
@@ -2417,6 +2509,18 @@ namespace OutRunVRRenderer
 		out = LatchedStereo;
 		return out.valid && out.poseSequence != 0;
 	}
+
+    bool GetQuestNativeEyeInverse(float outMatrix[16],
+        int eye,std::uint32_t& poseSequence) noexcept
+    {
+        if(!outMatrix || eye<0 || eye>1 || !QuestNativeEyesValid ||
+           QuestNativeEyePoseSequence==0 ||
+           QuestNativeEyePoseSequence!=LatchedPoseSequence) return false;
+        std::memcpy(outMatrix,&QuestNativeEyeInverse[eye],
+                    sizeof(D3DMATRIX));
+        poseSequence=QuestNativeEyePoseSequence;
+        return true;
+    }
 
 	bool GetLatchedHeadInverse(float outMatrix[16],
 		std::uint32_t& poseSequence) noexcept
