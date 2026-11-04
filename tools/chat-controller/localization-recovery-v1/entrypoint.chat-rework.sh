@@ -113,7 +113,9 @@ PY
   # Chrome for Testing 153's network-service sandbox can conflict with
   # restricted Docker capabilities. This narrowly-scoped workaround is temporary;
   # keep Docker's no-new-privileges, cap_drop and loopback-only CDP unchanged.
-  "$chrome" --no-sandbox --disable-gpu \
+  # Prefer Chromium's supported Linux graphics path rather than forcing off GPU
+  # compositing. Avoid UDP/443 QUIC while diagnosing broken HTTPS navigation.
+  "$chrome" --no-sandbox --disable-quic \
     --disable-features=NetworkServiceSandbox \
     --no-first-run --no-default-browser-check --password-store=basic \
     --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 \
@@ -153,10 +155,11 @@ until launch_visible_chrome; do
 done
 
 
-# One-time diagnostics: distinguish Docker DNS/TLS failures from a Chromium
-# networking failure without touching the authenticated browser profile.
-# Probe only a neutral public site and never record credentials or cookies.
+# One-time diagnostics: distinguish Docker connectivity, Chromium's local
+# renderer, and Chromium HTTPS loading. Never read/save cookies or login content.
+# Use a newly created disposable tab; the user's tabs and profile are untouched.
 python - <<'PY' || true
+import io
 import sys
 import urllib.request
 
@@ -170,15 +173,28 @@ except Exception as exc:
 
 try:
     from playwright.sync_api import sync_playwright
+    from PIL import Image
     with sync_playwright() as pw:
         browser = pw.chromium.connect_over_cdp("http://127.0.0.1:9222", timeout=6000)
-        page = browser.contexts[0].new_page()
+        context = browser.contexts[0]
+        page = context.new_page()
         try:
-            response = page.goto(url, wait_until="domcontentloaded", timeout=12000)
-            status = response.status if response else "NO_HTTP_RESPONSE"
-            print(f"CHROMIUM_HTTPS_PROBE: HTTP_{status}", file=sys.stderr, flush=True)
-        except Exception as exc:
-            print(f"CHROMIUM_HTTPS_PROBE_FAIL: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+            try:
+                page.goto('data:text/html,<html><body style="background:#1f72d5;color:white">LOCAL_RENDER_OK</body></html>', wait_until="domcontentloaded", timeout=10000)
+                dom_ok = "LOCAL_RENDER_OK" in page.locator("body").inner_text(timeout=4000)
+                shot = Image.open(io.BytesIO(page.screenshot(timeout=7000))).convert("RGB")
+                pixel = shot.getpixel((shot.width // 2, shot.height // 2))
+                pixel_ok = max(abs(pixel[i] - ref) for i, ref in enumerate((31,114,213))) <= 20
+                status = "PASS" if (dom_ok and pixel_ok) else "FAIL"
+                print(f"CHROMIUM_LOCAL_RENDER_PROBE: {status} dom={dom_ok} pixel={pixel}", file=sys.stderr, flush=True)
+            except Exception as exc:
+                print(f"CHROMIUM_LOCAL_RENDER_PROBE_FAIL: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+            try:
+                response = page.goto(url, wait_until="domcontentloaded", timeout=12000)
+                status = response.status if response else "NO_HTTP_RESPONSE"
+                print(f"CHROMIUM_HTTPS_PROBE: HTTP_{status}", file=sys.stderr, flush=True)
+            except Exception as exc:
+                print(f"CHROMIUM_HTTPS_PROBE_FAIL: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
         finally:
             page.close()
 except Exception as exc:
