@@ -298,6 +298,26 @@ class ChatBridge:
                 viewport={"width":1400,"height":860},accept_downloads=True)
         return self.context
 
+    async def bootstrap_login_page(self):
+        """Open the visible ChatGPT login tab BEFORE polling GitHub or any queue.
+
+        A missing token, GitHub outage, empty queue or composer login screen
+        must never prevent the browser from appearing on the authenticated VNC.
+        """
+        await self.ensure_context()
+        pg=self.pages.get("A")
+        if pg is None or pg.is_closed():
+            pg=await self.context.new_page()
+            self.pages["A"]=pg
+        try:
+            await pg.bring_to_front()
+            if pg.url.rstrip("/")!=PROJECT_URL.rstrip("/"):
+                await pg.goto(PROJECT_URL,wait_until="domcontentloaded",timeout=30000)
+            return "CHATGPT_LOGIN_BROWSER_VISIBLE_NOT_AUTHENTICATED"
+        except Exception as exc:
+            # Chromium window is still visible for manual navigation.
+            return "HOLD_CHATGPT_PAGE_NAVIGATION_"+type(exc).__name__
+
     async def page(self,role,url=None):
         if role not in ("A","B","C1"):
             raise ValueError("INVALID_ROLE")
@@ -559,18 +579,33 @@ async def run_forever():
     if not 120<=POLL<=3600:
         raise ValueError("OUTRUN_REWORK_POLL_SECONDS_OUT_OF_BOUNDS")
     check_project_url(PROJECT_URL)
-    if not TOKEN:
-        raise ValueError("OUTRUN_GITHUB_CONTENTS_TOKEN_REQUIRED")
     ROOT.mkdir(parents=True,exist_ok=True)
-    gh=Github(TOKEN)
+    gh=Github(TOKEN) if TOKEN else None
     async with async_playwright() as playwright:
         bridge=ChatBridge(gh,playwright)
         try:
+            # Independent from GitHub availability, task queue and user login.
             while True:
                 try:
-                    result=await bridge.cycle()
+                    browser_state=await bridge.bootstrap_login_page()
+                    print(json.dumps({"status":browser_state,"checked_utc":utc()},
+                                     ensure_ascii=False,sort_keys=True),flush=True)
+                    break
                 except Exception as exc:
-                    # Fail closed without exposing token or page content.
+                    # Retry startup rather than leaving a blank VNC desktop.
+                    print(json.dumps({"status":"HOLD_BROWSER_BOOTSTRAP_RETRY",
+                        "error_type":type(exc).__name__,"checked_utc":utc()},
+                        sort_keys=True),flush=True)
+                    await asyncio.sleep(30)
+            while True:
+                try:
+                    if not TOKEN:
+                        result={"status":"HOLD_GITHUB_CONTENTS_TOKEN_MISSING",
+                                "browser_login_available":True}
+                    else:
+                        result=await bridge.cycle()
+                except Exception as exc:
+                    # Fail closed without exposing token, page or user content.
                     result={"status":"HOLD_RETRY","error_type":type(exc).__name__}
                 result["checked_utc"]=utc()
                 print(json.dumps(result,ensure_ascii=False,sort_keys=True),flush=True)
