@@ -169,14 +169,5 @@
       "summary": "Actual game native point/list/strip source -> homogeneous stroke clipping -> paired GPU tile capture, unchanged runtime guards and C++ regression. No causal source repair; OpenXR one network-failed job rerun at same SHA."
     }
   ],
-  "checkpoint": {
-    "source_material_sha": "f544ea5847568481a497b2e39496e78837c7ec63",
-    "validation_bearing_exact_sha": "f544ea5847568481a497b2e39496e78837c7ec63",
-    "gate_count": 5,
-    "gate_conclusion": "SUCCESS",
-    "release_status": "BUILD_VERIFIED_ONLY",
-    "runtime_status": "NEED_HMD_TEST",
-    "gameplay_pass_claim": false,
-    "full_native_frame_complete": false
-  }
+  "checkpoint": "C6_STATE"
 }
