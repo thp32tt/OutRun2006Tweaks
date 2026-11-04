@@ -104,8 +104,12 @@ PY
     echo "HOLD_CHROMIUM_EXECUTABLE_MISSING: $chrome" >&2
     return 1
   fi
-  "$chrome" --no-sandbox --disable-gpu \
-    --no-first-run --no-default-browser-check --password-store=basic \
+  # Chrome for Testing 153's network-service sandbox can conflict with
+  # restricted Docker capabilities. This narrowly-scoped workaround is temporary;
+  # keep Docker's no-new-privileges, cap_drop and loopback-only CDP unchanged.
+  "$chrome" --no-sandbox --disable-gpu \\
+    --disable-features=NetworkServiceSandbox \\
+    --no-first-run --no-default-browser-check --password-store=basic \\
     --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 \
     --user-data-dir=/data/hd-rework/browser-rework-profile \
     --new-window "https://chatgpt.com/" \
@@ -141,6 +145,39 @@ until launch_visible_chrome; do
   sleep 30 &
   wait "$!" || true
 done
+
+
+# One-time diagnostics: distinguish Docker DNS/TLS failures from a Chromium
+# networking failure without touching the authenticated browser profile.
+# Probe only a neutral public site and never record credentials or cookies.
+python - <<'PY' || true
+import sys
+import urllib.request
+
+url = "https://example.com/"
+try:
+    req = urllib.request.Request(url, method="HEAD")
+    with urllib.request.urlopen(req, timeout=7) as response:
+        print(f"CONTAINER_HTTPS_PROBE: HTTP_{response.status}", file=sys.stderr, flush=True)
+except Exception as exc:
+    print(f"CONTAINER_HTTPS_PROBE_FAIL: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+
+try:
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as pw:
+        browser = pw.chromium.connect_over_cdp("http://127.0.0.1:9222", timeout=6000)
+        page = browser.contexts[0].new_page()
+        try:
+            response = page.goto(url, wait_until="domcontentloaded", timeout=12000)
+            status = response.status if response else "NO_HTTP_RESPONSE"
+            print(f"CHROMIUM_HTTPS_PROBE: HTTP_{status}", file=sys.stderr, flush=True)
+        except Exception as exc:
+            print(f"CHROMIUM_HTTPS_PROBE_FAIL: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+        finally:
+            page.close()
+except Exception as exc:
+    print(f"CHROMIUM_CDP_PROBE_FAIL: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+PY
 
 
 # A missing/invalid GitHub token is a worker HOLD, not a reason to prevent
