@@ -43,6 +43,8 @@ services:
       MODEL2_SCHEDULE_MINUTES: "0,30"
       MODEL2_CONTINUE_MIN_SECONDS: "1800"
       MODEL2_RESPONSE_STABLE_SECONDS: "30"
+      # Force brand-new Model2 chat/task session at 60m even when UI says busy.
+      MODEL2_HARD_NEW_CHAT_SECONDS: "3600"
       CONVERSION_ONLY_SLOT: ""
       QUEUE_CHECK_SECONDS: "15"
       # GUI Chrome/noVNC stays enabled; only failed tabs are replaced.
@@ -61,9 +63,9 @@ services:
       QUEUE_NEXT_TASK_DELAY_SECONDS: "0"
       MAX_TASK_ATTEMPTS: "3"
       CONVERSATION_ROLLOVER_ENABLED: "true"
-      CONVERSATION_ROLLOVER_MIN_SECONDS: "1800"
-      VR_FORCE_ROLLOVER_SECONDS: "1800"
-      VR_UNCONDITIONAL_RESUME_SECONDS: "2400"
+      CONVERSATION_ROLLOVER_MIN_SECONDS: "3600"
+      VR_FORCE_ROLLOVER_SECONDS: "3600"
+      VR_UNCONDITIONAL_RESUME_SECONDS: "3600"
       VR_CHECKPOINT_ENABLED: "true"
       VR_CHECKPOINT_PERIOD_MINUTES: "15"
       DEVELOPMENT_TARGET_PERCENT: "70"
@@ -76,9 +78,10 @@ services:
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       # New DX11 production: :30 KST, at most once per hour.
       SCHEDULE_MINUTES: "30"
-      # Model2 C: one initial contextual prompt, then one short continuation
-      # per 30m or later. Do not interrupt a busy worker. Model2 master plan
-      # lives in thp32tt/Model2VR-tools@main and is separate from OutRun.
+      # Model2 C: >=30m normal followups; at 60m hard NEW ChatGPT project
+      # conversation even if its previous answer is busy, frozen or missing.
+      # DX11 A: 60m hard fresh chat carries the same unfinished TASK_ID to
+      # avoid duplicate work/scoring. Only a terminal verified result gets a new ID.
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
@@ -97,7 +100,7 @@ services:
       EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"
       REQUIRE_PROJECT_URL: "true"
       PREFERRED_THINKING_LEVEL: "High"
-      STRICT_THINKING_LEVEL: "true"  # preserved required baseline; existing 40m fallback remains
+      STRICT_THINKING_LEVEL: "true"  # mandatory except explicit 60m hard-recovery path
       FRESH_CHAT_EACH_RUN: "false"
       RETRY_BUTTON_COOLDOWN_SECONDS: "45"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
