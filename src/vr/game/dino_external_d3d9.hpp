@@ -57,8 +57,10 @@ class GpuOwner final {
            !staging)return false;
         std::size_t pos=128;
         for(UINT mip=0;mip<8;++mip) {
-            const unsigned dim=std::max(1u,128u>>mip);
-            const unsigned blocks=std::max(1u,(dim+3u)/4u);
+            const unsigned shr=128u>>mip;
+            const unsigned dim=shr?shr:1u;
+            const unsigned quotient=(dim+3u)/4u;
+            const unsigned blocks=quotient?quotient:1u;
             const unsigned row=blocks*8u;
             D3DLOCKED_RECT lock{};
             if(FAILED(staging->LockRect(mip,&lock,nullptr,0))) {staging->Release();return false;}
