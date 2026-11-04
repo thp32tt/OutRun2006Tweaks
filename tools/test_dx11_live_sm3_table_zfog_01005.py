@@ -247,6 +247,8 @@ require('#include "native_game_raw_clipping_visual.hpp"' in bridge and
         "enum class NativeGameClippingMode" in clipping_header and
         "sourceClipping == 1u" in clipping_header and
         "sourceClipping == 0u && rawVisualOptIn" in clipping_header and
+        "native_game_user_clip_mask(" in clipping_header and
+        "clipPlanes = native_game_user_clip_mask(clipPlanes, clippingMode);" in bridge and
         "if (clippingMode == NativeGameClippingMode::Reject) return false;" in bridge and
         "output.rawClippingVisualMismatch =" in bridge and
         "if (output.rawClippingVisualMismatch && s.issued > issuedBeforeFvf)" in bridge and

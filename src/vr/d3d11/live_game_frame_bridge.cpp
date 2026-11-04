@@ -4270,6 +4270,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     DWORD clipPlanes = ~0u;
     if (FAILED(game->GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)))
         return false;
+    // D3D9 CLIPPING=FALSE also suppresses inherited user clipping.
+    // Only the explicitly opted-in RAW incomplete visual may omit these
+    // planes. Exact native Draws retain the authentic mask and caps checks.
+    clipPlanes = native_game_user_clip_mask(clipPlanes, clippingMode);
     D3DCAPS9 clipCaps{};
     if (clipPlanes && FAILED(game->GetDeviceCaps(&clipCaps))) return false;
     if (!native_game_fixed_clip_mask_admitted(

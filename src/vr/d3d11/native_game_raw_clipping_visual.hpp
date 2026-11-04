@@ -18,4 +18,12 @@ enum class NativeGameClippingMode : std::uint8_t {
         return NativeGameClippingMode::RawDiagnostic;
     return NativeGameClippingMode::Reject;
 }
+// CLIPPING=FALSE disables effective D3D9 user-plane clipping too. Keep the
+// authenticated source register read, but never synthesize clip distances
+// in the intentionally incomplete RAW diagnostic. Exact native Draws still
+// use the entire proven source mask and fall back on unsafe coefficients.
+[[nodiscard]] constexpr std::uint32_t native_game_user_clip_mask(
+    std::uint32_t sourceMask, NativeGameClippingMode mode) noexcept {
+    return mode == NativeGameClippingMode::RawDiagnostic ? 0u : sourceMask;
+}
 } // namespace outrun::vr::dx11
