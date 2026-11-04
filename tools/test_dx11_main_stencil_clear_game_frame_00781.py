@@ -101,7 +101,7 @@ for token, disabled in (
     ("if (clippingMode == NativeGameClippingMode::Reject) return false;",
      "if (false) return false;"),
     ("output.rawClippingVisualMismatch =",
-     "/* lost RAW clipping provenance */ output.rawClippingVisualMismatch ="),
+     "/* lost RAW clipping provenance */ output.untrackedClippingVisualMismatch ="),
 ):
     assert token in raster
     unsafe = prefix + rasterStart + raster.replace(token, disabled, 1) + rasterEnd + suffix

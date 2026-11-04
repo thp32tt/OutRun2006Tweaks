@@ -273,7 +273,7 @@ def main() -> None:
         ("if (clippingMode == NativeGameClippingMode::Reject) return false;",
          "if (false) return false;"),
         ("output.rawClippingVisualMismatch =",
-         "/* lost RAW clipping provenance */ output.rawClippingVisualMismatch ="),
+         "/* lost RAW clipping provenance */ output.untrackedClippingVisualMismatch ="),
         ("GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
          "GetRenderState(D3DRS_SCISSORTESTENABLE, &clip)"),
         ("const auto polygonMode = game_sm3_effective_polygon_mode(",
