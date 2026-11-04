@@ -3788,6 +3788,23 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
             continue
         now = datetime.now(TZ)
         active = active_by_lane.get(lane_key)
+        if active and active.get("phase") == "WAIT_CHAT" and vr_unconditional_resume_due(active, now):
+            # Do this BEFORE the usual chat UI probe. A hung renderer can
+            # permanently block detect_busy/last_assistant_text on that path.
+            # Hard 60m recovery owns the lane until a fresh chat is sent;
+            # never mint a duplicate TASK_ID for still-unverified work.
+            try:
+                await asyncio.wait_for(
+                    vr_checkpoint_and_rollover(context, pages, q, active, now),
+                    timeout=75.0,
+                )
+            except Exception as exc:
+                log.warning("DX11 hard 60m new-chat recovery deferred task=%s: %r",
+                            active.get("task_id"), exc)
+                write_runtime(status="vr_60m_recovery_retry",
+                              last_action=f"{active.get('task_id')}: hard recovery retry pending")
+            save_queue_state(q)
+            continue
         if active:
             try:
                 await conversion_process_lane(context, pages, q, lane_key)
