@@ -1,0 +1,98 @@
+name: Dino 246 Cockpit V13 Textured VR Test Build
+
+on:
+  push:
+    branches: [ 'test/dino-cockpit-v13-textured-20261104' ]
+    paths:
+      - '.github/workflows/dino-cockpit-v13-textured.yml'
+      - 'tools/cockpit/dino_v13/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  package:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate CC0 leather DDS and v13 patcher
+        shell: pwsh
+        run: |
+          $dir="tools/cockpit/dino_v13"
+          $hashes=@{
+            "DinoV13_saddle_BC1_128.dds"="4f131d5006ead9a82090576ed297ff458dc17ae3a26287eafcb821f4edd53748"
+            "DinoV13_black_BC1_128.dds"="3da6692a66caf17aec7d5298a541be2d43d68a5276841c83d919c5d878dcbdf0"
+          }
+          foreach($key in $hashes.Keys){
+            $path=Join-Path $dir $key
+            if(!(Test-Path $path)){throw "Missing texture $key"}
+            if((Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hashes[$key]){
+              throw "Texture digest mismatch: $key"
+            }
+            $b=[IO.File]::ReadAllBytes($path)
+            if($b.Length -ne 11136 -or [Text.Encoding]::ASCII.GetString($b,0,4) -ne 'DDS ' -or
+              [Text.Encoding]::ASCII.GetString($b,84,4) -ne 'DXT1'){throw "Texture format mismatch: $key"}
+          }
+          python -m py_compile "$dir/dino_cockpit_pmt_patch_v13.py"
+
+      - name: Build self-contained Windows textured installer
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pyinstaller==6.16.0
+          python -m PyInstaller --noconfirm --clean --onefile --name DinoCockpitV13 tools/cockpit/dino_v13/dino_cockpit_pmt_patch_v13.py
+          if(!(Test-Path "dist/DinoCockpitV13.exe")){throw "Standalone v13 installer missing"}
+
+      - name: Assemble latest verified cockpit VR host plus textured model
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $repo="thp32tt/OutRun2006Tweaks"
+          $name="OutRun2-VR-Dino246-Cockpit-V12-Test-bfafd5fe98efb6d53537f22dea93f60f9406a4e0"
+          gh run download 41815760057 --repo $repo --name $name --dir stage/base-artifact
+          if($LASTEXITCODE -ne 0){throw "Cannot download successful prior VR test build"}
+          $archive=Get-ChildItem stage/base-artifact -Recurse -File -Filter *.zip|Select-Object -First 1
+          if(!$archive){throw "Prior VR test ZIP not found"}
+          Expand-Archive -LiteralPath $archive.FullName -DestinationPath stage/package -Force
+          $pkg="stage/package"
+          foreach($need in @("backends/d3d9/dinput8.dll","backends/d3d9/outrun-vr-host.exe",
+              "RUN-QUEST-COCKPIT-V2.cmd","Dino246_CabinOnly_v12.dcm")) {
+            if(!(Test-Path (Join-Path $pkg $need))){throw "Base package missing $need"}
+          }
+          foreach($old in @("DinoCockpitV12.exe","dino_cockpit_pmt_patch_v12.py",
+               "INSTALL-DINO-COCKPIT-V12.cmd","RESTORE-DINO-COCKPIT-V12.cmd",
+               "README_DINO_V12_TEST_KO.md")) {
+            Remove-Item -LiteralPath (Join-Path $pkg $old) -Force -ErrorAction SilentlyContinue
+          }
+          $dir="tools/cockpit/dino_v13"
+          Copy-Item "dist/DinoCockpitV13.exe" $pkg
+          foreach($item in @("DinoV13_saddle_BC1_128.dds","DinoV13_black_BC1_128.dds",
+             "dino_cockpit_pmt_patch_v13.py","INSTALL-DINO-COCKPIT-V13-TEXTURED.cmd",
+             "RESTORE-DINO-COCKPIT-V13-TEXTURED.cmd","README_DINO_V13_TEXTURED_TEST_KO.md")) {
+            Copy-Item (Join-Path $dir $item) $pkg
+          }
+          @"
+          NAME=DINO_246_V13_TEXTURED_COCKPIT
+          SOURCE_BRANCH=test/dino-cockpit-v13-textured-20261104
+          BASE_COCKPIT_SHA=bfafd5fe98efb6d53537f22dea93f60f9406a4e0
+          GAME_DLL_SHA=01cd99e3113cb9a8ed662beadab0600efdf4709a
+          OPENXR_HOST_SHA=cbf035bd72d8bfd13080ed5c50822e45cef32457
+          NEW_TEXTURES=2 BC1/DXT1 128x128 with 8 MIP levels
+          ORIGINAL_TEXTURES_PRESERVED=41
+          NEW_TEXTURE_SLOTS=41,42
+          EXPECTED_PATCHED_SHA256=83199d4f62519d8c0d77ed9944926d279832a1f9ee78cf04963d6218211e15ad
+          RUNTIME_VALIDATION=UNTESTED
+          "@ | Set-Content (Join-Path $pkg "DINO_V13_BUILD_MANIFEST.txt") -Encoding utf8
+          $zip="OutRun2_VR_DINO246_COCKPIT_V13_TEXTURED_TEST.zip"
+          Compress-Archive -Path "$pkg/*" -DestinationPath $zip -CompressionLevel Optimal -Force
+          if(!(Test-Path $zip)){throw "Textured release ZIP missing"}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-Dino246-V13-Textured-Test-${{ github.sha }}
+          path: OutRun2_VR_DINO246_COCKPIT_V13_TEXTURED_TEST.zip
+          retention-days: 14
+          if-no-files-found: error
