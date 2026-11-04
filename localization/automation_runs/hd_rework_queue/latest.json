@@ -1,11 +1,411 @@
 {
-  "schema": "outrun-hd-qa-chat-workqueue-v1",
+  "ab_eligible_counts": {
+    "A": 130,
+    "B": 125
+  },
+  "hold_categories": {
+    "AB_IMAGE_AND_CLEAN_REWORK": 255,
+    "ENGINE_OR_COORDINATE_HOLD": 694,
+    "EVIDENCE_REVIEW_HOLD": 1
+  },
+  "hold_count": 950,
+  "old_painted_count_invalid_for_release": 4,
   "policy": "hd-strict-chat-rework-v1-20261104",
-  "status": "WAITING_GITHUB_HD_QA",
-  "source_asset_sha256": null,
-  "hold_count": null,
-  "tasks": [],
+  "previously_claimed_ticket_count": 0,
+  "qa_report_schema": "outrun.ab-imagegen-hd-strict.v2",
+  "reference_blockers": {},
   "release_approved": false,
+  "remote_reference_prefix": "localization/automation_runs/hd_rework_queue/refs",
   "runtime_validation": "UNTESTED",
-  "message": "GitHub strict QA rebuild will publish SHA-pinned queue with native HD source refs. No chat task has yet been sent."
+  "schema": "outrun-hd-qa-chat-workqueue-v1",
+  "selection_policy": "8 TOTAL MAX; 4 PER ROLE; SHA-DEDUPE BEFORE CHAT SEND",
+  "source_asset_sha256": "726270942f5ab4bfce103e8b05df9ed379ddba20ef60aec64e14a5262350c3e4",
+  "source_reference_count_verified": 8,
+  "source_roi_count": 954,
+  "tasks": [
+    {
+      "english": "Stage",
+      "korean": "스테이지",
+      "old_candidate_sha256": "37d2bf9edae2abfe9c5b4de7b58ac673828ea535d03342bf8b8584e9808c1406",
+      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+      "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+      "reference": {
+        "height": 89,
+        "name": "HDRW-B-2dbbead57bffbda1e053_HD_SOURCE.png",
+        "roi_within_reference_xyxy": [
+          8,
+          8,
+          223,
+          81
+        ],
+        "sha256": "627059bfa61213e79b260335c0d5fb762c420cbbe1fd886791fe1a47971e6323",
+        "source_box_xyxy": [
+          557,
+          169,
+          788,
+          258
+        ],
+        "source_native_size": [
+          2048,
+          2048
+        ],
+        "width": 231
+      },
+      "required": [
+        "KOREAN_LETTERING_RGBA_PNG",
+        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+        "PRESERVE_ORIGINAL_LINE_COUNT",
+        "C1_INDEPENDENT_VISUAL_QA"
+      ],
+      "roi_id": "Q044_4384f7339ae91043",
+      "role": "B",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_native_bbox_xyxy": [
+        565,
+        177,
+        780,
+        250
+      ],
+      "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+      "task_id": "HDRW-B-2dbbead57bffbda1e053"
+    },
+    {
+      "english": "Sector3",
+      "korean": "섹터 3",
+      "old_candidate_sha256": "2fb3d2528dba1091ce4691cbe3d0cb0de1c6228d289ddd61a4155c15207cd918",
+      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+      "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+      "reference": {
+        "height": 223,
+        "name": "HDRW-A-8db54a59ed82bb86daa1_HD_SOURCE.png",
+        "roi_within_reference_xyxy": [
+          8,
+          8,
+          356,
+          215
+        ],
+        "sha256": "f5fa581bab804c0c568b53ff7bddcb377fe94f255b4ca8b7d28065d2d7a9e3cd",
+        "source_box_xyxy": [
+          1692,
+          1094,
+          2048,
+          1317
+        ],
+        "source_native_size": [
+          2048,
+          2048
+        ],
+        "width": 356
+      },
+      "required": [
+        "KOREAN_LETTERING_RGBA_PNG",
+        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+        "PRESERVE_ORIGINAL_LINE_COUNT",
+        "C1_INDEPENDENT_VISUAL_QA"
+      ],
+      "roi_id": "Q044_460dedb1427ef8cb",
+      "role": "A",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_native_bbox_xyxy": [
+        1700,
+        1102,
+        2048,
+        1309
+      ],
+      "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+      "task_id": "HDRW-A-8db54a59ed82bb86daa1"
+    },
+    {
+      "english": "Sector1",
+      "korean": "섹터 1",
+      "old_candidate_sha256": "ae07383bd3c63cfbc1fe34f8d23ef0f2a6ab9cdc5eeba92395df6173177b6480",
+      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+      "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+      "reference": {
+        "height": 85,
+        "name": "HDRW-A-38db4b6b72d868b4f61e_HD_SOURCE.png",
+        "roi_within_reference_xyxy": [
+          8,
+          8,
+          199,
+          77
+        ],
+        "sha256": "c1ce753ef980463fcd7416c5de4915a484c4467a2eab1bc1c158fa84784d3d8b",
+        "source_box_xyxy": [
+          194,
+          89,
+          401,
+          174
+        ],
+        "source_native_size": [
+          2048,
+          2048
+        ],
+        "width": 207
+      },
+      "required": [
+        "KOREAN_LETTERING_RGBA_PNG",
+        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+        "PRESERVE_ORIGINAL_LINE_COUNT",
+        "C1_INDEPENDENT_VISUAL_QA"
+      ],
+      "roi_id": "Q044_65bad63fe0353b2b",
+      "role": "A",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_native_bbox_xyxy": [
+        202,
+        97,
+        393,
+        166
+      ],
+      "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+      "task_id": "HDRW-A-38db4b6b72d868b4f61e"
+    },
+    {
+      "english": "WIN",
+      "korean": "승리",
+      "old_candidate_sha256": "69250d187081ac6aac6abdfc1005adb8d88be41000f000ebb0c1a9bcffafbf8c",
+      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+      "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+      "reference": {
+        "height": 74,
+        "name": "HDRW-B-805da89d618b8a37fa5d_HD_SOURCE.png",
+        "roi_within_reference_xyxy": [
+          8,
+          8,
+          95,
+          66
+        ],
+        "sha256": "ccb72f90727ad33b8619f5c649635cf4ee7b1868162fa8bc5b41c50d7a519e21",
+        "source_box_xyxy": [
+          412,
+          100,
+          515,
+          174
+        ],
+        "source_native_size": [
+          2048,
+          2048
+        ],
+        "width": 103
+      },
+      "required": [
+        "KOREAN_LETTERING_RGBA_PNG",
+        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+        "PRESERVE_ORIGINAL_LINE_COUNT",
+        "C1_INDEPENDENT_VISUAL_QA"
+      ],
+      "roi_id": "Q044_7a31403046d4e992",
+      "role": "B",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_native_bbox_xyxy": [
+        420,
+        108,
+        507,
+        166
+      ],
+      "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+      "task_id": "HDRW-B-805da89d618b8a37fa5d"
+    },
+    {
+      "english": "Rival",
+      "korean": "라이벌",
+      "old_candidate_sha256": "bc58c244a29aa8c9272100ad602e38321e155edfa7e4f4dde8c9ec7d6417c85c",
+      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+      "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+      "reference": {
+        "height": 291,
+        "name": "HDRW-A-8e97ab6a797a62b25ee9_HD_SOURCE.png",
+        "roi_within_reference_xyxy": [
+          8,
+          8,
+          564,
+          283
+        ],
+        "sha256": "58a1f84a0680356dbc7d24bd208273937c853c77404d0dffb7f0bc51087500e3",
+        "source_box_xyxy": [
+          314,
+          1303,
+          886,
+          1594
+        ],
+        "source_native_size": [
+          2048,
+          2048
+        ],
+        "width": 572
+      },
+      "required": [
+        "KOREAN_LETTERING_RGBA_PNG",
+        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+        "PRESERVE_ORIGINAL_LINE_COUNT",
+        "C1_INDEPENDENT_VISUAL_QA"
+      ],
+      "roi_id": "Q044_7c4b4ca9cd581877",
+      "role": "A",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_native_bbox_xyxy": [
+        322,
+        1311,
+        878,
+        1586
+      ],
+      "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+      "task_id": "HDRW-A-8e97ab6a797a62b25ee9"
+    },
+    {
+      "english": "Sector2",
+      "korean": "섹터 2",
+      "old_candidate_sha256": "abb634090f013a845ee8db77c09068455bc420ae9f36c4903cda5ff5654e623e",
+      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+      "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+      "reference": {
+        "height": 85,
+        "name": "HDRW-A-9c6e691c748781fea3d5_HD_SOURCE.png",
+        "roi_within_reference_xyxy": [
+          6,
+          8,
+          198,
+          77
+        ],
+        "sha256": "9d71d4c2b12b6ea7fa8fa1e8c6566d14fb608e83631581f21540666883fcd8d6",
+        "source_box_xyxy": [
+          0,
+          89,
+          206,
+          174
+        ],
+        "source_native_size": [
+          2048,
+          2048
+        ],
+        "width": 206
+      },
+      "required": [
+        "KOREAN_LETTERING_RGBA_PNG",
+        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+        "PRESERVE_ORIGINAL_LINE_COUNT",
+        "C1_INDEPENDENT_VISUAL_QA"
+      ],
+      "roi_id": "Q044_8f2fb4bb6e3a34b0",
+      "role": "A",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_native_bbox_xyxy": [
+        6,
+        97,
+        198,
+        166
+      ],
+      "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+      "task_id": "HDRW-A-9c6e691c748781fea3d5"
+    },
+    {
+      "english": "Diff",
+      "korean": "차이",
+      "old_candidate_sha256": "c6f7dd76500c1222d8c54dfbdbffb1f9d3297229fec0e97edd8b8e35cf1b86eb",
+      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+      "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+      "reference": {
+        "height": 85,
+        "name": "HDRW-B-de00e9c6d4e5c0a9af4f_HD_SOURCE.png",
+        "roi_within_reference_xyxy": [
+          8,
+          8,
+          130,
+          77
+        ],
+        "sha256": "438e6149b8fdaad6e5e90a2880cd74cacb5566cc248bf24eae0cddb979fe06b5",
+        "source_box_xyxy": [
+          1845,
+          304,
+          1983,
+          389
+        ],
+        "source_native_size": [
+          2048,
+          2048
+        ],
+        "width": 138
+      },
+      "required": [
+        "KOREAN_LETTERING_RGBA_PNG",
+        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+        "PRESERVE_ORIGINAL_LINE_COUNT",
+        "C1_INDEPENDENT_VISUAL_QA"
+      ],
+      "roi_id": "Q044_a036a116ad16dcc5",
+      "role": "B",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_native_bbox_xyxy": [
+        1853,
+        312,
+        1975,
+        381
+      ],
+      "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+      "task_id": "HDRW-B-de00e9c6d4e5c0a9af4f"
+    },
+    {
+      "english": "Result",
+      "korean": "결과",
+      "old_candidate_sha256": "19ef2a808206e67de620193113fca579f5bebea3ad8c05bb30d694911974e054",
+      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+      "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+      "reference": {
+        "height": 89,
+        "name": "HDRW-B-4f06c9e3610308c3369e_HD_SOURCE.png",
+        "roi_within_reference_xyxy": [
+          8,
+          8,
+          229,
+          81
+        ],
+        "sha256": "b240067f4937e5c0032984bd43b624a1c9d58224014742427a25e40ff4a613a5",
+        "source_box_xyxy": [
+          20,
+          169,
+          257,
+          258
+        ],
+        "source_native_size": [
+          2048,
+          2048
+        ],
+        "width": 237
+      },
+      "required": [
+        "KOREAN_LETTERING_RGBA_PNG",
+        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+        "PRESERVE_ORIGINAL_LINE_COUNT",
+        "C1_INDEPENDENT_VISUAL_QA"
+      ],
+      "roi_id": "Q044_b2708f0084b065f8",
+      "role": "B",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_native_bbox_xyxy": [
+        28,
+        177,
+        249,
+        250
+      ],
+      "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+      "task_id": "HDRW-B-4f06c9e3610308c3369e"
+    }
+  ]
 }
