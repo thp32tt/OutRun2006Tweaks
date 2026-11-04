@@ -578,10 +578,11 @@ class ChatBridge:
                 "release_approved":False}
 
     async def close(self):
-        # Disconnect from CDP; keep the visible browser/profile owned by
-        # entrypoint alive so manual ChatGPT login is not interrupted.
-        if self.browser:
-            await self.browser.close()
+        # The entrypoint owns Chromium and its persistent login profile.
+        # Never call Browser.close() on this CDP connection: that could close
+        # the manually authenticated visible window during a worker restart.
+        self.context=None
+        self.browser=None
 
 
 async def run_forever():
