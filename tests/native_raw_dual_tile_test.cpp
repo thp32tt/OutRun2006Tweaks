@@ -194,14 +194,14 @@ bool native_raw_fvf_clip_capture_regression() {
             rect, 0u, source) || source.first.x < 2500u)
         return reject(__LINE__);
     auto invalidW = verts;
-    invalidW[1][3] = 0.0f;
+    invalidW[1] = {{0.f,0.f,0.f,0.f}};
     if (native_raw_fvf_projected_raster(
             {invalidW.data(), sizeof(invalidW[0]), invalidW.size()},
             0, 0, 3440, 1440, rect))
         return reject(__LINE__);
     // Mixed-sign homogeneous W is a valid D3D11 clipped game Draw.
     // Validate both original source rectangle and the integrated native
-    // PRE/POST dual-GPU capture origin, without relaxing invalid W=0.
+    // PRE/POST dual-GPU capture origin, without admitting zero vectors.
     constexpr std::array<std::array<float,4>,3> crossingEye{{
         {{-0.7f,-0.1f,0.5f,1.f}}, {{0.7f,-0.1f,0.5f,1.f}},
         {{0.0f,0.2f,-0.5f,-0.5f}}
@@ -345,7 +345,7 @@ bool native_raw_fvf_clip_capture_regression() {
             badSpan, 0, 0, 3440, 1440, rect))
         return reject(__LINE__);
     auto invalidActive = indexedVerts;
-    invalidActive[5][3] = 0.0f;
+    invalidActive[5] = {{0.f,0.f,0.f,0.f}};
     if (native_raw_fvf_projected_raster(
             {invalidActive.data(), sizeof(invalidActive[0]),
              invalidActive.size(), used.data(), used.size()},
@@ -410,7 +410,7 @@ bool native_raw_fvf_island_regression() {
                  malformed.data(),malformed.size()},canvas,0u))
         return fail(__LINE__);
     auto invalid = vertices;
-    invalid[4][3] = 0.f;
+    invalid[4] = {{0.f,0.f,0.f,0.f}};
     if (capture({invalid.data(),sizeof(invalid[0]),invalid.size()},
                 canvas,0u)) return fail(__LINE__);
     // A large single primitive must still produce two independent GPU
@@ -478,9 +478,11 @@ bool native_raw_fvf_broad_interior_second_gpu_capture_regression() {
     if (native_raw_fvf_island_dual_draw_tile(
             source,0,0,sw,sh,sw,sh,tw,th,outside,0u,invalid))
         return false;
-    // A malformed source W may not produce a fabricated GPU evidence tile.
+    // A projectively undefined ALL-ZERO source clip vector cannot produce
+    // a fabricated GPU evidence tile. W=0 with nonzero XYZ is valid and
+    // must instead pass the authentic homogeneous eye-plane clip.
     auto bad = triangle;
-    bad[1][3] = 0.0f;
+    bad[1] = {{0.f,0.f,0.f,0.f}};
     return !native_raw_fvf_island_dual_draw_tile(
         {bad.data(),sizeof(bad[0]),bad.size()},
         0,0,sw,sh,sw,sh,tw,th,canvas,0u,invalid);
@@ -832,7 +834,7 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
     // Invalid W and unreferenced vertices must remain fail closed, even
     // when the other submitted triangle is front-facing.
     auto invalid = positions;
-    invalid[5][3] = 0.f;
+    invalid[5] = {{0.f,0.f,0.f,0.f}};
     if (native_raw_fvf_projected_raster(
             {invalid.data(),sizeof(invalid[0]),invalid.size()},
             0,0,3440,1440,front,nullptr,&cullBack))
@@ -899,7 +901,7 @@ bool native_raw_fvf_depth_clip_disabled_gpu_capture_regression() {
          !native_raw_source_tiles_disjoint(
              samples.first,samples.second,512,288))) return false;
     // A triangle straddling W=0 remains clipped at the eye plane even
-    // with depth clip disabled; malformed zero W is never admitted.
+    // with depth clip disabled; only an all-zero clip vector is invalid.
     auto acrossEye = beyondNear;
     acrossEye[2][3] = -1.0f;
     const NativeRawFvfClipSpan eyeSpan{
@@ -907,7 +909,7 @@ bool native_raw_fvf_depth_clip_disabled_gpu_capture_regression() {
     if (!native_raw_fvf_projected_raster(
             eyeSpan,0,0,3440,1440,nearOff,nullptr,&depthOff))
         return false;
-    acrossEye[2][3] = 0.0f;
+    acrossEye[2] = {{0.f,0.f,0.f,0.f}};
     if (native_raw_fvf_projected_raster(
             eyeSpan,0,0,3440,1440,nearOff,nullptr,&depthOff))
         return false;
@@ -1026,7 +1028,7 @@ bool native_raw_fvf_sparse_diagonal_gpu_capture_regression() {
             source,0,0,sw,sh,sw,sh,tw,th,excluded,0u,none))
         return false;
     auto invalid=diagonal;
-    invalid[2][3]=0.0f;
+    invalid[2]={{0.f,0.f,0.f,0.f}};
     if (native_raw_fvf_island_dual_draw_tile(
             {invalid.data(),sizeof(invalid[0]),invalid.size()},
             0,0,sw,sh,sw,sh,tw,th,viewport,0u,none))
