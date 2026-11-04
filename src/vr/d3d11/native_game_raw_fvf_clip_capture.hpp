@@ -85,8 +85,11 @@ struct NativeRawFvfClipSpan {
 // including wholly offscreen/depth-clipped and degenerate geometry.
 // Partial diagnostic output is still sampled from the actual GPU texture;
 // no CPU polygon can substitute for the native pixel/RT/Present proof.
-// Unknown W, malformed IA, excessive geometry or unknown raster conditions
-// revert to the existing full-viewport GPU source-sampling path.
+// Malformed homogeneous source (including the all-zero eye vector), IA,
+// excessive geometry or unknown raster conditions revert to the existing
+// full-viewport GPU source-sampling path. A finite nonzero W=0 eye-crossing
+// triangle must be clipped before projection, exactly as the game FVF GPU
+// POINTLIST source translation already does.
 [[nodiscard]] inline bool native_raw_fvf_projected_raster(
     NativeRawFvfClipSpan source,
     float viewportX, float viewportY, float viewportW, float viewportH,
@@ -107,6 +110,11 @@ struct NativeRawFvfClipSpan {
         (source.indices == nullptr) != (source.indexCount == 0u) ||
         (source.indices && (source.indexCount < 3u ||
                             source.indexCount > 1048576u)) ||
+        // A line or point GPU IA is never a triangle fan for CPU sampling.
+        // Its real GPU coverage is handled by the separate stroke path.
+        (source.assembly != NativeRawFvfAssembly::TriangleList &&
+         source.assembly != NativeRawFvfAssembly::TriangleStrip &&
+         source.assembly != NativeRawFvfAssembly::TriangleFan) ||
         (source.clipDistanceMask & ~0x3fu) ||
         (source.clipDistanceMask &&
          (source.vertexStride < sizeof(float) * 6u ||
@@ -115,6 +123,10 @@ struct NativeRawFvfClipSpan {
         return false;
     const bool depthClipEnable = !rasterState || rasterState->depthClipEnable;
     const auto activeCount = source.indices ? source.indexCount : source.count;
+    // No incomplete late original IA tail may make an earlier polygon look
+    // like full source-authenticated RGB. Strip/fan share real endpoints.
+    if (source.assembly == NativeRawFvfAssembly::TriangleList &&
+        activeCount % 3u != 0u) return false;
     const auto triangles = source.assembly == NativeRawFvfAssembly::TriangleList
         ? activeCount / 3u : activeCount - 2u;
     // Bounded diagnostic CPU geometry work; a very large genuine draw
@@ -198,7 +210,10 @@ struct NativeRawFvfClipSpan {
             std::memcpy(clip, bytes + vertex * source.vertexStride, sizeof(clip));
             if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
                 !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
-                clip[3] == 0.0f ||
+                // W=0 is an authentic perspective plane crossing when the
+                // vector has finite nonzero XYZ. Reject the projectively
+                // undefined zero vector, not the entire original game Draw.
+                (!clip[0] && !clip[1] && !clip[2] && !clip[3]) ||
                 (clip[3] > 0.0f && clip[3] <= 0.00001f)) return false;
             homogeneous[corner] = {static_cast<double>(clip[0]),
                                    static_cast<double>(clip[1]),
@@ -214,9 +229,9 @@ struct NativeRawFvfClipSpan {
                     homogeneous[corner].userClip[p] = distances[p];
                 }
             }
-            // The existing fail-closed W=0/tiny-W contract is preserved.
-            // A negative-W game triangle is still clipped homogeneously.
-            crossesEyePlane = crossesEyePlane || clip[3] < 0.0f;
+            // Only a valid W>0 input can be projected immediately. Source
+            // W=0/W<0 requires homogeneous clipping, not division by zero.
+            crossesEyePlane = crossesEyePlane || clip[3] <= 0.0f;
             if (clip[3] > 0.0f) {
                 const double invW = 1.0 / static_cast<double>(clip[3]);
                 polygon[corner] = {static_cast<double>(clip[0]) * invW,
@@ -231,7 +246,8 @@ struct NativeRawFvfClipSpan {
         // Real menu, vehicle and race triangles can straddle the eye plane:
         // clip their finite source homogeneous vertices BEFORE dividing W.
         // Keep the original positive-W NDC path unchanged for ordinary game
-        // Draws. W=0, nonfinite source data and malformed IA still fail closed.
+        // Draws. Only the all-zero homogeneous vector, nonfinite source
+        // data and malformed IA fail closed; valid W=0 crosses this plane.
         if (crossesEyePlane || source.clipDistanceMask) {
             const auto distance = [](const HomogeneousPoint& q,
                                      unsigned plane) noexcept {

@@ -58,6 +58,41 @@ int main() {
     };
     NativeRawFvfClipSpan nearEye{eye,sizeof(Vertex),3u};
     assert(!native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
+    // A genuine world-space D3D9 WVP triangle may intersect the camera at
+    // finite, nonzero XYZ/W=0. The native clipped point/triangle GPU Draw
+    // must guide its own PRE/POST sampling rather than reverting to an
+    // unrelated viewport. This is sampling placement, NOT a fabricated RGB.
+    eye[0]={{-0.5f,-0.5f,0.5f,0.f},{1,1,1,1,1,1}};
+    NativeRawFvfInteriorSample nearEyeInterior{};
+    assert(native_raw_fvf_projected_raster(
+        nearEye,0,0,100,100,xy,nullptr,nullptr,&nearEyeInterior));
+    assert(xy.right>xy.left && xy.bottom>xy.top);
+    assert(nearEyeInterior.pixelX>=xy.left &&
+           nearEyeInterior.pixelX<xy.right &&
+           nearEyeInterior.pixelY>=xy.top &&
+           nearEyeInterior.pixelY<xy.bottom);
+    // Nonzero eye crossings are still subject to the real GPU scissor,
+    // source ClipDistance and homogeneous depth plane.
+    nearEye.clipDistanceMask=1u;
+    assert(native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
+    for (auto& v:eye) v.user[0]=-1.f;
+    assert(!native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
+    for (auto& v:eye) v.user[0]=1.f;
+    nearEye.clipDistanceMask=0u;
+    // Point/line IA can never be certified by a triangle-fan polygon.
+    // Their geometry must be routed to the native stroke capture helper.
+    nearEye.assembly=NativeRawFvfAssembly::LineStrip;
+    assert(!native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
+    nearEye.assembly=NativeRawFvfAssembly::PointList;
+    assert(!native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
+    nearEye.assembly=NativeRawFvfAssembly::TriangleList;
+    const std::uint32_t trailing[]{0u,1u,2u,0u};
+    nearEye.indices=trailing;
+    nearEye.indexCount=4u;
+    assert(!native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
+    nearEye.indices=nullptr;
+    nearEye.indexCount=0u;
+    assert(native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
     // A real FVF D3DFILL_WIREFRAME Draw colors edge fragments, not the
     // interior of its source-authentic clipped triangle. Verify that
     // bound D3D11 wire RS directs the same native PRE/POST GPU copies to
@@ -111,7 +146,10 @@ int main() {
     assert(!native_raw_fvf_projected_raster(
         wireSource,0,0,3440,1440,wireRaster,nullptr,&wireRs));
     wireSource.clipDistanceMask=1u;
-    wire[1].clip[3]=0.f;
+    wire[1].clip[0]=0.f;
+    wire[1].clip[1]=0.f;
+    wire[1].clip[2]=0.f;
+    wire[1].clip[3]=0.f; // all-zero remains malformed, unlike W=0/XYZ!=0
     assert(!native_raw_fvf_island_dual_draw_tile(
         wireSource,0,0,3440,1440,3440,1440,512,288,
         {0,0,3440,1440},0u,gpuWire,&wireRs));
