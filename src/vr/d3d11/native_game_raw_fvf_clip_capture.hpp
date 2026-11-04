@@ -193,8 +193,9 @@ struct NativeRawFvfClipSpan {
             float clip[4]{};
             std::memcpy(clip, bytes + vertex * source.vertexStride, sizeof(clip));
             if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
-                !std::isfinite(clip[2]) || !std::isfinite(clip[3]))
-                return false;
+                !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
+                clip[3] == 0.0f ||
+                (clip[3] > 0.0f && clip[3] <= 0.00001f)) return false;
             homogeneous[corner] = {static_cast<double>(clip[0]),
                                    static_cast<double>(clip[1]),
                                    static_cast<double>(clip[2]),
@@ -209,9 +210,9 @@ struct NativeRawFvfClipSpan {
                     homogeneous[corner].userClip[p] = distances[p];
                 }
             }
-            // Finite W=0 and small-positive-W vertices can still intersect
-            // the real visible polygon after safe homogeneous clipping.
-            crossesEyePlane = crossesEyePlane || clip[3] <= 0.00001f;
+            // The existing fail-closed W=0/tiny-W contract is preserved.
+            // A negative-W game triangle is still clipped homogeneously.
+            crossesEyePlane = crossesEyePlane || clip[3] < 0.0f;
             if (clip[3] > 0.0f) {
                 const double invW = 1.0 / static_cast<double>(clip[3]);
                 polygon[corner] = {static_cast<double>(clip[0]) * invW,

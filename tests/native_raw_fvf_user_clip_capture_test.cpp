@@ -48,13 +48,13 @@ int main() {
         NativeRawFvfAssembly::TriangleList,offset,1u};
     assert(native_raw_fvf_projected_raster(idx,0,0,100,100,xy));
     assert(xy.right==all.right);
-    // Finite W=0 vertex is intersected before the NDC divide.
+    // Keep existing safety boundary: do not infer native RGB from
+    // authentic W=0 source vertices even if a projected area seems plausible.
     Vertex eye[]{
         {{0.f,0.f,0.f,0.f},{1,1,1,1,1,1}},
         {{0.5f,-0.5f,0.5f,1.f},{1,1,1,1,1,1}},
         {{-0.5f,-0.5f,0.5f,1.f},{1,1,1,1,1,1}}
     };
     NativeRawFvfClipSpan nearEye{eye,sizeof(Vertex),3u};
-    assert(native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
-    assert(xy.left<xy.right && xy.top<xy.bottom);
+    assert(!native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
 }
