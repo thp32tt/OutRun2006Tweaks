@@ -27,6 +27,7 @@
 #include "native_game_raw_gpu_wait.hpp"
 #include "native_game_raw_source_target_identity.hpp"
 #include "native_game_raw_color_write_admission.hpp"
+#include "native_game_fvf_clipped_draw.hpp"
 #include "native_game_raw_fvf_clip_capture.hpp"
 #include "native_game_raw_fvf_island_sampling.hpp"
 #include "native_game_raw_fvf_stroke_sampling.hpp"
@@ -1235,6 +1236,18 @@ private:
             fvfClip.assembly == NativeRawFvfAssembly::LineList ||
             fvfClip.assembly == NativeRawFvfAssembly::LineStrip ||
             fvfClip.assembly == NativeRawFvfAssembly::PointList;
+        // All original IA primitives outside a proved native clip plane
+        // cannot change ANY real GPU RGB. Do not occupy the one in-flight
+        // BEFORE/AFTER staging pair with a known empty Draw; this leaves
+        // the source-owned capture available to later visible menu/race
+        // Draws in the same Present. Unknown/malformed IA keeps the old
+        // fail-closed real GPU sampler rather than declaring an empty Draw.
+        if (fvfClip.firstClip && knownNativeCull &&
+            (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID ||
+             nativeWireframe) &&
+            native_game_fvf_fully_clipped_draw(
+                fvfClip, fvfRaster.depthClipEnable))
+            return NativeRawPreviewResult::NoDraw;
         bool authenticFvfFootprint = false;
         if (!nativeStroke && fvfClip.firstClip && knownNativeCull &&
             (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID ||

@@ -1,3 +1,4 @@
+#include "../src/vr/d3d11/native_game_fvf_clipped_draw.hpp"
 #include "../src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp"
 #include "../src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp"
 #include <cassert>
@@ -157,4 +158,83 @@ int main() {
     assert(!native_raw_fvf_island_dual_draw_tile(
         wireSource,0,0,3440,1440,3440,1440,512,288,
         {0,0,3440,1440},0u,gpuWire,&wireRs));
+
+    // 01230: actual menu/car/race FVF source Draw ordinals stay contiguous
+    // when ALL of their genuine indexed or linear IA primitives are clipped.
+    // Native GPU RAW sampling must also retain its PRE/POST slot for the
+    // next visible real Draw, with no fabricated skipped fragments.
+    Vertex offscreen[] {
+        {{-4.f,-0.8f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{-3.f,-0.2f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{-2.f, 0.7f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{ 2.f,-0.8f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{ 3.f,-0.2f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{ 4.f, 0.7f,0.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan hidden{
+        offscreen,sizeof(Vertex),6u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,userOffset,0u};
+    assert(native_game_fvf_fully_clipped_draw(hidden));
+    NativeRawDrawExtent hiddenRaster{};
+    assert(!native_raw_fvf_projected_raster(
+        hidden,0,0,100,100,hiddenRaster));
+    // A crossing triangle has corners outside opposite planes, but clips
+    // to visible screen pixels and may write game Z/stencil/color.
+    offscreen[1].clip[0]=3.f;
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
+    offscreen[1].clip[0]=-3.f;
+    const std::uint32_t onlyHidden[]{0u,1u,2u,3u,4u,5u};
+    hidden.indices=onlyHidden;
+    hidden.indexCount=6u;
+    assert(native_game_fvf_fully_clipped_draw(hidden));
+    const std::uint32_t invalidLate[]{0u,1u,2u,3u,4u,9u};
+    hidden.indices=invalidLate;
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
+    const std::uint32_t dangling[]{0u,1u,2u,3u};
+    hidden.indices=dangling;
+    hidden.indexCount=4u;
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
+    hidden.indices=nullptr; hidden.indexCount=0u;
+    // A wholly clipped TriangleStrip and TriangleFan use their complete
+    // original topology, not an assumed list of independent triangles.
+    hidden.count=3u;
+    hidden.assembly=NativeRawFvfAssembly::TriangleFan;
+    assert(native_game_fvf_fully_clipped_draw(hidden));
+    hidden.assembly=NativeRawFvfAssembly::TriangleStrip;
+    assert(native_game_fvf_fully_clipped_draw(hidden));
+    hidden.assembly=NativeRawFvfAssembly::LineStrip;
+    assert(native_game_fvf_fully_clipped_draw(hidden));
+    hidden.assembly=NativeRawFvfAssembly::LineList;
+    assert(!native_game_fvf_fully_clipped_draw(hidden)); // dangling line
+    hidden.assembly=NativeRawFvfAssembly::PointList;
+    assert(native_game_fvf_fully_clipped_draw(hidden));
+    // Source W=0 eye crossing with real XYZ is not automatically empty;
+    // an invalid all-zero homogeneous vector cannot certify either outcome.
+    hidden.assembly=NativeRawFvfAssembly::TriangleList;
+    offscreen[1].clip[0]=0.f;
+    offscreen[1].clip[3]=0.f;
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
+    offscreen[1].clip[1]=0.f; offscreen[1].clip[2]=0.f;
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
+    offscreen[1]={{-3.f,-0.2f,0.5f,1.f},{1,1,1,1,1,1}};
+    // Exact enabled source ClipDistance can alone prove exclusion; missing
+    // or nonfinite active plane payload never becomes a no-op certificate.
+    for (auto& v:offscreen) v.clip[0]=0.f;
+    for (unsigned i=0;i<3u;++i) offscreen[i].user[0]=-1.f;
+    hidden.clipDistanceMask=1u;
+    assert(native_game_fvf_fully_clipped_draw(hidden));
+    offscreen[0].user[0]=0.f;
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
+    offscreen[0].user[0]=std::numeric_limits<float>::quiet_NaN();
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
+    hidden.clipDistanceMask=0x40u;
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
+    // D3D11 DepthClipEnable=FALSE never cancels XY clipping.
+    hidden.clipDistanceMask=0u;
+    for (unsigned i=0;i<3u;++i) {
+        offscreen[i].clip[0]=0.f;
+        offscreen[i].clip[2]=2.f;
+    }
+    assert(native_game_fvf_fully_clipped_draw(hidden));
+    assert(!native_game_fvf_fully_clipped_draw(hidden,false));
 }

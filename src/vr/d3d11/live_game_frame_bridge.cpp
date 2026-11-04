@@ -80,6 +80,7 @@
 #include "native_game_shared_desktop.hpp"
 #include "native_game_cpu_upload_transaction.hpp"
 #include "native_game_shared_desktop_admission.hpp"
+#include "native_game_fvf_clipped_draw.hpp"
 #include "native_game_raw_visual_diagnostic.hpp"
 #include "native_game_raw_present_coverage.hpp"
 #include "native_game_raw_source_probe.hpp"
@@ -9248,6 +9249,38 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                     return;
                 }
             }
+        }
+        // A real successful D3D9 FVF Draw which is wholly outside the
+        // source-authentic homogeneous/user clip volume cannot change the
+        // main game's color, Z or stencil. Consume its EXACT source ordinal
+        // inside the contiguous native frame instead of poisoning later
+        // menu/vehicle/race Draws or fabricating a D3D11 submission. All
+        // original source IA elements (including final indexed primitives)
+        // are checked; W=0 crossings and viewport-spanning polygons remain
+        // on the normal Draw route. CLIPPING=FALSE is never considered exact.
+        // Point-filled triangles may have a D3D9 point-size footprint and
+        // are deliberately excluded from this conservative optimization.
+        if (fullMode && !output.rawClippingVisualMismatch &&
+            !output.nativePointFill && !vertices.empty() &&
+            native_game_fvf_fully_clipped_draw({
+                vertices.front().clip, sizeof(NativeVertex), vertices.size(),
+                indices, indexCount,
+                type == D3DPT_TRIANGLESTRIP
+                    ? NativeRawFvfAssembly::TriangleStrip :
+                type == D3DPT_TRIANGLEFAN
+                    ? NativeRawFvfAssembly::TriangleFan :
+                type == D3DPT_LINELIST
+                    ? NativeRawFvfAssembly::LineList :
+                type == D3DPT_LINESTRIP
+                    ? NativeRawFvfAssembly::LineStrip :
+                type == D3DPT_POINTLIST
+                    ? NativeRawFvfAssembly::PointList :
+                    NativeRawFvfAssembly::TriangleList,
+                offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask})) {
+            if (!s.frameBatch.absorb_empty_source_draw(
+                    sourceOrdinal, sameClearedGameTarget))
+                s.frameBatch.abort();
+            return; // native RTV/DSV and original D3D9 Draw/FFB untouched
         }
         // A genuine FVF menu/vehicle/race fan, or a 2049..4096 triangle
         // POINT-filled strip, may expand past one GPU IB although its compact
