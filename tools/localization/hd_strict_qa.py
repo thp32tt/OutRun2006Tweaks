@@ -207,6 +207,7 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
     data = raw[:128] + native.tobytes("raw", fmt)
     if data[:128] != raw[:128] or len(data) != len(raw) or data == raw:
         raise ValueError("QA_NATIVE_DDS_SOURCE_HEADER_OR_NOOP")
-    if ImageChops.difference(decode(data), native).getbbox():
+    diff = ImageChops.difference(decode(data), native)
+    if any(channel.getbbox() for channel in diff.split()):
         raise ValueError("QA_NATIVE_DDS_ROUNDTRIP_MISMATCH")
     return data, result, clean, painted, holds
