@@ -10,6 +10,8 @@ on:
     paths:
       - ".github/workflows/outrun-ab-multi-atlas.yml"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
+      - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/test_hd_strict_qa.py"
       - "tools/localization/test_github_ab_imagegen_atlas_batch.py"
       - "localization/automation_inputs/candidate_outputs/**"
       - "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
@@ -36,6 +38,8 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             tools/localization/github_ab_imagegen_atlas_batch.py
+            tools/localization/hd_strict_qa.py
+            tools/localization/test_hd_strict_qa.py
             tools/localization/test_github_ab_imagegen_atlas_batch.py
             localization/automation_inputs/candidate_outputs
             localization/automation_inputs/hd_original_png_source_plan.json
@@ -51,18 +55,37 @@ jobs:
         run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
 
       - name: Verify synthetic multi-ROI safety and no-font guards
-        run: python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
+        run: |
+          python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
+          python -m unittest discover -s tools/localization -p test_hd_strict_qa.py -v
 
-      - name: Compose imported A/B artwork into native DDS once per atlas
+      - name: Compose strict HD source-clean-final A/B artwork into native DDS once per atlas
         shell: bash
         run: |
           set -euo pipefail
           python tools/localization/github_ab_imagegen_atlas_batch.py --repo-root . --out "$RUNNER_TEMP/ab-multi-one"
           python tools/localization/github_ab_imagegen_atlas_batch.py --repo-root . --out "$RUNNER_TEMP/ab-multi-two"
-          cmp "$RUNNER_TEMP/ab-multi-one/OUTRUN_AB_IMAGEGEN_MULTI_ATLAS_TEST_ONLY.zip" \
-              "$RUNNER_TEMP/ab-multi-two/OUTRUN_AB_IMAGEGEN_MULTI_ATLAS_TEST_ONLY.zip"
+          cmp "$RUNNER_TEMP/ab-multi-one/OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip" \
+              "$RUNNER_TEMP/ab-multi-two/OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip"
           cmp "$RUNNER_TEMP/ab-multi-one/qa_report.json" "$RUNNER_TEMP/ab-multi-two/qa_report.json"
-          sha256sum "$RUNNER_TEMP/ab-multi-one/OUTRUN_AB_IMAGEGEN_MULTI_ATLAS_TEST_ONLY.zip"
+          python - "$RUNNER_TEMP/ab-multi-one/qa_report.json" <<'PY'
+          import json, sys
+          j=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert j["schema"]=="outrun.ab-imagegen-hd-strict.v2"
+          assert j["release_approved"] is False and j["runtime_validation"]=="UNTESTED"
+          assert j["legacy_oversize_outputs_rejected"] is True
+          assert j["translated_roi_generated"]+sum(j["hold_roi_reason_counts"].values())==954
+          for atlas in j["generated"]:
+              assert atlas["plate_evidence"]=="SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED"
+              for roi in atlas["painted"]:
+                  assert roi["clean_type"]=="ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT"
+                  assert roi["original_line_count"]==roi["translated_line_count"]
+                  for original,translated in zip(roi["original_native_lines"],roi["translated_native_lines"]):
+                      assert original[0] <= translated[0] < translated[2] <= original[2]
+                      assert original[1] <= translated[1] < translated[3] <= original[3]
+          print("HD_STRICT_NATIVE_SIZE_AND_CLEAN_QA_GATES_PASS")
+          PY
+          sha256sum "$RUNNER_TEMP/ab-multi-one/OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip"
 
       - name: Preserve DDS TEST_ONLY, previews and per-ROI HOLD receipts
         if: always()
