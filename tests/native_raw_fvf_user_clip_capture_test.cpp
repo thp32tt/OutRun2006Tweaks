@@ -329,6 +329,68 @@ int main() {
     edgeSource.indices=nullptr;
     edgeSource.indexCount=0u;
 
+    // 01235: authenticated one-pixel POINTLIST / point-filled TRIANGLELIST
+    // use the same source-authentic clipping and face-cull certificate.
+    // Point scissor proof is conservatively expanded by one pixel.
+    Vertex points[]{
+        {{-.5f,-.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{-.4f, .5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{-.6f,-.1f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan unitPoint{
+        points,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::PointList,offset,0u};
+    const NativeRawFvfScissorClip rightPointScissor{
+        0.0,0.0,100.0,100.0,60,0,100,100};
+    assert(native_game_fvf_fully_clipped_draw(
+        unitPoint,true,&rightPointScissor));
+    points[0].clip[0]=.19f; // x=59.5: aliasing can reach sample x=60
+    assert(!native_game_fvf_fully_clipped_draw(
+        unitPoint,true,&rightPointScissor));
+    points[0].clip[0]=-.5f;
+    const std::uint32_t pointOrder[]{1u,0u,2u};
+    unitPoint.indices=pointOrder;unitPoint.indexCount=3u;
+    assert(native_game_fvf_fully_clipped_draw(
+        unitPoint,true,&rightPointScissor)); // valid indexed hidden points
+    points[1].clip[0]=.6f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        unitPoint,true,&rightPointScissor)); // visible indexed point
+    points[1].clip[0]=-.4f;
+    const std::uint32_t badPointOrder[]{1u,0u,99u};
+    unitPoint.indices=badPointOrder;
+    assert(!native_game_fvf_fully_clipped_draw(
+        unitPoint,true,&rightPointScissor)); // corrupt tail is not empty
+    unitPoint.indices=nullptr;unitPoint.indexCount=0u;
+    unitPoint.assembly=NativeRawFvfAssembly::TriangleList;
+    const NativeRawFvfRaster pointBack{
+        NativeRawFvfCull::Back,false,true,false};
+    const NativeRawFvfRaster pointNoCull{
+        NativeRawFvfCull::None,false,true,false};
+    points[0].clip[0]=-.7f;points[0].clip[1]=-.6f;
+    points[1].clip[0]= .7f;points[1].clip[1]=-.6f;
+    points[2].clip[0]=  0.f;points[2].clip[1]= .7f;
+    assert(native_game_fvf_fully_clipped_draw(
+        unitPoint,true,nullptr,&pointBack)); // source-cull no GPU points
+    assert(!native_game_fvf_fully_clipped_draw(
+        unitPoint,true,nullptr,&pointNoCull)); // actual native point draw
+    points[2].clip[3]=0.f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        unitPoint,true,nullptr,&pointBack)); // eye-plane source stays live
+    points[2].clip[3]=1.f;
+    unitPoint.clipDistanceMask=1u;
+    points[0].user[0]=-1.f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        unitPoint,true,nullptr,&pointBack)); // user-plane partial clip
+    points[0].user[0]=1.f;unitPoint.clipDistanceMask=0u;
+    live_game_frame::GameNativeFrameBatch pointBatch{};
+    assert(pointBatch.absorb_empty_source_draw(0u,true));
+    assert(pointBatch.absorb_empty_source_draw(1u,true));
+    assert(pointBatch.accepts_full(2u));
+    pointBatch.succeeded(false,false);
+    pointBatch.record_source_draw(2u);
+    assert(pointBatch.submitted==1u &&
+           pointBatch.leadingEmptySourceDraws==2u);
+
     // 01234: front/back face, indexed, strip/fan, eye-plane and lines
     // preserve a source-authentic zero-pixel ordinal only when safe.
     Vertex face[]{

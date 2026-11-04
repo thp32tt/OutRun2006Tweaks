@@ -9223,10 +9223,16 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // original source IA elements (including final indexed primitives)
         // are checked; W=0 crossings and viewport-spanning polygons remain
         // on the normal Draw route. CLIPPING=FALSE is never considered exact.
-        // Point-filled triangles may have a D3D9 point-size footprint and
-        // are deliberately excluded from this conservative optimization.
+        // POINTLIST and point-filled FVF triangles are admitted here only
+        // after supported_game_state() authenticates unit-size points with no
+        // sprites, scaling or per-vertex point size. Their one-pixel footprint
+        // is contained in the conservative expanded native scissor proof.
+        // Fully clipped original points and backface-culled source triangles
+        // have no native color/Z/stencil pixels. Keep their real source Draw
+        // ordinal instead of aborting all following menu/car/race Draws.
+        // Uncertain, crossing or visible points still issue a real D3D11
+        // Draw/DrawIndexed and original D3D9 rendering/input stays intact.
         if (fullMode && !output.rawClippingVisualMismatch &&
-            !output.nativePointFill && type != D3DPT_POINTLIST &&
             !vertices.empty() &&
             native_game_fvf_fully_clipped_draw({
                 vertices.front().clip, sizeof(NativeVertex), vertices.size(),
