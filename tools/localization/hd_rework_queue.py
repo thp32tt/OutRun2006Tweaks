@@ -97,10 +97,12 @@ def safe_hd_reference(root, row, plan, output):
     if not path.is_file() or path.is_symlink():
         raise ValueError("REF_ORIGINAL_DDS_MISSING")
     raw = path.read_bytes()
-    if atlas.sha(raw) != row["source_dds_sha256"] or atlas.sha(raw) != proof["sha256"]:
+    # load_pinned_orientations returns {source_dds_path: orientation_string};
+    # crosswalk already carries the SHA; never treat orientation as a dict.
+    if atlas.sha(raw) != row["source_dds_sha256"] or proof not in ("NORMAL","FLIPY"):
         raise ValueError("REF_ORIGINAL_DDS_SHA_CONFLICT")
     im = atlas.native_image(raw)
-    if plan[target]["orientation"] == "FLIPY":
+    if plan[target] == "FLIPY":
         im = ImageOps.flip(im)
     x0, y0, x1, y1 = row["_bbox"]
     if not (0 <= x0 < x1 <= im.width and 0 <= y0 < y1 <= im.height):
