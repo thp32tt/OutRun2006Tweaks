@@ -1,4 +1,5 @@
 #include "vr/d3d11/live_game_fvf_point_cull.hpp"
+#include "vr/d3d11/live_game_fvf_point_clip.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -117,4 +118,62 @@ int main() {
     tri[1].clip[1]=tri[0].clip[1];
     assert(!build(tri,3u,both,6u,4u,2u,0u,out));
     assert(out==intact);
+    // Intersecting source triangles must generate homogeneous-clipped
+    // GPU POINT vertices and preserve payload interpolation on two stages.
+    struct ClipVertex { float clip[4],clip0[4],clip1[4],uv[2]; };
+    const auto lerp=[](const ClipVertex& a,const ClipVertex& b,double t) {
+        ClipVertex v{};
+        for(unsigned i=0;i<4;++i) {
+            v.clip[i]=static_cast<float>((1-t)*a.clip[i]+t*b.clip[i]);
+            v.clip0[i]=static_cast<float>((1-t)*a.clip0[i]+t*b.clip0[i]);
+            v.clip1[i]=static_cast<float>((1-t)*a.clip1[i]+t*b.clip1[i]);
+        }
+        for(unsigned i=0;i<2;++i)
+            v.uv[i]=static_cast<float>((1-t)*a.uv[i]+t*b.uv[i]);
+        return v;
+    };
+    std::vector<ClipVertex> source{
+        {{-.5f,-.5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{0,0}},
+        {{ 2.f,-.5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{1,0}},
+        {{-.5f, .5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{0,1}}
+    };
+    std::vector<ClipVertex> clipped;
+    assert(game_fvf_clipped_point_vertices(
+        source,nullptr,3u,4u,1u,0u,64u,lerp,clipped));
+    assert(clipped.size()==4u);
+    for(const auto& v:clipped) {
+        assert(v.clip[0]<=v.clip[3]+1.e-5f);
+        assert(v.clip[0]>=-v.clip[3]-1.e-5f);
+        assert(v.uv[0]>=0.f && v.uv[0]<=1.f);
+    }
+    source[1].clip0[0]=-1.f;
+    assert(game_fvf_clipped_point_vertices(
+        source,nullptr,3u,4u,1u,1u,64u,lerp,clipped));
+    for(const auto& v:clipped) assert(v.clip0[0]>=-1.e-5f);
+    const auto original=clipped;
+    const std::uint32_t lateBad[]{0,1,99};
+    assert(!game_fvf_clipped_point_vertices(
+        source,lateBad,3u,4u,1u,1u,64u,lerp,clipped));
+    assert(clipped.size()==original.size());
+    assert(!game_fvf_clipped_point_vertices(
+        source,nullptr,3u,4u,1u,1u,3u,lerp,clipped));
+    assert(clipped.size()==original.size());
+    source[0].clip[3]=0.f;
+    assert(!game_fvf_clipped_point_vertices(
+        source,nullptr,3u,4u,1u,0u,64u,lerp,clipped));
+    source[0].clip[3]=1.f;
+    // Back-facing partially clipped source triangles are eliminated by the
+    // real D3D9 cull stage; following fully-visible faces still get points.
+    Vertex backface[]{
+        {{-.5f,-.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .5f,-.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ 2.f, .5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{-.5f,-.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .5f,-.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{-.5f, .5f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    const std::uint32_t order[]{2,1,0,3,4,5};
+    assert(build(backface,6u,order,6u,4u,2u,0u,out));
+    assert((out==std::vector<std::uint32_t>{3,4,5}));
+
 }

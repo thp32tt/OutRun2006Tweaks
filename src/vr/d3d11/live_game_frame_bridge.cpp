@@ -20,6 +20,7 @@
 #include "live_game_sm3_polygon_raster.hpp"
 #include "live_game_fvf_polygon_windows.hpp"
 #include "live_game_fvf_point_cull.hpp"
+#include "live_game_fvf_point_clip.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
@@ -7691,21 +7692,60 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // Surviving triangles preserve their source IA occurrences and winding.
     // Complete the entire CPU plan before allocating/binding native GPU IA.
     std::vector<std::uint32_t> pointIndices;
+    std::vector<NativeVertex> clippedPointVertices;
+    const std::vector<NativeVertex>* drawVertices = &vertices;
     if (output.nativePointFill) {
-        if (vertices.size() >
-                (std::numeric_limits<UINT>::max)() ||
-            !game_fvf_culled_point_indices(
+        if (vertices.size() > (std::numeric_limits<UINT>::max)())
+            return false;
+        const UINT sourceElements = indices ? indexCount :
+            static_cast<UINT>(vertices.size());
+        if (game_fvf_culled_point_indices(
                 vertices.empty() ? nullptr : vertices.front().clip,
                 sizeof(NativeVertex), static_cast<UINT>(vertices.size()),
-                indices, indices ? indexCount :
-                    static_cast<UINT>(vertices.size()),
+                indices, sourceElements,
                 static_cast<std::uint32_t>(topology),
                 static_cast<std::uint32_t>(output.nativeCullMode),
                 offsetof(NativeVertex, clip0),
-                output.nativeFvfUserClipMask, kMaxIndices, pointIndices))
-            return false;
-        indices = pointIndices.data();
-        indexCount = static_cast<UINT>(pointIndices.size());
+                output.nativeFvfUserClipMask, kMaxIndices, pointIndices)) {
+            indices = pointIndices.data();
+            indexCount = static_cast<UINT>(pointIndices.size());
+        } else {
+            // Only the original triangle's authentic post-clip vertices
+            // may enter the D3D11 one-pixel output. Interpolate both stage
+            // UVs, color, specular and six user-plane distances, not just
+            // position. Build the entire source plan before GPU allocation.
+            const auto interpolate = [](const NativeVertex& a,
+                                        const NativeVertex& b,
+                                        double t) noexcept {
+                NativeVertex v{};
+                const auto mix = [t](float x,float y) noexcept {
+                    return static_cast<float>(
+                        (1.0-t)*double(x)+t*double(y));
+                };
+                for (unsigned n=0u;n<4u;++n) {
+                    v.clip[n]=mix(a.clip[n],b.clip[n]);
+                    v.diffuse[n]=mix(a.diffuse[n],b.diffuse[n]);
+                    v.specular[n]=mix(a.specular[n],b.specular[n]);
+                    v.clip0[n]=mix(a.clip0[n],b.clip0[n]);
+                    v.clip1[n]=mix(a.clip1[n],b.clip1[n]);
+                }
+                for (unsigned n=0u;n<2u;++n) {
+                    v.uv[n]=mix(a.uv[n],b.uv[n]);
+                    v.uvStage1[n]=mix(a.uvStage1[n],b.uvStage1[n]);
+                }
+                return v;
+            };
+            if (!game_fvf_clipped_point_vertices(
+                    vertices, indices, sourceElements,
+                    static_cast<std::uint32_t>(topology),
+                    static_cast<std::uint32_t>(output.nativeCullMode),
+                    output.nativeFvfUserClipMask, kMaxVertices,
+                    interpolate, clippedPointVertices))
+                return false; // original D3D9 Draw/FFB unaffected
+            drawVertices = &clippedPointVertices;
+            indices = nullptr;
+            indexCount = 0u;
+        }
         topology = D3DPT_POINTLIST;
     }
     if (!ensure_pipeline(s, output.nativeWidth, output.nativeHeight)) return false;
@@ -7788,7 +7828,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         // Full-scene Draws normally share a pair of D3D11 GPU allocations;
         // only their *contents* change. Preserve VB/IB ownership across
         // complete menus, vehicle selection and racing, not an inset sample.
-        const std::size_t vertexBytes = vertices.size() * sizeof(NativeVertex);
+        const std::size_t vertexBytes = drawVertices->size() * sizeof(NativeVertex);
         if (vertexBytes == 0u ||
             vertexBytes > (std::numeric_limits<UINT>::max)()) return false;
         const UINT vertexSize = static_cast<UINT>(vertexBytes);
@@ -7797,7 +7837,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                                             D3D11_BIND_VERTEX_BUFFER)) return false;
         if (!upload_full_game_stream(ctx, s.fullGameVertexUpload.Get(),
                                      s.fullGameVertexCapacity,
-                                     vertices.data(), vertexSize)) return false;
+                                     drawVertices->data(), vertexSize)) return false;
         vb = s.fullGameVertexUpload;
         if (indices && indexCount) {
             if (indexCount > (std::numeric_limits<UINT>::max)() / sizeof(std::uint32_t))
@@ -7815,11 +7855,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     } else {
         // Preserve the original bounded diagnostic path byte-for-byte.
     D3D11_BUFFER_DESC bd{};
-    bd.ByteWidth = static_cast<UINT>(vertices.size() * sizeof(NativeVertex));
+    bd.ByteWidth = static_cast<UINT>(drawVertices->size() * sizeof(NativeVertex));
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.Usage = D3D11_USAGE_IMMUTABLE;
     D3D11_SUBRESOURCE_DATA initial{};
-    initial.pSysMem = vertices.data();
+    initial.pSysMem = drawVertices->data();
     if (FAILED(dev->CreateBuffer(&bd, &initial, vb.GetAddressOf()))) return false;
     if (indices && indexCount) {
         bd.ByteWidth = indexCount * sizeof(std::uint32_t);
@@ -8560,7 +8600,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
               topology == D3DPT_POINTLIST))
                 ? NativeRawFvfClipSpan{
                       vertices.front().clip, sizeof(NativeVertex),
-                      vertices.size(),
+                      drawVertices->size(),
                       (indices && indexCount) ? indices : nullptr,
                       (indices && indexCount) ? indexCount : 0u,
                       topology == D3DPT_TRIANGLESTRIP
@@ -8578,7 +8618,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                 : NativeRawFvfClipSpan{});
     }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
-    else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
+    else ctx->Draw(static_cast<UINT>(drawVertices->size()), 0);
     // GPU submission is paired with the queued readback at Present.
     s.pending = true;
     ++s.issued;

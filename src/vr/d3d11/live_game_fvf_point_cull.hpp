@@ -108,7 +108,6 @@ namespace outrun::vr::dx11::live_game_frame {
                 partlyClipped |= outsideA || outsideB || outsideC;
             }
             if (triviallyInvisible) continue;
-            if (partlyClipped) return false;
             const double signedArea =
                 (b.x - a.x) * (c.y - a.y) -
                 (b.y - a.y) * (c.x - a.x);
@@ -120,6 +119,8 @@ namespace outrun::vr::dx11::live_game_frame {
             const bool clockwise = signedArea < 0.0;
             if ((cullMode == 2u && clockwise) ||
                 (cullMode == 3u && !clockwise)) continue;
+            // Backfacing clipped triangles create no visible points.
+            if (partlyClipped) return false;
             next.push_back(ia);
             next.push_back(ib);
             next.push_back(ic);
