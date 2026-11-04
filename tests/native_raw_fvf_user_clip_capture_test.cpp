@@ -173,7 +173,7 @@ int main() {
     };
     NativeRawFvfClipSpan hidden{
         offscreen,sizeof(Vertex),6u,nullptr,0u,
-        NativeRawFvfAssembly::TriangleList,userOffset,0u};
+        NativeRawFvfAssembly::TriangleList,offset,0u};
     assert(native_game_fvf_fully_clipped_draw(hidden));
     NativeRawDrawExtent hiddenRaster{};
     assert(!native_raw_fvf_projected_raster(
@@ -237,4 +237,14 @@ int main() {
     }
     assert(native_game_fvf_fully_clipped_draw(hidden));
     assert(!native_game_fvf_fully_clipped_draw(hidden,false));
+    // A positive but extremely small homogeneous W must NOT be replaced
+    // by the sampling helper's epsilon eye-plane approximation. Even tiny
+    // genuine rasterizable triangles require their real D3D9/D3D11 Draw.
+    for (unsigned i=0;i<3u;++i) {
+        offscreen[i].clip[0]=0.f;
+        offscreen[i].clip[1]=0.f;
+        offscreen[i].clip[2]=0.0000001f;
+        offscreen[i].clip[3]=0.0000002f;
+    }
+    assert(!native_game_fvf_fully_clipped_draw(hidden));
 }

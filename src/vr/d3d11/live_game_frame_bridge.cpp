@@ -9261,7 +9261,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // Point-filled triangles may have a D3D9 point-size footprint and
         // are deliberately excluded from this conservative optimization.
         if (fullMode && !output.rawClippingVisualMismatch &&
-            !output.nativePointFill && !vertices.empty() &&
+            !output.nativePointFill && type != D3DPT_POINTLIST &&
+            !vertices.empty() &&
             native_game_fvf_fully_clipped_draw({
                 vertices.front().clip, sizeof(NativeVertex), vertices.size(),
                 indices, indexCount,

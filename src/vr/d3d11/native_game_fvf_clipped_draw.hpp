@@ -89,7 +89,7 @@ namespace outrun::vr::dx11 {
             d[3] = double(clip[3]) - clip[1];
             d[4] = clip[2];
             d[5] = double(clip[3]) - clip[2];
-            d[6] = double(clip[3]) - 0.00001;
+            d[6] = clip[3]; // never discard positive-W genuine raster pixels
             if (source.clipDistanceMask) {
                 float user[6]{};
                 std::memcpy(user, bytes + index * source.vertexStride +
