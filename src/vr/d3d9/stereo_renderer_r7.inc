@@ -65,6 +65,12 @@ namespace Settings
 #define OUTRUN_VR_BUILD_SHA "unknown"
 #endif
 
+namespace OutRunVRRenderer
+{
+    bool GetQuestNativeEyeInverse(float outMatrix[16],
+        int eye,std::uint32_t& poseSequence) noexcept;
+}
+
 namespace OutRunVRStereo
 {
 	namespace
@@ -897,11 +903,30 @@ namespace OutRunVRStereo
 							stereo.eyeOrientation[eye], eyeOffset,
 							Settings::VRWorldScale * Settings::VRStereoDepth);
 					const D3DMATRIX eyeInverse = InverseRigid(eyePose);
-					state.fixedEyeView[eye] =
-						MultiplyMatrix(
-							MultiplyMatrix(
-								state.fixedOriginalView, appliedHeadInverse),
-							eyeInverse);
+					// Native Quest 2D6B98..2D6BFC directly computes:
+                    // view_matrix(compose(inverse(yawOrigin),XrEyePose)).
+                    // Mode1 only; menus and all other renderer owners retain
+                    // the preexisting headInverse * localEyeInverse route.
+                    float nativeViewBytes[16]{};
+                    std::uint32_t nativePoseSequence=0;
+                    if(OutRunVRRenderer::GetQuestNativeEyeInverse(
+                           nativeViewBytes,eye,nativePoseSequence) &&
+                       nativePoseSequence==stereo.poseSequence) {
+                        D3DMATRIX nativeView{};
+                        std::memcpy(&nativeView,nativeViewBytes,
+                                    sizeof(nativeView));
+                        if(!MatrixFinite(nativeView))
+                            return EyeBuildResult::FatalError;
+                        state.fixedEyeView[eye]=MultiplyMatrix(
+                            state.fixedOriginalView,nativeView);
+                    } else {
+                        state.fixedEyeView[eye] =
+                            MultiplyMatrix(
+                                MultiplyMatrix(
+                                    state.fixedOriginalView,
+                                    appliedHeadInverse),
+                                eyeInverse);
+                    }
 					state.fixedEyeProjection[eye] =
 						ProjectionFromFov(
 							state.fixedOriginalProjection,
@@ -958,7 +983,35 @@ namespace OutRunVRStereo
 			for (int eye = 0; eye < 2; ++eye)
 			{
 				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale * Settings::VRStereoDepth);
-				const D3DMATRIX eyeInverse = InverseRigid(eyePose);
+				D3DMATRIX eyeInverse = InverseRigid(eyePose);
+                float nativeViewBytes[16]{};
+                std::uint32_t nativePoseSequence=0;
+                if(OutRunVRRenderer::GetQuestNativeEyeInverse(
+                       nativeViewBytes,eye,nativePoseSequence) &&
+                   nativePoseSequence==stereo.poseSequence) {
+                    float headBytes[16]{};
+                    std::uint32_t headPoseSequence=0;
+                    if(!OutRunVRRenderer::GetLatchedHeadInverse(
+                            headBytes,headPoseSequence) ||
+                       headPoseSequence!=stereo.poseSequence)
+                        return EyeBuildResult::FatalError;
+                    D3DMATRIX nativeFullView{},headInverse{};
+                    std::memcpy(&nativeFullView,nativeViewBytes,
+                                sizeof(nativeFullView));
+                    std::memcpy(&headInverse,headBytes,
+                                sizeof(headInverse));
+                    if(!MatrixFinite(nativeFullView) ||
+                       !MatrixFinite(headInverse))
+                        return EyeBuildResult::FatalError;
+                    // This shader c64 source ALREADY contains the head
+                    // inverse. Compensate its head transform before applying
+                    // the exact Quest full-eye view, or headset motion would
+                    // be applied twice to programmable world passes.
+                    eyeInverse=MultiplyMatrix(
+                        InverseRigid(headInverse),nativeFullView);
+                    if(!MatrixFinite(eyeInverse))
+                        return EyeBuildResult::FatalError;
+                }
 				const D3DMATRIX eyeProjection = ProjectionFromFov(projection, stereo.eyeFov[eye]);
 				const D3DMATRIX eyeWvp = MultiplyMatrix(MultiplyMatrix(correctedWorldView, eyeInverse), eyeProjection);
 				if (!MatrixFinite(eyeWvp)) return EyeBuildResult::FatalError;
