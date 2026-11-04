@@ -13,6 +13,11 @@ import struct
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageOps, UnidentifiedImageError
+from hd_existing_candidate_salvage import (
+    candidate_lines as salvage_candidate_lines,
+    pad_candidate_edge,
+    prove_source_edge_clear,
+)
 
 MAX_LINES = 3
 MAX_SRC_ALPHA_OCCUPANCY = 0.62
@@ -65,20 +70,26 @@ def strict_candidate(image_bytes):
     b = a.getbbox()
     if not b:
         raise QualityHold("QA_CANDIDATE_INVISIBLE")
+    salvage_actions = []
     if min(b[0], b[1], img.width - b[2], img.height - b[3]) < MARGIN:
-        raise QualityHold("QA_CANDIDATE_EDGE_CLIP")
+        img, salvage_actions = pad_candidate_edge(img, MARGIN)
+        a = img.getchannel("A")
+        b = a.getbbox()
     if a.getpixel((0, 0)) or a.getpixel((img.width - 1, img.height - 1)):
         raise QualityHold("QA_CANDIDATE_BACKGROUND_NOT_CLEAN")
-    return img
+    return img, salvage_actions
 
 
-def source_text_evidence(area: Image.Image):
+def source_text_evidence(source: Image.Image, box):
+    area = source.crop(box)
     a = area.getchannel("A")
     extent = a.getbbox()
     if not extent:
         raise QualityHold("QA_NO_SOURCE_TEXT_ALPHA")
-    if min(extent[0], extent[1], area.width - extent[2], area.height - extent[3]) < MARGIN:
-        raise QualityHold("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+    try:
+        salvage_actions = prove_source_edge_clear(source, box, extent, MARGIN)
+    except ValueError as exc:
+        raise QualityHold(str(exc)) from exc
     # Any completely opaque/painted panel is NOT an isolated glyph layer.
     nonzero = a.point(lambda n: 255 if n else 0)
     occupied = nonzero.histogram()[255] / (area.width * area.height)
@@ -89,7 +100,7 @@ def source_text_evidence(area: Image.Image):
         raise QualityHold("QA_SOURCE_LINE_LAYOUT_UNVERIFIED")
     if any((b[2] - b[0]) < 3 or (b[3] - b[1]) < 3 for b in lines):
         raise QualityHold("QA_SOURCE_GLYPH_TOO_SMALL")
-    return nonzero, lines, occupied
+    return nonzero, lines, occupied, salvage_actions
 
 
 def fit_line(glyph: Image.Image, source_box):
@@ -121,19 +132,19 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check):
         raise QualityHold("QA_OVERLAP_PROTECTED")
     if not import_check(repo, row):
         raise QualityHold("AB_PNG_NOT_YET_IMPORTED")
-    src = source.crop(box)
-    removal_mask, src_lines, occupancy = source_text_evidence(src)
+    removal_mask, src_lines, occupancy, source_salvage = source_text_evidence(source, box)
     candidate_path = repo / row["_candidate_rel"]
     candidate_bytes = candidate_path.read_bytes()
-    candidate = strict_candidate(candidate_bytes)
-    cand_alpha = candidate.getchannel("A")
-    translated_lines = alpha_lines(cand_alpha)
-    if len(translated_lines) != len(src_lines):
-        raise QualityHold("QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED")
+    candidate, candidate_salvage = strict_candidate(candidate_bytes)
+    try:
+        translated_images, detected_line_count, line_salvage = salvage_candidate_lines(
+            candidate, src_lines, alpha_lines
+        )
+    except ValueError as exc:
+        raise QualityHold(str(exc)) from exc
     positions = []
     render = []
-    for s, c in zip(src_lines, translated_lines):
-        glyph = candidate.crop(c)
+    for s, glyph in zip(src_lines, translated_images):
         fitted = fit_line(glyph, s)
         left = x0 + s[0] + ((s[2] - s[0]) - fitted.width) // 2
         top = y0 + s[1] + ((s[3] - s[1]) - fitted.height) // 2
@@ -160,8 +171,11 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check):
         "translated_native_lines": positions,
         "source_alpha_occupancy": round(occupancy, 5),
         "original_line_count": len(src_lines),
-        "translated_line_count": len(translated_lines),
+        "translated_line_count": len(render),
+        "candidate_detected_line_count": detected_line_count,
         "candidate_sha256": hashlib.sha256(candidate_bytes).hexdigest(),
+        "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+        "auto_salvage": source_salvage + candidate_salvage + line_salvage,
         "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
         "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
     }
