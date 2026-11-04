@@ -1,4 +1,5 @@
 #include "../src/vr/d3d11/native_game_fvf_clipped_draw.hpp"
+#include "../src/vr/d3d11/native_game_frame_batch.hpp"
 #include "../src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp"
 #include "../src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp"
 #include <cassert>
@@ -247,4 +248,50 @@ int main() {
         offscreen[i].clip[3]=0.0000002f;
     }
     assert(!native_game_fvf_fully_clipped_draw(hidden));
+    // 01231: Native D3D11 menu scissor can exclude every real source
+    // triangle even when all homogeneous XY/Z planes still admit it.
+    // Preserve its exact Draw ordinal without Z/cull/color GPU mutations.
+    Vertex scissorVertices[]{
+        {{-0.8f,-0.5f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{-0.4f, 0.6f,0.5f,1.f},{1,1,1,1,1,1}},
+        {{-0.6f,-0.7f,0.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan scissorSource{
+        scissorVertices,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    const NativeRawFvfScissorClip rightViewport{
+        0.0,0.0,100.0,100.0,60,0,95,100};
+    assert(!native_game_fvf_fully_clipped_draw(scissorSource));
+    assert(native_game_fvf_fully_clipped_draw(
+        scissorSource,true,&rightViewport));
+    // Crossing either scissor edge must keep the REAL native GPU Draw.
+    scissorVertices[1].clip[0]=0.6f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        scissorSource,true,&rightViewport));
+    scissorVertices[1].clip[0]=-0.4f;
+    const NativeRawFvfScissorClip invalidViewport{
+        0.0,0.0,0.0,100.0,60,0,95,100};
+    assert(!native_game_fvf_fully_clipped_draw(
+        scissorSource,true,&invalidViewport));
+    const NativeRawFvfScissorClip invertedScissor{
+        0.0,0.0,100.0,100.0,95,0,60,100};
+    assert(!native_game_fvf_fully_clipped_draw(
+        scissorSource,true,&invertedScissor));
+    scissorSource.clipDistanceMask=1u;
+    scissorVertices[2].user[0]=std::numeric_limits<float>::quiet_NaN();
+    assert(!native_game_fvf_fully_clipped_draw(
+        scissorSource,true,&rightViewport));
+    // Even an independent foreign-Z/reversed-Z source command cannot
+    // poison a prior real native Draw when its entire IA is pixel-neutral.
+    live_game_frame::GameNativeFrameBatch scissorBatch{};
+    assert(scissorBatch.absorb_empty_source_draw(0u,true));
+    assert(scissorBatch.accepts_full(1u));
+    scissorBatch.succeeded(true,false);
+    scissorBatch.record_source_draw(1u);
+    assert(!scissorBatch.accepts_depth(true,true));
+    assert(scissorBatch.absorb_empty_source_draw(2u,true));
+    assert(scissorBatch.accepts_full(3u));
+    assert(scissorBatch.submitted == 1u &&
+           scissorBatch.postDrawEmptySourceDraws == 1u);
+
 }

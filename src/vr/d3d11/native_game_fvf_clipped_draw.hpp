@@ -14,9 +14,17 @@
 #include <limits>
 
 namespace outrun::vr::dx11 {
+// An exact D3D11 source-viewport/scissor mapping for the original FVF draw.
+// A confirmed scissor-excluded polygon has no color, Z or stencil samples;
+// invalid/unknown viewport or rectangle must use the ordinary GPU route.
+struct NativeRawFvfScissorClip {
+    double viewportX{}, viewportY{}, viewportWidth{}, viewportHeight{};
+    std::int64_t left{}, top{}, right{}, bottom{};
+};
 [[nodiscard]] inline bool native_game_fvf_fully_clipped_draw(
     NativeRawFvfClipSpan source,
-    bool depthClipEnable = true) noexcept {
+    bool depthClipEnable = true,
+    const NativeRawFvfScissorClip* scissor = nullptr) noexcept {
     if (!source.firstClip || source.vertexStride < 4u * sizeof(float) ||
         source.vertexStride > 4096u || source.count == 0u ||
         source.count > 1048576u ||
@@ -54,9 +62,38 @@ namespace outrun::vr::dx11 {
     // Bounded source-authentic scan; oversized valid game IA retains the
     // established normal GPU path rather than a speculative no-op shortcut.
     if (!primitives || primitives > 8192u) return false;
+    // Convert the ACTUALLY bound scissor pixel edges into homogeneous
+    // halfspaces. This excludes diagonals entirely outside a narrow
+    // menu/car viewport without confusing overlapping AABBs with pixels.
+    // All arithmetic uses double; any invalid mapping retains native Draw.
+    double ndcLeft = -1.0, ndcRight = 1.0;
+    double ndcBottom = -1.0, ndcTop = 1.0;
+    if (scissor) {
+        if (!std::isfinite(scissor->viewportX) ||
+            !std::isfinite(scissor->viewportY) ||
+            !std::isfinite(scissor->viewportWidth) ||
+            !std::isfinite(scissor->viewportHeight) ||
+            !(scissor->viewportWidth > 0.0) ||
+            !(scissor->viewportHeight > 0.0) ||
+            scissor->left >= scissor->right ||
+            scissor->top >= scissor->bottom)
+            return false;
+        ndcLeft = 2.0 * (double(scissor->left) - scissor->viewportX) /
+            scissor->viewportWidth - 1.0;
+        ndcRight = 2.0 * (double(scissor->right) - scissor->viewportX) /
+            scissor->viewportWidth - 1.0;
+        ndcTop = 1.0 - 2.0 * (double(scissor->top) - scissor->viewportY) /
+            scissor->viewportHeight;
+        ndcBottom = 1.0 - 2.0 * (double(scissor->bottom) - scissor->viewportY) /
+            scissor->viewportHeight;
+        if (!std::isfinite(ndcLeft) || !std::isfinite(ndcRight) ||
+            !std::isfinite(ndcTop) || !std::isfinite(ndcBottom) ||
+            !(ndcLeft < ndcRight) || !(ndcBottom < ndcTop))
+            return false;
+    }
     const auto* bytes = static_cast<const std::uint8_t*>(source.firstClip);
     for (std::size_t primitive = 0u; primitive < primitives; ++primitive) {
-        std::array<std::array<double, 13u>, 3u> distances{};
+        std::array<std::array<double, 17u>, 3u> distances{};
         for (unsigned corner = 0u; corner < corners; ++corner) {
             std::size_t element = 0u;
             switch (source.assembly) {
@@ -90,6 +127,14 @@ namespace outrun::vr::dx11 {
             d[4] = clip[2];
             d[5] = double(clip[3]) - clip[2];
             d[6] = clip[3]; // never discard positive-W genuine raster pixels
+            if (scissor) {
+                d[13] = double(clip[0]) - ndcLeft * double(clip[3]);
+                d[14] = ndcRight * double(clip[3]) - double(clip[0]);
+                d[15] = double(clip[1]) - ndcBottom * double(clip[3]);
+                d[16] = ndcTop * double(clip[3]) - double(clip[1]);
+                for (unsigned plane = 13u; plane < 17u; ++plane)
+                    if (!std::isfinite(d[plane])) return false;
+            }
             if (source.clipDistanceMask) {
                 float user[6]{};
                 std::memcpy(user, bytes + index * source.vertexStride +
@@ -105,7 +150,7 @@ namespace outrun::vr::dx11 {
         // Proving ONE plane excludes an entire assembled primitive suffices.
         // A polygon whose corners are outside DIFFERENT planes can still
         // cross the game viewport: never discard that actual native Draw.
-        for (unsigned plane = 0u; plane < 13u; ++plane) {
+        for (unsigned plane = 0u; plane < (scissor ? 17u : 13u); ++plane) {
             if (!depthClipEnable && (plane == 4u || plane == 5u))
                 continue;
             if (plane >= 7u &&

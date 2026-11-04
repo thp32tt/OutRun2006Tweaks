@@ -9175,6 +9175,76 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             s.frameBatch.abort();
             return;
         }
+        if (indexCount && (!indices || indexCount != expectedElements ||
+                           vertexCount > kMaxVertices)) {
+            s.frameBatch.abort();
+            return;
+        }
+        if (!indexCount && vertexCount != expectedElements) {
+            s.frameBatch.abort();
+            return;
+        }
+        std::vector<NativeVertex> vertices;
+        if (!translate_vertices(bytes, vertexCount, stride, vp,
+                                layout, transforms, fixedClip, capture, vertices)) {
+            s.frameBatch.abort();
+            return;
+        }
+        if (indices) {
+            for (UINT i=0; i<indexCount; ++i) {
+                if (indices[i] >= vertexCount) {
+                    s.frameBatch.abort();
+                    return;
+                }
+            }
+        }
+        // A verified source-clipped no-op is independent of the Z surface,
+        // reversed depth comparison and destination color-write mask.
+        // Classify AFTER complete original IA validation but BEFORE testing
+        // those GPU write states, otherwise a harmless offscreen source Draw
+        // poisons every later legitimate menu/vehicle/race native frame.
+        const NativeRawFvfScissorClip fullFvfScissor{
+            output.nativeViewport.TopLeftX, output.nativeViewport.TopLeftY,
+            output.nativeViewport.Width, output.nativeViewport.Height,
+            output.nativeScissor.left, output.nativeScissor.top,
+            output.nativeScissor.right, output.nativeScissor.bottom};
+        // A real successful D3D9 FVF Draw which is wholly outside the
+        // source-authentic homogeneous/user clip volume cannot change the
+        // main game's color, Z or stencil. Consume its EXACT source ordinal
+        // inside the contiguous native frame instead of poisoning later
+        // menu/vehicle/race Draws or fabricating a D3D11 submission. All
+        // original source IA elements (including final indexed primitives)
+        // are checked; W=0 crossings and viewport-spanning polygons remain
+        // on the normal Draw route. CLIPPING=FALSE is never considered exact.
+        // Point-filled triangles may have a D3D9 point-size footprint and
+        // are deliberately excluded from this conservative optimization.
+        if (fullMode && !output.rawClippingVisualMismatch &&
+            !output.nativePointFill && type != D3DPT_POINTLIST &&
+            !vertices.empty() &&
+            native_game_fvf_fully_clipped_draw({
+                vertices.front().clip, sizeof(NativeVertex), vertices.size(),
+                indices, indexCount,
+                type == D3DPT_TRIANGLESTRIP
+                    ? NativeRawFvfAssembly::TriangleStrip :
+                type == D3DPT_TRIANGLEFAN
+                    ? NativeRawFvfAssembly::TriangleFan :
+                type == D3DPT_LINELIST
+                    ? NativeRawFvfAssembly::LineList :
+                type == D3DPT_LINESTRIP
+                    ? NativeRawFvfAssembly::LineStrip :
+                type == D3DPT_POINTLIST
+                    ? NativeRawFvfAssembly::PointList :
+                    NativeRawFvfAssembly::TriangleList,
+                offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask},
+                true, output.scissor ? &fullFvfScissor : nullptr)) {
+            if (!s.frameBatch.absorb_empty_source_draw(
+                    sourceOrdinal, sameClearedGameTarget))
+                s.frameBatch.abort();
+            return; // native RTV/DSV and original D3D9 Draw/FFB untouched
+        }
+        // These state gates are required for a PIXEL-WRITING source Draw.
+        // Provably empty source IA above does not touch RTV/DSV, and its
+        // original D3D9 ordinal has already been retained.
         // A vehicle/menu pass can rebind a foreign Z surface without a
         // corresponding Clear. Even an accepted main-RT color Draw cannot
         // reuse that depth history as the native full-resolution DSV.
@@ -9226,62 +9296,6 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 s.frameBatch.abort();
                 return;
             }
-        }
-        if (indexCount && (!indices || indexCount != expectedElements ||
-                           vertexCount > kMaxVertices)) {
-            s.frameBatch.abort();
-            return;
-        }
-        if (!indexCount && vertexCount != expectedElements) {
-            s.frameBatch.abort();
-            return;
-        }
-        std::vector<NativeVertex> vertices;
-        if (!translate_vertices(bytes, vertexCount, stride, vp,
-                                layout, transforms, fixedClip, capture, vertices)) {
-            s.frameBatch.abort();
-            return;
-        }
-        if (indices) {
-            for (UINT i=0; i<indexCount; ++i) {
-                if (indices[i] >= vertexCount) {
-                    s.frameBatch.abort();
-                    return;
-                }
-            }
-        }
-        // A real successful D3D9 FVF Draw which is wholly outside the
-        // source-authentic homogeneous/user clip volume cannot change the
-        // main game's color, Z or stencil. Consume its EXACT source ordinal
-        // inside the contiguous native frame instead of poisoning later
-        // menu/vehicle/race Draws or fabricating a D3D11 submission. All
-        // original source IA elements (including final indexed primitives)
-        // are checked; W=0 crossings and viewport-spanning polygons remain
-        // on the normal Draw route. CLIPPING=FALSE is never considered exact.
-        // Point-filled triangles may have a D3D9 point-size footprint and
-        // are deliberately excluded from this conservative optimization.
-        if (fullMode && !output.rawClippingVisualMismatch &&
-            !output.nativePointFill && type != D3DPT_POINTLIST &&
-            !vertices.empty() &&
-            native_game_fvf_fully_clipped_draw({
-                vertices.front().clip, sizeof(NativeVertex), vertices.size(),
-                indices, indexCount,
-                type == D3DPT_TRIANGLESTRIP
-                    ? NativeRawFvfAssembly::TriangleStrip :
-                type == D3DPT_TRIANGLEFAN
-                    ? NativeRawFvfAssembly::TriangleFan :
-                type == D3DPT_LINELIST
-                    ? NativeRawFvfAssembly::LineList :
-                type == D3DPT_LINESTRIP
-                    ? NativeRawFvfAssembly::LineStrip :
-                type == D3DPT_POINTLIST
-                    ? NativeRawFvfAssembly::PointList :
-                    NativeRawFvfAssembly::TriangleList,
-                offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask})) {
-            if (!s.frameBatch.absorb_empty_source_draw(
-                    sourceOrdinal, sameClearedGameTarget))
-                s.frameBatch.abort();
-            return; // native RTV/DSV and original D3D9 Draw/FFB untouched
         }
         // A genuine FVF menu/vehicle/race fan, or a 2049..4096 triangle
         // POINT-filled strip, may expand past one GPU IB although its compact

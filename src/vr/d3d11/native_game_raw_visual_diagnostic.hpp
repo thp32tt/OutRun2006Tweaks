@@ -1236,6 +1236,9 @@ private:
             fvfClip.assembly == NativeRawFvfAssembly::LineList ||
             fvfClip.assembly == NativeRawFvfAssembly::LineStrip ||
             fvfClip.assembly == NativeRawFvfAssembly::PointList;
+        const NativeRawFvfScissorClip rawFvfScissor{
+            view.TopLeftX, view.TopLeftY, view.Width, view.Height,
+            draw.left, draw.top, draw.right, draw.bottom};
         // All original IA primitives outside a proved native clip plane
         // cannot change ANY real GPU RGB. Do not occupy the one in-flight
         // BEFORE/AFTER staging pair with a known empty Draw; this leaves
@@ -1246,7 +1249,8 @@ private:
             (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID ||
              nativeWireframe) &&
             native_game_fvf_fully_clipped_draw(
-                fvfClip, fvfRaster.depthClipEnable))
+                fvfClip, fvfRaster.depthClipEnable,
+                raster && rasterDesc.ScissorEnable ? &rawFvfScissor : nullptr))
             return NativeRawPreviewResult::NoDraw;
         bool authenticFvfFootprint = false;
         if (!nativeStroke && fvfClip.firstClip && knownNativeCull &&
