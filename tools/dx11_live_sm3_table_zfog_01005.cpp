@@ -197,8 +197,15 @@ int main() {
         false, true, 1u, 0u, 0u, 0.f, 1.f, 0.1f));
     assert(!native_raw_fvf_fog_visual_admission(
         true, false, 1u, 0u, 0u, 0.f, 1.f, 0.1f));
-    assert(!native_raw_fvf_fog_visual_admission(
+    assert(native_raw_fvf_fog_visual_admission(
         true, true, 1u, 0u, 3u, 0.f, 1.f, 0.1f));
+    assert(native_game_fog_range_state_required(0u, 3u));
+    assert(!native_game_fog_range_state_required(0u, 0u));
+    assert(!native_game_fog_range_state_required(1u, 3u));
+    assert(!native_game_fog_range_state_required(2u, 3u));
+    assert(!native_game_fog_range_state_required(3u, 3u));
+    assert(!native_raw_fvf_fog_visual_admission(
+        true, true, 0u, 3u, 3u, 0.f, 1.f, 0.1f));
     assert(!native_raw_fvf_fog_visual_admission(
         true, true, 0u, 0u, 0u, 0.f, 1.f, 0.1f));
     assert(!native_raw_fvf_fog_visual_admission(

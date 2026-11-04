@@ -2936,8 +2936,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         // active game equation, never guess missing COM state.
         const DWORD sourceFogEquation = sourceTableFog != D3DFOG_NONE
             ? sourceTableFog : sourceVertexFog;
+        const bool rangeSourceRequired =
+            native_game_fog_range_state_required(
+                sourceTableFog, sourceVertexFog);
         const bool sourceKnown = fog == TRUE && fogModesKnown &&
-            SUCCEEDED(game->GetRenderState(D3DRS_RANGEFOGENABLE, &sourceRangeFog)) &&
+            (!rangeSourceRequired ||
+             SUCCEEDED(game->GetRenderState(
+                 D3DRS_RANGEFOGENABLE, &sourceRangeFog))) &&
             SUCCEEDED(game->GetRenderState(D3DRS_FOGCOLOR, &sourceFogColor)) &&
             (!native_sm3_table_fog_requires_linear_bounds(sourceFogEquation) ||
              (SUCCEEDED(game->GetRenderState(D3DRS_FOGSTART, &startBits)) &&
@@ -2945,7 +2950,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             (!native_sm3_table_fog_requires_density(sourceFogEquation) ||
              SUCCEEDED(game->GetRenderState(D3DRS_FOGDENSITY, &densityBits))) &&
             SUCCEEDED(game->GetDeviceCaps(&actualCaps));
-        if (!sourceKnown || (sourceRangeFog != FALSE && sourceRangeFog != TRUE))
+        if (!sourceKnown ||
+            (rangeSourceRequired &&
+             sourceRangeFog != FALSE && sourceRangeFog != TRUE))
             return false;
         float start=0.0f, end=0.0f, density=0.0f;
         std::memcpy(&start, &startBits, sizeof(start));
@@ -2966,7 +2973,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             fogDepth != NativeSm3FogDepth::Unknown &&
             native_sm3_table_zfog_admission(
                 true, sourceTableFog, sourceVertexFog,
-                sourceRangeFog != FALSE, srgbWrite == TRUE,
+                sourceRangeFog == TRUE, srgbWrite == TRUE,
                 (actualCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
                 (actualCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
                 sourceFogColor, start, end, density,
@@ -5649,7 +5656,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         // The unused float DWORDs remain finite zero in the native cbuffer;
         // no synthetic fallback is substituted for a *required* getter.
         const bool parametersKnown = densityKnown && (!activeEquation ||
-            ((tableMode != 0u ||
+            ((!native_game_fog_range_state_required(tableMode, vertexMode) ||
               readFog(D3DRS_RANGEFOGENABLE, rangeFog, 3u)) &&
              readFog(D3DRS_FOGCOLOR, fogColor, 4u) &&
              (!(native_sm3_table_fog_requires_linear_bounds(tableMode) ||

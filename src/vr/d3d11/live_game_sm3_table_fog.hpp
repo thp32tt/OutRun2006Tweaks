@@ -44,6 +44,13 @@ struct NativeSm3TableFog {
     bool fogEnabled, unsigned tableMode, unsigned vertexMode) noexcept {
     return fogEnabled && !native_game_inert_fog_modes(tableMode, vertexMode);
 }
+// D3D9 RANGEFOGENABLE only changes vertex-distance fog. A live TABLE
+// equation overrides inherited vertex/range fog, so RANGEFOGENABLE is
+// not a required COM read in that case. Vertex-only fog still requires it.
+[[nodiscard]] constexpr bool native_game_fog_range_state_required(
+    unsigned tableMode, unsigned vertexMode) noexcept {
+    return tableMode == 0u && vertexMode != 0u;
+}
 // D3D9 table fog equations consume disjoint source registers. EXP/EXP2
 // use density (not START/END); LINEAR uses START/END (not DENSITY).
 // Preserve exact per-Draw COM reads only for the source equation in use.

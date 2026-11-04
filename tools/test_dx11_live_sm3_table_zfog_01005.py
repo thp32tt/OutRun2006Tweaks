@@ -60,6 +60,17 @@ require("sourceInertExponential = native_sm3_inert_exponential_table_fog(" in br
         "source FVF inert EXP and raw vertex fog parameter transport missing")
 require("native_game_inert_fog_modes(tableMode, vertexMode)" in header,
         "shared programmable and FVF source equation classification absent")
+# The exact live shader/FVF game paths share the table-over-vertex range
+# read plan. Do not allow an unused COM getter to reject a genuine native
+# Draw; do not silently omit the required vertex-only source query.
+require("native_game_fog_range_state_required(" in header and
+        "native_game_fog_range_state_required(" in source and
+        "native_game_fog_range_state_required(" in fvf_header and
+        "const bool rangeSourceRequired =" in bridge and
+        "sourceRangeFog != FALSE && sourceRangeFog != TRUE" in bridge and
+        "(!rangeSourceRequired ||" in bridge and
+        "SUCCEEDED(game->GetRenderState(" in bridge,
+        "authentic table/vertex fog range COM dependency diverged")
 # FVF and SM3 RAW must use exactly the same source equation precedence.
 # The FVF bridge reads only consumed original D3D9 DWORDs; a failed required
 # getter still prevents native submission and preserves game/DX9Ex fallback.

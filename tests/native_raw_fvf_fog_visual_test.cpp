@@ -20,7 +20,13 @@ int main() {
     assert(!admitted(true, true, 0u, 0u, 0u, 0.f, 1.f, 0.5f));
     assert(!admitted(true, true, 4u, 0u, 0u, 0.f, 1.f, 0.5f));
     assert(!admitted(true, true, 0u, 0xffffffffu, 0u, 0.f, 1.f, 0.5f));
-    assert(!admitted(true, true, 1u, 0u, 2u, 0.f, 1.f, 0.5f));
+    // Active table fog ignores an unread range register. A genuine
+    // vertex-only equation still rejects the same malformed source DWORD.
+    assert(admitted(true, true, 1u, 0u, 2u, 0.f, 1.f, 0.5f));
+    assert(admitted(true, true, 3u, 2u, 0xffffffffu, 0.f, 1.f, 0.5f));
+    assert(!admitted(true, true, 0u, 2u, 2u, 0.f, 1.f, 0.5f));
+    assert(!admitted(true, true, 0u, 3u, 0xffffffffu, 0.f, 1.f, 0.5f));
+    assert(!admitted(true, false, 3u, 2u, 0xffffffffu, 0.f, 1.f, 0.5f));
     assert(!admitted(true, true, 3u, 0u, 0u, 2.f, 1.f, 0.5f));
     assert(!admitted(true, true, 0u, 3u, 1u, 1.f, 1.f, 0.5f));
     assert(!admitted(true, true, 1u, 0u, 0u, 0.f, 1.f, -0.1f));

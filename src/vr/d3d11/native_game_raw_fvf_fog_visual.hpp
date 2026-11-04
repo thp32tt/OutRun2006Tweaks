@@ -17,7 +17,12 @@ namespace outrun::vr::dx11 {
     // vertex fog: unused start/end/density register payload is immaterial
     // ONLY when the corresponding getter was intentionally not required.
     // Preserve strict source-query, mode and opt-in checks from SM3 RAW.
-    if (rangeFog != 0u && rangeFog != 1u) return false;
+    // A table equation never reads the range register: its sentinel is
+    // permitted ONLY with a valid active table mode. Unknown table/vertex
+    // modes, required source queries and consumed equation floats still
+    // fail closed in the shared RAW admission below.
+    if (native_game_fog_range_state_required(tableMode, vertexMode) &&
+        rangeFog != 0u && rangeFog != 1u) return false;
     return native_sm3_raw_visual_fog_omission(
         rawVisualOptIn, allSourceQueriesSucceeded,
         tableMode, vertexMode, start, end, density);
