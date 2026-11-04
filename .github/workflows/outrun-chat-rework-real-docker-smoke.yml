@@ -73,6 +73,48 @@ jobs:
           echo "REAL_DOCKER_VISIBLE_CHROMIUM_AND_VNC_FAIL"
           exit 1
 
+      - name: Test N100-style persisted volume with abandoned Chromium Singleton locks
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker volume create outrun-chat-smoke-persist
+          docker run --rm \
+            -v outrun-chat-smoke-persist:/data \
+            --entrypoint /bin/bash outrun-chat-qa-smoke:local -lc '
+              mkdir -p /data/hd-rework/browser-rework-profile
+              cd /data/hd-rework/browser-rework-profile
+              echo "keep-my-browser-login-data" > DO_NOT_DELETE_USER_DATA
+              ln -s "removed-previous-docker-host-99999" SingletonLock
+              ln -s "/tmp/old-chrome-socket" SingletonSocket
+              ln -s "old-session-id" SingletonCookie
+            '
+          docker run -d --name outrun-chat-qa-smoke-recreate --init \
+            --cpus 0.65 --memory 1800m --pids-limit 128 --shm-size 512m \
+            --security-opt no-new-privileges --cap-drop ALL \
+            -v outrun-chat-smoke-persist:/data \
+            -e OUTRUN_REWORK_VNC_PASSWORD=ci-local-only-not-real \
+            -e OUTRUN_GITHUB_CONTENTS_TOKEN= \
+            -e CHATGPT_PROJECT_URL=https://chatgpt.com/ \
+            -p 127.0.0.1:16085:6080 \
+            outrun-chat-qa-smoke:local
+          for i in $(seq 1 70); do
+            if ! docker inspect -f '{{.State.Running}}' outrun-chat-qa-smoke-recreate | grep -q true; then
+              echo "PROFILE_RECREATE_CONTAINER_EXITED"
+              exit 1
+            fi
+            if curl -fsS --max-time 2 http://127.0.0.1:16085/vnc.html -o /dev/null &&
+              docker exec outrun-chat-qa-smoke-recreate python -c 'import json,urllib.request; x=json.load(urllib.request.urlopen("http://127.0.0.1:9222/json/version",timeout=3)); assert x["webSocketDebuggerUrl"]' &&
+              docker logs outrun-chat-qa-smoke-recreate 2>&1 | grep -q 'CHROMIUM_LOGIN_WINDOW_READY' &&
+              docker logs outrun-chat-qa-smoke-recreate 2>&1 | grep -q 'removed 3 lock symlinks' &&
+              docker exec outrun-chat-qa-smoke-recreate bash -lc 'test "$(cat /data/hd-rework/browser-rework-profile/DO_NOT_DELETE_USER_DATA)" = "keep-my-browser-login-data"'; then
+              echo "PERSISTENT_PROFILE_STALE_SINGLETON_RECOVERY_AND_USER_DATA_PRESERVED_PASS"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "PERSISTENT_PROFILE_RECOVERY_FAILED"
+          exit 1
+
       - name: Collect diagnostic logs and chromium executable evidence
         if: always()
         shell: bash
@@ -81,4 +123,7 @@ jobs:
           docker ps -a --filter name=outrun-chat-qa-smoke
           docker logs --tail 160 outrun-chat-qa-smoke
           docker exec outrun-chat-qa-smoke bash -lc 'echo "--- Chromium stderr ---"; tail -n 85 /logs/hd-rework-chromium.log; echo "--- Playwright chromium path ---"; python -c "from playwright.sync_api import sync_playwright; p=sync_playwright().start(); print(p.chromium.executable_path); p.stop()"; echo "--- Browser processes ---"; ps aux | grep -Ei "[c]hromium|[c]hrome|[X]vfb|[g]ithub_chat_rework_controller"'
+          docker logs --tail 130 outrun-chat-qa-smoke-recreate
+          docker rm -f outrun-chat-qa-smoke-recreate
+          docker volume rm outrun-chat-smoke-persist
           docker rm -f outrun-chat-qa-smoke
