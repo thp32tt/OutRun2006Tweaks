@@ -41,7 +41,7 @@ novnc_pid=$!
 
 shutdown() {
   trap - INT TERM
-  kill "${chrome_pid:-0}" 2>/dev/null || true
+  if [[ -n "${chrome_pid:-}" ]]; then kill "$chrome_pid" 2>/dev/null || true; fi
   kill "$novnc_pid" "$vnc_pid" "$openbox_pid" "$xvfb_pid" 2>/dev/null || true
   wait 2>/dev/null || true
 }
@@ -97,12 +97,12 @@ PY
   return 1
 }
 
-if ! launch_visible_chrome; then
-  echo "HOLD_VISIBLE_BROWSER_START_FAILED: noVNC remains running for diagnostics." >&2
-  # Avoid claiming the browser is available or consuming tasks. Exit so
-  # Docker restart policy retries; the error is visible in container logs.
-  exit 4
-fi
+until launch_visible_chrome; do
+  echo "HOLD_VISIBLE_BROWSER_START_FAILED: noVNC remains running; retry in 30 seconds. Review /logs/hd-rework-chromium.log." >&2
+  if [[ -n "${chrome_pid:-}" ]]; then kill "$chrome_pid" 2>/dev/null || true; fi
+  sleep 30 &
+  wait "$!" || true
+done
 
 
 # A missing/invalid GitHub token is a worker HOLD, not a reason to prevent
