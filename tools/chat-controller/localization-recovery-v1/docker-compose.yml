@@ -34,11 +34,11 @@ services:
     stop_grace_period: 20s
 
 
-  # Optional user-deployed browser lane: one authenticated A/B/C1 chat worker.
-  # Enable COMPOSE_PROFILES=chat-rework in Portainer before redeploying.
-  # GitHub remains DDS/QA compute; this is only ChatGPT UI work and file transfer.
+  # A/B/C1 chat worker is a default service, because Portainer Git stacks may
+  # omit Compose profiles even when a stack variable is present. Browser work
+  # still fails closed until VNC password, GitHub token and ChatGPT login exist.
+  # Actual DDS and HD QA compute remain on GitHub-hosted runners.
   outrun-chat-qa-rework:
-    profiles: ["chat-rework"]
     build:
       context: .
       dockerfile: Dockerfile.chat-rework
