@@ -50,3 +50,16 @@
 - Portainer 재배포나 게임 설치를 요청할 단계가 아니다. C1/C3 독립 시각검수와 실제 게임 테스트는 여전히 UNTESTED. 기존 104-DDS v3 백업과 원본을 덮어쓰지 않는다.
 
 - **20:56 KST 안전한 단일 아틀라스 추가 시도:** Q047 `AD720950`의 기존 검증 원본 DDS SHA `141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f`와 원본 HD PNG SHA `3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c`에 대응하는 `FLIPY`만 커밋 `cffc05e19008984675c0376a0137441bd5ff2a49`에서 추가했다. GitHub fast safety [41631547584](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41631547584) **10/10 PASS**. 실제 Q047 DDS 출력·재디코드·ZIP 결정성은 다중 아틀라스 본 빌드 artifact가 나와야 확인할 수 있으므로 아직 PASS가 아니다.
+
+## 2026-11-05 — 기존 A/B 이미지 자동 salvage 우선 정책
+
+사용자 지시에 따라 ImageGen 재생성은 최후 수단으로 내린다. 954개 활성 ROI에 이미 존재하는 A/B 고품질 PNG를 먼저 재사용하며, 새 글자를 그리거나 일반 폰트로 대체하지 않는다.
+
+1. 기존 A/B PNG의 픽셀을 그대로 입력으로 사용한다.
+2. 후보 PNG가 캔버스 가장자리에 닿은 경우 투명 패딩 후 HD 원문 글자 bbox 이하로 축소한다. 새 픽셀/새 글리프를 생성하지 않는다.
+3. 원문 줄수와 후보 줄수가 다를 때는 기존 후보의 알파 컴포넌트를 읽기 순서대로 분리·재배치하여 원문 줄수에 맞춘다. 각 줄은 원문 native HD 줄 bbox보다 커질 수 없다.
+4. 원문 텍스트 bbox가 ROI 가장자리에 닿는 경우 즉시 ImageGen으로 보내지 않는다. ROI 바로 바깥 원본 알파가 비어 있음을 증명할 수 있을 때만 기존 ROI를 안전하게 사용한다.
+5. 위 deterministic salvage가 실패한 항목만 ImageGen fallback 큐에 들어간다. ROI_OVERLAP_*, DDS_NOT_*, QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE처럼 이미지 생성으로 해결되지 않는 항목은 엔진/좌표 HOLD로 분리한다.
+6. 자동 salvage 성공은 TEST_ONLY다. C1/C3 시각 QA, 보호아트/잘림/줄바꿈 검수 및 실제 게임 검증 전에는 RELEASE 승인하지 않는다.
+
+정책 식별자는 EXISTING_AB_PIXELS_FIRST_THEN_IMAGEGEN_ONLY_IF_UNSALVAGEABLE_V1이며, GitHub Actions가 동일 입력으로 두 번 실행해 ZIP/QA 결과가 결정적으로 일치하는지 계속 검사한다.
