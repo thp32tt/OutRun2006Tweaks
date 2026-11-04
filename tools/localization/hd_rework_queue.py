@@ -134,8 +134,8 @@ def build_queue(root, report, out_dir):
     plan = atlas.load_pinned_orientations(root, groups)
     by_id = {x["roi_id"]: x for rows in groups.values() for x in rows}
     holds, good = flatten_holds(report)
-    ordered = sorted((by_id[rid],reason) for rid,reason in holds.items()
-                     if category(reason) == "AB_IMAGE_AND_CLEAN_REWORK" and rid in by_id)
+    ordered = [(by_id[rid],reason) for rid,reason in holds.items()
+               if category(reason) == "AB_IMAGE_AND_CLEAN_REWORK" and rid in by_id]
     ordered.sort(key=lambda item: priority(*item))
     selected = []
     eligible = Counter()
