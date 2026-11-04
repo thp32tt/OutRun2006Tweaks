@@ -229,3 +229,52 @@ def valid_generated_image(raw):
 
 
 # Stage 2: browser task execution remains separately gated by logged-in UI evidence.
+
+
+def c1_decision_from_text(body, task_id, source_sha, candidate_sha):
+    """Recognize only an exact structured independent reviewer response."""
+    if not isinstance(body,str) or len(body)>20000:
+        return None
+    matches=[]
+    for raw in re.findall(r"\\{[^{}]{50,4000}\\}",body):
+        try:
+            decision=json.loads(raw)
+        except ValueError:
+            continue
+        if (decision.get("task_id")==task_id
+            and decision.get("source_dds_sha256")==source_sha
+            and decision.get("candidate_sha256")==candidate_sha
+            and decision.get("decision") in
+                 ("PASS_PROVISIONAL","REWORK_REQUIRED","HOLD_EVIDENCE")
+            and isinstance(decision.get("reason"),str)
+            and 15<=len(decision["reason"])<=1500):
+            matches.append(decision)
+    return matches[0] if len(matches)==1 else None
+
+
+def publish_c1_candidate(gh,task,decision,png):
+    """Store only a C1 provisional candidate; DDS/C3/game gate still pending."""
+    if decision.get("decision")!="PASS_PROVISIONAL":
+        raise ValueError("C1_NOT_PROVISIONAL_PASS")
+    candidate_sha=hashlib.sha256(png).hexdigest()
+    if decision.get("candidate_sha256")!=candidate_sha:
+        raise ValueError("C1_CANDIDATE_HASH_MISMATCH")
+    dimensions=valid_generated_image(png)
+    receipt={
+        "schema":"outrun-hd-rework-c1-provisional-v1",
+        "task_id":task["task_id"],"role":task["role"],"roi_id":task["roi_id"],
+        "source_dds_path":task["source_dds_path"],
+        "source_dds_sha256":task["source_dds_sha256"],
+        "old_candidate_sha256":task["old_candidate_sha256"],
+        "candidate_sha256":candidate_sha,
+        "candidate_native_dimensions":dimensions,
+        "c1_decision":"C1_PRELIMINARY_PASS_NOT_C3",
+        "c1_reason":decision["reason"],
+        "release_approved":False,"runtime_validation":"UNTESTED",
+        "visual_qa":"C1_PRELIMINARY_NEEDS_HD_DDS_AND_C3",
+    }
+    rel=APPROVED+"/"+task["task_id"]
+    gh.write(rel+".png",ASSETS_BRANCH,png)
+    gh.write_json(rel+".json",ASSETS_BRANCH,receipt)
+    return receipt
+
