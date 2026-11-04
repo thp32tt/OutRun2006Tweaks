@@ -48,7 +48,8 @@ for token in ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
     require(token in bridge, "fixed-function live D3D9 fog fallback missing: " + token)
 require("native_sm3_raw_visual_fog_omission(" in source and
         "fogProjectionQueryFailed" in source and
-        "fogProjectionQueryFailed ? 9u : 0u" in source and
+        "fogProjectionQueryFailed ? 9u :" in source and
+        "(!fogCapsKnown ? 8u : 0u)" in source and
         "if (rawFogOmitted) liveBatch.abort();" in source,
         "SM3 incomplete RAW Fog Draw cannot certify a full native game frame")
 require("sourceInertExponential = native_sm3_inert_exponential_table_fog(" in bridge and
@@ -138,6 +139,19 @@ require("native_sm3_inert_exponential_table_fog(" in header and
         "if (native_sm3_inert_exponential_table_fog(" in header and
         "if (srgbOutput)" in header,
         "exact zero-density no-op must precede active source fog safety")
+# Missing D3D9 CAPS is not missing authentic table/vertex fog registers.
+# Source-known RAW mode can omit fog ONLY in the opt-in incomplete tile;
+# source-invalid COM values and exact full-frame publication still fail.
+require("const bool fogCapsKnown = sourceKnown &&" in fvf_gate and
+        "fogCapsKnown && sourceTableFog != D3DFOG_NONE" in fvf_gate and
+        "const bool fogCapsKnown = modesKnown && parametersKnown &&" in fog_gate and
+        "const bool exactFogAdmitted = fogCapsKnown &&" in fog_gate and
+        "!fogCapsKnown ||" in fog_gate and
+        "if (!modesKnown || !parametersKnown)" in fog_gate and
+        "if (!output.rawFogVisualMismatch) return false;" in bridge and
+        "if (rawFogOmitted) liveBatch.abort();" in source,
+        "source CAPS failure admitted exact or bypassed RAW fallback")
+
 # FVF table fog must reach native GPU RGB and an authentic per-Draw b2,
 # not merely an admission helper or repeated prior SM3 PASS.
 for token in ("PSFvfTableFogDiffuse", "PSFvfTableFogModulate",
