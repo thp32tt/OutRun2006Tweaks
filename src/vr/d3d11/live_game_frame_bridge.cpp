@@ -7680,7 +7680,7 @@ bool upload_full_game_stream(ID3D11DeviceContext* context,
     return copied;
 }
 
-bool submit(State& s, const std::vector<NativeVertex>& vertices,
+bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
             const std::uint32_t* indices, UINT indexCount,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
             const OutputCapture& output,
@@ -7693,15 +7693,15 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // Complete the entire CPU plan before allocating/binding native GPU IA.
     std::vector<std::uint32_t> pointIndices;
     std::vector<NativeVertex> clippedPointVertices;
-    const std::vector<NativeVertex>* drawVertices = &vertices;
+    const std::vector<NativeVertex>* drawVertices = &sourceVertices;
     if (output.nativePointFill) {
-        if (vertices.size() > (std::numeric_limits<UINT>::max)())
+        if (sourceVertices.size() > (std::numeric_limits<UINT>::max)())
             return false;
         const UINT sourceElements = indices ? indexCount :
-            static_cast<UINT>(vertices.size());
+            static_cast<UINT>(sourceVertices.size());
         if (game_fvf_culled_point_indices(
-                vertices.empty() ? nullptr : vertices.front().clip,
-                sizeof(NativeVertex), static_cast<UINT>(vertices.size()),
+                sourceVertices.empty() ? nullptr : sourceVertices.front().clip,
+                sizeof(NativeVertex), static_cast<UINT>(sourceVertices.size()),
                 indices, sourceElements,
                 static_cast<std::uint32_t>(topology),
                 static_cast<std::uint32_t>(output.nativeCullMode),
@@ -7710,7 +7710,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             indices = pointIndices.data();
             indexCount = static_cast<UINT>(pointIndices.size());
         } else {
-            // Only the original triangle's authentic post-clip vertices
+            // Only the original triangle's authentic post-clip sourceVertices
             // may enter the D3D11 one-pixel output. Interpolate both stage
             // UVs, color, specular and six user-plane distances, not just
             // position. Build the entire source plan before GPU allocation.
@@ -7736,7 +7736,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                 return v;
             };
             if (!game_fvf_clipped_point_vertices(
-                    vertices, indices, sourceElements,
+                    sourceVertices, indices, sourceElements,
                     static_cast<std::uint32_t>(topology),
                     static_cast<std::uint32_t>(output.nativeCullMode),
                     output.nativeFvfUserClipMask, kMaxVertices,
@@ -7748,6 +7748,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         }
         topology = D3DPT_POINTLIST;
     }
+    const std::vector<NativeVertex>& vertices = *drawVertices;
     if (!ensure_pipeline(s, output.nativeWidth, output.nativeHeight)) return false;
     // Missing paired RTV is not permission to encode sRGB into linear UNORM.
     if (!s.backend.color_rtv() ||
@@ -7828,7 +7829,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         // Full-scene Draws normally share a pair of D3D11 GPU allocations;
         // only their *contents* change. Preserve VB/IB ownership across
         // complete menus, vehicle selection and racing, not an inset sample.
-        const std::size_t vertexBytes = drawVertices->size() * sizeof(NativeVertex);
+        const std::size_t vertexBytes = vertices.size() * sizeof(NativeVertex);
         if (vertexBytes == 0u ||
             vertexBytes > (std::numeric_limits<UINT>::max)()) return false;
         const UINT vertexSize = static_cast<UINT>(vertexBytes);
@@ -7837,7 +7838,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                                             D3D11_BIND_VERTEX_BUFFER)) return false;
         if (!upload_full_game_stream(ctx, s.fullGameVertexUpload.Get(),
                                      s.fullGameVertexCapacity,
-                                     drawVertices->data(), vertexSize)) return false;
+                                     vertices.data(), vertexSize)) return false;
         vb = s.fullGameVertexUpload;
         if (indices && indexCount) {
             if (indexCount > (std::numeric_limits<UINT>::max)() / sizeof(std::uint32_t))
@@ -7855,11 +7856,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     } else {
         // Preserve the original bounded diagnostic path byte-for-byte.
     D3D11_BUFFER_DESC bd{};
-    bd.ByteWidth = static_cast<UINT>(drawVertices->size() * sizeof(NativeVertex));
+    bd.ByteWidth = static_cast<UINT>(vertices.size() * sizeof(NativeVertex));
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.Usage = D3D11_USAGE_IMMUTABLE;
     D3D11_SUBRESOURCE_DATA initial{};
-    initial.pSysMem = drawVertices->data();
+    initial.pSysMem = vertices.data();
     if (FAILED(dev->CreateBuffer(&bd, &initial, vb.GetAddressOf()))) return false;
     if (indices && indexCount) {
         bd.ByteWidth = indexCount * sizeof(std::uint32_t);
@@ -8600,7 +8601,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
               topology == D3DPT_POINTLIST))
                 ? NativeRawFvfClipSpan{
                       vertices.front().clip, sizeof(NativeVertex),
-                      drawVertices->size(),
+                      vertices.size(),
                       (indices && indexCount) ? indices : nullptr,
                       (indices && indexCount) ? indexCount : 0u,
                       topology == D3DPT_TRIANGLESTRIP
@@ -8618,7 +8619,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                 : NativeRawFvfClipSpan{});
     }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
-    else ctx->Draw(static_cast<UINT>(drawVertices->size()), 0);
+    else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
     // GPU submission is paired with the queued readback at Present.
     s.pending = true;
     ++s.issued;
