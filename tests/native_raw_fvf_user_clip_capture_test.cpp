@@ -49,8 +49,8 @@ int main() {
         NativeRawFvfAssembly::TriangleList,offset,1u};
     assert(native_raw_fvf_projected_raster(idx,0,0,100,100,xy));
     assert(xy.right==all.right);
-    // Keep existing safety boundary: do not infer native RGB from
-    // authentic W=0 source vertices even if a projected area seems plausible.
+    // An all-zero homogeneous vector is projectively undefined and must
+    // remain fail-closed even when nearby vertices would survive clipping.
     Vertex eye[]{
         {{0.f,0.f,0.f,0.f},{1,1,1,1,1,1}},
         {{0.5f,-0.5f,0.5f,1.f},{1,1,1,1,1,1}},
@@ -73,6 +73,10 @@ int main() {
            nearEyeInterior.pixelY<xy.bottom);
     // Nonzero eye crossings are still subject to the real GPU scissor,
     // source ClipDistance and homogeneous depth plane.
+    // ClipDistance0 belongs to Vertex::user, not the leading clip[4].
+    // Without this source-authentic offset the negative regression reads
+    // a clip-space X coordinate and falsely treats it as a user plane.
+    nearEye.clipDistanceOffset=offset;
     nearEye.clipDistanceMask=1u;
     assert(native_raw_fvf_projected_raster(nearEye,0,0,100,100,xy));
     for (auto& v:eye) v.user[0]=-1.f;
