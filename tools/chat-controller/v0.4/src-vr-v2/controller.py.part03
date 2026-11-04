@@ -1308,20 +1308,20 @@ def hold_unconfirmed_chat(q: dict, active: dict, reason: str) -> None:
         )
 
 
-def vr_rollover_must_wait_for_owner(owner_busy_or_missing: bool, hard_40m: bool) -> bool:
-    """Do not let a stale busy renderer defeat the 40-minute recovery deadline."""
-    return bool(owner_busy_or_missing and not hard_40m)
+def vr_rollover_must_wait_for_owner(owner_busy_or_missing: bool, hard_ceiling: bool) -> bool:
+    """Do not let a stale busy renderer defeat the 60-minute hard deadline."""
+    return bool(owner_busy_or_missing and not hard_ceiling)
 
 
 async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
-    """Rollover on confirmed UI failure or a VR 30-minute forced interval."""
+    """Rollover on confirmed UI failure or the VR 60-minute hard ceiling."""
     if not CONVERSATION_ROLLOVER_ENABLED:
         return False
     vr_forced = CONTROLLER_MODE == "conversion" and reason in {
         "VR_FORCED_30_MINUTE_ROLLOVER", "VR_FORCED_40_MINUTE_RESUME",
         "VR_FORCED_60_MINUTE_NEW_CHAT",
     }
-    hard_40m = CONTROLLER_MODE == "conversion" and reason in {
+    hard_ceiling = CONTROLLER_MODE == "conversion" and reason in {
         "VR_FORCED_40_MINUTE_RESUME", "VR_FORCED_60_MINUTE_NEW_CHAT",
     }
     if not vr_forced and not rollover_has_confirmed_ui_failure(reason):
@@ -1373,7 +1373,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
 
     old_page = pages.get(slot.name)
     if vr_forced:
-        # At 30m preserve the active worker; by the explicit 60m ceiling a
+        # At 60m replace the old worker; explicit hard ceiling ceiling a
         # permanently busy/crashed renderer must not block this lane forever.
         try:
             owner_busy_or_missing = (
@@ -1383,13 +1383,13 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         except Exception:
             # A frozen Playwright page must not hold the 60m deadline hostage.
             owner_busy_or_missing = True
-        if vr_rollover_must_wait_for_owner(owner_busy_or_missing, hard_40m):
+        if vr_rollover_must_wait_for_owner(owner_busy_or_missing, hard_ceiling):
             active["rollover_pending_reason"] = reason
             write_runtime(status="conversation_rollover_owner_wait",
                           last_action=f"{active['task_id']}: retain owner until idle is confirmed",
                           queue=active)
             return False
-        if owner_busy_or_missing and hard_40m:
+        if owner_busy_or_missing and hard_ceiling:
             # The next worker must reconcile GitHub HEAD and existing C6 first.
             # Keep TASK_ID stable; the old chat may still finish independently.
             active["forced_owner_recovery_at"] = datetime.now(TZ).isoformat()
@@ -1406,7 +1406,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         previous.append(old_url)
     active["previous_chat_urls"] = previous[-20:]
 
-    page = await hard_replace_slot_page(context, pages, slot) if hard_40m else await replace_with_fresh_slot_page(context, pages, slot)
+    page = await hard_replace_slot_page(context, pages, slot) if hard_ceiling else await replace_with_fresh_slot_page(context, pages, slot)
     if not await ensure_logged_in(page):
         write_runtime(status="login_required", last_action=f"{active['task_id']}: login required after conversation rollover")
         return False
@@ -1422,13 +1422,13 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     runtime["queue_failure_context"] = active.get("failure_context", "")
 
     thinking_verified = await ensure_thinking_level(page)
-    if not thinking_verified and STRICT_THINKING_LEVEL and not hard_40m:
+    if not thinking_verified and STRICT_THINKING_LEVEL and not hard_ceiling:
         write_runtime(status="thinking_level_blocked", last_action=f"{active['task_id']}: rollover chat thinking level unverified")
         return False
-    if not thinking_verified and hard_40m:
+    if not thinking_verified and hard_ceiling:
         write_runtime(
             vr_resume_thinking_unverified=True,
-            last_action=f"{active['task_id']}: 40m forced resume proceeds despite unverified thinking selector",
+            last_action=f"{active['task_id']}: 60m forced resume proceeds despite unverified thinking selector",
         )
 
     active["last_rollover_reason"] = reason
@@ -2659,7 +2659,7 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
 
     The existing OutRun A/DX11 controller does not own C's project, prompts or
     GitHub task IDs. A missing/different project URL fails closed, never falls
-    back to OutRun. Never interrupt an active generation.
+    back to OutRun. At 60m, abandon a frozen generation and start a new chat.
     """
     if not MODEL2_AUTODEV_ENABLED or (CONVERSION_ONLY_SLOT and CONVERSION_ONLY_SLOT != "C"):
         return False
