@@ -9,12 +9,13 @@ import argparse, csv, hashlib, io, json, re, struct, zipfile
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
 from PIL import Image, ImageChops, ImageDraw, ImageOps, UnidentifiedImageError
+from hd_strict_qa import process_strict_atlas
 
 CROSS="localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
 ORIGINAL="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
 CANDIDATES="localization/automation_inputs/candidate_outputs"
 SOURCE_PLAN="localization/automation_inputs/hd_original_png_source_plan.json"
-ZIPNAME="OUTRUN_AB_IMAGEGEN_MULTI_ATLAS_TEST_ONLY.zip"
+ZIPNAME="OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip"
 MASKS=(0x00ff0000,0x0000ff00,0x000000ff,0xff000000)
 MASKS_RGBA=(0x000000ff,0x0000ff00,0x00ff0000,0xff000000)
 ORIENTATIONS={
@@ -261,14 +262,25 @@ def build(root,out):
    holds.append({"target":target,"reason":"SOURCE_DDS_SHA_MISMATCH","rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]});continue
   orientation=orientations[target]
   try:
-   binary,readable,painted,local_holds=process_atlas(raw,rows,root,orientation)
+   binary,readable,clean,painted,local_holds=process_strict_atlas(raw,rows,root,orientation,
+    native_image,imported_candidate,conflicting_rois,dominant_container_holds)
    if painted:
     archive[target]=binary
     thumb=readable.copy()
     thumb.thumbnail((1536,1536),Image.Resampling.LANCZOS)
     thumb.save(out/preview_name(target),format="PNG")
+    source_view=native_image(raw)
+    if orientation=="FLIPY":source_view=ImageOps.flip(source_view)
+    source_view.thumbnail((1536,1536),Image.Resampling.LANCZOS)
+    source_view.save(out/preview_name(target).replace("PREVIEW_","SOURCE_"),format="PNG")
+    clean_view=clean.copy()
+    clean_view.thumbnail((1536,1536),Image.Resampling.LANCZOS)
+    clean_view.save(out/preview_name(target).replace("PREVIEW_","CLEAN_"),format="PNG")
     admitted.append({"target":target,"origin_sha256":sha(raw),"dds_sha256":sha(binary),
-                     "orientation":orientation,"orientation_evidence":"DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA","painted":painted,
+                     "orientation":orientation,"orientation_evidence":"DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+                     "plate_evidence":"SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+                     "text_scale_gate":"NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX",
+                     "painted":painted,
                      "holds":local_holds})
    else:
     holds.append({"target":target,"reason":"IMPORTED_ROI_ALL_HELD",
@@ -279,7 +291,11 @@ def build(root,out):
  pending_import_holds=[{"roi_id":r["roi_id"],"target":target,"reason":"AB_PNG_NOT_YET_IMPORTED"}
   for target,rows in sorted(groups.items()) for r in rows if not imported_candidate(root,r)]
  if len(pending_import_holds)!=954-imported_total:raise ValueError("PENDING_IMPORT_HOLD_COUNT_MISMATCH")
- report={"schema":"outrun.ab-imagegen-multi-atlas.v1",
+ report={"schema":"outrun.ab-imagegen-hd-strict.v2",
+         "legacy_oversize_outputs_rejected":True,
+         "clean_plate_qa":"MECHANICAL_ALPHA_ONLY_C1_C3_VISUAL_REVIEW_REQUIRED",
+         "scale_policy":"SOURCE_NATIVE_HD_GLYPH_AND_LINE_BOX_CEILING_NO_UPSCALE",
+         "layout_policy":"ORIGINAL_LINE_COUNT_AND_PER_LINE_BBOX_PRESERVED",
          "release_approved":False,"runtime_validation":"UNTESTED","visual_qa":"REVIEW_REQUIRED",
          "source":"A/B original ImageGen PNG only, no font fallback",
          "active_roi_total":954,"imported_roi_total":imported_total,
@@ -293,6 +309,7 @@ def build(root,out):
   zput(z,"TEST_ONLY_MANIFEST.json",json.dumps({
    "status":"NOT_GAME_APPROVED","source":"A/B ImageGen original PNG",
    "release_approved":False,"game_runtime":"UNTESTED",
+   "hd_quality_gate":"SOURCE_CLEAN_FINAL_STRICT_V2_NOT_VISUALLY_APPROVED",
    "entries":{p:sha(d) for p,d in sorted(archive.items())}},
    ensure_ascii=False,sort_keys=True,indent=2).encode())
  with zipfile.ZipFile(out/ZIPNAME) as z:
@@ -316,7 +333,8 @@ def build(root,out):
  (out/"qa_report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2,sort_keys=True)+"\n",encoding="utf-8")
  print(json.dumps({k:report[k] for k in ("active_roi_total","imported_roi_total","native_dds_generated",
    "translated_roi_generated","source_dds_missing_rows","source_sha_conflict_rows","hold_roi_reason_counts","zip_sha256")},ensure_ascii=False))
- if not archive:raise SystemExit("NO_SAFE_AB_NATIVE_ATLAS_GENERATED")
+ if not archive:
+  print("QA_ALL_ROWS_HELD_NO_SAFE_NATIVE_ATLAS",flush=True)
  return report
 
 if __name__=="__main__":
