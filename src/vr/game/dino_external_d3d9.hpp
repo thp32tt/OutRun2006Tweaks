@@ -201,4 +201,5 @@ public:
         return FAILED(hr)?hr:restore;
     }
 };
+inline GpuOwner& GlobalGpu() noexcept {static GpuOwner owner;return owner;}
 } // OutRunVR::DinoSidecar

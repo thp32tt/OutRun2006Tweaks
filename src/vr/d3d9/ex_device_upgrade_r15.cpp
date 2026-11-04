@@ -17,6 +17,7 @@
 
 #include "ex_device_upgrade_r14.cpp"
 #include "../runtime_eligibility.hpp"
+#include "../game/dino_external_d3d9.hpp"
 
 namespace OutRunVRStereo
 {
@@ -450,6 +451,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         bool ResetCompatDeviceR15(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params, HRESULT& result) noexcept
         {
+            OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
             R15ResetStateHealthy.store(false, std::memory_order_release);
             if (IsCompatDevice(device))
                 OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);

@@ -10,7 +10,7 @@
 #include <cstring>
 
 namespace OutRunVR::DinoSidecar {
-inline GpuOwner& Gpu() noexcept {static GpuOwner g;return g;}
+inline GpuOwner& Gpu() noexcept {return GlobalGpu();}
 struct ScopedInternal final {
     bool old;
     ScopedInternal() noexcept : old(OutRunVRStereo::R29OwnerExchangeInternalStereoPass(true)) {}

@@ -37,6 +37,7 @@
 #include "../game/rank_marker_physical_source.hpp"
 #include "../game/hud_native_source_transaction.hpp"
 #include "../core/r29_owner_api.hpp"
+#include "../game/dino_external_d3d9.hpp"
 
 namespace OutRunVRRenderer {
     std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
@@ -2254,6 +2255,7 @@ namespace OutRunVRStereo
             const bool gameDevice = R32ReviewIsGameDevice(device);
             if (gameDevice)
             {
+                OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
                 // A reset can invalidate original SpriteNode ring addresses
                 // without a final queue walk. Discard old-frame attribution.
                 OutRunVR::GameSemantic::EndSpriteQueueFrame(true);
