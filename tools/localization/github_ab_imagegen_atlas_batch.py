@@ -14,6 +14,7 @@ from hd_strict_qa import process_strict_atlas
 CROSS="localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
 ORIGINAL="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
 CANDIDATES="localization/automation_inputs/candidate_outputs"
+APPROVED="localization/automation_inputs/qa_rework/approved"
 SOURCE_PLAN="localization/automation_inputs/hd_original_png_source_plan.json"
 ZIPNAME="OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip"
 MASKS=(0x00ff0000,0x0000ff00,0x000000ff,0xff000000)
@@ -119,6 +120,55 @@ def dominant_container_holds(rows):
    inside(outer,other["_bbox"]) and size(outer)>=4*size(other["_bbox"]))
   if children>=2:held.add(row["roi_id"])
  return held
+
+def apply_c1_preliminary_overrides(root,groups):
+ """Use new ImageGen PNG only with independent C1 SHA-bound receipt.
+
+ A passed C1 is still TEST_ONLY; strict clean/size/line QA runs again in DDS.
+ """
+ directory=root/APPROVED
+ if not directory.is_dir():
+  return 0
+ by_id={r["roi_id"]:r for rows in groups.values() for r in rows}
+ used=set()
+ imported=0
+ for receipt_path in sorted(directory.glob("HDRW-*.json")):
+  if receipt_path.is_symlink() or receipt_path.stat().st_size>16000:
+   raise ValueError("C1_RECEIPT_INVALID_FILE")
+  item=json.loads(receipt_path.read_text(encoding="utf-8"))
+  task=item.get("task_id","")
+  if not re.fullmatch(r"HDRW-[AB]-[0-9a-f]{20}",task):
+   raise ValueError("C1_TASK_ID_UNSAFE")
+  if task in used or receipt_path.stem!=task:
+   raise ValueError("C1_DUPLICATE_OR_NAME_CONFLICT")
+  used.add(task)
+  rid=item.get("roi_id")
+  if rid not in by_id:
+   raise ValueError("C1_ROI_NOT_IN_954")
+  row=by_id[rid]
+  if (item.get("schema")!="outrun-hd-rework-c1-provisional-v1" or
+      item.get("role")!=row["roles"] or
+      item.get("source_dds_sha256")!=row["source_dds_sha256"] or
+      item.get("source_dds_path")!=row["source_dds_path"] or
+      item.get("c1_decision")!="C1_PRELIMINARY_PASS_NOT_C3" or
+      item.get("release_approved") is not False or
+      item.get("runtime_validation")!="UNTESTED"):
+   raise ValueError("C1_RECEIPT_NOT_PINNED_OR_FAKE_APPROVAL")
+  prior=root/row["_candidate_rel"]
+  if not prior.is_file() or prior.is_symlink():
+   raise ValueError("C1_ORIGINAL_CANDIDATE_MISSING")
+  if sha(prior.read_bytes())!=item.get("old_candidate_sha256"):
+   raise ValueError("C1_ORIGINAL_CANDIDATE_SHA_CHANGED")
+  candidate=directory/(task+".png")
+  if not candidate.is_file() or candidate.is_symlink() or candidate.stat().st_size>4*1024*1024:
+   raise ValueError("C1_NEW_CANDIDATE_UNAVAILABLE")
+  if sha(candidate.read_bytes())!=item.get("candidate_sha256"):
+   raise ValueError("C1_NEW_CANDIDATE_SHA_CHANGED")
+  row["_candidate_rel"]=str(candidate.relative_to(root))
+  row["_c1_source_candidate_sha256"]=item["old_candidate_sha256"]
+  row["_c1_receipt"]=task
+  imported+=1
+ return imported
 
 def native_image(b):
  if len(b)<128 or b[:4]!=b"DDS " or struct.unpack_from("<I",b,4)[0]!=124:raise ValueError("DDS_HEADER")
@@ -243,6 +293,7 @@ def build(root,out):
  out.mkdir(parents=True,exist_ok=True)
  groups=load_cross(root/CROSS)
  orientations=load_pinned_orientations(root,groups)
+ c1_provisional_count=apply_c1_preliminary_overrides(root,groups)
  archive={};admitted=[];holds=[];unavailable=0;sha_conflicts=0
  for target,rows in sorted(groups.items()):
   imported_rows=[r for r in rows if imported_candidate(root,r)]
@@ -299,6 +350,7 @@ def build(root,out):
          "release_approved":False,"runtime_validation":"UNTESTED","visual_qa":"REVIEW_REQUIRED",
          "source":"A/B original ImageGen PNG only, no font fallback",
          "active_roi_total":954,"imported_roi_total":imported_total,
+         "c1_preliminary_new_png_count":c1_provisional_count,
          "pending_import":954-imported_total,
          "native_dds_generated":len(archive),
          "translated_roi_generated":sum(len(v["painted"]) for v in admitted),
