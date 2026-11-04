@@ -245,10 +245,20 @@ struct NativeRawFvfScissorClip {
                 }
             }
             if (strictInterior) {
+                // Projective equality matters, not identical source W.
+                // Original FVF vertices can carry different positive W/Z/UV
+                // yet land on the EXACT same homogeneous screen point.
+                // Products of two source float values are represented exactly
+                // in double (including subnormals); unlike an epsilon or
+                // approximate divide, this cannot erase a thin real pixel.
+                // Strict interior/positive-W admission above remains required.
                 const auto sameScreenCorner = [&](unsigned a, unsigned b) noexcept {
-                    return distances[a][6u] == distances[b][6u] &&
-                           distances[a][0u] == distances[b][0u] &&
-                           distances[a][2u] == distances[b][2u];
+                    const double wa = distances[a][6u], wb = distances[b][6u];
+                    const double xa = distances[a][0u] - wa;
+                    const double xb = distances[b][0u] - wb;
+                    const double ya = distances[a][2u] - wa;
+                    const double yb = distances[b][2u] - wb;
+                    return xa * wb == xb * wa && ya * wb == yb * wa;
                 };
                 if (sameScreenCorner(0u, 1u) ||
                     sameScreenCorner(1u, 2u) ||

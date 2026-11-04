@@ -355,6 +355,29 @@ int main() {
         collapsedSource,true,nullptr,&wireNoCull,true));
     assert(!native_game_fvf_fully_clipped_draw(
         collapsedSource,true,nullptr,&solidNoCull,false)); // point-filled
+    // 01237: an original D3D9 WVP projects equal XY/W even when the
+    // duplicated screen corner has DIFFERENT homogeneous W, source Z and
+    // shader UVs. Recognize exact projective equality, not merely copied
+    // XYZ/W payloads. A different Y/W or an almost-equal X/W is real GPU
+    // geometry and must retain its original native Draw.
+    collapsed[1].clip[0]=-.8f;
+    collapsed[1].clip[1]=-1.2f;
+    collapsed[1].clip[3]=2.f;
+    assert(native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&wireNoCull,true));
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,false));
+    collapsed[1].clip[1]=-.6f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    collapsed[1].clip[1]=-1.2f;
+    collapsed[1].clip[0]=-.7999999f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        collapsedSource,true,nullptr,&solidNoCull,true));
+    collapsed[1].clip[3]=1.f;
+    collapsed[1].clip[1]=-.6f;
     collapsed[1].clip[0]=-.399f;
     assert(!native_game_fvf_fully_clipped_draw(
         collapsedSource,true,nullptr,&solidNoCull,true)); // thin real pixels
