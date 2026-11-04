@@ -11,6 +11,8 @@
 #include <d3d9.h>
 #include <algorithm>
 #include <cstring>
+#include <cwchar>
+#include <iterator>
 #include <string>
 #include <vector>
 #include "dino_external_sidecar.hpp"
@@ -38,7 +40,7 @@ class GpuOwner final {
         if(!ok){CloseHandle(f);return false;}
         std::vector<std::uint8_t> b(static_cast<std::size_t>(size.QuadPart));
         DWORD got=0;
-        const bool read=ReadFile(f,b.data(),static_cast<DWORD>(b.size()),&got,nullptr)!=FALSE &&
+        const bool read=::ReadFile(f,b.data(),static_cast<DWORD>(b.size()),&got,nullptr)!=FALSE &&
                         got==b.size();
         CloseHandle(f);
         if(!read)return false;
@@ -49,23 +51,33 @@ class GpuOwner final {
                           IDirect3DTexture9** out) noexcept {
         if(!dev || !dds || !out)return false;
         *out=nullptr;
-        if(FAILED(dev->CreateTexture(128,128,8,0,D3DFMT_DXT1,D3DPOOL_MANAGED,out,nullptr)))
-            return false;
+        IDirect3DTexture9* staging=nullptr;
+        // D3D9Ex forbids MANAGED; use a lockable SYSTEMMEM staging texture.
+        if(FAILED(dev->CreateTexture(128,128,8,0,D3DFMT_DXT1,D3DPOOL_SYSTEMMEM,&staging,nullptr))||
+           !staging)return false;
         std::size_t pos=128;
         for(UINT mip=0;mip<8;++mip) {
             const unsigned dim=std::max(1u,128u>>mip);
             const unsigned blocks=std::max(1u,(dim+3u)/4u);
             const unsigned row=blocks*8u;
             D3DLOCKED_RECT lock{};
-            if(FAILED((*out)->LockRect(mip,&lock,nullptr,0)))return false;
+            if(FAILED(staging->LockRect(mip,&lock,nullptr,0))) {staging->Release();return false;}
             for(unsigned y=0;y<blocks;++y) {
                 std::memcpy(static_cast<std::uint8_t*>(lock.pBits)+
                             std::size_t(lock.Pitch)*y,dds+pos+std::size_t(row)*y,row);
             }
-            (*out)->UnlockRect(mip);
+            staging->UnlockRect(mip);
             pos+=std::size_t(blocks)*row;
         }
-        return pos==128u+10936u;
+        if(pos!=128u+10936u) {staging->Release();return false;}
+        HRESULT hr=dev->CreateTexture(128,128,8,0,D3DFMT_DXT1,D3DPOOL_DEFAULT,out,nullptr);
+        if(SUCCEEDED(hr)&&*out)hr=dev->UpdateTexture(staging,*out);
+        staging->Release();
+        if(FAILED(hr)||!*out) {
+            if(*out){(*out)->Release();*out=nullptr;}
+            return false;
+        }
+        return true;
     }
     void ReleaseGpu() noexcept {
         for(auto& m:meshes_) {
@@ -86,8 +98,8 @@ class GpuOwner final {
         if(!last)return false;
         *++last=L'\0';
         constexpr wchar_t suffix[]=L"Dino246_Cockpit_LHD_v15.ovc";
-        if(std::wcslen(path)+std::size(suffix)>=MAX_PATH)return false;
-        std::wcscat(path,suffix);
+        if(std::wcslen(path)+(sizeof(suffix)/sizeof(suffix[0]))>MAX_PATH)return false;
+        if(wcscat_s(path,MAX_PATH,suffix)!=0)return false;
         std::vector<std::uint8_t> bytes;
         if(!ReadFile(path,bytes))return false;
         std::string error;
@@ -115,9 +127,9 @@ class GpuOwner final {
             const UINT vertexBytes=next.vertexCount*sizeof(Vertex);
             const UINT indexBytes=next.indexCount*sizeof(std::uint16_t);
             if(FAILED(dev->CreateVertexBuffer(vertexBytes,D3DUSAGE_WRITEONLY,
-                    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,D3DPOOL_MANAGED,&next.vb,nullptr)) ||
+                    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,D3DPOOL_DEFAULT,&next.vb,nullptr)) ||
                FAILED(dev->CreateIndexBuffer(indexBytes,D3DUSAGE_WRITEONLY,
-                    D3DFMT_INDEX16,D3DPOOL_MANAGED,&next.ib,nullptr))) {
+                    D3DFMT_INDEX16,D3DPOOL_DEFAULT,&next.ib,nullptr))) {
                 if(next.vb)next.vb->Release();
                 if(next.ib)next.ib->Release();
                 ReleaseGpu();return false;
@@ -145,11 +157,14 @@ public:
     GpuOwner& operator=(const GpuOwner&)=delete;
     void OnDeviceReset() noexcept {ReleaseGpu();}
     bool Loaded() const noexcept {return loaded_;}
+    bool EnsureResources(IDirect3DDevice9* device) noexcept {
+        try{return EnsureGpu(device);}catch(...){ReleaseGpu();return false;}
+    }
     // Only call during an active BeginScene with correct per-eye RT and depth
     // already bound by the owning VR renderer. No BeginScene/EndScene here.
     HRESULT DrawEye(IDirect3DDevice9* device,const D3DMATRIX& world,
                     const D3DMATRIX& view,const D3DMATRIX& projection) noexcept {
-        if(!EnsureGpu(device))return E_FAIL;
+        if(!EnsureResources(device))return E_FAIL;
         IDirect3DStateBlock9* saved=nullptr;
         if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&saved))||!saved)
             return E_FAIL;
