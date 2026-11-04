@@ -96,5 +96,69 @@
   },
   "runtime_evidence": null,
   "runtime_note": "No physical original-game desktop Draw/Present evidence or Quest3/VDXR HMD test at this exact material SHA. RUNTIME_VALIDATION=UNTESTED; no native game frame parity/renderer promotion claim.",
-  "c6_note": "Bookkeeping commit only, after unchanged material SHA five-Gate pass. [skip ci] belongs only to C6 and never to the validation-bearing material commit."
+  "c6_note": "Bookkeeping commit only, after unchanged material SHA five-Gate pass. [skip ci] belongs only to C6 and never to the validation-bearing material commit.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "integration_path": [
+      "LIVE_ORIGINAL_D3D9_FVF_SOURCE_DRAW",
+      "PROJECTIVE_POSITIVE_W_EQUAL_XY_SCREEN_CORNERS",
+      "AUTHENTIC_NATIVE_D3D11_RASTER_SOURCE_CONTINUITY",
+      "REAL_GAME_GPU_FRAME_OR_ORIGINAL_D3D9_FALLBACK"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "PROJECTIVE_SOURCE_XY_W_CXX",
+      "NATIVE_GAME_FVF_CLIPPED_DRAW_INTEGRATION",
+      "SOURCE_DEPTH_UV_AND_THIN_NONZERO_AREA_NEGATIVE_REGRESSION",
+      "EXACT_SHA_FIVE_MANDATORY_ACTIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact source projective XY/W equality across positive unequal W/Z authentic game solid FVF Draw/DrawIndexed is a proven zero-raster ordinal. Existing exact-SHA Fast 41907852896 and Backend 41907852976 succeeded at immutable 1c3ca85.",
+      "negative_regression": "Wireframe and point-fill, nonzero thin triangle, W=0 crossing, active clip-plane boundary and corrupt indexed terminal vertex retain real native GPU submission/fail-closed D3D9 fallback.",
+      "component_integration": "live_game_frame_bridge.cpp uses native_game_fvf_fully_clipped_draw.hpp before GameNativeFrameBatch.absorb_empty_source_draw; original D3D9 Draw/input and frame full-color source remain intact."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED_ONLY at 1c3ca85; no real game desktop GPU frame or Quest3 stereo evidence. RUNTIME_VALIDATION=UNTESTED.",
+    "activation_guard_and_fallback": "EXPLICIT_SOLID_SOURCE_FVF_ONLY; untouched original game renderer, input/FFB, DX9Ex and DXVK."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+    "goal": "Maintain exact source-authentic game Draw chronology through harmless original zero-area solid FVF triangle commands while preserving native GPU real-pixel and fallback safety.",
+    "acceptance_items": [
+      {
+        "id": "source_zero_area_ordinals",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ORIGINAL_D3D9_FVF_TO_NATIVE_D3D11_FRAME",
+        "expected_behavior": "Exact source-confirmed strictly interior zero-pixel solid triangles consume original Draw ordinal without fabricated GPU submission, allowing subsequent real game native geometry."
+      },
+      {
+        "id": "native_ia_primitive_family",
+        "category": "integrated_behavior",
+        "behavior_area": "SOURCE_INDEXED_AND_STRIP_FAN_ASSEMBLY",
+        "expected_behavior": "List/strip/fan/indexed authentic IA, source depth variation and first GPU Draw preserve source ordering."
+      },
+      {
+        "id": "source_real_pixels_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_REAL_GAME_RENDER_AND_FFB",
+        "expected_behavior": "Wireframe/point fill, near-thin triangle, clip/eye crossing and invalid source indices never qualify as zero-pixel raster; original game paths survive."
+      },
+      {
+        "id": "immutable_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Five unchanged mandatory GitHub Actions SUCCESS at exact material SHA; actual gameplay and HMD UNTESTED."
+      }
+    ]
+  }
 }
