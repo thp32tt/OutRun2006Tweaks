@@ -268,4 +268,20 @@ if compiler:
                         "-o", str(exe)], check=True)
         subprocess.run([str(exe)], check=True)
 
-print("DX11 SM3/FVF fog and RAW clipping visual source dispatch PASS (runtime UNTESTED)")
+# RAW PRE/POST capture now uses actual fixed-function VS SV_ClipDistance.
+clip_source = (root / "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp").read_text()
+island_source = (root / "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp").read_text()
+require("offsetof(NativeVertex, clip0), fixedClip.mask" in bridge and
+        "source.clipDistanceOffset, source.clipDistanceMask" in island_source and
+        "q.userClip[plane - 7u]" in clip_source and
+        "source.clipDistanceMask ? 13u : 7u" in clip_source,
+        "authentic FVF GPU sampling user clipping disconnected")
+if compiler:
+    with tempfile.TemporaryDirectory() as folder:
+        exe = Path(folder) / "fvf_raw_clip"
+        subprocess.run([compiler, "-std=c++17", "-Wall", "-Wextra", "-Werror",
+                        "-pedantic", "-I", str(root),
+                        str(root / "tests/native_raw_fvf_user_clip_capture_test.cpp"),
+                        "-o", str(exe)], check=True)
+        subprocess.run([str(exe)], check=True)
+print("DX11 SM3/FVF fog and authentic RAW user clip capture PASS (runtime UNTESTED)")

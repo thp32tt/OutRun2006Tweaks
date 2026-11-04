@@ -1101,6 +1101,9 @@ struct NativeVertex {
     float clip0[4]; // World-space FVF plane distances 0..3.
     float clip1[4]; // World-space FVF plane distances 4..5.
 };
+static_assert(offsetof(NativeVertex, clip1) ==
+              offsetof(NativeVertex, clip0) + sizeof(NativeVertex::clip0),
+              "Native FVF VS outputs must preserve contiguous clip distances");
 
 // Narrow fixed-function stage-0 textured subset for real game menu/vehicle/race
 // draws. Any unmirrored texture, sampler, alpha or stage state fails closed.
@@ -8553,7 +8556,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                           ? NativeRawFvfAssembly::TriangleStrip
                           : topology == D3DPT_TRIANGLEFAN
                               ? NativeRawFvfAssembly::TriangleFan
-                              : NativeRawFvfAssembly::TriangleList}
+                              : NativeRawFvfAssembly::TriangleList,
+                      offsetof(NativeVertex, clip0), fixedClip.mask}
                 : NativeRawFvfClipSpan{});
     }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);

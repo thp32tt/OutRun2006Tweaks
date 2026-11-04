@@ -71,6 +71,10 @@ struct NativeRawFvfClipSpan {
     const std::uint32_t* indices = nullptr;
     std::size_t indexCount = 0u;
     NativeRawFvfAssembly assembly = NativeRawFvfAssembly::TriangleList;
+    // Enabled authentic FVF SV_ClipDistance0/1 source values, borrowed
+    // strictly during the native GPU PRE/POST capture geometry calculation.
+    std::size_t clipDistanceOffset = 0u;
+    std::uint32_t clipDistanceMask = 0u;
 };
 // Clip each real assembled triangle against the SAME D3D11 clip volume
 // (x,y in [-w,w], z in [0,w]) instead of bounding all raw IA vertices,
@@ -98,7 +102,12 @@ struct NativeRawFvfClipSpan {
             source.vertexStride ||
         (source.indices == nullptr) != (source.indexCount == 0u) ||
         (source.indices && (source.indexCount < 3u ||
-                            source.indexCount > 1048576u)))
+                            source.indexCount > 1048576u)) ||
+        (source.clipDistanceMask & ~0x3fu) ||
+        (source.clipDistanceMask &&
+         (source.vertexStride < sizeof(float) * 6u ||
+          source.clipDistanceOffset >
+              source.vertexStride - sizeof(float) * 6u)))
         return false;
     const bool depthClipEnable = !rasterState || rasterState->depthClipEnable;
     const auto activeCount = source.indices ? source.indexCount : source.count;
@@ -134,7 +143,10 @@ struct NativeRawFvfClipSpan {
             scissorBottom >= scissorTop) return false;
     }
     struct Point { double x, y, z; };
-    struct HomogeneousPoint { double x, y, z, w; };
+    struct HomogeneousPoint {
+        double x, y, z, w;
+        std::array<double, 6u> userClip{};
+    };
     const auto* bytes = static_cast<const std::uint8_t*>(source.firstClip);
     const auto plane_distance = [&](Point p, int plane) noexcept {
         switch (plane) {
@@ -181,14 +193,25 @@ struct NativeRawFvfClipSpan {
             float clip[4]{};
             std::memcpy(clip, bytes + vertex * source.vertexStride, sizeof(clip));
             if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
-                !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
-                clip[3] == 0.0f ||
-                (clip[3] > 0.0f && clip[3] <= 0.00001f)) return false;
+                !std::isfinite(clip[2]) || !std::isfinite(clip[3]))
+                return false;
             homogeneous[corner] = {static_cast<double>(clip[0]),
                                    static_cast<double>(clip[1]),
                                    static_cast<double>(clip[2]),
                                    static_cast<double>(clip[3])};
-            crossesEyePlane = crossesEyePlane || clip[3] < 0.0f;
+            if (source.clipDistanceMask) {
+                float distances[6]{};
+                std::memcpy(distances, bytes + vertex * source.vertexStride +
+                            source.clipDistanceOffset, sizeof(distances));
+                for (unsigned p = 0u; p < 6u; ++p) {
+                    if (!(source.clipDistanceMask & (1u << p))) continue;
+                    if (!std::isfinite(distances[p])) return false;
+                    homogeneous[corner].userClip[p] = distances[p];
+                }
+            }
+            // Finite W=0 and small-positive-W vertices can still intersect
+            // the real visible polygon after safe homogeneous clipping.
+            crossesEyePlane = crossesEyePlane || clip[3] <= 0.00001f;
             if (clip[3] > 0.0f) {
                 const double invW = 1.0 / static_cast<double>(clip[3]);
                 polygon[corner] = {static_cast<double>(clip[0]) * invW,
@@ -204,7 +227,7 @@ struct NativeRawFvfClipSpan {
         // clip their finite source homogeneous vertices BEFORE dividing W.
         // Keep the original positive-W NDC path unchanged for ordinary game
         // Draws. W=0, nonfinite source data and malformed IA still fail closed.
-        if (crossesEyePlane) {
+        if (crossesEyePlane || source.clipDistanceMask) {
             const auto distance = [](const HomogeneousPoint& q,
                                      unsigned plane) noexcept {
                 switch (plane) {
@@ -214,10 +237,16 @@ struct NativeRawFvfClipSpan {
                 case 3u: return q.w - q.y;
                 case 4u: return q.z;
                 case 5u: return q.w - q.z;
-                default: return q.w - 0.00001;
+                case 6u: return q.w - 0.00001;
+                default: return q.userClip[plane - 7u];
                 }
             };
-            for (unsigned plane = 0u; plane < 7u && polygonCount; ++plane) {
+            for (unsigned plane = 0u;
+                 plane < (source.clipDistanceMask ? 13u : 7u) &&
+                 polygonCount; ++plane) {
+                if (plane >= 7u &&
+                    !(source.clipDistanceMask & (1u << (plane - 7u))))
+                    continue;
                 // D3D11 DepthClipEnable=FALSE drops only 0<=z<=w.
                 // The eye-plane W and x/y bounds still apply to EVERY Draw.
                 if (!depthClipEnable && (plane == 4u || plane == 5u))
@@ -235,11 +264,15 @@ struct NativeRawFvfClipSpan {
                         if (!std::isfinite(divisor) || divisor == 0.0 ||
                             nextCount >= clippedH.size()) return false;
                         const double t = prevDistance / divisor;
-                        clippedH[nextCount++] = {
+                        HomogeneousPoint intersection{
                             previous.x + t * (current.x - previous.x),
                             previous.y + t * (current.y - previous.y),
                             previous.z + t * (current.z - previous.z),
                             previous.w + t * (current.w - previous.w)};
+                        for (unsigned c = 0u; c < 6u; ++c)
+                            intersection.userClip[c] = previous.userClip[c] +
+                                t * (current.userClip[c] - previous.userClip[c]);
+                        clippedH[nextCount++] = intersection;
                     }
                     if (isInside) {
                         if (nextCount >= clippedH.size()) return false;

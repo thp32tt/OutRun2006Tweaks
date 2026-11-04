@@ -52,7 +52,8 @@ namespace outrun::vr::dx11 {
         }
         if (!native_raw_fvf_projected_raster(
                 {source.firstClip, source.vertexStride, source.count,
-                 indices, 3u, NativeRawFvfAssembly::TriangleList},
+                 indices, 3u, NativeRawFvfAssembly::TriangleList,
+                 source.clipDistanceOffset, source.clipDistanceMask},
                 vx, vy, vw, vh, triangle, &admitted, rasterState, interior))
             return false;
         triangle.left = (std::max)(triangle.left,
