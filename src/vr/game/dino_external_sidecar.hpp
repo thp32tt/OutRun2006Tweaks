@@ -20,7 +20,9 @@ struct Mesh {
 };
 struct Model {
     std::vector<Mesh> meshes;
-    std::array<std::array<std::uint8_t,DdsSize>,Materials> dds{};
+    // Keep 19x11 KiB on the heap, not twice on the original x86 game's
+    // render-hook stack (Parse result + EnsureLoaded temporary).
+    std::vector<std::array<std::uint8_t,DdsSize>> dds;
 };
 inline unsigned U32(const std::uint8_t* a) noexcept {
     return unsigned(a[0])|(unsigned(a[1])<<8)|(unsigned(a[2])<<16)|(unsigned(a[3])<<24);
@@ -84,6 +86,7 @@ inline bool Parse(const std::uint8_t* data,std::size_t size,Model& output,std::s
         result.meshes.push_back(std::move(mesh));
     }
     if(nv!=Vertices||nt!=Triangles)return fail("model total");
+    result.dds.resize(Materials);
     for(unsigned i=0;i<Materials;++i){
         if(!Bounds(p,4,size))return fail("dds length");
         const auto len=U32(data+p);p+=4;
