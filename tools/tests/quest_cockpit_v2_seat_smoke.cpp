@@ -63,6 +63,20 @@ int main(){
     NativePose invalidEye{};
     assert(!NativeStereoEye(pitchedOrigin,pitchedHead,
         {{0.f,0.f,0.f,1.f},{0.f,INFINITY,0.f}},invalidEye));
+    // The game view is yaw-recentered, but the PC OpenXR projection
+    // space remains LOCAL. Keep original located eye pose for the
+    // runtime submission: these are distinct when the yaw origin is
+    // non-identity. Transforming both would double-recenter the image.
+    NativePose physicalLeft{};
+    assert(NativeHeadLocalEye(pitchedHead,
+        {{0.f,0.012f,0.f,0.999928f},{-.031f,.002f,.004f}},
+        physicalLeft));
+    assert(std::fabs(physicalLeft.p.x-left2.p.x)>0.5f);
+    NativePose recoveredLocal{};
+    assert(NativeInverseOriginCompose(pitchedOrigin,physicalLeft,recoveredLocal));
+    assert(near(recoveredLocal.p.x,left2.p.x));
+    assert(near(recoveredLocal.p.y,left2.p.y));
+    assert(near(recoveredLocal.p.z,left2.p.z));
     std::array<std::uint8_t,30u*36u> table{};
     for(int i=0;i<30;++i){
         const float v[3]{float((i%15)*-0.01f-0.35f),

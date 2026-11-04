@@ -1597,8 +1597,6 @@ namespace OutRunVRRenderer
 				Vec3 effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
 				if (Settings::VRPositionalTracking && sample.positionValid)
 					effectiveHeadPosition = sample.position;
-                std::array<OutRunVR::QuestCockpitV2::NativePose,2>
-                    questLocatedEyePoses{};
                 bool questEyePairValid=questNativeMode1 &&
                     sample.positionValid && CenterPositionValid &&
                     LatchedHeadInverseValid &&
@@ -1617,7 +1615,6 @@ namespace OutRunVRRenderer
                         OutRunVR::QuestCockpitV2::NativePose originalEye{};
                         if(OutRunVR::QuestCockpitV2::NativeStereoEye(
                             questOrigin,questHead,localEye,originalEye)) {
-                            questLocatedEyePoses[eye]=originalEye;
                             const Quat q{
                                 originalEye.q.x,originalEye.q.y,
                                 originalEye.q.z,originalEye.q.w};
@@ -1659,25 +1656,18 @@ namespace OutRunVRRenderer
                 QuestNativeEyesValid=questEyePairValid;
                 QuestNativeEyePoseSequence=questEyePairValid
                     ? sample.sequence : 0;
-                if(questEyePairValid) {
-                    // Quest XrRig::locate returns the two views AFTER
-                    // inverse(yawOrigin) composition. The game shader has
-                    // already used these same poses, so the Frame.v2
-                    // projection-source view must use them too.
-                    // Keep positions as OpenXR metres: WorldScale applies
-                    // only in D3D9 game-side view/projection matrices.
-                    for(int eye=0;eye<2;++eye) {
-                        const auto& q=questLocatedEyePoses[eye].q;
-                        const auto& p=questLocatedEyePoses[eye].p;
-                        LatchedStereo.effectiveEyeOrientation[eye][0]=q.x;
-                        LatchedStereo.effectiveEyeOrientation[eye][1]=q.y;
-                        LatchedStereo.effectiveEyeOrientation[eye][2]=q.z;
-                        LatchedStereo.effectiveEyeOrientation[eye][3]=q.w;
-                        LatchedStereo.effectiveEyePosition[eye][0]=p.x;
-                        LatchedStereo.effectiveEyePosition[eye][1]=p.y;
-                        LatchedStereo.effectiveEyePosition[eye][2]=p.z;
-                    }
-                }
+                // Coordinate-space boundary: the native Quest HMD views
+                // above are recentered to the game's yaw origin and are
+                // consumed only by D3D9 game/world matrices. The PC OpenXR
+                // host submits frame.eye under projection.space=LOCAL,
+                // NOT an origin-shifted XrSpace. Thus Frame.v2 MUST retain
+                // the original absolute LOCAL-space effectiveEye poses
+                // assembled from xrLocateViews. Overwriting these with
+                // Quest-recentered poses causes incorrect runtime reprojection
+                // and can make sky/world appear to counter-rotate on HMD yaw.
+                // To use the original Quest-relative poses for OpenXR layer
+                // submission instead, the host must first establish an
+                // XrSpace aligned to that same origin (not done here).
 			}
 
 			const float w = std::clamp(std::fabs(relativeOrientation.w), 0.0f, 1.0f);

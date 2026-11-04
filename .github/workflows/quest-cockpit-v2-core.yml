@@ -178,6 +178,9 @@ jobs:
           assert 'NativeYawOrigin(' in native_pose
           assert 'NativeInverseOriginCompose(' in native_renderer
           assert 'NativeStereoEye(' in native_renderer
+          assert 'The PC OpenXR' in native_renderer
+          assert 'LatchedStereo.effectiveEyeOrientation[eye][0]=q.x' not in native_renderer
+          assert 'frame.eye[eye].orientation,stereo->effectiveEyeOrientation' in r7
           assert 'GetQuestNativeEyeInverse(' in native_renderer
           assert 'GetQuestNativeEyeInverse(' in r7
           assert 'InverseRigid(headInverse),nativeFullView' in r7
