@@ -1,6 +1,9 @@
 """Fail-closed QA workqueue tests; no browser or network."""
 import sys
 import unittest
+import tempfile
+from unittest.mock import patch
+from PIL import Image, ImageDraw
 from pathlib import Path
 root=Path(__file__).resolve().parent
 sys.path.insert(0,str(root))
@@ -38,6 +41,25 @@ class QueueSafety(unittest.TestCase):
     publisher.content_path(s)
   with self.assertRaises(ValueError):
    publisher.api("/repos/unused","")
+ def test_real_orientation_mapping_string_yields_hd_png_proof(self):
+  import github_ab_imagegen_atlas_batch as atlas
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory)
+   target="textures/load/spr_fixture/ABCD0001_256x128.dds"
+   raw=b"synthetic-sha-pinned-dds"
+   src=root/atlas.ORIGINAL/target
+   src.parent.mkdir(parents=True)
+   src.write_bytes(raw)
+   native=Image.new("RGBA",(256,128),(0,0,0,0))
+   ImageDraw.Draw(native).rectangle((20,20,65,38),fill=(255,255,255,255))
+   row={"source_dds_path":target,"source_dds_sha256":atlas.sha(raw),
+        "_bbox":[12,12,77,47]}
+   output=root/"proof.png"
+   with patch.object(atlas,"native_image",return_value=native):
+    proof=q.safe_hd_reference(root,row,{target:"NORMAL"},output)
+   self.assertEqual(proof["sha256"],atlas.sha(output.read_bytes()))
+   self.assertEqual(proof["source_native_size"],[256,128])
+   self.assertTrue(output.is_file())
  def test_rework_is_not_release(self):
   from inspect import getsource
   body=getsource(q.build_queue)
