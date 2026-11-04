@@ -226,3 +226,6 @@ def valid_generated_image(raw):
         raise ValueError("CANDIDATE_BACKGROUND_NOT_TRANSPARENT")
     # This verifies PNG structure, not actual Korean wording, font or clean plate.
     return [im.width,im.height]
+
+
+# Stage 2: browser task execution remains separately gated by logged-in UI evidence.
