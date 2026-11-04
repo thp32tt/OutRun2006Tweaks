@@ -5796,6 +5796,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         clippingMode == NativeGameClippingMode::RawDiagnostic;
     NativeSm3UserClip userClip{};
     if (clipPlanes != 0u) {
+        // D3D9 CLIPPING=FALSE disables user-plane clipping as well.
+        // Avoid constructing native HLSL clip distances from the inherited
+        // plane mask in an explicitly imperfect RAW GPU tile. Exact mode
+        // continues to validate all live game plane CAPS and coefficients.
+        if (!rawClippingOmitted) {
         D3DCAPS9 clipCaps{};
         std::array<std::array<float, 4>, 6> planes{};
         if ((clipPlanes & ~0x3fu) != 0u ||
@@ -5815,6 +5820,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 clipPlanes, clipCaps.MaxUserClipPlanes, planes, userClip)) {
             ++s.liveSm3StateRejectReasons[2];
             return false;
+        }
         }
     }
     // D3D9 FILLMODE is inherited between game Draws but applies only to

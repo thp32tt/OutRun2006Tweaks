@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01220",
+  "production_id": "CONVERSION-DX11-01220",
+  "event_id": "CONVERSION-DX11-01220-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_D3D9_CLIPPING_RAW_FVF_SM3_NATIVE_DRAW",
+  "classification": "A_UNFINISHED_RAW_VISUAL_NATIVE_DRAW_CLIPPING_INTEGRATION",
+  "status": "IN_PROGRESS_GATE_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "db41d77e55c451dee1a0db9721e364da38f97c97",
+  "material_result_sha": "0a5dd9967766f93a178824db8f29b73c102dd6bc",
+  "validation_bearing_result_sha": "PENDING",
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_clipping_visual.hpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    "tests/native_raw_clipping_visual_test.cpp"
+  ],
+  "implementation": "Connected real game-authored FVF and SM3 Draw/DrawIndexed D3DRS_CLIPPING=FALSE to explicitly opted-in incomplete RAW D3D11 diagnostic tiles. Original source state getter, valid DWORD, native GPU resource and backbuffer admission remain required. The game-authoritative D3D9 Draw/Present/input/FFB and ordinary exact native mode are unchanged. A native RAW clipping mismatch always aborts full-resolution frame publication after GPU draw; SM3 also omits inherited user-clip planes only for its opt-in incomplete RAW tile. Regression exercises valid and invalid clipping source state plus both native submission/abort paths. No actual game/HMD testing.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SOURCE_FVF_OR_SM3_AUTHENTIC_CLIPPING",
+      "D3D11_NATIVE_DRAW",
+      "RAW_INCOMPLETE_GPU_TILE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "LIVE_FVF_SM3_D3D9_CLIPPING_GETRENDERSTATE",
+      "SOURCE_BOOLEAN_AND_RAW_OPT_IN_ADMISSION",
+      "NATIVE_D3D11_DRAW_DRAWINDEXED",
+      "RAW_GPU_TILE_PRE_POST_PRESENT_WITH_FULLFRAME_ABORT",
+      "ORIGINAL_D3D9_GAME_PRESENT_FALLBACK"
+    ],
+    "batch_components": [
+      "SHARED_SOURCE_CLIPPING_ENUM_ADMISSION",
+      "LIVE_FVF_RAW_NATIVE_GPU_TILE",
+      "LIVE_SM3_RAW_USER_PLANE_OMISSION",
+      "FULLFRAME_ABORT_AFTER_SUBMITTED_GPU_DRAW",
+      "POSITIVE_NEGATIVE_CXX_AND_SOURCE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source-authenticated CLIPPING=FALSE FVF and shader-bound SM3 can issue native D3D11 Draw/DrawIndexed in explicitly opted-in RAW visual preview with real game geometry and independently captured GPU tile.",
+      "negative_regression": "Unknown/failed CLIPPING state, ordinary full-frame mode, invalid/foreign source targets, unsafe COM/resource states and all incomplete RAW frame promotion fail closed; exact true clipping and original D3D9 input unaffected.",
+      "component_integration": "live_game_frame_bridge.cpp FVF supported_game_state and submit_live_sm3_game_draw -> native_game_raw_clipping_visual.hpp -> D3D11 GPU Draw -> full_frame abort; portable C++ assertions and tools/test_dx11_live_sm3_table_zfog_01005.py exercise both routes."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY_GATE_PENDING. LIVE runtime game pixel and HMD output UNTESTED, no full-frame gameplay PASS.",
+    "activation_guard_and_fallback": "Requires OUTRUN_DX11_FIRST_GAME_FRAME=1, OUTRUN_DX11_FULL_GAME_FRAME=1, OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC=1; normal path exact and fail-closed, incomplete GPU tile only, original D3D9 Draw/gamepad/FFB/DX9Ex fallback preserved."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Connect authentic game FVF and programmable SM3 clipping-disabled Draws to a native D3D11 GPU visual diagnostic while retaining original D3D9 fallback and forbidding incomplete full-frame publication.",
+    "acceptance_items": [
+      {
+        "id": "raw_fvf_sm3_clipping_gpu_route",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_NATIVE_D3D11_DRAW",
+        "expected_behavior": "Actual source CLIPPING=FALSE and opt-in diagnostic can reach both native FVF and SM3 GPU Draw while SM3 suppresses inherited user clip planes."
+      },
+      {
+        "id": "source_owner_and_fullframe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_INPUT_RESOURCE_AND_FRAME_PARITY",
+        "expected_behavior": "Unknown source DWORD, no RAW opt-in, unsafe resources and partial native frame remain D3D9-authoritative; original gamepad/FFB not changed."
+      },
+      {
+        "id": "exact_source_ci_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "DX11 Fast, Backend, Build, OpenXR and HUD gates run and pass at one final matching source-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "validation_gate_runs": {},
+  "runtime_evidence": {
+    "native_game_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "gpu_desktop_frames": "UNTESTED",
+    "gameplay_menu_car_race": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no actual source-matched game launch, live native Draw count, published frame count, GPU desktop pixel or Quest3/VDXR evidence.",
+  "real_game_draw_blocker": "Actual CLIPPING=FALSE source Draw population, GPU tile pixel and full game frame remain UNTESTED; this isolated RAW source admission is not native complete-frame proof.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "On matching source SHA, collect game-authored D3D9 Draw/native GPU RGB evidence with genuine clipping state before deciding next full-frame blocker; preserve DX9Ex fallback and OpenXR isolation.",
+  "checkpoint": "C5_GATE_PENDING",
+  "record_type": "SOURCE_AND_GATE_PENDING",
+  "score_note": "One unfinished DX11 native complete-frame feature. CI repair, same TASK_ID checkpoint, RAW source expansion and retest do not earn duplicate independent achievement points (+0)."
+}

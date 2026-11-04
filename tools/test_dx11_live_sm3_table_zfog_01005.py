@@ -251,6 +251,8 @@ require('#include "native_game_raw_clipping_visual.hpp"' in bridge and
         "output.rawClippingVisualMismatch =" in bridge and
         "if (output.rawClippingVisualMismatch && s.issued > issuedBeforeFvf)" in bridge and
         "if (rawClippingOmitted)" in clipping_source and
+        "if (!rawClippingOmitted) {" in clipping_source and
+        "D3D11_NATIVE_DRAW" not in clipping_header and
         "liveBatch.abort();" in clipping_source and
         'DX11_VISUAL_MISMATCH_CLIPPING path=SM3' in bridge and
         'DX11_VISUAL_MISMATCH_CLIPPING path=FVF' in bridge,
