@@ -104,7 +104,7 @@ PY
     echo "HOLD_CHROMIUM_EXECUTABLE_MISSING: $chrome" >&2
     return 1
   fi
-  "$chrome" --no-sandbox --disable-dev-shm-usage --disable-gpu \
+  "$chrome" --no-sandbox --disable-gpu \
     --no-first-run --no-default-browser-check --password-store=basic \
     --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 \
     --user-data-dir=/data/hd-rework/browser-rework-profile \
