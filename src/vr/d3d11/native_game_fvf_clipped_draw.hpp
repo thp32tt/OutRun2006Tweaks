@@ -147,6 +147,10 @@ struct NativeRawFvfScissorClip {
             }
         }
         bool invisible = false;
+        bool hasNonpositiveEyeW = false;
+        for (unsigned corner = 0u; corner < corners; ++corner)
+            hasNonpositiveEyeW = hasNonpositiveEyeW ||
+                distances[corner][6u] <= 0.0;
         // Proving ONE plane excludes an entire assembled primitive suffices.
         // A polygon whose corners are outside DIFFERENT planes can still
         // cross the game viewport: never discard that actual native Draw.
@@ -186,7 +190,7 @@ struct NativeRawFvfScissorClip {
                 }
                 if (inside) { hasInsideVertex = true; break; }
             }
-            if (hasInsideVertex) return false;
+            if (hasInsideVertex || hasNonpositiveEyeW) return false;
 
             // An actual source primitive may be outside the INTERSECTION
             // of two scissor/ClipDistance planes while crossing each plane
@@ -215,11 +219,12 @@ struct NativeRawFvfScissorClip {
                     if (previousInside != currentInside) {
                         const double denominator =
                             previous[plane] - current[plane];
-                        const double fraction = previous[plane] / denominator;
                         if (!std::isfinite(denominator) ||
-                            denominator == 0.0 || !std::isfinite(fraction) ||
-                            fraction < 0.0 || fraction > 1.0 ||
-                            nextCount >= clipped.size())
+                            denominator == 0.0 || nextCount >= clipped.size())
+                            return false;
+                        const double fraction = previous[plane] / denominator;
+                        if (!std::isfinite(fraction) ||
+                            fraction < 0.0 || fraction > 1.0)
                             return false;
                         auto& intersection = clipped[nextCount++];
                         for (unsigned component = 0u; component < 17u; ++component) {
