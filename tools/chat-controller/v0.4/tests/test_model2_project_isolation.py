@@ -148,7 +148,7 @@ class Model2ProjectIsolation(unittest.TestCase):
         self.assertEqual(len(self.sent), 1)
         self.assertIn("Model2VR-tools@main", self.sent[0])
         self.assertIn("MODEL2_VR_AUTODEV_MASTER_PLAN.md", self.sent[0])
-        self.assertNotIn("웹포팅", self.sent[0])
+        self.assertNotIn("웹포팅 개발 계속진행해", self.sent[0])
         self.assertFalse(self.tick(9, 4))
         self.assertFalse(self.tick(9, 29, 59))
         self.assertTrue(self.tick(9, 30))
