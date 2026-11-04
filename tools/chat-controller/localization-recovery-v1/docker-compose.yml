@@ -58,6 +58,7 @@ services:
     environment:
       TZ: Asia/Seoul
       OUTRUN_REWORK_HOME: /data/hd-rework
+      OUTRUN_REWORK_BROWSER_PROFILE_DIR: /browser-profile
       OUTRUN_REWORK_POLL_SECONDS: "${OUTRUN_REWORK_POLL_SECONDS:-600}"
       OUTRUN_GITHUB_CONTENTS_TOKEN: "${OUTRUN_GITHUB_CONTENTS_TOKEN:-}"
       OUTRUN_REWORK_VNC_PASSWORD: "${OUTRUN_REWORK_VNC_PASSWORD:-}"
@@ -65,6 +66,7 @@ services:
     volumes:
       - outrun_chat_localization_recovery_data:/data
       - outrun_chat_localization_recovery_logs:/logs
+      - outrun_chat_browser_profile_clean_v2:/browser-profile
     ports:
       - "${OUTRUN_REWORK_VNC_BIND:-6084}:6080"
     healthcheck:
@@ -80,3 +82,5 @@ volumes:
     name: outrun_chat_localization_recovery_data
   outrun_chat_localization_recovery_logs:
     name: outrun_chat_localization_recovery_logs
+  outrun_chat_browser_profile_clean_v2:
+    name: outrun_chat_browser_profile_clean_v2
