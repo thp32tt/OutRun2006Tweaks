@@ -109,7 +109,7 @@ class HourlyDX11Recovery(unittest.TestCase):
         class Context:
             async def new_page(self): return NewPage()
         env = {
-            "BrowserContext": object, "Page": object, "asyncio": asyncio,
+            "BrowserContext": object, "Page": object, "Slot": object, "asyncio": asyncio,
             "slot_project_home": lambda name: "https://chatgpt.com/g/g-p-new-model2/project",
             "log": SimpleNamespace(warning=lambda *args: None)
         }
