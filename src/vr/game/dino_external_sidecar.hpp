@@ -108,6 +108,6 @@ struct Gate {
 };
 inline bool Eligible(const Gate& g) noexcept {
     return g.optIn&&g.vr&&g.seat&&g.gameplay&&g.stereo&&g.playerDraw&&
-           g.deviceReady&&!g.stateRecording&&g.carKind==0;
+           g.deviceReady&&!g.stateRecording&&g.carKind==1;
 }
 } // OutRunVR::DinoSidecar
