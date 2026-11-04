@@ -7,6 +7,11 @@ on:
       - ".github/workflows/outrun-ab-multi-atlas-safety-tests.yml"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/hd_rework_queue.py"
+      - "tools/localization/hd_qa_queue_refill.py"
+      - "tools/localization/publish_hd_rework_queue.py"
+      - "tools/localization/test_hd_rework_queue.py"
+      - "tools/localization/test_hd_c1_overrides.py"
       - "tools/localization/test_hd_strict_qa.py"
       - "tools/localization/test_github_ab_imagegen_atlas_batch.py"
 
@@ -29,6 +34,11 @@ jobs:
           sparse-checkout: |
             tools/localization/github_ab_imagegen_atlas_batch.py
             tools/localization/hd_strict_qa.py
+            tools/localization/hd_rework_queue.py
+            tools/localization/hd_qa_queue_refill.py
+            tools/localization/publish_hd_rework_queue.py
+            tools/localization/test_hd_rework_queue.py
+            tools/localization/test_hd_c1_overrides.py
             tools/localization/test_hd_strict_qa.py
             tools/localization/test_github_ab_imagegen_atlas_batch.py
       - uses: actions/setup-python@v5
@@ -40,3 +50,5 @@ jobs:
         run: |
           python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
           python -m unittest discover -s tools/localization -p test_hd_strict_qa.py -v
+          python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
+          python -m unittest discover -s tools/localization -p test_hd_c1_overrides.py -v
