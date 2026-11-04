@@ -17,6 +17,7 @@ on:
       - "tools/localization/test_hd_strict_qa.py"
       - "tools/localization/test_github_ab_imagegen_atlas_batch.py"
       - "localization/automation_inputs/candidate_outputs/**"
+      - "localization/automation_inputs/qa_rework/approved/**"
       - "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
       - "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/**"
 
@@ -48,6 +49,7 @@ jobs:
             tools/localization/test_hd_strict_qa.py
             tools/localization/test_github_ab_imagegen_atlas_batch.py
             localization/automation_inputs/candidate_outputs
+            localization/automation_inputs/qa_rework/approved
             localization/automation_inputs/hd_original_png_source_plan.json
             localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
             localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
