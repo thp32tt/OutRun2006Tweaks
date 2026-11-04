@@ -236,7 +236,7 @@ def c1_decision_from_text(body, task_id, source_sha, candidate_sha):
     if not isinstance(body,str) or len(body)>20000:
         return None
     matches=[]
-    for raw in re.findall(r"\\{[^{}]{50,4000}\\}",body):
+    for raw in re.findall(r"\{[^{}]{50,4000}\}",body):
         try:
             decision=json.loads(raw)
         except ValueError:
