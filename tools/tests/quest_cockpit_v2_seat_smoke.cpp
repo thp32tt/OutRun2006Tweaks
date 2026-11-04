@@ -39,6 +39,30 @@ int main(){
     assert(!NativeStereoEye(origin,worldHead,
         {{0.f,0.f,0.f,1.f},{std::numeric_limits<float>::quiet_NaN(),0,0}},
         invalidNative));
+    // Nontrivial binocular XR test: the original source applies one
+    // inverse-yaw origin to both eyes, preserving their physical eye
+    // separation and head-local rotational relationship. Equal camera
+    // source YZ additions must never move either OpenXR eye pose.
+    NativePose pitchedHead{
+        {0.10f,0.20f,-0.12f,0.968f},
+        {4.5f,1.4f,-2.7f}};
+    NativePose pitchedOrigin{};
+    assert(NativeYawOrigin(pitchedHead,pitchedOrigin));
+    NativePose left2{},right2{};
+    assert(NativeStereoEye(pitchedOrigin,pitchedHead,
+        {{0.f,0.012f,0.f,0.999928f},{-.031f,0.002f,0.004f}},
+        left2));
+    assert(NativeStereoEye(pitchedOrigin,pitchedHead,
+        {{0.f,-.012f,0.f,0.999928f},{.031f,-0.002f,0.004f}},
+        right2));
+    const float sepX=right2.p.x-left2.p.x;
+    const float sepY=right2.p.y-left2.p.y;
+    const float sepZ=right2.p.z-left2.p.z;
+    assert(std::fabs(std::sqrt(sepX*sepX+sepY*sepY+sepZ*sepZ)
+                     -std::sqrt(.062f*.062f+.004f*.004f))<1.e-4f);
+    NativePose invalidEye{};
+    assert(!NativeStereoEye(pitchedOrigin,pitchedHead,
+        {{0.f,0.f,0.f,1.f},{0.f,INFINITY,0.f}},invalidEye));
     std::array<std::uint8_t,30u*36u> table{};
     for(int i=0;i<30;++i){
         const float v[3]{float((i%15)*-0.01f-0.35f),

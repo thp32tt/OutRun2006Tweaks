@@ -143,15 +143,15 @@ namespace Settings
     Setting<bool> VRQuestCockpitV2Enabled{ "VR", "QuestCockpitV2Enabled", false,
         "EXPERIMENTAL Quest mode1 car camera + 30-car native VR seat profile; opt-in only; restart required." };
     Setting<bool> VRQuestCockpitV2ApkNativeCamera{ "VR", "QuestCockpitV2ApkNativeCamera", true,
-        "Use original Quest 2E17F4 source +0.32 Y/+0.55 Z, once before native mode1 swing/blend. Ignores old manual F11 seat offsets while enabled. OFF = legacy manual A/B." };
+        "Quest mode1 guest XYZ after original ARM64 captured-profile Y+0.32/Z+0.55, applied once before mode1 swing/blend. HMD tracking and eye views remain separate; hardware parity is not yet verified. OFF = manual seat A/B." };
     Setting<bool> VRQuestCockpitV2NativeSeatProfile{ "VR", "QuestCockpitV2NativeSeatProfile", true,
-        "Quest 30-model camera XYZ source inserted before original swing/blend/ground. ApkNativeCamera=true applies source-exact ARM64 +0.32 Y / +0.55 Z and ignores F11 manual tuning." };
+        "Original Quest 30-car selected guest profile and captured Y+0.32/Z+0.55 input before native mode1 swing/blend/ground. In APK mode ignore manual F11 seat tuning; Quest HMD runtime proof is still required." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
     Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.f,
         "Legacy manual seat depth, used ONLY when ApkNativeCamera=false; original Quest source ignores saved F11 manual values.",Range<float>{-1.2f,1.2f} };
     Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.f,
-        "Legacy manual seat height, used ONLY when ApkNativeCamera=false. Original Quest mode applies +0.32 Y/+0.55 Z before the camera.",Range<float>{-1.0f,0.8f} };
+        "Manual seat height, ONLY when ApkNativeCamera=false. APK mode uses original per-model guest captured XYZ and the source-specific Y+0.32/Z+0.55 step.",Range<float>{-1.0f,0.8f} };
     Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
         "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,

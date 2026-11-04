@@ -1,8 +1,10 @@
 // Source-parity translation of original Quest XrRig::locate at ARM64
 // 0x2D69C8..0x2D6C08. Recenter yaw comes from xrLocateSpace; each
 // xrLocateViews eye is composed with inverse(yawOrigin).
-// This function does NOT use the +0.32/+0.55/+0.04 virtual-wheel/controller
-// pivot. Those belong to run_game::$_2 and the separate camera-source input.
+// This function does NOT re-add the Quest captured-profile +0.32Y/+0.55Z,
+// nor the additional +0.04 angular term in run_game::$_2's later view-matrix
+// branch. Those belong to the original guest camera/angle source pipeline,
+// not as an extra translation on every tracked OpenXR eye.
 // No XR handles, game memory writes, or allocations; pure C++17.
 #pragma once
 #include "quest_cockpit_v2_seat.hpp"
