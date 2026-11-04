@@ -7,6 +7,7 @@ on:
       - ".github/workflows/outrun-ab-multi-atlas-safety-tests.yml"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/hd_existing_candidate_salvage.py"
       - "tools/localization/hd_rework_queue.py"
       - "tools/localization/hd_qa_queue_refill.py"
       - "tools/localization/publish_hd_rework_queue.py"
@@ -34,6 +35,7 @@ jobs:
           sparse-checkout: |
             tools/localization/github_ab_imagegen_atlas_batch.py
             tools/localization/hd_strict_qa.py
+            tools/localization/hd_existing_candidate_salvage.py
             tools/localization/hd_rework_queue.py
             tools/localization/hd_qa_queue_refill.py
             tools/localization/publish_hd_rework_queue.py
