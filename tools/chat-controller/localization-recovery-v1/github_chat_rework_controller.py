@@ -405,3 +405,175 @@ class ChatBridge:
             "candidate_dimensions":dimensions,"candidate_gh_path":rel,
             "candidate_status":"IMAGEGEN_BLOB_SAVED_PENDING_C1"})
         return "C1_READY"
+
+
+    async def submit_c1(self,state):
+        task=state["task"]
+        candidate_sha=state.get("candidate_sha256","")
+        if not HASH.fullmatch(candidate_sha):
+            raise ValueError("C1_CANDIDATE_HASH_MISSING")
+        pg=await self.page("C1")
+        if pg is None:
+            return "HOLD_C1_LOGIN_REQUIRED"
+        source=await asyncio.to_thread(stage_source_ref,self.gh,task)
+        rel=state["candidate_gh_path"]
+        if rel!=QROOT+"/candidates/"+task["task_id"]+".png":
+            raise ValueError("C1_CANDIDATE_PATH_CHANGED")
+        png,_=await asyncio.to_thread(self.gh.read,rel,QUEUE_BRANCH)
+        if png is None or hashlib.sha256(png).hexdigest()!=candidate_sha:
+            raise ValueError("C1_CANDIDATE_FILE_HASH_CHANGED")
+        local=ROOT/"c1_candidates"/(task["task_id"]+"_HANGUL.png")
+        local.parent.mkdir(parents=True,exist_ok=True)
+        if local.is_file() and local.read_bytes()!=png:
+            raise ValueError("C1_LOCAL_CANDIDATE_CONFLICT")
+        local.write_bytes(png)
+        prompt=(
+            "OutRun 2006 한글화 C1 독립 시각 QA입니다. A/B 제작자가 아닙니다.\n"
+            "첨부 1은 원본 HD DDS에서 읽는 방향으로 추출한 영문, 첨부 2는 생성된 한글입니다.\n"
+            "원문 영문: "+task["english"]+"\n정확한 번역: "+task["korean"]+
+            "\n원본 HD 네이티브 글자 크기·기울기·줄 수, 원문 제거/CLEAN 복원 가능성,"
+            " 영문 잔상, 다른 UI 침범, 한글 맞춤법·깨짐을 검사하세요."
+            "\n텍스트가 원본 크기보다 크거나 줄 수가 다르거나, 원문 위에 단순 덧쓴 듯하면 REWORK_REQUIRED."
+            "\n불투명 배경을 복원할 독립 CLEAN 마스크 증거가 없으면 HOLD_EVIDENCE."
+            "\n실게임 승인/최종 C3 PASS를 주장하지 마세요."
+            "\n응답은 JSON 객체 한 개로만 작성하세요. 필드는"
+            " task_id,source_dds_sha256,candidate_sha256,decision,reason 입니다."
+            "\n결정값은 PASS_PROVISIONAL,REWORK_REQUIRED,HOLD_EVIDENCE 중 하나이며"
+            " PASS_PROVISIONAL도 기계적 DDS·C3·인게임 검수 전 승인 아님."
+            "\ntask_id: "+task["task_id"]+
+            "\nsource_dds_sha256: "+task["source_dds_sha256"]+
+            "\ncandidate_sha256: "+candidate_sha)
+        outcome=await self.send_with_png(pg,task,prompt,[source,local],False)
+        if outcome!="CHAT_SENT_VERIFIED":
+            await asyncio.to_thread(stage_state,self.gh,task,"HOLD",{
+                "hold_reason":outcome,"candidate_sha256":candidate_sha})
+            return outcome
+        await asyncio.to_thread(stage_state,self.gh,task,"C1_SENT",{
+            "candidate_sha256":candidate_sha,
+            "candidate_gh_path":rel,"ab_chat_url":state.get("ab_chat_url"),
+            "c1_chat_url":pg.url})
+        return "C1_SENT"
+
+    async def inspect_c1(self,state):
+        task=state["task"]
+        pg=await self.page("C1",state.get("c1_chat_url"))
+        if pg is None:
+            return "HOLD_C1_LOGIN_REQUIRED"
+        responses=await pg.locator(
+            '[data-markdown-text-tone="assistant"],[data-message-author-role="assistant"]'
+        ).all_inner_texts()
+        body="\n".join(responses[-3:])
+        candidate_sha=state["candidate_sha256"]
+        decision=c1_decision_from_text(body,task["task_id"],
+                    task["source_dds_sha256"],candidate_sha)
+        if decision is None:
+            return "WAIT_C1_EXACT_JSON"
+        if decision["decision"]!="PASS_PROVISIONAL":
+            await asyncio.to_thread(stage_state,self.gh,task,
+                 "C1_REWORK_REQUIRED" if decision["decision"]=="REWORK_REQUIRED" else "HOLD",
+                 {"hold_reason":decision["reason"],"c1_decision":decision,
+                  "candidate_sha256":candidate_sha,
+                  "c1_chat_url":pg.url})
+            return decision["decision"]
+        rel=QROOT+"/candidates/"+task["task_id"]+".png"
+        png,_=await asyncio.to_thread(self.gh.read,rel,QUEUE_BRANCH)
+        if not png or hashlib.sha256(png).hexdigest()!=candidate_sha:
+            raise ValueError("C1_APPROVAL_PNG_SHA_MISSING")
+        result=await asyncio.to_thread(publish_c1_candidate,
+              self.gh,task,decision,png)
+        await asyncio.to_thread(stage_state,self.gh,task,
+             "C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY",{
+             "c1_chat_url":pg.url,"c1_decision":decision,
+             "candidate_sha256":candidate_sha,
+             "asset_candidate":APPROVED+"/"+task["task_id"]+".png",
+             "asset_receipt":APPROVED+"/"+task["task_id"]+".json",
+             "release_approved":False})
+        return "C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY"
+
+    async def cycle(self):
+        queue,_=await asyncio.to_thread(self.gh.read_json,
+                                QROOT+"/latest.json",QUEUE_BRANCH)
+        if not isinstance(queue,dict) or queue.get("schema")!="outrun-hd-qa-chat-workqueue-v1":
+            return {"status":"HOLD_QUEUE_SCHEMA"}
+        tasks=queue.get("tasks",[])
+        if not isinstance(tasks,list) or len(tasks)>8:
+            return {"status":"HOLD_QUEUE_SIZE"}
+        submitted=[]
+        for task in tasks:
+            if not valid_task(task):
+                return {"status":"HOLD_INVALID_TASK"}
+            prior,_=await asyncio.to_thread(self.gh.read_json,
+                           task_state_path(task["task_id"]),QUEUE_BRANCH)
+            if prior:
+                continue
+            try:
+                result=await self.submit_producer(task)
+            except Exception as exc:
+                result="HOLD_"+type(exc).__name__
+            submitted.append({"task_id":task["task_id"],"result":result})
+            # Keep browser and account usage bounded: at most two sends per cycle.
+            if len(submitted)>=2:
+                break
+        progressed=[]
+        tasks_root=ROOT/"tasks"
+        for file in sorted(tasks_root.glob("HDRW-*.json"))[:120] if tasks_root.is_dir() else []:
+            try:
+                entry=json.loads(file.read_text(encoding="utf-8"))
+                if not valid_task(entry.get("task",{})):
+                    continue
+                task=entry["task"]
+                updated,_=await asyncio.to_thread(self.gh.read_json,
+                                  task_state_path(task["task_id"]),QUEUE_BRANCH)
+                if updated is None:
+                    continue
+                status=updated.get("status")
+                if status=="AB_SENT":
+                    result=await self.collect_producer(updated)
+                elif status=="C1_READY":
+                    result=await self.submit_c1(updated)
+                elif status=="C1_SENT":
+                    result=await self.inspect_c1(updated)
+                else:
+                    continue
+                progressed.append({"task_id":task["task_id"],"status":result})
+                if len(progressed)>=3:
+                    break
+            except Exception as exc:
+                progressed.append({"error_type":type(exc).__name__})
+                if len(progressed)>=3:
+                    break
+        return {"status":"CYCLE_OK","active_queue":len(tasks),
+                "sent":submitted,"processed":progressed,
+                "release_approved":False}
+
+    async def close(self):
+        if self.context:
+            await self.context.close()
+
+
+async def run_forever():
+    if not 120<=POLL<=3600:
+        raise ValueError("OUTRUN_REWORK_POLL_SECONDS_OUT_OF_BOUNDS")
+    check_project_url(PROJECT_URL)
+    if not TOKEN:
+        raise ValueError("OUTRUN_GITHUB_CONTENTS_TOKEN_REQUIRED")
+    ROOT.mkdir(parents=True,exist_ok=True)
+    gh=Github(TOKEN)
+    async with async_playwright() as playwright:
+        bridge=ChatBridge(gh,playwright)
+        try:
+            while True:
+                try:
+                    result=await bridge.cycle()
+                except Exception as exc:
+                    # Fail closed without exposing token or page content.
+                    result={"status":"HOLD_RETRY","error_type":type(exc).__name__}
+                result["checked_utc"]=utc()
+                print(json.dumps(result,ensure_ascii=False,sort_keys=True),flush=True)
+                await asyncio.sleep(POLL)
+        finally:
+            await bridge.close()
+
+
+if __name__=="__main__":
+    asyncio.run(run_forever())
