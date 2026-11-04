@@ -126,7 +126,7 @@ def safe_hd_reference(root, row, plan, output):
     }
 
 
-def build_queue(root, report, out_dir):
+def build_queue(root, report, out_dir, skip_state_root=None):
     root = Path(root).resolve()
     out_dir = Path(out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -137,6 +137,18 @@ def build_queue(root, report, out_dir):
     ordered = [(by_id[rid],reason) for rid,reason in holds.items()
                if category(reason) == "AB_IMAGE_AND_CLEAN_REWORK" and rid in by_id]
     ordered.sort(key=lambda item: priority(*item))
+    skip_ids=set()
+    if skip_state_root:
+        state_root=Path(skip_state_root)
+        if state_root.is_dir():
+            for path in state_root.glob("HDRW-*.json"):
+                if not re.fullmatch(r"HDRW-[AB]-[0-9a-f]{20}\.json",path.name):
+                    continue
+                if path.stat().st_size>40000:
+                    raise ValueError("OVERSIZE_REWORK_STATE")
+                state=json.loads(path.read_text(encoding="utf-8"))
+                if state.get("task_id")==path.stem and state.get("status") not in (None,""):
+                    skip_ids.add(path.stem)
     selected = []
     eligible = Counter()
     selected_counts = Counter()
@@ -156,6 +168,8 @@ def build_queue(root, report, out_dir):
             current_sha+"|"+reason
         ).encode()).hexdigest()[:20]
         task_id = ("HDRW-" + role + "-" + digest)
+        if task_id in skip_ids:
+            continue
         img_name = task_id + "_HD_SOURCE.png"
         img_path = out_dir / img_name
         try:
@@ -186,6 +200,7 @@ def build_queue(root, report, out_dir):
         "schema": "outrun-hd-qa-chat-workqueue-v1",
         "policy": POLICY,
         "source_asset_sha256": report.get("zip_sha256",""),
+        "previously_claimed_ticket_count":len(skip_ids),
         "qa_report_schema": report["schema"],
         "release_approved": False,
         "runtime_validation": "UNTESTED",
@@ -207,8 +222,9 @@ if __name__ == "__main__":
     ap.add_argument("--repo-root",default=".")
     ap.add_argument("--qa-report",required=True)
     ap.add_argument("--out",required=True)
+    ap.add_argument("--skip-state-root",default=None)
     args=ap.parse_args()
     print(json.dumps({k:v for k,v in build_queue(
         args.repo_root,json.loads(Path(args.qa_report).read_text(encoding="utf-8")),
-        args.out).items() if k in ("hold_count","hold_categories","ab_eligible_counts","reference_blockers")},
+        args.out,args.skip_state_root).items() if k in ("hold_count","hold_categories","ab_eligible_counts","reference_blockers")},
         ensure_ascii=False))
