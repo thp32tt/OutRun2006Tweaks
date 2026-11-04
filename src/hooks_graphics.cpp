@@ -626,31 +626,39 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
            !std::isfinite(cameraY))return;
         static const EVWORK_CAR* lastPlayer=nullptr;
         static float lastB0Y=0.f,lastF0Y=0.f,lastCameraY=0.f;
+        static float lastRelativeY=0.f;
         static float maxB0Delta=0.f,maxF0Delta=0.f,maxCameraDelta=0.f;
+        static float maxRelativeDelta=0.f;
         static unsigned observations=0;
         if(lastPlayer!=player) {
             lastPlayer=player;observations=0;
-            maxB0Delta=maxF0Delta=maxCameraDelta=0.f;
+            maxB0Delta=maxF0Delta=maxCameraDelta=maxRelativeDelta=0.f;
             lastB0Y=b0Y;lastF0Y=f0Y;lastCameraY=cameraY;
+            lastRelativeY=b0Y-cameraY;
         }
         const float b0Delta=std::fabs(b0Y-lastB0Y);
         const float f0Delta=std::fabs(f0Y-lastF0Y);
         const float cameraDelta=std::fabs(cameraY-lastCameraY);
+        const float relativeY=b0Y-cameraY;
+        const float relativeDelta=std::fabs(relativeY-lastRelativeY);
+        if(relativeDelta>maxRelativeDelta)maxRelativeDelta=relativeDelta;
         if(b0Delta>maxB0Delta)maxB0Delta=b0Delta;
         if(f0Delta>maxF0Delta)maxF0Delta=f0Delta;
         if(cameraDelta>maxCameraDelta)maxCameraDelta=cameraDelta;
         lastB0Y=b0Y;lastF0Y=f0Y;lastCameraY=cameraY;
+        lastRelativeY=relativeY;
         if(++observations==90u) {
             spdlog::info(
                 "VR CAR MOTION PROBE: samples=90 maxDeltaB0Y={:.5f} "
                 "maxDeltaF0Y={:.5f} maxDeltaCameraY={:.5f} "
+                "maxDeltaCarMinusCameraY={:.5f} "
                 "currentB0Y={:.5f} currentF0Y={:.5f} currentCameraY={:.5f} "
                 "f0RenderScope={} (render-only source, not tire physics)",
-                maxB0Delta,maxF0Delta,maxCameraDelta,
+                maxB0Delta,maxF0Delta,maxCameraDelta,maxRelativeDelta,
                 b0Y,f0Y,cameraY,
                 Settings::VRQuestCockpitV2F0RenderScope.get());
             observations=0;
-            maxB0Delta=maxF0Delta=maxCameraDelta=0.f;
+            maxB0Delta=maxF0Delta=maxCameraDelta=maxRelativeDelta=0.f;
         }
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
