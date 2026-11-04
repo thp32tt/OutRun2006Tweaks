@@ -8,7 +8,7 @@
   "lane": "DX11",
   "target_repo": "thp32tt/OutRun2006Tweaks",
   "target_branch": "vr-dx11-native-r71",
-  "feature_id": null,
+  "feature_id": "DX11:AUTHENTIC_FVF_FULLY_CLIPPED_DRAW_ORDINAL_AND_RAW_GPU_BUDGET",
   "feature_work_key": "DX11:AUTHENTIC_FVF_FULLY_CLIPPED_DRAW_ORDINAL_AND_RAW_GPU_BUDGET",
   "classification": "A_REAL_SOURCE_DEFECT_IN_UNFINISHED_FULL_NATIVE_GAME_FRAME",
   "status": "COMPLETE_BUILD_VERIFIED",
@@ -72,7 +72,7 @@
     "activation_guard_and_fallback": "Do not fabricate native GPU pixels for clipped Draws or drop uncertain visible source. Keep native optimization fail-closed; original game D3D9 Draw/Present/input/FFB and DX9Ex fallback untouched."
   },
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:AUTHENTIC_FVF_FULLY_CLIPPED_DRAW_ORDINAL_AND_RAW_GPU_BUDGET",
     "goal": "Preserve authentic original-game fully clipped FVF Draw source ordinal continuity while avoiding unnecessary native GPU output/readback and retaining fail-closed fallback.",
     "acceptance_items": [
       {
