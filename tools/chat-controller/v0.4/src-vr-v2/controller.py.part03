@@ -2690,8 +2690,15 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
 
     last_sent = _parse_iso(state.get("last_sent_at"))
     send_age = (now - last_sent).total_seconds() if last_sent else None
-    hard_due = bool(send_age is not None and send_age >= MODEL2_HARD_NEW_CHAT_SECONDS)
-    if send_age is not None and send_age < MODEL2_CONTINUE_MIN_SECONDS:
+    # The hard 60m clock belongs to the CHAT, not the last 30m follow-up.
+    # Do not reset it on normal successful continuations.
+    if last_sent and not state.get("chat_started_at"):
+        state["chat_started_at"] = state["last_sent_at"]  # v7 -> v8 migration
+        save_queue_state(q)
+    chat_started = _parse_iso(state.get("chat_started_at"))
+    chat_age = (now - chat_started).total_seconds() if chat_started else None
+    hard_due = bool(chat_age is not None and chat_age >= MODEL2_HARD_NEW_CHAT_SECONDS)
+    if not hard_due and send_age is not None and send_age < MODEL2_CONTINUE_MIN_SECONDS:
         return False
     if not pending and send_age is None:
         return False
@@ -2829,6 +2836,9 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
     slot.watchdog_resumes_since_schedule = 0
     save_registry(reg)
     state["last_sent_at"] = sent_at.isoformat()
+    # Only an actual NEW conversation resets the hard 60m chat lifetime.
+    if bootstrap or hard_due or not state.get("chat_started_at"):
+        state["chat_started_at"] = sent_at.isoformat()
     state["bootstrap_complete"] = True
     if hard_due:
         state["hard_rotation_sent_total"] = int(state.get("hard_rotation_sent_total") or 0) + 1
