@@ -107,9 +107,9 @@ PY
   # Chrome for Testing 153's network-service sandbox can conflict with
   # restricted Docker capabilities. This narrowly-scoped workaround is temporary;
   # keep Docker's no-new-privileges, cap_drop and loopback-only CDP unchanged.
-  "$chrome" --no-sandbox --disable-gpu \\
-    --disable-features=NetworkServiceSandbox \\
-    --no-first-run --no-default-browser-check --password-store=basic \\
+  "$chrome" --no-sandbox --disable-gpu \
+    --disable-features=NetworkServiceSandbox \
+    --no-first-run --no-default-browser-check --password-store=basic \
     --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 \
     --user-data-dir=/data/hd-rework/browser-rework-profile \
     --new-window "https://chatgpt.com/" \
