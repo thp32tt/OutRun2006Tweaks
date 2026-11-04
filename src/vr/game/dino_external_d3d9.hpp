@@ -30,19 +30,22 @@ class GpuOwner final {
     IDirect3DTexture9* textures_[Materials]{};
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
-    static bool ReadFile(const wchar_t* path,std::vector<std::uint8_t>& out) noexcept {
+    static bool ReadFile(const wchar_t* path,std::vector<std::uint8_t>& out) {
         HANDLE f=CreateFileW(path,GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,
                             FILE_ATTRIBUTE_NORMAL,nullptr);
         if(f==INVALID_HANDLE_VALUE)return false;
+        struct FileHandleGuard final {
+            HANDLE handle;
+            ~FileHandleGuard() noexcept {CloseHandle(handle);}
+        } guard{f};
         LARGE_INTEGER size{};
         const bool ok=GetFileSizeEx(f,&size)!=FALSE &&
                       size.QuadPart>=36 && size.QuadPart<=8ll*1024*1024;
-        if(!ok){CloseHandle(f);return false;}
+        if(!ok)return false;
         std::vector<std::uint8_t> b(static_cast<std::size_t>(size.QuadPart));
         DWORD got=0;
         const bool read=::ReadFile(f,b.data(),static_cast<DWORD>(b.size()),&got,nullptr)!=FALSE &&
                         got==b.size();
-        CloseHandle(f);
         if(!read)return false;
         out=std::move(b);
         return true;
@@ -64,6 +67,9 @@ class GpuOwner final {
             const unsigned row=blocks*8u;
             D3DLOCKED_RECT lock{};
             if(FAILED(staging->LockRect(mip,&lock,nullptr,0))) {staging->Release();return false;}
+            if(!lock.pBits || lock.Pitch < static_cast<INT>(row)) {
+                staging->UnlockRect(mip);staging->Release();return false;
+            }
             for(unsigned y=0;y<blocks;++y) {
                 std::memcpy(static_cast<std::uint8_t*>(lock.pBits)+
                             std::size_t(lock.Pitch)*y,dds+pos+std::size_t(row)*y,row);
@@ -90,7 +96,7 @@ class GpuOwner final {
         for(auto& texture:textures_) {if(texture)texture->Release();texture=nullptr;}
         owner_=nullptr;
     }
-    bool EnsureLoaded() noexcept {
+    bool EnsureLoaded() {
         if(loadAttempted_)return loaded_;
         loadAttempted_=true;
         wchar_t path[MAX_PATH]{};
@@ -111,11 +117,14 @@ class GpuOwner final {
         loaded_=true;
         return true;
     }
-    bool EnsureGpu(IDirect3DDevice9* dev) noexcept {
+    bool EnsureGpu(IDirect3DDevice9* dev) {
         if(!dev || !EnsureLoaded())return false;
         if(owner_==dev && meshes_.size()==Groups)return true;
         ReleaseGpu();
         owner_=dev;
+        // No vector reallocations after COM allocations begin: an allocation
+        // failure must not leak the just-created VB/IB pair of a pending mesh.
+        meshes_.reserve(Groups);
         for(unsigned material=0;material<Materials;++material) {
             if(!UploadDDS(dev,cpu_.dds[material].data(),&textures_[material])) {
                 ReleaseGpu();return false;
@@ -181,14 +190,31 @@ public:
            FAILED(device->SetTransform(D3DTS_PROJECTION,&projection)) ||
            FAILED(device->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE)) ||
            FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,TRUE)) ||
+           FAILED(device->SetRenderState(D3DRS_ZFUNC,D3DCMP_LESSEQUAL)) ||
            FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE)) ||
+           FAILED(device->SetRenderState(D3DRS_ALPHATESTENABLE,FALSE)) ||
+           FAILED(device->SetRenderState(D3DRS_STENCILENABLE,FALSE)) ||
+           FAILED(device->SetRenderState(D3DRS_FOGENABLE,FALSE)) ||
+           FAILED(device->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE)) ||
+           FAILED(device->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE)) ||
            FAILED(device->SetRenderState(D3DRS_LIGHTING,FALSE)) ||
+           FAILED(device->SetRenderState(D3DRS_COLORWRITEENABLE,
+                  D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
+                  D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA)) ||
            FAILED(device->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_SELECTARG1)) ||
            FAILED(device->SetTextureStageState(0,D3DTSS_COLORARG1,D3DTA_TEXTURE)) ||
            FAILED(device->SetTextureStageState(0,D3DTSS_ALPHAOP,D3DTOP_SELECTARG1)) ||
            FAILED(device->SetTextureStageState(0,D3DTSS_ALPHAARG1,D3DTA_TEXTURE)) ||
+           FAILED(device->SetTextureStageState(0,D3DTSS_TEXCOORDINDEX,0)) ||
+           FAILED(device->SetTextureStageState(0,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE)) ||
+           // A native car or sky shader may have enabled stages 1..7.
+           // Stop the cascade explicitly after our textured stage 0.
+           FAILED(device->SetTextureStageState(1,D3DTSS_COLOROP,D3DTOP_DISABLE)) ||
+           FAILED(device->SetSamplerState(0,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
+           FAILED(device->SetSamplerState(0,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
            FAILED(device->SetSamplerState(0,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)))
+           FAILED(device->SetSamplerState(0,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
+           FAILED(device->SetSamplerState(0,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)))
             hr=E_FAIL;
         if(SUCCEEDED(hr))for(const auto& m:meshes_) {
             if(FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||

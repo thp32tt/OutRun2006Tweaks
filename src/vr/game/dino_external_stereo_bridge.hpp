@@ -73,11 +73,24 @@ inline bool TryDrawTwoEyes(IDirect3DDevice9* device,const D3DMATRIX& carWorld,
         originalRt->Release();
         return false;
     }
+    // One real cockpit pair per Present, even if the native player body runs
+    // multiple opaque passes. Count only a fully admitted original RT owner.
+    static thread_local std::uint64_t lastSubmittedEpoch=~std::uint64_t{0};
+    static thread_local IDirect3DDevice9* lastSubmittedDevice=nullptr;
+    if(lastSubmittedDevice==device && lastSubmittedEpoch==snapshot.presentEpoch) {
+        originalDepth->Release();originalRt->Release();return false;
+    }
+    lastSubmittedDevice=device;
+    lastSubmittedEpoch=snapshot.presentEpoch;
     bool good=false;
     {
         // Bypass R33 physical Draw hooks for each explicit sidecar eye:
         // the sidecar itself changes target and eye view/projection.
         ScopedInternal internal;
+        // Match the native R33 stereo accounting. The sidecar changes the
+        // current game depth and cannot be advertised as a pristine mono copy.
+        OutRunVRStereo::R29OwnerNoteStereoDrawWithoutMonoBackup();
+        OutRunVRStereo::R29OwnerNoteMainDepthContentWrite();
         const HRESULT left=Gpu().DrawEye(device,world,views[0],projections[0]);
         HRESULT right=E_FAIL;
         if(SUCCEEDED(left)) {
