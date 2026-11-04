@@ -158,9 +158,25 @@ int main() {
     assert(!game_fvf_clipped_point_vertices(
         source,nullptr,3u,4u,1u,1u,3u,lerp,clipped));
     assert(clipped.size()==original.size());
+    // Valid D3D9 WVP camera-plane corner: the full polygon must clip to
+    // positive-W GPU points rather than lose an authentic game source Draw.
     source[0].clip[3]=0.f;
+    assert(game_fvf_clipped_point_vertices(
+        source,nullptr,3u,4u,1u,0u,64u,lerp,clipped));
+    assert(clipped.size()>=3u);
+    for(const auto& v:clipped) assert(v.clip[3]>0.f);
+    const auto cameraPlanePoints=clipped;
+    // An all-zero homogeneous coordinate has no projectable direction;
+    // failing that source leaves previous native IA points untouched.
+    source[0].clip[0]=0.f;
+    source[0].clip[1]=0.f;
+    source[0].clip[2]=0.f;
     assert(!game_fvf_clipped_point_vertices(
         source,nullptr,3u,4u,1u,0u,64u,lerp,clipped));
+    assert(clipped.size()==cameraPlanePoints.size());
+    source[0].clip[0]=-.5f;
+    source[0].clip[1]=-.5f;
+    source[0].clip[2]=.5f;
     source[0].clip[3]=1.f;
     // Back-facing partially clipped source triangles are eliminated by the
     // real D3D9 cull stage; following fully-visible faces still get points.
