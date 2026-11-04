@@ -19,6 +19,7 @@
 #include "live_game_sm3_connected_submission.hpp"
 #include "live_game_sm3_polygon_raster.hpp"
 #include "live_game_fvf_polygon_windows.hpp"
+#include "live_game_fvf_point_cull.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
@@ -3079,11 +3080,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             cullMode, static_cast<std::uint32_t>(topology), admittedCull))
         return false;
     output.nativeCullMode = admittedCull.d3d9Mode;
-    // A point-filled triangle is generated as individual 1-pixel vertices.
-    // Face culling has no corresponding D3D11 POINTLIST primitive, so source
-    // culling must be disabled before its draw is promoted.
-    if (output.nativePointFill && output.nativeCullMode != D3DCULL_NONE)
-        return false;
+    // D3D11 POINTLIST cannot apply triangle culling. submit() now lowers
+    // fully source-validated, non-clipped FVF triangles after authentic D3D9
+    // winding/cull filtering. Unknown clip/IA remains original D3D9-owned.
     // Mirror only one isolated game-authored Z draw. The newly cleared DSV
     // omits earlier D3D9 occluders: this is diagnostic, NOT scene parity.
     // W-buffering, depth-bias and missing depth fail closed; depth-read-only
@@ -7692,7 +7691,26 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // oversized/invalid late IB entries and preserve the original D3D9 Draw.
     std::vector<std::uint32_t> pointIndices;
     if (output.nativePointFill) {
-        if (topology == D3DPT_TRIANGLESTRIP) {
+        if (output.nativeCullMode != D3DCULL_NONE) {
+            // Real D3D9 D3DFILL_POINT culls TRIANGLES before emitting 1px
+            // vertex occurrences. D3D11 POINTLIST skips face culling, so
+            // filter source front/back winding before any native GPU write.
+            // Unknown clipped triangles must stay on original D3D9.
+            if (vertices.size() >
+                    (std::numeric_limits<UINT>::max)() ||
+                !game_fvf_culled_point_indices(
+                    vertices.empty() ? nullptr : vertices.front().clip,
+                    sizeof(NativeVertex), static_cast<UINT>(vertices.size()),
+                    indices, indices ? indexCount :
+                        static_cast<UINT>(vertices.size()),
+                    static_cast<std::uint32_t>(topology),
+                    static_cast<std::uint32_t>(output.nativeCullMode),
+                    offsetof(NativeVertex, clip0),
+                    output.nativeFvfUserClipMask, kMaxIndices, pointIndices))
+                return false;
+            indices = pointIndices.data();
+            indexCount = static_cast<UINT>(pointIndices.size());
+        } else if (topology == D3DPT_TRIANGLESTRIP) {
             const UINT sourceCount = indices ? indexCount :
                 static_cast<UINT>(vertices.size());
             if (!game_sm3_expand_polygon_points(
