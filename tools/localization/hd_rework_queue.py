@@ -17,7 +17,7 @@ import github_ab_imagegen_atlas_batch as atlas
 POLICY = "hd-strict-chat-rework-v1-20261104"
 MAX_ACTIVE = 8
 MAX_PER_ROLE = 4
-MAX_REF_BYTES = 4 * 1024 * 1024
+MAX_REF_BYTES = 650 * 1024
 MAX_REF_SIDE = 4096
 REGEN_REASONS = (
     "QA_CANDIDATE", "CANDIDATE_", "QA_ORIGINAL_LINE_COUNT",
@@ -116,7 +116,7 @@ def safe_hd_reference(root, row, plan, output):
     ref.save(b, "PNG", optimize=True)
     data = b.getvalue()
     if len(data) > MAX_REF_BYTES:
-        raise ValueError("REF_HD_CROP_OVER_4MB")
+        raise ValueError("REF_HD_CROP_OVER_GITHUB_CONTENTS_LIMIT")
     output.write_bytes(data)
     return {
         "width": width, "height": height, "source_native_size": [im.width,im.height],
