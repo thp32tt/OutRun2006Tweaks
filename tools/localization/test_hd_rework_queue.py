@@ -24,6 +24,8 @@ class QueueSafety(unittest.TestCase):
   self.assertEqual(len(g),1)
   self.assertEqual(q.category(h["Q044_bbbbbbbbbbbbbbbb"]),"AB_IMAGE_AND_CLEAN_REWORK")
   self.assertEqual(q.category(h["Q044_cccccccccccccccc"]),"ENGINE_OR_COORDINATE_HOLD")
+  self.assertEqual(q.category("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE"),"ENGINE_OR_COORDINATE_HOLD")
+  self.assertEqual(q.category("QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED"),"AB_IMAGE_AND_CLEAN_REWORK")
  def test_no_fake_pass(self):
   x=self.sample()
   x["generated"][0]["holds"][0]["roi_id"]="Q200_aaaaaaaaaaaaaaaa"
