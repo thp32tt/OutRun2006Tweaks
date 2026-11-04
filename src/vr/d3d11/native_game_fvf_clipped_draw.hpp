@@ -24,7 +24,8 @@ struct NativeRawFvfScissorClip {
 [[nodiscard]] inline bool native_game_fvf_fully_clipped_draw(
     NativeRawFvfClipSpan source,
     bool depthClipEnable = true,
-    const NativeRawFvfScissorClip* scissor = nullptr) noexcept {
+    const NativeRawFvfScissorClip* scissor = nullptr,
+    const NativeRawFvfRaster* nativeRaster = nullptr) noexcept {
     if (!source.firstClip || source.vertexStride < 4u * sizeof(float) ||
         source.vertexStride > 4096u || source.count == 0u ||
         source.count > 1048576u ||
@@ -160,6 +161,53 @@ struct NativeRawFvfScissorClip {
                     if (!(source.clipDistanceMask & (1u << p))) continue;
                     if (!std::isfinite(user[p])) return false;
                     d[p + 7u] = user[p];
+                }
+            }
+        }
+        // 01234: an original D3D9 FVF source Draw is also pixel-neutral
+        // when every authentic triangle is fully backface-culled by the
+        // bound D3D11 RS. Only wholly inside positive-W triangles qualify:
+        // clipping, eye-plane crossings and degenerate winding keep the real
+        // GPU Draw/DrawIndexed and the existing D3D9 fallback.
+        if (nativeRaster && nativeRaster->cull != NativeRawFvfCull::None &&
+            corners == 3u &&
+            (source.assembly == NativeRawFvfAssembly::TriangleList ||
+             source.assembly == NativeRawFvfAssembly::TriangleStrip ||
+             source.assembly == NativeRawFvfAssembly::TriangleFan)) {
+            bool inside = true;
+            for (unsigned c = 0u; c < 3u && inside; ++c) {
+                const auto& d = distances[c];
+                if (!(d[6] > 0.0)) { inside = false; break; }
+                for (unsigned p = 0u; p < (scissor ? 17u : 13u); ++p) {
+                    if ((!depthClipEnable && (p == 4u || p == 5u)) ||
+                        (p >= 7u && p < 13u &&
+                         !(source.clipDistanceMask & (1u << (p - 7u)))))
+                        continue;
+                    if (d[p] < 0.0) { inside = false; break; }
+                }
+            }
+            if (inside) {
+                std::array<double, 3u> x{}, y{};
+                for (unsigned c = 0u; c < 3u; ++c) {
+                    const auto& d = distances[c];
+                    x[c] = (d[0] - d[1]) / (2.0 * d[6]);
+                    y[c] = (d[2] - d[3]) / (2.0 * d[6]);
+                    if (!std::isfinite(x[c]) || !std::isfinite(y[c]))
+                        return false;
+                }
+                double area = (x[1] - x[0]) * (y[2] - y[0]) -
+                              (y[1] - y[0]) * (x[2] - x[0]);
+                if (!std::isfinite(area)) return false;
+                // Native triangle-strip flips two original IA corners on
+                // odd triangles; a fan always retains its zero anchor.
+                if (source.assembly == NativeRawFvfAssembly::TriangleStrip &&
+                    (primitive & 1u)) area = -area;
+                if (std::abs(area) > 1.0e-12) {
+                    const bool front = nativeRaster->frontCounterClockwise
+                        ? area > 0.0 : area < 0.0;
+                    if ((front && nativeRaster->cull == NativeRawFvfCull::Front) ||
+                        (!front && nativeRaster->cull == NativeRawFvfCull::Back))
+                        continue; // proven source-raster no-op
                 }
             }
         }

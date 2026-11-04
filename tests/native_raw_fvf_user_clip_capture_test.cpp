@@ -329,6 +329,78 @@ int main() {
     edgeSource.indices=nullptr;
     edgeSource.indexCount=0u;
 
+    // 01234: front/back face, indexed, strip/fan, eye-plane and lines
+    // preserve a source-authentic zero-pixel ordinal only when safe.
+    Vertex face[]{
+        {{-.7f,-.6f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .7f,-.6f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ 0.f, .7f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan faceSrc{
+        face,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    const NativeRawFvfRaster backCcw{
+        NativeRawFvfCull::Back,false,true,false};
+    const NativeRawFvfRaster backCw{
+        NativeRawFvfCull::Back,true,true,false};
+    const NativeRawFvfRaster noCull{
+        NativeRawFvfCull::None,false,true,false};
+    assert(!native_game_fvf_fully_clipped_draw(faceSrc));
+    assert(native_game_fvf_fully_clipped_draw(
+        faceSrc,true,nullptr,&backCcw));
+    assert(!native_game_fvf_fully_clipped_draw(
+        faceSrc,true,nullptr,&backCw));
+    assert(!native_game_fvf_fully_clipped_draw(
+        faceSrc,true,nullptr,&noCull));
+    const NativeRawFvfScissorClip allScissor{
+        0,0,100,100,0,0,100,100};
+    assert(native_game_fvf_fully_clipped_draw(
+        faceSrc,true,&allScissor,&backCcw));
+    const std::uint32_t reverseFace[]{0u,2u,1u};
+    faceSrc.indices=reverseFace;faceSrc.indexCount=3u;
+    assert(!native_game_fvf_fully_clipped_draw(
+        faceSrc,true,nullptr,&backCcw));
+    const std::uint32_t badFace[]{0u,2u,99u};
+    faceSrc.indices=badFace;
+    assert(!native_game_fvf_fully_clipped_draw(
+        faceSrc,true,nullptr,&backCcw));
+    faceSrc.indices=nullptr;faceSrc.indexCount=0u;
+    faceSrc.clipDistanceMask=1u;
+    face[0].user[0]=-1.f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        faceSrc,true,nullptr,&backCcw));
+    faceSrc.clipDistanceMask=0u;face[0].user[0]=1.f;
+    face[0].clip[3]=0.f;
+    assert(!native_game_fvf_fully_clipped_draw(
+        faceSrc,true,nullptr,&backCcw));
+    face[0].clip[3]=1.f;
+    Vertex quad[]{
+        {{-.7f,-.7f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .7f,-.7f,.5f,1.f},{1,1,1,1,1,1}},
+        {{-.7f, .7f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .7f, .7f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan quadSrc{
+        quad,sizeof(Vertex),4u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleStrip,offset,0u};
+    assert(native_game_fvf_fully_clipped_draw(
+        quadSrc,true,nullptr,&backCcw));
+    assert(!native_game_fvf_fully_clipped_draw(
+        quadSrc,true,nullptr,&backCw));
+    quadSrc.assembly=NativeRawFvfAssembly::TriangleFan;
+    assert(!native_game_fvf_fully_clipped_draw(
+        quadSrc,true,nullptr,&backCcw));
+    quadSrc.assembly=NativeRawFvfAssembly::LineStrip;
+    assert(!native_game_fvf_fully_clipped_draw(
+        quadSrc,true,nullptr,&backCcw));
+    live_game_frame::GameNativeFrameBatch faceBatch{};
+    assert(faceBatch.absorb_empty_source_draw(0u,true));
+    assert(faceBatch.accepts_full(1u));
+    faceBatch.succeeded(false,false);
+    faceBatch.record_source_draw(1u);
+    assert(faceBatch.submitted==1u &&
+           faceBatch.leadingEmptySourceDraws==1u);
+
     // 01232: a corner-scissored original FVF triangle can cross EACH
     // clipping plane, yet lie entirely outside their INTERSECTION.
     // A single-plane vertex test cannot prove this empty GPU Draw.

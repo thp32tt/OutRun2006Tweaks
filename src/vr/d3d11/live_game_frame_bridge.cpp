@@ -9208,6 +9208,13 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             output.nativeViewport.Width, output.nativeViewport.Height,
             output.nativeScissor.left, output.nativeScissor.top,
             output.nativeScissor.right, output.nativeScissor.bottom};
+        // Match the live D3D9 CW/CCW admission to the actual D3D11
+        // BACK-cull state used by submit(); never infer an unbound default.
+        const NativeRawFvfRaster fullFvfRaster{
+            output.nativeCullMode == D3DCULL_NONE
+                ? NativeRawFvfCull::None : NativeRawFvfCull::Back,
+            output.nativeCullMode == D3DCULL_CW,
+            true, output.nativeWireFill};
         // A real successful D3D9 FVF Draw which is wholly outside the
         // source-authentic homogeneous/user clip volume cannot change the
         // main game's color, Z or stencil. Consume its EXACT source ordinal
@@ -9236,7 +9243,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                     ? NativeRawFvfAssembly::PointList :
                     NativeRawFvfAssembly::TriangleList,
                 offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask},
-                true, output.scissor ? &fullFvfScissor : nullptr)) {
+                true, output.scissor ? &fullFvfScissor : nullptr,
+                &fullFvfRaster)) {
             if (!s.frameBatch.absorb_empty_source_draw(
                     sourceOrdinal, sameClearedGameTarget))
                 s.frameBatch.abort();
