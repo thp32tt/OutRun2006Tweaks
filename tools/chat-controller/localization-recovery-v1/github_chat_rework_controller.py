@@ -278,3 +278,130 @@ def publish_c1_candidate(gh,task,decision,png):
     gh.write_json(rel+".json",ASSETS_BRANCH,receipt)
     return receipt
 
+
+
+class ChatBridge:
+    """One persistent Chrome context and separate A/B/C1 conversations."""
+    def __init__(self, gh, playwright):
+        self.gh=gh
+        self.playwright=playwright
+        self.context=None
+        self.pages={}
+
+    async def ensure_context(self):
+        if self.context is None:
+            profile=ROOT/"browser-rework-profile"
+            profile.mkdir(parents=True,exist_ok=True)
+            self.context=await self.playwright.chromium.launch_persistent_context(
+                str(profile),headless=False,
+                args=["--no-sandbox","--disable-dev-shm-usage"],
+                viewport={"width":1400,"height":860},accept_downloads=True)
+        return self.context
+
+    async def page(self,role,url=None):
+        if role not in ("A","B","C1"):
+            raise ValueError("INVALID_ROLE")
+        await self.ensure_context()
+        pg=self.pages.get(role)
+        if pg is None or pg.is_closed():
+            pg=await self.context.new_page()
+            self.pages[role]=pg
+        target=url if url and url.startswith("https://chatgpt.com/c/") else PROJECT_URL
+        if pg.url.rstrip("/")!=target.rstrip("/"):
+            await pg.goto(target,wait_until="domcontentloaded",timeout=60000)
+        composer=pg.locator('[role="textbox"][contenteditable="true"]').first
+        try:
+            await composer.wait_for(state="visible",timeout=11000)
+        except Exception:
+            return None
+        return pg
+
+    async def send_with_png(self,pg,task,prompt,paths,imagegen):
+        if pg is None:
+            return "HOLD_CHATGPT_LOGIN_REQUIRED"
+        if imagegen:
+            status=await ensure_image_tool(pg)
+            if status!="CREATE_IMAGE_TOOL_SELECTED":
+                return "HOLD_IMAGE_TOOL_NOT_VERIFIED"
+        else:
+            selected=pg.locator('[data-inline-selection-pill][data-system-hint-type="picture_v2"]')
+            if await selected.count():
+                return "HOLD_C1_IMAGE_TOOL_SELECTED"
+        clear=await clear_attachment_previews(pg)
+        if clear!="COMPOSER_ATTACHMENTS_CLEAR":
+            return "HOLD_COMPOSER_ATTACHMENTS_NOT_CLEAR"
+        binding={"path":str(paths[0])} if len(paths)==1 else {"paths":[str(x) for x in paths]}
+        uploaded=(await attach_png(pg,binding)) if len(paths)==1 else (
+            await attach_batch_pngs(pg,binding))
+        if uploaded!="ATTACHMENT_UPLOAD_COMPLETED":
+            return "HOLD_CHAT_UPLOAD_NOT_VERIFIED"
+        box=pg.locator('[role="textbox"][contenteditable="true"]').first
+        await box.click()
+        await pg.keyboard.insert_text(prompt+"\n\nUPLOAD_TASK_ID="+task["task_id"])
+        if "UPLOAD_TASK_ID="+task["task_id"] not in await box.inner_text():
+            return "HOLD_CHAT_COMPOSER_MARKER_MISSING"
+        await box.press("Enter")
+        receipt=await verify_submission_receipt(
+            pg,task["task_id"],[p.name for p in paths])
+        if receipt!="PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED":
+            return "HOLD_CHAT_SENT_UNVERIFIED"
+        if "/c/" not in pg.url or "local-chatgpt" in pg.url:
+            return "HOLD_CHAT_URL_NOT_PERSISTED"
+        return "CHAT_SENT_VERIFIED"
+
+    async def submit_producer(self,task):
+        pg=await self.page(task["role"])
+        if pg is None:
+            return "HOLD_CHATGPT_LOGIN_REQUIRED"
+        source=await asyncio.to_thread(stage_source_ref,self.gh,task)
+        prompt=(
+          "@Create image — OutRun 2006 HD 원본 영문 UI 문구를 한글 PNG로 교체.\n"
+          "첨부는 원본 HD DDS SHA와 좌표가 검증된 원문 크롭입니다.\n"
+          "영문 원문: "+task["english"]+"\n한국어 번역: "+task["korean"]+
+          "\n원문 글자/외곽선/그림자만 한국어로 새로 만드세요."
+          "\n배경, 자동차, 아이콘, 박스, 영어 원문은 새 PNG에 포함하지 마세요."
+          "\n**투명한 RGBA PNG 한 장**, 글자와 효과가 PNG 가장자리에 닿지 않도록."
+          "\n글자 크기, 기울기, 줄바꿈은 원본 HD의 개별 문구를 기준으로 하며"
+          " 원문 텍스트/효과보다 크면 안 됩니다. 종횡비 강제 확대 금지."
+          "\n원문 제거/CLEAN 배경 복원은 독립 QA에서 검증하며 덧쓰기만 하지 않습니다."
+          "\n완성이라고 주장하지 말고 생성 PNG만 제공하세요."
+          "\n원본 DDS SHA: "+task["source_dds_sha256"])
+        await asyncio.to_thread(stage_state,self.gh,task,"AB_CLAIMED")
+        state=await self.send_with_png(pg,task,prompt,[source],True)
+        if state!="CHAT_SENT_VERIFIED":
+            await asyncio.to_thread(stage_state,self.gh,task,"HOLD",{"hold_reason":state})
+            return state
+        await asyncio.to_thread(stage_state,self.gh,task,"AB_SENT",{
+            "ab_chat_url":pg.url})
+        return "AB_SENT"
+
+    async def collect_producer(self,state):
+        import text_roi_queue as old
+        task=state["task"]
+        pg=await self.page(task["role"],state.get("ab_chat_url"))
+        if pg is None:
+            return "HOLD_CHATGPT_LOGIN_REQUIRED"
+        probe=await old._probe_imagegen_result(pg,task["task_id"],1)
+        if probe.get("error") or probe.get("count")!=1 or probe.get("busy"):
+            return "WAIT_IMAGEGEN_"+str(probe.get("error") or "IN_PROGRESS")
+        source_name=task["reference"]["name"]
+        active={"task_id":task["task_id"],"role":task["role"],"count":1,
+                "items":[{"output_filename":task["task_id"]+".png",
+                          "ordinal":1,"filename":source_name,
+                          "width":task["reference"]["width"],
+                          "height":task["reference"]["height"]}]}
+        outcome=await old.export_unapproved_k_candidates(pg,active,str(ROOT))
+        if outcome not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                           "EXISTING_CANDIDATES_VERIFIED"):
+            return "WAIT_IMAGEGEN_EXPORT_"+outcome
+        file=ROOT/old.STATE_DIR/"candidate_outputs"/task["role"]/(task["task_id"]+".png")
+        png=file.read_bytes()
+        dimensions=valid_generated_image(png)
+        digest=hashlib.sha256(png).hexdigest()
+        rel=QROOT+"/candidates/"+task["task_id"]+".png"
+        await asyncio.to_thread(self.gh.write,rel,QUEUE_BRANCH,png)
+        await asyncio.to_thread(stage_state,self.gh,task,"C1_READY",{
+            "ab_chat_url":pg.url,"candidate_sha256":digest,
+            "candidate_dimensions":dimensions,"candidate_gh_path":rel,
+            "candidate_status":"IMAGEGEN_BLOB_SAVED_PENDING_C1"})
+        return "C1_READY"
