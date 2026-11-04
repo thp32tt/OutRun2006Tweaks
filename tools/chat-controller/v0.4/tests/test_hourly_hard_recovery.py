@@ -36,7 +36,8 @@ class HourlyDX11Recovery(unittest.TestCase):
         }
         self.q = {"active_by_lane": {"A": self.active}}
         self.env = {
-            "CONTROLLER_MODE": "conversion", "VR_UNCONDITIONAL_RESUME_SECONDS": 3600,
+            "CONTROLLER_MODE": "conversion", "BrowserContext": object, "Page": object,
+            "VR_UNCONDITIONAL_RESUME_SECONDS": 3600,
             "VR_FORCE_ROLLOVER_SECONDS": 3600,
             "VR_CHECKPOINT_ENABLED": True,
             "datetime": SimpleNamespace(now=lambda tz: self.now),
