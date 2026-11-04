@@ -1,7 +1,7 @@
 name: Dino v15 LHD Textured Cockpit Installer
 on:
   push:
-    branches: [ 'test/dino-cockpit-v15-textured-20261104' ]
+    branches: [ 'test/dino-cockpit-v15-textured-20261104', 'test/dino-cockpit-v15-pmt-r3-20261104' ]
     paths: [ 'tools/cockpit/dino_v15/**', '.github/workflows/dino-cockpit-v15-installer.yml' ]
   workflow_dispatch:
 permissions:

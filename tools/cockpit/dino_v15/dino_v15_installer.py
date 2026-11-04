@@ -68,6 +68,51 @@ def patch_v13_source(s):
     encoded=zlib.compress(struct.pack("<4I",n,t,len(S),len(V))+S+V,9)'''
     if patched.count(marker)!=1:
         raise ValueError("DINO_R2_SOURCE_DRIFT: PMT compressor target unavailable")
+    # R3: preserve original shader records and link new draw into root mesh.
+    # Derived from original loader's format-major shader cache (42E4F0).
+    rewrites=[
+      (
+        '    p2=put(S0[q[2]:q[2]+h[9]*16]+packu(vp,0,0,0))',
+        '''    p2=put(S0[q[2]:q[2]+h[9]*16]+packu(vp,0,0,0))
+    old_shader_bytes=S0[q[3]:q[3]+h[9]*h[11]*24]
+    assert len(old_shader_bytes)==h[9]*h[11]*24
+    assert q[3]+len(old_shader_bytes)==q[2]
+    shader_count=h[9]+1
+    material_count=h[11]+ng
+    shader_records=bytearray(shader_count*material_count*24)
+    for fi in range(h[9]):
+        source=fi*h[11]*24
+        dest=fi*material_count*24
+        shader_records[dest:dest+h[11]*24]=old_shader_bytes[source:source+h[11]*24]
+    p3=put(shader_records)'''
+      ),
+      (
+        'nq=q[:];nq[1]=p1;nq[2]=p2;nq[9:15]=[p9,p10,p11,p12,p13,p14]',
+        'nq=q[:];nq[1]=p1;nq[2]=p2;nq[3]=p3;nq[9:15]=[p9,p10,p11,p12,p13,p14]'
+      ),
+      (
+        '    struct.pack_into("<15I",S,24,*nq)',
+        '''    struct.pack_into("<15I",S,24,*nq)
+    # Root node references mesh0. Mesh0 currently contains the original two
+    # primitives: extend its reference to the new third primitive.
+    assert (q[9]-q[8])//8==1 and orig_prims==2
+    assert u(S0,q[7]+0x28)==0 and u(S0,q[7]+0x20)==0xffffffff
+    assert u(S0,q[8])==0 and u(S0,q[8]+4)==2
+    struct.pack_into("<I",S,q[8]+4,orig_prims+1)
+    assert len(shader_records)==nh[9]*nh[11]*24
+    assert S[p3:p3+len(shader_records)]==shader_records'''
+      ),
+      (
+        '    assert S[24+60:len(S0)]==S0[24+60:] and V[:len(V0)]==V0',
+        '''    assert S[24+60:q[8]+4]==S0[24+60:q[8]+4]
+    assert S[q[8]+8:len(S0)]==S0[q[8]+8:]
+    assert V[:len(V0)]==V0'''
+      )
+    ]
+    for old,new in rewrites:
+        if patched.count(old)!=1:
+            raise ValueError("DINO_R3_SOURCE_DRIFT: "+old[:70])
+        patched=patched.replace(old,new,1)
     return patched.replace(marker,guarded)
 def main():
     home=pathlib.Path(getattr(sys,"_MEIPASS",pathlib.Path(__file__).resolve().parent))
