@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+if [[ -z "${OUTRUN_GITHUB_CONTENTS_TOKEN:-}" ]]; then
+  echo "HOLD: Set OUTRUN_GITHUB_CONTENTS_TOKEN (GitHub Contents: read/write) in Portainer." >&2
+  exit 2
+fi
 if [[ -z "${OUTRUN_REWORK_VNC_PASSWORD:-}" ]]; then
   echo "HOLD: Set OUTRUN_REWORK_VNC_PASSWORD in Portainer before enabling chat browser." >&2
   exit 2
