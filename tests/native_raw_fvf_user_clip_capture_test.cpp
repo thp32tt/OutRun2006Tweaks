@@ -481,6 +481,67 @@ int main() {
     assert(collapsedBatch.submitted==1u &&
            collapsedBatch.leadingEmptySourceDraws==2u);
 
+    // 01239: genuine one-float-ULP FVF triangles have finite nonzero
+    // projected area far below 1e-12. They still belong to native PRE/POST
+    // GPU RGB sampling; the old absolute-area threshold discarded their
+    // entire original Draw from source-authentic island capture.
+    Vertex fine[]{
+        {{.5f,.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{.500000059604644775390625f,.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{.5f,.500000059604644775390625f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan fineSource{
+        fine,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    NativeRawDrawExtent fineExtent{};
+    NativeRawFvfInteriorSample fineInterior{};
+    assert(!native_game_fvf_fully_clipped_draw(
+        fineSource,true,nullptr,&solidNoCull,true));
+    assert(native_raw_fvf_projected_raster(
+        fineSource,0,0,3440,1440,fineExtent,nullptr,&solidNoCull,
+        &fineInterior));
+    assert(fineExtent.left < fineExtent.right &&
+           fineExtent.top < fineExtent.bottom &&
+           fineInterior.pixelX >= fineExtent.left &&
+           fineInterior.pixelX < fineExtent.right);
+    // Authenticated indexed Draw: unused vertices never substitute for the
+    // real one-ULP triangle. Every source index must be in-range and the
+    // live GPU source geometry remains available to the island selector.
+    Vertex fineIndexed[]{
+        {{-.8f,-.8f,.5f,1.f},{1,1,1,1,1,1}},
+        fine[0],fine[1],fine[2],
+        {{-.7f,-.3f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    const std::uint32_t fineIndices[]{1u,2u,3u};
+    NativeRawFvfClipSpan fineIndexedSource{
+        fineIndexed,sizeof(Vertex),5u,fineIndices,3u,
+        NativeRawFvfAssembly::TriangleList,offset,0u};
+    assert(native_raw_fvf_projected_raster(
+        fineIndexedSource,0,0,3440,1440,fineExtent,nullptr,
+        &solidNoCull));
+    NativeRawDualTile fineTiles{};
+    assert(native_raw_fvf_island_dual_draw_tile(
+        fineIndexedSource,0,0,3440,1440,3440,1440,512,288,
+        {0,0,3440,1440},0u,fineTiles,&solidNoCull));
+    const std::uint32_t fineBadIndices[]{1u,2u,99u};
+    fineIndexedSource.indices=fineBadIndices;
+    assert(!native_raw_fvf_projected_raster(
+        fineIndexedSource,0,0,3440,1440,fineExtent,nullptr,
+        &solidNoCull));
+    assert(!native_raw_fvf_island_dual_draw_tile(
+        fineIndexedSource,0,0,3440,1440,3440,1440,512,288,
+        {0,0,3440,1440},0u,fineTiles,&solidNoCull));
+    // Exact axis-collapse remains an empty SOLID source, but its authentic
+    // WIREFRAME edges must still have a real GPU sampling footprint.
+    fineIndexedSource.indices=fineIndices;
+    fineIndexed[2].clip[0]=.5f;
+    assert(!native_raw_fvf_projected_raster(
+        fineIndexedSource,0,0,3440,1440,fineExtent,nullptr,
+        &solidNoCull));
+    assert(native_raw_fvf_projected_raster(
+        fineIndexedSource,0,0,3440,1440,fineExtent,nullptr,
+        &wireNoCull));
+
     // 01235: authenticated one-pixel POINTLIST / point-filled TRIANGLELIST
     // use the same source-authentic clipping and face-cull certificate.
     // Point scissor proof is conservatively expanded by one pixel.

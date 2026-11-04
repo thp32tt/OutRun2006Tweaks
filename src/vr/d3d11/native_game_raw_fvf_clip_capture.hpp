@@ -377,23 +377,44 @@ struct NativeRawFvfClipSpan {
         if (polygonCount < 3u) continue;
         // A point or zero-area edge cannot color an RGB sample as a solid
         // triangle. It must not inflate a distant legitimate menu raster.
-        double area = 0.0;
-        for (std::size_t i = 0u; i < polygonCount; ++i) {
-            const auto& a = polygon[i];
-            const auto& b = polygon[(i + 1u) % polygonCount];
-            area += a.x * b.y - b.x * a.y;
+        // The old absolute 1e-12 area cutoff silently discarded genuine
+        // one-ULP-wide menu/HUD/road triangles from the native GPU capture
+        // population. Calculate oriented area around one clipped vertex:
+        // shoelace subtraction at large screen positions cancels the tiny
+        // remaining area even when the original source primitive is valid.
+        // This remains a GPU PRE/POST sampling hint, never CPU pixel proof.
+        const Point origin = polygon[0];
+        double area = 0.0, areaMagnitude = 0.0;
+        for (std::size_t i = 1u; i + 1u < polygonCount; ++i) {
+            const double ax = polygon[i].x - origin.x;
+            const double ay = polygon[i].y - origin.y;
+            const double bx = polygon[i + 1u].x - origin.x;
+            const double by = polygon[i + 1u].y - origin.y;
+            const double crossA = ax * by, crossB = ay * bx;
+            area += crossA - crossB;
+            areaMagnitude += std::abs(crossA) + std::abs(crossB);
         }
-        if (!std::isfinite(area)) return false;
-        // Solid zero-area triangles cannot touch an RGB sample, but
-        // D3D11 WIREFRAME may emit their actual surviving line edges.
-        // Preserve a GPU capture footprint only with authenticated
-        // wireframe + CULL_NONE; face-culling a degenerate winding is
-        // undefined and never proves a source pixel.
-        const bool lineOnly = std::abs(area) <= 1.0e-12;
+        if (!std::isfinite(area) || !std::isfinite(areaMagnitude))
+            return false;
+        // Only an exact axis collapse can be confidently classified as a
+        // zero-area solid source here. A diagonal collinearity or cancellation
+        // may still be GPU-rasterized after subpixel quantization: retain its
+        // extent instead of hiding a potentially changed real GPU pixel.
+        bool sameX = true, sameY = true;
+        for (std::size_t i = 1u; i < polygonCount; ++i) {
+            sameX = sameX && polygon[i].x == origin.x;
+            sameY = sameY && polygon[i].y == origin.y;
+        }
+        const bool lineOnly = area == 0.0 && (sameX || sameY);
         if (lineOnly && (!rasterState || !rasterState->wireframe ||
                          rasterState->cull != NativeRawFvfCull::None))
             continue;
-        if (!lineOnly && rasterState &&
+        // Do not infer the opposite face from a cancellation-level area.
+        // Missing a cull optimization is safe; omitting a live native RGB
+        // capture from a thin source triangle is not.
+        const bool reliableWinding = std::abs(area) >
+            32.0 * (std::numeric_limits<double>::epsilon)() * areaMagnitude;
+        if (!lineOnly && reliableWinding && rasterState &&
             rasterState->cull != NativeRawFvfCull::None) {
             // Viewport Y reverses the NDC polygon winding. A negative
             // NDC area is clockwise on the D3D11 screen render target;
