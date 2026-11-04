@@ -475,3 +475,36 @@ for label, mutate in (
     broken_01219 = copy.deepcopy(historical_01219)
     mutate(broken_01219)
     assert validate_task(broken_01219, p), "01219 gate repair regression: " + label
+
+# 01234-E002 causal Fast/Backend failure regression: malformed 01233 C6
+# must not bypass source-stage acceptance, nor should previously exact-SHA-
+# verified build work require a fabricated live-game/HMD PASS.
+historical_01233 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01233.json").read_text(encoding="utf-8"))
+assert historical_01233["validation_bearing_result_sha"] == (
+    "2754573593e31a52b6f8bb743f1c681fa6532059")
+assert historical_01233["runtime_validation"] == "UNTESTED"
+assert historical_01233["score_change"] == 0
+assert historical_01233["full_dx11_renderer_complete"] is False
+assert not validate_task(historical_01233, p), validate_task(historical_01233, p)
+for label, mutate in (
+    ("regression evidence removed", lambda t: t["development_strategy"].pop(
+        "blocking_evidence")),
+    ("original D3D9 game draw absent", lambda t: t["development_strategy"][
+        "live_game_draw_path"].remove("LIVE_D3D9_CALLSITE")),
+    ("native Draw stage absent", lambda t: t["development_strategy"][
+        "live_game_draw_path"].remove("D3D11_NATIVE_DRAW")),
+    ("visible output stage absent", lambda t: t["development_strategy"][
+        "live_game_draw_path"].remove("VISIBLE_FRAME_OUTPUT")),
+    ("fallback acceptance missing", lambda t: t["feature_contract"][
+        "acceptance_items"][2].update(category="source_correctness")),
+    ("acceptance evidence missing", lambda t: t["acceptance_results"][
+        "near_edge_real_stroke_preserved"].update(evidence_paths=[])),
+    ("unverified gate", lambda t: t["acceptance_results"][
+        "five_exact_sha_gates"].update(status="PENDING_CI")),
+    ("HMD result forged", lambda t: t.update(runtime_validation="PASS")),
+):
+    bad_01233 = copy.deepcopy(historical_01233)
+    mutate(bad_01233)
+    assert validate_task(bad_01233, p), (
+        "01233 acceptance repair regression allowed: " + label)
