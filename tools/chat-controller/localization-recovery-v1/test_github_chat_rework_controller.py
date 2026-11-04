@@ -55,51 +55,56 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 
 class BrowserBootstrapBeforeGithubTests(unittest.IsolatedAsyncioTestCase):
- async def test_vnc_browser_opens_without_github_token_or_queue(self):
-  with tempfile.TemporaryDirectory() as root:
-   with patch.object(c,"ROOT",Path(root)):
-    page=MagicMock()
-    page.url="about:blank"
-    page.is_closed.return_value=False
-    page.bring_to_front=AsyncMock()
-    page.goto=AsyncMock()
-    context=MagicMock()
-    context.new_page=AsyncMock(return_value=page)
-    chromium=MagicMock()
-    chromium.launch_persistent_context=AsyncMock(return_value=context)
-    browser=MagicMock()
-    browser.chromium=chromium
-    bridge=c.ChatBridge(None,browser)
-    result=await bridge.bootstrap_login_page()
-    self.assertEqual(result,"CHATGPT_LOGIN_BROWSER_VISIBLE_NOT_AUTHENTICATED")
-    chromium.launch_persistent_context.assert_awaited_once()
-    context.new_page.assert_awaited_once()
-    page.bring_to_front.assert_awaited_once()
-    page.goto.assert_awaited_once_with(c.PROJECT_URL,
-        wait_until="domcontentloaded",timeout=30000)
-    self.assertIn("A",bridge.pages)
-    self.assertIsNone(bridge.gh)
+ async def make_bridge(self,navigation_error=None):
+  page=MagicMock()
+  page.url="about:blank"
+  page.is_closed.return_value=False
+  page.bring_to_front=AsyncMock()
+  page.goto=AsyncMock(side_effect=navigation_error)
+  context=MagicMock()
+  context.pages=[page]
+  context.new_page=AsyncMock(return_value=page)
+  browser=MagicMock()
+  browser.contexts=[context]
+  browser.close=AsyncMock()
+  chromium=MagicMock()
+  chromium.connect_over_cdp=AsyncMock(return_value=browser)
+  playwright=MagicMock()
+  playwright.chromium=chromium
+  bridge=c.ChatBridge(None,playwright)
+  return bridge,page,context,chromium
 
- async def test_navigation_failure_leaves_browser_for_manual_login(self):
-  with tempfile.TemporaryDirectory() as root:
-   with patch.object(c,"ROOT",Path(root)):
-    page=MagicMock()
-    page.url="about:blank"
-    page.is_closed.return_value=False
-    page.bring_to_front=AsyncMock()
-    page.goto=AsyncMock(side_effect=TimeoutError("network unavailable"))
-    context=MagicMock()
-    context.new_page=AsyncMock(return_value=page)
-    chromium=MagicMock()
-    chromium.launch_persistent_context=AsyncMock(return_value=context)
-    browser=MagicMock()
-    browser.chromium=chromium
-    bridge=c.ChatBridge(None,browser)
-    self.assertEqual(await bridge.bootstrap_login_page(),
-        "HOLD_CHATGPT_PAGE_NAVIGATION_TimeoutError")
-    self.assertIs(bridge.pages["A"],page)
-    context.new_page.assert_awaited_once()
+ async def test_vnc_browser_reuses_visible_chrome_login_tab_without_github(self):
+  bridge,page,context,chromium=await self.make_bridge()
+  result=await bridge.bootstrap_login_page()
+  self.assertEqual(result,"CHATGPT_LOGIN_BROWSER_VISIBLE_NOT_AUTHENTICATED")
+  chromium.connect_over_cdp.assert_awaited_once_with(
+      "http://127.0.0.1:9222",timeout=30000)
+  context.new_page.assert_not_awaited()
+  page.bring_to_front.assert_awaited_once()
+  page.goto.assert_awaited_once_with(c.PROJECT_URL,
+      wait_until="domcontentloaded",timeout=30000)
+  self.assertIn("A",bridge.pages)
+  self.assertIsNone(bridge.gh)
 
+ async def test_navigation_failure_leaves_same_visible_login_tab(self):
+  bridge,page,context,chromium=await self.make_bridge(
+      TimeoutError("network unavailable"))
+  self.assertEqual(await bridge.bootstrap_login_page(),
+      "HOLD_CHATGPT_PAGE_NAVIGATION_TimeoutError")
+  self.assertIs(bridge.pages["A"],page)
+  context.new_page.assert_not_awaited()
+
+ async def test_browser_context_ambiguous_is_hold(self):
+  playwright=MagicMock()
+  browser=MagicMock()
+  browser.contexts=[]
+  browser.close=AsyncMock()
+  playwright.chromium.connect_over_cdp=AsyncMock(return_value=browser)
+  bridge=c.ChatBridge(None,playwright)
+  with self.assertRaisesRegex(RuntimeError,"CONTEXT_NOT_EXACTLY_ONE"):
+   await bridge.bootstrap_login_page()
+  browser.close.assert_awaited_once()
 
 if __name__=="__main__":
  unittest.main()
