@@ -176,4 +176,42 @@ int main() {
     assert(build(backface,6u,order,6u,4u,2u,0u,out));
     assert((out==std::vector<std::uint32_t>{3,4,5}));
 
+    // A real world-space WVP game triangle can straddle the eye plane.
+    // GPU D3D11 triangle clipping would retain its visible polygon, while
+    // the old CPU point-fill path discarded the entire original game Draw
+    // merely because the third source corner had W<0. Clip before dividing
+    // by W, then carry both UV stages and real shader attributes to POINTLIST.
+    std::vector<ClipVertex> eyeCrossing{
+        {{-.5f,-.5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{0,0}},
+        {{ .5f,-.5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{1,0}},
+        {{ 0.f, .5f,.2f,-.2f},{1,1,1,1},{1,1,0,0},{.5f,1}}
+    };
+    std::vector<ClipVertex> eyePoints;
+    assert(game_fvf_clipped_point_vertices(
+        eyeCrossing,nullptr,3u,4u,1u,0u,64u,lerp,eyePoints));
+    assert(eyePoints.size()>=3u);
+    for (const auto& v:eyePoints) {
+        assert(v.clip[3]>0.0f);
+        assert(v.clip[0]>=-v.clip[3]-1.e-4f &&
+               v.clip[0]<= v.clip[3]+1.e-4f);
+        assert(v.clip[1]>=-v.clip[3]-1.e-4f &&
+               v.clip[1]<= v.clip[3]+1.e-4f);
+        assert(v.clip[2]>=-1.e-4f && v.clip[2]<=v.clip[3]+1.e-4f);
+        assert(v.uv[0]>=0.f && v.uv[0]<=1.f);
+        assert(v.uv[1]>=0.f && v.uv[1]<=1.f);
+    }
+    const auto validEyePoints=eyePoints;
+    // Full transactional fallback when a late source IA value is invalid.
+    const std::uint32_t malformedEye[]{0u,1u,99u};
+    assert(!game_fvf_clipped_point_vertices(
+        eyeCrossing,malformedEye,3u,4u,1u,0u,64u,lerp,eyePoints));
+    assert(eyePoints.size()==validEyePoints.size());
+    assert(!game_fvf_clipped_point_vertices(
+        eyeCrossing,nullptr,3u,4u,1u,0u,2u,lerp,eyePoints));
+    assert(eyePoints.size()==validEyePoints.size());
+    eyeCrossing[2].clip[3]=std::numeric_limits<float>::quiet_NaN();
+    assert(!game_fvf_clipped_point_vertices(
+        eyeCrossing,nullptr,3u,4u,1u,0u,64u,lerp,eyePoints));
+    assert(eyePoints.size()==validEyePoints.size());
+
 }
