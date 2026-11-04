@@ -4723,7 +4723,7 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
         if time.monotonic() - last < TAB_RECOVERY_COOLDOWN_SECONDS:
             continue
         state["last_recovered"][slot.name] = time.monotonic()
-        target = slot.url if slot.url and is_project_scoped_chat_url(slot.url) else BASE_URL
+        target = slot.url if slot.url and is_project_scoped_chat_url(slot.url, slot.name) else slot_project_home(slot.name)
         log.error("slot tab recovery slot=%s reason=%s target=%s", slot.name, reason, target)
         # Preserve a visual diagnostic where Chromium still permits screenshots.
         if not closed:
