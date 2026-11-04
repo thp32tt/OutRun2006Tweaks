@@ -11,6 +11,7 @@ on:
       - ".github/workflows/outrun-ab-multi-atlas.yml"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/hd_existing_candidate_salvage.py"
       - "tools/localization/hd_rework_queue.py"
       - "tools/localization/publish_hd_rework_queue.py"
       - "tools/localization/test_hd_rework_queue.py"
@@ -43,6 +44,7 @@ jobs:
           sparse-checkout: |
             tools/localization/github_ab_imagegen_atlas_batch.py
             tools/localization/hd_strict_qa.py
+            tools/localization/hd_existing_candidate_salvage.py
             tools/localization/hd_rework_queue.py
             tools/localization/publish_hd_rework_queue.py
             tools/localization/test_hd_rework_queue.py
@@ -77,7 +79,7 @@ jobs:
           python -m unittest discover -s tools/localization -p test_hd_strict_qa.py -v
           python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
 
-      - name: Compose strict HD source-clean-final A/B artwork into native DDS once per atlas
+      - name: Reuse and deterministically salvage existing A/B artwork into native HD DDS
         shell: bash
         run: |
           set -euo pipefail
@@ -92,6 +94,7 @@ jobs:
           assert j["schema"]=="outrun.ab-imagegen-hd-strict.v2"
           assert j["release_approved"] is False and j["runtime_validation"]=="UNTESTED"
           assert j["legacy_oversize_outputs_rejected"] is True
+          assert j["salvage_policy"]=="EXISTING_AB_PIXELS_FIRST_THEN_IMAGEGEN_ONLY_IF_UNSALVAGEABLE_V1"
           assert j["translated_roi_generated"]+sum(j["hold_roi_reason_counts"].values())==954
           for atlas in j["generated"]:
               assert atlas["plate_evidence"]=="SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED"
@@ -105,7 +108,7 @@ jobs:
           PY
           sha256sum "$RUNNER_TEMP/ab-multi-one/OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip"
 
-      - name: Materialize exact HD-source A/B rework tickets from QA HOLD
+      - name: Materialize ImageGen fallback tickets only after deterministic salvage fails
         if: success()
         shell: bash
         run: |
