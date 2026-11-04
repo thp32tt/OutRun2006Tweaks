@@ -1,6 +1,7 @@
 #include "../src/vr/d3d11/native_game_raw_clipping_visual.hpp"
 #include <cassert>
 #include <cstdint>
+#include <initializer_list>
 
 using namespace outrun::vr::dx11;
 constexpr auto choose = native_game_clipping_mode;
