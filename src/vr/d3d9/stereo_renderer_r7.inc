@@ -917,6 +917,16 @@ namespace OutRunVRStereo
                                     sizeof(nativeView));
                         if(!MatrixFinite(nativeView))
                             return EyeBuildResult::FatalError;
+                        // Original sky rotation-only contract: never move the
+                        // sky sphere with headset translation or virtual IPD.
+                        // Before this correction Quest mode1 bypassed the
+                        // rotationOnly translation masking above, making the
+                        // sky layer move as the headset position changed.
+                        if(rotationOnly) {
+                            nativeView._41=0.f;
+                            nativeView._42=0.f;
+                            nativeView._43=0.f;
+                        }
                         state.fixedEyeView[eye]=MultiplyMatrix(
                             state.fixedOriginalView,nativeView);
                     } else {

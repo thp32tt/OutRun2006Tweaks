@@ -60,21 +60,25 @@ inline bool OriginalQuestVrProfileAnchor(
     return true;
 }
 
-// ARM64 0x2E17F4..0x2E1808 exact native source: the selected 30-car
-// guest-profile XYZ is amended with (+0.32 Y, +0.55 Z), BEFORE the
-// race_camera_eye_look_485590 mode1 override and original swing/blend.
-// It does NOT belong to the per-eye HMD view. Add these once only.
+// Verified by original APK callback capture address tracing, 2026-11-05:
+// ARM64 run_game::$_2 at 0x2E17F4..0x2E1808 writes (+0.32Y,+0.55Z)
+// into x19[64] -> android_main's sp+0x64 vector, initialized separately
+// (sp+0x68/+0x6C zero), later consumed by hand/controller view-matrix
+// assembly at 0x2E1BB0..0x2E1D18. This is NOT the 30-car guest profile.
+// The native cockpit source anchor remains the ORIGINAL guest record XYZ.
+// Do not add controller calibration to the camera or the HMD eye pose.
 inline bool OriginalQuestModeOneInput(Vec3 guestProfile,
                                       Vec3& destination) noexcept {
     if(!Finite(guestProfile) || std::fabs(guestProfile.x)>5.f ||
        std::fabs(guestProfile.y)>5.f ||
        std::fabs(guestProfile.z)>5.f) return false;
-    const Vec3 next{guestProfile.x,guestProfile.y+0.319999993f,
-                    guestProfile.z+0.550000012f};
+    const Vec3 next=guestProfile;
     if(!Finite(next) || std::fabs(next.y)>5.f ||
        std::fabs(next.z)>5.f) return false;
     destination=next;return true;
 }
+// Future source changes must locate the actual native guest camera writer,
+// NOT infer a camera pivot from an unrelated run_game callback.
 // HMD feedback: positive mode1 local Z moves eye rearward; positive
 // SeatDown moves it downward. Both offsets are now signed in F11.
 // Runtime-safe PC bridge: substitute the Quest profile as the ORIGINAL
