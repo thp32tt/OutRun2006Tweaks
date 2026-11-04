@@ -271,7 +271,8 @@ if compiler:
 # RAW PRE/POST capture now uses actual fixed-function VS SV_ClipDistance.
 clip_source = (root / "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp").read_text()
 island_source = (root / "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp").read_text()
-require("offsetof(NativeVertex, clip0), fixedClip.mask" in bridge and
+require("output.nativeFvfUserClipMask = clipPlanes;" in bridge and
+        "offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask" in bridge and
         "source.clipDistanceOffset, source.clipDistanceMask" in island_source and
         "q.userClip[plane - 7u]" in clip_source and
         "source.clipDistanceMask ? 13u : 7u" in clip_source,

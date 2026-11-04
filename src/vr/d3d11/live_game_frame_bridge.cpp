@@ -1251,6 +1251,7 @@ struct OutputCapture {
     bool nativeSpecularAdd = false; // FVF vertex SPECULAR RGB added after source stage0/1 texture cascade.
     bool rawFogVisualMismatch = false; // Only for a fog-omitting opt-in RAW tile; NEVER a full game frame.
     bool rawClippingVisualMismatch = false; // D3D9 CLIPPING=FALSE: separately isolated RAW tile only.
+    std::uint32_t nativeFvfUserClipMask = 0u; // Per Draw D3D9 FVF GPU clip0/1; source getter validated.
     NativeSm3TableFog nativeTableFog{}; // Authenticated live FVF Z/W fog RGB output.
     bool additiveBlend = false; // D3D9 ONE/ONE
     bool sourceAlphaAddBlend = false; // D3D9 SRCALPHA/ONE
@@ -4284,6 +4285,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             layout.pretransformed)) return false;
     fixedClip = {};
     fixedClip.mask = clipPlanes;
+    // submit() consumes OutputCapture, not the local supported_game_state()
+    // source plane object. Preserve the EXACT admitted source clip mask
+    // through that Draw to its GPU PRE/POST raster capture.
+    output.nativeFvfUserClipMask = clipPlanes;
     for (DWORD slot = 0u; slot < 6u; ++slot) {
         if ((clipPlanes & (1u << slot)) == 0u) continue;
         if (FAILED(game->GetClipPlane(slot, fixedClip.world[slot].data())))
@@ -8557,7 +8562,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                           : topology == D3DPT_TRIANGLEFAN
                               ? NativeRawFvfAssembly::TriangleFan
                               : NativeRawFvfAssembly::TriangleList,
-                      offsetof(NativeVertex, clip0), fixedClip.mask}
+                      offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask}
                 : NativeRawFvfClipSpan{});
     }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
