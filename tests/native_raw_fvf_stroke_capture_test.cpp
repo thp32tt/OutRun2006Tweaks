@@ -82,11 +82,44 @@ int main() {
         strip,0,0,3440,1440,3440,1440,400,200,
         full,0u,clipped,clippedTiles));
     strip.indices=indices;
+    // Source WVP clip-space lines can cross the camera eye at W=0 or
+    // negative W. Retain their real visible clipped segment for native
+    // GPU PRE/POST sampling, as the corresponding FVF polygon path does.
+    lines[1].clip[3]=0.f;
+    assert(native_raw_fvf_stroke_dual_draw_tile(
+        strip,0,0,3440,1440,3440,1440,400,200,
+        full,0u,clipped,clippedTiles));
+    assert(clipped.right > clipped.left && clipped.bottom > clipped.top);
+    lines[1].clip[3]=-0.5f;
+    assert(native_raw_fvf_stroke_dual_draw_tile(
+        strip,0,0,3440,1440,3440,1440,400,200,
+        full,1u,clipped,clippedTiles));
+    // A zero clip-space vector is not a valid source intersection.
+    lines[1].clip[0]=0.f;
+    lines[1].clip[1]=0.f;
+    lines[1].clip[2]=0.f;
     lines[1].clip[3]=0.f;
     assert(!native_raw_fvf_stroke_dual_draw_tile(
         strip,0,0,3440,1440,3440,1440,400,200,
         full,0u,clipped,clippedTiles));
-    lines[1].clip[3]=1.f;
+    assert(clipped.left==0 && clipped.right==0 && !clippedTiles.hasSecond);
+    lines[1]={{-0.45f,-0.72f,0.5f,1.f},{1,1,1,1,1,1}};
+
+    // LINELIST's entire IA must be even-sized: a dangling or malformed
+    // final index is not a safe native source even if earlier lines draw.
+    const std::uint32_t oddIndices[]{0u,1u,99u};
+    NativeRawFvfClipSpan oddList{
+        lines,sizeof(Vertex),4u,oddIndices,3u,
+        NativeRawFvfAssembly::LineList,userOffset,0u};
+    assert(!native_raw_fvf_stroke_dual_draw_tile(
+        oddList,0,0,3440,1440,3440,1440,400,200,
+        full,0u,clipped,clippedTiles));
+    oddList.indices=nullptr;
+    oddList.indexCount=0u;
+    oddList.count=3u;
+    assert(!native_raw_fvf_stroke_dual_draw_tile(
+        oddList,0,0,3440,1440,3440,1440,400,200,
+        full,0u,clipped,clippedTiles));
 
     // Pointlist captures only valid point pixels; a bound outside clip
     // space is not treated as a large imaginary FVF triangle.

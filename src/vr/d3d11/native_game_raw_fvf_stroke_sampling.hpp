@@ -52,7 +52,11 @@ struct NativeRawStrokeEndpoints {
         !(vw > 0.f) || !(vh > 0.f) ||
         !sw || !sh || !tw || !th || tw > sw || th > sh ||
         admitted.left >= admitted.right || admitted.top >= admitted.bottom ||
-        (lines && active < 2u))
+        (lines && active < 2u) ||
+        // D3D9 LINELIST submits exactly two IA elements per source line.
+        // A dangling indexed tail must not escape whole-source validation.
+        (source.assembly == NativeRawFvfAssembly::LineList &&
+         (active & 1u)))
         return false;
     const auto primitives = points ? active :
         source.assembly == NativeRawFvfAssembly::LineList
@@ -77,8 +81,15 @@ struct NativeRawStrokeEndpoints {
         float clip[4]{};
         std::memcpy(clip, bytes + index * source.vertexStride, sizeof(clip));
         for (float q : clip) if (!std::isfinite(q)) return false;
-        // Unknown W=0 is never a source-authenticated GPU capture hint.
-        if (clip[3] == 0.f) return false;
+        // A real WVP line can cross the eye plane at W=0 (or W<0).
+        // Clip its *homogeneous segment* before perspective division rather
+        // than treating the endpoint as a malformed source. The eye and
+        // XY/Z/user planes below admit only its genuinely visible portion.
+        // A standalone point at W=0 cannot produce an authenticated pixel;
+        // the all-zero homogeneous vector is invalid for either topology.
+        if ((!clip[0] && !clip[1] && !clip[2] && !clip[3]) ||
+            (points && clip[3] == 0.f))
+            return false;
         v.x = clip[0]; v.y = clip[1]; v.z = clip[2]; v.w = clip[3];
         if (source.clipDistanceMask) {
             float user[6]{};
