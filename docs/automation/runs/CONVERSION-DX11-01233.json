@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01233",
+  "production_id": "CONVERSION-DX11-01233",
+  "event_id": "CONVERSION-DX11-01233-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+  "classification": "A_EXISTING_FEATURE_ACTUAL_SOURCE_PIXEL_RASTER_DEFECT_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 0,
+  "score_note": "Existing 01231/01232 authentic FVF scissor empty-source-Draw feature correctness repair, not a new independent FEATURE_ID achievement. Same area, same source path; CI/checkpoint are also +0. AI 2 existing scoreboard preserved without change.",
+  "material_implementation_sha": "2754573593e31a52b6f8bb743f1c681fa6532059",
+  "material_result_sha": "2754573593e31a52b6f8bb743f1c681fa6532059",
+  "validation_bearing_result_sha": "2754573593e31a52b6f8bb743f1c681fa6532059",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_fvf_clipped_draw.hpp",
+    "tests/native_raw_fvf_user_clip_capture_test.cpp"
+  ],
+  "implementation": "A source-authentic D3D9 Draw/DrawIndexed touching scissor edge by subpixel aliased line/wireframe raster coverage is not certifiably empty merely because its geometric centreline is outside the integer scissor. Expand only CPU-side FVF no-pixel certificate by 1 native viewport pixel; leave actual D3D11 bound scissor, native GPU draw/readback, D3D9 fallback/Present/input/FFB unchanged. Far-away truly empty geometry still conserves frame ordinal.",
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "integration_path": [
+      "AUTHENTIC_D3D9_FVF_DRAW_INDEXED",
+      "SOURCE_VIEWPORT_SCISSOR_PIXEL_FOOTPRINT_CERTIFICATE",
+      "FRAME_BATCH_EMPTY_ORDINAL_OR_REAL_NATIVE_DRAW",
+      "GPU_RGB_PRE_POST_IF_VISIBLE",
+      "ORIGINAL_D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "CXX_SCISSOR_PIXEL_FOOTPRINT_REPAIR",
+      "LINE_WIREFRAME_INDEXED_USER_CLIP_CXX_REGRESSION",
+      "EXACT_SHA_FIVE_GATE_CONFIRMATION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Near-edge real FVF LINESTRIP/wireframe/indexed potential raster is no longer certified empty; original GPU Draw preserved. Fast Gate compiles and runs C++ source test.",
+      "negative_regression": "Distant line and triangle IA remain certifiably empty; user ClipDistance still excludes authentically; invalid viewport fails closed.",
+      "component_integration": "live_game_frame_bridge.cpp existing FVF observer calls native_game_fvf_fully_clipped_draw.hpp before consume source frame ordinal, but actual D3D11 rasterizer/scissor are unmodified."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY, HMD/GAME UNTESTED",
+    "activation_guard_and_fallback": "No partial native promotion or game-visible proof; original D3D9 Draw/Present and input/FFB, DX9Ex fallback and frozen DXVK untouched."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+    "goal": "Correct pixel-neutral Draw certification for real scissored strokes, not a new feature or independent score.",
+    "acceptance_items": [
+      {
+        "id": "near_edge_real_stroke_preserved",
+        "category": "source_correctness",
+        "expected_behavior": "Near-boundary one-pixel line/wireframe and authentic indexed Draw retain GPU raster path"
+      },
+      {
+        "id": "empty_distance_clip_preserved",
+        "category": "regression",
+        "expected_behavior": "Far outside raster and enabled authentic ClipDistance may still prove empty source ordinal"
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integration_validation",
+        "expected_behavior": "All required Actions PASS at immutable material SHA; actual game/HMD runtime remains UNTESTED"
+      }
+    ]
+  },
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41868810489,
+      "sha": "2754573593e31a52b6f8bb743f1c681fa6532059",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41868810589,
+      "sha": "2754573593e31a52b6f8bb743f1c681fa6532059",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41868810569,
+      "sha": "2754573593e31a52b6f8bb743f1c681fa6532059",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41868810551,
+      "sha": "2754573593e31a52b6f8bb743f1c681fa6532059",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41868811053,
+      "sha": "2754573593e31a52b6f8bb743f1c681fa6532059",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "runtime_evidence": null,
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. Static/native build and synthetic regression are not native game visible GPU pixel or Quest 3 optical verification.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Continue unresolved full native menu-to-race game frame and genuine GPU pixel publication under controller-selected distinct active implementation; do not rerun this PASS_SHA merely to restore bookkeeping."
+}
