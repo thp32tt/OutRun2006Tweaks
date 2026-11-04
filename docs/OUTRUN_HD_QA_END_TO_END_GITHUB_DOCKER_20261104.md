@@ -33,14 +33,14 @@
 - Git Stack: `thp32tt/OutRun2006Tweaks`, 브랜치 `localization-controller-recovery-20260928`.
 - 기존 `tools/chat-controller/localization-recovery-v1/docker-compose.yml` Stack을 그대로 Pull latest + Rebuild + Redeploy. **기존 볼륨 삭제 금지**.
 - Portainer stack 환경변수:
-  - `COMPOSE_PROFILES=chat-rework` (선택형 이미지 작업 컨테이너 활성화)
+  - 채팅 서비스 `outrun-chat-qa-rework`는 **기본 활성**입니다. `COMPOSE_PROFILES` 설정은 필요하지 않습니다. 2026-11-04 15:09 KST Portainer 프로필 누락 시 미배포 문제로 수정했습니다.
   - `OUTRUN_GITHUB_CONTENTS_TOKEN` (저장소 한정 Contents **Read and write** PAT; 채팅/파일/코드에 절대 출력하지 않음)
   - `OUTRUN_REWORK_VNC_PASSWORD` (별도 강한 VNC 암호; 미설정 시 시작 차단)
   - `CHATGPT_PROJECT_URL` (기존 한글화 ChatGPT 프로젝트 URL, 기본 `https://chatgpt.com/`)
   - `OUTRUN_REWORK_POLL_SECONDS=600` (옵션; 120~3600초, 기본 10분)
   - `OUTRUN_REWORK_VNC_BIND=6084` (옵션; 포트 충돌 시 다른 포트 사용)
-- 브라우저 컨테이너는 별도 프로필 `/data/hd-rework/browser-rework-profile`을 사용. 최초 실행 후 VNC `http://N100_HOST:6084/vnc.html`에서 **사용자가 직접** ChatGPT 로그인해야 함.
-- 기존 저부하 GitHub 모니터 `outrun-chat-controller-localization-recovery`는 0.1 CPU/96MB로 독립 유지. 브라우저 컨테이너는 필요할 때만 프로필 활성화(최대 0.65 CPU/1800MB).
+- 브라우저 컨테이너는 별도 Chrome 사용자 데이터 디렉터리 `/data/hd-rework/browser-rework-profile`을 사용. 최초 실행 후 VNC `http://N100_HOST:6084/vnc.html`에서 **사용자가 직접** ChatGPT 로그인해야 함.
+- 기존 저부하 GitHub 모니터 `outrun-chat-controller-localization-recovery`는 0.1 CPU/96MB로 독립 유지. 브라우저 컨테이너는 기본 배포되며 최대 0.65 CPU/1800MB로 제한.
 - 실패/로그인 없음/UI 변경/이미지 생성 제한/파일 저장 실패는 `HOLD`. 자동 생성·저장·승인 성공이라고 주장하지 않음.
 
 ## 검증 증거
@@ -53,3 +53,9 @@
 ## 남은 작업
 - 불투명·혼합 원문 영역의 독립 CLEAN 플레이트·마스크 확보, BC/DXT/mip 인코더, 좌표 중첩 매뉴얼 매핑, C3 및 게임 실제 QA는 기계적 PASS가 아니며 별도 해결 필요.
 - 실제 도커 배포 후 A/B/C1 로그, 큐 상태, 결과 원본 SHA 증빙을 확인해 자동 루프가 정상 동작하는지 재검증한다.
+
+## 2026-11-04 15:08 KST 배포 후 복구 검증
+- N100 기존 경량 컨트롤러 재시작 확인; 새 A/B/C1 채팅 프로세스와 TCP 6084 미확인. 이전 Compose profiles로는 배포 대상에서 제외될 수 있었음.
+- Controller 브랜치 `0b3fd1a5`부터 신규 브라우저 작업자 기본 포함. UI 로그인 이전 `OUTRUN_GITHUB_CONTENTS_TOKEN`과 `OUTRUN_REWORK_VNC_PASSWORD` 빈 값은 명시적 HOLD/시작 차단.
+- GitHub 엄격 QA 보고서는 954 ROI / 4 합성 / 950 HOLD, 새 SHA 기반 A/B 지시 8건까지 발행됨. 최종 합격/인게임 배포 아님.
+- 수정 코드 재배포 후 `outrun-chat-qa-rework` 생성/Running, 내부망 VNC `6084`, ChatGPT 로그인 및 `HDRW-...` 작업 전송 증빙까지 점검해야 정상 가동으로 판정.
