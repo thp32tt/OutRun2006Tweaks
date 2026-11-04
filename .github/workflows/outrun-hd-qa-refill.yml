@@ -44,6 +44,41 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Recover already-verified strict QA report from failed queue-publishing run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="hd-qa-queue-state/localization/automation_runs/hd_rework_queue/last_report.json"
+          if [[ -s "$report" ]]; then
+            echo "EXISTING_SHA_BOUND_REPORT_REUSE"
+            exit 0
+          fi
+          # The DDS itself passed twice and matched SHA; only the ticket
+          # materializer crashed after completion. Reuse its exact report.
+          run_id=41778858739
+          expected_sha="60ef6f26fbd97d2132141b47e2251a5b8af1b405"
+          actual_sha="$(gh api "repos/thp32tt/OutRun2006Tweaks/actions/runs/$run_id" --jq '.head_sha')"
+          test "$actual_sha" = "$expected_sha"
+          gh run download "$run_id" --repo thp32tt/OutRun2006Tweaks \
+            --name "outrun-ab-multi-atlas-$run_id" --dir "$RUNNER_TEMP/seed-qa"
+          source_report="$RUNNER_TEMP/seed-qa/qa_report.json"
+          test -s "$source_report"
+          python - "$source_report" <<'PY'
+          import json,sys
+          j=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert j.get("schema")=="outrun.ab-imagegen-hd-strict.v2"
+          assert j.get("active_roi_total")==954
+          assert j.get("translated_roi_generated")==4
+          assert j.get("release_approved") is False
+          assert j.get("runtime_validation")=="UNTESTED"
+          assert j.get("zip_sha256")=="726270942f5ab4bfce103e8b05df9ed379ddba20ef60aec64e14a5262350c3e4"
+          print("RECOVERED_STRICT_HD_REPORT_SHA_VERIFIED")
+          PY
+          mkdir -p "$(dirname "$report")"
+          cp "$source_report" "$report"
+
       - name: Refill at most eight new verified HD ImageGen tasks
         env:
           GH_TOKEN: ${{ github.token }}
