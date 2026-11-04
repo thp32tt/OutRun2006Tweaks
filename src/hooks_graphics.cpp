@@ -52,7 +52,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff,VRQuestCockpitV2SkyProbe;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff,VRQuestCockpitV2SkyProbe,VRQuestCockpitV2ApkNativeCamera;
     extern Setting<float> VRQuestCockpitV2SeatBack,VRQuestCockpitV2SeatDown,VRQuestCockpitV2SeatRight;
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
@@ -569,10 +569,13 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                    pointers,SeatTableCount*sizeof(std::uint32_t),
                    profiles,SeatTableCount*kProfileStride,
                    static_cast<int>(i),profile) ||
-               !OutRunVR::QuestCockpitV2::NativeVrProfileInputAnchor(
-                   profile,Settings::VRQuestCockpitV2SeatBack.get(),
-                   Settings::VRQuestCockpitV2SeatDown.get(),
-                   Settings::VRQuestCockpitV2SeatRight.get(),injected[i])) {
+               !(Settings::VRQuestCockpitV2ApkNativeCamera
+                    ? OutRunVR::QuestCockpitV2::OriginalQuestModeOneInput(
+                        profile,injected[i])
+                    : OutRunVR::QuestCockpitV2::NativeVrProfileInputAnchor(
+                        profile,Settings::VRQuestCockpitV2SeatBack.get(),
+                        Settings::VRQuestCockpitV2SeatDown.get(),
+                        Settings::VRQuestCockpitV2SeatRight.get(),injected[i]))) {
                 RestoreNativeSeatProfile();
                 return false;
             }

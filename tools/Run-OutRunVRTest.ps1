@@ -338,6 +338,7 @@ if($QuestCockpitV2 -eq 'ON'){
         '-VR.QuestCockpitV2HideDriver=true',
         '-VR.QuestCockpitV2RawB0Camera=false',
         '-VR.QuestCockpitV2NativeSeatProfile=true',
+        '-VR.QuestCockpitV2ApkNativeCamera=true',
         # Do not override seat tuning on the command line: F11 must be
         # able to edit it and preserve OutRun2006Tweaks.user.ini values.
         # SeatDown negative lifts the eye; SeatBack positive moves rearward.

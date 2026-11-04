@@ -60,6 +60,21 @@ inline bool OriginalQuestVrProfileAnchor(
     return true;
 }
 
+// ARM64 0x2E17F4..0x2E1808 exact native source: the selected 30-car
+// guest-profile XYZ is amended with (+0.32 Y, +0.55 Z), BEFORE the
+// race_camera_eye_look_485590 mode1 override and original swing/blend.
+// It does NOT belong to the per-eye HMD view. Add these once only.
+inline bool OriginalQuestModeOneInput(Vec3 guestProfile,
+                                      Vec3& destination) noexcept {
+    if(!Finite(guestProfile) || std::fabs(guestProfile.x)>5.f ||
+       std::fabs(guestProfile.y)>5.f ||
+       std::fabs(guestProfile.z)>5.f) return false;
+    const Vec3 next{guestProfile.x,guestProfile.y+0.319999993f,
+                    guestProfile.z+0.550000012f};
+    if(!Finite(next) || std::fabs(next.y)>5.f ||
+       std::fabs(next.z)>5.f) return false;
+    destination=next;return true;
+}
 // HMD feedback: positive mode1 local Z moves eye rearward; positive
 // SeatDown moves it downward. Both offsets are now signed in F11.
 // Runtime-safe PC bridge: substitute the Quest profile as the ORIGINAL

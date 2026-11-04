@@ -167,8 +167,12 @@ jobs:
           assert 'SyncNativeSeatProfile()' in hook
           assert 'SeatTablePatched=true;' in hook
           assert 'OriginalQuestVrProfileAnchor(' in hook
-          assert 'QuestCockpitV2SeatBack = 0.35' in ini
-          assert 'QuestCockpitV2SeatDown = -0.25' in ini
+          assert 'QuestCockpitV2SeatBack = 0.0' in ini
+          assert 'QuestCockpitV2SeatDown = 0.0' in ini
+          assert 'QuestCockpitV2ApkNativeCamera = true' in ini
+          assert 'OriginalQuestModeOneInput(' in hook
+          assert 'OriginalQuestModeOneInput(' in Path('src/vr/game/quest_cockpit_v2_seat.hpp').read_text(encoding='utf-8')
+          assert "'-VR.QuestCockpitV2ApkNativeCamera=true'" in launcher
           assert "'-VR.QuestCockpitV2NativeSeatProfile=true'" in launcher
           assert "'-VR.QuestCockpitV2SeatBack=0.0'" not in launcher
           assert "'-VR.QuestCockpitV2SeatDown=0.0'" not in launcher

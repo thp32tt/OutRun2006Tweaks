@@ -142,14 +142,16 @@ namespace Settings
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
     Setting<bool> VRQuestCockpitV2Enabled{ "VR", "QuestCockpitV2Enabled", false,
         "EXPERIMENTAL Quest mode1 car camera + 30-car native VR seat profile; opt-in only; restart required." };
+    Setting<bool> VRQuestCockpitV2ApkNativeCamera{ "VR", "QuestCockpitV2ApkNativeCamera", true,
+        "Use original Quest 2E17F4 source +0.32 Y/+0.55 Z, once before native mode1 swing/blend. Ignores old manual F11 seat offsets while enabled. OFF = legacy manual A/B." };
     Setting<bool> VRQuestCockpitV2NativeSeatProfile{ "VR", "QuestCockpitV2NativeSeatProfile", true,
-        "Quest native 30-car profile XYZ is inserted before original mode1 swing/blend/ground clamp. Signed SeatDown (negative=up) calibrates PCVR height. F11 OFF restores original view1." };
+        "Quest 30-model camera XYZ source inserted before original swing/blend/ground. ApkNativeCamera=true applies source-exact ARM64 +0.32 Y / +0.55 Z and ignores F11 manual tuning." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
-    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.35f,
-        "Signed mode1 seat depth: positive = back, negative = forward. Default +0.35 from the user's HMD-tuned position; not yet exact APK parity.",Range<float>{-1.2f,1.2f} };
-    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", -0.25f,
-        "Signed mode1 seat height: NEGATIVE = UP, positive = down. Default -0.25 is calibrated from HMD user tuning; exact Quest XR pivot parity is not claimed. F11 live; game units.",Range<float>{-1.0f,0.8f} };
+    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.f,
+        "Legacy manual seat depth, used ONLY when ApkNativeCamera=false; original Quest source ignores saved F11 manual values.",Range<float>{-1.2f,1.2f} };
+    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.f,
+        "Legacy manual seat height, used ONLY when ApkNativeCamera=false. Original Quest mode applies +0.32 Y/+0.55 Z before the camera.",Range<float>{-1.0f,0.8f} };
     Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
         "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,

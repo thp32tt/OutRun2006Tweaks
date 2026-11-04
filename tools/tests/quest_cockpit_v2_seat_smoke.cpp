@@ -111,6 +111,20 @@ int main(){
         guestPointers.size(),records.data(),records.size(),0,fetched));
     // Runtime now injects Quest XYZ at the original mode1 producer input,
     // so the game's own swing/blend/ground clamp consumes it before XR.
+    // Original ARM64 2E17F4 callback adds a fixed Y/Z pair to the
+    // 30-entry profile before native view1; never to OpenXR eye matrices.
+    Vec3 exactQuestInput{};
+    assert(OriginalQuestModeOneInput(questXYZ[0],exactQuestInput));
+    assert(near(exactQuestInput.x,-.353f));
+    assert(near(exactQuestInput.y,.947f));
+    assert(near(exactQuestInput.z,.160f));
+    assert(OriginalQuestModeOneInput(questXYZ[15],exactQuestInput));
+    assert(near(exactQuestInput.y,.947f));
+    assert(near(exactQuestInput.z,.100f));
+    assert(!OriginalQuestModeOneInput(
+        {0.f,std::numeric_limits<float>::quiet_NaN(),0.f},
+        exactQuestInput));
+    assert(near(exactQuestInput.z,.100f));
     Vec3 inputAnchor{};
     assert(NativeVrProfileInputAnchor(
         questXYZ[0],0.f,0.f,0.f,inputAnchor));
