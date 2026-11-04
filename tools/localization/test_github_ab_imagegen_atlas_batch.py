@@ -105,6 +105,56 @@ class MultiAtlasTest(unittest.TestCase):
    self.assertFalse(m.imported_candidate(root,{"_candidate_rel":"alias.png"}))
  def test_q047_orientation_is_exact_source_pinned(self):
   self.assertEqual(m.ORIENTATIONS["AD720950"],"FLIPY")
+ def test_pinned_orientation_accepts_all_104_sha_matching_targets(self):
+  import json
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);(root/"localization/automation_inputs").mkdir(parents=True)
+   entries=[]
+   groups={}
+   for i in range(104):
+    target=f"textures/load/spr_etc_xst/{i:08X}_256x64.dds"
+    dds_sha=f"{i+1:064x}"
+    orient="NORMAL" if i==0 else "FLIPY"
+    entries.append({"target":target,"orientation":orient,
+                    "original_dds_sha256":dds_sha,
+                    "original_png_sha256":f"{i+201:064x}"})
+    groups[target]=[{"source_dds_sha256":dds_sha}]
+   (root/m.SOURCE_PLAN).write_text(json.dumps({"entries":entries}))
+   directions=m.load_pinned_orientations(root,groups)
+   self.assertEqual(len(directions),104)
+   self.assertEqual(directions[entries[0]["target"]],"NORMAL")
+   self.assertEqual(directions[entries[1]["target"]],"FLIPY")
+   entries[1]["original_dds_sha256"]="0"*64
+   (root/m.SOURCE_PLAN).write_text(json.dumps({"entries":entries}))
+   with self.assertRaisesRegex(ValueError,"SHA_CONFLICT"):
+    m.load_pinned_orientations(root,groups)
+
+ def test_dominant_coarse_roi_held_but_children_can_be_painted(self):
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);p=root/"candidate.png";make_candidate(p)
+   rows=[
+    {"roi_id":"Q044_1234567890abcdef","english":"BANNER",
+     "korean":"배너","_bbox":[0,0,240,120],"_candidate_rel":p.name},
+    {"roi_id":"Q044_fedcba0987654321","english":"WIN",
+     "korean":"승리","_bbox":[3,7,101,40],"_candidate_rel":p.name},
+    {"roi_id":"Q044_ffffffffffffffff","english":"LOSE",
+     "korean":"패배","_bbox":[127,58,224,90],"_candidate_rel":p.name}]
+   original=fake_native()
+   binary,_,painted,holds=m.process_atlas(original,rows,root,"NORMAL")
+   self.assertIsNotNone(binary)
+   self.assertEqual(len(painted),2)
+   self.assertEqual(len(holds),1)
+   self.assertEqual(holds[0]["reason"],"COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD")
+   self.assertEqual(holds[0]["roi_id"],rows[0]["roi_id"])
+
+ def test_dominant_subsets_never_resolve_ambiguous_partial_overlap(self):
+  rows=[
+   {"roi_id":"a","_bbox":[0,0,240,120]},
+   {"roi_id":"b","_bbox":[5,5,80,35]},
+   {"roi_id":"c","_bbox":[40,15,120,45]}]
+  self.assertEqual(m.dominant_container_holds(rows),{"a"})
+  self.assertEqual(m.conflicting_rois(rows[1:]),{"b","c"})
+
  def test_no_font_regeneration(self):
   s=src.read_text()
   for term in ("ImageFont","truetype(","draw.text(","font_path"):
