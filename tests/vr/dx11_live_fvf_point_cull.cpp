@@ -43,7 +43,7 @@ int main() {
     assert(build(strip,4u,nullptr,4u,5u,2u,0u,out));
     assert((out == std::vector<std::uint32_t>{0,1,2, 2,1,3}));
     const std::uint32_t permute[]{3u,2u,1u,0u};
-    assert(build(strip,4u,permute,4u,5u,3u,0u,out));
+    assert(build(strip,4u,permute,4u,5u,2u,0u,out));
     assert((out == std::vector<std::uint32_t>{3,2,1, 1,2,0}));
     const auto intact=out;
     // Never bypass source clip/IA and never mutate a previously validated

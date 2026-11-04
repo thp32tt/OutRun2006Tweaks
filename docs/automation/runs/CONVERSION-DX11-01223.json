@@ -36,10 +36,13 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "REAL_D3D9_FVF_LINE_POINT_CALLSITE",
+      "D3D11_NATIVE_DRAW",
       "NATIVE_D3D11_FVF_LINE_POINT_DRAW",
       "AUTHENTIC_SOURCE_STROKE_HOMOGENEOUS_CLIP",
       "NATIVE_GPU_RAW_PRE_POST_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT",
       "ORIGINAL_GAME_D3D9_PRESENT_FALLBACK"
     ],
     "integration_path": [
@@ -65,7 +68,7 @@
       "DX11:REAL_GAME_DRAW"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_ONLY. The diagnostic captures source-aligned GPU pixels only when real native GPU RGB/epoch/Present conditions are met. No actual game/HMD/contiguous menu-car-race full-frame evidence. RUNTIME_VALIDATION=UNTESTED.",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_ONLY. LIVE_D3D9_CALLSITE / D3D11_NATIVE_DRAW / VISIBLE_FRAME_OUTPUT are conditional source code path labels, NOT observed game-native runtime evidence. Actual visible source-aligned GPU pixels require native RGB delta, source identity, GPU fence and original D3D9 Present. No full-frame menu/car/race or HMD proof. RUNTIME_VALIDATION=UNTESTED.",
     "activation_guard_and_fallback": "Existing explicit DX11_RAW_VISUAL_DIAGNOSTIC opt-in only; actual original D3D9 renderer and Present, FFB/input/SkyGlow, DX9Ex fallback preserved; DXVK frozen. Never enable production native fullframe based on CI."
   },
   "feature_contract": {
@@ -160,7 +163,7 @@
   "real_game_draw_blocker": "NEW_SHA_RUNTIME_UNTESTED: authentic real-game Draw/native GPU RGB/Present remains to be observed and full-size menu-car-race source coverage has not been proven; prior observed zero native Draws applies only to older pinned source SHA.",
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "next_implementation_action": "Continue coherent native D3D11 full-size real-game Draw/DrawIndexed -> complete game frame -> native stereo OpenXR GPU path under controller-owned follow-on task; preserve owner lease and DXVK freeze. Need exact-SHA desktop and Quest3 HMD validation before promotion.",
-  "record_type": "C6_RESULT_ONLY",
+  "record_type": "C6_RESULT_ONLY_CORRECTIVE_CONTRACT_LABELS",
   "score_note": "NO ADDITIONAL SCORE: still incomplete DX11 full-resolution native game frame feature. One 01223 source commit, exact-SHA Gates and C6 record represent one unpromoted source stage; failed-job network retry and this report +0. AI1 unaffected.",
   "source_and_repair_commits": [
     {
@@ -169,5 +172,5 @@
       "summary": "Actual game native point/list/strip source -> homogeneous stroke clipping -> paired GPU tile capture, unchanged runtime guards and C++ regression. No causal source repair; OpenXR one network-failed job rerun at same SHA."
     }
   ],
-  "checkpoint": "C6_STATE"
+  "checkpoint": "C6_STATE_POLICY_PATH_LABEL_REPAIR_01224; source result SHA and five prior exact SHA gates unchanged"
 }
