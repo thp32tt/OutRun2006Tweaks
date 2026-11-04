@@ -36,11 +36,18 @@ def source_dds(multiline=False, opaque=False):
 def candidate_file(path, multiline=False, edge=False):
     img = Image.new("RGBA", (480, 200))
     draw = ImageDraw.Draw(img)
-    draw.rectangle((25, 35, 420, 100), fill=(40, 80, 220, 255))
+    draw.rectangle((0 if edge else 25, 35, 420, 100), fill=(40, 80, 220, 255))
     if multiline:
         draw.rectangle((25, 140, 420, 165), fill=(40, 80, 220, 255))
-    if edge:
-        draw.rectangle((0, 0, 10, 10), fill=(40, 80, 220, 255))
+    img.save(path)
+
+
+def candidate_components_file(path):
+    """One visual line with separable existing glyph groups; no font generation."""
+    img = Image.new("RGBA", (480, 200))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((25, 35, 155, 100), fill=(40, 80, 220, 255))
+    draw.rectangle((220, 35, 420, 100), fill=(40, 80, 220, 255))
     img.save(path)
 
 
@@ -100,6 +107,21 @@ class StrictHDQualityTests(unittest.TestCase):
         self.assertFalse(painted)
         self.assertEqual(holds[0]["reason"], "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED")
 
+    def test_source_two_lines_candidate_one_reflows_existing_pixels_when_separable(self):
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            candidate_components_file(repo/"candidate.png")
+            data, _, _, painted, holds = strict.process_strict_atlas(
+                source_dds(multiline=True), [row()], repo, "NORMAL", native.native_image,
+                native.imported_candidate, native.conflicting_rois,
+                native.dominant_container_holds)
+        self.assertIsNotNone(data)
+        self.assertFalse(holds)
+        self.assertEqual(painted[0]["candidate_detected_line_count"], 1)
+        self.assertEqual(painted[0]["translated_line_count"], 2)
+        self.assertTrue(any("REFLOW_EXISTING_CANDIDATE_1_TO_2_LINES" in x
+                            for x in painted[0]["auto_salvage"]))
+
     def test_source_two_lines_candidate_two_is_separate_fit(self):
         data, _, _, painted, holds = self.run_case(source_dds(multiline=True), multiline=True)
         self.assertIsNotNone(data)
@@ -109,17 +131,29 @@ class StrictHDQualityTests(unittest.TestCase):
             self.assertLessEqual(b[2]-b[0], a[2]-a[0])
             self.assertLessEqual(b[3]-b[1], a[3]-a[1])
 
-    def test_candidate_edge_clipping_is_rejected(self):
+    def test_candidate_edge_is_padded_and_shrunk_before_imagegen_fallback(self):
         data, _, _, painted, holds = self.run_case(source_dds(), candidate_edge=True)
-        self.assertIsNone(data)
-        self.assertFalse(painted)
-        self.assertEqual(holds[0]["reason"], "QA_CANDIDATE_EDGE_CLIP")
+        self.assertIsNotNone(data)
+        self.assertFalse(holds)
+        self.assertTrue(any("PAD_EXISTING_CANDIDATE_EDGE" in x
+                            for x in painted[0]["auto_salvage"]))
 
-    def test_source_border_touch_is_rejected(self):
+    def test_source_border_touch_is_accepted_only_when_neighbor_pixels_are_clear(self):
         src = source_dds()
         b = bytearray(src)
         im = native.native_image(src)
-        ImageDraw.Draw(im).rectangle((4, 10, 12, 13), fill=(255, 255, 255, 255))
+        ImageDraw.Draw(im).rectangle((4, 18, 14, 37), fill=(255, 255, 255, 255))
+        b[128:] = im.tobytes("raw", "BGRA")
+        data, _, _, painted, holds = self.run_case(bytes(b))
+        self.assertIsNotNone(data)
+        self.assertFalse(holds)
+        self.assertIn("SOURCE_EDGE_CLEAR_NEIGHBOR_PROOF", painted[0]["auto_salvage"])
+
+    def test_source_border_touch_with_alpha_outside_roi_remains_hold(self):
+        src = source_dds()
+        b = bytearray(src)
+        im = native.native_image(src)
+        ImageDraw.Draw(im).rectangle((3, 18, 14, 37), fill=(255, 255, 255, 255))
         b[128:] = im.tobytes("raw", "BGRA")
         data, _, _, painted, holds = self.run_case(bytes(b))
         self.assertIsNone(data)
