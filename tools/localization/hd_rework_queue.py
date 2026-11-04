@@ -14,17 +14,25 @@ from pathlib import Path
 from PIL import Image, ImageOps
 import github_ab_imagegen_atlas_batch as atlas
 
-POLICY = "hd-strict-chat-rework-v1-20261104"
+POLICY = "hd-existing-ab-salvage-first-v2-20261105"
 MAX_ACTIVE = 8
 MAX_PER_ROLE = 4
 MAX_REF_BYTES = 650 * 1024
 MAX_REF_SIDE = 4096
+# ImageGen is a last-resort fallback. Existing A/B pixels are deterministically
+# padded/reflowed/downscaled by hd_strict_qa before any queue item can reach here.
 REGEN_REASONS = (
-    "QA_CANDIDATE", "CANDIDATE_", "QA_ORIGINAL_LINE_COUNT",
-    "QA_SOURCE_", "QA_NATIVE_HD_ROI_", "OPAQUE_PROTECTED_ART_HOLD",
+    "QA_CANDIDATE_UNREADABLE", "QA_CANDIDATE_INVISIBLE",
+    "QA_CANDIDATE_PNG_GEOMETRY", "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "QA_DOWNSCALE_LOST_GLYPHS", "QA_TRANSLATION_TOO_SMALL_TO_READ",
+    "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT", "QA_SOURCE_LINE_LAYOUT_UNVERIFIED",
+    "OPAQUE_PROTECTED_ART_HOLD",
 )
-NOT_GENERATION = ("DDS_NOT_", "SOURCE_DDS_", "QA_NATIVE_DDS_", "ROI_OVERLAP_",
-                  "COARSE_ROI_", "AB_PNG_NOT_YET_IMPORTED")
+NOT_GENERATION = (
+    "DDS_NOT_", "SOURCE_DDS_", "QA_NATIVE_DDS_", "ROI_OVERLAP_",
+    "COARSE_ROI_", "AB_PNG_NOT_YET_IMPORTED", "QA_NATIVE_HD_ROI_",
+    "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+)
 
 
 def flatten_holds(report):
@@ -184,13 +192,15 @@ def build_queue(root, report, out_dir, skip_state_root=None):
         selected.append({
             "task_id": task_id, "role": role, "roi_id": row["roi_id"],
             "english": row["english"], "korean": row["korean"],
-            "reason": reason, "status": "READY_FOR_AB_IMAGEGEN_NOT_SUBMITTED",
+            "reason": reason,
+            "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
             "source_dds_path": row["source_dds_path"],
             "source_dds_sha256": row["source_dds_sha256"],
             "old_candidate_sha256": current_sha,
             "source_native_bbox_xyxy": row["_bbox"],
             "reference": {"name":img_name, **proof},
-            "required": ["KOREAN_LETTERING_RGBA_PNG",
+            "required": ["DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+                         "KOREAN_LETTERING_RGBA_PNG",
                          "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
                          "EXACT_SOURCE_NATIVE_SIZE_CEILING",
                          "PRESERVE_ORIGINAL_LINE_COUNT",
@@ -212,7 +222,7 @@ def build_queue(root, report, out_dir, skip_state_root=None):
         "hold_categories": dict(sorted(count.items())),
         "ab_eligible_counts": dict(sorted(eligible.items())),
         "reference_blockers": dict(sorted(blockers.items())),
-        "selection_policy": "8 TOTAL MAX; 4 PER ROLE; SHA-DEDUPE BEFORE CHAT SEND",
+        "selection_policy": "IMAGEGEN FALLBACK ONLY; 8 TOTAL MAX; 4 PER ROLE; SHA-DEDUPE BEFORE CHAT SEND",
         "tasks": selected,
     }
     (out_dir/"queue.json").write_text(json.dumps(q,ensure_ascii=False,sort_keys=True,indent=2)+"\n",encoding="utf-8")
