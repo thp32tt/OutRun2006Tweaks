@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageChops
+from PIL import Image, ImageDraw, ImageChops, ImageOps
 
 root = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("ab_native", root / "github_ab_imagegen_atlas_batch.py")
@@ -130,12 +130,12 @@ class StrictHDQualityTests(unittest.TestCase):
         src = source_dds()
         # Native upside-down input contains the original text near the bottom.
         im = native.native_image(src)
-        raw = src[:128] + __import__("PIL").ImageOps.flip(im).tobytes("raw", "BGRA")
+        raw = src[:128] + ImageOps.flip(im).tobytes("raw", "BGRA")
         data, final, clean, painted, holds = self.run_case_fliPY(raw)
         self.assertIsNotNone(data)
         self.assertFalse(holds)
         self.assertTrue(ImageChops.difference(native.native_image(data),
-                     __import__("PIL").ImageOps.flip(final)).getbbox() is None)
+                     ImageOps.flip(final)).getbbox() is None)
 
     def run_case_fliPY(self, raw):
         with tempfile.TemporaryDirectory() as d:
