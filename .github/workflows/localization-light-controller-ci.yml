@@ -10,6 +10,9 @@ on:
       - "tools/chat-controller/localization-recovery-v1/test_github_actions_light_controller.py"
       - "tools/chat-controller/localization-recovery-v1/Dockerfile.gitops"
       - "tools/chat-controller/localization-recovery-v1/docker-compose.yml"
+      - "tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework"
+      - "tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh"
   workflow_dispatch:
 
 permissions:
@@ -30,6 +33,9 @@ jobs:
             tools/chat-controller/localization-recovery-v1/test_github_actions_light_controller.py
             tools/chat-controller/localization-recovery-v1/Dockerfile.gitops
             tools/chat-controller/localization-recovery-v1/docker-compose.yml
+            tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
+            tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework
+            tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh
 
       - uses: actions/setup-python@v5
         with:
@@ -50,13 +56,22 @@ jobs:
           base = pathlib.Path("tools/chat-controller/localization-recovery-v1")
           doc=yaml.safe_load((base/"docker-compose.yml").read_text())
           services=doc["services"]
-          assert len(services)==1
+          assert set(services)=={"outrun-chat-controller-localization-recovery","outrun-chat-qa-rework"}
           s=services["outrun-chat-controller-localization-recovery"]
           assert s["build"]["dockerfile"]=="Dockerfile.gitops"
           assert float(s["cpus"]) <= 0.1
           assert s["mem_limit"]=="96m"
           assert "OUTRUN_GITHUB_ACTIONS_TOKEN" in s["environment"]
-          assert not s.get("ports"), "Browser/VNC should not start"
+          assert not s.get("ports"), "Low-impact watcher must not open VNC"
+          browser=services["outrun-chat-qa-rework"]
+          assert browser["profiles"]==["chat-rework"]
+          assert browser["build"]["dockerfile"]=="Dockerfile.chat-rework"
+          assert float(browser["cpus"])<=0.65
+          assert browser["mem_limit"]=="1800m"
+          assert "OUTRUN_GITHUB_CONTENTS_TOKEN" in browser["environment"]
+          assert "OUTRUN_REWORK_VNC_PASSWORD" in browser["environment"]
+          assert len(browser.get("ports",[]))==1
+          assert "browser-rework-profile" in (base/"github_chat_rework_controller.py").read_text()
           dockerfile=(base/"Dockerfile.gitops").read_text()
           assert "pip install" not in dockerfile
           assert "github_actions_light_controller.py" in dockerfile
