@@ -47,7 +47,7 @@ def api(path, token, payload=None):
 
 
 def content_path(rel):
-    if not re.fullmatch(r"[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*",rel):
+    if ".." in rel.split("/") or not re.fullmatch(r"[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*",rel):
         raise ValueError("UNSAFE_QUEUE_PATH")
     return "/repos/"+REPO+"/contents/"+PREFIX+"/"+rel
 
