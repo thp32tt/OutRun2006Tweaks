@@ -1,0 +1,73 @@
+name: Dino v15 External Cockpit Win32 DLL Build
+
+on:
+  push:
+    branches: [ 'feature/dino-v15-external-cockpit-20261104' ]
+    paths:
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/game/dino_external_*.hpp'
+      - 'src/vr/d3d9/stereo_renderer_r33.cpp'
+      - 'src/vr/d3d9/ex_device_upgrade_r15.cpp'
+      - '.github/workflows/dino-v15-external-win32.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  win32-dll:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+      - name: Configure exact SHA Win32 MSVC source graph
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-dino -G "Visual Studio 17 2022" -A Win32
+          if ($LASTEXITCODE -ne 0) { throw "CMake failed" }
+      - name: Upstream toolchain compatibility adjustments
+        shell: pwsh
+        run: |
+          foreach ($path in @(
+            'build-dino/_deps/safetyhook-build/src/safetyhook.vcxproj',
+            'build-dino/_deps/zydis-build/Zydis.vcxproj',
+            'build-dino/_deps/zydis-build/zycore/Zycore.vcxproj')) {
+            if (Test-Path $path) {
+              (Get-Content $path) -replace 'ZYCORE_STATIC_BUILD',
+                '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' |
+                Set-Content $path
+            }
+          }
+          $sdl = 'build-dino/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c'
+          if (Test-Path $sdl) { Set-Content $sdl -Value '' }
+          $cfg = 'build-dino/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h'
+          if (Test-Path $cfg) {
+            (Get-Content $cfg) -replace '#define SDL_JOYSTICK_GAMEINPUT 1',
+              '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content $cfg
+          }
+      - name: Compile actual Win32 VR DLL
+        shell: pwsh
+        run: |
+          cmake --build build-dino --config Release --target outrun2006tweaks --parallel 4
+          if ($LASTEXITCODE -ne 0) { throw "Win32 source build failed" }
+          $dll = Get-ChildItem build-dino -Recurse -Filter dinput8.dll |
+            Where-Object { $_.FullName -notmatch '_deps' } |
+            Sort-Object Length -Descending | Select-Object -First 1
+          if (-not $dll) { throw "Dino DLL missing" }
+          New-Item -ItemType Directory -Force out-dino | Out-Null
+          Copy-Item $dll.FullName out-dino/dinput8.dll
+          $bin = [IO.File]::ReadAllBytes((Resolve-Path out-dino/dinput8.dll))
+          $pe = [BitConverter]::ToInt32($bin,0x3C)
+          if ([Text.Encoding]::ASCII.GetString($bin,$pe,4) -ne "PE`0`0" -or
+              [BitConverter]::ToUInt16($bin,$pe+4) -ne 0x14c) { throw "Not PE32 x86" }
+          Get-FileHash out-dino/dinput8.dll -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DinoV15External-Win32-${{ github.sha }}
+          path: out-dino/dinput8.dll
+          retention-days: 14
+          if-no-files-found: error
