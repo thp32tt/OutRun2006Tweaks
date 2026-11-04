@@ -109,6 +109,24 @@ int main(){
     records[0x4cu+6u]=0xff; records[0x4cu+7u]=0x7f;
     assert(!OriginalQuestVrProfileAnchor(guestPointers.data(),
         guestPointers.size(),records.data(),records.size(),0,fetched));
+    // Runtime now injects Quest XYZ at the original mode1 producer input,
+    // so the game's own swing/blend/ground clamp consumes it before XR.
+    Vec3 inputAnchor{};
+    assert(NativeVrProfileInputAnchor(
+        questXYZ[0],0.f,0.f,0.f,inputAnchor));
+    assert(near(inputAnchor.x,questXYZ[0].x));
+    assert(near(inputAnchor.y,questXYZ[0].y));
+    assert(near(inputAnchor.z,questXYZ[0].z));
+    assert(NativeVrProfileInputAnchor(
+        questXYZ[0],.1f,.1f,.05f,inputAnchor));
+    assert(near(inputAnchor.x,-.303f));
+    assert(near(inputAnchor.y,.527f));
+    assert(near(inputAnchor.z,-.490f));
+    const Vec3 inputBefore=inputAnchor;
+    assert(!NativeVrProfileInputAnchor(
+        questXYZ[0],-1.f,0.f,0.f,inputAnchor));
+    assert(near(inputAnchor.x,inputBefore.x));
+
     // No raw B0 is used: the source view1 camera remains the same and
     // only its profile delta is applied ONCE, atomically to eye and look.
     SeatPose profilePose{};
