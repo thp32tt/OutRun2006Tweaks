@@ -49,7 +49,8 @@ def integrated(b: str, h: str) -> bool:
             "return matchesClearedBackbuffer &&" in h and
             "const bool sameClearedGameTarget = s.clearColor.matches(" in section and
             "s.frameBatch.accepts_full_on_source_target(" in section and
-            "sourceOrdinal, sameClearedGameTarget)" in section)
+            "s.frameBatch.accepts_full_on_source_target(\n"
+            "                  sourceOrdinal, sameClearedGameTarget)" in section)
 
 assert integrated(bridge,batch), "empty game Draw must preserve source order only after actual native Draw"
 for broken_bridge, broken_batch in (
