@@ -2769,7 +2769,7 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
         "20분 이상 실제 개발을 목표로 하되 대기로 시간을 채우지 마세요."
         if bootstrap else "모델2 VR 개발 계속진행해"
     )
-    sent = await send_message(page, prompt)
+    sent = await send_message(page, prompt, slot_name="C")
     if sent != "sent":
         write_runtime(status="model2_send_retry", last_action=f"C send deferred: {sent}")
         return False
