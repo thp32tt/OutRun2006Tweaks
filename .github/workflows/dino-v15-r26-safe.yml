@@ -23,7 +23,9 @@ jobs:
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_external_sidecar.cpp -o /tmp/test-dino
           /tmp/test-dino
-          python3 -m py_compile tools/cockpit/dino_v15_external/build_sidecar.py
+          c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_external_hq.cpp -o /tmp/test-dino-hq
+          /tmp/test-dino-hq
+          python3 -m py_compile tools/cockpit/dino_v15_external/build_sidecar.py tools/cockpit/dino_v15_external/build_sidecar_hq.py
           python3 - <<'PY'
           from pathlib import Path
           owner=Path("src/vr/d3d9/dino_external_r26_owner.inc").read_text()
