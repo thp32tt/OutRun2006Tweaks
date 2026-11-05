@@ -38,6 +38,8 @@ ROOT = Path(os.getenv("OUTRUN_REWORK_HOME", "/data/hd-rework")).resolve()
 PROJECT_URL = os.getenv("CHATGPT_PROJECT_URL", "https://chatgpt.com/").strip()
 TOKEN = os.getenv("OUTRUN_GITHUB_CONTENTS_TOKEN", "").strip()
 POLL = int(os.getenv("OUTRUN_REWORK_POLL_SECONDS", "600"))
+# User policy 2026-11-05: reuse existing A/B PNGs; no new ImageGen sends.
+REUSE_ONLY = os.getenv("OUTRUN_REWORK_REUSE_ONLY", "1").strip() != "0"
 CHAT_TASK = re.compile(r"^HDRW-[AB]-[0-9a-f]{20}$")
 HASH = re.compile(r"^[0-9a-f]{64}$")
 MAX_CONTENTS_PNG = 650 * 1024
@@ -526,7 +528,7 @@ class ChatBridge:
         if not isinstance(tasks,list) or len(tasks)>8:
             return {"status":"HOLD_QUEUE_SIZE"}
         submitted=[]
-        for task in tasks:
+        for task in ([] if REUSE_ONLY else tasks):
             if not valid_task(task):
                 return {"status":"HOLD_INVALID_TASK"}
             prior,_=await asyncio.to_thread(self.gh.read_json,
@@ -573,7 +575,8 @@ class ChatBridge:
                 progressed.append({"error_type":type(exc).__name__})
                 if len(progressed)>=3:
                     break
-        return {"status":"CYCLE_OK","active_queue":len(tasks),
+        return {"status":"CYCLE_REUSE_ONLY" if REUSE_ONLY else "CYCLE_OK",
+                 "new_imagegen_disabled":REUSE_ONLY,"active_queue":len(tasks),
                 "sent":submitted,"processed":progressed,
                 "release_approved":False}
 
