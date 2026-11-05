@@ -117,10 +117,21 @@ namespace outrun::vr::dx11::live_game_frame {
             const double signedArea =
                 (b.x - a.x) * (c.y - a.y) -
                 (b.y - a.y) * (c.x - a.x);
-            // Zero-area rasterization is driver-sensitive for point fill.
-            // Keep such a Draw on D3D9 rather than inventing native pixels.
+            // Point fill rasterizes the surviving triangle's CORNERS.
+            // Even a source triangle with subpixel area can contribute
+            // genuine game-authored GPU points: an absolute 1e-12 area
+            // cutoff wrongly drops very thin menu/road/HUD triangles.
+            // Admit only a reliably nonzero signed orientation relative
+            // to its own edge cross-products; ambiguous/zero faces still
+            // fall back to D3D9 instead of manufacturing native pixels.
+            const double termA = (b.x - a.x) * (c.y - a.y);
+            const double termB = (b.y - a.y) * (c.x - a.x);
+            const double uncertainty =
+                16.0 * std::numeric_limits<double>::epsilon() *
+                (std::abs(termA) + std::abs(termB));
             if (!std::isfinite(signedArea) ||
-                std::abs(signedArea) <= 1.0e-12) return false;
+                !std::isfinite(uncertainty) ||
+                !(std::abs(signedArea) > uncertainty)) return false;
             // D3D11 viewport flips Y: negative NDC winding is screen-CW.
             const bool clockwise = signedArea < 0.0;
             if ((cullMode == 2u && clockwise) ||

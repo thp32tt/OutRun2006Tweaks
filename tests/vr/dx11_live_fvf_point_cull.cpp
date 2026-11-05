@@ -433,4 +433,65 @@ int main() {
         fanSource,movedAnchor,4u,6u,1u,0u,64u,lerp,fanPoints));
     assert(fanPoints.size()==savedFanPoints.size());
 
+    // 01248: D3DFILL_POINT emits real vertices even for a triangle whose
+    // projected area is much smaller than the old fixed 1e-12 cutoff.
+    // This must work through BOTH the indexed fast path and the CPU-clipped
+    // Draw-to-native-POINTLIST path, preserving safe culling and fallback.
+    Vertex hairline[]{ 
+        {{-.5f,0.f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .5f,0.f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .5f,1.e-13f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    const std::uint32_t hairIndices[]{0u,1u,2u};
+    assert(build(hairline,3u,hairIndices,3u,4u,1u,0u,out));
+    assert((out==std::vector<std::uint32_t>{0u,1u,2u}));
+    assert(build(hairline,3u,nullptr,3u,4u,2u,0u,out));
+    const auto goodHair=out;
+    assert(!build(hairline,3u,nullptr,3u,4u,3u,0u,out));
+    assert(out==goodHair); // cull must not publish partial GPU geometry
+    hairline[2].clip[1]=0.f;
+    assert(!build(hairline,3u,nullptr,3u,4u,1u,0u,out));
+    assert(out==goodHair);
+    hairline[2].clip[1]=1.e-13f;
+
+    // Crossing a native homogeneous X clip plane creates four true D3D9
+    // polygon corners and hence SIX GPU point occurrences (two triangles).
+    // Their signed area is also below the old 2e-12 fixed cutoff.
+    std::vector<ClipVertex> thinClippedSource{
+        {{-.5f,0.f,.5f,1.f},{1,1,1,1},{1,1,0,0},{0,0}},
+        {{1.5f,0.f,.5f,1.f},{1,1,1,1},{1,1,0,0},{1,0}},
+        {{ .5f,1.e-13f,.5f,1.f},{1,1,1,1},{1,1,0,0},{.5f,1}}
+    };
+    std::vector<ClipVertex> thinNativePoints;
+    assert(game_fvf_clipped_point_vertices(
+        thinClippedSource,nullptr,3u,4u,1u,1u,64u,lerp,
+        thinNativePoints));
+    assert(thinNativePoints.size()==6u);
+    for (const auto& v:thinNativePoints) {
+        assert(v.clip[3]>0.f && v.clip[0]<=v.clip[3]);
+        assert(v.clip[1]>=0.f && v.clip[1]<=1.e-13f);
+        assert(v.clip0[0]>=0.f);
+        assert(v.uv[0]>=0.f && v.uv[0]<=1.f);
+        assert(v.uv[1]>=0.f && v.uv[1]<=1.f);
+    }
+    const auto savedThinPoints=thinNativePoints;
+    assert(!game_fvf_clipped_point_vertices(
+        thinClippedSource,nullptr,3u,4u,3u,1u,64u,lerp,
+        thinNativePoints)); // authentic backface cull
+    assert(thinNativePoints.size()==savedThinPoints.size());
+    const std::uint32_t invalidThinIndices[]{0u,1u,99u};
+    assert(!game_fvf_clipped_point_vertices(
+        thinClippedSource,invalidThinIndices,3u,4u,1u,1u,64u,lerp,
+        thinNativePoints));
+    assert(thinNativePoints.size()==savedThinPoints.size());
+    assert(!game_fvf_clipped_point_vertices(
+        thinClippedSource,nullptr,3u,4u,1u,1u,5u,lerp,
+        thinNativePoints)); // fail closed when native upload cannot fit
+    assert(thinNativePoints.size()==savedThinPoints.size());
+    thinClippedSource[2].clip[1]=0.f;
+    assert(!game_fvf_clipped_point_vertices(
+        thinClippedSource,nullptr,3u,4u,1u,1u,64u,lerp,
+        thinNativePoints)); // mathematically zero projected polygon
+    assert(thinNativePoints.size()==savedThinPoints.size());
+
 }

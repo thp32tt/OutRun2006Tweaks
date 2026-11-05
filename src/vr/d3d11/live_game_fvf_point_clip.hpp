@@ -159,20 +159,37 @@ template<class Vertex, class Interpolate>
             // D3D9 polygon winding is evaluated on the clipped projected
             // polygon, never by dividing a negative-W source vertex. This
             // also preserves original CW/CCW exclusion for point-filled faces.
-            double signedArea=0.0;
-            for (std::size_t i=0u;i<polygon.size();++i) {
-                const auto& a=polygon[i].vertex;
-                const auto& b=polygon[(i+1u)%polygon.size()].vertex;
-                if (!std::isfinite(a.clip[3]) || !(a.clip[3]>0.0f))
+            // Anchor the clipped polygon at one projected source corner
+            // and sum its triangle fans. Unlike an origin-based shoelace
+            // with a fixed area cutoff, this preserves thin but genuinely
+            // nondegenerate D3D9 point-filled faces and their interpolated
+            // GPU vertices. Only an orientation indistinguishable from
+            // floating-point cancellation is rejected to D3D9 fallback.
+            std::vector<std::array<double,2u>> projected;
+            projected.reserve(polygon.size());
+            for (const auto& corner:polygon) {
+                const auto& v=corner.vertex;
+                if (!std::isfinite(v.clip[3]) || !(v.clip[3]>0.0f))
                     return false;
-                const double ax=double(a.clip[0])/a.clip[3];
-                const double ay=double(a.clip[1])/a.clip[3];
-                const double bx=double(b.clip[0])/b.clip[3];
-                const double by=double(b.clip[1])/b.clip[3];
-                signedArea+=ax*by-ay*bx;
+                const double x=double(v.clip[0])/v.clip[3];
+                const double y=double(v.clip[1])/v.clip[3];
+                if (!std::isfinite(x)||!std::isfinite(y)) return false;
+                projected.push_back({x,y});
             }
-            if (!std::isfinite(signedArea)||std::abs(signedArea)<=2.e-12)
-                return false;
+            double signedArea=0.0, magnitude=0.0;
+            for (std::size_t i=1u;i+1u<projected.size();++i) {
+                const double abx=projected[i][0]-projected[0][0];
+                const double aby=projected[i][1]-projected[0][1];
+                const double acx=projected[i+1u][0]-projected[0][0];
+                const double acy=projected[i+1u][1]-projected[0][1];
+                const double p=abx*acy, q=aby*acx;
+                signedArea+=p-q;
+                magnitude+=std::abs(p)+std::abs(q);
+            }
+            const double uncertainty =
+                16.0 * std::numeric_limits<double>::epsilon() * magnitude;
+            if (!std::isfinite(signedArea)||!std::isfinite(uncertainty)||
+                !(std::abs(signedArea)>uncertainty)) return false;
             const bool clockwise=signedArea<0.0; // D3D viewport Y flip
             if ((cull==2u&&clockwise)||(cull==3u&&!clockwise)) continue;
             // The D3D9 polygon clipper triangulates a newly clipped
