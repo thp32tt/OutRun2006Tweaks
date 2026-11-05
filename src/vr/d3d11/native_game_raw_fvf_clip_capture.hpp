@@ -87,6 +87,11 @@ struct NativeRawFvfInteriorSample {
     // Covers the opposite end of a skinny menu/race GPU triangle.
     std::int64_t oppositePixelX{}, oppositePixelY{};
     bool sparseDiagonal = false;
+    // Endpoints of the three selected ORIGINAL post-clip wireframe edges,
+    // in physical source viewport pixels (x0,y0,x1,y1). Midpoints alone
+    // miss long spans between native GPU capture tiles.
+    std::array<std::array<std::int64_t, 4u>, 3u> wireEdges{};
+    bool wireEdgesValid = false;
 };
 struct NativeRawFvfClipSpan {
     const void* firstClip = nullptr;
@@ -211,6 +216,8 @@ struct NativeRawFvfClipSpan {
     double alternatePixelX = 0.0, alternatePixelY = 0.0;
     double oppositePixelX = 0.0, oppositePixelY = 0.0;
     bool interiorSparseDiagonal = false;
+    std::array<std::array<double, 4u>, 3u> selectedWireEdges{};
+    bool haveSelectedWireEdges = false;
     for (std::size_t triangle = 0u; triangle < triangles; ++triangle) {
         std::array<Point, 20u> polygon{}, clipped{};
         std::array<HomogeneousPoint,20u> homogeneous{}, clippedH{};
@@ -572,6 +579,22 @@ struct NativeRawFvfClipSpan {
                     return static_cast<double>(viewportY) +
                         (1.0 - p.y) * static_cast<double>(viewportH) * 0.5;
                 };
+                // Preserve actual post-homogeneous/scissor clip endpoints.
+                // These are a GPU READBACK search schedule, not CPU raster
+                // evidence. Traverse the edges in later source Draw ordinals
+                // rather than resampling only three middle pixels.
+                const std::array<std::size_t, 3u> chosenEdges{
+                    primary, secondary, tertiary};
+                for (std::size_t edge = 0u; edge < chosenEdges.size(); ++edge) {
+                    const auto start = chosenEdges[edge];
+                    const auto finish = (start + 1u) % polygonCount;
+                    selectedWireEdges[edge] = {
+                        screenX(polygon[start]), screenY(polygon[start]),
+                        screenX(polygon[finish]), screenY(polygon[finish])};
+                    for (double coordinate : selectedWireEdges[edge])
+                        if (!std::isfinite(coordinate)) return false;
+                }
+                haveSelectedWireEdges = true;
                 x = screenX(edges[primary]); y = screenY(edges[primary]);
                 ax = screenX(edges[secondary]); ay = screenY(edges[secondary]);
                 ox = screenX(edges[tertiary]); oy = screenY(edges[tertiary]);
@@ -649,6 +672,20 @@ struct NativeRawFvfClipSpan {
         interior->oppositePixelX = static_cast<std::int64_t>(std::floor(oppositePixelX));
         interior->oppositePixelY = static_cast<std::int64_t>(std::floor(oppositePixelY));
         interior->sparseDiagonal = interiorSparseDiagonal;
+        if (haveSelectedWireEdges) {
+            // No guessed endpoint may reach the sampler: keep the same
+            // bounded physical source-pixel range as the other anchors.
+            for (std::size_t edge = 0u; edge < 3u; ++edge) {
+                for (std::size_t c = 0u; c < 4u; ++c) {
+                    const double q = selectedWireEdges[edge][c];
+                    if (!std::isfinite(q) || q < -maxCoordinate ||
+                        q >= maxCoordinate) return false;
+                    interior->wireEdges[edge][c] =
+                        static_cast<std::int64_t>(std::floor(q));
+                }
+            }
+            interior->wireEdgesValid = true;
+        }
     }
     return raster.right > raster.left && raster.bottom > raster.top;
 }

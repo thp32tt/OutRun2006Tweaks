@@ -561,13 +561,16 @@ int main() {
     assert(native_raw_fvf_projected_raster(
         diagonalSource,0,0,3440,1440,diagonalExtent,nullptr,
         &wireNoCull,&diagonalEdge));
-    assert(diagonalEdge.sparseDiagonal &&
+    assert(diagonalEdge.sparseDiagonal && diagonalEdge.wireEdgesValid &&
            diagonalEdge.pixelX>=diagonalExtent.left &&
            diagonalEdge.pixelX<diagonalExtent.right &&
            diagonalEdge.pixelY>=diagonalExtent.top &&
            diagonalEdge.pixelY<diagonalExtent.bottom);
-    NativeRawDualTile diagonalPhases[6]{};
-    for (std::uint32_t phase=0u; phase<6u; ++phase) {
+    // 01241: source-authentic GPU crops must progress along long original
+    // clipped WIREFRAME edges instead of repeating three midpoints forever.
+    // Per-edge positions visit both endpoints and six intervening fractions.
+    NativeRawDualTile diagonalPhases[27]{};
+    for (std::uint32_t phase=0u; phase<27u; ++phase) {
         assert(native_raw_fvf_island_dual_draw_tile(
             diagonalSource,0,0,3440,1440,3440,1440,512,288,
             {0,0,3440,1440},phase,diagonalPhases[phase],&wireNoCull));
@@ -575,13 +578,19 @@ int main() {
                native_raw_source_tiles_disjoint(
                    diagonalPhases[phase].first,
                    diagonalPhases[phase].second,512,288));
-        if (phase >= 3u) {
-            assert(diagonalPhases[phase].first.x ==
-                   diagonalPhases[phase-3u].first.x &&
-                   diagonalPhases[phase].first.y ==
-                   diagonalPhases[phase-3u].first.y);
-        }
     }
+    // The first three phases preserve the known clipped midpoints; phases
+    // 3,6,...24 now traverse the primary real edge across the native target.
+    assert(diagonalPhases[3].first.x != diagonalPhases[24].first.x);
+    assert(diagonalPhases[3].first.y != diagonalPhases[24].first.y);
+    assert(diagonalPhases[6].first.x != diagonalPhases[3].first.x);
+    // No native endpoint schedule is exposed to ordinary solid GPU draws.
+    NativeRawFvfInteriorSample solidDiagonal{};
+    NativeRawDrawExtent solidDiagonalExtent{};
+    assert(native_raw_fvf_projected_raster(
+        diagonalSource,0,0,3440,1440,solidDiagonalExtent,nullptr,
+        &solidNoCull,&solidDiagonal));
+    assert(!solidDiagonal.wireEdgesValid);
     // All original edge anchors are physically distinct for this large
     // source line; no fabricated CPU pixels can replace PRE/POST GPU delta.
     assert(diagonalPhases[0].first.x!=diagonalPhases[1].first.x &&

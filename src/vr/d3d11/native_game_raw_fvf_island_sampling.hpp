@@ -144,16 +144,31 @@ namespace outrun::vr::dx11 {
             const NativeRawTileOrigin anchors[8]{
                 centered, farEnd, oppositeEnd, middleFar, middleOpposite,
                 farEnd, oppositeEnd, centered};
-            // Solid sparse triangles have interior pixels, so eight
-            // independent interior/sweep phases are useful. WIREFRAME
-            // pixels exist on the authentic clipped edges only: mixing
-            // edge midpoint anchors produces empty interior positions.
-            // Rotate all three proven edge anchors instead, retaining
-            // the native GPU PRE/POST/source-epoch proof unchanged.
-            const bool wireframeEdges = rasterState && rasterState->wireframe;
-            const auto phase = sourcePhase % (wireframeEdges ? 3u : 8u);
+            // The original three edge midpoints do not cover a wide
+            // menu/road wireframe: a 3,440px edge can have thousands of
+            // authentic GPU pixels outside 512px readback crops. Start with
+            // those three midpoints, then traverse all three *source-clipped*
+            // edges at eight fractions each on subsequent Draw ordinals.
+            // This is capture placement only: GPU PRE/POST RGB, target,
+            // epoch and Present verification remain strictly unchanged.
+            const bool wireframeEdges = rasterState && rasterState->wireframe &&
+                interior.wireEdgesValid;
+            const auto phase = sourcePhase % (wireframeEdges ? 27u : 8u);
             const NativeRawDualTile swept = sampled;
-            sampled.first = anchors[phase];
+            if (wireframeEdges && phase >= 3u) {
+                const auto& edge = interior.wireEdges[(phase - 3u) % 3u];
+                const auto fraction = (phase - 3u) / 3u; // exactly 0..7
+                const auto along = [&](std::int64_t a,
+                                       std::int64_t b) noexcept {
+                    // Endpoint coordinates are independently bounded to
+                    // 2^32; the largest 7*(b-a) fits signed 64-bit.
+                    return a + (b - a) * fraction / 7;
+                };
+                sampled.first = origin(along(edge[0], edge[2]),
+                                       along(edge[1], edge[3]));
+            } else {
+                sampled.first = anchors[phase];
+            }
             sampled.hasSecond = false;
             // A second disjoint genuine polygon interior beats an AABB
             // corner; if none fits, keep the authentic GPU raster sweep.
