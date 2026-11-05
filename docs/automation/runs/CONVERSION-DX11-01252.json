@@ -3,7 +3,7 @@
   "task_id": "CONVERSION-DX11-01252",
   "production_id": "CONVERSION-DX11-01252",
   "event_id": "CONVERSION-DX11-01252-E001",
-  "event_type": "dispatch",
+  "event_type": "result",
   "attempt": "1/3",
   "lane": "DX11",
   "target_repo": "thp32tt/OutRun2006Tweaks",
@@ -13,11 +13,11 @@
   "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_MULTI_GPU_DRAW_WINDOWS",
   "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
   "classification": "A_EXISTING_FVF_FULL_SOURCE_CLIP_GROWTH_AND_REUSABLE_GPU_UPLOAD_B_CAUSAL_STATIC_GATE_REPAIR",
-  "status": "IMPLEMENTING_GATE_PENDING",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
-  "score_note": "Continuation of 01251 FVF clipped point-fill native GPU windows; no new independent feature or score for bounds extension, CI repair, C6 or retest.",
+  "score_note": "01252 continues the same already-scored 01251 clipped FVF POINTLIST multi-D3D11-Draw source feature. Wider 13-plane source budget, bounded WRITE_DISCARD GPU streams, small source budget repair, source graph/acceptance repair, exact-SHA CI and C6 are one continuation; no independent score (+0).",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
@@ -27,7 +27,8 @@
     "src/vr/d3d11/live_game_fvf_point_batches.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tests/vr/dx11_live_fvf_point_cull.cpp",
-    "tools/verify_dx11_first_game_frame_boundary.py"
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "development_strategy": {
     "work_class": "integration",
@@ -92,14 +93,71 @@
   },
   "acceptance_results": {
     "point_geometry_and_gpu_windows": {
-      "status": "PENDING"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "Authentic FVF clipped source budget 42x/source triangle; bounded 6144+456 GPU upload regression; DX11 Fast Structural Checks 42021955044 SUCCESS and Windows Build 42021963248 SUCCESS on exact f25c32eedba89067e8bf2b375eb919db4691d6d5."
     },
     "transactional_game_fallback": {
-      "status": "PENDING"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp",
+        "tools/verify_dx11_first_game_frame_boundary.py",
+        "tools/test_dx11_first_game_frame_regressions.py"
+      ],
+      "validation_command": "Original D3D9 source IB/capacity checks and GPU fail-closed, preserved input/FFB and no DXVK changes; Backend Gate 42021955366 SUCCESS + Windows Build 42021963248 SUCCESS exact SHA f25c32eedba89067e8bf2b375eb919db4691d6d5."
     },
     "exact_source_gates": {
-      "status": "PENDING"
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tools/verify_dx11_first_game_frame_boundary.py",
+        "tools/test_dx11_first_game_frame_regressions.py"
+      ],
+      "validation_command": "GitHub exact f25c32eedba89067e8bf2b375eb919db4691d6d5: Fast 42021955044, Backend 42021955366, Windows Build 42021963248, OpenXR 42021963370, HUD 42021963232 all SUCCESS. No original game/HMD runtime performed."
     }
   },
-  "runtime_validation_notes": "Quest 3/VDXR and physical desktop game renderer not tested; RUNTIME_VALIDATION=UNTESTED."
+  "runtime_validation_notes": "No original physical OutRun menu/vehicle/race native GPU frame or Quest3/VDXR HMD session was run on this source. Build-only source acceptance; full native renderer and HMD promotion unverified.",
+  "feature_stage": "FEATURE_READY",
+  "result_sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+  "material_result_sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+  "validation_bearing_result_sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "work_allocation_measured": false,
+  "source_repair_shas": [
+    "8a8cf067648708ee7b38632123a3dea402b43f83",
+    "1ce82374f90252634946a28fb204ac84530e9e65",
+    "89aba07c36a9b00b7242b900522205a1423028ff",
+    "f25c32eedba89067e8bf2b375eb919db4691d6d5"
+  ],
+  "ci_exact_sha": {
+    "sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+    "fast": {
+      "id": 42021955044,
+      "conclusion": "success"
+    },
+    "backend": {
+      "id": 42021955366,
+      "conclusion": "success"
+    },
+    "build": {
+      "id": 42021963248,
+      "conclusion": "success"
+    },
+    "openxr": {
+      "id": 42021963370,
+      "conclusion": "success"
+    },
+    "hud": {
+      "id": 42021963232,
+      "conclusion": "success"
+    }
+  }
 }
