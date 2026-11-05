@@ -62,7 +62,7 @@
       "CXX_REAL_FVF_MULTI_PLANE_POSITIVE_AND_NEGATIVE_REGRESSION",
       "MSVC_WINDOWS_H_MIN_MACRO_CAUSAL_REPAIR"
     ],
-    "full_gate_plan": "one_validation_bearing_sha_after_causal_repair",
+    "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY; actual menu/vehicle/race or Quest3 native game output not run on this exact binary.",
     "activation_guard_and_fallback": "Explicit native diagnostic opt-in/fail-closed only; DX9Ex renderer, D3D9 original draws/input/FFB and frozen DXVK unchanged.",
     "acceptance_proof": {
