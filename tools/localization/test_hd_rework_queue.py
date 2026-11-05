@@ -37,6 +37,19 @@ class QueueSafety(unittest.TestCase):
   self.assertLess(q.MAX_REF_BYTES,750000)
   self.assertTrue(publisher.TASK_ID.fullmatch("HDRW-A-"+"a"*20))
   self.assertEqual(publisher.BRANCH,"korean-localization-qa-queue-20261104")
+ def test_reuse_only_default_never_schedules_new_imagegen(self):
+  report=self.sample()
+  groups={"test.dds":[{"roi_id":"Q044_bbbbbbbbbbbbbbbb","roles":"A"},
+                      {"roi_id":"Q044_cccccccccccccccc","roles":"A"}]}
+  with tempfile.TemporaryDirectory() as directory:
+   with patch.object(q.atlas,"load_cross",return_value=groups), \
+        patch.object(q.atlas,"load_pinned_orientations",return_value={"test.dds":"NORMAL"}):
+    result=q.build_queue(directory,report,Path(directory)/"output")
+   self.assertEqual(result["tasks"],[])
+   self.assertTrue(result["new_imagegen_disabled"])
+   self.assertIn("NO_NEW_IMAGEGEN",result["selection_policy"])
+   self.assertEqual(result["hold_count"],2)
+
  def test_unsafe_paths_and_missing_token_rejected(self):
   for s in ("../up","bad?query","/absolute"):
    with self.assertRaises(ValueError):
