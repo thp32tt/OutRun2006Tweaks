@@ -174,7 +174,38 @@ def main() -> None:
     ):
         assert evidence in bridge, "missing diagnostic safety/telemetry: " + evidence
     assert bridge.count("ctx->DrawIndexed(") == 1
-    assert bridge.count("ctx->Draw(") == 1
+    # 01251: Source-clipped POINTLIST may require multiple native draws,
+    # but only inside the same verified original FVF source submission.
+    # Retain the single original fallback draw and cap the new windowed draw.
+    assert bridge.count("ctx->Draw(") == 2
+    fvf_submit = bridge[bridge.index("bool submit("):
+                        bridge.index("bool observe_source_device(")]
+    windowed = fvf_submit.partition(
+        "    if (clippedPointBatches.supported && clippedPointBatches.draws > 1u) {"
+    )[2].partition(
+        "    // GPU submission is paired with the queued readback at Present."
+    )[0]
+    assert windowed and all(token in windowed for token in (
+        "first < clippedPointBatches.totalVertices;",
+        "first += clippedPointBatches.verticesPerDraw",
+        "clippedPointBatches.totalVertices - first);",
+        "ctx->Draw(count, first);",
+        "else if (ib) ctx->DrawIndexed(indexCount, 0, 0);",
+        "else ctx->Draw(static_cast<UINT>(vertices.size()), 0);"
+    ))
+    assert all(token in fvf_submit for token in (
+        "if (!game_fvf_clipped_point_vertices(",
+        "clippedPointBatches = game_fvf_native_point_batch_plan(",
+        "if (!clippedPointBatches.supported ||",
+        "(!env_full_game_opt_in() && clippedPointBatches.draws != 1u)",
+        "if (FAILED(dev->GetDeviceRemovedReason())) return false;"
+    ))
+    # Mutation controls: losing either the bounded iteration or original
+    # DX9 indexed fallback must be rejected instead of expanding admission.
+    for removed in ("first += clippedPointBatches.verticesPerDraw",
+                    "else if (ib) ctx->DrawIndexed(indexCount, 0, 0);"):
+        assert removed in windowed
+        assert removed not in windowed.replace(removed, "", 1)
     # A live stage-1 operation must not silently modify stage-0 DIFFUSE.
     # The old boundary accepted such draws while the native shader ignored
     # the extra stage. These are fail-closed static mutation checks, not GPU proof.
