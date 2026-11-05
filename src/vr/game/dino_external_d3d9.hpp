@@ -66,11 +66,11 @@ class GpuOwner final {
             return false;
         std::size_t pos=128;
         for(UINT mip=0;mip<texture.mips;++mip) {
-            const unsigned width=std::max(1u,texture.width>>mip);
-            const unsigned height=std::max(1u,texture.height>>mip);
-            const unsigned rows=blockBytes?std::max(1u,(height+3u)/4u):height;
+            const unsigned width=(texture.width>>mip)?(texture.width>>mip):1u;
+            const unsigned height=(texture.height>>mip)?(texture.height>>mip):1u;
+            const unsigned rows=blockBytes?(((height+3u)/4u)?(height+3u)/4u:1u):height;
             const unsigned row=blockBytes?
-                std::max(1u,(width+3u)/4u)*blockBytes:width*4u;
+                (((width+3u)/4u)?(width+3u)/4u:1u)*blockBytes:width*4u;
             if(!Bounds(pos,std::size_t(rows)*row,texture.dds.size())) {
                 staging->Release();return false;
             }

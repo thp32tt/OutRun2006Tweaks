@@ -64,7 +64,7 @@ inline bool ParseDds(const std::uint8_t* d,std::size_t size,Texture& out,bool le
        (width&(width-1))!=0 || (height&(height-1))!=0)
         return false;
     const unsigned mip=U32(d+28);
-    const unsigned maxDim=std::max(width,height);
+    const unsigned maxDim=width>height?width:height;
     unsigned fullMips=1;
     for(unsigned dim=maxDim;dim>1;dim>>=1)++fullMips;
     if(!mip || mip>fullMips)return false;
@@ -79,11 +79,11 @@ inline bool ParseDds(const std::uint8_t* d,std::size_t size,Texture& out,bool le
     } else return false;
     std::size_t need=128;
     for(unsigned level=0;level<mip;++level) {
-        const unsigned w=std::max(1u,width>>level);
-        const unsigned h=std::max(1u,height>>level);
-        const std::size_t rows=blockBytes ? std::max(1u,(h+3u)/4u) : h;
+        const unsigned w=(width>>level)?(width>>level):1u;
+        const unsigned h=(height>>level)?(height>>level):1u;
+        const std::size_t rows=blockBytes ? ((h+3u)/4u? (h+3u)/4u:1u) : h;
         const std::size_t pitch=blockBytes ?
-             std::size_t(std::max(1u,(w+3u)/4u))*blockBytes : std::size_t(w)*4u;
+             std::size_t(((w+3u)/4u)?(w+3u)/4u:1u)*blockBytes : std::size_t(w)*4u;
         if(!Bounds(need,rows*pitch,size))return false;
         need+=rows*pitch;
     }
