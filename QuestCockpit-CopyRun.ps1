@@ -154,11 +154,16 @@ if((HashFile (Join-Path $root 'dinput8.dll')) -ne $identity.GameDllSha256 -or
    (HashFile (Join-Path $root 'outrun-vr-host.exe')) -ne $identity.HostExeSha256){
     throw 'Installed game DLL and OpenXR host do not match the same source build.'
 }
-$argv=@('-TestProfile','CORRECTNESS','-QuestCockpitV2ReleaseParity','ON',
-    '-QuestCockpitV2','ON')
-if($Mode -eq 'SKY'){$argv+=@('-QuestCockpitV2SkyProbe','ON')}
-if($Mode -eq 'INTERP'){$argv+=@('-QuestCockpitV2Interpolation','OFF',
-    '-QuestCockpitV2SkyProbe','ON')}
+$launchArgs=@{
+    TestProfile='CORRECTNESS'
+    QuestCockpitV2ReleaseParity='ON'
+    QuestCockpitV2='ON'
+}
+if($Mode -eq 'SKY'){$launchArgs.QuestCockpitV2SkyProbe='ON'}
+if($Mode -eq 'INTERP'){
+    $launchArgs.QuestCockpitV2Interpolation='OFF'
+    $launchArgs.QuestCockpitV2SkyProbe='ON'
+}
 Write-Host "Starting Quest cockpit; mode=$Mode"
-& (Join-Path $root 'Run-OutRunVRTest.ps1') @argv
+& (Join-Path $root 'Run-OutRunVRTest.ps1') @launchArgs
 if(-not $?){throw 'VR runner failed. See OUTRUNVR_LAUNCH_ERROR.txt or collected logs.'}
