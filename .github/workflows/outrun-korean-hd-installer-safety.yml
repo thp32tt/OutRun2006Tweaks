@@ -1,0 +1,30 @@
+name: OutRun Korean HD Windows Canary Installer Safety
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/outrun-korean-hd-installer-safety.yml
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-windows:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/Install-OutRunKoreanTest.ps1
+            tools/localization/Test-OutRunKoreanInstall.ps1
+
+      - name: Real PowerShell parser + file SHA + rollback smoke
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          & ./tools/localization/Test-OutRunKoreanInstall.ps1
