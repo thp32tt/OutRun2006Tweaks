@@ -1,0 +1,36 @@
+name: Dino FitV6 OVC2 converter smoke
+on:
+  push:
+    branches: [ 'feature/dino-fitv6-r26-test-20261105' ]
+    paths: [ 'tools/cockpit/dino_v15_external/convert_fitv6.py', '.github/workflows/dino-fitv6-converter.yml' ]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install isolated conversion prerequisites
+        run: python3 -m pip install --disable-pip-version-check --break-system-packages numpy trimesh Pillow
+      - name: Synthetic-only smoke test (not the user's V6 bytes)
+        run: |
+          python3 -m py_compile tools/cockpit/dino_v15_external/build_sidecar_hq.py tools/cockpit/dino_v15_external/convert_fitv6.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import trimesh
+          p=Path('/tmp/Dino246_NoGlass_FitV6_UniformProportions.glb')
+          p.write_bytes(trimesh.Scene(trimesh.creation.box()).export(file_type='glb'))
+          PY
+          python3 tools/cockpit/dino_v15_external/convert_fitv6.py --v6 /tmp/Dino246_NoGlass_FitV6_UniformProportions.glb --out-dir /tmp/ovc2
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,struct,zlib
+          b=Path('/tmp/ovc2/Dino246_Cockpit_LHD_v15.ovc').read_bytes()
+          assert b[:8]==b'OVRCABH2' and struct.unpack_from('<I',b,8)[0]==2
+          assert struct.unpack_from('<I',b,32)[0]==zlib.crc32(b[36:])
+          m=json.loads(Path('/tmp/ovc2/FITV6_BUILD_MANIFEST.json').read_text())
+          assert m['model_version']=='DINO_NOGLASS_FIT_V6'
+          assert m['runtime_validation']=='UNTESTED'
+          print('DINO_FITV6_SYNTHETIC_CONVERTER_PASS')
+          PY
