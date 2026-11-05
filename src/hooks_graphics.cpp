@@ -570,24 +570,46 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             return false;
         }
 
+        const bool apkNativeCamera=
+            Settings::VRQuestCockpitV2ApkNativeCamera.get();
+        // Exact APK parity must not inherit an old F11/manual seat offset from
+        // OutRun2006Tweaks.user.ini. The Quest source selects the per-car
+        // guest profile and then applies its own +0.32Y/+0.55Z step. Manual
+        // SeatBack/Down/Right remains available only for the explicit
+        // ApkNativeCamera=false comparison path.
+        const float manualBack=apkNativeCamera
+            ? 0.f : Settings::VRQuestCockpitV2SeatBack.get();
+        const float manualDown=apkNativeCamera
+            ? 0.f : Settings::VRQuestCockpitV2SeatDown.get();
+        const float manualRight=apkNativeCamera
+            ? 0.f : Settings::VRQuestCockpitV2SeatRight.get();
+        if(apkNativeCamera &&
+           (Settings::VRQuestCockpitV2SeatBack.get()!=0.f ||
+            Settings::VRQuestCockpitV2SeatDown.get()!=0.f ||
+            Settings::VRQuestCockpitV2SeatRight.get()!=0.f)) {
+            static bool manualIgnoredLogged=false;
+            if(!manualIgnoredLogged) {
+                manualIgnoredLogged=true;
+                spdlog::info(
+                    "VR COCKPIT APK PARITY: saved manual seat offsets ignored "
+                    "(back={:.3f}, down={:.3f}, right={:.3f})",
+                    Settings::VRQuestCockpitV2SeatBack.get(),
+                    Settings::VRQuestCockpitV2SeatDown.get(),
+                    Settings::VRQuestCockpitV2SeatRight.get());
+            }
+        }
+
         std::array<OutRunVR::QuestCockpitV2::Vec3,SeatTableCount> injected{};
         for(std::size_t i=0;i<SeatTableCount;++i) {
             OutRunVR::QuestCockpitV2::Vec3 profile{};
             OutRunVR::QuestCockpitV2::Vec3 tuned{};
-            // Both native and baseline paths must honor F11 seat tuning.
-            // Tune the ORIGINAL 30-profile input, then let the Quest
-            // source's +0.32Y/+0.55Z run exactly once when requested.
-            // With zero tuning this is byte-for-byte the previous native
-            // input; it never moves the OpenXR head or the car B0 matrix.
             if(!OutRunVR::QuestCockpitV2::OriginalQuestVrProfileAnchor(
                    pointers,SeatTableCount*sizeof(std::uint32_t),
                    profiles,SeatTableCount*kProfileStride,
                    static_cast<int>(i),profile) ||
                !OutRunVR::QuestCockpitV2::NativeVrProfileInputAnchor(
-                   profile,Settings::VRQuestCockpitV2SeatBack.get(),
-                   Settings::VRQuestCockpitV2SeatDown.get(),
-                   Settings::VRQuestCockpitV2SeatRight.get(),tuned) ||
-               (Settings::VRQuestCockpitV2ApkNativeCamera
+                   profile,manualBack,manualDown,manualRight,tuned) ||
+               (apkNativeCamera
                     ? !OutRunVR::QuestCockpitV2::OriginalQuestModeOneInput(
                           tuned,injected[i])
                     : (injected[i]=tuned,false))) {
