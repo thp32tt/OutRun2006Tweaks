@@ -48,14 +48,30 @@ def source_ink_bounds(source, box):
     return x0 + ink[0], y0 + ink[1], x0 + ink[2], y0 + ink[3]
 
 
-def source_ink_conflicts(source, rows, geometric_conflict_fn):
-    """Allow intersecting ROI rectangles only with disjoint native ink bboxes.
+def shared_native_alpha(alpha, first_box, second_box):
+    """Prove that two metadata ROIs share actual native source pixels.
 
-    This never declares a pixel-shared overlap safe. Candidate transforms later
-    fit strictly within these original source glyph/effect bounding rectangles.
+    Bounding boxes of disconnected letters can overlap while the shared
+    rectangle contains no source ink. Never infer that such bounds alone
+    establish a real collision; never ignore even one alpha pixel in common.
+    """
+    if not intersects(first_box, second_box):
+        return False
+    x0 = max(first_box[0], second_box[0])
+    y0 = max(first_box[1], second_box[1])
+    x1 = min(first_box[2], second_box[2])
+    y1 = min(first_box[3], second_box[3])
+    return alpha.crop((x0, y0, x1, y1)).getbbox() is not None
+
+
+def source_ink_conflicts(source, rows, geometric_conflict_fn):
+    """HOLD every source-pixel-shared overlap; allow empty shared padding.
+
+    Translated candidate pixels must additionally remain outside every
+    OTHER non-coarse ROI, even when source shared padding was empty.
     """
     geometric = geometric_conflict_fn(rows)
-    ink = {r["roi_id"]: source_ink_bounds(source, r["_bbox"]) for r in rows}
+    alpha = source.getchannel("A")
     unsafe = set()
     for i, first in enumerate(rows):
         if first["roi_id"] not in geometric:
@@ -63,11 +79,23 @@ def source_ink_conflicts(source, rows, geometric_conflict_fn):
         for second in rows[i + 1:]:
             if second["roi_id"] not in geometric:
                 continue
-            if intersects(first["_bbox"], second["_bbox"]) and intersects(
-                ink[first["roi_id"]], ink[second["roi_id"]]
-            ):
+            if shared_native_alpha(alpha, first["_bbox"], second["_bbox"]):
                 unsafe.update((first["roi_id"], second["roi_id"]))
     return unsafe
+
+
+def translated_alpha_touches_box(image, left, top, other):
+    """Check actual NEW pixels, not only the destination bounding rectangle."""
+    dst = (left, top, left + image.width, top + image.height)
+    if not intersects(dst, other):
+        return False
+    x0 = max(dst[0], other[0])
+    y0 = max(dst[1], other[1])
+    x1 = min(dst[2], other[2])
+    y1 = min(dst[3], other[3])
+    return image.getchannel("A").crop(
+        (x0 - left, y0 - top, x1 - left, y1 - top)
+    ).getbbox() is not None
 
 
 def alpha_lines(alpha: Image.Image):
@@ -164,15 +192,16 @@ def fit_line(glyph: Image.Image, source_box):
     return resized
 
 
-def place_one_source_text(source, clean, result, row, repo, used, import_check):
+def place_one_source_text(source, clean, result, row, repo, used, import_check,
+                          other_boxes=()):
     rid = row["roi_id"]
     x0, y0, x1, y1 = row["_bbox"]
     if x0 < 0 or y0 < 0 or x0 >= x1 or y0 >= y1 or x1 > source.width or y1 > source.height:
         raise QualityHold("QA_NATIVE_HD_ROI_BOUNDS_INVALID")
     box = (x0, y0, x1, y1)
     overlap_used = [b for b in used if intersects(box, b)]
-    if any(intersects(source_ink_bounds(source, box), source_ink_bounds(source, b))
-           for b in overlap_used):
+    alpha = source.getchannel("A")
+    if any(shared_native_alpha(alpha, box, b) for b in overlap_used):
         raise QualityHold("QA_OVERLAP_PROTECTED")
     if not import_check(repo, row):
         raise QualityHold("AB_PNG_NOT_YET_IMPORTED")
@@ -197,6 +226,12 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check):
         assert dest[2] <= x0 + s[2] and dest[3] <= y0 + s[3]
         positions.append(dest)
         render.append((fitted, left, top))
+    # Even empty source padding belongs to another label's metadata ROI.
+    # New translated ink must not enter it. Check every other ROI, including
+    # candidates that will be held or have not been processed yet.
+    if any(translated_alpha_touches_box(im, left, top, other)
+           for im, left, top in render for other in other_boxes):
+        raise QualityHold("QA_TRANSLATED_OVERLAPS_OTHER_ROI")
     # No modifications are made until every line and mask has passed.
     clean.paste((0, 0, 0, 0), box, removal_mask)
     result.paste((0, 0, 0, 0), box, removal_mask)
@@ -248,7 +283,11 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
             holds.append({"roi_id": rid, "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"})
             continue
         try:
-            evidence = place_one_source_text(source, clean, result, row, repo, used, import_check)
+            other_boxes = [r["_bbox"] for r in rows
+                           if r["roi_id"] != rid and r["roi_id"] not in coarse]
+            evidence = place_one_source_text(
+                source, clean, result, row, repo, used, import_check, other_boxes
+            )
             painted.append(evidence)
         except (OSError, ValueError, UnidentifiedImageError, OverflowError) as exc:
             holds.append({"roi_id": rid, "reason": str(exc)[:160]})
