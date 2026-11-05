@@ -12,6 +12,9 @@ def safe(src_submit: str, src_observer: str) -> bool:
         "bool initializeFrame = true) noexcept" in src_submit
         and "if (initializeFrame && s.frameBatch.first_draw())" in src_submit
         and "s.backend.begin_frame(env_full_game_opt_in()" in src_submit
+        and "if (streamedClippedPoints) {" in src_submit
+        and "game_fvf_native_point_batch_window(" in src_submit
+        and "ctx->Draw(count, 0u);" in src_submit
         # 01097: extending the authentic connected polygon source span to
         # the full 6144-element VB/IB requires BOTH source topologies to
         # cross the same bounded native multi-window GPU submit. Losing the
@@ -21,12 +24,19 @@ def safe(src_submit: str, src_observer: str) -> bool:
         and "std::uint64_t(primitives) * 3u > kMaxIndices" in src_observer
         and "for (UINT i=0; i<indexCount; ++i) {" in src_observer
         and "if (indices[i] >= vertexCount)" in src_observer
+        # The complete original point-fill fan/strip is never split into
+        # independent CPU clip transactions: an empty old first window must
+        # not abort later visible game geometry or lose its source ordinal.
+        # Legacy polygon windows remain mandatory for non-point fan/strip.
+        and "const auto originalPointSource = game_fvf_native_original_point_source(" in src_observer
+        and "if (originalPointSource.supported) {" in src_observer
+        and "if (!submit(s, vertices, indices, indexCount, type,\n                        capture, output)) {" in src_observer
         and "if (oversizedFan || oversizedPointStrip)" in src_observer
         and "game_fvf_build_polygon_window(" in src_observer
         and "D3DPT_TRIANGLELIST, capture, output,\n"
             "                            first == 0u))" in src_observer
-        and src_observer.count("s.frameBatch.succeeded(output.nativeDepthTest,") == 3
-        and src_observer.count("s.frameBatch.record_source_draw(sourceOrdinal);") >= 3
+        and src_observer.count("s.frameBatch.succeeded(output.nativeDepthTest,") == 4
+        and src_observer.count("s.frameBatch.record_source_draw(sourceOrdinal);") >= 4
         and "if (!success) {\n                s.frameBatch.abort();" in src_observer
     )
 assert safe(submit, observer)
@@ -38,6 +48,21 @@ mutations = [
     (submit, observer.replace("first == 0u))", "true))", 1)),
     (submit, observer.replace("first == 0u))", "false))", 1)),
     (submit, observer.replace(
+        "if (originalPointSource.supported) {",
+        "if (false /* missing full-source point fan/strip */) {", 1)),
+    (submit, observer.replace(
+        "const auto originalPointSource = game_fvf_native_original_point_source(",
+        "const auto originalPointSource = suppressed_original_points(", 1)),
+    (submit, observer.replace(
+        "if (!submit(s, vertices, indices, indexCount, type,\n                        capture, output)) {",
+        "if (false /* missing full-source GPU point dispatch */) {", 1)),
+    (submit.replace(
+        "game_fvf_native_point_batch_window(",
+        "missing_point_gpu_batch_window(", 1), observer),
+    (submit, observer.replace(
+        "s.frameBatch.record_source_draw(sourceOrdinal);",
+        "/* original game Draw source ordinal lost */", 1)),
+    (submit, observer.replace(
         "const bool oversizedFan = type == D3DPT_TRIANGLEFAN &&",
         "const bool oversizedFan = false &&", 1)),
     (submit, observer.replace(
@@ -48,7 +73,7 @@ mutations = [
 # The seventh historical abort-only mutation is exercised separately below:
 # other valid abort branches exist, so global first-occurrence removal is not
 # itself a proof that the native GPU-window failure path disappeared.
-for a, b in mutations[:6]:
+for a, b in mutations[:-1]:
     assert not safe(a, b), "deleted native window source frame isolation"
 # The preflight/error branch must not disappear even when another abort exists.
 failure = observer[observer.index("if (oversizedFan || oversizedPointStrip)"):]
@@ -56,4 +81,4 @@ assert "if (!success) {\n                s.frameBatch.abort();" in failure
 assert not safe(submit, observer.replace(
     "if (!success) {\n                s.frameBatch.abort();",
     "if (!success) {\n                /* lost batch abort */", 1))
-print("01094 FVF window frame seed: first window only, original source abort preserved")
+print("01094 FVF whole-source point stream and legacy GPU polygon windows: source ordinal, first-frame seed and guarded fallback PASS")
