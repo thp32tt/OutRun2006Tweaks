@@ -28,6 +28,7 @@ template<class Vertex, class Interpolate>
     struct V {
         Vertex vertex{};
         std::array<double,13> plane{};
+        bool generated=false; // Only synthesized corners may be float-snapped.
     };
     // The synthetic positive-W plane is required only for an eye crossing.
     // Its scale is derived from the actual original Draw vertices, not the
@@ -140,6 +141,7 @@ template<class Vertex, class Interpolate>
                         // never duplicate or silently skip an intersection.
                         if (u>0.0 && u<1.0) {
                             V cut{};
+                            cut.generated=true;
                             cut.vertex=interpolate(last.vertex,current.vertex,u);
                             if (!load(cut.vertex,cut)) return false;
                             for (unsigned d=0u;d<13u;++d)
@@ -179,6 +181,65 @@ template<class Vertex, class Interpolate>
                 polygon.swap(clipped);
             }
             if (polygon.size()<3u) continue;
+            // Later polygon-plane intersections interpolate two float
+            // positions separately, while the CPU admission planes retain
+            // double values. Even if BOTH endpoints obey X<=W, independently
+            // rounded float X/W can place the new POINTLIST vertex just
+            // outside an earlier native hardware clip plane. Reconcile
+            // GENERATED vertices against every already-clipped GPU float
+            // boundary before calculating winding and uploading attributes.
+            // Corrections larger than a few native float ulps are not
+            // numerical noise: fail closed to original D3D9 rather than
+            // admitting an untrusted geometry change.
+            const auto boundedGpuFloat = [](float& component, float lo,
+                                            float hi) noexcept {
+                const double scale=(std::max)({
+                    std::abs(double(component)), std::abs(double(lo)),
+                    std::abs(double(hi)),
+                    double(std::numeric_limits<float>::min())});
+                const double tolerance=8.0*
+                    double(std::numeric_limits<float>::epsilon())*scale;
+                if (component<lo) {
+                    if (double(lo)-double(component)>tolerance) return false;
+                    component=lo;
+                } else if (component>hi) {
+                    if (double(component)-double(hi)>tolerance) return false;
+                    component=hi;
+                }
+                return true;
+            };
+            std::array<double,6u> userSourceScale{};
+            for (unsigned p=0u;p<6u;++p) if (userMask & (1u<<p)) {
+                const auto value=[p](const Vertex& v) noexcept {
+                    return double(p<4u?v.clip0[p]:v.clip1[p-4u]);
+                };
+                userSourceScale[p]=(std::max)({
+                    std::abs(value(va.vertex)),std::abs(value(vb.vertex)),
+                    std::abs(value(vc.vertex)),
+                    double(std::numeric_limits<float>::min())});
+            }
+            for (auto& corner:polygon) if (corner.generated) {
+                auto& v=corner.vertex;
+                const float w=v.clip[3];
+                if (!std::isfinite(w) || !(w>0.0f) ||
+                    !boundedGpuFloat(v.clip[0],-w,w) ||
+                    !boundedGpuFloat(v.clip[1],-w,w) ||
+                    !boundedGpuFloat(v.clip[2],0.0f,w)) return false;
+                // Vertex and pixel stages consume BOTH enabled source clip
+                // registers as float SV_ClipDistance. Keep independently
+                // interpolated color, specular and UVs bit-for-bit intact.
+                for (unsigned p=0u;p<6u;++p) if (userMask & (1u<<p)) {
+                    float& distance=p<4u?v.clip0[p]:v.clip1[p-4u];
+                    if (!std::isfinite(distance)) return false;
+                    if (distance<0.0f) {
+                        const double tolerance=8.0*
+                            double(std::numeric_limits<float>::epsilon())*
+                            userSourceScale[p];
+                        if (-double(distance)>tolerance) return false;
+                        distance=0.0f;
+                    }
+                }
+            }
             // D3D9 polygon winding is evaluated on the clipped projected
             // polygon, never by dividing a negative-W source vertex. This
             // also preserves original CW/CCW exclusion for point-filled faces.
