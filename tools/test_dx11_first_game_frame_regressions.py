@@ -182,10 +182,39 @@ def main() -> None:
     assert bridge.count("ctx->DrawIndexed(") == 1
     assert bridge.count("ctx->Draw(") == 2
     assert source_submit.count("ctx->Draw(") == 2
-    assert "if (clippedPointBatches.supported && clippedPointBatches.draws > 1u)" in source_submit
-    assert "first += clippedPointBatches.verticesPerDraw" in source_submit
-    assert "clippedPointBatches.totalVertices - first" in source_submit
-    assert "ctx->Draw(count, first);" in source_submit
+    # 01252 keeps a reusable bounded IA upload. After the first GPU window
+    # every subsequent chunk WRITE_DISCARD uploads its own source slice and
+    # draws from VB offset zero. The former Draw(count, first) audit described
+    # an obsolete one-upload implementation and rejected the correct source.
+    def streamed_point_window_contract(submit: str) -> bool:
+        required = (
+            "const bool streamedClippedPoints =",
+            "clippedPointBatches.supported && clippedPointBatches.draws > 1u;",
+            "if (streamedClippedPoints) {",
+            "for (UINT window = 0u; window < clippedPointBatches.draws; ++window)",
+            "game_fvf_native_point_batch_window(",
+            "if (window != 0u) {",
+            "upload_full_game_stream(",
+            "vertices.data() + first, bytes",
+            "ctx->Draw(count, 0u);",
+        )
+        return all(token in submit for token in required) and (
+            submit.index("game_fvf_native_point_batch_window(") <
+            submit.index("if (window != 0u) {") <
+            submit.index("upload_full_game_stream(", submit.index("if (window != 0u) {")) <
+            submit.index("ctx->Draw(count, 0u);")
+        )
+    assert streamed_point_window_contract(source_submit)
+    for token in (
+        "if (window != 0u) {",
+        "upload_full_game_stream(",
+        "vertices.data() + first, bytes",
+        "ctx->Draw(count, 0u);",
+    ):
+        sabotaged = source_submit.replace(token, "/* omitted window operation */", 1)
+        assert sabotaged != source_submit and not streamed_point_window_contract(sabotaged), (
+            "streaming clip point negative mutation admitted: " + token
+        )
     assert "else if (ib) ctx->DrawIndexed(indexCount, 0, 0);" in source_submit
     # A live stage-1 operation must not silently modify stage-0 DIFFUSE.
     # The old boundary accepted such draws while the native shader ignored
