@@ -94,7 +94,8 @@ jobs:
           assert j["schema"]=="outrun.ab-imagegen-hd-strict.v2"
           assert j["release_approved"] is False and j["runtime_validation"]=="UNTESTED"
           assert j["legacy_oversize_outputs_rejected"] is True
-          assert j["salvage_policy"]=="EXISTING_AB_PIXELS_FIRST_THEN_IMAGEGEN_ONLY_IF_UNSALVAGEABLE_V1"
+          assert j["translated_roi_generated"] >= 155 # last confirmed existing PNG salvage baseline
+          assert j["salvage_policy"]=="EXISTING_AB_PNG_RESIZE_REFLOW_ONLY_NO_NEW_IMAGEGEN_V2"
           assert j["translated_roi_generated"]+sum(j["hold_roi_reason_counts"].values())==954
           for atlas in j["generated"]:
               assert atlas["plate_evidence"]=="SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED"
@@ -108,17 +109,17 @@ jobs:
           PY
           sha256sum "$RUNNER_TEMP/ab-multi-one/OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip"
 
-      - name: Materialize ImageGen fallback tickets only after deterministic salvage fails
+      - name: Preserve existing-art-only HOLD accountability without new ImageGen requests
         if: success()
         shell: bash
         run: |
           set -euo pipefail
-          python tools/localization/hd_rework_queue.py --repo-root . \
+          python tools/localization/hd_rework_queue.py --reuse-only --repo-root . \
             --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
             --out "$RUNNER_TEMP/qa-rework-queue" \
             --skip-state-root "$GITHUB_WORKSPACE/hd-qa-queue-state/localization/automation_runs/hd_rework_queue/state"
 
-      - name: Publish bounded ticket manifest and original HD PNG references
+      - name: Publish reuse-only QA report with zero new ChatGPT tasks
         if: success()
         shell: bash
         env:
