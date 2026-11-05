@@ -226,6 +226,30 @@ int main(){
         questXYZ[0],-.25f,.25f,0.f,inputAnchor));
     assert(near(inputAnchor.y,.377f));
     assert(near(inputAnchor.z,-.640f));
+    // The F11 sliders must also work when APK-native camera composition
+    // is ON. Previously that branch skipped NativeVrProfileInputAnchor,
+    // so manual offsets were silently ignored after choosing the APK pose.
+    // Tuning happens BEFORE the source-proven +0.32Y/+0.55Z pair;
+    // zero tuning must reproduce the exact original guest values.
+    Vec3 nativeTuned{},nativeComposed{};
+    assert(NativeVrProfileInputAnchor(questXYZ[0],0.f,0.f,0.f,nativeTuned));
+    assert(OriginalQuestModeOneInput(nativeTuned,nativeComposed));
+    assert(near(nativeComposed.x,-.353f));
+    assert(near(nativeComposed.y,.947f));
+    assert(near(nativeComposed.z,.160f));
+    assert(NativeVrProfileInputAnchor(questXYZ[0],.1f,.1f,.05f,nativeTuned));
+    assert(OriginalQuestModeOneInput(nativeTuned,nativeComposed));
+    assert(near(nativeComposed.x,-.303f));
+    assert(near(nativeComposed.y,.847f));
+    assert(near(nativeComposed.z,.260f));
+    assert(NativeVrProfileInputAnchor(questXYZ[0],.25f,-.38f,-.05f,nativeTuned));
+    assert(OriginalQuestModeOneInput(nativeTuned,nativeComposed));
+    assert(near(nativeComposed.x,-.403f));
+    assert(near(nativeComposed.y,1.327f));
+    assert(near(nativeComposed.z,.410f));
+    const Vec3 priorComposed=nativeComposed;
+    assert(!NativeVrProfileInputAnchor(questXYZ[0],-1.3f,0.f,0.f,nativeTuned));
+    assert(near(nativeComposed.y,priorComposed.y));
     const Vec3 inputBefore=inputAnchor;
     assert(!NativeVrProfileInputAnchor(
         questXYZ[0],-1.3f,0.f,0.f,inputAnchor));
