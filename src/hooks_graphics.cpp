@@ -683,16 +683,38 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             maxB0Delta=maxF0Delta=maxCameraDelta=maxRelativeDelta=0.f;
         }
     }
-    static void TryDrawDinoFitV6(EVWORK_CAR* player) noexcept
+    struct DinoFitV6DrawTicket final
+    {
+        IDirect3DDevice9* device=nullptr;
+        D3DMATRIX world{},view{},projection{};
+        std::uint64_t nativeFrame=0,xrPose=0;
+        bool valid=false;
+        DinoFitV6DrawTicket()=default;
+        DinoFitV6DrawTicket(const DinoFitV6DrawTicket&)=delete;
+        DinoFitV6DrawTicket& operator=(const DinoFitV6DrawTicket&)=delete;
+        DinoFitV6DrawTicket(DinoFitV6DrawTicket&& other) noexcept
+            :device(other.device),world(other.world),view(other.view),
+             projection(other.projection),nativeFrame(other.nativeFrame),
+             xrPose(other.xrPose),valid(other.valid)
+        {
+            other.device=nullptr;other.valid=false;
+        }
+        ~DinoFitV6DrawTicket() noexcept
+        {
+            if(device)device->Release();
+        }
+    };
+    static DinoFitV6DrawTicket PrepareDinoFitV6(EVWORK_CAR* player) noexcept
     {
         using namespace OutRunVR::QuestCockpitV2;
+        DinoFitV6DrawTicket ticket{};
         if (!Settings::VRDinoExternalCockpit || !Settings::VREnabled ||
             !Settings::VRQuestCockpitV2Enabled || !Settings::VRStereo ||
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
             !NativeFrameTrace().Active() || InSceneEffect() ||
             !Game::current_mode || *Game::current_mode != STATE_GAME ||
             !player || player != Game::pl_car() || player->car_kind_11 != 1)
-            return;
+            return ticket;
         const auto* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
         IDirect3DDevice9* device=Game::D3DDevice();
@@ -708,32 +730,56 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         gate.deviceReady=device!=nullptr;
         gate.stateRecording=OutRunVR::State::StateBlockTracker::Recording();
         gate.carKind=static_cast<unsigned char>(player->car_kind_11);
-        if(!OutRunVR::DinoSidecar::Eligible(gate))return;
+        if(!OutRunVR::DinoSidecar::Eligible(gate))return ticket;
         const auto* nativeView=Module::exe_ptr<const D3DMATRIX>(0x55D860);
         const auto* nativeProjection=Module::exe_ptr<const D3DMATRIX>(0x55D8A0);
         if(!QuestCockpitGlassLive::Memory(nativeView,sizeof(D3DMATRIX)) ||
            !QuestCockpitGlassLive::Memory(nativeProjection,sizeof(D3DMATRIX)))
+            return ticket;
+        // Snapshot every player-owned value BEFORE the original display
+        // callback. During race->menu teardown that callback may release or
+        // recycle EVWORK_CAR; nothing after it may dereference 'player'.
+        ticket.world=player->matrix_B0;
+        ticket.view=*nativeView;
+        ticket.projection=*nativeProjection;
+        ticket.nativeFrame=NativeFrameTrace().ActiveEpoch();
+        ticket.xrPose=xr->poseSequence;
+        device->AddRef();
+        ticket.device=device;
+        ticket.valid=true;
+        return ticket;
+    }
+    static void DrawPreparedDinoFitV6(DinoFitV6DrawTicket& ticket) noexcept
+    {
+        using namespace OutRunVR::QuestCockpitV2;
+        if(!ticket.valid || !ticket.device)return;
+        // The original callback is allowed to advance the game state. If it
+        // crossed out of race gameplay, discard the prepared draw rather than
+        // drawing a stale car into the loading/menu frame.
+        if(!NativeFrameTrace().Active() || !Game::current_mode ||
+           *Game::current_mode != STATE_GAME) {
+            ticket.valid=false;
             return;
-        // One original player-frame draw only. Do NOT construct a second eye
-        // pair here: the existing Quest/R26 D3D9 draw owner duplicates this
-        // fixed-function world draw using the already-latched native eye pose.
+        }
         const HRESULT hr=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
-            device,player->matrix_B0,*nativeView,*nativeProjection);
+            ticket.device,ticket.world,ticket.view,ticket.projection);
         if(Settings::VRTelemetry) {
             static std::uint64_t attempts=0;
             const auto sample=++attempts;
             if(sample<=8u || (sample&(sample-1u))==0u)
                 spdlog::info(
                     "VR QUEST DINO FITV6: sample={} nativeFrame={} xrPose={} mode=1 drawHr=0x{:08X} originalPMT=UNCHANGED",
-                    sample,NativeFrameTrace().ActiveEpoch(),xr->poseSequence,
+                    sample,ticket.nativeFrame,ticket.xrPose,
                     static_cast<unsigned int>(hr));
         }
+        ticket.valid=false;
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
+        auto dino=PrepareDinoFitV6(player);
         QuestCockpitGlassLive::PlayerCallback scope(player);
         PlayerCallbackHook.ccall<void>(player);
-        TryDrawDinoFitV6(player);
+        DrawPreparedDinoFitV6(dino);
     }
     static void __cdecl OnPlayerCallback(EVWORK_CAR* player)
     {
