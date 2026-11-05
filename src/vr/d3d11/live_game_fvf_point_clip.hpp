@@ -196,7 +196,7 @@ template<class Vertex, class Interpolate>
                 const double scale=(std::max)({
                     std::abs(double(component)), std::abs(double(lo)),
                     std::abs(double(hi)),
-                    double(std::numeric_limits<float>::min())});
+                    double((std::numeric_limits<float>::min)())});
                 const double tolerance=8.0*
                     double(std::numeric_limits<float>::epsilon())*scale;
                 if (component<lo) {
@@ -216,7 +216,7 @@ template<class Vertex, class Interpolate>
                 userSourceScale[p]=(std::max)({
                     std::abs(value(va.vertex)),std::abs(value(vb.vertex)),
                     std::abs(value(vc.vertex)),
-                    double(std::numeric_limits<float>::min())});
+                    double((std::numeric_limits<float>::min)())});
             }
             for (auto& corner:polygon) if (corner.generated) {
                 auto& v=corner.vertex;
