@@ -60,9 +60,14 @@
       "FVF_CXX_POLYGON_POINT_OCCURRENCE_GPU_SOURCE_FIX",
       "FVF_CXX_SOURCE_UV_CLIP_AND_CAPACITY_NEGATIVE_REGRESSIONS"
     ],
-    "full_gate_plan": "one_validation_bearing_exact_sha",
+    "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY. Native FVF original-game clip/source -> D3D11 POINTLIST and diagnostic PRE/POST source route are source-integrated; original-game native menu/vehicle/race visible frames and real Quest3 VR have NOT been measured on this SHA.",
-    "activation_guard_and_fallback": "Native diagnostic opt-in only. Original D3D9 game Draw, DX9Ex fallback, input/wheel FFB, OpenXR lease/epochs, source RT identity, GPU pixel/fence authentication, SkyGlow and frozen DXVK left unchanged."
+    "activation_guard_and_fallback": "Native diagnostic opt-in only. Original D3D9 game Draw, DX9Ex fallback, input/wheel FFB, OpenXR lease/epochs, source RT identity, GPU pixel/fence authentication, SkyGlow and frozen DXVK left unchanged.",
+    "acceptance_proof": {
+      "positive_probe": "Previous exact source SHA 779022071ec7c4640249df2039b8ce4c803d35db: clipped source FVF triangle produces native POINTLIST source triangle occurrences; targeted regression and DX11 Fast 41975267927 SUCCESS.",
+      "negative_regression": "Previously validated indexed/user-plane/UV and bounded capacity malformed-source cases leave original D3D9 and prior native output plan unchanged; source/code SHA 779022071ec7c4640249df2039b8ce4c803d35db.",
+      "component_integration": "Previously validated live_game_frame_bridge.cpp native submit routes original game FVF Draw/DrawIndexed through clipped point assembly and native GPU source; five exact-SHA workflow runs 41975267927, 41975268112, 41975267896, 41975275934, 41975267930 SUCCESS. Real game/Quest3 runtime UNTESTED."
+    }
   },
   "feature_contract": {
     "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
