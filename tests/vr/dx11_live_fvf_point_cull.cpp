@@ -317,7 +317,7 @@ int main() {
     std::vector<ClipVertex> nearEyeTiny{
         {{-5.e-8f,-5.e-8f,2.e-8f,1.e-7f},{1,1,1,1},{1,1,0,0},{0,0}},
         {{ 5.e-8f,-5.e-8f,2.e-8f,1.e-7f},{1,1,1,1},{1,1,0,0},{1,0}},
-        {{ 0.f,   5.e-8f,-2.e-8f,-1.e-7f},{1,1,1,1},{1,1,0,0},{.5f,1}}
+        {{ 0.f,   0.f,-2.e-8f,-1.e-7f},{1,1,1,1},{1,1,0,0},{.5f,1}}
     };
     std::vector<ClipVertex> nearEyeOut;
     assert(game_fvf_clipped_point_vertices(
