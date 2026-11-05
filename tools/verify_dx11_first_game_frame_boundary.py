@@ -268,31 +268,39 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     # exempt arbitrary new native Draw calls.
     fvf = match.group(1)
     expanded_draw = fvf.partition(
-        "    if (clippedPointBatches.supported && clippedPointBatches.draws > 1u) {")[2].partition(
+        "    if (streamedClippedPoints) {")[2].partition(
         "    // GPU submission is paired with the queued readback at Present.")[0]
     point_helper = (ROOT / "src/vr/d3d11/live_game_fvf_point_batches.hpp").read_text(
         encoding="utf-8")
     point_regression = (ROOT / "tests" / "vr" / "dx11_live_fvf_point_cull.cpp").read_text(
         encoding="utf-8")
+    # 01252: preserve the original Draw cardinality and source-fail-closed
+    # preflight, but require the full bound derived from authentic clip planes
+    # and dynamic WRITE_DISCARD GPU uploads for later point windows.
     require(bool(expanded_draw) and
             re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", expanded_draw) ==
                 ["->Draw(", "->DrawIndexed(", "->Draw("] and
             all(token in fvf for token in (
                 "const UINT totalBudget = env_full_game_opt_in()",
-                "? kMaxExpandedPointVertices : kMaxVertices;",
+                "game_fvf_native_point_expansion_budget(",
+                "sourceElements, kMaxVertices)",
                 "if (!game_fvf_clipped_point_vertices(",
                 "output.nativeFvfUserClipMask, totalBudget,",
                 "clippedPointBatches = game_fvf_native_point_batch_plan(",
                 "if (!clippedPointBatches.supported ||",
                 "(!env_full_game_opt_in() && clippedPointBatches.draws != 1u)",
+                "const bool streamedClippedPoints =",
+                "const std::size_t uploadVertices = streamedClippedPoints",
                 "if (!ensure_full_game_upload_buffer(",
                 "if (!upload_full_game_stream(",
                 "if (FAILED(dev->GetDeviceRemovedReason())) return false;")) and
             all(token in expanded_draw for token in (
-                "first < clippedPointBatches.totalVertices;",
-                "first += clippedPointBatches.verticesPerDraw",
-                "clippedPointBatches.totalVertices - first);",
-                "ctx->Draw(count, first);",
+                "for (UINT window = 0u; window < clippedPointBatches.draws; ++window)",
+                "game_fvf_native_point_batch_window(",
+                "if (window != 0u)",
+                "vertices.data() + first, bytes",
+                "s.fullGameVertexCapacity",
+                "ctx->Draw(count, 0u);",
                 "else if (ib) ctx->DrawIndexed(indexCount, 0, 0);",
                 "else ctx->Draw(static_cast<UINT>(vertices.size()), 0);")) and
             all(token in point_helper for token in (
@@ -302,15 +310,24 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
                 "maxPerDraw - (maxPerDraw % 3u)",
                 "plan.totalVertices =",
                 "plan.verticesPerDraw = window;",
-                "plan.draws =")) and
+                "plan.draws = 1u +",
+                "game_fvf_native_point_expansion_budget(",
+                "kMaxPointsPerSourceTriangle = 42u",
+                "game_fvf_native_point_batch_window(",
+                "const std::uint64_t begin =",
+                "count = segment;")) and
             all(token in point_regression for token in (
                 "expandedPoints.size()==24u",
                 "plan.verticesPerDraw==9u && plan.draws==3u",
                 "!game_fvf_native_point_batch_plan(24u,9u,23u).supported",
                 "!game_fvf_native_point_batch_plan(25u,9u,48u).supported",
                 "lateBadMultiPlane",
-                "badExpandedIndices")),
-            "clipped native FVF point GPU windows lack original source admission, exact bound or regression")
+                "badExpandedIndices",
+                "longGamePoints.size()==6600u",
+                "first==6144u && count==456u",
+                "!game_fvf_native_point_batch_window(longPlan,2u,first,count)",
+                "6000u,lerp,longGamePoints")),
+            "clipped native FVF point GPU streaming lacks authenticated source IA, exact plane bound, GPU rename or regression")
     require(len(dispatch) == len(scoped) + len(sm3_scoped) == 11 and
             scoped == ["->Draw(", "->DrawIndexed(", "->Draw("] and
             sm3_scoped == ["->DrawIndexed(", "->Draw(",
