@@ -26,6 +26,13 @@ on:
       - 'tools/tests/quest_cockpit_v2_occupant_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
       - 'RUN-QUEST-COCKPIT-V2.cmd'
+      - 'RUN-QUEST-APK-COCKPIT.cmd'
+      - 'RUN-QUEST-APK-SKY-DIAG.cmd'
+      - 'RUN-QUEST-APK-INTERP-OFF.cmd'
+      - 'RESTORE-QUEST-APK-COCKPIT.cmd'
+      - 'QuestCockpit-CopyRun.ps1'
+      - 'QuestCockpit-CopyRestore.ps1'
+      - 'QUEST-APK-COPYRUN-README.txt'
       - 'QUEST-COCKPIT-V2-START-HERE.txt'
       - 'RUN-QUEST-COCKPIT-V2-F0.cmd'
       - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
@@ -89,7 +96,7 @@ jobs:
         if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
         shell: pwsh
         run: |
-          foreach($file in @('tools/Run-OutRunVRTest.ps1','Run-QuestCockpitV2-CrashDiag.ps1','QuestCockpitV2-GlassControl.ps1')) {
+          foreach($file in @('tools/Run-OutRunVRTest.ps1','Run-QuestCockpitV2-CrashDiag.ps1','QuestCockpitV2-GlassControl.ps1','QuestCockpit-CopyRun.ps1','QuestCockpit-CopyRestore.ps1')) {
             $tokens=$null
             $parseErrors=$null
             [void][System.Management.Automation.Language.Parser]::ParseFile(
@@ -196,11 +203,59 @@ jobs:
               if(!(Test-Path $item)){throw "missing Quest cockpit launcher: $item"}
               Copy-Item $item $pkg
             }
+            foreach($item in @(
+              'RUN-QUEST-APK-COCKPIT.cmd',
+              'RUN-QUEST-APK-SKY-DIAG.cmd',
+              'RUN-QUEST-APK-INTERP-OFF.cmd',
+              'RESTORE-QUEST-APK-COCKPIT.cmd',
+              'QuestCockpit-CopyRun.ps1',
+              'QuestCockpit-CopyRestore.ps1',
+              'QUEST-APK-COPYRUN-README.txt')) {
+              if(!(Test-Path $item)){throw "missing copy-run entrypoint: $item"}
+              Copy-Item $item $pkg
+            }
             # The superseded PMT file editor stays source-only. Packaged
             # cockpit glass controls are now F11 live hooks, never disk edits.
           }
           $env:GITHUB_SHA | Set-Content (Join-Path $backend 'SOURCE_SHA.txt') -Encoding ascii
           'ACTIVE_R26_R43_R44' | Set-Content (Join-Path $backend 'VARIANT_ID.txt') -Encoding ascii
+          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
+            # Self-contained copy-run payload: extraction touches NONE of the
+            # user's existing root DLL/host/INI/renderer files. The launcher
+            # validates hashes and backs originals up before selection.
+            $copy=Join-Path $pkg 'QUEST_APK_COPYRUN_PAYLOAD'
+            $copyBackend=Join-Path $copy 'backend'
+            $copyScripts=Join-Path $copy 'scripts'
+            $copyDefaults=Join-Path $copy 'defaults'
+            foreach($dir in @($copyBackend,$copyScripts,$copyDefaults)) {
+              New-Item -ItemType Directory -Force $dir|Out-Null
+            }
+            foreach($name in @('dinput8.dll','outrun-vr-host.exe',
+                                'SOURCE_SHA.txt','VARIANT_ID.txt')) {
+              Copy-Item (Join-Path $backend $name) $copyBackend -Force
+            }
+            $env:GITHUB_SHA | Set-Content (Join-Path $copyBackend 'HOST_BUILD_SOURCE_SHA.txt') -Encoding ascii
+            foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')){
+              Copy-Item (Join-Path $pkg $name) $copyDefaults -Force
+            }
+            foreach($name in @('Run-OutRunVRTest.ps1','Select-OutRunVRBackend.ps1',
+                                'OutRunVR-TestProfiles.ps1','Collect-OutRunVRLogs.ps1',
+                                'Collect-OutRunVRLogs.cmd','Analyze-OutRunVRSession.ps1',
+                                'Run-QuestCockpitV2-CrashDiag.ps1','analyze_outrun_assets.py')){
+              $input=Join-Path $pkg $name
+              if(!(Test-Path $input)){throw "missing copy-run helper $name"}
+              Copy-Item $input $copyScripts -Force
+            }
+            $manifest=[ordered]@{
+              SourceSha=$env:GITHUB_SHA
+              VariantId='ACTIVE_R26_R43_R44'
+              GameDllSha256=(Get-FileHash (Join-Path $copyBackend 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant()
+              HostExeSha256=(Get-FileHash (Join-Path $copyBackend 'outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
+            }
+            $manifest|ConvertTo-Json|Set-Content (Join-Path $copy 'IDENTITY.json') -Encoding ascii
+            & (Join-Path (Resolve-Path $pkg) 'QuestCockpit-CopyRun.ps1') -VerifyOnly
+            if(-not $?){throw 'copy-run payload integrity verification failed'}
+          }
           'GITHUB_HOSTED_GENERAL_CLEAN' | Set-Content (Join-Path $pkg 'BUILD_CLASS.txt') -Encoding ascii
           $zip="build-general/OutRun2_VR_GITHUB_GENERAL_$env:GITHUB_SHA.zip"
           Compress-Archive -Path "$pkg/*" -DestinationPath $zip -Force
