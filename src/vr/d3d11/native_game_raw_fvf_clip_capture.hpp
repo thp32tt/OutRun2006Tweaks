@@ -246,8 +246,11 @@ struct NativeRawFvfClipSpan {
                 // W=0 is an authentic perspective plane crossing when the
                 // vector has finite nonzero XYZ. Reject the projectively
                 // undefined zero vector, not the entire original game Draw.
-                (!clip[0] && !clip[1] && !clip[2] && !clip[3]) ||
-                (clip[3] > 0.0f && clip[3] <= 0.00001f)) return false;
+                (!clip[0] && !clip[1] && !clip[2] && !clip[3])) return false;
+            // The game's real native Draw accepts ANY finite positive W.
+            // A fixed 1e-5 eye-plane safety threshold must never discard
+            // a small but fully projectable, source-authentic FVF primitive.
+            // Preserve the guarded plane only for actual W<=0 crossings.
             homogeneous[corner] = {static_cast<double>(clip[0]),
                                    static_cast<double>(clip[1]),
                                    static_cast<double>(clip[2]),
@@ -304,6 +307,11 @@ struct NativeRawFvfClipSpan {
                 // D3D11 DepthClipEnable=FALSE drops only 0<=z<=w.
                 // The eye-plane W and x/y bounds still apply to EVERY Draw.
                 if (!depthClipEnable && (plane == 4u || plane == 5u))
+                    continue;
+                // With all original W>0 there is no eye crossing: user
+                // ClipDistance must not activate the synthetic 1e-5 guard.
+                // Actual W<=0 crossings retain their bounded projection.
+                if (plane == 6u && !crossesEyePlane)
                     continue;
                 std::size_t nextCount = 0u;
                 auto previous = homogeneous[polygonCount - 1u];

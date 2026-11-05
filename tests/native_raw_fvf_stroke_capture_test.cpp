@@ -105,6 +105,39 @@ int main() {
     assert(clipped.left==0 && clipped.right==0 && !clippedTiles.hasSecond);
     lines[1]={{-0.45f,-0.72f,0.5f,1.f},{1,1,1,1,1,1}};
 
+    // 01243: tiny but POSITIVE homogeneous W is valid in the original
+    // D3D9/D3D11 source Draw, including POINTLIST, indexed lines and an
+    // enabled user clip plane. Only actual eye crossings retain 1e-5 guard.
+    Vertex tinyStroke[]{
+        {{-1.2e-7f,0.f,1.0e-7f,2.0e-7f},{1,1,1,1,1,1}},
+        {{ 1.2e-7f,0.f,1.0e-7f,2.0e-7f},{1,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan smallLine{
+        tinyStroke,sizeof(Vertex),2u,nullptr,0u,
+        NativeRawFvfAssembly::LineList,userOffset,0u};
+    assert(native_raw_fvf_stroke_dual_draw_tile(
+        smallLine,0,0,3440,1440,3440,1440,128,96,
+        full,0u,clipped,clippedTiles));
+    assert(clipped.right > clipped.left && clipped.bottom > clipped.top);
+    smallLine.clipDistanceMask=1u;
+    assert(native_raw_fvf_stroke_dual_draw_tile(
+        smallLine,0,0,3440,1440,3440,1440,128,96,
+        full,0u,clipped,clippedTiles));
+    smallLine.assembly=NativeRawFvfAssembly::PointList;
+    assert(native_raw_fvf_stroke_dual_draw_tile(
+        smallLine,0,0,3440,1440,3440,1440,128,96,
+        full,0u,clipped,clippedTiles));
+    tinyStroke[0].user[0]=-1.f;
+    tinyStroke[1].user[0]=-1.f;
+    assert(!native_raw_fvf_stroke_dual_draw_tile(
+        smallLine,0,0,3440,1440,3440,1440,128,96,
+        full,0u,clipped,clippedTiles));
+    tinyStroke[0].user[0]=1.f;
+    tinyStroke[1].user[0]=1.f;
+    tinyStroke[0].clip[3]=0.f; // invalid POINTLIST eye-plane point
+    assert(!native_raw_fvf_stroke_dual_draw_tile(
+        smallLine,0,0,3440,1440,3440,1440,128,96,
+        full,0u,clipped,clippedTiles));
     // LINELIST's entire IA must be even-sized: a dangling or malformed
     // final index is not a safe native source even if earlier lines draw.
     const std::uint32_t oddIndices[]{0u,1u,99u};

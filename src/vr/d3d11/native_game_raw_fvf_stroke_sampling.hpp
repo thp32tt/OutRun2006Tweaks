@@ -146,6 +146,11 @@ struct NativeRawStrokeEndpoints {
             if (p == 4u || p == 5u) {
                 if (rasterState && !rasterState->depthClipEnable) continue;
             }
+            // Source-positive W is directly projectable even below 1e-5.
+            // Apply the bounded eye-plane threshold only to line segments
+            // that actually cross W<=0; POINTLIST never has such a segment.
+            if (p == 6u && a.w > 0.0 && b.w > 0.0)
+                continue;
             const double da = distance(a, p), db = distance(b, p);
             if (!std::isfinite(da) || !std::isfinite(db)) return false;
             if (da < 0.0 && db < 0.0) {
