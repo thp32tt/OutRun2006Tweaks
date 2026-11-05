@@ -1,0 +1,181 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01245",
+  "production_id": "CONVERSION-DX11-01245",
+  "event_id": "CONVERSION-DX11-01245-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "1628c28f9c9cf8b3802a7f61e6bf1d8bd0180bc4",
+  "result_sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+  "material_implementation_sha": "cb26c9f07dcb1c25dc625cf2681d7eef588c716c",
+  "material_result_sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+  "validation_bearing_result_sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+  "feature_id": "DX11:LIVE_FVF_POINT_FILL_TINY_POSITIVE_W_SOURCE_INTEGRATION",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
+  "classification": "A_INHERITED_FVF_POINT_FILL_TRIANGLE_FAN_SOURCE_INTEGRATION_B_C6_POLICY_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 0,
+  "score_note": "Continuation of existing FVF native source point-fill family; original D3D9 TRIANGLEFAN topology is not a new independently scored feature. No score for causal 01244 C6 metadata repair, CI, or documentation; retain prior GitHub AI2 cumulative 2596 unless independently superseded by other workers.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+    "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01244.json"
+  ],
+  "implementation": "The original D3D9 FVF TRIANGLEFAN point-fill native game Draw/DrawIndexed now reaches D3D11 POINTLIST via source-indexed/unindexed face-cull and full homogeneous/user-plane post-clip vertex interpolation. Preserve fan anchor, constant fan winding, actual source UV/color/clip attributes, positive-W, fail-closed invalid later IA/capacity and original game D3D9 Present/input/FFB/DX9Ex fallback. Causal repair normalizes missing earlier 01244 source-stage C6 contract fields without changing 01244's verified material SHA or score.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW",
+      "DX11:LIVE_FVF_POINT_FILL_TINY_POSITIVE_W_SOURCE_INTEGRATION"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_GAME_FVF_TRIANGLE_FAN_DRAW_DRAWINDEXED",
+      "SOURCE_FAN_CULL_OR_CLIPPED_ATTRIBUTE_INTERPOLATION",
+      "D3D11_NATIVE_POINTLIST_DRAW",
+      "AUTHENTIC_GPU_PRE_POST_AND_CONDITIONAL_ORIGINAL_D3D9_PRESENT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "FVF_INDEXED_AND_LINEAR_FAN_NATIVE_POINTLIST_SOURCE_CXX",
+      "FVF_FAN_HOMOGENEOUS_USER_PLANE_AND_EYE_CLIP_CXX",
+      "POSITIVE_NEGATIVE_ORIGINAL_FAN_INDEX_CULL_UV_INTERPOLATION_TESTS",
+      "CAUSAL_INHERITED_C6_POLICY_GATE_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real game FVF fan POINTLIST source dispatch has indexed, nonindexed, winding and post-clip UV test; g++ C++17 -Werror focused test and DX11 Fast 41968773147 SUCCESS at exact SHA.",
+      "negative_regression": "Partly clipped fan fast path refuses original-only point indices; full clipping interpolates actual source attributes; malformed late fan index, source NaN and capped vertex upload leave previous GPU plan intact. All original D3D9 input/FFB/fallback untouched.",
+      "component_integration": "Both helpers called by live_game_frame_bridge.cpp submit for D3DFILL_POINT prior native GPU resource binding; original D3D9 source Draw/PRE-POST/conditional Present remains opt-in. Backend/Build/OpenXR/HUD exact-SHA CI all SUCCESS."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY. Genuine D3D9 game-authored fan source -> D3D11 native POINTLIST GPU Draw -> GPU PRE/POST RGB source -> conditional visible diagnostic/original D3D9 Present fallback is implemented, but no actual menu/vehicle/race native output or Quest3 HMD recorded at this SHA.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in only; original D3D9 game Draw, input, wheel FFB, DX9Ex fallback, owner lease, GPU source epoch/RT and native pixel evidence retained; no DXVK activation and no production full-frame promotion."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FVF_POINT_FILL_TINY_POSITIVE_W_SOURCE_INTEGRATION",
+    "goal": "Extend authentic game FVF point-fill native DX11 Draw conversion from list/strip and tiny-positive-W to indexed and unindexed triangle fans, including fully clipped and interpolated fallback, while preserving original game input and DX9Ex render.",
+    "acceptance_items": [
+      {
+        "id": "fan_source_native_pointfill",
+        "category": "end_to_end_behavior",
+        "behavior_area": "FVF_GAME_FAN_NATIVE_DRAW",
+        "expected_behavior": "Original indexed/unindexed fan anchor and face-cull sequence lowers to genuine native D3D11 point IA with original source geometry."
+      },
+      {
+        "id": "fan_clipping_and_input_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "FVF_HOMOGENEOUS_CLIP_AND_D3D9_FALLBACK",
+        "expected_behavior": "Source XY, enabled user plane, eye crossing, malformed later IB and capacity preserve interpolated attributes or reject before GPU mutation; original input/FFB unaffected."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Exact final source and causal C6 record repair SHA passes all mandatory GitHub gates without claiming actual desktop game or HMD runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "fan_source_native_pointfill": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #41968773147 SUCCESS at exact SHA 4553426c5d03281c663b591122dfa27a4e10d83c"
+    },
+    "fan_clipping_and_input_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #41968773147 SUCCESS; Backend Conversion Gate #41968773179 SUCCESS"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "DX11 Fast #41968773147, Backend Conversion #41968773179, Build #41968773183, OpenXR #41968773031, HUD #41968773096 all SUCCESS at SHA 4553426c5d03281c663b591122dfa27a4e10d83c"
+    }
+  },
+  "source_and_repair_commits": [
+    {
+      "sha": "cb26c9f07dcb1c25dc625cf2681d7eef588c716c",
+      "kind": "MATERIAL_CXX_SOURCE_AND_REGRESSION",
+      "summary": "Original FVF TriangleFan native point-fill indexed/unindexed, source cull, clipping/interpolation and transaction fallback regressions."
+    },
+    {
+      "sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+      "kind": "CAUSAL_INHERITED_01244_C6_POLICY_GATE_REPAIR_AND_VALIDATION_SHA",
+      "summary": "Normalize missing prior C6 source draw path/visible acceptance/DX9Ex fallback after Fast+Backend exact-SHA failure; no score and original prior acceptance untouched."
+    }
+  ],
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41968773147,
+      "sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41968773179,
+      "sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41968773183,
+      "sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41968773031,
+      "sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41968773096,
+      "sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "runtime_evidence": null,
+  "runtime_note": "No actual original OutRun 2006 game desktop menu, car selection, race or Quest3/VDXR session at 4553426c5d03281c663b591122dfa27a4e10d83c. Native Draw and published game frame counts are UNTESTED. CI/WARP source checks do not establish physical GPU/HMD frame visibility.",
+  "c6_note": "C6 documentation recorded only after verified 5/5 exact-SHA GitHub Actions. Dedicated docs bookkeeping commit with skip ci is distinct from source validation-bearing 4553426c; no new code, re-running CI, new score, or runtime claim.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "NATIVE_REAL_GAME_MENU_VEHICLE_RACE_VISIBLE_FRAME_RUNTIME_NOT_MEASURED",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "code_changed_sha": "4553426c5d03281c663b591122dfa27a4e10d83c",
+  "next_implementation_action": "Continue integrated native menu -> vehicle selection -> race authentic game source Draw/Present and separate OpenXR stereo GPU output under same full-frame feature; preserve D3D9Ex fallback and DXVK freeze; game/HMD testing separately."
+}
