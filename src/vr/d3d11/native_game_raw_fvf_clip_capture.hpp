@@ -90,7 +90,10 @@ struct NativeRawFvfInteriorSample {
     // Endpoints of the three selected ORIGINAL post-clip wireframe edges,
     // in physical source viewport pixels (x0,y0,x1,y1). Midpoints alone
     // miss long spans between native GPU capture tiles.
-    std::array<std::array<std::int64_t, 4u>, 3u> wireEdges{};
+    // All post-clip polygon boundaries matter: a source triangle clipped
+    // by the frustum, scissor or user planes can have more than three edges.
+    std::array<std::array<std::int64_t, 4u>, 20u> wireEdges{};
+    std::uint32_t wireEdgeCount = 0u;
     bool wireEdgesValid = false;
 };
 struct NativeRawFvfClipSpan {
@@ -216,8 +219,8 @@ struct NativeRawFvfClipSpan {
     double alternatePixelX = 0.0, alternatePixelY = 0.0;
     double oppositePixelX = 0.0, oppositePixelY = 0.0;
     bool interiorSparseDiagonal = false;
-    std::array<std::array<double, 4u>, 3u> selectedWireEdges{};
-    bool haveSelectedWireEdges = false;
+    std::array<std::array<double, 4u>, 20u> selectedWireEdges{};
+    std::size_t selectedWireEdgeCount = 0u;
     for (std::size_t triangle = 0u; triangle < triangles; ++triangle) {
         std::array<Point, 20u> polygon{}, clipped{};
         std::array<HomogeneousPoint,20u> homogeneous{}, clippedH{};
@@ -579,22 +582,21 @@ struct NativeRawFvfClipSpan {
                     return static_cast<double>(viewportY) +
                         (1.0 - p.y) * static_cast<double>(viewportH) * 0.5;
                 };
-                // Preserve actual post-homogeneous/scissor clip endpoints.
-                // These are a GPU READBACK search schedule, not CPU raster
-                // evidence. Traverse the edges in later source Draw ordinals
-                // rather than resampling only three middle pixels.
-                const std::array<std::size_t, 3u> chosenEdges{
-                    primary, secondary, tertiary};
-                for (std::size_t edge = 0u; edge < chosenEdges.size(); ++edge) {
-                    const auto start = chosenEdges[edge];
-                    const auto finish = (start + 1u) % polygonCount;
+                // Preserve EVERY actual post-homogeneous/user-plane/scissor
+                // boundary, not just the three most distant midpoints. A
+                // clipped source triangle can become a 4..20-edge polygon;
+                // a missing edge is a missing native GPU readback island.
+                // Coordinates schedule PRE/POST GPU crops only, never infer
+                // raster pixels or relax D3D9 Present/source identity.
+                for (std::size_t edge = 0u; edge < polygonCount; ++edge) {
+                    const auto finish = (edge + 1u) % polygonCount;
                     selectedWireEdges[edge] = {
-                        screenX(polygon[start]), screenY(polygon[start]),
+                        screenX(polygon[edge]), screenY(polygon[edge]),
                         screenX(polygon[finish]), screenY(polygon[finish])};
                     for (double coordinate : selectedWireEdges[edge])
                         if (!std::isfinite(coordinate)) return false;
                 }
-                haveSelectedWireEdges = true;
+                selectedWireEdgeCount = polygonCount;
                 x = screenX(edges[primary]); y = screenY(edges[primary]);
                 ax = screenX(edges[secondary]); ay = screenY(edges[secondary]);
                 ox = screenX(edges[tertiary]); oy = screenY(edges[tertiary]);
@@ -672,10 +674,10 @@ struct NativeRawFvfClipSpan {
         interior->oppositePixelX = static_cast<std::int64_t>(std::floor(oppositePixelX));
         interior->oppositePixelY = static_cast<std::int64_t>(std::floor(oppositePixelY));
         interior->sparseDiagonal = interiorSparseDiagonal;
-        if (haveSelectedWireEdges) {
+        if (selectedWireEdgeCount) {
             // No guessed endpoint may reach the sampler: keep the same
             // bounded physical source-pixel range as the other anchors.
-            for (std::size_t edge = 0u; edge < 3u; ++edge) {
+            for (std::size_t edge = 0u; edge < selectedWireEdgeCount; ++edge) {
                 for (std::size_t c = 0u; c < 4u; ++c) {
                     const double q = selectedWireEdges[edge][c];
                     if (!std::isfinite(q) || q < -maxCoordinate ||
@@ -684,6 +686,8 @@ struct NativeRawFvfClipSpan {
                         static_cast<std::int64_t>(std::floor(q));
                 }
             }
+            interior->wireEdgeCount =
+                static_cast<std::uint32_t>(selectedWireEdgeCount);
             interior->wireEdgesValid = true;
         }
     }

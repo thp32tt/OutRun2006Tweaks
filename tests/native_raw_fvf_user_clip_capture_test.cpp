@@ -584,6 +584,93 @@ int main() {
     assert(diagonalPhases[3].first.x != diagonalPhases[24].first.x);
     assert(diagonalPhases[3].first.y != diagonalPhases[24].first.y);
     assert(diagonalPhases[6].first.x != diagonalPhases[3].first.x);
+
+    // 01242: an authentic D3D9 source triangle clipped against one enabled
+    // user plane produces a FOUR-edge convex WIREFRAME polygon. The native
+    // GPU PRE/POST tile schedule must traverse the newly created clipping
+    // boundary too, not only the original triangle's three selected edges.
+    Vertex clippedFour[]{
+        {{-.95f,-.75f,.5f,1.f},{-1.f,1,1,1,1,1}},
+        {{ .95f,-.75f,.5f,1.f},{ 1.f,1,1,1,1,1}},
+        {{ .25f, .95f,.5f,1.f},{ 1.f,1,1,1,1,1}}
+    };
+    NativeRawFvfClipSpan fourSource{
+        clippedFour,sizeof(Vertex),3u,nullptr,0u,
+        NativeRawFvfAssembly::TriangleList,offset,1u};
+    NativeRawFvfInteriorSample fourEdges{};
+    NativeRawDrawExtent fourExtent{};
+    assert(native_raw_fvf_projected_raster(
+        fourSource,0,0,3440,1440,fourExtent,nullptr,
+        &wireNoCull,&fourEdges));
+    assert(fourEdges.wireEdgesValid && fourEdges.wireEdgeCount==4u);
+    const auto actualTileOrigin = [](std::int64_t px,
+                                     std::uint32_t tile,
+                                     std::uint32_t surface) {
+        return static_cast<std::uint32_t>((std::max)(
+            std::int64_t{0},(std::min)(
+                px-static_cast<std::int64_t>(tile)/2,
+                static_cast<std::int64_t>(surface-tile))));
+    };
+    // At phase 6 the fourth authentic boundary's first endpoint is
+    // sampled; phase 34 reaches its last endpoint, not a duplicated tile.
+    // All other phases keep source-owned, disjoint GPU copies.
+    NativeRawDualTile fourFirst{},fourLast{};
+    for (std::uint32_t phase=0u; phase<35u; ++phase) {
+        NativeRawDualTile t{};
+        assert(native_raw_fvf_island_dual_draw_tile(
+            fourSource,0,0,3440,1440,3440,1440,128,96,
+            {0,0,3440,1440},phase,t,&wireNoCull));
+        assert(t.first.x<=3440-128 && t.first.y<=1440-96);
+        assert(!t.hasSecond || native_raw_source_tiles_disjoint(
+            t.first,t.second,128,96));
+        if (phase==6u) fourFirst=t;
+        if (phase==34u) fourLast=t;
+    }
+    assert(fourFirst.first.x ==
+           actualTileOrigin(fourEdges.wireEdges[3][0],128,3440));
+    assert(fourFirst.first.y ==
+           actualTileOrigin(fourEdges.wireEdges[3][1],96,1440));
+    assert(fourLast.first.x ==
+           actualTileOrigin(fourEdges.wireEdges[3][2],128,3440));
+    assert(fourLast.first.y ==
+           actualTileOrigin(fourEdges.wireEdges[3][3],96,1440));
+    assert(fourFirst.first.x!=fourLast.first.x ||
+           fourFirst.first.y!=fourLast.first.y);
+    // A full source Draw still uses authentic indexed IA topology.
+    const std::uint32_t clippedIndices[]{0u,1u,2u};
+    fourSource.indices=clippedIndices;
+    fourSource.indexCount=3u;
+    NativeRawDualTile fourIndexed{};
+    assert(native_raw_fvf_island_dual_draw_tile(
+        fourSource,0,0,3440,1440,3440,1440,128,96,
+        {0,0,3440,1440},6u,fourIndexed,&wireNoCull));
+    assert(fourIndexed.first.x==fourFirst.first.x &&
+           fourIndexed.first.y==fourFirst.first.y);
+    // SOLID never reads the wire-only edge schedule. Invalid original IA
+    // and unknown ClipDistance masks remain safely rejected.
+    NativeRawFvfInteriorSample fourSolid{};
+    assert(native_raw_fvf_projected_raster(
+        fourSource,0,0,3440,1440,fourExtent,nullptr,
+        &solidNoCull,&fourSolid));
+    assert(!fourSolid.wireEdgesValid && fourSolid.wireEdgeCount==0u);
+    const std::uint32_t badClippedIndices[]{0u,1u,8u};
+    fourSource.indices=badClippedIndices;
+    assert(!native_raw_fvf_island_dual_draw_tile(
+        fourSource,0,0,3440,1440,3440,1440,128,96,
+        {0,0,3440,1440},6u,fourIndexed,&wireNoCull));
+    fourSource.indices=nullptr;
+    fourSource.indexCount=0u;
+    fourSource.clipDistanceMask=0x40u;
+    assert(!native_raw_fvf_island_dual_draw_tile(
+        fourSource,0,0,3440,1440,3440,1440,128,96,
+        {0,0,3440,1440},6u,fourIndexed,&wireNoCull));
+    // A fully hidden source user-plane draw must not manufacture edge RGB.
+    fourSource.clipDistanceMask=1u;
+    for (auto& v:clippedFour) v.user[0]=-1.f;
+    assert(!native_raw_fvf_island_dual_draw_tile(
+        fourSource,0,0,3440,1440,3440,1440,128,96,
+        {0,0,3440,1440},6u,fourIndexed,&wireNoCull));
+
     // No native endpoint schedule is exposed to ordinary solid GPU draws.
     NativeRawFvfInteriorSample solidDiagonal{};
     NativeRawDrawExtent solidDiagonalExtent{};

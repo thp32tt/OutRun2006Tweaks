@@ -144,39 +144,56 @@ namespace outrun::vr::dx11 {
             const NativeRawTileOrigin anchors[8]{
                 centered, farEnd, oppositeEnd, middleFar, middleOpposite,
                 farEnd, oppositeEnd, centered};
-            // The original three edge midpoints do not cover a wide
-            // menu/road wireframe: a 3,440px edge can have thousands of
-            // authentic GPU pixels outside 512px readback crops. Start with
-            // those three midpoints, then traverse all three *source-clipped*
-            // edges at eight fractions each on subsequent Draw ordinals.
-            // This is capture placement only: GPU PRE/POST RGB, target,
-            // epoch and Present verification remain strictly unchanged.
+            // Actual polygon clipping may produce 4..20 wire boundaries,
+            // not only the original triangle's three edges. Rotate all
+            // post-clip edges through eight fractions, with the three
+            // proven distant midpoints as first-frame anchors. This affects
+            // ONLY real DX11 GPU readback placement, not original D3D9 Draw
+            // routing, source/target ownership or RGB/Present proof.
             const bool wireframeEdges = rasterState && rasterState->wireframe &&
-                interior.wireEdgesValid;
-            const auto phase = sourcePhase % (wireframeEdges ? 27u : 8u);
+                interior.wireEdgesValid &&
+                interior.wireEdgeCount >= 3u &&
+                interior.wireEdgeCount <= interior.wireEdges.size();
+            const auto edgeCount = wireframeEdges ? interior.wireEdgeCount : 0u;
+            const auto phase = sourcePhase %
+                (wireframeEdges ? 3u + edgeCount * 8u : 8u);
             const NativeRawDualTile swept = sampled;
+            sampled.hasSecond = false;
             if (wireframeEdges && phase >= 3u) {
-                const auto& edge = interior.wireEdges[(phase - 3u) % 3u];
-                const auto fraction = (phase - 3u) / 3u; // exactly 0..7
+                const auto& edge = interior.wireEdges[(phase - 3u) % edgeCount];
+                const auto fraction = (phase - 3u) / edgeCount; // 0..7
                 const auto along = [&](std::int64_t a,
-                                       std::int64_t b) noexcept {
-                    // Endpoint coordinates are independently bounded to
-                    // 2^32; the largest 7*(b-a) fits signed 64-bit.
-                    return a + (b - a) * fraction / 7;
+                                       std::int64_t b,
+                                       std::uint32_t numerator) noexcept {
+                    // Each clipped endpoint is independently bounded to
+                    // 2^32; eight-fraction interpolation stays within int64.
+                    return a + (b - a) * numerator / 7;
                 };
-                sampled.first = origin(along(edge[0], edge[2]),
-                                       along(edge[1], edge[3]));
+                sampled.first = origin(along(edge[0], edge[2], fraction),
+                                       along(edge[1], edge[3], fraction));
+                // The same actual GPU Draw can paint two far-apart portions
+                // of a long clipped edge. Use both PRE/POST copies for this
+                // original edge when the physical readback tiles do not
+                // overlap; otherwise retain the established source sweep.
+                const auto other = (fraction + 4u) % 8u;
+                const auto companion = origin(
+                    along(edge[0], edge[2], other),
+                    along(edge[1], edge[3], other));
+                if (native_raw_source_tiles_disjoint(
+                        sampled.first, companion, tw, th)) {
+                    sampled.second = companion;
+                    sampled.hasSecond = true;
+                }
             } else {
                 sampled.first = anchors[phase];
             }
-            sampled.hasSecond = false;
             // A second disjoint genuine polygon interior beats an AABB
             // corner; if none fits, keep the authentic GPU raster sweep.
             const NativeRawTileOrigin candidates[5]{
                 phase == 0u ? farEnd : centered,
                 phase == 1u ? centered : farEnd,
                 oppositeEnd, swept.first, swept.second};
-            for (std::size_t c = 0u; c < 5u; ++c) {
+            for (std::size_t c = 0u; !sampled.hasSecond && c < 5u; ++c) {
                 if (c == 4u && !swept.hasSecond) break;
                 if (!native_raw_source_tiles_disjoint(
                         sampled.first, candidates[c], tw, th)) continue;
