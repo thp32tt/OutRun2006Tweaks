@@ -28,6 +28,48 @@ class QualityHold(ValueError):
     pass
 
 
+def intersects(a, b):
+    return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
+
+
+def source_ink_bounds(source, box):
+    """Conservative full-alpha bbox, not estimated text pixels.
+
+    If source boundaries are invalid or empty, keep the whole ROI as unsafe.
+    A safe overlap needs both full source-alpha bounding rectangles to be
+    disjoint; unknown artwork/other labels must never be rewritten blindly.
+    """
+    x0, y0, x1, y1 = box
+    if not 0 <= x0 < x1 <= source.width or not 0 <= y0 < y1 <= source.height:
+        return tuple(box)
+    ink = source.crop(box).getchannel("A").getbbox()
+    if ink is None:
+        return tuple(box)
+    return x0 + ink[0], y0 + ink[1], x0 + ink[2], y0 + ink[3]
+
+
+def source_ink_conflicts(source, rows, geometric_conflict_fn):
+    """Allow intersecting ROI rectangles only with disjoint native ink bboxes.
+
+    This never declares a pixel-shared overlap safe. Candidate transforms later
+    fit strictly within these original source glyph/effect bounding rectangles.
+    """
+    geometric = geometric_conflict_fn(rows)
+    ink = {r["roi_id"]: source_ink_bounds(source, r["_bbox"]) for r in rows}
+    unsafe = set()
+    for i, first in enumerate(rows):
+        if first["roi_id"] not in geometric:
+            continue
+        for second in rows[i + 1:]:
+            if second["roi_id"] not in geometric:
+                continue
+            if intersects(first["_bbox"], second["_bbox"]) and intersects(
+                ink[first["roi_id"]], ink[second["roi_id"]]
+            ):
+                unsafe.update((first["roi_id"], second["roi_id"]))
+    return unsafe
+
+
 def alpha_lines(alpha: Image.Image):
     """Return line-local effect bounding boxes; merge tiny antialias gaps."""
     width, height = alpha.size
@@ -128,7 +170,9 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check):
     if x0 < 0 or y0 < 0 or x0 >= x1 or y0 >= y1 or x1 > source.width or y1 > source.height:
         raise QualityHold("QA_NATIVE_HD_ROI_BOUNDS_INVALID")
     box = (x0, y0, x1, y1)
-    if any(x0 < b[2] and b[0] < x1 and y0 < b[3] and b[1] < y1 for b in used):
+    overlap_used = [b for b in used if intersects(box, b)]
+    if any(intersects(source_ink_bounds(source, box), source_ink_bounds(source, b))
+           for b in overlap_used):
         raise QualityHold("QA_OVERLAP_PROTECTED")
     if not import_check(repo, row):
         raise QualityHold("AB_PNG_NOT_YET_IMPORTED")
@@ -175,7 +219,9 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check):
         "candidate_detected_line_count": detected_line_count,
         "candidate_sha256": hashlib.sha256(candidate_bytes).hexdigest(),
         "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
-        "auto_salvage": source_salvage + candidate_salvage + line_salvage,
+        "auto_salvage": source_salvage + candidate_salvage + line_salvage + (
+            ["OVERLAPPING_ROI_REUSED_ONLY_AFTER_DISJOINT_SOURCE_ALPHA_BBOX_PROOF"]
+            if overlap_used else []),
         "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
         "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
     }
@@ -190,7 +236,9 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
     result = source.copy()
     painted, holds, used = [], [], []
     coarse = coarse_fn(rows)
-    conflicts = conflict_fn([r for r in rows if r["roi_id"] not in coarse])
+    conflicts = source_ink_conflicts(
+        source, [r for r in rows if r["roi_id"] not in coarse], conflict_fn
+    )
     for row in sorted(rows, key=lambda r: (r["_bbox"][1], r["_bbox"][0], r["roi_id"])):
         rid = row["roi_id"]
         if rid in coarse:
