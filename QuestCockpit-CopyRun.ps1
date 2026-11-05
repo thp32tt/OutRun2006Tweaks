@@ -61,6 +61,32 @@ foreach($name in $scripts){
         throw "Incomplete test helper: $name"
     }
 }
+
+# Static launcher contract: parse the exact payload scripts and confirm every
+# named parameter used below still exists. This prevents a future positional
+# binding regression such as CORRECTNESS being consumed by QuestCockpitV2.
+function Assert-ScriptParameters([string]$path,[string[]]$required){
+    $tokens=$null
+    $parseErrors=$null
+    $ast=[System.Management.Automation.Language.Parser]::ParseFile(
+        $path,[ref]$tokens,[ref]$parseErrors)
+    if($parseErrors.Count -gt 0){
+        throw "PowerShell parse failure: $([IO.Path]::GetFileName($path)): $(($parseErrors|ForEach-Object Message)-join '; ')"
+    }
+    if(!$ast.ParamBlock){throw "Missing param block: $([IO.Path]::GetFileName($path))"}
+    $names=@($ast.ParamBlock.Parameters|ForEach-Object{$_.Name.VariablePath.UserPath})
+    foreach($name in $required){
+        if($name -notin $names){
+            throw "Launcher contract mismatch: $([IO.Path]::GetFileName($path)) has no -$name parameter."
+        }
+    }
+}
+Assert-ScriptParameters (Join-Path $payload 'scripts/Run-OutRunVRTest.ps1') @(
+    'TestProfile','QuestCockpitV2ReleaseParity','QuestCockpitV2',
+    'QuestCockpitV2SkyProbe','QuestCockpitV2Interpolation')
+Assert-ScriptParameters (Join-Path $payload 'scripts/Select-OutRunVRBackend.ps1') @(
+    'Backend','TestProfile','VariantId')
+
 foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')){
     if(!(Test-Path (Join-Path $payload ('defaults/'+$name)) -PathType Leaf)){
         throw "Missing default config $name"
@@ -164,6 +190,10 @@ if($Mode -eq 'INTERP'){
     $launchArgs.QuestCockpitV2Interpolation='OFF'
     $launchArgs.QuestCockpitV2SkyProbe='ON'
 }
+$runner=Join-Path $root 'Run-OutRunVRTest.ps1'
+if(!(Test-Path -LiteralPath $runner -PathType Leaf)){
+    throw 'Run-OutRunVRTest.ps1 was not installed into the game folder.'
+}
 Write-Host "Starting Quest cockpit; mode=$Mode"
-& (Join-Path $root 'Run-OutRunVRTest.ps1') @launchArgs
+& $runner @launchArgs
 if(-not $?){throw 'VR runner failed. See OUTRUNVR_LAUNCH_ERROR.txt or collected logs.'}

@@ -19,7 +19,7 @@ exit /b %EC%
 
 :verify
 echo [VERIFY] QUEST APK COCKPIT: copy and run
-"%PS%" -NoProfile -ExecutionPolicy Bypass -File "%~dp0QuestCockpit-CopyRun.ps1" -VerifyOnly
+"%PS%" -NoProfile -ExecutionPolicy Bypass -File "%~dp0QuestCockpit-CopyRun.ps1" -Mode NORMAL -VerifyOnly
 set "EC=%ERRORLEVEL%"
 if not "%EC%"=="0" echo [FAILED] Static package verification exit %EC%.
 exit /b %EC%
