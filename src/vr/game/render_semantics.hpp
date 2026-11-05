@@ -16,6 +16,9 @@ namespace OutRunVR::GameSemantic
         None = 0,
         SceneEffect,
         SkyGlow,
+        // Exact original PC race sky display owner at 0x4521C0. This is the
+        // two-layer world sky sphere, NOT the mono SkyGlow post-process.
+        WorldSky,
         WorldParticle,
         WorldBillboard,
         // Exact vehicle-relative world anchor that the game already projected
@@ -1182,6 +1185,7 @@ namespace OutRunVR::GameSemantic
         {
         case RenderScope::SceneEffect: return "SCENE_EFFECT";
         case RenderScope::SkyGlow: return "SKY_GLOW";
+        case RenderScope::WorldSky: return "WORLD_SKY_4521C0";
         case RenderScope::WorldParticle: return "WORLD_PARTICLE";
         case RenderScope::WorldBillboard: return "WORLD_BILLBOARD";
         case RenderScope::ProjectedWorldMarker2D: return "PROJECTED_WORLD_MARKER_2D";
@@ -1701,6 +1705,9 @@ namespace OutRunVR::GameSemantic
         ProducerToken::None, nullptr, 0, false, 0}
         .DeniesGenericWorldFallback());
     static_assert(PhysicalDrawCommand{RenderScope::SkyGlow,
+        ProducerToken::None, nullptr, 0, false, 0}
+        .DeniesGenericWorldFallback());
+    static_assert(!PhysicalDrawCommand{RenderScope::WorldSky,
         ProducerToken::None, nullptr, 0, false, 0}
         .DeniesGenericWorldFallback());
     static_assert(!PhysicalDrawCommand{RenderScope::WorldParticle,

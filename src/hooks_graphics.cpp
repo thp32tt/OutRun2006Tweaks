@@ -827,6 +827,58 @@ public:
 };
 QuestCockpitV2NativeFrameProbe QuestCockpitV2NativeFrameProbe::instance;
 
+// Exact original world-sky source owner. r4dius/outrun2-decomp's x86 oracle
+// proves 0x4521C0 is race_sky_display(work): one cdecl stack argument, Z off,
+// both 0x90-byte sky layers, then Z on. Keep the semantic alive across the
+// original function so fixed-function and programmable sky draws cannot be
+// confused with pause/menu depth-off content or with the SkyGlow postprocess.
+class VrOriginalRaceSkyOwner final : public Hook
+{
+    static constexpr int RaceSkyDisplayRva = 0x521C0;
+    inline static SafetyHookInline RaceSkyDisplayHook{};
+
+    static void __cdecl RaceSkyDisplayDest(void* work)
+    {
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic sky(
+            OutRunVR::GameSemantic::RenderScope::WorldSky);
+        RaceSkyDisplayHook.ccall<void>(work);
+    }
+
+public:
+    std::string_view description() override
+    {
+        return "VrOriginalRaceSkyOwner4521C0";
+    }
+
+    bool validate() override
+    {
+        return Settings::VREnabled && Settings::VRStereo;
+    }
+
+    bool apply() override
+    {
+        auto* entry=Module::exe_ptr<std::uint8_t>(RaceSkyDisplayRva);
+        MEMORY_BASIC_INFORMATION info{};
+        if(!entry ||
+           VirtualQuery(entry,&info,sizeof(info))!=sizeof(info) ||
+           info.State!=MEM_COMMIT || (info.Protect&PAGE_GUARD) ||
+           (info.Protect&PAGE_NOACCESS)) {
+            spdlog::warn("VR WORLD SKY: original 4521C0 entry unavailable; exact sky owner disabled");
+            return false;
+        }
+        RaceSkyDisplayHook=safetyhook::create_inline(entry,RaceSkyDisplayDest);
+        if(!RaceSkyDisplayHook) {
+            spdlog::warn("VR WORLD SKY: failed to hook original 4521C0");
+            return false;
+        }
+        spdlog::info("VR WORLD SKY: exact original 4521C0 owner installed; two sky layers use rotation-only stereo");
+        return true;
+    }
+
+    static VrOriginalRaceSkyOwner instance;
+};
+VrOriginalRaceSkyOwner VrOriginalRaceSkyOwner::instance;
+
 // QuestCockpitV2 mode1 camera: keep original game eye/swing/blend, but
 // opt-in experimental native Quest 30-profile table delta in camera basis.
 // Do not confuse the 30x36 PC camera anchors with the 30x296 VR profiles.

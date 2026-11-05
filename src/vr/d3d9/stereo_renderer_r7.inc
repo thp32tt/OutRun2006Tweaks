@@ -242,6 +242,7 @@ namespace OutRunVRStereo
         // programmable c64 WVP rather than fixed-function XYZ.
         // This is NOT exact sky source ownership.
         std::uint64_t ProgrammableDepthOffWorldDraws = 0;
+        std::uint64_t ProgrammableExactWorldSkyDraws = 0;
 		bool FirstFixedFunctionWorldLogged = false;
 		bool FirstFixedFunctionSkyRotationLogged = false;
 		std::uint64_t OcclusionQueriesCreated = 0;
@@ -850,6 +851,11 @@ namespace OutRunVRStereo
 					++FixedFunctionNonWorldDraws;
 					return EyeBuildResult::NonWorld;
 				}
+				const auto physicalDraw =
+					OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+				const bool exactWorldSky =
+					physicalDraw.scope ==
+					OutRunVR::GameSemantic::RenderScope::WorldSky;
 				const auto fixedPolicy =
 					OutRunVR::PassPolicy::ClassifyFixedFunctionStereo(
 						projectionClass, GameplayActive(),
@@ -861,6 +867,7 @@ namespace OutRunVRStereo
 					return EyeBuildResult::NonWorld;
 				}
 				const bool rotationOnly =
+					exactWorldSky ||
 					fixedPolicy ==
 					OutRunVR::PassPolicy::FixedFunctionStereoPolicy::SkyRotationOnly;
 
@@ -957,7 +964,7 @@ namespace OutRunVRStereo
 					{
 						FirstFixedFunctionSkyRotationLogged = true;
 						spdlog::info(
-							"VR SKY ROTATION: depth-off fixed-function perspective draw keeps headset rotation/FOV but removes head/IPD translation");
+							"VR SKY ROTATION: exact 4521C0 or depth-off fixed-function sky keeps headset rotation/FOV but removes head/IPD translation");
 					}
 				}
 				else
@@ -990,6 +997,9 @@ namespace OutRunVRStereo
 			const D3DMATRIX currentWvp = TransposeMatrix(uploadedT);
 			const D3DMATRIX correctedWorldView = MultiplyMatrix(currentWvp, invProjection);
 			if (!MatrixFinite(correctedWorldView)) return EyeBuildResult::FatalError;
+			const bool exactWorldSky =
+				OutRunVR::GameSemantic::CapturePhysicalDrawCommand().scope ==
+				OutRunVR::GameSemantic::RenderScope::WorldSky;
 			for (int eye = 0; eye < 2; ++eye)
 			{
 				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale * Settings::VRStereoDepth);
@@ -1017,8 +1027,36 @@ namespace OutRunVRStereo
                     // inverse. Compensate its head transform before applying
                     // the exact Quest full-eye view, or headset motion would
                     // be applied twice to programmable world passes.
+                    // For exact original 4521C0 sky, the replacement target
+                    // keeps orientation only: no headset-position parallax
+                    // and no per-eye IPD translation. Inverse(headInverse)
+                    // still cancels the full transform already baked into c64.
+                    if(exactWorldSky) {
+                        nativeFullView._41=0.f;
+                        nativeFullView._42=0.f;
+                        nativeFullView._43=0.f;
+                    }
                     eyeInverse=MultiplyMatrix(
                         InverseRigid(headInverse),nativeFullView);
+                    if(!MatrixFinite(eyeInverse))
+                        return EyeBuildResult::FatalError;
+                } else if(exactWorldSky) {
+                    float headBytes[16]{};
+                    std::uint32_t headPoseSequence=0;
+                    if(!OutRunVRRenderer::GetLatchedHeadInverse(
+                            headBytes,headPoseSequence) ||
+                       headPoseSequence!=stereo.poseSequence)
+                        return EyeBuildResult::FatalError;
+                    D3DMATRIX headInverse{};
+                    std::memcpy(&headInverse,headBytes,sizeof(headInverse));
+                    if(!MatrixFinite(headInverse))
+                        return EyeBuildResult::FatalError;
+                    D3DMATRIX rotationOnly=headInverse;
+                    rotationOnly._41=0.f;
+                    rotationOnly._42=0.f;
+                    rotationOnly._43=0.f;
+                    eyeInverse=MultiplyMatrix(
+                        InverseRigid(headInverse),rotationOnly);
                     if(!MatrixFinite(eyeInverse))
                         return EyeBuildResult::FatalError;
                 }
@@ -1028,6 +1066,8 @@ namespace OutRunVRStereo
 				const D3DMATRIX eyeWvpT = TransposeMatrix(eyeWvp); std::memcpy(state.eyeConstants[eye], &eyeWvpT, sizeof(eyeWvpT));
 			}
 			if (Settings::VRQuestCockpitV2SkyProbe) {
+                if(exactWorldSky)
+                    ++ProgrammableExactWorldSkyDraws;
                 DWORD depth=D3DZB_TRUE;
                 if (ReadTrackedRenderState(device,D3DRS_ZENABLE,depth) &&
                     depth==D3DZB_FALSE)
@@ -2154,13 +2194,14 @@ if(WaitForEventQuery(slot.fence,1,0u))
             if(frames>=90) {
                 spdlog::info(
                     "VR SKY PROBE: present={} samples={} skyLikeFrames={} "
-                    "skyLikeDraws={} otherFixedWorldDraws={} shaderDepthOffWorldDraws={} incomplete={} "
+                    "skyLikeDraws={} otherFixedWorldDraws={} shaderDepthOffWorldDraws={} shaderExactSkyDraws={} incomplete={} "
                     "rightFailed={} poisoned={} depthUnsynced={} "
                     "requested={} composed={} direct={} lastFailure={} presentHr={}",
                     totalPresent,frames,skyFrames,
                     FixedFunctionSkyRotationOnlyDraws-windowSky,
                     FixedFunctionWorldStereoDraws-windowWorld,
                     ProgrammableDepthOffWorldDraws-windowShaderDepthOff,
+                    ProgrammableExactWorldSkyDraws,
                     badFrames,rightFailures,poisoned,depthMissing,
                     sawRequested,sawComposed,sawDirect,
                     static_cast<unsigned>(FrameFailureReason),
