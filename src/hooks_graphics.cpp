@@ -506,6 +506,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     inline static SafetyHookMid FrameEnterHook{},FrameEndHook{};
     inline static SafetyHookInline PlayerCallbackHook{};
     inline static thread_local bool F0CallbackActive=false;
+    inline static thread_local bool DinoGameplayResourceArmed=false;
     static constexpr std::size_t SeatTableCount=30u;
     inline static bool SeatTableCaptured=false;
     inline static bool SeatTablePatched=false;
@@ -618,6 +619,15 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     }
     static void OnFrameEnter(SafetyHookContext&)
     {
+        // Release sidecar GPU resources exactly once when leaving playable
+        // race rendering. This covers race->loading/menu transitions even when
+        // the game does not issue Reset/ResetEx immediately.
+        const bool dinoGameplayNow=
+            Settings::VRDinoExternalCockpit && Game::current_mode &&
+            *Game::current_mode==STATE_GAME;
+        if(DinoGameplayResourceArmed && !dinoGameplayNow)
+            OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
+        DinoGameplayResourceArmed=dinoGameplayNow;
         // Camera control for the next tick reads this persistent live table.
         // Re-sync here only for live F11/tuning changes; startup apply below
         // installs the profile before the first playable camera tick.
