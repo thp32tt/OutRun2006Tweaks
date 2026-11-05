@@ -146,6 +146,29 @@ template<class Vertex, class Interpolate>
                                 cut.plane[d]=last.plane[d]+u*
                                     (current.plane[d]-last.plane[d]);
                             cut.plane[p]=0.0;
+                            // CPU clipping computes the intersection in double,
+                            // but the native D3D11 POINTLIST consumes float
+                            // coordinates and float SV_ClipDistance. Rounding
+                            // the interpolated float back across the very
+                            // plane we just intersected can silently drop an
+                            // authentic original-game point pixel. Snap ONLY
+                            // generated intersections to their exact source
+                            // boundary; untouched game vertices and the
+                            // interpolated UV/color/specular remain unchanged.
+                            if (p==0u) cut.vertex.clip[0]=-cut.vertex.clip[3];
+                            else if (p==1u) cut.vertex.clip[0]=cut.vertex.clip[3];
+                            else if (p==2u) cut.vertex.clip[1]=-cut.vertex.clip[3];
+                            else if (p==3u) cut.vertex.clip[1]=cut.vertex.clip[3];
+                            else if (p==4u) cut.vertex.clip[2]=0.0f;
+                            else if (p==5u) cut.vertex.clip[2]=cut.vertex.clip[3];
+                            else if (p>=6u && p<10u)
+                                cut.vertex.clip0[p-6u]=0.0f;
+                            else if (p>=10u && p<12u)
+                                cut.vertex.clip1[p-10u]=0.0f;
+                            // The synthetic eye-plane W guard must never
+                            // manufacture a GPU-visible point from zero W.
+                            // It remains verified by the final positive-W
+                            // and projected-winding checks below.
                             clipped.push_back(cut);
                         }
                     }

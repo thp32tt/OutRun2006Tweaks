@@ -488,6 +488,66 @@ int main() {
         thinClippedSource,nullptr,3u,4u,1u,1u,5u,lerp,
         thinNativePoints)); // fail closed when native upload cannot fit
     assert(thinNativePoints.size()==savedThinPoints.size());
+    // 01249: Actual native POINTLIST uses FLOAT SV_ClipDistance, not the
+    // double clipping accumulator. For .1f -> -.3f intersections the old
+    // floating interpolation can produce a tiny NEGATIVE signed distance,
+    // culling an otherwise valid menu/vehicle/race point on the GPU.
+    // Preserve source-authentic UV/color payload and snap generated user
+    // clip intersections to exactly zero on BOTH hardware clip registers.
+    std::vector<ClipVertex> roundedUserSource{
+        {{-.5f,-.5f,.5f,1.f},{.1f,1,1,1},{.3f,1,0,0},{0,0}},
+        {{ .5f,-.5f,.5f,1.f},{-.3f,1,1,1},{-.1f,1,0,0},{1,0}},
+        {{-.5f, .5f,.5f,1.f},{.1f,1,1,1},{.3f,1,0,0},{0,1}}
+    };
+    std::vector<ClipVertex> roundedUserPoints;
+    assert(game_fvf_clipped_point_vertices(
+        roundedUserSource,nullptr,3u,4u,1u,1u,64u,lerp,
+        roundedUserPoints));
+    assert(roundedUserPoints.size()==6u);
+    std::size_t snapped0=0u;
+    for(const auto& v:roundedUserPoints) {
+        assert(v.clip0[0]>=0.0f);
+        snapped0+=v.clip0[0]==0.0f;
+        assert(v.uv[0]>=0.0f && v.uv[0]<=1.0f);
+        assert(v.uv[1]>=0.0f && v.uv[1]<=1.0f);
+    }
+    assert(snapped0>=2u);
+    assert(game_fvf_clipped_point_vertices(
+        roundedUserSource,nullptr,3u,4u,1u,16u,64u,lerp,
+        roundedUserPoints));
+    assert(roundedUserPoints.size()==6u);
+    std::size_t snapped4=0u;
+    for(const auto& v:roundedUserPoints) {
+        assert(v.clip1[0]>=0.0f);
+        snapped4+=v.clip1[0]==0.0f;
+        assert(v.uv[0]>=0.0f && v.uv[0]<=1.0f);
+    }
+    assert(snapped4>=2u);
+    // Hardware homogeneous X/Y/Z intersection vertices must likewise
+    // sit ON the native float clip boundary before GPU submission.
+    roundedUserSource[1].clip[0]=2.f;
+    assert(game_fvf_clipped_point_vertices(
+        roundedUserSource,nullptr,3u,4u,1u,0u,64u,lerp,
+        roundedUserPoints));
+    assert(roundedUserPoints.size()==6u);
+    std::size_t rightBoundary=0u;
+    for(const auto& v:roundedUserPoints) {
+        assert(v.clip[0]<=v.clip[3]);
+        rightBoundary+=v.clip[0]==v.clip[3];
+        assert(v.uv[0]>=0.0f && v.uv[0]<=1.0f);
+    }
+    assert(rightBoundary>=2u);
+    const auto stableRounded=roundedUserPoints;
+    const std::uint32_t invalidRounded[]{0u,1u,99u};
+    assert(!game_fvf_clipped_point_vertices(
+        roundedUserSource,invalidRounded,3u,4u,1u,0u,64u,lerp,
+        roundedUserPoints));
+    assert(roundedUserPoints.size()==stableRounded.size());
+    assert(!game_fvf_clipped_point_vertices(
+        roundedUserSource,nullptr,3u,4u,1u,0u,5u,lerp,
+        roundedUserPoints));
+    assert(roundedUserPoints.size()==stableRounded.size());
+
     thinClippedSource[2].clip[1]=0.f;
     assert(!game_fvf_clipped_point_vertices(
         thinClippedSource,nullptr,3u,4u,1u,1u,64u,lerp,
