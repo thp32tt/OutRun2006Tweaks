@@ -16,9 +16,6 @@ namespace OutRunVR::GameSemantic
         None = 0,
         SceneEffect,
         SkyGlow,
-        // Exact original PC race sky display owner at 0x4521C0. This is the
-        // two-layer world sky sphere, NOT the mono SkyGlow post-process.
-        WorldSky,
         WorldParticle,
         WorldBillboard,
         // Exact vehicle-relative world anchor that the game already projected
@@ -37,6 +34,10 @@ namespace OutRunVR::GameSemantic
         // the *current* accepted ScreenOverlay2D GPU route as FOV-only.
         ScreenOverlay2D,
         ScreenHud,
+        // Append-only: preserve all existing RenderScope numeric identities.
+        // Exact original PC race sky display owner at 0x4521C0. This is the
+        // two-layer world sky sphere, NOT the mono SkyGlow post-process.
+        WorldSky,
     };
 
     struct ProjectedMarkerInfo
