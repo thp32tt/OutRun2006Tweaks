@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6aebdeca-88d0-83ee-b651-b6d807bed81e",
   "old_candidate_sha256": "7835f7243f5a40f535e81f3979ca764f9b2a21216682dd9548564855e5c0be0c",
   "release_approved": false,
   "roi_id": "Q049_de9a907afba73cc7",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "TUNED",
     "korean": "튜닝",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-44256c4140cd288469f0"
   },
   "task_id": "HDRW-A-44256c4140cd288469f0",
-  "updated_utc": "2026-11-05T01:41:26+00:00"
+  "updated_utc": "2026-11-05T01:41:39+00:00"
 }
