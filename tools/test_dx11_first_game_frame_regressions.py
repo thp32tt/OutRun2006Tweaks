@@ -173,8 +173,20 @@ def main() -> None:
         "s.backend.shutdown();",
     ):
         assert evidence in bridge, "missing diagnostic safety/telemetry: " + evidence
+    # One source-owned FVF call can now issue bounded, triangle-aligned
+    # clipped POINTLIST GPU windows before its original D3D9 Draw returns.
+    # Keep the legacy single FVF Draw and indexed Draw sites audited, and
+    # require the new site to be inside that SAME FVF source submit only.
+    source_submit = bridge[bridge.index("bool submit(State& s,"):bridge.index(
+        "bool observe_source_device(")]
     assert bridge.count("ctx->DrawIndexed(") == 1
-    assert bridge.count("ctx->Draw(") == 1
+    assert bridge.count("ctx->Draw(") == 2
+    assert source_submit.count("ctx->Draw(") == 2
+    assert "if (clippedPointBatches.supported && clippedPointBatches.draws > 1u)" in source_submit
+    assert "first += clippedPointBatches.verticesPerDraw" in source_submit
+    assert "clippedPointBatches.totalVertices - first" in source_submit
+    assert "ctx->Draw(count, first);" in source_submit
+    assert "else if (ib) ctx->DrawIndexed(indexCount, 0, 0);" in source_submit
     # A live stage-1 operation must not silently modify stage-0 DIFFUSE.
     # The old boundary accepted such draws while the native shader ignored
     # the extra stage. These are fail-closed static mutation checks, not GPU proof.
