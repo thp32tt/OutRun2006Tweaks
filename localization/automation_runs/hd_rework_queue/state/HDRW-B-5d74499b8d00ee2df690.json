@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6aebdee5-2d20-83ee-be41-5ba0264bddf4",
   "old_candidate_sha256": "1e94c9cfffa47fa0f8e73daabb3d5dc65b583402ceb0ab73239cade1fcaeed90",
   "release_approved": false,
   "roi_id": "Q046_1aed03d1cf8b7210",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Ancient Ruins",
     "korean": "에인션트 루인스",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-B-5d74499b8d00ee2df690"
   },
   "task_id": "HDRW-B-5d74499b8d00ee2df690",
-  "updated_utc": "2026-11-05T01:41:50+00:00"
+  "updated_utc": "2026-11-05T01:42:10+00:00"
 }
