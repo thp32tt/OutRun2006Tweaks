@@ -161,6 +161,72 @@ class StrictHDQualityTests(unittest.TestCase):
             self.assertLessEqual(translated[2], original[2])
             self.assertLessEqual(translated[3], original[3])
 
+    def test_intersecting_ink_bounding_boxes_with_empty_shared_pixels_are_safe(self):
+        # The bounding rectangles intersect, but not a single original
+        # alpha pixel is inside the two ROIs' shared padding rectangle.
+        img = Image.new("RGBA", (256, 128), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        draw.rectangle((10, 10, 135, 19), fill=(255, 255, 255, 255))
+        draw.rectangle((10, 55, 75, 62), fill=(255, 255, 255, 255))
+        draw.rectangle((180, 48, 215, 53), fill=(255, 255, 255, 255))
+        draw.rectangle((95, 90, 210, 95), fill=(255, 255, 255, 255))
+        a, b = (4, 4, 140, 64), (80, 40, 220, 116)
+        self.assertTrue(strict.intersects(strict.source_ink_bounds(img, a),
+                                          strict.source_ink_bounds(img, b)))
+        self.assertIsNone(img.crop((80, 40, 140, 64)).getchannel("A").getbbox())
+        raw = source_dds()[:128] + img.tobytes("raw", "BGRA")
+        rows = [
+            {"roi_id": "Q012_1234567890abcdef", "english": "FIRST",
+             "korean": "첫째", "_bbox": list(a), "_candidate_rel": "a.png"},
+            {"roi_id": "Q012_fedcba0987654321", "english": "SECOND",
+             "korean": "둘째", "_bbox": list(b), "_candidate_rel": "b.png"},
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            candidate_file(repo / "a.png", multiline=True)
+            candidate_file(repo / "b.png", multiline=True)
+            data, final, clean, painted, holds = strict.process_strict_atlas(
+                raw, rows, repo, "NORMAL", native.native_image,
+                native.imported_candidate, native.conflicting_rois,
+                native.dominant_container_holds)
+        self.assertIsNotNone(data)
+        self.assertEqual(len(painted), 2)
+        self.assertEqual(holds, [])
+        self.assertIsNone(final.crop((80, 40, 140, 64)).getchannel("A").getbbox())
+        self.assertEqual(data[:128], raw[:128])
+        self.assertEqual(len(data), len(raw))
+
+    def test_empty_source_overlap_but_translated_pixel_intrusion_stays_held(self):
+        # Source strokes do not enter the overlapping ROI padding, but a
+        # resized candidate would. No protected ROI may receive its pixels.
+        img = Image.new("RGBA", (256, 128), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        draw.line((130, 10, 10, 60), fill=(255, 255, 255, 255), width=1)
+        draw.rectangle((180, 80, 210, 95), fill=(255, 255, 255, 255))
+        a, b = (4, 4, 140, 64), (80, 40, 220, 116)
+        self.assertIsNone(img.crop((80, 40, 140, 64)).getchannel("A").getbbox())
+        raw = source_dds()[:128] + img.tobytes("raw", "BGRA")
+        rows = [
+            {"roi_id": "Q012_1234567890abcdef", "english": "FIRST",
+             "korean": "첫째", "_bbox": list(a), "_candidate_rel": "a.png"},
+            {"roi_id": "Q012_fedcba0987654321", "english": "SECOND",
+             "korean": "둘째", "_bbox": list(b), "_candidate_rel": "b.png"},
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            candidate_file(repo / "a.png")
+            candidate_file(repo / "b.png")
+            data, final, clean, painted, holds = strict.process_strict_atlas(
+                raw, rows, repo, "NORMAL", native.native_image,
+                native.imported_candidate, native.conflicting_rois,
+                native.dominant_container_holds)
+        self.assertIsNotNone(data)
+        self.assertEqual(len(painted), 1)
+        self.assertEqual(painted[0]["roi_id"], rows[1]["roi_id"])
+        self.assertEqual(holds, [{"roi_id": rows[0]["roi_id"],
+                                  "reason": "QA_TRANSLATED_OVERLAPS_OTHER_ROI"}])
+        self.assertEqual(final.getpixel((130, 10)), img.getpixel((130, 10)))
+
     def test_partial_roi_overlap_with_shared_native_ink_stays_held(self):
         with tempfile.TemporaryDirectory() as d:
             repo = Path(d)
