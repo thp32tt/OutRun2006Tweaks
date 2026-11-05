@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01249",
+  "production_id": "CONVERSION-DX11-01249",
+  "event_id": "CONVERSION-DX11-01249-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "713c7358288d8b1158051c5b3dad38bef95e94d9",
+  "result_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92",
+  "material_implementation_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92",
+  "material_result_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92",
+  "validation_bearing_result_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92",
+  "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
+  "classification": "A_INCOMPLETE_FVF_GENERATED_CLIP_BOUNDARY_NATIVE_GPU_POINT_OUTPUT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 0,
+  "score_note": "Same existing original D3D9 FVF point-fill native conversion feature as tasks 01244-01248. This genuine connected game C++ fix, regression, five exact-SHA Gates, and C6 are one feature continuation, not a new independent competition achievement. No points awarded for same FEATURE_ID.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "work_allocation_measured": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp"
+  ],
+  "implementation": "In the actual game FVF D3DFILL_POINT homogeneous and enabled user-plane clipping CPU plan, double-valued mathematical zero can round to negative float SV_ClipDistance, discarding real D3D11 POINTLIST pixels. Generated polygon clipping intersections now snap exact hardware X/Y/Z limits and both source-authentic enabled user clip distance registers to their float zero/limit. Preserve original native vertex payload, finite/positive W, source index/cull/capacity rules and original D3D9 Draw/input/FFB fallback. This is SOURCE_BUILD_VERIFIED only; not physical game or Quest3 evidence.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW",
+      "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL"
+    ],
+    "integration_path": [
+      "REAL_GAME_D3D9_FVF_DRAW_DRAWINDEXED_POINT_FILL",
+      "CPU_HOMOGENEOUS_AND_USER_POLYGON_CLIPPING",
+      "FLOAT_GPU_INTERSECTION_BOUNDARY_SNAPPING",
+      "NATIVE_D3D11_POINTLIST_VERTEX_UPLOAD_AND_DRAW",
+      "NATIVE_GPU_SOURCE_CAPTURE_WITH_ORIGINAL_D3D9_INPUT_FFB_FALLBACK"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CXX_HOMOGENEOUS_XYZ_FLOAT_CLIP_BOUNDARY_CORRECTION",
+      "CXX_BOTH_USER_CLIP_DISTANCE_GPU_FLOAT_BOUNDARIES",
+      "REAL_FVF_CLIPPED_POINT_NATIVE_PLAN_POSITIVE_AND_NEGATIVE_CPP_REGRESSIONS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY; no actual game menu/vehicle/race or Quest3 HMD run on this SHA.",
+    "activation_guard_and_fallback": "Native routing remains explicit opt-in and fail closed. No default native route activation, no altered D3D9 renderer, input, FFB, DX9Ex fallback, DXVK or R84.",
+    "acceptance_proof": {
+      "positive_probe": "Actual FVF native clipped-point C++ source and linked positive regression for both ClipDistance registers, XY source homogeneous intersection and attribute retention. Exact-SHA Fast #41995909454 SUCCESS.",
+      "negative_regression": "Malformed original indexed source and insufficient GPU vertex upload capacity reject without mutating previous GPU point plan; no bypass of original index/cull/float W invariants.",
+      "component_integration": "src/vr/d3d11/live_game_frame_bridge.cpp::submit invokes game_fvf_clipped_point_vertices before D3D11 POINTLIST and optional native GPU output; all five exact-SHA required CI gates succeeded. Real-game GPU and HMD observation NOT performed."
+    }
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
+    "goal": "Preserve authentic clipped original game FVF D3DFILL_POINT GPU vertices at exact D3D11 float homogeneous and user clip boundaries rather than lose them to rounded negative SV_ClipDistance.",
+    "acceptance_items": [
+      {
+        "id": "original_fvf_gpu_user_clip_boundary",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ORIGINAL_D3D9_FVF_POINT_TO_D3D11_GPU_CLIP",
+        "expected_behavior": "Generated authentic user-plane vertices on both source clip registers are exactly on float GPU boundary with source UVs retained."
+      },
+      {
+        "id": "homogeneous_native_boundary_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_HOMOGENEOUS_GPU_POINT_AND_FALLBACK",
+        "expected_behavior": "Clipped homogeneous intersections land exactly on native GPU float plane; invalid source IB or inadequate native GPU buffer capacity fails transactionally."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "All five required GitHub Actions succeed on the same material source SHA, without claiming HMD or actual game runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "original_fvf_gpu_user_clip_boundary": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast #41995909454 SUCCESS; game GPU observed output UNTESTED"
+    },
+    "homogeneous_native_boundary_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "Focused C++ tests in DX11 Fast #41995909454 SUCCESS"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Fast #41995909454, Backend #41995909365, Build #41995909442, OpenXR #41995909523, HUD #41995909574 all SUCCESS on df703cb1ee1029ee3fa047104414eb92b6defa92"
+    }
+  },
+  "full_exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 41995909454,
+      "conclusion": "SUCCESS",
+      "head_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 41995909365,
+      "conclusion": "SUCCESS",
+      "head_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92"
+    },
+    "Build": {
+      "run_id": 41995909442,
+      "conclusion": "SUCCESS",
+      "head_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 41995909523,
+      "conclusion": "SUCCESS",
+      "head_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 41995909574,
+      "conclusion": "SUCCESS",
+      "head_sha": "df703cb1ee1029ee3fa047104414eb92b6defa92"
+    }
+  },
+  "source_and_repair_commits": [
+    {
+      "sha": "df703cb1ee1029ee3fa047104414eb92b6defa92",
+      "kind": "material_cpp_and_regression",
+      "score_change": 0
+    }
+  ],
+  "c6_commit_type": "DOCS_ONLY_POST_VALIDATION",
+  "runtime_evidence": "NONE",
+  "actual_game_native_gpu_pixel_observation": false
+}
