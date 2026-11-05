@@ -2,7 +2,7 @@ name: OpenXR VR architecture
 
 on:
   push:
-    branches: [ vr-openxr, vr-dx11-native-r71, feature/dx11-01013-visible-game-frame, feature/dx11-00952-live-sm3-device-bool, feature/dx11-00966-live-game-frame, feature/dx11-00970-live-game-rt-frame, feature/dx11-00973-live-cube-rt-game-frame, feature/dx11-00974-live-cube-color-frame ]
+    branches: [ vr-openxr, vr-dx11-native-r71, feature/dx11-01251-backend-source-graph-path-fix, feature/dx11-01013-visible-game-frame, feature/dx11-00952-live-sm3-device-bool, feature/dx11-00966-live-game-frame, feature/dx11-00970-live-game-rt-frame, feature/dx11-00973-live-cube-rt-game-frame, feature/dx11-00974-live-cube-color-frame ]
     paths:
       - 'src/vr/**'
       # Keep genuine RAW native pixel source-pair regressions on this SHA.

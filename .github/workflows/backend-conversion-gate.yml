@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - vr-dx11-native-r71
+      - feature/dx11-01251-backend-source-graph-path-fix
       - feature/dx11-01037-offscreen-postpass-overflow
       - feature/dx11-01013-visible-game-frame
       - feature/dx11-00952-live-sm3-device-bool
@@ -39,7 +40,7 @@ jobs:
         run: python tools/verify_queue_controller_contract.py
 
       - name: Verify DX11 integration-first auto-development acceptance
-        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-01037-offscreen-postpass-overflow' || github.ref_name == 'feature/dx11-01013-visible-game-frame' || github.ref_name == 'feature/dx11-00966-live-game-frame' || github.ref_name == 'feature/dx11-00970-live-game-rt-frame' || github.ref_name == 'feature/dx11-00973-live-cube-rt-game-frame' || github.ref_name == 'feature/dx11-00974-live-cube-color-frame')
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-01251-backend-source-graph-path-fix' || github.ref_name == 'feature/dx11-01037-offscreen-postpass-overflow' || github.ref_name == 'feature/dx11-01013-visible-game-frame' || github.ref_name == 'feature/dx11-00966-live-game-frame' || github.ref_name == 'feature/dx11-00970-live-game-rt-frame' || github.ref_name == 'feature/dx11-00973-live-cube-rt-game-frame' || github.ref_name == 'feature/dx11-00974-live-cube-color-frame')
         shell: pwsh
         run: |
           python tools/test_dx11_autodev_policy.py
