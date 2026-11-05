@@ -339,11 +339,10 @@ if($QuestCockpitV2 -eq 'ON'){
         '-VR.QuestCockpitV2RawB0Camera=false',
         '-VR.QuestCockpitV2NativeSeatProfile=true',
         '-VR.QuestCockpitV2ApkNativeCamera=true',
-        # Do not override seat tuning on the command line: F11 must be
-        # able to edit it and preserve OutRun2006Tweaks.user.ini values.
-        # SeatDown negative lifts the eye; SeatBack positive moves rearward.
-        # New install baseline matches user's latest F11 tuning:
-        # SeatBack=+0.35 / SeatDown=-0.25; saved user.ini wins.
+        # APK parity owns its native seat source. Saved F11 manual
+        # SeatBack/SeatDown/SeatRight values may remain in user.ini for A/B,
+        # but the runtime intentionally ignores them while ApkNativeCamera=true.
+        # They are consumed only by the explicit non-APK comparison path.
         '-VR.QuestCockpitV2GlassReflectionOff=true',
         '-VR.QuestCockpitV2OccupantCorrection=true',
         ('-VR.QuestCockpitV2OccupantLod0=' + $(if($QuestCockpitV2Lod0 -eq 'ON'){'true'}else{'false'})),

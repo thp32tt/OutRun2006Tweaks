@@ -31,9 +31,11 @@ matrix and player-car F0 render-time vibration are NOT yet HMD-verified.
 TEST AND APK COMPARISON (2026-11-05):
 - Keep original view1 (in-car) selected. The native Quest 30-car profile
   and verified game-state guard remain in use; no EXE or APK asset patch.
-- F11 VR QuestCockpitV2SeatBack/SeatDown/SeatRight now adjust the native
-  Quest input even when QuestCockpitV2ApkNativeCamera=true. All zero gives
-  unmodified Quest profile input, then exactly one source Y/Z composition.
+- QuestCockpitV2ApkNativeCamera=true is the APK-parity path. Saved F11
+  QuestCockpitV2SeatBack/SeatDown/SeatRight values are intentionally ignored
+  there so an old manual SeatDown cannot raise/lower the native Quest seat.
+  The original 30-car profile and exactly one source Y/Z composition remain.
+  Manual seat tuning is only for the explicit ApkNativeCamera=false comparison.
 - If road bounce/sky flicker persists, use the two included A/B scripts
   without changing the original game files. These remain unresolved
   visual comparisons until captured on a Quest 3 headset.
