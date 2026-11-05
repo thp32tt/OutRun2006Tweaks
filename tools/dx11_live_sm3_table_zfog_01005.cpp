@@ -38,6 +38,24 @@ int main() {
         assert(!native_sm3_inert_exponential_table_fog(
             mode, 3u, std::nanf("")));
     }
+    // 01254: unblended live sRGB native RT0 preserves the exact linear
+    // table-fog equation followed by hardware UNORM_SRGB encoding.
+    // Missing paired target or destination alpha/RGB blending remains
+    // original D3D9 fallback, never silent linear RTV substitution.
+    for (unsigned mode : {1u, 2u, 3u}) {
+        NativeSm3FogReject reason = NativeSm3FogReject::SourceQuery;
+        assert(native_sm3_table_zfog_admission(
+            true, mode, 2u, true, true, true, false,
+            0xff204080u, 0.2f, 0.8f, 0.5f, fog, &reason,
+            NativeSm3FogDepth::Z, true));
+        assert(fog.enabled && reason == NativeSm3FogReject::None);
+        assert(fog.controls[3] == float(mode));
+        assert(!native_sm3_table_zfog_admission(
+            true, mode, 2u, true, true, true, false,
+            0xff204080u, 0.2f, 0.8f, 0.5f, fog, &reason,
+            NativeSm3FogDepth::Z, false));
+        assert(!fog.enabled && reason == NativeSm3FogReject::Srgb);
+    }
     assert(!native_sm3_exponential_table_density_probe(3u, 3u));
     assert(!native_sm3_exponential_table_density_probe(1u, 4u));
     assert(!native_sm3_inert_exponential_table_fog(0u, 0u, 0.0f));

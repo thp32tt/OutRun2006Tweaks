@@ -3001,7 +3001,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                 (actualCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
                 (actualCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
                 sourceFogColor, start, end, density,
-                output.nativeTableFog, nullptr, fogDepth) &&
+                output.nativeTableFog, nullptr, fogDepth,
+                fullFrame && blend == FALSE) &&
             output.nativeTableFog.enabled;
         if (!exactTableFog) {
             // An unmirrored equation remains original D3D9, except for
@@ -5749,7 +5750,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                     (fogCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
                     (fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
                     fogColor, fogStart, fogEnd, fogDensity, tableZFog,
-                    &fogCause, fogDepth);
+                    &fogCause, fogDepth,
+                    env_full_game_opt_in() && blend == FALSE);
             if (!exactFogAdmitted) {
                 if (!fogCapsKnown || fogProjectionQueryFailed)
                     fogCause = NativeSm3FogReject::SourceQuery;

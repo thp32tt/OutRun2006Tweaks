@@ -137,8 +137,18 @@ for wrong, correct in (
 require("native_sm3_inert_exponential_table_fog(" in header and
         "std::isfinite(density) && density == 0.0f" in header and
         "if (native_sm3_inert_exponential_table_fog(" in header and
-        "if (srgbOutput)" in header,
+        "if (srgbOutput && !nativeSrgbTargetUnblended)" in header,
         "exact zero-density no-op must precede active source fog safety")
+# 01254: BOTH original FVF and SM3 admit unblended table fog only with
+# full-game opt-in and the already established paired SRGB RTV. Shader fog
+# RGB must remain linear until the hardware sRGB target performs encoding.
+require("nativeSrgbTargetUnblended" in header and
+        "fullFrame && blend == FALSE) &&" in bridge and
+        "env_full_game_opt_in() && blend == FALSE);" in source and
+        "srgbWrite == TRUE\\n        ? s.backend.color_rtv_srgb()" in source and
+        "output.nativeSrgbWrite && !s.backend.color_rtv_srgb()" in bridge and
+        "output.nativeSrgbWrite\\n        ? s.backend.color_rtv_srgb()" in bridge,
+        "01254 native Fog sRGB target/linear order/source fallback disconnected")
 # Missing D3D9 CAPS is not missing authentic table/vertex fog registers.
 # Source-known RAW mode can omit fog ONLY in the opt-in incomplete tile;
 # source-invalid COM values and exact full-frame publication still fail.

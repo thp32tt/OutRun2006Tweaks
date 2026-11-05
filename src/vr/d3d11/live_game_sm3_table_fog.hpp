@@ -109,7 +109,8 @@ enum class NativeSm3FogReject : unsigned {
     std::uint32_t color, float start, float end, float density,
     NativeSm3TableFog& result,
     NativeSm3FogReject* rejected = nullptr,
-    NativeSm3FogDepth sourceDepth = NativeSm3FogDepth::Unknown) noexcept {
+    NativeSm3FogDepth sourceDepth = NativeSm3FogDepth::Unknown,
+    bool nativeSrgbTargetUnblended = false) noexcept {
     result = {};
     // RANGEFOGENABLE affects vertex-distance fog only; a table equation
     // overrides it. Preserve the input in the API without a false GPU gate.
@@ -139,7 +140,13 @@ enum class NativeSm3FogReject : unsigned {
     // unused capability/float/color queries may suppress that source Draw.
     if (native_sm3_inert_exponential_table_fog(
             tableMode, vertexMode, density)) return true;
-    if (srgbOutput) return fail(NativeSm3FogReject::Srgb);
+    // D3D9 performs table fog on linear PS RGB before sRGB write encoding.
+    // Native D3D11 can preserve that order ONLY with the authenticated
+    // paired sRGB RTV, and no destination blend whose D3D9 gamma-domain
+    // ordering is not yet proven equivalent. Keep all unverified fades on
+    // the original D3D9 path (or separately labeled RAW partial preview).
+    if (srgbOutput && !nativeSrgbTargetUnblended)
+        return fail(NativeSm3FogReject::Srgb);
     // WFOG capability alone does not mean the current source Draw uses W.
     // On a WFOG rasterizer consult the authentic projection matrix before
     // selecting the fog distance. A canonical W projection uses camera Z;
