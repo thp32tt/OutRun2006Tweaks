@@ -50,6 +50,21 @@ function Write-ActiveSession([string]$backend,[string]$variant,[string]$profile,
     ) | Set-Content $active -Encoding ascii
 }
 
+function Write-ConfigSnapshot([string]$outputPath){
+    $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector|DriverSeatView|FramerateInterpolation|FrameCadenceMode|CullingUnionFov|CullingUnionMarginDegrees|CockpitFrameProbe|QuestCockpitV2[A-Za-z0-9_]*)\s*='
+    $snapshot=@()
+    foreach($source in @(
+        [pscustomobject]@{Label='BASE';Path=(Join-Path $root 'OutRun2006Tweaks.ini')},
+        [pscustomobject]@{Label='USER';Path=(Join-Path $root 'OutRun2006Tweaks.user.ini')}
+    )){
+        $snapshot += "# SOURCE=$($source.Label) FILE=$([IO.Path]::GetFileName($source.Path))"
+        if(Test-Path -LiteralPath $source.Path){
+            $snapshot += @(Get-Content -LiteralPath $source.Path | Where-Object{$_ -match $allowed})
+        }else{$snapshot += '# MISSING'}
+    }
+    $snapshot | Set-Content -LiteralPath $outputPath -Encoding UTF8
+}
+
 function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,[string]$matrix,[string]$sourceSha){
     $startedUtc=(Get-Date).ToUniversalTime()
     $session=$startedUtc.ToString('yyyyMMddTHHmmssfffZ')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8)
@@ -57,7 +72,9 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
     New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 
     $ini=Join-Path $root 'OutRun2006Tweaks.ini'
+    $userIni=Join-Path $root 'OutRun2006Tweaks.user.ini'
     $configHash=if(Test-Path $ini){(Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+    $userConfigHash=if(Test-Path $userIni){(Get-FileHash $userIni -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
     $state=[ordered]@{
         SchemaVersion=3
         BuildMatrixId=$matrix
@@ -68,6 +85,7 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
         SessionId=$session
         StartedUtc=$startedUtc.ToString('o')
         ConfigSha256=$configHash
+        UserConfigSha256=$userConfigHash
         CollectionStatus='prepared-after-previous-collection'
         PreexistingLogs=@()
     }
@@ -75,10 +93,7 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
     $state|ConvertTo-Json -Depth 4|Set-Content (Join-Path $sessionRoot 'session_manifest.json') -Encoding UTF8
     Write-ActiveSession $backend $variant $profile $matrix $session $startedUtc $sourceSha
 
-    if(Test-Path $ini){
-        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector|DriverSeatView)\s*='
-        Get-Content $ini|Where-Object{$_ -match $allowed}|Set-Content (Join-Path $sessionRoot 'VR_CONFIG_SNAPSHOT.txt') -Encoding UTF8
-    }
+    Write-ConfigSnapshot (Join-Path $sessionRoot 'VR_CONFIG_SNAPSHOT.txt')
     Copy-Item (Join-Path $root 'ACTIVE_VR_BACKEND.txt') $sessionRoot -Force
     $inputs=Join-Path $root 'BUILD_INPUTS.json'
     if(Test-Path $inputs){Copy-Item $inputs $sessionRoot -Force}
@@ -133,6 +148,7 @@ foreach($file in $sourceFiles){
 
 Copy-Item $active $dest -Force
 Copy-Item $sessionState $dest -Force
+Write-ConfigSnapshot (Join-Path $dest 'VR_CONFIG_SNAPSHOT_END.txt')
 $captureRoot=Join-Path $root 'captures'
 $capturedDirs=@()
 if(Test-Path $captureRoot){
