@@ -1,0 +1,104 @@
+name: OutRun HD Korean TEST_ONLY Preview Package (GitHub CPU)
+
+# No fonts, no ImageGen, no installation and no change to the game's files.
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/outrun-hd-korean-preview-package.yml
+  workflow_run:
+    workflows: ["OutRun A/B High-Quality Multi-Atlas (GitHub CPU)"]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: outrun-hd-korean-preview
+  cancel-in-progress: false
+
+jobs:
+  package-test-only:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout packaging code only (no N100 or Docker)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/make_hd_korean_test_patch.py
+            tools/localization/test_make_hd_korean_test_patch.py
+            tools/localization/Install-OutRunKoreanTest.ps1
+
+      - name: Verify fail-closed canary packaging tests
+        run: python -m unittest discover -s tools/localization -p test_make_hd_korean_test_patch.py -v
+
+      - name: Find latest completed and successful source atlas run
+        id: source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TRIGGER: ${{ github.event_name }}
+          TRIGGER_ID: ${{ github.event.workflow_run.id }}
+          TRIGGER_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$TRIGGER" == "workflow_run" ]]; then
+            run_id="$TRIGGER_ID"
+            source_commit="$TRIGGER_SHA"
+          else
+            run_id="$(gh api -X GET repos/thp32tt/OutRun2006Tweaks/actions/workflows/outrun-ab-multi-atlas.yml/runs -f branch=korean-localization-recovery-20260928 -f status=success -f per_page=1 --jq '.workflow_runs[0].id')"
+            test -n "$run_id" && test "$run_id" != "null"
+            source_commit="$(gh api "repos/thp32tt/OutRun2006Tweaks/actions/runs/$run_id" --jq '.head_sha')"
+          fi
+          status="$(gh api "repos/thp32tt/OutRun2006Tweaks/actions/runs/$run_id" --jq '.conclusion')"
+          branch="$(gh api "repos/thp32tt/OutRun2006Tweaks/actions/runs/$run_id" --jq '.head_branch')"
+          test "$status" = "success"
+          test "$branch" = "korean-localization-recovery-20260928"
+          [[ "$source_commit" =~ ^[0-9a-f]{40}$ ]]
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "commit=$source_commit" >> "$GITHUB_OUTPUT"
+          echo "Using successful strict A/B DDS run $run_id at $source_commit"
+
+      - name: Download only exact source-run TEST_ONLY QA artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.source.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/korean-source"
+          gh run download "$RUN_ID" --repo thp32tt/OutRun2006Tweaks \
+            --name "outrun-ab-multi-atlas-$RUN_ID" --dir "$RUNNER_TEMP/korean-source"
+          test -s "$RUNNER_TEMP/korean-source/OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip"
+          test -s "$RUNNER_TEMP/korean-source/qa_report.json"
+
+      - name: Assemble SHA-verified Korean preview + canary installer
+        env:
+          RUN_ID: ${{ steps.source.outputs.run_id }}
+          SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+        run: |
+          set -euo pipefail
+          python tools/localization/make_hd_korean_test_patch.py \
+            --qa-report "$RUNNER_TEMP/korean-source/qa_report.json" \
+            --source-zip "$RUNNER_TEMP/korean-source/OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip" \
+            --installer tools/localization/Install-OutRunKoreanTest.ps1 \
+            --output-dir "$RUNNER_TEMP/korean-test-preview" \
+            --source-run-id "$RUN_ID" \
+            --source-commit "$SOURCE_COMMIT"
+          test -s "$RUNNER_TEMP/korean-test-preview/OUTRUN_KOREAN_HD_PREVIEW_TEST_ONLY.zip"
+          test -s "$RUNNER_TEMP/korean-test-preview/preview_summary.json"
+
+      - name: Upload non-release test preview with automatic retention
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-korean-hd-preview-test-only-${{ github.run_id }}
+          path: ${{ runner.temp }}/korean-test-preview/
+          retention-days: 14
+          if-no-files-found: error
