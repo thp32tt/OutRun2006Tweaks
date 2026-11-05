@@ -174,7 +174,7 @@ def main() -> None:
     ):
         assert evidence in bridge, "missing diagnostic safety/telemetry: " + evidence
     assert bridge.count("ctx->DrawIndexed(") == 1
-    assert bridge.count("ctx->Draw(") == 1
+    assert bridge.count("ctx->Draw(") == 2
     # A live stage-1 operation must not silently modify stage-0 DIFFUSE.
     # The old boundary accepted such draws while the native shader ignored
     # the extra stage. These are fail-closed static mutation checks, not GPU proof.
