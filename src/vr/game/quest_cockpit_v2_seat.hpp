@@ -67,10 +67,11 @@ inline bool OriginalQuestVrProfileAnchor(
 //   0x2E16C4 writes guest Z to [x12+8].
 //   0x2E17F4..0x2E1808 reads Y/Z from this SAME captured output
 //   buffer, adds original ELF rodata pair (+0.32,+0.55) and stores it.
-//   Later 0x2E1BB0..0x2E1D18 uses that updated source vector to form
-//   an eye/hand view matrix; separate controller correction terms exist.
+//   Later 0x2E1B00..0x2E1D18 also references this vector, but its two
+//   branches are gated by bytes owned by outrun::quest::VirtualWheel::update;
+//   they are NOT an unconditional HMD seat-height cancellation.
 // This is original per-car camera input data, NOT a generic world
-// HMD translation. Never add the pair again to OpenXR eye matrices.
+// HMD translation. Never add or subtract the pair again from every OpenXR eye.
 // Quest run_game::$_5 at 0x2E3690..0x2E36C8 enables
 // PcRaceCameraInputs only when guest state==0x10 (STATE_GAME)
 // and the captured PadSnapshot toggle is asserted. This
@@ -126,9 +127,10 @@ inline bool NativeVrProfileInputAnchor(
 // through its car/swing/blend pipeline. Its horizontal smoothed direction is
 // the translation basis, avoiding per-frame raw-B0 jitter in the user's test.
 // Local right is (+Z,0,-X) around the game camera forward; Y stays world-up.
-// Quest run_game separately adds (+0.32,+0.55) to the captured Y/Z and the
-// XR view construction cancels this with (-0.32,-0.55) in a rotated basis;
-// NEVER add those unpaired constants again to this existing PC OpenXR view.
+// Quest run_game separately adds (+0.32,+0.55) to the captured Y/Z.
+// The later (-0.32,-0.55) arithmetic is VirtualWheel-state conditional,
+// not a universal XR seat cancellation; NEVER synthesize it as a fixed
+// post-camera offset in this legacy comparison helper.
 inline bool NativeVrProfilePose(
     Vec3 nativeEye, Vec3 nativeLook, Vec3 originalAnchor,
     Vec3 questProfile, float extraBack, float extraDown, float extraRight,
