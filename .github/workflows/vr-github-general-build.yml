@@ -321,7 +321,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: OutRun2-QuestCockpitV2-COPY-RUN-${{ github.sha }}
-          path: ${{ env.COCKPIT_COPYRUN_ZIP }}
+          # upload-artifact creates the single ZIP downloaded by users.
+          # Upload the staging DIRECTORY, not the verified nested .zip,
+          # so extraction directly produces the launchers and payload.
+          path: build-general/cockpit-copyrun/
           if-no-files-found: error
           retention-days: 7
 
