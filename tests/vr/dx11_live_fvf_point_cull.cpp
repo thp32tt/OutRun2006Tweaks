@@ -644,6 +644,60 @@ int main() {
         expandedSource,nullptr,12u,4u,1u,1u,23u,lerp,expandedPoints));
     assert(expandedPoints.size()==stableExpanded.size());
 
+    // 01252: 1100 real FVF source triangles clip to 6600 original-game
+    // POINTLIST occurrences, across an authentic GPU window boundary.
+    // Never truncate the original source stream, UVs or user clip planes.
+    assert(game_fvf_native_point_expansion_budget(4u,6144u,6144u)==86016u);
+    assert(game_fvf_native_point_expansion_budget(5u,6144u,6144u)==257964u);
+    assert(game_fvf_native_point_expansion_budget(6u,6144u,6144u)==257964u);
+    assert(game_fvf_native_point_expansion_budget(4u,3300u,6144u)==46200u);
+    assert(game_fvf_native_point_expansion_budget(4u,4u,6144u)==0u);
+    assert(game_fvf_native_point_expansion_budget(5u,6145u,6144u)==0u);
+    assert(game_fvf_native_point_expansion_budget(7u,3300u,6144u)==0u);
+    std::vector<ClipVertex> longGameSource;
+    for(unsigned n=0u;n<1100u;++n)
+        longGameSource.insert(longGameSource.end(),
+                              thinClippedSource.begin(),
+                              thinClippedSource.end());
+    std::vector<ClipVertex> longGamePoints;
+    const auto gameBudget=game_fvf_native_point_expansion_budget(
+        4u,static_cast<std::uint32_t>(longGameSource.size()),6144u);
+    assert(game_fvf_clipped_point_vertices(
+        longGameSource,nullptr,
+        static_cast<std::uint32_t>(longGameSource.size()),
+        4u,1u,1u,gameBudget,lerp,longGamePoints));
+    assert(longGamePoints.size()==6600u);
+    const auto longPlan=game_fvf_native_point_batch_plan(
+        longGamePoints.size(),6144u,gameBudget);
+    assert(longPlan.supported && longPlan.draws==2u &&
+           longPlan.verticesPerDraw==6144u);
+    std::uint32_t first=99u,count=99u;
+    assert(game_fvf_native_point_batch_window(longPlan,0u,first,count));
+    assert(first==0u && count==6144u);
+    assert(game_fvf_native_point_batch_window(longPlan,1u,first,count));
+    assert(first==6144u && count==456u);
+    for(std::size_t i=0u;i<longGamePoints.size();++i) {
+        const auto& v=longGamePoints[i];
+        assert(v.clip[3]>0.f && v.clip[0]<=v.clip[3] &&
+               v.clip0[0]>=0.f && v.uv[0]>=0.f && v.uv[0]<=1.f);
+        for(unsigned k=0u;k<4u;++k)
+            assert(v.clip[k]==longGamePoints[i%6u].clip[k]);
+    }
+    first=99u;count=99u;
+    assert(!game_fvf_native_point_batch_window(longPlan,2u,first,count));
+    assert(first==99u && count==99u);
+    const auto oldLongPoints=longGamePoints;
+    assert(!game_fvf_clipped_point_vertices(
+        longGameSource,nullptr,
+        static_cast<std::uint32_t>(longGameSource.size()),
+        4u,1u,1u,6000u,lerp,longGamePoints));
+    assert(longGamePoints.size()==oldLongPoints.size());
+    const auto widePlan=game_fvf_native_point_batch_plan(
+        4294967295ull,4294967295u,4294967295u);
+    assert(widePlan.supported && widePlan.draws==1u);
+    assert(game_fvf_native_point_batch_window(widePlan,0u,first,count));
+    assert(first==0u && count==4294967295u);
+
     thinClippedSource[2].clip[1]=0.f;
     assert(!game_fvf_clipped_point_vertices(
         thinClippedSource,nullptr,3u,4u,1u,1u,64u,lerp,

@@ -7738,18 +7738,17 @@ bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
                 }
                 return v;
             };
-            // A clipped FVF triangle can generate multiple authentic point
-            // occurrences. The source IA remains bounded at kMaxVertices,
-            // but a 6144-point native upload can overflow even when the
-            // original game Draw and every source clip plane are valid.
-            // Preflight ALL CPU-clipped points before ANY GPU work; permit a
-            // bounded 4x expansion only for the full-size opt-in path.
-            // D3D11 receives consecutive POINTLIST windows (each multiple
-            // of three), preserving source triangle order, stage UVs, depth,
-            // blend and the original D3D9 Draw/input fallback.
-            constexpr UINT kMaxExpandedPointVertices = kMaxVertices * 4u;
+            // Real clipped game triangles can grow across 13 hardware,
+            // user and positive-W planes. Preflight their entire authentic
+            // source geometry before any GPU allocation or pixel mutation.
+            // Keep the original single-window diagnostic admission unchanged;
+            // opt-in full-game Draws stream triangle-aligned GPU VB windows.
             const UINT totalBudget = env_full_game_opt_in()
-                ? kMaxExpandedPointVertices : kMaxVertices;
+                ? game_fvf_native_point_expansion_budget(
+                    static_cast<std::uint32_t>(topology),
+                    sourceElements, kMaxVertices)
+                : kMaxVertices;
+            if (!totalBudget) return false;
             if (!game_fvf_clipped_point_vertices(
                     sourceVertices, indices, sourceElements,
                     static_cast<std::uint32_t>(topology),
@@ -7759,7 +7758,7 @@ bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
                 return false; // original D3D9 Draw/FFB unaffected
             clippedPointBatches = game_fvf_native_point_batch_plan(
                 clippedPointVertices.size(), kMaxVertices,
-                kMaxExpandedPointVertices);
+                totalBudget);
             if (!clippedPointBatches.supported ||
                 (!env_full_game_opt_in() && clippedPointBatches.draws != 1u))
                 return false;
@@ -7770,6 +7769,8 @@ bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
         topology = D3DPT_POINTLIST;
     }
     const std::vector<NativeVertex>& vertices = *drawVertices;
+    const bool streamedClippedPoints =
+        clippedPointBatches.supported && clippedPointBatches.draws > 1u;
     if (!ensure_pipeline(s, output.nativeWidth, output.nativeHeight)) return false;
     // Missing paired RTV is not permission to encode sRGB into linear UNORM.
     if (!s.backend.color_rtv() ||
@@ -7850,7 +7851,11 @@ bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
         // Full-scene Draws normally share a pair of D3D11 GPU allocations;
         // only their *contents* change. Preserve VB/IB ownership across
         // complete menus, vehicle selection and racing, not an inset sample.
-        const std::size_t vertexBytes = vertices.size() * sizeof(NativeVertex);
+        // First upload is one bounded source triangle-aligned window; later
+        // windows reuse the same dynamic allocation with WRITE_DISCARD.
+        const std::size_t uploadVertices = streamedClippedPoints
+            ? clippedPointBatches.verticesPerDraw : vertices.size();
+        const std::size_t vertexBytes = uploadVertices * sizeof(NativeVertex);
         if (vertexBytes == 0u ||
             vertexBytes > (std::numeric_limits<UINT>::max)()) return false;
         const UINT vertexSize = static_cast<UINT>(vertexBytes);
@@ -8639,17 +8644,26 @@ bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
                       offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask}
                 : NativeRawFvfClipSpan{});
     }
-    if (clippedPointBatches.supported && clippedPointBatches.draws > 1u) {
-        // The complete CPU plan and one shared GPU VB were committed above.
-        // Issue every ordered point window on the same IA/OM/DSV; each Draw
-        // starts at a genuine triangle (three POINTLIST occurrences). Keep
-        // one source ordinal and one PRE/POST GPU capture per original call.
-        for (UINT first = 0u; first < clippedPointBatches.totalVertices;
-             first += clippedPointBatches.verticesPerDraw) {
-            const UINT count = (std::min)(
-                clippedPointBatches.verticesPerDraw,
-                clippedPointBatches.totalVertices - first);
-            ctx->Draw(count, first);
+    if (streamedClippedPoints) {
+        // Preserve real source triangle order, depth, blend and both UV
+        // stages. GPU WRITE_DISCARD renames storage for each later Draw
+        // without overwriting the older in-flight game's native vertices.
+        // No partial batch can ever certify the main frame: any failure
+        // aborts source publication, original D3D9/input/FFB survive.
+        for (UINT window = 0u; window < clippedPointBatches.draws; ++window) {
+            UINT first = 0u, count = 0u;
+            if (!game_fvf_native_point_batch_window(
+                    clippedPointBatches, window, first, count))
+                return false;
+            if (window != 0u) {
+                const UINT bytes = count * static_cast<UINT>(
+                    sizeof(NativeVertex));
+                if (!upload_full_game_stream(
+                        ctx, vb.Get(), s.fullGameVertexCapacity,
+                        vertices.data() + first, bytes))
+                    return false;
+            }
+            ctx->Draw(count, 0u);
         }
     } else if (ib) ctx->DrawIndexed(indexCount, 0, 0);
     else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
