@@ -17,7 +17,7 @@ services:
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
       VR_FEATURE_DEVELOPMENT_ENABLED: "true"
-      # Native DX11 A keeps its existing production/CI queue; UW2 C does not use it.
+      # DX11 A is disabled by operator request; Model2 C continues independently.
       VR_CONTINUOUS_30M_ENABLED: "true"
       VR_SCHEDULED_DISPATCH_ENABLED: "true"
       VR_CONTINUOUS_INTERVAL_SECONDS: "3600"
@@ -25,7 +25,7 @@ services:
       VR_FEATURE_POLL_SECONDS: "60"
       VR_FEATURE_C6_REMINDER_SECONDS: "300"
       CONVERSION_ACTIVE_LIMIT: "2"
-      CONVERSION_DX11_ENABLED: "true"
+      CONVERSION_DX11_ENABLED: "false"
       DXVK_FROZEN: "true"
       CONVERSION_DXVK_ENABLED: "false"
       # C is no longer UW2 web porting or DX9Ex review.
@@ -76,12 +76,11 @@ services:
       PRODUCTION_COUNTER_MODE: "lane"
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      # New DX11 production: :30 KST, at most once per hour.
+      # Legacy DX11 dispatch minute retained for when A is explicitly re-enabled.
       SCHEDULE_MINUTES: "30"
       # Model2 C: >=30m normal followups; at 60m hard NEW ChatGPT project
       # conversation even if its previous answer is busy, frozen or missing.
-      # DX11 A: 60m hard fresh chat carries the same unfinished TASK_ID to
-      # avoid duplicate work/scoring. Only a terminal verified result gets a new ID.
+      # DX11 A is disabled; no automatic dispatch, continuation, or rollover.
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
