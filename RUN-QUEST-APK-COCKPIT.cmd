@@ -9,6 +9,7 @@ if not exist "%~dp0QuestCockpit-CopyRun.ps1" goto :missing_launcher
 if not exist "%~dp0QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json" goto :missing_payload
 
 if /I "%~1"=="VERIFY" goto :verify
+if not exist "%~dp0OR2006C2C.EXE" goto :missing_game
 
 echo QUEST APK COCKPIT: copy and run
 "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%~dp0QuestCockpit-CopyRun.ps1" -Mode NORMAL
@@ -38,3 +39,7 @@ exit /b 92
 echo [FAILED] QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json is missing.
 echo Re-extract the ENTIRE COPY-RUN ZIP. Do not copy only the CMD files.
 exit /b 93
+:missing_game
+echo [FAILED] OR2006C2C.EXE is not in this folder.
+echo Extract the ENTIRE COPY-RUN ZIP directly into the original OutRun 2006 game folder.
+exit /b 95
