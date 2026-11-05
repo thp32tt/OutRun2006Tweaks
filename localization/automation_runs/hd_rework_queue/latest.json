@@ -17,11 +17,12 @@
   "remote_reference_prefix": "localization/automation_runs/hd_rework_queue/refs",
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-workqueue-v1",
-  "selection_policy": "IMAGEGEN FALLBACK ONLY; 8 TOTAL MAX; 4 PER ROLE; SHA-DEDUPE BEFORE CHAT SEND",
+  "selection_policy": "EXISTING_A_B_PNG_ONLY_NO_NEW_IMAGEGEN_USER_DIRECTIVE_20261105",
   "source_asset_sha256": "e8afe657930fdc36232a3232bbf472ce7b615c515feaf749048dc6a76f9a1136",
   "source_reference_count_verified": 8,
   "source_roi_count": 954,
-  "tasks": [
+  "tasks": [],
+  "paused_tasks": [
     {
       "english": "Sector1",
       "korean": "섹터 1",
@@ -414,5 +415,6 @@
       "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
       "task_id": "HDRW-B-5d74499b8d00ee2df690"
     }
-  ]
+  ],
+  "new_imagegen_disabled": true
 }
