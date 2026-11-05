@@ -34,3 +34,35 @@ jobs:
           assert m['runtime_validation']=='UNTESTED'
           print('DINO_FITV6_SYNTHETIC_CONVERTER_PASS')
           PY
+  windows-converter:
+    runs-on: windows-2022
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: x64
+      - name: Build portable FitV6 converter executable
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pyinstaller trimesh numpy Pillow
+          if($LASTEXITCODE -ne 0){throw "Python conversion dependencies failed"}
+          python -m PyInstaller --noconfirm --clean --onefile --name Convert-Dino-FitV6 --paths tools/cockpit/dino_v15_external --collect-submodules trimesh tools/cockpit/dino_v15_external/convert_fitv6.py
+          if($LASTEXITCODE -ne 0){throw "FitV6 converter EXE build failed"}
+      - name: Windows binary smoke test with synthetic GLB
+        shell: pwsh
+        run: |
+          python -c "import trimesh,pathlib;pathlib.Path('Dino246_NoGlass_FitV6_UniformProportions.glb').write_bytes(trimesh.Scene(trimesh.creation.box()).export(file_type='glb'))"
+          if($LASTEXITCODE -ne 0){throw "Synthetic source generation failed"}
+          .\dist\Convert-Dino-FitV6.exe --v6 .\Dino246_NoGlass_FitV6_UniformProportions.glb --out-dir .\fitv6-synthetic
+          if($LASTEXITCODE -ne 0){throw "Windows EXE synthetic conversion failed"}
+          $ovc = Get-Item .\fitv6-synthetic\Dino246_Cockpit_LHD_v15.ovc
+          if($ovc.Length -lt 128){throw "Windows OVC2 output missing"}
+          Get-FileHash .\dist\Convert-Dino-FitV6.exe -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dino-FitV6-Converter-Windows-Standalone
+          path: dist/Convert-Dino-FitV6.exe
+          retention-days: 14
+          if-no-files-found: error
