@@ -548,6 +548,53 @@ int main() {
         roundedUserPoints));
     assert(roundedUserPoints.size()==stableRounded.size());
 
+    // 01250: A real FVF point-filled source face can cross the native
+    // homogeneous right plane AND both enabled user clip-distance registers.
+    // The CPU clip polygon is double precision; every generated float
+    // vertex ultimately reaches D3D11 POINTLIST / SV_ClipDistance. A later
+    // clipping intersection must not round back outside an earlier plane.
+    std::vector<ClipVertex> multiPlaneSource{
+        {{-.5f,-.5f,.5f,1.f},{.1f,1,1,1},{.3f,1,0,0},{0,0}},
+        {{2.0f,-.5f,.5f,1.f},{.1f,1,1,1},{-.01f,1,0,0},{1,0}},
+        {{-.5f, .5f,.5f,1.f},{-.3f,1,1,1},{.3f,1,0,0},{0,1}}
+    };
+    std::vector<ClipVertex> multiPlaneNative;
+    assert(game_fvf_clipped_point_vertices(
+        multiPlaneSource,nullptr,3u,4u,1u,17u,96u,lerp,multiPlaneNative));
+    assert(multiPlaneNative.size()>=3u &&
+           multiPlaneNative.size()%3u==0u);
+    std::size_t rightEdgeCount=0u;
+    std::size_t user0Count=0u, user4Count=0u;
+    for (const auto& v:multiPlaneNative) {
+        assert(v.clip[3]>0.f && std::isfinite(v.clip[3]));
+        assert(v.clip[0]>=-v.clip[3] && v.clip[0]<=v.clip[3]);
+        assert(v.clip[1]>=-v.clip[3] && v.clip[1]<=v.clip[3]);
+        assert(v.clip[2]>=0.f && v.clip[2]<=v.clip[3]);
+        assert(v.clip0[0]>=0.f && v.clip1[0]>=0.f);
+        assert(v.uv[0]>=0.f && v.uv[0]<=1.f);
+        assert(v.uv[1]>=0.f && v.uv[1]<=1.f);
+        rightEdgeCount+=v.clip[0]==v.clip[3];
+        user0Count+=v.clip0[0]==0.f;
+        user4Count+=v.clip1[0]==0.f;
+    }
+    assert(rightEdgeCount>0u && user0Count>0u && user4Count>0u);
+    const auto preservedMultiPlane=multiPlaneNative;
+    const std::uint32_t lateBadMultiPlane[]{0u,1u,99u};
+    assert(!game_fvf_clipped_point_vertices(
+        multiPlaneSource,lateBadMultiPlane,3u,4u,1u,17u,96u,
+        lerp,multiPlaneNative));
+    assert(multiPlaneNative.size()==preservedMultiPlane.size());
+    assert(!game_fvf_clipped_point_vertices(
+        multiPlaneSource,nullptr,3u,4u,1u,17u,2u,
+        lerp,multiPlaneNative));
+    assert(multiPlaneNative.size()==preservedMultiPlane.size());
+    multiPlaneSource[2].clip1[0]=
+        std::numeric_limits<float>::quiet_NaN();
+    assert(!game_fvf_clipped_point_vertices(
+        multiPlaneSource,nullptr,3u,4u,1u,17u,96u,
+        lerp,multiPlaneNative));
+    assert(multiPlaneNative.size()==preservedMultiPlane.size());
+
     thinClippedSource[2].clip[1]=0.f;
     assert(!game_fvf_clipped_point_vertices(
         thinClippedSource,nullptr,3u,4u,1u,1u,64u,lerp,
