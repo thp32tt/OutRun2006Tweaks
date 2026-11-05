@@ -27,7 +27,7 @@ class GpuOwner final {
     };
     Model cpu_{};
     std::vector<GpuMesh> meshes_{};
-    IDirect3DTexture9* textures_[Materials]{};
+    std::vector<IDirect3DTexture9*> textures_{};
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
     static bool ReadFile(const wchar_t* path,std::vector<std::uint8_t>& out) {
@@ -40,7 +40,8 @@ class GpuOwner final {
         } guard{f};
         LARGE_INTEGER size{};
         const bool ok=GetFileSizeEx(f,&size)!=FALSE &&
-                      size.QuadPart>=36 && size.QuadPart<=8ll*1024*1024;
+                      size.QuadPart>=36 &&
+                      size.QuadPart<=static_cast<LONGLONG>(MaxSidecarBytes);
         if(!ok)return false;
         std::vector<std::uint8_t> b(static_cast<std::size_t>(size.QuadPart));
         DWORD got=0;
@@ -50,39 +51,49 @@ class GpuOwner final {
         out=std::move(b);
         return true;
     }
-    static bool UploadDDS(IDirect3DDevice9* dev,const std::uint8_t* dds,
+    static bool UploadDDS(IDirect3DDevice9* dev,const Texture& texture,
                           IDirect3DTexture9** out) noexcept {
-        if(!dev || !dds || !out)return false;
+        if(!dev || !out || texture.dds.size()<128 || !texture.width ||
+           !texture.height || !texture.mips)return false;
         *out=nullptr;
+        const D3DFORMAT format=texture.format==TextureFormat::DXT1?D3DFMT_DXT1:
+            texture.format==TextureFormat::DXT5?D3DFMT_DXT5:D3DFMT_A8R8G8B8;
+        const unsigned blockBytes=texture.format==TextureFormat::DXT1?8u:
+            texture.format==TextureFormat::DXT5?16u:0u;
         IDirect3DTexture9* staging=nullptr;
-        // D3D9Ex forbids MANAGED; use a lockable SYSTEMMEM staging texture.
-        if(FAILED(dev->CreateTexture(128,128,8,0,D3DFMT_DXT1,D3DPOOL_SYSTEMMEM,&staging,nullptr))||
-           !staging)return false;
+        if(FAILED(dev->CreateTexture(texture.width,texture.height,texture.mips,0,
+                                     format,D3DPOOL_SYSTEMMEM,&staging,nullptr))||!staging)
+            return false;
         std::size_t pos=128;
-        for(UINT mip=0;mip<8;++mip) {
-            const unsigned shr=128u>>mip;
-            const unsigned dim=shr?shr:1u;
-            const unsigned quotient=(dim+3u)/4u;
-            const unsigned blocks=quotient?quotient:1u;
-            const unsigned row=blocks*8u;
-            D3DLOCKED_RECT lock{};
-            if(FAILED(staging->LockRect(mip,&lock,nullptr,0))) {staging->Release();return false;}
-            if(!lock.pBits || lock.Pitch < static_cast<INT>(row)) {
+        for(UINT mip=0;mip<texture.mips;++mip) {
+            const unsigned width=std::max(1u,texture.width>>mip);
+            const unsigned height=std::max(1u,texture.height>>mip);
+            const unsigned rows=blockBytes?std::max(1u,(height+3u)/4u):height;
+            const unsigned row=blockBytes?
+                std::max(1u,(width+3u)/4u)*blockBytes:width*4u;
+            if(!Bounds(pos,std::size_t(rows)*row,texture.dds.size())) {
+                staging->Release();return false;
+            }
+            D3DLOCKED_RECT locked{};
+            if(FAILED(staging->LockRect(mip,&locked,nullptr,0))) {
+                staging->Release();return false;
+            }
+            if(!locked.pBits || locked.Pitch<static_cast<INT>(row)) {
                 staging->UnlockRect(mip);staging->Release();return false;
             }
-            for(unsigned y=0;y<blocks;++y) {
-                std::memcpy(static_cast<std::uint8_t*>(lock.pBits)+
-                            std::size_t(lock.Pitch)*y,dds+pos+std::size_t(row)*y,row);
-            }
+            for(unsigned y=0;y<rows;++y)
+                std::memcpy(static_cast<std::uint8_t*>(locked.pBits)+
+                            std::size_t(locked.Pitch)*y,
+                            texture.dds.data()+pos+std::size_t(row)*y,row);
             staging->UnlockRect(mip);
-            pos+=std::size_t(blocks)*row;
+            pos+=std::size_t(rows)*row;
         }
-        if(pos!=128u+10936u) {staging->Release();return false;}
-        HRESULT hr=dev->CreateTexture(128,128,8,0,D3DFMT_DXT1,D3DPOOL_DEFAULT,out,nullptr);
-        if(SUCCEEDED(hr)&&*out)hr=dev->UpdateTexture(staging,*out);
+        HRESULT hr=dev->CreateTexture(texture.width,texture.height,texture.mips,0,
+            format,D3DPOOL_DEFAULT,out,nullptr);
+        if(SUCCEEDED(hr) && *out)hr=dev->UpdateTexture(staging,*out);
         staging->Release();
-        if(FAILED(hr)||!*out) {
-            if(*out){(*out)->Release();*out=nullptr;}
+        if(FAILED(hr) || !*out) {
+            if(*out) {(*out)->Release();*out=nullptr;}
             return false;
         }
         return true;
@@ -94,6 +105,7 @@ class GpuOwner final {
         }
         meshes_.clear();
         for(auto& texture:textures_) {if(texture)texture->Release();texture=nullptr;}
+        textures_.clear();
         owner_=nullptr;
     }
     bool EnsureLoaded() {
@@ -119,14 +131,16 @@ class GpuOwner final {
     }
     bool EnsureGpu(IDirect3DDevice9* dev) {
         if(!dev || !EnsureLoaded())return false;
-        if(owner_==dev && meshes_.size()==Groups)return true;
+        if(owner_==dev && meshes_.size()==cpu_.meshes.size() &&
+           textures_.size()==cpu_.textures.size())return true;
         ReleaseGpu();
         owner_=dev;
         // No vector reallocations after COM allocations begin: an allocation
         // failure must not leak the just-created VB/IB pair of a pending mesh.
-        meshes_.reserve(Groups);
-        for(unsigned material=0;material<Materials;++material) {
-            if(!UploadDDS(dev,cpu_.dds[material].data(),&textures_[material])) {
+        meshes_.reserve(cpu_.meshes.size());
+        textures_.resize(cpu_.textures.size(),nullptr);
+        for(std::size_t material=0;material<cpu_.textures.size();++material) {
+            if(!UploadDDS(dev,cpu_.textures[material],&textures_[material])) {
                 ReleaseGpu();return false;
             }
         }
@@ -136,11 +150,12 @@ class GpuOwner final {
             next.vertexCount=static_cast<UINT>(m.vertices.size());
             next.indexCount=static_cast<UINT>(m.indices.size());
             const UINT vertexBytes=next.vertexCount*sizeof(Vertex);
-            const UINT indexBytes=next.indexCount*sizeof(std::uint16_t);
+            const UINT indexBytes=next.indexCount*(m.index32?4u:2u);
             if(FAILED(dev->CreateVertexBuffer(vertexBytes,D3DUSAGE_WRITEONLY,
                     D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,D3DPOOL_DEFAULT,&next.vb,nullptr)) ||
                FAILED(dev->CreateIndexBuffer(indexBytes,D3DUSAGE_WRITEONLY,
-                    D3DFMT_INDEX16,D3DPOOL_DEFAULT,&next.ib,nullptr))) {
+                    m.index32?D3DFMT_INDEX32:D3DFMT_INDEX16,
+                    D3DPOOL_DEFAULT,&next.ib,nullptr))) {
                 if(next.vb)next.vb->Release();
                 if(next.ib)next.ib->Release();
                 ReleaseGpu();return false;
@@ -155,11 +170,19 @@ class GpuOwner final {
             if(FAILED(next.ib->Lock(0,indexBytes,&iData,0)) || !iData) {
                 next.vb->Release();next.ib->Release();ReleaseGpu();return false;
             }
-            std::memcpy(iData,m.indices.data(),indexBytes);
+            if(m.index32)
+                std::memcpy(iData,m.indices.data(),indexBytes);
+            else {
+                // OVC1/16-bit OVC2 are converted explicitly: a uint32 vector
+                // must not be copied byte-for-byte into an INDEX16 buffer.
+                auto* indexOut=static_cast<std::uint16_t*>(iData);
+                for(UINT i=0;i<next.indexCount;++i)
+                    indexOut[i]=static_cast<std::uint16_t>(m.indices[i]);
+            }
             next.ib->Unlock();
             meshes_.push_back(next);
         }
-        return meshes_.size()==Groups;
+        return meshes_.size()==cpu_.meshes.size();
     }
 public:
     GpuOwner()=default;
