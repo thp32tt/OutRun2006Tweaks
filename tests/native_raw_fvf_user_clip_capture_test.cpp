@@ -248,6 +248,8 @@ int main() {
         offscreen[i].clip[3]=0.0000002f;
     }
     assert(!native_game_fvf_fully_clipped_draw(hidden));
+    const NativeRawFvfRaster tinyWireNoCull{
+        NativeRawFvfCull::None,false,true,true};
     // 01243: source-authentic geometry can use uniformly tiny, strictly
     // positive homogeneous W. Empty-Draw detection already retains it;
     // native GPU PRE/POST capture must not lose its actual screen pixels.
@@ -266,22 +268,22 @@ int main() {
     assert(!native_game_fvf_fully_clipped_draw(tinyTriangle));
     assert(native_raw_fvf_projected_raster(
         tinyTriangle,0,0,3440,1440,tinyRaster,nullptr,
-        &wireNoCull,&tinyInterior));
+        &tinyWireNoCull,&tinyInterior));
     assert(tinyInterior.wireEdgesValid && tinyInterior.wireEdgeCount==3u);
     assert(native_raw_fvf_island_dual_draw_tile(
         tinyTriangle,0,0,3440,1440,3440,1440,128,96,
-        {0,0,3440,1440},7u,tinyTiles,&wireNoCull));
+        {0,0,3440,1440},7u,tinyTiles,&tinyWireNoCull));
     tinyTriangle.clipDistanceMask=1u;
     assert(native_raw_fvf_projected_raster(
         tinyTriangle,0,0,3440,1440,tinyRaster,nullptr,
-        &wireNoCull,&tinyInterior));
+        &tinyWireNoCull,&tinyInterior));
     assert(native_raw_fvf_island_dual_draw_tile(
         tinyTriangle,0,0,3440,1440,3440,1440,128,96,
-        {0,0,3440,1440},2u,tinyTiles,&wireNoCull));
+        {0,0,3440,1440},2u,tinyTiles,&tinyWireNoCull));
     for (auto& v : tinyPositiveW) v.user[0]=-1.f;
     assert(!native_raw_fvf_projected_raster(
         tinyTriangle,0,0,3440,1440,tinyRaster,nullptr,
-        &wireNoCull,&tinyInterior));
+        &tinyWireNoCull,&tinyInterior));
     for (auto& v : tinyPositiveW) v.user[0]=1.f;
     tinyPositiveW[0].clip[0]=0.f;
     tinyPositiveW[0].clip[1]=0.f;
@@ -289,7 +291,7 @@ int main() {
     tinyPositiveW[0].clip[3]=0.f; // malformed homogeneous source
     assert(!native_raw_fvf_projected_raster(
         tinyTriangle,0,0,3440,1440,tinyRaster,nullptr,
-        &wireNoCull,&tinyInterior));
+        &tinyWireNoCull,&tinyInterior));
     // 01231: Native D3D11 menu scissor can exclude every real source
     // triangle even when all homogeneous XY/Z planes still admit it.
     // Preserve its exact Draw ordinal without Z/cull/color GPU mutations.
