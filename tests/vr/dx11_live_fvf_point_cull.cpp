@@ -307,6 +307,41 @@ int main() {
     assert(!game_fvf_clipped_point_vertices(
         tinyPointSource,nullptr,3u,4u,1u,1u,64u,lerp,tinyPointDest));
     assert(tinyPointDest.size()==savedTinyPoints.size());
+
+    // 01247: tiny original FVF positive-W vertices can be visible in a
+    // camera-plane-crossing triangle. An absolute W>=1e-5 clip erroneously
+    // discards EVERY source corner even though two valid corners rasterize.
+    // Keep both texture stages and the enabled user clip plane after actual
+    // homogeneous clipping, and do not mutate an earlier native point plan
+    // when a later indexed game source triangle is malformed.
+    std::vector<ClipVertex> nearEyeTiny{
+        {{-5.e-8f,-5.e-8f,2.e-8f,1.e-7f},{1,1,1,1},{1,1,0,0},{0,0}},
+        {{ 5.e-8f,-5.e-8f,2.e-8f,1.e-7f},{1,1,1,1},{1,1,0,0},{1,0}},
+        {{ 0.f,   5.e-8f,-2.e-8f,-1.e-7f},{1,1,1,1},{1,1,0,0},{.5f,1}}
+    };
+    std::vector<ClipVertex> nearEyeOut;
+    assert(game_fvf_clipped_point_vertices(
+        nearEyeTiny,nullptr,3u,4u,1u,1u,64u,lerp,nearEyeOut));
+    assert(nearEyeOut.size()>=3u && nearEyeOut.size()%3u==0u);
+    for (const auto& v : nearEyeOut) {
+        assert(v.clip[3]>0.f && v.clip[3]<1.e-5f);
+        assert(v.clip[0]>=-v.clip[3]-1.e-12f &&
+               v.clip[0]<= v.clip[3]+1.e-12f);
+        assert(v.clip[1]>=-v.clip[3]-1.e-12f &&
+               v.clip[1]<= v.clip[3]+1.e-12f);
+        assert(v.clip0[0]>=-1.e-6f);
+        assert(v.uv[0]>=0.f && v.uv[0]<=1.f &&
+               v.uv[1]>=0.f && v.uv[1]<=1.f);
+    }
+    const auto nearEyeGood=nearEyeOut;
+    const std::uint32_t invalidNearEye[]{0u,1u,99u};
+    assert(!game_fvf_clipped_point_vertices(
+        nearEyeTiny,invalidNearEye,3u,4u,1u,1u,64u,lerp,nearEyeOut));
+    assert(nearEyeOut.size()==nearEyeGood.size());
+    for (auto& v : nearEyeTiny) v.clip[3]=-1.e-7f;
+    assert(!game_fvf_clipped_point_vertices(
+        nearEyeTiny,nullptr,3u,4u,1u,1u,64u,lerp,nearEyeOut));
+    assert(nearEyeOut.size()==nearEyeGood.size());
     // A real world-space WVP game triangle can straddle the eye plane.
     // GPU D3D11 triangle clipping would retain its visible polygon, while
     // the old CPU point-fill path discarded the entire original game Draw

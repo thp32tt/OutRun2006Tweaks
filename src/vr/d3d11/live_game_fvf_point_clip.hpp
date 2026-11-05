@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <limits>
 #include <vector>
 namespace outrun::vr::dx11::live_game_frame {
 template<class Vertex, class Interpolate>
@@ -28,14 +29,19 @@ template<class Vertex, class Interpolate>
         Vertex vertex{};
         std::array<double,13> plane{};
     };
-    const auto load = [userMask](const Vertex& v,V& out) noexcept {
+    // The synthetic positive-W plane is required only for an eye crossing.
+    // Its scale is derived from the actual original Draw vertices, not the
+    // fixed 1e-5 threshold that can erase a near-camera menu/race polygon.
+    // All native points still pass the real hardware X/Y/Z/user clip planes.
+    double eyeGuard=0.00001;
+    const auto load = [userMask,&eyeGuard](const Vertex& v,V& out) noexcept {
         const double x=v.clip[0],y=v.clip[1],z=v.clip[2],w=v.clip[3];
         if (!std::isfinite(x)||!std::isfinite(y)||!std::isfinite(z)||
             !std::isfinite(w)||(!x&&!y&&!z&&!w)) return false;
         out.vertex=v;
         // Keep GPU perspective division out of the CPU until all vertices
         // have been clipped to a strictly positive homogeneous eye plane.
-        out.plane={w+x,w-x,w+y,w-y,z,w-z,0,0,0,0,0,0,w-0.00001};
+        out.plane={w+x,w-x,w+y,w-y,z,w-z,0,0,0,0,0,0,w-eyeGuard};
         for (unsigned p=0u;p<6u;++p) if (userMask & (1u<<p)) {
             const double d=p<4u?v.clip0[p]:v.clip1[p-4u];
             if (!std::isfinite(d)) return false;
@@ -63,6 +69,9 @@ template<class Vertex, class Interpolate>
             const auto a=idx(ai),b=idx(bi),c=idx(ci);
             if (a>=source.size()||b>=source.size()||c>=source.size())
                 return false;
+            // Per-source-face guard; previous triangle/window must never
+            // leak its camera-plane tolerance into a later original Draw.
+            eyeGuard=0.00001;
             V va{},vb{},vc{};
             if (!load(source[a],va)||!load(source[b],vb)||
                 !load(source[c],vc)) return false;
@@ -75,6 +84,26 @@ template<class Vertex, class Interpolate>
                 va.vertex.clip[3] <= 0.0f ||
                 vb.vertex.clip[3] <= 0.0f ||
                 vc.vertex.clip[3] <= 0.0f;
+            if (crossesEyePlane) {
+                // Linear homogeneous clipping cannot create positive W if
+                // every authentic corner has W<=0. Otherwise retain a
+                // strictly positive float-representable guard below the
+                // smallest ORIGINAL positive W. This preserves tiny near-
+                // camera geometry, unlike an absolute 1e-5 cutoff. Values
+                // too small for a safe guard fail closed to the real D3D9.
+                double closestPositiveW=std::numeric_limits<double>::infinity();
+                for (double w : {double(va.vertex.clip[3]),
+                                 double(vb.vertex.clip[3]),
+                                 double(vc.vertex.clip[3])})
+                    if (w>0.0) closestPositiveW=(std::min)(closestPositiveW,w);
+                if (!std::isfinite(closestPositiveW)) continue;
+                eyeGuard=(std::min)(1.0e-5, closestPositiveW*0.25);
+                if (!(eyeGuard>0.0) ||
+                    !(static_cast<float>(eyeGuard)>0.0f)) return false;
+                va.plane[12u]=double(va.vertex.clip[3])-eyeGuard;
+                vb.plane[12u]=double(vb.vertex.clip[3])-eyeGuard;
+                vc.plane[12u]=double(vc.vertex.clip[3])-eyeGuard;
+            }
             // All source indices and active user-plane values were validated
             // first, including negative/zero W world-space game vertices.
             bool invisible=false;
