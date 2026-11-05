@@ -177,7 +177,24 @@ int main() {
     std::vector<ClipVertex> clipped;
     assert(game_fvf_clipped_point_vertices(
         source,nullptr,3u,4u,1u,0u,64u,lerp,clipped));
-    assert(clipped.size()==4u);
+    assert(clipped.size()==6u);
+    // A clipped source triangle becomes two D3D11 point triangles, not
+    // four de-duplicated points. The shared polygon fan corners retain
+    // their exact interpolated original-game shader attributes.
+    for (unsigned p=0u;p<4u;++p) {
+        assert(clipped[0].clip[p]==clipped[3].clip[p]);
+        assert(clipped[2].clip[p]==clipped[4].clip[p]);
+        assert(clipped[0].clip0[p]==clipped[3].clip0[p]);
+        assert(clipped[2].clip1[p]==clipped[4].clip1[p]);
+    }
+    for (unsigned p=0u;p<2u;++p) {
+        assert(clipped[0].uv[p]==clipped[3].uv[p]);
+        assert(clipped[2].uv[p]==clipped[4].uv[p]);
+    }
+    const auto clippedSix=clipped;
+    assert(!game_fvf_clipped_point_vertices(
+        source,nullptr,3u,4u,1u,0u,5u,lerp,clipped));
+    assert(clipped.size()==clippedSix.size());
     for(const auto& v:clipped) {
         assert(v.clip[0]<=v.clip[3]+1.e-5f);
         assert(v.clip[0]>=-v.clip[3]-1.e-5f);
@@ -273,7 +290,9 @@ int main() {
     tinyPointSource[1].clip[0]=2.e-7f; // regular X homogeneous clip
     assert(game_fvf_clipped_point_vertices(
         tinyPointSource,nullptr,3u,4u,1u,1u,64u,lerp,tinyPointDest));
-    assert(tinyPointDest.size()==4u);
+    assert(tinyPointDest.size()==6u);
+    assert(tinyPointDest[0].clip[3]==tinyPointDest[3].clip[3]);
+    assert(tinyPointDest[2].uv[0]==tinyPointDest[4].uv[0]);
     for (const auto& v:tinyPointDest) {
         assert(v.clip[3]>0.f && v.clip[3]<1.e-5f);
         assert(v.clip[0]<=v.clip[3]+1.e-12f);
@@ -349,7 +368,8 @@ int main() {
     fanSource[3].clip[0]=-2.f; // second triangle crosses real XY plane
     assert(game_fvf_clipped_point_vertices(
         fanSource,movedAnchor,4u,6u,2u,0u,64u,lerp,fanPoints));
-    assert(fanPoints.size()>=6u);
+    assert(fanPoints.size()==9u); // clipped face: 6, surviving face: 3
+    assert(fanPoints.size()%3u==0u);
     for(const auto& v:fanPoints) {
         assert(v.clip[0]>=-v.clip[3]-1.e-5f);
         assert(v.uv[0]>=0.f && v.uv[0]<=1.f);

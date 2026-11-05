@@ -146,8 +146,23 @@ template<class Vertex, class Interpolate>
                 return false;
             const bool clockwise=signedArea<0.0; // D3D viewport Y flip
             if ((cull==2u&&clockwise)||(cull==3u&&!clockwise)) continue;
-            if (polygon.size()>maxVertices-fresh.size()) return false;
-            for (const auto& v:polygon) fresh.push_back(v.vertex);
+            // The D3D9 polygon clipper triangulates a newly clipped
+            // polygon before D3DFILL_POINT rasterization. Native POINTLIST
+            // therefore needs THREE corner occurrences for each clipped
+            // fan triangle, not one point per unique polygon vertex. For a
+            // four-corner clipped menu/race face this is six real GPU points
+            // (0,1,2; 0,2,3), preserving the interpolated color, both UV
+            // stages and enabled user-plane distances at every occurrence.
+            // Capacity is checked for the complete original primitive
+            // before its first vertex reaches the native GPU upload.
+            const std::size_t pointCount = (polygon.size()-2u)*3u;
+            if (fresh.size()>maxVertices ||
+                pointCount>maxVertices-fresh.size()) return false;
+            for (std::size_t corner=1u;corner+1u<polygon.size();++corner) {
+                fresh.push_back(polygon[0u].vertex);
+                fresh.push_back(polygon[corner].vertex);
+                fresh.push_back(polygon[corner+1u].vertex);
+            }
         }
         if (fresh.empty()) return false;
         destination.swap(fresh);
