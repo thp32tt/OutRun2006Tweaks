@@ -14,6 +14,8 @@
 #include "vr/game/quest_cockpit_v2_visibility.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
 #include "vr/game/quest_cockpit_v2_glass_hook.hpp"
+#include "vr/game/dino_external_d3d9.hpp"
+#include "vr/state/state_block_tracker.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -55,6 +57,8 @@ namespace Settings
     extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff,VRQuestCockpitV2SkyProbe,VRQuestCockpitV2ApkNativeCamera;
     extern Setting<float> VRQuestCockpitV2SeatBack,VRQuestCockpitV2SeatDown,VRQuestCockpitV2SeatRight;
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
+    Setting<bool> VRDinoExternalCockpit{ "VR", "DinoExternalCockpit", false,
+        "QuestCockpitV2-only Dino FitV6 external model. Uses the native mode-1 player frame; no legacy DriverSeat camera owner." };
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -679,10 +683,57 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             maxB0Delta=maxF0Delta=maxCameraDelta=maxRelativeDelta=0.f;
         }
     }
+    static void TryDrawDinoFitV6(EVWORK_CAR* player) noexcept
+    {
+        using namespace OutRunVR::QuestCockpitV2;
+        if (!Settings::VRDinoExternalCockpit || !Settings::VREnabled ||
+            !Settings::VRQuestCockpitV2Enabled || !Settings::VRStereo ||
+            !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
+            !NativeFrameTrace().Active() || InSceneEffect() ||
+            !Game::current_mode || *Game::current_mode != STATE_GAME ||
+            !player || player != Game::pl_car() || player->car_kind_11 != 1)
+            return;
+        const auto* camera=Game::camera();
+        const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
+        IDirect3DDevice9* device=Game::D3DDevice();
+        OutRunVR::DinoSidecar::Gate gate{};
+        gate.optIn=Settings::VRDinoExternalCockpit.get();
+        gate.vr=Settings::VREnabled.get();
+        gate.seat=camera && camera->cam_mode_34A==1 &&
+            NativeFrameTrace().Active();
+        gate.gameplay=true;
+        gate.stereo=xr && xr->valid && xr->poseSequence!=0 &&
+            OutRunVR::RuntimeEligibility::MayInjectStereo();
+        gate.playerDraw=true;
+        gate.deviceReady=device!=nullptr;
+        gate.stateRecording=OutRunVR::State::StateBlockTracker::Recording();
+        gate.carKind=static_cast<unsigned char>(player->car_kind_11);
+        if(!OutRunVR::DinoSidecar::Eligible(gate))return;
+        const auto* nativeView=Module::exe_ptr<const D3DMATRIX>(0x55D860);
+        const auto* nativeProjection=Module::exe_ptr<const D3DMATRIX>(0x55D8A0);
+        if(!QuestCockpitGlassLive::Memory(nativeView,sizeof(D3DMATRIX)) ||
+           !QuestCockpitGlassLive::Memory(nativeProjection,sizeof(D3DMATRIX)))
+            return;
+        // One original player-frame draw only. Do NOT construct a second eye
+        // pair here: the existing Quest/R26 D3D9 draw owner duplicates this
+        // fixed-function world draw using the already-latched native eye pose.
+        const HRESULT hr=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
+            device,player->matrix_B0,*nativeView,*nativeProjection);
+        if(Settings::VRTelemetry) {
+            static std::uint64_t attempts=0;
+            const auto sample=++attempts;
+            if(sample<=8u || (sample&(sample-1u))==0u)
+                spdlog::info(
+                    "VR QUEST DINO FITV6: sample={} nativeFrame={} xrPose={} mode=1 drawHr=0x{:08X} originalPMT=UNCHANGED",
+                    sample,NativeFrameTrace().ActiveEpoch(),xr->poseSequence,
+                    static_cast<unsigned int>(hr));
+        }
+    }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
         QuestCockpitGlassLive::PlayerCallback scope(player);
         PlayerCallbackHook.ccall<void>(player);
+        TryDrawDinoFitV6(player);
     }
     static void __cdecl OnPlayerCallback(EVWORK_CAR* player)
     {

@@ -1,0 +1,75 @@
+name: Dino FitV6 on QuestCockpitV2 Win32
+on:
+  push:
+    branches: [ 'feature/dino-fitv6-quest-cockpit-v2-20261106' ]
+    paths:
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/game/dino_external_*.hpp'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'QuestCockpit-CopyRun.ps1'
+      - 'RUN-QUEST-APK-DINO-FITV6.cmd'
+      - 'tests/test_dino_external_*.cpp'
+      - '.github/workflows/dino-fitv6-quest-cockpit-v2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: FitV6 parser and Quest ownership contract
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_external_sidecar.cpp -o /tmp/dino-v1
+          /tmp/dino-v1
+          c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_external_hq.cpp -o /tmp/dino-v2
+          /tmp/dino-v2
+          python3 - <<'PY'
+          from pathlib import Path
+          hook=Path('src/hooks_graphics.cpp').read_text()
+          seat=Path('src/vr/game/quest_cockpit_v2_seat.hpp').read_text()
+          dino=Path('src/vr/game/dino_external_d3d9.hpp').read_text()
+          runner=Path('tools/Run-OutRunVRTest.ps1').read_text()
+          assert 'VRDriverSeatRenderTest' not in hook
+          assert 'ApplyDriverSeatCameraOffset' not in hook
+          assert 'RawB0Camera is retired' in hook
+          assert 'camera->cam_mode_34A==1' in hook
+          assert 'NativeFrameTrace().Active()' in hook
+          assert 'player != Game::pl_car()' in hook
+          assert 'player->car_kind_11 != 1' in hook
+          assert 'DrawNativeScene(' in hook and 'DrawNativeScene(' in dino
+          assert 'R26DinoSidecarTryDraw' not in hook
+          assert 'OriginalQuestGameCameraState' in seat
+          assert "'-VR.DinoExternalCockpit=true'" in runner
+          print('DINO_FITV6_QUEST_NATIVE_OWNER_CONTRACT_PASS')
+          PY
+  win32:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure Quest R26 HUD graph
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-r26 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=OFF
+          if($LASTEXITCODE -ne 0){throw "R26 configure failed"}
+      - name: Build Win32 DLL
+        shell: pwsh
+        run: |
+          cmake --build build-r26 --config Release --target outrun2006tweaks --parallel 4
+          if($LASTEXITCODE -ne 0){throw "Win32 build failed"}
+          $dll=Get-ChildItem build-r26 -Recurse -Filter dinput8.dll | Where-Object {$_.FullName -notmatch '_deps'} | Sort-Object Length -Descending | Select-Object -First 1
+          if(-not $dll){throw "Missing dinput8.dll"}
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item $dll.FullName out/dinput8.dll
+          Get-FileHash out/dinput8.dll -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DinoFitV6-QuestCockpitV2-Win32
+          path: out/dinput8.dll
+          retention-days: 14
+          if-no-files-found: error

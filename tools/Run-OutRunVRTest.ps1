@@ -1,6 +1,7 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2 = 'OFF',
+    [ValidateSet('OFF','ON')][string]$DinoFitV6 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2F0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Lod0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
@@ -357,6 +358,14 @@ if($QuestCockpitV2 -eq 'ON'){
     )
     if($QuestCockpitV2Diagnostics -eq 'ON') { $env:OUTRUN_VR_FILE_LOG='1' }
     else { $env:OUTRUN_VR_FILE_LOG='0' }
+    if($DinoFitV6 -eq 'ON') {
+        $dinoModel=Join-Path $root 'Dino246_Cockpit_LHD_v15.ovc'
+        if(!(Test-Path -LiteralPath $dinoModel -PathType Leaf)) {
+            throw 'Dino FitV6 sidecar is missing next to OR2006C2C.exe.'
+        }
+        $gameArgs += '-VR.DinoExternalCockpit=true'
+        Write-Host 'Dino FitV6 enabled on QuestCockpitV2 native mode-1 owner.'
+    }
     Write-Host "QuestCockpitV2 mode1 active; detailed diagnostics=$QuestCockpitV2Diagnostics."
     if($QuestCockpitV2SkyProbe -eq 'ON') {
         # Sky-only bounded evidence, no megabytes per draw.

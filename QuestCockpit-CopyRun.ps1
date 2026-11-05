@@ -1,10 +1,13 @@
-param([ValidateSet('NORMAL','SKY','INTERP')][string]$Mode='NORMAL',[switch]$VerifyOnly)
+param([ValidateSet('NORMAL','SKY','INTERP','DINO')][string]$Mode='NORMAL',[switch]$VerifyOnly)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $payload=Join-Path $root 'QUEST_APK_COPYRUN_PAYLOAD'
 $identityFile=Join-Path $payload 'IDENTITY.json'
 $backup=Join-Path $root 'QUEST_APK_COPYRUN_ORIGINAL_BACKUP'
 $backupManifest=Join-Path $backup 'original_files.json'
+$dinoName='Dino246_Cockpit_LHD_v15.ovc'
+$dinoExpected='eba3510b2848b13702452ca6e0216ac99ad0528d0c40fd47c182e003ea5d1e6b'
+$dinoPayload=Join-Path $payload ('model/'+$dinoName)
 function HashFile([string]$p){(Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()}
 function Assert-Machine([string]$p,[int]$expected){
     $f=[IO.File]::OpenRead($p)
@@ -66,6 +69,12 @@ foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')){
         throw "Missing default config $name"
     }
 }
+if($Mode -eq 'DINO') {
+    if(!(Test-Path -LiteralPath $dinoPayload -PathType Leaf) -or
+       (HashFile $dinoPayload) -ne $dinoExpected) {
+        throw 'Dino FitV6 model payload is missing or has the wrong SHA256.'
+    }
+}
 if($VerifyOnly){
     Write-Host "PASS copy-run source=$($identity.SourceSha), payload verified, no game file modifications."
     return
@@ -84,7 +93,7 @@ if(!(Test-Path $backupManifest)){
     $rootNames=@('dinput8.dll','outrun-vr-host.exe','d3d9.dll',
       'multiviewpatcher.dll','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini',
       'ACTIVE_VR_BACKEND.txt','CURRENT_VR_SESSION.json',
-      'BUILD_INPUTS.json','PC_FAST_BUILD.txt')+$scripts
+      'BUILD_INPUTS.json','PC_FAST_BUILD.txt',$dinoName)+$scripts
     $backendNames=@('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt',
       'HOST_BUILD_SOURCE_SHA.txt','VARIANT_ID.txt','BUILD_VARIANT.txt',
       'CMAKE_FLAGS.txt','GAME_DLL_SHA256.txt')
@@ -146,6 +155,15 @@ foreach($name in @('BUILD_INPUTS.json','PC_FAST_BUILD.txt')){
     $p=Join-Path $root $name
     if(Test-Path $p){Remove-Item -LiteralPath $p -Force}
 }
+if($Mode -eq 'DINO') {
+    $dinoDest=Join-Path $root $dinoName
+    if((Test-Path -LiteralPath $dinoDest -PathType Leaf) -and
+       (HashFile $dinoDest) -ne $dinoExpected) {
+        throw "Refusing to overwrite a different existing $dinoName"
+    }
+    Copy-Item -LiteralPath $dinoPayload -Destination $dinoDest -Force
+    if((HashFile $dinoDest) -ne $dinoExpected){throw 'Dino FitV6 model copy verification failed.'}
+}
 Write-Host "Quest APK test backend activated: $($identity.SourceSha)"
 Write-Host 'The original EXE, models, textures and saved OutRun2006Tweaks.user.ini remain untouched.'
 & (Join-Path $root 'Select-OutRunVRBackend.ps1') -Backend d3d9 -TestProfile CORRECTNESS -VariantId CURRENT_FOCUS
@@ -160,6 +178,7 @@ $launchArgs=@{
     QuestCockpitV2='ON'
 }
 if($Mode -eq 'SKY'){$launchArgs.QuestCockpitV2SkyProbe='ON'}
+if($Mode -eq 'DINO'){$launchArgs.DinoFitV6='ON'}
 if($Mode -eq 'INTERP'){
     $launchArgs.QuestCockpitV2Interpolation='OFF'
     $launchArgs.QuestCockpitV2SkyProbe='ON'
