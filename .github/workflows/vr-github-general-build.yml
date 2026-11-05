@@ -300,7 +300,7 @@ jobs:
             Add-Type -AssemblyName System.IO.Compression
             $archive=[IO.Compression.ZipFile]::OpenRead((Resolve-Path $copyRunZip).Path)
             try {
-              $names=@($archive.Entries | ForEach-Object {$_.FullName.Replace('\\','/')})
+              $names=@($archive.Entries | ForEach-Object {$_.FullName.Replace('\','/')})
               foreach($entry in $entrypoints) {
                 if($entry -notin $names){throw "Copy-run ZIP missing entrypoint: $entry"}
               }
@@ -308,7 +308,7 @@ jobs:
                 throw 'Copy-run ZIP missing payload identity'
               }
               foreach($name in $names) {
-                if($name -match '(^|/)\\.\\.(/|$)' -or $name.StartsWith('/')){
+                if($name -match '(^|/)\.\.(/|$)' -or $name.StartsWith('/')){
                   throw "Unsafe archive path: $name"
                 }
               }
