@@ -554,8 +554,8 @@ int main() {
     // vertex ultimately reaches D3D11 POINTLIST / SV_ClipDistance. A later
     // clipping intersection must not round back outside an earlier plane.
     std::vector<ClipVertex> multiPlaneSource{
-        {{-.5f,-.5f,.5f,1.f},{.1f,1,1,1},{.3f,1,0,0},{0,0}},
-        {{2.0f,-.5f,.5f,1.f},{.1f,1,1,1},{-.01f,1,0,0},{1,0}},
+        {{-.5f,-.5f,.5f,1.f},{.1f,1,1,1},{-.01f,1,0,0},{0,0}},
+        {{2.0f,-.5f,.5f,1.f},{.1f,1,1,1},{.3f,1,0,0},{1,0}},
         {{-.5f, .5f,.5f,1.f},{-.3f,1,1,1},{.3f,1,0,0},{0,1}}
     };
     std::vector<ClipVertex> multiPlaneNative;
