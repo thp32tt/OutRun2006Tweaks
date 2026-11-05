@@ -3860,7 +3860,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     save_queue_state(q)
     write_runtime(
         status="vr_continuous_running",
-        last_action="A(DX11 implementation)+C("+(
+        last_action=("A(DX11 implementation)" if CONVERSION_DX11_ENABLED else "A(DX11 disabled)")+ "+C("+(
             "Model2 VR last sent " + str((q.get("model2_simple") or {}).get("last_sent_at") or "not sent yet")
             if MODEL2_AUTODEV_ENABLED else
             "UW2 last sent " + str((q.get("uw2_simple") or {}).get("last_sent_at") or "not sent yet")
@@ -3880,6 +3880,21 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     reconcile_legacy_conversion_blocked(q)
     q = load_queue_state()
     active_by_lane = q.setdefault("active_by_lane", {})
+
+    # An operator-disabled DX11 lane must not resume a retained TASK_ID after
+    # redeploy. Park it once, preserving its task identity and source commits.
+    if not CONVERSION_DX11_ENABLED:
+        disabled_dx11 = active_by_lane.pop("A", None)
+        if isinstance(disabled_dx11, dict):
+            frozen = q.setdefault("frozen_lane_tasks", [])
+            frozen.append({
+                **disabled_dx11,
+                "frozen_lane": "A",
+                "frozen_at": now.isoformat(),
+                "frozen_reason": "DX11 auto-development disabled by operator",
+            })
+            q["frozen_lane_tasks"] = frozen[-100:]
+            save_queue_state(q)
 
     if DX9EX_REVIEW_ONLY and not UW2_WEB_PORT_ENABLED and not MODEL2_AUTODEV_ENABLED and int(q.get("dx9ex_review_only_policy_version", 0)) < 1:
         retired = q.setdefault("retired_lane_tasks", [])
