@@ -32,7 +32,7 @@ class GpuOwner final {
     bool loaded_=false,loadAttempted_=false;
     // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
     // textures on every eye Draw. Retry only after Reset/device change.
-    IDirect3DDevice9* rejectedDevice_=nullptr; // borrowed, equality only
+    GpuRetryPolicy gpuRetry_{};
     static bool ReadFile(const wchar_t* path,std::vector<std::uint8_t>& out) {
         HANDLE f=CreateFileW(path,GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,
                             FILE_ATTRIBUTE_NORMAL,nullptr);
@@ -113,7 +113,7 @@ class GpuOwner final {
     }
     bool RejectGpu(IDirect3DDevice9* device) noexcept {
         ReleaseGpu();
-        rejectedDevice_=device;
+        gpuRetry_.NoteFailure(device);
         return false;
     }
     bool EnsureLoaded() {
@@ -139,10 +139,7 @@ class GpuOwner final {
     }
     bool EnsureGpu(IDirect3DDevice9* dev) {
         if(!dev || !EnsureLoaded())return false;
-        if(rejectedDevice_==dev)return false;
-        // A different device may have valid allocations. Never retain the
-        // rejection of a retired device as the owner of a newly seen one.
-        if(rejectedDevice_!=dev)rejectedDevice_=nullptr;
+        if(!gpuRetry_.CanAttempt(dev))return false;
         if(owner_==dev && meshes_.size()==cpu_.meshes.size() &&
            textures_.size()==cpu_.textures.size())return true;
         ReleaseGpu();
@@ -201,7 +198,7 @@ public:
     ~GpuOwner(){ReleaseGpu();}
     GpuOwner(const GpuOwner&)=delete;
     GpuOwner& operator=(const GpuOwner&)=delete;
-    void OnDeviceReset() noexcept {ReleaseGpu();rejectedDevice_=nullptr;}
+    void OnDeviceReset() noexcept {ReleaseGpu();gpuRetry_.OnReset();}
     bool Loaded() const noexcept {return loaded_;}
     bool EnsureResources(IDirect3DDevice9* device) noexcept {
         try{return EnsureGpu(device);}catch(...){return RejectGpu(device);}
@@ -249,7 +246,12 @@ public:
            FAILED(device->SetSamplerState(0,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
            FAILED(device->SetSamplerState(0,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
            FAILED(device->SetSamplerState(0,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)))
+           FAILED(device->SetSamplerState(0,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
+           // Game HUD/sky draws may leave a nonzero minimum mip-level.
+           // A 1024px HQ albedo would otherwise be sampled as low-resolution.
+           FAILED(device->SetSamplerState(0,D3DSAMP_MAXMIPLEVEL,0u)) ||
+           FAILED(device->SetSamplerState(0,D3DSAMP_MIPMAPLODBIAS,0u)) ||
+           FAILED(device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE)))
             hr=E_FAIL;
         if(SUCCEEDED(hr))for(const auto& m:meshes_) {
             if(FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||

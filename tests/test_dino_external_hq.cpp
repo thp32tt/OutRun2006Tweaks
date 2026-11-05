@@ -82,6 +82,17 @@ int main(){
     wr32(b,32,Crc32(b.data()+36,b.size()-36));
     assert(!Parse(b.data(),b.size(),model,error) &&
            error=="index outside vertex group");
-    std::puts("DINO_OVC2_157_GROUP_1024_ARGB_2048_DXT5_INDEX32_PASS");
+    // Failed HQ GPU resource creation must not repeat on every VR eye Draw.
+    // Recovery after D3D9/9Ex Reset, or on a genuinely distinct device, is
+    // explicitly permitted.
+    GpuRetryPolicy retry;
+    int firstDevice=0,secondDevice=0;
+    assert(retry.CanAttempt(&firstDevice));
+    retry.NoteFailure(&firstDevice);
+    assert(!retry.CanAttempt(&firstDevice));
+    assert(retry.CanAttempt(&secondDevice));
+    retry.OnReset();
+    assert(retry.CanAttempt(&firstDevice));
+    std::puts("DINO_OVC2_157_GROUP_1024_ARGB_2048_DXT5_INDEX32_GPU_RETRY_PASS");
     return 0;
 }

@@ -182,6 +182,19 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
     error.clear();
     return true;
 }
+// Portable failure policy: a failed x86 D3D9Ex allocation is retried only
+// after device Reset or an actual different device. No per-frame OOM storm.
+struct GpuRetryPolicy {
+    std::uintptr_t rejectedDevice=0;
+    bool CanAttempt(const void* device) const noexcept {
+        return device &&
+            reinterpret_cast<std::uintptr_t>(device)!=rejectedDevice;
+    }
+    void NoteFailure(const void* device) noexcept {
+        rejectedDevice=reinterpret_cast<std::uintptr_t>(device);
+    }
+    void OnReset() noexcept {rejectedDevice=0;}
+};
 struct Gate {
     bool optIn=false,vr=false,seat=false,gameplay=false,stereo=false;
     bool playerDraw=false,deviceReady=false,stateRecording=false;
