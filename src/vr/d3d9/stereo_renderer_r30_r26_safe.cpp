@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r26.cpp"
+#include "../game/dino_external_r26_bridge.hpp"
 #include "r30_indexed_up_bounds.hpp"
 #include "r30_shadow_ranges.hpp"
 #include "r30_shadow_bytes.hpp"
@@ -1561,6 +1562,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
+            R26DinoSidecarReleaseGpu();
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;
             R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;
@@ -9460,3 +9462,6 @@ namespace OutRunVRStereo
             VRR26HudSafeCompareMarkerHook::instance;
     }
 }
+
+// Dino v15 sidecar is an R26+HUD-only final owner; never in R84 graph.
+#include "dino_external_r26_owner.inc"

@@ -14,6 +14,8 @@
 #include "vr/game/driver_seat_vehicle_scale.hpp"
 #include "vr/game/driver_seat_occupant.hpp"
 #include "vr/game/cockpit_glass_material_probe.hpp"
+#include "vr/game/dino_external_r26_bridge.hpp"
+#include "vr/state/state_block_tracker.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -52,6 +54,8 @@ namespace Settings
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
 	extern Setting<bool> VRDriverSeatView;
+    Setting<bool> VRDinoExternalCockpit{ "VR", "DinoExternalCockpit", false,
+        "Experimental R26+HUD Dino 246 GTS external cockpit. Load 70-group OVC sidecar without modifying original PMT." };
     extern Setting<bool> VRDriverSeatGlassMaterialTrace;
     extern Setting<float> VRDriverSeatVehicleScale;
     extern Setting<float> VRDriverSeatGlassOpacity;
@@ -342,6 +346,48 @@ class VRDriverSeatRenderTest : public Hook
 					camera ? static_cast<std::uint8_t>(camera->cam_mode_34A) : 0xFF);
 			}
 		}
+        // R26-safe external cockpit: original 3D owner remains R26/R23.
+        // No R29/R33 functions, no game PMT/XPR patches and no selection draws.
+        // The model is loaded only after all scene/gameplay gates are admitted.
+        if (Settings::VRDinoExternalCockpit && Settings::VREnabled &&
+            Settings::VRDriverSeatView && Settings::VRStereo &&
+            VRDriverSeatGameplayActive() && Game::current_mode &&
+            *Game::current_mode == STATE_GAME)
+        {
+            EVWORK_CAR* selected = Game::pl_car();
+            const bool playerDraw=selected &&
+                reinterpret_cast<EVWORK_CAR*>(ctx.ebx)==selected;
+            OutRunVR::DinoSidecar::Gate gate{};
+            gate.optIn=Settings::VRDinoExternalCockpit.get();
+            gate.vr=Settings::VREnabled.get();
+            gate.seat=playerDraw && VRDriverSeatCameraEligible(Game::camera());
+            gate.gameplay=VRDriverSeatGameplayActive();
+            gate.stereo=Settings::VRStereo.get();
+            gate.playerDraw=playerDraw;
+            gate.deviceReady=Game::D3DDevice()!=nullptr;
+            gate.stateRecording=OutRunVR::State::StateBlockTracker::Recording();
+            gate.carKind=playerDraw
+                ? static_cast<unsigned char>(selected->car_kind_11) : 255;
+            if (OutRunVR::DinoSidecar::Eligible(gate))
+            {
+                // Native EXE world-view owner, not headset space or menu UI.
+                const auto* nativeView=Module::exe_ptr<const D3DMATRIX>(0x55D860);
+                const D3DMATRIX nativeWorld=selected->matrix_B0;
+                const bool paired=OutRunVRStereo::R26DinoSidecarTryDraw(
+                    Game::D3DDevice(),nativeWorld,*nativeView,gate,
+                    Settings::VRWorldScale.get(),Settings::VRStereoDepth.get(),
+                    Settings::VRDriverSeatVehicleScale.get());
+                if (Settings::VRTelemetry)
+                {
+                    static std::uint64_t attempts=0;
+                    const auto sample=++attempts;
+                    if(sample<=4 || (sample&(sample-1))==0)
+                        spdlog::info(
+                            "VR R26 DINO OVC: attempt={} paired={} originalPMT=UNCHANGED carKind=1",
+                            sample,paired?1:0);
+                }
+            }
+        }
 		if (!Active() || !Settings::VRDriverSeatFullCar)
 			return;
 		EVWORK_CAR* player = Game::pl_car();
