@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01250",
+  "production_id": "CONVERSION-DX11-01250",
+  "event_id": "CONVERSION-DX11-01250-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "2d138aba1fbc74169dfb319a31fe21ffb74df816",
+  "result_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d",
+  "material_implementation_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d",
+  "material_result_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d",
+  "validation_bearing_result_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d",
+  "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
+  "classification": "A_INCOMPLETE_ORIGINAL_GAME_FVF_MULTI_PLANE_FLOAT_GPU_CLIP_AND_B_EXACT_WINDOWS_MSVC_FAILURE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 0,
+  "score_note": "Continuation of existing original FVF point-filled native clipping feature from 01244-01249. The coherent genuine source implementation, CI-caused regression/MSVC repairs, exact-SHA 5 gates and C6 form one ongoing feature; no newly independent competition result or double credit.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "work_allocation_measured": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp"
+  ],
+  "implementation": "In the real original D3D9 game FVF Draw/DrawIndexed point-fill native D3D11 conversion, generated CPU polygon clip intersections can drift outside earlier native hardware XYZ or both user ClipDistance float planes when several planes cross a source triangle. Track only synthesized clip vertices and reconcile tiny final float GPU boundary rounding within bounded source-derived ulps; reject larger deviation transactionally and retain original D3D9 rendering/input/FFB. Keep original vertices and interpolated color/UV/specular attributes unchanged. Add triple-boundary clipped GPU point regression plus bad-IB, capacity and invalid activated source clip register fallback. Repair initial fixture's shadowed boundary, then exact Windows MSVC min macro failure using (numeric_limits<float>::min)(). No DXVK or DX9Ex modifications.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW",
+      "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL"
+    ],
+    "integration_path": [
+      "LIVE_D3D9_FVF_POINT_DRAW_DRAWINDEXED",
+      "CPU_HOMOGENEOUS_AND_SIX_USER_PLANES",
+      "GENERATED_GPU_FLOAT_BOUNDARY_RECONCILIATION",
+      "NATIVE_D3D11_POINTLIST_UPLOAD_DRAW",
+      "GPU_SOURCE_CAPTURE_WITH_UNCHANGED_D3D9_FALLBACK"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CXX_GENERATED_MULTI_PLANE_GPU_FLOAT_BOUNDS",
+      "CXX_DUAL_CLIP_DISTANCE_REGISTER_BOUNDED_RECONCILIATION",
+      "CXX_REAL_FVF_MULTI_PLANE_POSITIVE_AND_NEGATIVE_REGRESSION",
+      "MSVC_WINDOWS_H_MIN_MACRO_CAUSAL_REPAIR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha_after_causal_repair",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY; actual menu/vehicle/race or Quest3 native game output not run on this exact binary.",
+    "activation_guard_and_fallback": "Explicit native diagnostic opt-in/fail-closed only; DX9Ex renderer, D3D9 original draws/input/FFB and frozen DXVK unchanged.",
+    "acceptance_proof": {
+      "positive_probe": "Triple-boundary authentic FVF point polygon generated source reaches GPU-safe float homogeneous and dual user ClipDistance values with UV preserved; Fast #42005851722 SUCCESS.",
+      "negative_regression": "Invalid later source IB, insufficient native point vertex capacity and NaN enabled source user plane return false without publishing partial native GPU data, original D3D9 fallback unaffected.",
+      "component_integration": "live_game_frame_bridge.cpp::submit already calls game_fvf_clipped_point_vertices; compile and source checks on exact c9fd6403 completed 5/5. No native gameplay/HMD optical evidence."
+    }
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
+    "goal": "Original D3D9 FVF clipped point-fill triangle preserves generated float-accurate hardware and dual user GPU planes after multiple clip intersections.",
+    "acceptance_items": [
+      {
+        "id": "source_fvf_multi_plane_native_gpu_float",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_FVF_POINT_DRAW_TO_D3D11_CLIP",
+        "expected_behavior": "Generated GPU point vertices remain inside all active real clip planes, retaining untouched native shader attributes."
+      },
+      {
+        "id": "strict_original_gpu_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_D3D9_FVF_CLIPPING_AND_FFB",
+        "expected_behavior": "Materially wrong generated intersections, malformed indices, NaN user planes, undercapacity fail closed transactionally."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Five mandatory exact material SHA GitHub Actions successfully complete; no HMD false promotion."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_fvf_multi_plane_native_gpu_float": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast 42005851722 success; game GPU observed output UNTESTED"
+    },
+    "strict_original_gpu_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "Focused C++ regression included in exact-SHA DX11 Fast; physical game/HMD UNTESTED"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Fast 42005851722, Backend 42005851561, Build 42005851612, OpenXR 42005851600, HUD 42005851784 all SUCCESS on c9fd640391039835fa61e7fe1023d8d2f129418d"
+    }
+  },
+  "full_exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 42005851722,
+      "conclusion": "SUCCESS",
+      "head_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 42005851561,
+      "conclusion": "SUCCESS",
+      "head_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d"
+    },
+    "Build": {
+      "run_id": 42005851612,
+      "conclusion": "SUCCESS",
+      "head_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 42005851600,
+      "conclusion": "SUCCESS",
+      "head_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 42005851784,
+      "conclusion": "SUCCESS",
+      "head_sha": "c9fd640391039835fa61e7fe1023d8d2f129418d"
+    }
+  },
+  "source_and_repair_commits": [
+    {
+      "sha": "6aa9163e3af365ba77d423423b5f6efefe598fca",
+      "kind": "material_cpp_and_multi_plane_regression_first_candidate",
+      "score_change": 0
+    },
+    {
+      "sha": "935d0bafa5118f85bd113a5d88aff11865033164",
+      "kind": "same_task_failed_fast_fixture_repair",
+      "score_change": 0
+    },
+    {
+      "sha": "c9fd640391039835fa61e7fe1023d8d2f129418d",
+      "kind": "final_validation_bearing_same_task_MSVC_source_repair",
+      "score_change": 0
+    }
+  ],
+  "c6_commit_type": "DOCS_ONLY_POST_VALIDATION",
+  "runtime_evidence": "NONE",
+  "actual_game_native_gpu_pixel_observation": false,
+  "next_runtime_action": "Check actual desktop OutRun menu->vehicle->race native_draws>0 and published native GPU frames on exactly built source SHA, then Quest3 stereo L/R+VDXR only after real game evidence."
+}
