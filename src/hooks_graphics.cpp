@@ -573,17 +573,24 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         std::array<OutRunVR::QuestCockpitV2::Vec3,SeatTableCount> injected{};
         for(std::size_t i=0;i<SeatTableCount;++i) {
             OutRunVR::QuestCockpitV2::Vec3 profile{};
+            OutRunVR::QuestCockpitV2::Vec3 tuned{};
+            // Both native and baseline paths must honor F11 seat tuning.
+            // Tune the ORIGINAL 30-profile input, then let the Quest
+            // source's +0.32Y/+0.55Z run exactly once when requested.
+            // With zero tuning this is byte-for-byte the previous native
+            // input; it never moves the OpenXR head or the car B0 matrix.
             if(!OutRunVR::QuestCockpitV2::OriginalQuestVrProfileAnchor(
                    pointers,SeatTableCount*sizeof(std::uint32_t),
                    profiles,SeatTableCount*kProfileStride,
                    static_cast<int>(i),profile) ||
-               !(Settings::VRQuestCockpitV2ApkNativeCamera
-                    ? OutRunVR::QuestCockpitV2::OriginalQuestModeOneInput(
-                        profile,injected[i])
-                    : OutRunVR::QuestCockpitV2::NativeVrProfileInputAnchor(
-                        profile,Settings::VRQuestCockpitV2SeatBack.get(),
-                        Settings::VRQuestCockpitV2SeatDown.get(),
-                        Settings::VRQuestCockpitV2SeatRight.get(),injected[i]))) {
+               !OutRunVR::QuestCockpitV2::NativeVrProfileInputAnchor(
+                   profile,Settings::VRQuestCockpitV2SeatBack.get(),
+                   Settings::VRQuestCockpitV2SeatDown.get(),
+                   Settings::VRQuestCockpitV2SeatRight.get(),tuned) ||
+               (Settings::VRQuestCockpitV2ApkNativeCamera
+                    ? !OutRunVR::QuestCockpitV2::OriginalQuestModeOneInput(
+                          tuned,injected[i])
+                    : (injected[i]=tuned,false))) {
                 RestoreNativeSeatProfile();
                 return false;
             }
