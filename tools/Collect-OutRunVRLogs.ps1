@@ -2,6 +2,17 @@ param([switch]$All)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 
+function Get-Sha256Lower([string]$Path){
+    $stream=[System.IO.File]::OpenRead($Path)
+    try {
+        $sha=[System.Security.Cryptography.SHA256]::Create()
+        try {
+            $bytes=$sha.ComputeHash($stream)
+            return ([System.BitConverter]::ToString($bytes)).Replace('-','').ToLowerInvariant()
+        } finally { $sha.Dispose() }
+    } finally { $stream.Dispose() }
+}
+
 $patterns=@(
     'OutRun2006Tweaks*.log',
     'OutRun2006Tweaks-hudtrace*.csv',
@@ -73,8 +84,8 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
 
     $ini=Join-Path $root 'OutRun2006Tweaks.ini'
     $userIni=Join-Path $root 'OutRun2006Tweaks.user.ini'
-    $configHash=if(Test-Path $ini){(Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
-    $userConfigHash=if(Test-Path $userIni){(Get-FileHash $userIni -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+    $configHash=if(Test-Path $ini){(Get-Sha256Lower $ini)}else{'missing'}
+    $userConfigHash=if(Test-Path $userIni){(Get-Sha256Lower $userIni)}else{'missing'}
     $state=[ordered]@{
         SchemaVersion=3
         BuildMatrixId=$matrix
@@ -169,7 +180,7 @@ $exeSemanticIdentity='MISSING'
 $gameExe=Join-Path $root 'OR2006C2C.EXE'
 if(Test-Path $gameExe){
     $exeItem=Get-Item $gameExe
-    $exeSha=(Get-FileHash $gameExe -Algorithm SHA256).Hash.ToLowerInvariant()
+    $exeSha=(Get-Sha256Lower $gameExe)
     $upstreamReferenceSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
     $matchesUpstream=($exeSha -eq $upstreamReferenceSha)
     $exeSemanticIdentity=if($matchesUpstream){'VERIFIED_REFERENCE_SHA256'}else{'MISMATCH'}
@@ -195,8 +206,8 @@ if($backend -eq '2d'){$selectedDll=Join-Path $root 'backends/2d/dinput8.dll'}
 if($backend -eq 'd3d9' -and ($variant -eq 'R26_SAFE' -or $variant -eq 'R84_TEST')){
     $selectedDll=Join-Path $root ("slots/{0}/dinput8.dll" -f $variant)
 }
-$installedHash=if(Test-Path $installedDll){(Get-FileHash $installedDll -Algorithm SHA256).Hash.ToLowerInvariant()}else{'MISSING'}
-$selectedHash=if(Test-Path $selectedDll){(Get-FileHash $selectedDll -Algorithm SHA256).Hash.ToLowerInvariant()}else{'MISSING'}
+$installedHash=if(Test-Path $installedDll){(Get-Sha256Lower $installedDll)}else{'MISSING'}
+$selectedHash=if(Test-Path $selectedDll){(Get-Sha256Lower $selectedDll)}else{'MISSING'}
 # A PC Fast ACTIVE_VR_BACKEND.txt is not required to provide this
 # optional field. Dot lookup under StrictMode raises PropertyNotFoundStrict.
 # Hashtable membership, unlike .property access, is safe for absent keys.
@@ -336,7 +347,7 @@ if(Test-Path $analyzer){
     }
 }
 
-$configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash (Join-Path $root 'OutRun2006Tweaks.ini') -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+$configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-Sha256Lower (Join-Path $root 'OutRun2006Tweaks.ini'))}else{'missing'}
 
 $analysisRequest=[ordered]@{
     SchemaVersion=1

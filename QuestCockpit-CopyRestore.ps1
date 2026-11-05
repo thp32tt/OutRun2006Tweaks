@@ -3,6 +3,16 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $backup=Join-Path $root 'QUEST_APK_COPYRUN_ORIGINAL_BACKUP'
 $manifest=Join-Path $backup 'original_files.json'
+function Get-Sha256Lower([string]$Path){
+    $stream=[System.IO.File]::OpenRead($Path)
+    try {
+        $sha=[System.Security.Cryptography.SHA256]::Create()
+        try {
+            $bytes=$sha.ComputeHash($stream)
+            return ([System.BitConverter]::ToString($bytes)).Replace('-','').ToLowerInvariant()
+        } finally { $sha.Dispose() }
+    } finally { $stream.Dispose() }
+}
 if($VerifyOnly){
     Write-Host 'PASS restore launcher entrypoint verified; no files changed.'
     return
@@ -21,7 +31,7 @@ foreach($e in $m.Entries){
     if($e.Existed){
         $src=Join-Path (Join-Path $backup $e.Scope) $e.Name
         if(!(Test-Path $src -PathType Leaf) -or
-           (Get-FileHash $src -Algorithm SHA256).Hash.ToLowerInvariant() -ne [string]$e.Sha256){
+           (Get-Sha256Lower $src) -ne [string]$e.Sha256){
             throw "Original backup corrupted: $($e.Scope)/$($e.Name)"
         }
     }

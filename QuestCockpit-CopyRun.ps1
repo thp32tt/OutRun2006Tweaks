@@ -5,7 +5,17 @@ $payload=Join-Path $root 'QUEST_APK_COPYRUN_PAYLOAD'
 $identityFile=Join-Path $payload 'IDENTITY.json'
 $backup=Join-Path $root 'QUEST_APK_COPYRUN_ORIGINAL_BACKUP'
 $backupManifest=Join-Path $backup 'original_files.json'
-function HashFile([string]$p){(Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()}
+function Get-Sha256Lower([string]$Path){
+    $stream=[System.IO.File]::OpenRead($Path)
+    try {
+        $sha=[System.Security.Cryptography.SHA256]::Create()
+        try {
+            $bytes=$sha.ComputeHash($stream)
+            return ([System.BitConverter]::ToString($bytes)).Replace('-','').ToLowerInvariant()
+        } finally { $sha.Dispose() }
+    } finally { $stream.Dispose() }
+}
+function HashFile([string]$p){Get-Sha256Lower $p}
 function Assert-Machine([string]$p,[int]$expected){
     $f=[IO.File]::OpenRead($p)
     try{

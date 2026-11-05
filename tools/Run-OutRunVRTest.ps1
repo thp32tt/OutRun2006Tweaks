@@ -26,6 +26,16 @@ param(
 
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
+function Get-Sha256Lower([string]$Path){
+    $stream=[System.IO.File]::OpenRead($Path)
+    try {
+        $sha=[System.Security.Cryptography.SHA256]::Create()
+        try {
+            $bytes=$sha.ComputeHash($stream)
+            return ([System.BitConverter]::ToString($bytes)).Replace('-','').ToLowerInvariant()
+        } finally { $sha.Dispose() }
+    } finally { $stream.Dispose() }
+}
 Set-Location -LiteralPath $root
 
 # GUI starts this script in a hidden PowerShell child. Without an explicit
@@ -478,7 +488,7 @@ $env:OUTRUN_VR_SOURCE_SHA=$sourceSha
 # Establish the gate before process creation so the runtime inspector and
 # renderer see the same identity decision as the post-run collector.
 $canonicalExeSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
-$launchExeSha=(Get-FileHash $game -Algorithm SHA256).Hash.ToLowerInvariant()
+$launchExeSha=Get-Sha256Lower $game
 if($backend -ne '2d' -and $launchExeSha -ne $canonicalExeSha){
     throw "VR semantic identity mismatch before launch. Expected $canonicalExeSha, got $launchExeSha"
 }

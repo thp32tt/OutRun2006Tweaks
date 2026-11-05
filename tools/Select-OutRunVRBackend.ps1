@@ -12,6 +12,17 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backendRoot = Join-Path $root "backends"
 $payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" } else { $Backend }
 
+function Get-Sha256Lower([string]$Path){
+    $stream=[System.IO.File]::OpenRead($Path)
+    try {
+        $sha=[System.Security.Cryptography.SHA256]::Create()
+        try {
+            $bytes=$sha.ComputeHash($stream)
+            return ([System.BitConverter]::ToString($bytes)).Replace('-','').ToLowerInvariant()
+        } finally { $sha.Dispose() }
+    } finally { $stream.Dispose() }
+}
+
 $defaultVariant = switch ($Backend) {
     "2d"        { "CONTROL_2D" }
     "d3d9"      { "CURRENT_FOCUS" }
@@ -142,7 +153,7 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
             $expectedDllHash.Length -ne 64 -or
             !(Test-Path -LiteralPath $dllHashFile) -or
             $expectedDllHash -ne (Get-Content -LiteralPath $dllHashFile -Raw).Trim() -or
-            $expectedDllHash -ne (Get-FileHash (Join-Path $src 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant()) {
+            $expectedDllHash -ne (Get-Sha256Lower (Join-Path $src 'dinput8.dll'))) {
             $contractFailures += 'PC Fast game DLL SHA256 mismatch'
         }
         if ([string]$buildInputs.RendererSourceOwner -ne 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp') {
@@ -162,8 +173,8 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
     foreach ($name in @('dinput8.dll','outrun-vr-host.exe')) {
         if (!(Test-Path (Join-Path $src $name))) { throw "DX9Ex missing $name" }
     }
-    if ((Get-FileHash (Join-Path $src 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne
-        (Get-FileHash (Join-Path $backendPayload 'outrun-vr-host.exe') -Algorithm SHA256).Hash) {
+    if ((Get-Sha256Lower (Join-Path $src 'outrun-vr-host.exe')) -ne
+        (Get-Sha256Lower (Join-Path $backendPayload 'outrun-vr-host.exe'))) {
         throw 'DX9Ex selected host is not the matching exact-SHA host.'
     }
 }
@@ -187,10 +198,6 @@ function Assert-X86Pe([string]$Path,[string]$Label) {
     if ($machine -ne 0x014C) {
         throw ("$Label must be x86 PE32 for OR2006C2C.EXE; machine=0x{0:X4}: {1}" -f $machine,$Path)
     }
-}
-
-function Get-Sha256Lower([string]$Path) {
-    return (Get-FileHash $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 
 $backendProvider = switch ($Backend) {
@@ -513,7 +520,7 @@ $activeText = @(
 Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding ascii
 
 $configHash = "missing"
-if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
+if (Test-Path $ini) { $configHash = Get-Sha256Lower $ini }
 $sessionManifest = [ordered]@{
     SchemaVersion = 4
     BuildMatrixId = $matrix
