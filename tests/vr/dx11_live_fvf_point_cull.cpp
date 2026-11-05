@@ -715,7 +715,115 @@ int main() {
     assert(game_fvf_native_point_batch_window(widePlan,0u,first,count));
     assert(first==0u && count==4294967295u);
 
-    thinClippedSource[2].clip[1]=0.f;
+    // 01253: the integrated real-game FULL-SOURCE point path is required
+    // for an original long TRIANGLEFAN/STRIP, not just 01252's isolated
+    // TRIANGLELIST GPU windows. An entirely invisible first polygon window
+    // cannot cancel later visible, clipped fan geometry and its UVs.
+    const auto fanSourcePlan=game_fvf_native_original_point_source(
+        true,true,6u,3253u,6144u);
+    assert(fanSourcePlan.supported &&
+           fanSourcePlan.sourceTriangles==3251u &&
+           fanSourcePlan.maxExpandedPoints==3251u*42u);
+    assert(game_fvf_native_original_point_source(
+        true,true,5u,3253u,6144u).supported);
+    assert(!game_fvf_native_original_point_source(
+        false,true,6u,3253u,6144u).supported);
+    assert(!game_fvf_native_original_point_source(
+        true,false,6u,3253u,6144u).supported);
+    assert(!game_fvf_native_original_point_source(
+        true,true,4u,3252u,6144u).supported);
+    assert(!game_fvf_native_original_point_source(
+        true,true,6u,6145u,6144u).supported);
+
+    std::vector<ClipVertex> longFan(3253u);
+    for (std::size_t i=0u;i<longFan.size();++i) {
+        longFan[i]={{2.f, (i&1u)?-.3f:.3f, .5f, 1.f},
+                    {1.f,1.f,1.f,1.f},{1.f,1.f,1.f,1.f},
+                    {float(i)/float(longFan.size()),.25f}};
+        if (i>=2051u) {
+            longFan[i].clip[0]=-.5f;
+            longFan[i].clip[1]=(i&1u)?-.4f:.4f;
+        }
+    }
+    // The legacy split handed only this entirely clipped 2048-face prefix
+    // to submit(), which returned false, aborting the full native frame.
+    const auto firstFanWindow=game_fvf_polygon_window_plan(
+        6u,static_cast<std::uint32_t>(longFan.size()),6144u,128u);
+    assert(firstFanWindow.windows>=2u &&
+           firstFanWindow.trianglesPerWindow==2048u);
+    std::vector<std::uint32_t> oldWindowIndices;
+    assert(game_fvf_build_polygon_window(
+        6u,nullptr,static_cast<std::uint32_t>(longFan.size()),
+        static_cast<std::uint32_t>(longFan.size()),0u,
+        firstFanWindow.trianglesPerWindow,6144u,oldWindowIndices));
+    std::vector<ClipVertex> wholeFanPoints;
+    assert(!game_fvf_clipped_point_vertices(
+        longFan,oldWindowIndices.data(),
+        static_cast<std::uint32_t>(oldWindowIndices.size()),
+        4u,1u,1u,fanSourcePlan.maxExpandedPoints,lerp,wholeFanPoints));
+    // One authentic source IA preflight must reach the later visible faces,
+    // and the established native VB streamer must dispatch ALL occurrences.
+    assert(game_fvf_clipped_point_vertices(
+        longFan,nullptr,static_cast<std::uint32_t>(longFan.size()),
+        6u,1u,1u,fanSourcePlan.maxExpandedPoints,lerp,wholeFanPoints));
+    assert(wholeFanPoints.size()>6144u &&
+           wholeFanPoints.size()%3u==0u);
+    const auto fanGpuPlan=game_fvf_native_point_batch_plan(
+        wholeFanPoints.size(),6144u,fanSourcePlan.maxExpandedPoints);
+    assert(fanGpuPlan.supported && fanGpuPlan.draws>=2u);
+    std::size_t fanSubmitted=0u;
+    for (std::uint32_t w=0u;w<fanGpuPlan.draws;++w) {
+        std::uint32_t at=0u,n=0u;
+        assert(game_fvf_native_point_batch_window(fanGpuPlan,w,at,n));
+        assert(at==fanSubmitted && n%3u==0u);
+        fanSubmitted+=n;
+    }
+    assert(fanSubmitted==wholeFanPoints.size());
+    for (const auto& v:wholeFanPoints) {
+        assert(v.clip[3]>0.f &&
+               v.clip[0]>=-v.clip[3] && v.clip[0]<=v.clip[3]);
+        assert(v.clip0[0]>=0.f &&
+               v.uv[0]>=0.f && v.uv[0]<=1.f);
+    }
+    const auto goodFanPoints=wholeFanPoints;
+    std::vector<std::uint32_t> invalidLateFan(longFan.size());
+    for (std::size_t i=0u;i<invalidLateFan.size();++i)
+        invalidLateFan[i]=static_cast<std::uint32_t>(i);
+    invalidLateFan.back()=static_cast<std::uint32_t>(longFan.size());
+    assert(!game_fvf_clipped_point_vertices(
+        longFan,invalidLateFan.data(),
+        static_cast<std::uint32_t>(invalidLateFan.size()),
+        6u,1u,1u,fanSourcePlan.maxExpandedPoints,
+        lerp,wholeFanPoints));
+    assert(wholeFanPoints.size()==goodFanPoints.size());
+
+    // A real long STRIP also retains its global odd/even face winding. Its
+    // first legacy chunk is wholly outside, but later original triangles
+    // remain source-visible without an intermediate per-window failure.
+    std::vector<ClipVertex> longStrip(4300u);
+    for(std::size_t i=0u;i<longStrip.size();++i) {
+        longStrip[i]={{2.f,(i&1u)?-.3f:.3f,.5f,1.f},
+                      {1.f,1.f,1.f,1.f},{1.f,1.f,1.f,1.f},
+                      {float(i)/float(longStrip.size()),.5f}};
+        if(i>=2051u && (i%3u)!=0u) {
+            longStrip[i].clip[0]=-.5f;
+            longStrip[i].clip[1]=(i&1u)?-.4f:.4f;
+        }
+    }
+    const auto stripSourcePlan=game_fvf_native_original_point_source(
+        true,true,5u,static_cast<std::uint32_t>(longStrip.size()),6144u);
+    assert(stripSourcePlan.supported);
+    std::vector<ClipVertex> wholeStripPoints;
+    assert(game_fvf_clipped_point_vertices(
+        longStrip,nullptr,static_cast<std::uint32_t>(longStrip.size()),
+        5u,1u,1u,stripSourcePlan.maxExpandedPoints,lerp,wholeStripPoints));
+    assert(wholeStripPoints.size()>6144u &&
+           wholeStripPoints.size()%3u==0u);
+    assert(game_fvf_native_point_batch_plan(
+        wholeStripPoints.size(),6144u,
+        stripSourcePlan.maxExpandedPoints).draws>=2u);
+
+        thinClippedSource[2].clip[1]=0.f;
     assert(!game_fvf_clipped_point_vertices(
         thinClippedSource,nullptr,3u,4u,1u,1u,64u,lerp,
         thinNativePoints)); // mathematically zero projected polygon

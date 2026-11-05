@@ -9366,13 +9366,38 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // in bounded native DrawIndexed windows. The entire source IB was
         // validated above BEFORE the first GPU mutation. Failed later GPU
         // windows abort native frame publication; D3D9 still renders.
+        // Whole-source point fill must traverse the authentic fan/strip
+        // exactly once. The older per-2048-face polygon split could make an
+        // entirely clipped FIRST window return false and abandon later
+        // visible menu/car/race faces. The clipped POINTLIST builder now
+        // preflights the original source IA and streams complete GPU VB
+        // windows itself; preserve one source ordinal and one native frame.
+        const auto originalPointSource = game_fvf_native_original_point_source(
+            fullMode, output.nativePointFill,
+            static_cast<std::uint32_t>(type), expectedElements, kMaxVertices);
         const bool oversizedFan = type == D3DPT_TRIANGLEFAN &&
             std::uint64_t(primitives) * 3u > kMaxIndices;
         const bool oversizedPointStrip = type == D3DPT_TRIANGLESTRIP &&
             output.nativePointFill &&
             std::uint64_t(primitives) * 3u > kMaxIndices;
         const std::uint64_t issuedBeforeFvf = s.issued;
-        if (oversizedFan || oversizedPointStrip) {
+        if (originalPointSource.supported) {
+            // Do not partition a genuine source fan/strip before clipping.
+            // Its complete point output, including globally ordered fan
+            // anchors, strip winding, user-plane intersections and texture
+            // attributes, is transactionally validated inside submit().
+            // A single supported source Draw may issue several D3D11 Draw
+            // windows, but is recorded once only after all windows succeed.
+            if (!submit(s, vertices, indices, indexCount, type,
+                        capture, output)) {
+                s.frameBatch.abort();
+                ++s.failed;
+            } else {
+                s.frameBatch.succeeded(output.nativeDepthTest,
+                                       output.nativeDepthOrderingMode != 0u);
+                s.frameBatch.record_source_draw(sourceOrdinal);
+            }
+        } else if (oversizedFan || oversizedPointStrip) {
             const auto windowPlan = game_fvf_polygon_window_plan(
                 static_cast<std::uint32_t>(type), expectedElements,
                 kMaxIndices, 128u);

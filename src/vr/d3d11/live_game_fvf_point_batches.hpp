@@ -63,6 +63,33 @@ game_fvf_native_point_batch_plan(std::size_t total,
     return triangles * kMaxPointsPerSourceTriangle;
 }
 
+// The source-frame owner must NOT split a real D3D9 point-filled fan/strip
+// into independent polygon windows before full homogeneous/user-plane clip.
+// A wholly clipped early window is a valid source no-op, not evidence that
+// later source triangles are missing. Full-source CPU preflight and native
+// VB streaming happen as one original game Draw/DrawIndexed transaction.
+struct GameFvfNativeOriginalPointSource {
+    bool supported = false;
+    std::uint32_t sourceTriangles = 0u;
+    std::uint32_t maxExpandedPoints = 0u;
+};
+[[nodiscard]] constexpr GameFvfNativeOriginalPointSource
+game_fvf_native_original_point_source(
+    bool fullFrame, bool pointFill, std::uint32_t topology,
+    std::uint32_t sourceElements, std::uint32_t maxSourceElements) noexcept {
+    if (!fullFrame || !pointFill || (topology != 5u && topology != 6u))
+        return {};
+    const std::uint32_t expanded =
+        game_fvf_native_point_expansion_budget(
+            topology, sourceElements, maxSourceElements);
+    if (!expanded) return {};
+    return {true, sourceElements - 2u, expanded};
+}
+static_assert(game_fvf_native_original_point_source(
+    true, true, 6u, 3253u, 6144u).sourceTriangles == 3251u);
+static_assert(!game_fvf_native_original_point_source(
+    false, true, 6u, 3253u, 6144u).supported);
+
 // Every triangle-aligned CPU-clipped point window uploads into the same
 // dynamic D3D11 VB using a GPU-safe WRITE_DISCARD rename. Invalid plans do
 // not mutate the caller's outputs or partially consume source geometry.
