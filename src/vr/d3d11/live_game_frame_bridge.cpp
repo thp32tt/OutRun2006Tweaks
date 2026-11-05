@@ -21,6 +21,7 @@
 #include "live_game_fvf_polygon_windows.hpp"
 #include "live_game_fvf_point_cull.hpp"
 #include "live_game_fvf_point_clip.hpp"
+#include "live_game_fvf_point_batches.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
@@ -7694,6 +7695,7 @@ bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
     // Complete the entire CPU plan before allocating/binding native GPU IA.
     std::vector<std::uint32_t> pointIndices;
     std::vector<NativeVertex> clippedPointVertices;
+    GameFvfNativePointBatchPlan clippedPointBatches{};
     const std::vector<NativeVertex>* drawVertices = &sourceVertices;
     if (output.nativePointFill) {
         if (sourceVertices.size() > (std::numeric_limits<UINT>::max)())
@@ -7736,13 +7738,31 @@ bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
                 }
                 return v;
             };
+            // A clipped FVF triangle can generate multiple authentic point
+            // occurrences. The source IA remains bounded at kMaxVertices,
+            // but a 6144-point native upload can overflow even when the
+            // original game Draw and every source clip plane are valid.
+            // Preflight ALL CPU-clipped points before ANY GPU work; permit a
+            // bounded 4x expansion only for the full-size opt-in path.
+            // D3D11 receives consecutive POINTLIST windows (each multiple
+            // of three), preserving source triangle order, stage UVs, depth,
+            // blend and the original D3D9 Draw/input fallback.
+            constexpr UINT kMaxExpandedPointVertices = kMaxVertices * 4u;
+            const UINT totalBudget = env_full_game_opt_in()
+                ? kMaxExpandedPointVertices : kMaxVertices;
             if (!game_fvf_clipped_point_vertices(
                     sourceVertices, indices, sourceElements,
                     static_cast<std::uint32_t>(topology),
                     static_cast<std::uint32_t>(output.nativeCullMode),
-                    output.nativeFvfUserClipMask, kMaxVertices,
+                    output.nativeFvfUserClipMask, totalBudget,
                     interpolate, clippedPointVertices))
                 return false; // original D3D9 Draw/FFB unaffected
+            clippedPointBatches = game_fvf_native_point_batch_plan(
+                clippedPointVertices.size(), kMaxVertices,
+                kMaxExpandedPointVertices);
+            if (!clippedPointBatches.supported ||
+                (!env_full_game_opt_in() && clippedPointBatches.draws != 1u))
+                return false;
             drawVertices = &clippedPointVertices;
             indices = nullptr;
             indexCount = 0u;
@@ -8619,7 +8639,19 @@ bool submit(State& s, const std::vector<NativeVertex>& sourceVertices,
                       offsetof(NativeVertex, clip0), output.nativeFvfUserClipMask}
                 : NativeRawFvfClipSpan{});
     }
-    if (ib) ctx->DrawIndexed(indexCount, 0, 0);
+    if (clippedPointBatches.supported && clippedPointBatches.draws > 1u) {
+        // The complete CPU plan and one shared GPU VB were committed above.
+        // Issue every ordered point window on the same IA/OM/DSV; each Draw
+        // starts at a genuine triangle (three POINTLIST occurrences). Keep
+        // one source ordinal and one PRE/POST GPU capture per original call.
+        for (UINT first = 0u; first < clippedPointBatches.totalVertices;
+             first += clippedPointBatches.verticesPerDraw) {
+            const UINT count = (std::min)(
+                clippedPointBatches.verticesPerDraw,
+                clippedPointBatches.totalVertices - first);
+            ctx->Draw(count, first);
+        }
+    } else if (ib) ctx->DrawIndexed(indexCount, 0, 0);
     else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
     // GPU submission is paired with the queued readback at Present.
     s.pending = true;

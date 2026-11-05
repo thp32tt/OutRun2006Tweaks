@@ -1,5 +1,6 @@
 #include "vr/d3d11/live_game_fvf_point_cull.hpp"
 #include "vr/d3d11/live_game_fvf_point_clip.hpp"
+#include "vr/d3d11/live_game_fvf_point_batches.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -594,6 +595,54 @@ int main() {
         multiPlaneSource,nullptr,3u,4u,1u,17u,96u,
         lerp,multiPlaneNative));
     assert(multiPlaneNative.size()==preservedMultiPlane.size());
+
+    // 01251: a real source FVF polygon's generated point vertices can
+    // exceed the 6144-vertex *single* D3D11 upload window even though every
+    // original source triangle fits. Complete the source clip transaction
+    // before issuing ordered, triangle-aligned GPU Draw windows.
+    std::vector<ClipVertex> expandedSource;
+    for (unsigned n=0u;n<4u;++n)
+        expandedSource.insert(expandedSource.end(),
+                              thinClippedSource.begin(),
+                              thinClippedSource.end());
+    std::vector<ClipVertex> expandedPoints;
+    assert(game_fvf_clipped_point_vertices(
+        expandedSource,nullptr,12u,4u,1u,1u,48u,lerp,expandedPoints));
+    assert(expandedPoints.size()==24u); // four clipped quads -> 8 triangles
+    const auto plan=game_fvf_native_point_batch_plan(
+        expandedPoints.size(),9u,48u);
+    assert(plan.supported && plan.totalVertices==24u &&
+           plan.verticesPerDraw==9u && plan.draws==3u);
+    std::size_t processed=0u;
+    for (unsigned i=0u;i<plan.draws;++i) {
+        const auto count=(std::min)(
+            std::size_t(plan.verticesPerDraw),
+            std::size_t(plan.totalVertices)-processed);
+        assert(count%3u==0u && count>=3u);
+        for (std::size_t j=processed;j<processed+count;++j) {
+            assert(expandedPoints[j].clip[3]>0.f);
+            assert(expandedPoints[j].clip[0]<=expandedPoints[j].clip[3]);
+            assert(expandedPoints[j].clip0[0]>=0.f);
+            assert(expandedPoints[j].uv[0]>=0.f &&
+                   expandedPoints[j].uv[0]<=1.f);
+        }
+        processed+=count;
+    }
+    assert(processed==expandedPoints.size());
+    assert(!game_fvf_native_point_batch_plan(24u,9u,23u).supported);
+    assert(!game_fvf_native_point_batch_plan(25u,9u,48u).supported);
+    assert(!game_fvf_native_point_batch_plan(24u,2u,48u).supported);
+    assert(!game_fvf_native_point_batch_plan(0u,9u,48u).supported);
+    const auto stableExpanded=expandedPoints;
+    const std::uint32_t badExpandedIndices[]{
+        0u,1u,2u,3u,4u,5u,6u,7u,8u,9u,10u,99u};
+    assert(!game_fvf_clipped_point_vertices(
+        expandedSource,badExpandedIndices,12u,4u,1u,1u,48u,lerp,
+        expandedPoints));
+    assert(expandedPoints.size()==stableExpanded.size());
+    assert(!game_fvf_clipped_point_vertices(
+        expandedSource,nullptr,12u,4u,1u,1u,23u,lerp,expandedPoints));
+    assert(expandedPoints.size()==stableExpanded.size());
 
     thinClippedSource[2].clip[1]=0.f;
     assert(!game_fvf_clipped_point_vertices(
