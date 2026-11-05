@@ -28,3 +28,11 @@
 - External V6 loading is guarded by VR+stereo+driver-seat+gameplay and player Dino car kind 1, with no loading on car selection screen.
 - Restore existing `dinput8.dll` and INI from user's backup to roll back. To disable sidecar alone set `[VR] DinoExternalCockpit=false` and restart.
 - Static file validation: `PASS`. Physical Windows/Quest 3 gameplay, car selection stability, alignment, performance and crash verification: `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-11-06 copy-and-run packaging fix
+- User-visible failure from the older prepared installer: `[FAILED] Unpack DinoFitV6_R26_Test inside game folder containing OR2006C2C.exe`.
+- That installer flow is retired for FitV6 R26 testing. The supported package layout is now flat: every payload file is stored at ZIP root and is extracted directly beside `OR2006C2C.EXE`.
+- Source-of-truth packaging helpers: `tools/cockpit/dino_v15_external/build_fitv6_r26_flat_package.py` and `RUN-FITV6-R26.cmd`.
+- Fixed conversation package: `OutRun2_VR_R26_Dino246_FitV6_COPY_AND_RUN_FIXED_20261106.zip`, size 19,683,049 bytes, SHA-256 `f9cadbc868379d37214a86f2586f6e39fe54b2e20dd0f0d89b392fd0e73f97ac`.
+- Static package validation: flat ZIP PASS; required root files PASS; original `OR2006C2C.EXE` absent PASS; V6 OVC2 SHA/CRC unchanged PASS; R26 `dinput8.dll` SHA unchanged PASS.
+- Runtime validation remains `UNTESTED` until physical Windows/Quest 3 execution.
