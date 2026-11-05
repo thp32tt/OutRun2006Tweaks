@@ -51,10 +51,10 @@
       "ORIGINAL_D3D9_PRESENT_INPUT_FFB_FALLBACK"
     ],
     "live_game_draw_path": [
-      "LIVE_ORIGINAL_D3D9_CALLSITE",
-      "ACTUAL_NATIVE_D3D11_DRAW",
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
       "OWNED_GPU_SOURCE_CROPS",
-      "VISIBLE_DIAGNOSTIC_PRESENT_ONLY_WHEN_GPU_RGB_PROVED"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "batch_components": [
       "CLIPPED_POLYGON_ALL_BOUNDARIES_CXX",
@@ -68,8 +68,9 @@
       "component_integration": "native_game_raw_fvf_clip_capture.hpp -> native_game_raw_fvf_island_sampling.hpp -> native_game_raw_visual_diagnostic.hpp -> D3D11 CopySubresourceRegion PRE/POST GPU source proof -> original D3D9 Present."
     },
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY; real desktop native Draw/published frame and Quest3/VDXR optics not tested.",
-    "activation_guard_and_fallback": "RAW diagnostic remains opt-in; no implicit conversion path promotion. DX9Ex game, original input/FFB, owner/RT/epoch/fence, and DXVK freeze unchanged."
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY; LIVE_D3D9_CALLSITE and D3D11_NATIVE_DRAW are C++ source stages, OWNED_GPU_SOURCE_CROPS and VISIBLE_FRAME_OUTPUT are strictly conditional opt-in diagnostics after real native RGB PRE/POST+original D3D9 Present proof. Real desktop native Draw/published frame and Quest3/VDXR optics not tested.",
+    "activation_guard_and_fallback": "RAW diagnostic remains opt-in; no implicit conversion path promotion. DX9Ex game, original input/FFB, owner/RT/epoch/fence, and DXVK freeze unchanged.",
+    "record_normalization": "01243 causal CI repair only: restore mandated canonical source-path stage identifiers for 01242's previously verified C++ path; does not add runtime or gameplay evidence, does not alter 01242 material SHA or score."
   },
   "feature_contract": {
     "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
