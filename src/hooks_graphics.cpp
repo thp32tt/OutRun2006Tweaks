@@ -879,13 +879,25 @@ public:
 
     bool apply() override
     {
+        // Canonical emoose v0.1 replacement EXE SHA256:
+        // 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
+        // Exact RVA 0x521C0 bytes were re-read from that binary. Fail closed
+        // on any other executable or a previously detoured entrypoint.
+        constexpr std::array<std::uint8_t,24> signature{{
+            0x83,0xEC,0x08,0x53,0x55,0x56,0x57,0xE8,
+            0x54,0xF0,0xFB,0xFF,0x50,0xE8,0xBE,0x7D,
+            0xFB,0xFF,0xA1,0x60,0xBD,0x89,0x00,0x8B
+        }};
         auto* entry=Module::exe_ptr<std::uint8_t>(RaceSkyDisplayRva);
         MEMORY_BASIC_INFORMATION info{};
         if(!entry ||
            VirtualQuery(entry,&info,sizeof(info))!=sizeof(info) ||
            info.State!=MEM_COMMIT || (info.Protect&PAGE_GUARD) ||
-           (info.Protect&PAGE_NOACCESS)) {
-            spdlog::warn("VR WORLD SKY: original 4521C0 entry unavailable; exact sky owner disabled");
+           (info.Protect&PAGE_NOACCESS) ||
+           reinterpret_cast<std::uintptr_t>(entry)+signature.size() >
+             reinterpret_cast<std::uintptr_t>(info.BaseAddress)+info.RegionSize ||
+           !std::equal(signature.begin(),signature.end(),entry)) {
+            spdlog::warn("VR WORLD SKY: canonical original 4521C0 signature mismatch; exact sky owner disabled");
             return false;
         }
         RaceSkyDisplayHook=safetyhook::create_inline(entry,RaceSkyDisplayDest);
