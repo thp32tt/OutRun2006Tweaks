@@ -136,7 +136,7 @@ def safe_hd_reference(root, row, plan, output):
     }
 
 
-def build_queue(root, report, out_dir, skip_state_root=None):
+def build_queue(root, report, out_dir, skip_state_root=None, reuse_only=True):
     root = Path(root).resolve()
     out_dir = Path(out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -166,6 +166,10 @@ def build_queue(root, report, out_dir, skip_state_root=None):
     for row, reason in ordered:
         role = row["roles"]
         eligible[role] += 1
+        if reuse_only:
+            # Existing imported A/B image pixels are the only authorized inputs.
+            # Preserve HOLD accounting but never create new ImageGen tickets.
+            continue
         if len(selected) >= MAX_ACTIVE or selected_counts[role] >= MAX_PER_ROLE:
             continue
         candidate = root / row["_candidate_rel"]
@@ -222,7 +226,9 @@ def build_queue(root, report, out_dir, skip_state_root=None):
         "hold_categories": dict(sorted(count.items())),
         "ab_eligible_counts": dict(sorted(eligible.items())),
         "reference_blockers": dict(sorted(blockers.items())),
-        "selection_policy": "IMAGEGEN FALLBACK ONLY; 8 TOTAL MAX; 4 PER ROLE; SHA-DEDUPE BEFORE CHAT SEND",
+        "selection_policy": ("EXISTING_A_B_PNG_ONLY_NO_NEW_IMAGEGEN" if reuse_only
+                             else "IMAGEGEN FALLBACK ONLY; 8 TOTAL MAX; 4 PER ROLE"),
+        "new_imagegen_disabled": bool(reuse_only),
         "tasks": selected,
     }
     (out_dir/"queue.json").write_text(json.dumps(q,ensure_ascii=False,sort_keys=True,indent=2)+"\n",encoding="utf-8")
@@ -235,8 +241,10 @@ if __name__ == "__main__":
     ap.add_argument("--qa-report",required=True)
     ap.add_argument("--out",required=True)
     ap.add_argument("--skip-state-root",default=None)
+    ap.add_argument("--reuse-only",action="store_true",default=True,
+                    help="Existing A/B PNG adjustment only; no new ImageGen tickets")
     args=ap.parse_args()
     print(json.dumps({k:v for k,v in build_queue(
         args.repo_root,json.loads(Path(args.qa_report).read_text(encoding="utf-8")),
-        args.out,args.skip_state_root).items() if k in ("hold_count","hold_categories","ab_eligible_counts","reference_blockers")},
+        args.out,args.skip_state_root,reuse_only=args.reuse_only).items() if k in ("hold_count","hold_categories","ab_eligible_counts","reference_blockers")},
         ensure_ascii=False))
