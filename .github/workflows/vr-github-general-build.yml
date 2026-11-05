@@ -369,19 +369,25 @@ jobs:
               # '-File does not exist' error.
               Remove-Item -LiteralPath 'QuestCockpit-CopyRun.ps1' -Force
               & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
-              if($LASTEXITCODE -ne 92){throw "missing-launcher guard returned $LASTEXITCODE instead of 92"}
+              $probeExit=$LASTEXITCODE
+              if($probeExit -ne 92){throw "missing-launcher guard returned $probeExit instead of 92"}
+              $global:LASTEXITCODE=0
               Copy-Item -LiteralPath (Join-Path $thinFull 'QuestCockpit-CopyRun.ps1') -Destination . -Force
 
               Remove-Item -LiteralPath 'QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json' -Force
               & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
-              if($LASTEXITCODE -ne 93){throw "missing-payload guard returned $LASTEXITCODE instead of 93"}
+              $probeExit=$LASTEXITCODE
+              if($probeExit -ne 93){throw "missing-payload guard returned $probeExit instead of 93"}
+              $global:LASTEXITCODE=0
               Copy-Item -LiteralPath (Join-Path $thinFull 'QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json') -Destination 'QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json' -Force
 
               # Missing nested runner must be rejected by the PowerShell
               # payload verifier before any game-folder mutation.
               Remove-Item -LiteralPath 'QUEST_APK_COPYRUN_PAYLOAD\scripts\Run-OutRunVRTest.ps1' -Force
               & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
-              if($LASTEXITCODE -eq 0){throw 'missing Run-OutRunVRTest.ps1 helper was not rejected'}
+              $probeExit=$LASTEXITCODE
+              if($probeExit -eq 0){throw 'missing Run-OutRunVRTest.ps1 helper was not rejected'}
+              $global:LASTEXITCODE=0
             } finally {
               Pop-Location
               Remove-Item -LiteralPath $cmdProbe -Recurse -Force -ErrorAction SilentlyContinue
