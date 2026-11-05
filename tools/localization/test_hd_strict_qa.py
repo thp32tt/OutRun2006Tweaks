@@ -122,6 +122,60 @@ class StrictHDQualityTests(unittest.TestCase):
         self.assertTrue(any("REFLOW_EXISTING_CANDIDATE_1_TO_2_LINES" in x
                             for x in painted[0]["auto_salvage"]))
 
+    def test_partial_roi_overlap_reuses_existing_pixels_only_when_native_ink_disjoint(self):
+        # Two overlapping metadata rectangles; actual native source glyph
+        # bounding boxes are separate. No newly generated lettering is needed.
+        src = source_dds()
+        image = Image.new("RGBA", (256, 128), (0, 0, 0, 0))
+        drawer = ImageDraw.Draw(image)
+        drawer.rectangle((10, 15, 39, 30), fill=(255, 255, 255, 255))
+        drawer.rectangle((70, 60, 99, 75), fill=(255, 255, 255, 255))
+        raw = src[:128] + image.tobytes("raw", "BGRA")
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            candidate_file(repo / "first.png")
+            candidate_file(repo / "second.png")
+            rows = [
+                {"roi_id": "Q012_1234567890abcdef", "english": "ONE",
+                 "korean": "하나", "_bbox": [4, 6, 70, 48],
+                 "_candidate_rel": "first.png"},
+                {"roi_id": "Q012_fedcba0987654321", "english": "TWO",
+                 "korean": "둘", "_bbox": [45, 36, 117, 99],
+                 "_candidate_rel": "second.png"},
+            ]
+            data, final, clean, painted, holds = strict.process_strict_atlas(
+                raw, rows, repo, "NORMAL", native.native_image,
+                native.imported_candidate, native.conflicting_rois,
+                native.dominant_container_holds)
+        self.assertIsNotNone(data)
+        self.assertFalse(holds)
+        self.assertEqual(len(painted), 2)
+        self.assertEqual(final.getpixel((55, 40)), (0, 0, 0, 0))
+        self.assertTrue(any("OVERLAPPING_ROI_REUSED_ONLY" in x
+                            for x in painted[1]["auto_salvage"]))
+        for placed in painted:
+            original = placed["original_native_lines"][0]
+            translated = placed["translated_native_lines"][0]
+            self.assertGreaterEqual(translated[0], original[0])
+            self.assertGreaterEqual(translated[1], original[1])
+            self.assertLessEqual(translated[2], original[2])
+            self.assertLessEqual(translated[3], original[3])
+
+    def test_partial_roi_overlap_with_shared_native_ink_stays_held(self):
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            candidate_file(repo / "candidate.png")
+            rows = [row(), dict(row(), roi_id="Q012_fedcba0987654321")]
+            data, _, _, painted, holds = strict.process_strict_atlas(
+                source_dds(), rows, repo, "NORMAL", native.native_image,
+                native.imported_candidate, native.conflicting_rois,
+                native.dominant_container_holds)
+        self.assertIsNone(data)
+        self.assertFalse(painted)
+        self.assertEqual(len(holds), 2)
+        self.assertTrue(all(h["reason"] == "ROI_OVERLAP_NEEDS_MANUAL_QA"
+                            for h in holds))
+
     def test_source_two_lines_candidate_two_is_separate_fit(self):
         data, _, _, painted, holds = self.run_case(source_dds(multiline=True), multiline=True)
         self.assertIsNotNone(data)
