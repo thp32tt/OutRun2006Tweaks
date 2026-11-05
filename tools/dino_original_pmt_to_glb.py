@@ -151,7 +151,7 @@ def decode_object(asset, oi):
             raise ValueError("invalid format index")
         vf, stride, ixoff, voff, nic, nvert = fmts[fidx]
         for alpha, first, count in ((0, first0, count0), (1, first1, count1)):
-            if first + count > h[10]:
+            if count and first + count > h[10]:
                 raise ValueError("invalid material group interval")
             for mgi in range(first, first + count):
                 mg = unpack(sys, "<8I", q[10] + mgi * 32)
