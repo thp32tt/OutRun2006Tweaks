@@ -59,7 +59,15 @@
       "positive_probe": "Native FVF tiny-positive-W index+interpolated clipping regression; Fast run 41962534023 SUCCESS",
       "negative_regression": "W=0 incomplete source, all-zero vector, malformed index and user-plane NaN fall back; Fast run SUCCESS",
       "component_integration": "Both affected functions are called by live_game_frame_bridge.cpp native game Draw conversion; exact SHA Backend/Build/OpenXR/HUD Gates SUCCESS"
-    }
+    },
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY: original D3D9 Draw/DrawIndexed FVF point-filled source -> native D3D11 POINTLIST Draw -> authentic native GPU source RGB PRE/POST -> conditional original D3D9 Present fallback; previously reported exact-SHA build only, no measured game-visible menu/vehicle/race pixels or Quest3 HMD.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in and original source/RT/epoch/pixel provenance are required for diagnostic publication; no production native renderer promotion. Native IA, interpolation, point clipping and raster failure retain original game D3D9 Draw, input, wheel FFB, DX9Ex fallback; DXVK remains frozen."
   },
   "feature_contract": {
     "feature_id": "DX11:LIVE_FVF_POINT_FILL_TINY_POSITIVE_W_SOURCE_INTEGRATION",
@@ -163,5 +171,6 @@
   "code_changed_sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
   "next_implementation_action": "Continue missing real menu -> vehicle selection -> race native game Draw/Present and OpenXR stereo integration from latest HEAD, keep DX9Ex fallback/FFB and DXVK frozen; physical HMD test separate.",
   "prior_hold_reason": "C6_NOT_COMPLETE",
-  "prior_hold_resolution": "C6_PASS_EXACT_SHA_RECORDED"
+  "prior_hold_resolution": "C6_PASS_EXACT_SHA_RECORDED",
+  "inherited_causal_ci_repair": "01245 Fast/Backend identified omitted 01244 gameplay source path/visible acceptance/fallback C6 contract fields; source SHA, historical 5-Gate PASS, prior score and runtime UNTESTED unchanged. This is no independent source achievement."
 }
