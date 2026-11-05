@@ -40,6 +40,8 @@ namespace Settings
 	// gets composited into the right eye as a translucent ghost.
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRStereo;
+    extern Setting<float> VRWorldScale;
+    extern Setting<float> VRStereoDepth;
 	extern Setting<bool> VRTelemetry;
 	extern Setting<bool> VRMirrorFitDesktop;
     extern Setting<bool> VRMirrorPreserveAspect;
