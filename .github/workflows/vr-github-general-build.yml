@@ -261,6 +261,70 @@ jobs:
           Compress-Archive -Path "$pkg/*" -DestinationPath $zip -Force
           "GENERAL_ZIP=$zip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
+          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
+            # This is the ONLY zip intended for "copy into existing game
+            # folder and double-click". The general build above includes
+            # top-level INI/helpers; never call that a no-overwrite install.
+            $thin='build-general/cockpit-copyrun'
+            New-Item -ItemType Directory -Force $thin | Out-Null
+            $entrypoints=@(
+              'RUN-QUEST-APK-COCKPIT.cmd',
+              'RUN-QUEST-APK-SKY-DIAG.cmd',
+              'RUN-QUEST-APK-INTERP-OFF.cmd',
+              'RESTORE-QUEST-APK-COCKPIT.cmd',
+              'QuestCockpit-CopyRun.ps1',
+              'QuestCockpit-CopyRestore.ps1',
+              'QUEST-APK-COPYRUN-README.txt'
+            )
+            foreach($entry in $entrypoints) {
+              Copy-Item -LiteralPath (Join-Path $pkg $entry) -Destination $thin -Force
+            }
+            Copy-Item -LiteralPath (Join-Path $pkg 'QUEST_APK_COPYRUN_PAYLOAD') -Destination $thin -Recurse
+            $allow=@($entrypoints) + @('QUEST_APK_COPYRUN_PAYLOAD')
+            $actual=@(Get-ChildItem -LiteralPath $thin | ForEach-Object {$_.Name})
+            if(@(Compare-Object -ReferenceObject $allow -DifferenceObject $actual).Count -ne 0){
+              throw 'Unexpected file in copy-run ZIP staging root'
+            }
+            # Copy-run must not replace existing root DLLs, DXVK, config,
+            # user.ini, game EXE or art merely by ZIP extraction.
+            foreach($unsafe in @('dinput8.dll','d3d9.dll','outrun-vr-host.exe',
+                'OutRun2006Tweaks.ini','OutRun2006Tweaks.user.ini',
+                'OutRun2006Tweaks.lods.ini','OR2006C2C.EXE',
+                'Start-OutRun.cmd','ACTIVE_VR_BACKEND.txt')) {
+              if(Test-Path -LiteralPath (Join-Path $thin $unsafe)){
+                throw "Unsafe root file in cockpit-only ZIP: $unsafe"
+              }
+            }
+            $copyRunZip="build-general/OutRun2_QuestCockpitV2_COPY_RUN_$env:GITHUB_SHA.zip"
+            Compress-Archive -Path "$thin/*" -DestinationPath $copyRunZip -Force
+            Add-Type -AssemblyName System.IO.Compression
+            $archive=[IO.Compression.ZipFile]::OpenRead((Resolve-Path $copyRunZip).Path)
+            try {
+              $names=@($archive.Entries | ForEach-Object {$_.FullName.Replace('\\','/')})
+              foreach($entry in $entrypoints) {
+                if($entry -notin $names){throw "Copy-run ZIP missing entrypoint: $entry"}
+              }
+              if('QUEST_APK_COPYRUN_PAYLOAD/IDENTITY.json' -notin $names){
+                throw 'Copy-run ZIP missing payload identity'
+              }
+              foreach($name in $names) {
+                if($name -match '(^|/)\\.\\.(/|$)' -or $name.StartsWith('/')){
+                  throw "Unsafe archive path: $name"
+                }
+              }
+            } finally { $archive.Dispose() }
+            "COCKPIT_COPYRUN_ZIP=$copyRunZip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          }
+
+      - name: Upload cockpit copy-run ZIP
+        if: github.ref_name == 'vr-quest-cockpit-v2'
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-QuestCockpitV2-COPY-RUN-${{ github.sha }}
+          path: ${{ env.COCKPIT_COPYRUN_ZIP }}
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Upload test ZIP
         uses: actions/upload-artifact@v4
         with:
