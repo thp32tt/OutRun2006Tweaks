@@ -255,6 +255,24 @@ jobs:
             $manifest|ConvertTo-Json|Set-Content (Join-Path $copy 'IDENTITY.json') -Encoding ascii
             & (Join-Path (Resolve-Path $pkg) 'QuestCockpit-CopyRun.ps1') -VerifyOnly
             if(-not $?){throw 'copy-run payload integrity verification failed'}
+
+            # Exercise the actual user-facing CMD entrypoints under cmd.exe.
+            # VERIFY never needs OR2006C2C.EXE and never changes game files.
+            # This catches quoting, %~dp0 path resolution, -File routing,
+            # payload discovery and accidental positional-argument regressions.
+            Push-Location $pkg
+            try {
+              foreach($cmd in @(
+                'RUN-QUEST-APK-COCKPIT.cmd',
+                'RUN-QUEST-APK-SKY-DIAG.cmd',
+                'RUN-QUEST-APK-INTERP-OFF.cmd',
+                'RESTORE-QUEST-APK-COCKPIT.cmd')) {
+                & $env:ComSpec /d /c ('"' + $cmd + '" VERIFY')
+                if($LASTEXITCODE -ne 0){
+                  throw "copy-run CMD verification failed: $cmd exit=$LASTEXITCODE"
+                }
+              }
+            } finally { Pop-Location }
           }
           'GITHUB_HOSTED_GENERAL_CLEAN' | Set-Content (Join-Path $pkg 'BUILD_CLASS.txt') -Encoding ascii
           $zip="build-general/OutRun2_VR_GITHUB_GENERAL_$env:GITHUB_SHA.zip"
