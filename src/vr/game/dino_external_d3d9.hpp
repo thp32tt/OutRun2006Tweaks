@@ -30,6 +30,9 @@ class GpuOwner final {
     std::vector<IDirect3DTexture9*> textures_{};
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
+    // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
+    // textures on every eye Draw. Retry only after Reset/device change.
+    IDirect3DDevice9* rejectedDevice_=nullptr; // borrowed, equality only
     static bool ReadFile(const wchar_t* path,std::vector<std::uint8_t>& out) {
         HANDLE f=CreateFileW(path,GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,
                             FILE_ATTRIBUTE_NORMAL,nullptr);
@@ -108,6 +111,11 @@ class GpuOwner final {
         textures_.clear();
         owner_=nullptr;
     }
+    bool RejectGpu(IDirect3DDevice9* device) noexcept {
+        ReleaseGpu();
+        rejectedDevice_=device;
+        return false;
+    }
     bool EnsureLoaded() {
         if(loadAttempted_)return loaded_;
         loadAttempted_=true;
@@ -131,6 +139,10 @@ class GpuOwner final {
     }
     bool EnsureGpu(IDirect3DDevice9* dev) {
         if(!dev || !EnsureLoaded())return false;
+        if(rejectedDevice_==dev)return false;
+        // A different device may have valid allocations. Never retain the
+        // rejection of a retired device as the owner of a newly seen one.
+        if(rejectedDevice_!=dev)rejectedDevice_=nullptr;
         if(owner_==dev && meshes_.size()==cpu_.meshes.size() &&
            textures_.size()==cpu_.textures.size())return true;
         ReleaseGpu();
@@ -141,7 +153,7 @@ class GpuOwner final {
         textures_.resize(cpu_.textures.size(),nullptr);
         for(std::size_t material=0;material<cpu_.textures.size();++material) {
             if(!UploadDDS(dev,cpu_.textures[material],&textures_[material])) {
-                ReleaseGpu();return false;
+                return RejectGpu(dev);
             }
         }
         for(const auto& m:cpu_.meshes) {
@@ -158,17 +170,17 @@ class GpuOwner final {
                     D3DPOOL_DEFAULT,&next.ib,nullptr))) {
                 if(next.vb)next.vb->Release();
                 if(next.ib)next.ib->Release();
-                ReleaseGpu();return false;
+                return RejectGpu(dev);
             }
             void* vData=nullptr;
             void* iData=nullptr;
             if(FAILED(next.vb->Lock(0,vertexBytes,&vData,0)) || !vData) {
-                next.vb->Release();next.ib->Release();ReleaseGpu();return false;
+                next.vb->Release();next.ib->Release();return RejectGpu(dev);
             }
             std::memcpy(vData,m.vertices.data(),vertexBytes);
             next.vb->Unlock();
             if(FAILED(next.ib->Lock(0,indexBytes,&iData,0)) || !iData) {
-                next.vb->Release();next.ib->Release();ReleaseGpu();return false;
+                next.vb->Release();next.ib->Release();return RejectGpu(dev);
             }
             if(m.index32)
                 std::memcpy(iData,m.indices.data(),indexBytes);
@@ -189,10 +201,10 @@ public:
     ~GpuOwner(){ReleaseGpu();}
     GpuOwner(const GpuOwner&)=delete;
     GpuOwner& operator=(const GpuOwner&)=delete;
-    void OnDeviceReset() noexcept {ReleaseGpu();}
+    void OnDeviceReset() noexcept {ReleaseGpu();rejectedDevice_=nullptr;}
     bool Loaded() const noexcept {return loaded_;}
     bool EnsureResources(IDirect3DDevice9* device) noexcept {
-        try{return EnsureGpu(device);}catch(...){ReleaseGpu();return false;}
+        try{return EnsureGpu(device);}catch(...){return RejectGpu(device);}
     }
     // Only call during an active BeginScene with correct per-eye RT and depth
     // already bound by the owning VR renderer. No BeginScene/EndScene here.
