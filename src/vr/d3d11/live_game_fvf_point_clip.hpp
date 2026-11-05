@@ -59,11 +59,20 @@ template<class Vertex, class Interpolate>
             V va{},vb{},vc{};
             if (!load(source[a],va)||!load(source[b],vb)||
                 !load(source[c],vc)) return false;
-            // A wholly invisible triangle cannot contribute point pixels.
+            // A wholly visible positive-W FVF polygon must preserve the
+            // ORIGINAL GPU eye plane W>0, even when all three W values are
+            // smaller than 1e-5. The synthetic epsilon plane is needed only
+            // when the actual source polygon crosses W<=0, where clipping
+            // protects finite perspective division and vertex interpolation.
+            const bool crossesEyePlane =
+                va.vertex.clip[3] <= 0.0f ||
+                vb.vertex.clip[3] <= 0.0f ||
+                vc.vertex.clip[3] <= 0.0f;
             // All source indices and active user-plane values were validated
             // first, including negative/zero W world-space game vertices.
             bool invisible=false;
             for (unsigned p=0u;p<13u;++p) {
+                if (p==12u && !crossesEyePlane) continue;
                 if (p>=6u && p<12u && !(userMask & (1u<<(p-6u))))
                     continue;
                 invisible |= va.plane[p]<0 && vb.plane[p]<0 && vc.plane[p]<0;
@@ -72,10 +81,12 @@ template<class Vertex, class Interpolate>
             std::vector<V> polygon{va,vb,vc};
             // The source WVP transform deliberately retains behind-eye and
             // eye-plane corners. NDC x/w and y/w are meaningless there:
-            // first intersect W>=epsilon, then the D3D9 homogeneous six
-            // planes and finally enabled D3D9 user clip planes.
+            // for a real eye crossing first intersect W>=epsilon, then
+            // the D3D9 homogeneous six planes and enabled user clip planes.
+            // Fully positive-W source polygons never use this synthetic guard.
             for (unsigned order=0u;order<13u;++order) {
                 const unsigned p=order==0u?12u:order-1u;
+                if (p==12u && !crossesEyePlane) continue;
                 if (p>=6u && p<12u && !(userMask & (1u<<(p-6u))))
                     continue;
                 if (polygon.empty()) break;

@@ -53,10 +53,11 @@ namespace outrun::vr::dx11::live_game_frame {
         std::memcpy(clip, bytes + std::size_t{sourceIndex} * stride,
                     sizeof(clip));
         for (float f : clip) if (!std::isfinite(f)) return false;
-        // Positive W is required for authentic perspective and winding.
-        // Do not mistake an eye-plane crossing for a trivially invisible
-        // triangle: only THREE valid vertices can prove outside coverage.
-        if (!(clip[3] > 0.00001f)) return false;
+        // The original native FVF Draw accepts every finite positive W,
+        // including projected menu/HUD geometry below 1e-5. Only W<=0
+        // needs homogeneous eye-plane clipping by the separate full-polygon
+        // path. Reject it here; never turn a crossing into raw POINTLIST.
+        if (!(clip[3] > 0.0f)) return false;
         const double x = double{clip[0]}, y = double{clip[1]};
         const double z = double{clip[2]}, w = double{clip[3]};
         out.clipPlane = {w + x, w - x, w + y, w - y, z, w - z,

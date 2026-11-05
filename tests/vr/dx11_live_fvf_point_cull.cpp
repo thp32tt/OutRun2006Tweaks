@@ -192,6 +192,65 @@ int main() {
     assert(build(backface,6u,order,6u,4u,2u,0u,out));
     assert((out==std::vector<std::uint32_t>{3,4,5}));
 
+
+    // 01244: source D3D9 FVF triangles with tiny but strictly positive W
+    // already rasterize through native D3D11 and GPU RGB capture. The
+    // POINT-fill lowering must not discard them via a fixed 1e-5 plane.
+    Vertex tinyPositive[]{
+        {{-5.e-8f,-5.e-8f,5.e-8f,1.e-7f},{1,1,1,1,1,1}},
+        {{ 5.e-8f,-5.e-8f,5.e-8f,1.e-7f},{1,1,1,1,1,1}},
+        {{-5.e-8f, 5.e-8f,5.e-8f,1.e-7f},{1,1,1,1,1,1}}
+    };
+    const std::uint32_t tinyIndexed[]{0u,1u,2u,2u,1u,0u};
+    assert(build(tinyPositive,3u,tinyIndexed,6u,4u,1u,1u,out));
+    assert((out==std::vector<std::uint32_t>{0,1,2,2,1,0}));
+    assert(build(tinyPositive,3u,tinyIndexed,6u,4u,2u,1u,out));
+    assert((out==std::vector<std::uint32_t>{0,1,2}));
+    const auto savedTiny=out;
+    tinyPositive[2].clip[3]=0.f; // crossing requires full point clip, not IA
+    assert(!build(tinyPositive,3u,tinyIndexed,6u,4u,2u,1u,out));
+    assert(out==savedTiny);
+    tinyPositive[2].clip[3]=1.e-7f;
+    tinyPositive[1].clipDistances[0]=std::numeric_limits<float>::quiet_NaN();
+    assert(!build(tinyPositive,3u,tinyIndexed,6u,4u,2u,1u,out));
+    assert(out==savedTiny);
+    tinyPositive[1].clipDistances[0]=1.f;
+
+    // The actual clipped-point VS attribute path must independently accept
+    // the same positive-W source polygon and interpolate its real UV payload
+    // when one corner crosses a regular homogeneous XY plane. User-plane
+    // clipping still operates, and failed IA never mutates prior GPU points.
+    std::vector<ClipVertex> tinyPointSource{
+        {{-5.e-8f,-5.e-8f,5.e-8f,1.e-7f},{1,1,1,1},{1,1,0,0},{0,0}},
+        {{ 5.e-8f,-5.e-8f,5.e-8f,1.e-7f},{1,1,1,1},{1,1,0,0},{1,0}},
+        {{-5.e-8f, 5.e-8f,5.e-8f,1.e-7f},{1,1,1,1},{1,1,0,0},{0,1}}
+    };
+    std::vector<ClipVertex> tinyPointDest;
+    assert(game_fvf_clipped_point_vertices(
+        tinyPointSource,nullptr,3u,4u,1u,1u,64u,lerp,tinyPointDest));
+    assert(tinyPointDest.size()==3u);
+    for (const auto& v:tinyPointDest) {
+        assert(v.clip[3]>0.f && v.clip[3]<1.e-5f);
+        assert(v.clip0[0]>=0.f && v.uv[0]>=0.f && v.uv[0]<=1.f);
+    }
+    tinyPointSource[1].clip[0]=2.e-7f; // regular X homogeneous clip
+    assert(game_fvf_clipped_point_vertices(
+        tinyPointSource,nullptr,3u,4u,1u,1u,64u,lerp,tinyPointDest));
+    assert(tinyPointDest.size()==4u);
+    for (const auto& v:tinyPointDest) {
+        assert(v.clip[3]>0.f && v.clip[3]<1.e-5f);
+        assert(v.clip[0]<=v.clip[3]+1.e-12f);
+    }
+    const auto savedTinyPoints=tinyPointDest;
+    for (auto& v:tinyPointSource) v.clip0[0]=-1.f;
+    assert(!game_fvf_clipped_point_vertices(
+        tinyPointSource,nullptr,3u,4u,1u,1u,64u,lerp,tinyPointDest));
+    assert(tinyPointDest.size()==savedTinyPoints.size());
+    for (auto& v:tinyPointSource) v.clip0[0]=1.f;
+    for (unsigned p=0u;p<4u;++p) tinyPointSource[0].clip[p]=0.f;
+    assert(!game_fvf_clipped_point_vertices(
+        tinyPointSource,nullptr,3u,4u,1u,1u,64u,lerp,tinyPointDest));
+    assert(tinyPointDest.size()==savedTinyPoints.size());
     // A real world-space WVP game triangle can straddle the eye plane.
     // GPU D3D11 triangle clipping would retain its visible polygon, while
     // the old CPU point-fill path discarded the entire original game Draw
