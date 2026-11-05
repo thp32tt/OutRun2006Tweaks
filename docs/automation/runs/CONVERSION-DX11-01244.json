@@ -20,7 +20,7 @@
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "record_type": "C6_RESULT_ONLY",
-  "checkpoint": "C6_COMPLETE",
+  "checkpoint": "C6_STATE",
   "score_change": 1,
   "score_note": "New connected D3D9 FVF point-fill lowering/native clipped POINTLIST source acceptance (not 01243 PRE/POST sampler). AI2 2593 +1 =2594, scoreboard commit 068c9409d7c444bb73dfbbbe36a072040a800bce; no point on C6, retry or duplicate Gate.",
   "full_dx11_renderer_complete": false,
@@ -155,11 +155,13 @@
   ],
   "runtime_evidence": null,
   "runtime_note": "No real desktop original OutRun game run or Quest3/VDXR HMD at this source SHA; native_draw_count, actual full frame visible publication and HMD pacing UNTESTED. Static CI/Win32 build does not prove actual gameplay parity.",
-  "c6_note": "Docs-only checkpoint recorded AFTER all five exact-source-SHA Gates success; [skip ci] only on C6 bookkeeping commit, not material result SHA. No duplicate Gate rerun. Scoreboard single independent +1 only, AI1 separate.",
+  "c6_note": "C6 bookkeeping re-aligned to checkpoint=C6_STATE for already-verified native FVF point-fill material SHA 0d837095e4c22262c1f87122b39e4aab87f93cbe; previous hold C6_NOT_COMPLETE resolved. Mandatory five exact-SHA Gates previously SUCCESS; no source, CI or material SHA change; original score history preserved without duplicate credit. RUNTIME_VALIDATION=UNTESTED.",
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "NATIVE_REAL_GAME_MENU_VEHICLE_RACE_VISIBLE_FRAME_RUNTIME_NOT_MEASURED",
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "code_changed_sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
-  "next_implementation_action": "Continue missing real menu -> vehicle selection -> race native game Draw/Present and OpenXR stereo integration from latest HEAD, keep DX9Ex fallback/FFB and DXVK frozen; physical HMD test separate."
+  "next_implementation_action": "Continue missing real menu -> vehicle selection -> race native game Draw/Present and OpenXR stereo integration from latest HEAD, keep DX9Ex fallback/FFB and DXVK frozen; physical HMD test separate.",
+  "prior_hold_reason": "C6_NOT_COMPLETE",
+  "prior_hold_resolution": "C6_PASS_EXACT_SHA_RECORDED"
 }
