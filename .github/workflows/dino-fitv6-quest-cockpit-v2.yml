@@ -6,6 +6,7 @@ on:
       - 'src/hooks_graphics.cpp'
       - 'src/vr/game/dino_external_*.hpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/vr/d3d9/ex_device_upgrade.cpp'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'QuestCockpit-CopyRun.ps1'
       - 'RUN-QUEST-APK-DINO-FITV6.cmd'
@@ -39,6 +40,14 @@ jobs:
           assert 'player != Game::pl_car()' in hook
           assert 'player->car_kind_11 != 1' in hook
           assert 'DrawNativeScene(' in hook and 'DrawNativeScene(' in dino
+          assert 'PrepareDinoFitV6(player)' in hook
+          assert 'auto dino=PrepareDinoFitV6(player);' in hook
+          assert hook.index('auto dino=PrepareDinoFitV6(player);') < hook.index('PlayerCallbackHook.ccall<void>(player);')
+          assert 'DrawPreparedDinoFitV6(dino);' in hook
+          assert 'DinoGameplayResourceArmed' in hook
+          ex=Path('src/vr/d3d9/ex_device_upgrade.cpp').read_text()
+          assert 'GlobalGpu().OnDeviceReset();' in ex
+          assert ex.index('GlobalGpu().OnDeviceReset();') < ex.index('deviceEx->ResetEx(&effective, fullscreenPtr);')
           assert 'R26DinoSidecarTryDraw' not in hook
           assert 'OriginalQuestGameCameraState' in seat
           assert "'-VR.DinoExternalCockpit=true'" in runner
