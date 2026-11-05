@@ -331,6 +331,48 @@ jobs:
                 }
               }
             } finally { $archive.Dispose() }
+
+            # Verify the exact thin staging directory that upload-artifact
+            # publishes. Duplicate it into a path containing spaces so
+            # %~dp0 and quoted -File paths match real user installs.
+            $thinFull=(Resolve-Path $thin).Path
+            $cmdProbe=Join-Path (Resolve-Path 'build-general').Path 'copy run CMD probe with spaces'
+            if(Test-Path -LiteralPath $cmdProbe){Remove-Item -LiteralPath $cmdProbe -Recurse -Force}
+            New-Item -ItemType Directory -Force -Path $cmdProbe | Out-Null
+            Copy-Item -Path (Join-Path $thinFull '*') -Destination $cmdProbe -Recurse -Force
+            Push-Location $cmdProbe
+            try {
+              foreach($cmd in @(
+                'RUN-QUEST-APK-COCKPIT.cmd',
+                'RUN-QUEST-APK-SKY-DIAG.cmd',
+                'RUN-QUEST-APK-INTERP-OFF.cmd',
+                'RESTORE-QUEST-APK-COCKPIT.cmd')) {
+                & $env:ComSpec /d /c ('"' + $cmd + '" VERIFY')
+                if($LASTEXITCODE -ne 0){throw "thin COPY-RUN CMD verification failed: $cmd exit=$LASTEXITCODE"}
+              }
+
+              # Fault injection: missing top-level launcher/payload files must
+              # fail with the explicit CMD guards, not an opaque PowerShell
+              # '-File does not exist' error.
+              Remove-Item -LiteralPath 'QuestCockpit-CopyRun.ps1' -Force
+              & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              if($LASTEXITCODE -ne 92){throw "missing-launcher guard returned $LASTEXITCODE instead of 92"}
+              Copy-Item -LiteralPath (Join-Path $thinFull 'QuestCockpit-CopyRun.ps1') -Destination . -Force
+
+              Remove-Item -LiteralPath 'QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json' -Force
+              & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              if($LASTEXITCODE -ne 93){throw "missing-payload guard returned $LASTEXITCODE instead of 93"}
+              Copy-Item -LiteralPath (Join-Path $thinFull 'QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json') -Destination 'QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json' -Force
+
+              # Missing nested runner must be rejected by the PowerShell
+              # payload verifier before any game-folder mutation.
+              Remove-Item -LiteralPath 'QUEST_APK_COPYRUN_PAYLOAD\scripts\Run-OutRunVRTest.ps1' -Force
+              & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              if($LASTEXITCODE -eq 0){throw 'missing Run-OutRunVRTest.ps1 helper was not rejected'}
+            } finally {
+              Pop-Location
+              Remove-Item -LiteralPath $cmdProbe -Recurse -Force -ErrorAction SilentlyContinue
+            }
             "COCKPIT_COPYRUN_ZIP=$copyRunZip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           }
 
