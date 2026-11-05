@@ -64,11 +64,17 @@ def linked(s):
         # Large game-authored FVF fan/point-strip IBs now have a third,
         # bounded indexed GPU window success path. Every accepted window
         # still uses the same alpha-test b0/AlphaGate as other native Draws.
+        # 01253: source-authentic clipped point fan/strip must keep one
+        # native frame/alpha-test chain across every GPU streaming window,
+        # even when its old first polygon window had no visible points.
+        and "const auto originalPointSource = game_fvf_native_original_point_source(" in observer
+        and "if (originalPointSource.supported) {" in observer
+        and "if (!submit(s, vertices, indices, indexCount, type,\n                        capture, output)) {" in observer
         and "if (oversizedFan || oversizedPointStrip)" in observer
         and "if (!game_fvf_build_polygon_window(" in observer
         and "!submit(s, vertices, window.data()," in observer
         and "if (!success) {" in observer
-        and observer.count("s.frameBatch.succeeded(output.nativeDepthTest,") == 3
+        and observer.count("s.frameBatch.succeeded(output.nativeDepthTest,") == 4
         and observer.count("s.frameBatch.abort();") >= 3
         and "return optedIn;" in s
     )
@@ -96,6 +102,12 @@ def main():
          "if (false /* fan native submit removed */"),
         ("if (!submit(s, vertices, indices, indexCount, type, capture, output)) {",
          "if (false /* indexed native submit removed */) {"),
+        ("const auto originalPointSource = game_fvf_native_original_point_source(",
+         "const auto originalPointSource = disconnected_point_path("),
+        ("if (originalPointSource.supported) {",
+         "if (false /* whole-source FVF points suppressed */) {"),
+        ("if (!submit(s, vertices, indices, indexCount, type,\n                        capture, output)) {",
+         "if (false /* clipped point native Draw removed */) {"),
         ("if (oversizedFan || oversizedPointStrip)",
          "if (false /* window draw deleted */)"),
         ("if (!game_fvf_build_polygon_window(",

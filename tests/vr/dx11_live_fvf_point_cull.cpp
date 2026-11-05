@@ -1,6 +1,7 @@
 #include "vr/d3d11/live_game_fvf_point_cull.hpp"
 #include "vr/d3d11/live_game_fvf_point_clip.hpp"
 #include "vr/d3d11/live_game_fvf_point_batches.hpp"
+#include "vr/d3d11/live_game_fvf_polygon_windows.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -745,6 +746,7 @@ int main() {
             longFan[i].clip[1]=(i&1u)?-.4f:.4f;
         }
     }
+    longFan[0].clip[1]=0.f; // Nondegenerate authentic fan anchor
     // The legacy split handed only this entirely clipped 2048-face prefix
     // to submit(), which returned false, aborting the full native frame.
     const auto firstFanWindow=game_fvf_polygon_window_plan(
@@ -805,8 +807,9 @@ int main() {
         longStrip[i]={{2.f,(i&1u)?-.3f:.3f,.5f,1.f},
                       {1.f,1.f,1.f,1.f},{1.f,1.f,1.f,1.f},
                       {float(i)/float(longStrip.size()),.5f}};
+        longStrip[i].clip[0]=2.f+0.001f*float(i%17u);
         if(i>=2051u && (i%3u)!=0u) {
-            longStrip[i].clip[0]=-.5f;
+            longStrip[i].clip[0]=-.5f+0.05f*float(i%5u);
             longStrip[i].clip[1]=(i&1u)?-.4f:.4f;
         }
     }
