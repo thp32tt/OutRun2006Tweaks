@@ -20,7 +20,8 @@ template<class Vertex, class Interpolate>
     if (source.empty() || source.size()>1048576u ||
         elements<3u || elements>1048576u ||
         (!indices && source.size()!=elements) ||
-        (topology!=4u && topology!=5u) || (topology==4u && elements%3u) ||
+        (topology!=4u && topology!=5u && topology!=6u) ||
+        (topology==4u && elements%3u) ||
         (cull!=1u && cull!=2u && cull!=3u) || (userMask & ~0x3fu) ||
         maxVertices<3u) return false;
     struct V {
@@ -47,8 +48,14 @@ template<class Vertex, class Interpolate>
         const unsigned triangles=topology==4u?elements/3u:elements-2u;
         fresh.reserve((std::min)(maxVertices,triangles*3u));
         for (unsigned t=0u;t<triangles;++t) {
-            const unsigned ai=topology==4u?3u*t:t+(t&1u);
-            const unsigned bi=topology==4u?ai+1u:t+1u-(t&1u);
+            // The original fan anchor is the first IA occurrence, even
+            // for an indexed fan whose first index is not vertex zero.
+            // Clipped polygons carry color, both UV stages and clip planes
+            // through interpolation before any native GPU POINTLIST write.
+            const unsigned ai=topology==4u?3u*t:
+                topology==6u?0u:t+(t&1u);
+            const unsigned bi=topology==4u?ai+1u:
+                topology==6u?t+1u:t+1u-(t&1u);
             const unsigned ci=topology==4u?ai+2u:t+2u;
             const auto idx=[indices](unsigned i) noexcept {
                 return indices?indices[i]:i;

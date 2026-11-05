@@ -22,13 +22,14 @@ namespace outrun::vr::dx11::live_game_frame {
     std::size_t clipDistanceOffset, std::uint32_t clipDistanceMask,
     std::uint32_t maxIndices,
     std::vector<std::uint32_t>& destination) noexcept {
-    // D3D9: TRIANGLELIST=4, TRIANGLESTRIP=5, CULL_CW=2, CULL_CCW=3.
+    // D3D9: TRIANGLELIST=4, TRIANGLESTRIP=5, TRIANGLEFAN=6.
+    // CULL_CW=2, CULL_CCW=3.
     // CULL_NONE=1 still requires source clip classification before POINTLIST.
     if (!packed || stride < 4u * sizeof(float) || stride > 4096u ||
         !vertexCount || vertexCount > 1048576u ||
         vertexCount > (std::numeric_limits<std::size_t>::max)() / stride ||
         elements < 3u || elements > 1048576u ||
-        (topology != 4u && topology != 5u) ||
+        (topology != 4u && topology != 5u && topology != 6u) ||
         (cullMode != 1u && cullMode != 2u && cullMode != 3u) ||
         (topology == 4u && elements % 3u != 0u) ||
         (clipDistanceMask & ~0x3fu) ||
@@ -82,9 +83,13 @@ namespace outrun::vr::dx11::live_game_frame {
         next.reserve(std::size_t{triangles} * 3u);
         for (std::uint32_t t = 0u; t < triangles; ++t) {
             // D3D9 strip odd triangles swap their first two IA corners.
+            // Fan primitives reuse the original first source occurrence;
+            // strips alone alternate IA winding. Keep indexed fan anchors
+            // (not vertex zero) and emit each authentic corner occurrence.
             const std::uint32_t first = topology == 4u ? 3u * t :
-                                         t + (t & 1u);
+                                         topology == 6u ? 0u : t + (t & 1u);
             const std::uint32_t second = topology == 4u ? first + 1u :
+                                          topology == 6u ? t + 1u :
                                           t + 1u - (t & 1u);
             const std::uint32_t third = topology == 4u ? first + 2u :
                                          t + 2u;

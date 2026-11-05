@@ -49,6 +49,43 @@ int main() {
     assert((out == std::vector<std::uint32_t>{0,1,2, 2,1,3}));
     assert(build(tri,3u,both,6u,4u,1u,0u,out));
     assert((out == std::vector<std::uint32_t>{0,1,2, 2,1,0}));
+    // 01245: Original indexed and non-indexed TRIANGLEFAN in D3DFILL_POINT.
+    // The first source/index occurrence is reused for every source face;
+    // unlike a strip, a fan never alternates winding. Point fill emits
+    // THREE GPU points per surviving triangle, preserving the shared anchor.
+    Vertex fan[]{
+        {{-.5f,-.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .5f,-.5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{ .5f, .5f,.5f,1.f},{1,1,1,1,1,1}},
+        {{-.5f, .5f,.5f,1.f},{1,1,1,1,1,1}}
+    };
+    assert(build(fan,4u,nullptr,4u,6u,2u,0u,out));
+    assert((out==std::vector<std::uint32_t>{0,1,2,0,2,3}));
+    assert(build(fan,4u,nullptr,4u,6u,1u,0u,out));
+    assert((out==std::vector<std::uint32_t>{0,1,2,0,2,3}));
+    const std::uint32_t reversedFan[]{0u,3u,2u,1u};
+    assert(build(fan,4u,reversedFan,4u,6u,3u,0u,out));
+    assert((out==std::vector<std::uint32_t>{0,3,2,0,2,1}));
+    // Indexed anchor is intentionally not vertex zero.
+    const std::uint32_t movedAnchor[]{2u,3u,0u,1u};
+    assert(build(fan,4u,movedAnchor,4u,6u,2u,0u,out));
+    assert((out==std::vector<std::uint32_t>{2,3,0,2,0,1}));
+    const auto safeFan=out;
+    // A partly clipped later fan triangle requires new vertices; the fast
+    // indexed plan must reject without publishing an incomplete Draw.
+    fan[3].clip[0]=-2.f;
+    assert(!build(fan,4u,movedAnchor,4u,6u,2u,0u,out));
+    assert(out==safeFan);
+    fan[3].clip[0]=-.5f;
+    fan[3].clipDistances[0]=-1.f;
+    assert(!build(fan,4u,movedAnchor,4u,6u,2u,1u,out));
+    assert(out==safeFan);
+    fan[3].clipDistances[0]=1.f;
+    const std::uint32_t badFan[]{2u,3u,0u,99u};
+    assert(!build(fan,4u,badFan,4u,6u,2u,0u,out));
+    assert(out==safeFan);
+    assert(!build(fan,4u,movedAnchor,4u,6u,2u,0u,out,5u));
+    assert(out==safeFan);
     // An original source triangle wholly beyond the homogeneous right
     // plane has no point pixels. Its following visible triangle is emitted
     // in the same indexed GPU Draw with its original source IA identifiers.
@@ -288,5 +325,57 @@ int main() {
     assert(!game_fvf_clipped_point_vertices(
         eyeCrossing,nullptr,3u,4u,1u,0u,64u,lerp,eyePoints));
     assert(eyePoints.size()==validEyePoints.size());
+
+    // 01245: The same TRIANGLEFAN must reach native clipped POINT vertices
+    // when an original fan face intersects XY/user/eye planes. The CPU
+    // interpolation preserves the real game UVs; the GPU path still owns
+    // the pixel, while malformed later IB entries leave the old plan intact.
+    std::vector<ClipVertex> fanSource{
+        {{-.5f,-.5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{0,0}},
+        {{ .5f,-.5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{1,0}},
+        {{ .5f, .5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{1,1}},
+        {{-.5f, .5f,.5f,1.f},{1,1,1,1},{1,1,0,0},{0,1}}
+    };
+    std::vector<ClipVertex> fanPoints;
+    assert(game_fvf_clipped_point_vertices(
+        fanSource,nullptr,4u,6u,2u,0u,64u,lerp,fanPoints));
+    assert(fanPoints.size()==6u);
+    assert(game_fvf_clipped_point_vertices(
+        fanSource,reversedFan,4u,6u,3u,0u,64u,lerp,fanPoints));
+    assert(fanPoints.size()==6u);
+    assert(game_fvf_clipped_point_vertices(
+        fanSource,movedAnchor,4u,6u,2u,0u,64u,lerp,fanPoints));
+    assert(fanPoints.size()==6u);
+    fanSource[3].clip[0]=-2.f; // second triangle crosses real XY plane
+    assert(game_fvf_clipped_point_vertices(
+        fanSource,movedAnchor,4u,6u,2u,0u,64u,lerp,fanPoints));
+    assert(fanPoints.size()>=6u);
+    for(const auto& v:fanPoints) {
+        assert(v.clip[0]>=-v.clip[3]-1.e-5f);
+        assert(v.uv[0]>=0.f && v.uv[0]<=1.f);
+        assert(v.uv[1]>=0.f && v.uv[1]<=1.f);
+    }
+    fanSource[3].clip[0]=-.5f;
+    fanSource[3].clip0[0]=-1.f; // original enabled user plane
+    assert(game_fvf_clipped_point_vertices(
+        fanSource,movedAnchor,4u,6u,2u,1u,64u,lerp,fanPoints));
+    for(const auto& v:fanPoints) assert(v.clip0[0]>=-1.e-5f);
+    fanSource[3].clip0[0]=1.f;
+    fanSource[3].clip[3]=-.2f; // real D3D9 perspective eye crossing
+    assert(game_fvf_clipped_point_vertices(
+        fanSource,movedAnchor,4u,6u,1u,0u,64u,lerp,fanPoints));
+    for(const auto& v:fanPoints) assert(v.clip[3]>0.f);
+    const auto savedFanPoints=fanPoints;
+    const std::uint32_t lateBadFan[]{2u,3u,0u,99u};
+    assert(!game_fvf_clipped_point_vertices(
+        fanSource,lateBadFan,4u,6u,1u,0u,64u,lerp,fanPoints));
+    assert(fanPoints.size()==savedFanPoints.size());
+    assert(!game_fvf_clipped_point_vertices(
+        fanSource,movedAnchor,4u,6u,1u,0u,2u,lerp,fanPoints));
+    assert(fanPoints.size()==savedFanPoints.size());
+    fanSource[3].clip[3]=std::numeric_limits<float>::quiet_NaN();
+    assert(!game_fvf_clipped_point_vertices(
+        fanSource,movedAnchor,4u,6u,1u,0u,64u,lerp,fanPoints));
+    assert(fanPoints.size()==savedFanPoints.size());
 
 }
