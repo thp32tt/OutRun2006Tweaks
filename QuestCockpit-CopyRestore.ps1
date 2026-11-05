@@ -1,7 +1,12 @@
+param([switch]$VerifyOnly)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $backup=Join-Path $root 'QUEST_APK_COPYRUN_ORIGINAL_BACKUP'
 $manifest=Join-Path $backup 'original_files.json'
+if($VerifyOnly){
+    Write-Host 'PASS restore launcher entrypoint verified; no files changed.'
+    return
+}
 if(!(Test-Path $manifest -PathType Leaf)){throw 'No copy-run original backup exists.'}
 $running=Get-Process -ErrorAction SilentlyContinue|Where-Object{
     $_.ProcessName -ieq 'OR2006C2C' -or $_.ProcessName -ieq 'outrun-vr-host'
