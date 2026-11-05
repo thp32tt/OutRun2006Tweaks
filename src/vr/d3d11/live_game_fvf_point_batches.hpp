@@ -24,8 +24,13 @@ game_fvf_native_point_batch_plan(std::size_t total,
     if (total == 0u || total % 3u != 0u ||
         total > maxExpanded ||
         total > (std::numeric_limits<std::uint32_t>::max)() ||
-        maxPerDraw < 3u || maxExpanded < maxPerDraw)
+        maxPerDraw < 3u)
         return plan;
+    // The actual clip fan budget can be far SMALLER than the 6144-vertex
+    // GPU IA capacity (one source triangle has at most 42 point vertices).
+    // It still uses one valid Draw; only total > maxExpanded is invalid.
+    // Do not reject legitimate small menu/HUD and race geometry merely
+    // because the device upload window has unused spare capacity.
     const std::uint32_t window = maxPerDraw - (maxPerDraw % 3u);
     if (window < 3u) return plan;
     plan.supported = true;

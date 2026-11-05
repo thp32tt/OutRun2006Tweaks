@@ -647,6 +647,23 @@ int main() {
     // 01252: 1100 real FVF source triangles clip to 6600 original-game
     // POINTLIST occurrences, across an authentic GPU window boundary.
     // Never truncate the original source stream, UVs or user clip planes.
+    // A single true D3D9 clipped source triangle has a maximum generated
+    // envelope of 42 points, below the native 6144-vertex GPU capacity.
+    // Prior batch preflight rejected such legitimate small Draws because
+    // maxExpanded < maxPerDraw. Short draws use exactly one GPU window.
+    const auto smallBudget=game_fvf_native_point_expansion_budget(
+        4u,3u,6144u);
+    assert(smallBudget==42u);
+    const auto shortPlan=game_fvf_native_point_batch_plan(
+        savedThinPoints.size(),6144u,smallBudget);
+    assert(shortPlan.supported && shortPlan.draws==1u &&
+           shortPlan.totalVertices==6u);
+    std::uint32_t shortFirst=99u,shortCount=99u;
+    assert(game_fvf_native_point_batch_window(
+        shortPlan,0u,shortFirst,shortCount));
+    assert(shortFirst==0u && shortCount==6u);
+    assert(!game_fvf_native_point_batch_plan(
+        savedThinPoints.size(),6144u,5u).supported);
     assert(game_fvf_native_point_expansion_budget(4u,6144u,6144u)==86016u);
     assert(game_fvf_native_point_expansion_budget(5u,6144u,6144u)==257964u);
     assert(game_fvf_native_point_expansion_budget(6u,6144u,6144u)==257964u);
