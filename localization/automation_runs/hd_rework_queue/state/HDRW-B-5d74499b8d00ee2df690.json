@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "1e94c9cfffa47fa0f8e73daabb3d5dc65b583402ceb0ab73239cade1fcaeed90",
+  "release_approved": false,
+  "roi_id": "Q046_1aed03d1cf8b7210",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Ancient Ruins",
+    "korean": "에인션트 루인스",
+    "old_candidate_sha256": "1e94c9cfffa47fa0f8e73daabb3d5dc65b583402ceb0ab73239cade1fcaeed90",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 142,
+      "name": "HDRW-B-5d74499b8d00ee2df690_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        280,
+        134
+      ],
+      "sha256": "0e15bf9a78e5136993498333ebf3c9fd143e5393a1e5bc1c8a85f80dd6cf9e69",
+      "source_box_xyxy": [
+        132,
+        870,
+        420,
+        1012
+      ],
+      "source_native_size": [
+        2048,
+        2048
+      ],
+      "width": 288
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q046_1aed03d1cf8b7210",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+    "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "source_native_bbox_xyxy": [
+      140,
+      878,
+      412,
+      1004
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-5d74499b8d00ee2df690"
+  },
+  "task_id": "HDRW-B-5d74499b8d00ee2df690",
+  "updated_utc": "2026-11-05T01:41:50+00:00"
+}
