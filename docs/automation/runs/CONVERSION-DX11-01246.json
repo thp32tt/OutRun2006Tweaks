@@ -1,0 +1,169 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01246",
+  "production_id": "CONVERSION-DX11-01246",
+  "event_id": "CONVERSION-DX11-01246-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "09a0bd2b6dad105853c44a38f61c5d81dc60d8f0",
+  "result_sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+  "material_implementation_sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+  "material_result_sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+  "validation_bearing_result_sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+  "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
+  "classification": "A_INCOMPLETE_AUTHENTIC_FVF_POST_CLIP_GPU_POINT_OCCURRENCES",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 0,
+  "score_note": "Same existing authentic FVF point-fill family as 01244/01245: C++ correctness continuation, regression, five gates and C6 are not independent scored achievements. AI2 GitHub scoreboard latest confirmed 2600; +0 for this task. Other AI score entries remain untouched.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "work_allocation_measured": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp"
+  ],
+  "implementation": "Real game D3D9 FVF D3DFILL_POINT triangles clipped by homogeneous XY/Z, user clip planes and camera eye plane can produce four-or-more-vertex visible polygons. The real native D3D11 POINTLIST previously submitted one point per polygon corner; now the entire source-authentic clipped polygon is fan-triangulated into THREE per-triangle GPU point occurrences, e.g. a clipped quad becomes six native point vertices. All interpolated clip/UV0/UV1/diffuse/specular/user-plane payloads are preserved by copying the same clipped polygon vertices. Preflight full polygon fan count against native upload capacity before touching GPU, preserving original D3D9 Draw/input/FFB on malformed/budget failures.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW",
+      "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_FVF_TRIANGLE_DRAW_DRAWINDEXED",
+      "POST_CLIP_HOMOGENEOUS_AND_USER_PLANE_VERTEX_INTERPOLATION",
+      "CLIPPED_POLYGON_TRIANGLE_FAN_POINT_OCCURRENCE_EXPANSION",
+      "D3D11_NATIVE_POINTLIST_GPU_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE_AND_CONDITIONAL_ORIGINAL_D3D9_PRESENT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "FVF_CXX_POLYGON_POINT_OCCURRENCE_GPU_SOURCE_FIX",
+      "FVF_CXX_SOURCE_UV_CLIP_AND_CAPACITY_NEGATIVE_REGRESSIONS"
+    ],
+    "full_gate_plan": "one_validation_bearing_exact_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY. Native FVF original-game clip/source -> D3D11 POINTLIST and diagnostic PRE/POST source route are source-integrated; original-game native menu/vehicle/race visible frames and real Quest3 VR have NOT been measured on this SHA.",
+    "activation_guard_and_fallback": "Native diagnostic opt-in only. Original D3D9 game Draw, DX9Ex fallback, input/wheel FFB, OpenXR lease/epochs, source RT identity, GPU pixel/fence authentication, SkyGlow and frozen DXVK left unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
+    "goal": "Preserve every real post-clipping triangle corner occurrence at native GPU point-fill rasterization, while retaining original game attributes and fail-closed fallback.",
+    "acceptance_items": [
+      {
+        "id": "clipped_polygon_source_point_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ORIGINAL_FVF_POST_CLIP_D3D11_POINTLIST",
+        "expected_behavior": "Authentic D3D9 game triangle clipped to 4+ vertices lowers to native triangle-fan point occurrences (six for a quad) before the native game GPU Draw."
+      },
+      {
+        "id": "interpolated_source_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "INTERPOLATED_UV_CLIP_SOURCE_AND_BOUNDED_GPU_UPLOAD",
+        "expected_behavior": "All repeated clip/UV/color/plane attributes preserved. Overflow and malformed IA retain last valid plan, original D3D9 game Draw/input/FFB."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Five mandatory Actions succeed on the exact validation-bearing source commit, separate from HMD runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "clipped_polygon_source_point_draw": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #41975267927 SUCCESS; Backend Conversion Gate #41975268112 SUCCESS"
+    },
+    "interpolated_source_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "C++ regression tests execute under focused DX11 Fast Gate #41975267927 SUCCESS; Build #41975267896 SUCCESS"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Fast 41975267927, Backend 41975268112, Build 41975267896, OpenXR 41975275934, HUD 41975267930 all SUCCESS at 779022071ec7c4640249df2039b8ce4c803d35db"
+    }
+  },
+  "source_and_repair_commits": [
+    {
+      "sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+      "kind": "MATERIAL_CXX_SOURCE_AND_REGRESSION",
+      "summary": "Original FVF source post-clipped polygon native point-fill GPU occurrence triangulation and interpolated attribute/budget regressions."
+    }
+  ],
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41975267927,
+      "sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41975268112,
+      "sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41975267896,
+      "sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41975275934,
+      "sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41975267930,
+      "sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "runtime_evidence": null,
+  "runtime_note": "No actual original OutRun 2006 game desktop menu, vehicle-selection, race or Quest3/VDXR session was executed at this source SHA. Native GPU frame counts and game display/parity UNTESTED. CI/source WARP validation cannot prove real GPU/HMD visible gameplay.",
+  "c6_note": "Docs-only checkpoint commit follows completed exact-SHA mandatory 5/5 Actions and already completed push/PR duplicate workflows. Never count CI/C6 as another material result or run the unchanged SHA a second time.",
+  "next_source_file": "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+  "real_game_draw_blocker": "NATIVE_REAL_GAME_MENU_VEHICLE_RACE_VISIBLE_FRAME_RUNTIME_NOT_MEASURED",
+  "native_game_draw_count": null,
+  "native_published_frame_count": null,
+  "code_changed_sha": "779022071ec7c4640249df2039b8ce4c803d35db",
+  "next_implementation_action": "Continue authentic native menu/vehicle/race Draw and source-owned GPU pixel sampling, including point-filled native IA PRE/POST geometry and distinct OpenXR eye submission, under new controller-selected independent task/feature only after terminal result."
+}
