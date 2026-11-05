@@ -47,7 +47,7 @@ int main(){
         const auto start=b.size();b.resize(start+DdsSize,0);
         std::memcpy(b.data()+start,"DDS ",4);
         set32(b,start+4,124);set32(b,start+12,128);
-        set32(b,start+16,128);set32(b,start+28,8);
+        set32(b,start+16,128);set32(b,start+28,8);set32(b,start+76,32);
         std::memcpy(b.data()+start+84,"DXT1",4);
     }
     set32(b,28,static_cast<unsigned>(b.size()-36));
