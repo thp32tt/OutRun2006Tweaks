@@ -270,12 +270,12 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     expanded_draw = fvf.partition(
         "    if (clippedPointBatches.supported && clippedPointBatches.draws > 1u) {")[2].partition(
         "    // GPU submission is paired with the queued readback at Present.")[0]
-    point_helper = (DX11 / "live_game_fvf_point_batches.hpp").read_text(
+    point_helper = (DX11.parent / "live_game_fvf_point_batches.hpp").read_text(
         encoding="utf-8")
     point_regression = (ROOT / "tests" / "vr" / "dx11_live_fvf_point_cull.cpp").read_text(
         encoding="utf-8")
     require(bool(expanded_draw) and
-            re.findall(r"(?:->|\\.)\\s*Draw(?:Indexed)?\\s*\\(", expanded_draw) ==
+            re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", expanded_draw) ==
                 ["->Draw(", "->DrawIndexed(", "->Draw("] and
             all(token in fvf for token in (
                 "const UINT totalBudget = env_full_game_opt_in()",
