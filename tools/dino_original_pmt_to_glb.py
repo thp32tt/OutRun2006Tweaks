@@ -53,7 +53,7 @@ def unpack(data, fmt, off):
 
 def open_pmt(path):
     raw = path.read_bytes()
-    if not raw.startswith((b"\\x78\\x9c", b"\\x78\\xda", b"\\x78\\x01")):
+    if raw[:2] not in (bytes((0x78,0x9c)), bytes((0x78,0xda)), bytes((0x78,0x01))):
         raise ValueError("expected zlib-compressed .sz")
     d = zlib.decompress(raw, max_length=MAX_PMT_BYTES) if hasattr(zlib, "max_length") else zlib.decompress(raw)
     if len(d) > MAX_PMT_BYTES:
@@ -294,7 +294,7 @@ def build_glb(asset, parts, scale, output):
     b += bytes(-len(b) % 4)
     header = struct.pack("<4sII", b"glTF", 2, 12 + 8 + len(j) + 8 + len(b))
     output.write_bytes(header + struct.pack("<I4s", len(j), b"JSON") + j +
-                       struct.pack("<I4s", len(b), b"BIN\\x00") + b)
+                       struct.pack("<I4s", len(b), b"BIN" + bytes((0,))) + b)
     return {"sourceObjects": sorted(set(p["object"] for p in parts)),
             "meshes": len(meshes), "vertices": sum(len(p["vertices"]) for p in parts),
             "triangles": sum(len(p["indices"]) // 3 for p in parts),
