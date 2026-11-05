@@ -1,0 +1,71 @@
+name: Dino v15 External R26 Safe Win32
+on:
+  push:
+    branches: [ 'feature/dino-v15-r26-safe-sidecar-20261105' ]
+    paths:
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/game/dino_external_*.hpp'
+      - 'src/vr/d3d9/dino_external_r26_owner.inc'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/vr/d3d9/ex_device_upgrade_r15.cpp'
+      - 'tools/cockpit/dino_v15_external/**'
+      - 'tests/test_dino_external_*.cpp'
+      - '.github/workflows/dino-v15-r26-safe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  portable:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict parser and source graph contract
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_external_sidecar.cpp -o /tmp/test-dino
+          /tmp/test-dino
+          python3 -m py_compile tools/cockpit/dino_v15_external/build_sidecar.py
+          python3 - <<'PY'
+          from pathlib import Path
+          owner=Path("src/vr/d3d9/dino_external_r26_owner.inc").read_text()
+          stereo=Path("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text()
+          hooks=Path("src/hooks_graphics.cpp").read_text()
+          assert "R29Owner" not in owner
+          assert "dino_external_r26_owner.inc" in stereo
+          assert "R26DinoSidecarTryDraw" in hooks and "VRDinoExternalCockpit" in hooks
+          assert all(s in owner for s in ("R30SafeStereoBase","InternalPassScope","SetRenderTargetHook.stdcall","SetDepthStencilSurfaceHook.stdcall","RestoreRightPassState","R9Poison","R30ArmSafeFallback"))
+          print("DINO_R26_SIDECAR_OWNER_CONTRACT_PASS")
+          PY
+  win32-r26:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure actual R26 HUD graph
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-r26 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=OFF
+          if($LASTEXITCODE -ne 0){throw "R26 configure failed"}
+          $cache=Get-Content build-r26/CMakeCache.txt
+          if($cache -notcontains 'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON'){throw "Wrong VR owner graph"}
+      - name: Compile exact R26 Win32 DLL
+        shell: pwsh
+        run: |
+          cmake --build build-r26 --config Release --target outrun2006tweaks --parallel 4
+          if($LASTEXITCODE -ne 0){throw "R26 DLL build failed"}
+          $dll=Get-ChildItem build-r26 -Recurse -Filter dinput8.dll | Where-Object {$_.FullName -notmatch '_deps'} | Sort-Object Length -Descending | Select-Object -First 1
+          if(-not $dll){throw "Missing R26 DLL"}
+          New-Item -ItemType Directory -Force out-r26 | Out-Null
+          Copy-Item $dll.FullName out-r26/dinput8.dll
+          $bytes=[IO.File]::ReadAllBytes((Resolve-Path out-r26/dinput8.dll))
+          $pe=[BitConverter]::ToInt32($bytes,0x3c)
+          if([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x14c){throw "Not x86 PE"}
+          Get-FileHash out-r26/dinput8.dll -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DinoV15External-R26-Win32
+          path: out-r26/dinput8.dll
+          retention-days: 14
+          if-no-files-found: error
