@@ -182,10 +182,19 @@ def main() -> None:
     assert bridge.count("ctx->DrawIndexed(") == 1
     assert bridge.count("ctx->Draw(") == 2
     assert source_submit.count("ctx->Draw(") == 2
-    assert "if (clippedPointBatches.supported && clippedPointBatches.draws > 1u)" in source_submit
-    assert "first += clippedPointBatches.verticesPerDraw" in source_submit
-    assert "clippedPointBatches.totalVertices - first" in source_submit
-    assert "ctx->Draw(count, first);" in source_submit
+    # One original-game source Draw remains atomic across CPU preflight,
+    # source-bounded clip fan expansion and ordered GPU WRITE_DISCARD windows.
+    # Assert the real data path instead of requiring the obsolete GPU offset
+    # Draw(count,first), which incorrectly reads past the renamed VB window.
+    assert "const bool streamedClippedPoints =" in source_submit
+    assert "clippedPointBatches.supported && clippedPointBatches.draws > 1u" in source_submit
+    assert "const std::size_t uploadVertices = streamedClippedPoints" in source_submit
+    assert "for (UINT window = 0u; window < clippedPointBatches.draws; ++window)" in source_submit
+    assert "game_fvf_native_point_batch_window(" in source_submit
+    assert "if (window != 0u)" in source_submit
+    assert "vertices.data() + first, bytes" in source_submit
+    assert "s.fullGameVertexCapacity" in source_submit
+    assert "ctx->Draw(count, 0u);" in source_submit
     assert "else if (ib) ctx->DrawIndexed(indexCount, 0, 0);" in source_submit
     # A live stage-1 operation must not silently modify stage-0 DIFFUSE.
     # The old boundary accepted such draws while the native shader ignored
