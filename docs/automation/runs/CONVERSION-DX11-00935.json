@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00935",
+  "production_id": "CONVERSION-DX11-00935",
+  "event_id": "CONVERSION-DX11-00935-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00935",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "c6_recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "material_result_sha": "84ad991540f591945e7cc3183a42da75d005deb1",
+  "validation_bearing_result_sha": "88156f513c7103fa66242ffe3b2a7c8221170d98",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Translate actual game-authored D3D9 SM3 VS/PS SINCOS and vertex-only SGN into the native D3D11 HLSL shader generation and live Draw/DrawIndexed path, with conservative TEMP read/write accounting and original D3D9/DX9Ex input and FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_sm3_procedural_math",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_created_sm3_shader_native_gpu_draw",
+        "expected_behavior": "Decode VS3/PS3 SINCOS and VS3 SGN and emit native HLSL sin/cos/sign arithmetic with supported destination masks through the existing live D3D11 GPU draw path."
+      },
+      {
+        "id": "scratch_and_unsupported_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "sm3_physical_TEMP_liveness_and_stage_restrictions",
+        "expected_behavior": "Validate SINCOS angle swizzle, reject undefined output channels, reject SGN scratch alias/invalid TEMP registers, invalidate SGN scratch lanes for later reads, and retain original D3D9 rendering/input/FFB on unsupported combinations."
+      },
+      {
+        "id": "same_sha_required_ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_source_and_regression_ci",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Win32 Build, OpenXR and HUD Inspector conclude success on the same validation-bearing SHA; actual Quest3/VDXR gameplay evidence is separately untested."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "Decode intercepted game D3D9 SM3 SINCOS/SGN operations into native shader instructions",
+      "Generate native GPU HLSL sin/cos/sign with source swizzle, destination mask, and SGN TEMP scratch lifetime validation",
+      "Route supported shader pairs through live D3D11 Draw/DrawIndexed with original D3D9/DX9Ex render/input/FFB fallback for unsupported states"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+      "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+      "tools/test_dx11_live_sm3_draw_00925.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Same SHA required DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector all succeeded.",
+      "negative_regression": "Static/C++ source tests cover unsupported SINCOS write masks, source swizzle and SGN scratch overlap/liveness; unknown cases retain original game rendering.",
+      "component_integration": "Live SM3 bytecode decoding -> native HLSL arithmetic materializer -> existing game-authored native D3D11 GPU shader Draw/DrawIndexed path."
+    },
+    "conflict_keys": [
+      "DX11:SM3_NATIVE_PROCEDURAL_MATH:CONVERSION-DX11-00935"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/build CI verified; real Quest3/VDXR menu/vehicle/race pixel evidence not collected.",
+    "activation_guard_and_fallback": "Diagnostic native opt-in only; original D3D9/DX9Ex renderer, gamepad/FFB authoritative; DXVK frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Previous 00934 C6 was complete at a45a3ff; 00935 source result and exact SHA already committed, but 00935 run record absent (RUN_RECORD_NOT_FOUND).",
+    "C1_REVIEW": "Previously unsupported real-game SM3 SINCOS/SGN procedural math and SGN scratch TEMP read/write lifetime admission; original stage fallback protected.",
+    "C2_IMPLEMENT": "Actual VS3/PS3 procedural math code and C++ regression changes committed at 84ad991540f591945e7cc3183a42da75d005deb1.",
+    "C3_VALIDATE": "Initial 00935 source regression had a test-local uninitialized 'arith' variable; causal same-task repair resulted in 88156f513c7103fa66242ffe3b2a7c8221170d98; five required exact-SHA Actions SUCCESS.",
+    "C4_COMMIT": "material=84ad991540f591945e7cc3183a42da75d005deb1; validation_bearing=88156f513c7103fa66242ffe3b2a7c8221170d98",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA_5_OF_5; COMPLETE_BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED; C6 bookkeeping only [skip ci]."
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Actual game launch, eligible/native draw counters, native full-frame publication and Quest3/VDXR HMD pixels not measured.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "84ad991540f591945e7cc3183a42da75d005deb1",
+  "NEXT_IMPLEMENTATION_ACTION": "Controller to select next independent live-game DX11 frame implementation after this source+CI milestone; do not replay the same exact-SHA validation or score C6 separately.",
+  "acceptance_results": {
+    "native_sm3_procedural_math": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "scratch_and_unsupported_source_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "same_sha_required_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED",
+    "exact_sha": "88156f513c7103fa66242ffe3b2a7c8221170d98",
+    "ci_status": "PASS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "exact_sha_workflow_runs": {
+      "fast": {
+        "run_id": 39166120140,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39166120202,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39166120150,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39166124088,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39166124070,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  },
+  "score_policy": "00935 source implementation and causal CI repair are one achievement; this C6 bookkeeping-only recovery is +0, with no duplicate score and no new validation-bearing SHA."
+}

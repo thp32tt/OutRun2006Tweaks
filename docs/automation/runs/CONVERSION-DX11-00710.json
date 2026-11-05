@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00710",
+  "production_id": "CONVERSION-DX11-00710",
+  "event_id": "CONVERSION-DX11-00710-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_STAGE1_MATCHED_TEXTURE_ALPHA_MENU_RACE",
+  "work_key": "DX11:STAGE1_MATCHED_TEXTURE_ALPHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 Stage1 texture/UV/sampler identity",
+      "D3D11 Stage1 shader RGB and alpha to native Draw/Indexed",
+      "unmatched state original D3D9 Draw and gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_texture_alpha_probe_00710.cpp",
+      "tools/test_dx11_stage1_texture_alpha_00710.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "400 regular and 160 TEMP combinations; five alpha weight samples",
+      "negative_regression": "different texture, texcoords/transform/filter/LOD/sRGB or bad source remains original D3D9",
+      "component_integration": "live game Stage1 capture to mirrored native pixel alpha and native Draw/Indexed"
+    },
+    "conflict_keys": [
+      "DX11:STAGE1_MATCHED_TEXTURE_ALPHA",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR image still untested",
+    "activation_guard_and_fallback": "diagnostic-only native opt-in; original D3D9/gamepad authoritative"
+  },
+  "feature_contract": {
+    "feature_id": "LIVE_STAGE1_MATCHED_TEXTURE_ALPHA_MENU_RACE",
+    "goal": "Carry same-texture Stage1 alpha blends from real game D3D9 menu/race states to native DX11 Draw and preserve fail-closed fallback",
+    "acceptance_items": [
+      {
+        "id": "native-game-alpha",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_state_to_HLSL_native",
+        "expected_behavior": "Stage1 RGB and independent alpha use matched game-texture alpha"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex_original_gamepad",
+        "expected_behavior": "unmatched sampler, UV, texture or source rejected without disturbing original draw"
+      },
+      {
+        "id": "exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "C++_Python_GitHub_Actions",
+        "expected_behavior": "560 source combinations, mutation checks, complete exact SHA gates"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_texture_alpha_probe_00710.cpp",
+    "tools/test_dx11_stage1_texture_alpha_00710.py",
+    "docs/automation/runs/CONVERSION-DX11-00710.json"
+  ],
+  "base_head_sha": "c8a5194bc434f4e76e5582724c9861fe47aaf6fd",
+  "material_result_sha": "18d6929712b21e7c1c091ed5aec6bccbfc5ffd1e",
+  "validation_bearing_result_sha": "e0b48a14df18cbacbdd36f7f4a59e33807420b04",
+  "next_action": "00710 5/5 BUILD_VERIFIED, NEED_HMD_TEST only for visual/gamepad promotion; new independent feature delegated to next controller dispatch, DXVK frozen; do not rescore 00710.",
+  "acceptance_results": {
+    "native-game-alpha": "PASS",
+    "fallback": "PASS",
+    "exact-sha": "PASS"
+  },
+  "pipeline": {
+    "C0_RECOVER": "DONE: baseline c8a5194b 00709 exact-SHA closure, DX11 policy and ledger, disjoint Stage1 resource/sampler alpha feature",
+    "C1_REVIEW": "DONE: Stage1 BLENDTEXTUREALPHA lacked game-authored sampler1 capture/native HLSL path, preserve original DX9Ex gamepad fallback",
+    "C2_IMPLEMENT": "DONE: live game Stage1 texture/UV/sampler exact match; native RGB and independent alpha sampled blend plus 400+160 C++ and structural negative regressions",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast #38505596404 SUCCESS; Backend #38505596362 validate+smoke SUCCESS; Windows Build #38505600737 SUCCESS; OpenXR #38505600797 SUCCESS; HUD #38505600700 SUCCESS at e0b48a14df18cbacbdd36f7f4a59e33807420b04; Quest3/VDXR/gamepad UNTESTED",
+    "C4_COMMIT": "DONE: original material 18d6929712b21e7c1c091ed5aec6bccbfc5ffd1e; same TASK legacy signature and new negative-check repairs 9cdd596a, a70cf6c, e0b48a14; validation-bearing SHA e0b48a14df18cbacbdd36f7f4a59e33807420b04 (no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED: user-controlled runtime deployment and no HMD visual promotion",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED exact-SHA 5/5; separate [skip ci] bookkeeping commit, no runtime promotion"
+  },
+  "gate_evidence": {
+    "initial_material_sha": "18d6929712b21e7c1c091ed5aec6bccbfc5ffd1e",
+    "validation_bearing_sha": "e0b48a14df18cbacbdd36f7f4a59e33807420b04",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38505596404,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38505596362,
+      "conclusion": "SUCCESS",
+      "validation_and_smoke": "PASS"
+    },
+    "windows_build": {
+      "id": 38505600737,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38505600797,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38505600700,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  },
+  "state_persisted": true
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00072",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T01:57:35+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "e8c7ff9940a56a22190308d4f59895bc07f1e5bc",
+  "result_sha": "6c0e4e560602e4458dd7b1778db5e2906cfc4574",
+  "validation_bearing_result_sha": "6c0e4e560602e4458dd7b1778db5e2906cfc4574",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F18 R108 MANAGED Texture2D registry mirror readiness/ownership proof.",
+  "summary": "R108 adds a registry-level observation-only managed-mirror preparation API and a non-binding readiness snapshot. The snapshot proves registered D3D9 texture identity, CPU-shadow validity, concrete D3D11 mirror resource ownership, managed lifetime currentness, exact expected D3D11 device ownership, device generation, CPU-shadow version, mirror generation and mirror shadow version without exposing a raw registry SRV. Hosted validation proves foreign-device rejection, R107 mutation invalidation, LockRect recapture recovery, Reset invalidation and post-Reset generation-correct recreation.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "runtime_census_calls_r108_observation_api": false,
+    "raw_registry_srv_getter": false,
+    "production_ps_set_shader_resources": false,
+    "native_game_draw_routing": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "The generic src/vr startup risk path was reviewed. R108 changes only dormant registry/helper code and hosted probe/verifier behavior; it does not modify D3D9 CreateDevice/Reset/Present activation, DirectGPU transport, R30 renderer ownership or selector flow. Runtime/HMD correctness is not inferred from hosted CI."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36600690575,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T16:56:37Z",
+      "validated_sha": "6c0e4e560602e4458dd7b1778db5e2906cfc4574",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 production build PASS; all DX11 semantic/input-layout/input-signature/object/shader/linkage probes PASS; R108 hosted constant-buffer probe build and run PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36600697202,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T16:57:35Z",
+      "validated_sha": "6c0e4e560602e4458dd7b1778db5e2906cfc4574"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36600697249,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T16:56:58Z",
+      "validated_sha": "6c0e4e560602e4458dd7b1778db5e2906cfc4574",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36600697027,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T16:57:01Z",
+      "validated_sha": "6c0e4e560602e4458dd7b1778db5e2906cfc4574",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36600690428,
+      "conclusion": "skipped",
+      "completed_utc": "2026-09-29T16:50:55Z",
+      "validated_sha": "6c0e4e560602e4458dd7b1778db5e2906cfc4574"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5894702231,
+    "validation_comment_id": 5894813230,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "evidence": [
+    "Result commit message contains exact controller marker [AUTO:CONVERSION-DX11-00072] and no CI-skip directive.",
+    "NativeManagedTextureRegistry::mirror_readiness returns ready only when the exact registered shadow has current managed lifetime state, concrete mirror resources and the expected D3D11 device.",
+    "Hosted probe proves null ownership rejection, positive identity-owned mirror creation, foreign-device rejection, R107 external mutation invalidation, LockRect recapture recovery, Reset invalidation and post-Reset generation-correct recreation.",
+    "The source-graph verifier fails if runtime_census.cpp calls the R108 observation-only mirror preparation/readiness APIs.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R108 is automation-validated but runtime-untested. Registry-level managed mirror readiness can now be proven for exact texture identity, D3D11 device, device generation and shadow version without exposing or binding the SRV.",
+  "next_action": "Continue Set 05 F18 with one bounded non-routing activation prerequisite after R108, such as proving exact per-stage mirror-readiness aggregation without exposing raw SRVs or enabling native draw routing. Preserve R107 mutation invalidation and R108 ownership/device/generation/version gates; keep HMD graphics parity runtime-gated."
+}

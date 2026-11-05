@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00596",
+  "production_id": "CONVERSION-DX11-00596",
+  "event_id": "CONVERSION-DX11-00596-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00596",
+  "work_key": "DX11:MENU_RACE_NATIVE_ADDITIVE_OM",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "2eb22aafc644289f70660ab9d163cfe63ed5115b",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real game D3D9 SRCBLEND/DESTBLEND/BLENDOP capture",
+      "Fail-closed ONE/ONE and SRCALPHA/ONE state selection",
+      "D3D11 exact RGB/alpha OM blend creation and partial color mask binding",
+      "Real game live Draw/DrawIndexed->diagnostic native inset with original D3D9 fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_game_blends_00596.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "257 numeric alpha factors, game blend pair matrix",
+      "negative_regression": "17 producer/consumer destructive mutations + previous alpha/mask tests",
+      "component_integration": "game D3D9 render state->OM native state->Draw/DrawIndexed->diagnostic Present"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_ADDITIVE_OM",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:OM_ADDITIVE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR menu-to-race untested",
+    "activation_guard_and_fallback": "exact opt-in; original game D3D9 Draw/Present/gamepad never replaced"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_game_blends_00596.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00596.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No new HMD-tested distributable candidate in diagnostic-only native Draw path"
+  },
+  "next_action": "Quest3/VDXR real menu, vehicle selection, race, gamepad and diagnostic inset parity remain NEED_HMD_TEST; no production native backend promotion. Controller may choose independent next code feature; do not rerun 00596.",
+  "runtime_evidence": null,
+  "ci_failure_repair": "Backend #38214462953 policy acceptance rejected VISIBLE_FRAME_DIAGNOSTIC; 1st fix cbdda8bba3a123e8f6169fb88244845286bfa009 updated documented live game path to VISIBLE_FRAME_OUTPUT. Build #38214568450 then identified alpha mutation false negative after introduction of a second SRC_ALPHA blend state; 2nd fix 943c5ae8b37406cd6aad19dfdd8032c7851df960 requires both occurrences. Both guards retained; full exact-SHA gates all succeeded.",
+  "material_result_sha": "f51a51ca82650e60964f36b2954fb10bd31eeb76",
+  "validation_bearing_result_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+  "result_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+  "c6_basis_head_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38214680810,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+      "event": "push"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38214685415,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38214680841,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+      "event": "push"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38214685559,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38214685265,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+      "event": "pull_request"
+    }
+  ],
+  "local_validation": [
+    "00596 new native additive OM real game Draw/DrawIndexed source path: GitHub Backend Gate 00596 test SUCCESS with 17 destructive mutations and alpha factor numeric tests",
+    "Previously existing alpha/mask regression repaired to reject duplicate source-alpha blend-factor mutation; Windows Build exact-SHA SUCCESS",
+    "DX11 Fast + Backend validate/readiness + Win32 Build + OpenXR + HUD exact-SHA all SUCCESS"
+  ],
+  "validation_bearing_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run": 38214680810,
+    "backend_gate_jobs": [
+      "validate:SUCCESS",
+      "DX11 readiness smoke probes:SUCCESS"
+    ],
+    "windows_build_run": 38214685415,
+    "windows_build_conclusion": "success",
+    "dx11_fast_run": 38214680841,
+    "dx11_fast_conclusion": "success",
+    "openxr_run": 38214685559,
+    "openxr_conclusion": "success",
+    "hud_run": 38214685265,
+    "hud_conclusion": "success",
+    "result_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960"
+  }
+}

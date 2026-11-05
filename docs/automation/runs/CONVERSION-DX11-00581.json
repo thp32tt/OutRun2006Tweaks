@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00581",
+  "production_id": "CONVERSION-DX11-00581",
+  "event_id": "CONVERSION-DX11-00581-E002",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00581",
+  "base_sha": "ef10982567dad5d70d19519d1f4a4a3ad018cfd3",
+  "work_key": "DX11:MENU_RACE_SELECTARG2_SCALED_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game D3D9 stage0 SELECTARG2 RGB + independent scaled-alpha capture",
+      "Compile native HLSL PS and submit native D3D11 Draw/DrawIndexed to opt-in visible inset"
+    ],
+    "batch_components": [
+      "C++ live source state capture/admission and safe fallback",
+      "Two actual HLSL shaders with D3D11 PS dispatch and 19 destructive integrated regressions",
+      "Resolve verified MSVC C2026 by splitting oversized raw HLSL string and compiling assembled HLSL once per pipeline"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 MODULATE2X/4X independently saturates texture * diffuse alpha before alpha test",
+      "negative_regression": "21 destructive source mutations including full HLSL concatenation and MSVC C2026 string-size regression",
+      "component_integration": "Live D3D9 callsite -> shader capture -> D3D11 Draw/DrawIndexed -> game Present inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SELECTARG2_SCALED_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SELECTARG2_MODULATE2X_4X"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in; default native replacement OFF; DX9Ex original Draw/Present and gamepad remain intact",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "256x144 visible game diagnostic inset code; Quest3/VDXR menu/race/gamepad evidence remains NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_selectarg2_scaled_alpha_00581.py",
+    "docs/automation/runs/CONVERSION-DX11-00581.json"
+  ],
+  "next_action": "Do not retry TASK_ID=CONVERSION-DX11-00581. Controller selects next disjoint native-game draw coverage. Quest3/VDXR and gamepad remain NEED_HMD_TEST, not runtime PASS.",
+  "evidence": {
+    "static_precommit": "source patterns and state/shader selection connected; mandatory test invoked",
+    "runtime_validation": "UNTESTED",
+    "hmd_game_quest3_vdxr_test": "not performed",
+    "gamepad_test": "not performed",
+    "initial_build_failure": {
+      "sha": "ef10982567dad5d70d19519d1f4a4a3ad018cfd3",
+      "workflow_run_id": 38191414351,
+      "job_id": 114624773949,
+      "reason": "MSVC C2026: string too big at raw HLSL literal close (line 374); previous literal ~16.5 KiB"
+    },
+    "repair_static": {
+      "original_single_literal_bytes": 16542,
+      "primary_literal_bytes": 15936,
+      "supplemental_literal_bytes": 648,
+      "method": "runtime one-time HLSL source concatenation; old shader test extraction preserved"
+    },
+    "backend_gate_run_id": 38191856167,
+    "backend_gate_conclusion": "success",
+    "backend_gate_jobs": "validate and DX11 readiness smoke probes succeeded",
+    "dx11_fast_run_id": 38191856178,
+    "dx11_fast_conclusion": "success",
+    "build_run_id": 38191859606,
+    "build_conclusion": "success",
+    "build_feature_acceptance": "DX11 VISIBLE FRAME/SAFE RETURN and scaled-alpha 21 negative mutation checks passed",
+    "openxr_run_ids": [
+      38191856349,
+      38191859648
+    ],
+    "openxr_conclusions": [
+      "success",
+      "success"
+    ],
+    "hud_inspector_run_id": 38191859597,
+    "hud_inspector_conclusion": "success",
+    "repair_validation_sha": "53861a4566857fe773fd496e37c7f33e086cec9b",
+    "original_material_sha": "ef10982567dad5d70d19519d1f4a4a3ad018cfd3",
+    "quest3_vdxr_gamepad_real_game": "NOT_TESTED; native gameplay promotion blocked"
+  },
+  "material_result_sha": "ef10982567dad5d70d19519d1f4a4a3ad018cfd3",
+  "validation_bearing_result_sha": "53861a4566857fe773fd496e37c7f33e086cec9b"
+}

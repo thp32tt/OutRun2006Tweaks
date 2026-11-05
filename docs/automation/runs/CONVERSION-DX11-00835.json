@@ -1,0 +1,156 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00835",
+  "production_id": "CONVERSION-DX11-00835",
+  "event_id": "CONVERSION-DX11-00835-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_GAME_MSAA_GPU_RESOLVE",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "R30_GAME_MENU_VEHICLE_RACE_STEREO_SOURCE_CALLBACK_PENDING",
+  "material_result_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+  "validation_bearing_result_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+  "source_material_commits": [
+    "36eeaa173c241f9522ac88354b9575811df89f8d"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "run_record_recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "score_change": 0,
+  "score_note": "C6 exact-SHA reconciliation and a recovered run-record bookkeeping commit are not independently scored accomplishments. No duplicate score awarded.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "goal": "Replay authentic MSAA source-owned game color render-target pixels into native D3D11 left/right stereo eyes through GPU resolves, including bounded cropped postpasses, without modifying D3D9 rendering/input fallback or claiming full R30 live stereo runtime readiness.",
+    "full_dx11_renderer_complete": false,
+    "acceptance_items": [
+      {
+        "id": "msaa-full-eye-gpu-resolve",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_msaa_full_surface_resolve",
+        "expected_behavior": "Resolve real compatible source multisample GPU render-target pixels directly into the bound native eye when full-eye dimensions match, retaining independent L/R output and real Draw provenance."
+      },
+      {
+        "id": "msaa-partial-postpass-isolated-resolve",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_msaa_cropped_gpu_resolve",
+        "expected_behavior": "Resolve partial menu/vehicle/race source rectangles through a private GPU intermediate before bounded copy, preserving untouched eye regions."
+      },
+      {
+        "id": "msaa-rejection-and-d3d9-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_game_multisample_format_bounds_and_input",
+        "expected_behavior": "Reject incompatible format/dimensions/ownership/sample-count and invalid rectangles; keep all MRT/DSV bindings, untouched eye and original D3D9 StretchRect, gamepad and FFB behavior."
+      },
+      {
+        "id": "msaa-warp-and-github-actions",
+        "category": "integrated_validation",
+        "behavior_area": "native_eye_warp_gpu_pixels_and_exact_sha_checks",
+        "expected_behavior": "WARP GPU pixel and negative-copy regression plus exact-SHA DX11 Fast, Backend, Windows Win32 Release build, OpenXR and HUD CI success."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "msaa-full-eye-gpu-resolve": "PASS_BUILD",
+    "msaa-partial-postpass-isolated-resolve": "PASS_BUILD",
+    "msaa-rejection-and-d3d9-fallback": "PASS_BUILD",
+    "msaa-warp-and-github-actions": "PASS_EXACT_SHA"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38932452135,
+      "head_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38932452154,
+      "head_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+      "conclusion": "success"
+    },
+    "Build (Win32, Release)": {
+      "run_id": 38932456967,
+      "head_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+      "conclusion": "success",
+      "job": "build (Win32, Release)"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38932451991,
+      "head_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38932457141,
+      "head_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38932451969,
+      "head_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture (pull_request)": {
+      "run_id": 38932457170,
+      "head_sha": "36eeaa173c241f9522ac88354b9575811df89f8d",
+      "conclusion": "success"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "Material source commit 36eeaa173c241f9522ac88354b9575811df89f8d is current branch HEAD; task run JSON not found, recovered with RUN_RECORD_NOT_FOUND.",
+    "C1_REVIEW": "Confirmed authored MSAA native stereo eye source change and its exact-SHA workflow results, without source edit.",
+    "C2_IMPLEMENT": "Existing material commit 36eeaa173c241f9522ac88354b9575811df89f8d contains actual MSAA full/partial GPU resolve and WARP regressions; this C6-only replay makes no source changes.",
+    "C3_VALIDATE": "Exact SHA 36eeaa173c241f9522ac88354b9575811df89f8d: DX11 Fast, Backend, Win32 Release Build, OpenXR, HUD and Native Transport WARP all concluded success. No CI rerun.",
+    "C4_COMMIT": "36eeaa173c241f9522ac88354b9575811df89f8d",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA; recovered missing run JSON only with [skip ci]; R30 per-eye live game camera/draw hookup remains pending; Quest3 HMD runtime UNTESTED; score +0."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Resolve game-authored native MSAA color target GPU pixels into distinct owned D3D11 stereo eye render-target resources without CPU roundtrips.",
+      "Replay bounded actual menu or vehicle source GPU postpass into L/R eye outputs while keeping original D3D9 draw and input/FFB paths unchanged.",
+      "Validate the two eye GPU pixel outputs, unsupported sample/format/bounds fallback and full exact-SHA GitHub Actions separately from HMD runtime."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source SHA 36eeaa173c241f9522ac88354b9575811df89f8d: actual full and partial MSAA GPU resolves with Native Transport WARP #38932451969 SUCCESS; same exact-SHA 5 mandatory GitHub gates SUCCESS.",
+      "negative_regression": "MSAA source format, sample count and rectangle rejection, same-device ownership, independent L/R eye target, MRT/DSV restore, original D3D9 gamepad/FFB and DX9Ex fallback preserved in original source and WARP probes.",
+      "component_integration": "NativeGameEyeDrawEncoder::copy_game_surface resolves a game-authored MSAA color target into separate NativeSharedEyeRing L/R eye pixels with GPU-backed copies; R30 camera hookup and Quest3 runtime remain pending."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_GAME_MSAA_GPU_RESOLVE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "DX11 native eye GPU resolve source and WARP pixel correctness only; exact matching R30 menu/vehicle/race Quest3 visual output is NOT validated.",
+    "activation_guard_and_fallback": "No production native draw-path activation; same-device MSAA source and eye ownership, format/extent checks, negative WARP cases and unchanged original DX9Ex Draw/Present/input/FFB fallback.",
+    "remaining_implementation": [
+      "Authentic R30 per-eye camera, VS/PS constants and menu-to-race native stereo Draw connection remain pending",
+      "Matching Quest3/VDXR live-game full-frame stereo and input verification remains UNTESTED"
+    ]
+  }
+}

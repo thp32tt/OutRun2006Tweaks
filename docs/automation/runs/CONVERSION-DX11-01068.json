@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01068",
+  "production_id": "CONVERSION-DX11-01068",
+  "event_id": "CONVERSION-DX11-01068-E001",
+  "event_type": "c6_bookkeeping",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01068",
+  "classification": "B",
+  "feature_id": "DX11:NATIVE_SIGNED_NORMAL_TEXTURE_GAME_DRAW_MIRROR",
+  "work_key": "DX11:NATIVE_SIGNED_NORMAL_TEXTURE_GAME_DRAW_MIRROR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "score_note": "C6-only recovery of existing task; no new source change, no CI rerun, no duplicate score award.",
+  "c6_recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "recovery_note": "Target C4 run JSON was absent in the branch and had no path history. Material SHA and source paths recovered from verified [AUTO:CONVERSION-DX11-01068] material commit; feature contract and acceptance entries reconstructed from that commit's stated behavior and already-completed exact-SHA CI, not copied from a missing original. FEATURE_ID not supplied by dispatch; local descriptive feature identity is reconstructed for schema compatibility.",
+  "summary": "Genuine signed D3D9 normal-map texture families V8U8/Q8W8V8U8/V16U16 preserve signed texels, row/mip pitch, and DXGI SNORM mirror formats through real native game draw shader sampler SRVs and budgeted GPU uploads. Unsupported formats and unproven sRGB fail closed to D3D9Ex with game input/FFB preserved. Five mandatory existing GitHub Actions SUCCESS on validation-bearing exact SHA; actual game/Quest3 HMD output remains UNTESTED.",
+  "material_result_sha": "fc45161d96f54c3ff5be8d6f1c6443eefab03ade",
+  "validation_bearing_result_sha": "e5e8da68fd6e88b423d3da75d37b03b6a0f588ba",
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_signed_normal_texture.hpp",
+    "tools/dx11_signed_normal_game_probe_01068.cpp",
+    "tools/test_dx11_signed_normal_texture_01068.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_SIGNED_NORMAL_TEXTURE_GAME_DRAW_MIRROR",
+    "goal": "Mirror supported original D3D9 signed normal-map families into byte-accurate D3D11 native texture SRVs for real SM3/FVF game Draw/DrawIndexed, preserving physical pitch/mips, GPU budget, input/FFB and original DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "signed_normal_format_fidelity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_SIGNED_NORMAL_TEXELS_TO_NATIVE_DXGI_SNORM",
+        "expected_behavior": "V8U8/Q8W8V8U8/V16U16 signed normal texture bytes map to matching native SNORM formats without BGRA quantization, with physical row/mip pitches preserved."
+      },
+      {
+        "id": "native_game_sampler_binding",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_SM3_FVF_GAME_DRAW_SHADER_SRV",
+        "expected_behavior": "Native per-draw D3D11 shader sampler SRV binding and texture budget account for actual signed-normal GPU texel size in game Draw/DrawIndexed."
+      },
+      {
+        "id": "unsupported_srgb_and_dx9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "NATIVE_UNSUPPORTED_FORMAT_FAIL_CLOSED",
+        "expected_behavior": "Unrecognized source formats and unjustified sRGB mapping reject native texture admission and preserve original D3D9Ex rendering and input/FFB."
+      },
+      {
+        "id": "exact_sha_five_gate",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_FIVE_GITHUB_ACTIONS",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD CI all succeed on one unmodified validation-bearing SHA, including portable positive and destructive regressions."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "signed_normal_format_fidelity": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01068 portable C++ probe and source-path assertions incorporated into DX11 Fast 40199894811; physical game texel parity is UNTESTED.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_signed_normal_texture.hpp",
+        "tools/dx11_signed_normal_game_probe_01068.cpp",
+        "tools/test_dx11_signed_normal_texture_01068.py"
+      ],
+      "validation_command": "Existing GitHub Actions DX11 Fast Structural Checks 40199894811 on exact e5e8da68fd6e88b423d3da75d37b03b6a0f588ba"
+    },
+    "native_game_sampler_binding": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Existing native game frame bridge source-link path, byte-accurate GPU budget regression and compiler/structure checks passed; physical native game Draw/frame counts UNTESTED.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_signed_normal_texture.hpp",
+        "tools/test_dx11_signed_normal_texture_01068.py"
+      ],
+      "validation_command": "Existing DX11 Fast 40199894811 and Windows Build 40199894774"
+    },
+    "unsupported_srgb_and_dx9ex_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Original material commit includes unsupported mapping/sRGB rejection and destructive source tests; integrated CI passed. Actual game input/FFB untested.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_signed_normal_texture.hpp",
+        "tools/test_dx11_signed_normal_texture_01068.py"
+      ],
+      "validation_command": "Existing DX11 Fast 40199894811 and Backend Conversion 40199894782"
+    },
+    "exact_sha_five_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub runs DX11 Fast 40199894811, Backend 40199894782, Build 40199894774, OpenXR 40199894765, HUD 40199894785 all conclusion=success on exact e5e8da68fd6e88b423d3da75d37b03b6a0f588ba. VR PC Fast Test Build 40199894760 skipped by design; no game/HMD claim.",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01068.json"
+      ],
+      "validation_command": "Read-only GitHub Actions successful conclusions at fixed validation SHA"
+    }
+  },
+  "validation_history": [
+    {
+      "exact_sha": "e5e8da68fd6e88b423d3da75d37b03b6a0f588ba",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Existing mandatory five GitHub Actions already succeeded at this SHA; RUN_RECORD_NOT_FOUND caused C6 documentation gap only, without changing or rerunning validation."
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "e5e8da68fd6e88b423d3da75d37b03b6a0f588ba",
+    "dx11_fast_run_id": 40199894811,
+    "backend_gate_run_id": 40199894782,
+    "windows_build_run_id": 40199894774,
+    "openxr_architecture_run_id": 40199894765,
+    "hud_inspector_run_id": 40199894785,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_conclusion": "success",
+    "runtime_validation": "UNTESTED"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "D3D9_SIGNED_NORMAL_SOURCE",
+      "EXACT_NATIVE_SNORM_MIP_ROW_UPLOAD",
+      "GAME_SHADER_SAMPLER_SRV_BINDING",
+      "NATIVE_DRAW_OR_INDEXED_DRAW",
+      "FAIL_CLOSED_D3D9EX_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_signed_normal_texture.hpp",
+      "tools/dx11_signed_normal_game_probe_01068.cpp",
+      "tools/test_dx11_signed_normal_texture_01068.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Existing 01068 C++ signed normal game texture positive assertions, DX11 Fast 40199894811 PASS",
+      "negative_regression": "Existing 01068 destructive source path regressions and corrected inherited 00589/00699 negative assertions, DX11 Fast 40199894811 PASS",
+      "component_integration": "live_game_signed_normal_texture.hpp -> live_game_frame_bridge.cpp -> real game D3D11 shader sampler mirror SRV / Draw paths; D3D9Ex fallback retained"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_SIGNED_NORMAL_TEXTURE_GAME_DRAW_MIRROR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "Unproven signed mapping and sRGB fail closed to D3D9Ex; existing gamepad/FFB unchanged; no Quest3 native promotion.",
+    "gameplay_path_evidence_boundary": "Source callsite, native shader draw and full-resolution frame publication linkage only. No real game or Quest3/VDXR observation; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No physical OutRun menu/car/race or Quest3/VDXR output verified.",
+  "c6_bookkeeping_only": true,
+  "c6_repair_note_01069": "Existing 01068 C6 record omitted canonical policy-required source-stage names; corrected in same 01069 actual Fast Gate failure repair, without re-awarding prior feature or changing original validation-bearing SHA."
+}

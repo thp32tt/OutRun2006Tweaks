@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00881",
+  "production_id": "CONVERSION-DX11-00881",
+  "event_id": "CONVERSION-DX11-00881-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_STEREO_OFFSCREEN_TAIL_REBIND",
+  "feature_id": "DX11:GAME_STEREO_OFFSCREEN_TAIL_REBIND",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "record_reconstruction": "The prior run record was absent (GitHub contents 404). Feature contract and acceptance results are reconstructed from the immutable existing material commit and the exact-SHA CI evidence; no gameplay/HMD observation and no new score.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "After each real game-authored left/right Draw callback returns on a foreign offscreen RTV and off-eye viewport, the native D3D11 stereo recorder restores the ring-owned RTV/DSV and current eye raster before its final-ordinal source-authored GPU timeline.",
+      "Replay the final real D3D9 menu/vehicle/race SourceCopy, SourceStretch and TARGET Clear against the correct native eye without inventing geometry draw counts or changing original D3D9 Draw/Present/input/FFB.",
+      "Native Transport WARP regression exercises both independent eyes ending on an auxiliary RT and off-eye viewport; exact validation SHA passes unchanged five mandatory GitHub Actions and additional WARP."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Native Transport Isolated WARP run 39031656946 SUCCESS on exact material/validation SHA; separate left/right source tail and GPU output regression.",
+      "negative_regression": "The pre-existing negative foreign-target/viewport, invalid source, ring fence/ACK, fallback and pipeline state assertions remain in native transport WARP; no original D3D9 input or FFB modification.",
+      "component_integration": "NativeGameStereoSubmission::render_game_eye_passes rebinds original ring per-eye OM/RS before NativeGameEyeDrawEncoder::finish_source_clear_timeline, and WARP gameEyePass deliberately leaves offscreen OM/RS state before genuine postpass tail."
+    },
+    "conflict_keys": [
+      "DX11:GAME_STEREO_OFFSCREEN_TAIL_REBIND"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native source and exact-SHA five mandatory CI verified; real game menu/car/race visuals, Quest3/VDXR pixels and frame pacing not observed.",
+    "activation_guard_and_fallback": "No gameplay backend promotion. Preserve DX9Ex native/original Draw, Present, gamepad, FFB, SkyGlow and frozen DXVK."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_STEREO_OFFSCREEN_TAIL_REBIND",
+    "goal": "Resume real game-authored final-ordinal native stereo GPU postpasses into the owned left/right full-resolution eye targets after a menu/vehicle/race camera callback changes OM render target and viewport.",
+    "acceptance_items": [
+      {
+        "id": "stereo_tail",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_camera_native_stereo_draw_and_gpu_postpass",
+        "expected_behavior": "After real game Draw/DrawIndexed callback returns on an offscreen OM/viewport, bind each correct ring RTV/DSV and game raster so late SourceCopy/Stretch/Clear replay writes actual L/R native eye color."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gpu_postpass_source_order_state_restore_and_d3d9_input",
+        "expected_behavior": "Keep source Draw evidence exact and all original D3D9 Draw/Present/input/FFB/Reset and invalid postpass rejection unchanged; restore borrowed D3D11 pipeline state after each pair."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_github_actions",
+        "expected_behavior": "DX11 Fast, Backend, Windows Build, OpenXR, HUD Inspector all succeed on the same material validation SHA without disabling any required Gate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stereo_tail": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: confirmed preceding HEAD dfe6240db786b8b36b39b2ce625eab2e5866d62d and 00880 completion; 00881 run JSON absent and no other material SHA replaced this task.",
+    "C1_REVIEW": "PASS: actual native stereo callback can leave foreign offscreen RTV/viewport before the final game-authored GPU postpass timeline.",
+    "C2_IMPLEMENT": "PASS: rebind native L/R RTV/DSV and original game camera RS state ahead of last-source-command replay; extend per-eye WARP offscreen-target regression.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast #39031657022, Backend #39031656900, Windows Build #39031659735, OpenXR #39031659737, HUD #39031659779 all SUCCESS on 623df4c40cc4a81650a52a7bfdda1ad673433f25; additional Native Transport WARP #39031656946 SUCCESS.",
+    "C4_COMMIT": "PASS: material source + WARP regression commit 623df4c40cc4a81650a52a7bfdda1ad673433f25 contains [AUTO:CONVERSION-DX11-00881] and no CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: game/Quest3 real-runtime acceptance not tested; no HMD promotion/package.",
+    "C6_STATE": "PASS_EXACT_SHA: separate bookkeeping record created after verifying all five mandatory exact-SHA Gate outcomes; no new feature score, no CI rerun or source edit; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "material_result_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25",
+  "validation_bearing_result_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25",
+  "result_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25",
+  "evidence": {
+    "material_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25",
+    "validation_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25",
+    "five_mandatory_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39031657022,
+        "conclusion": "success",
+        "head_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39031656900,
+        "conclusion": "success",
+        "head_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25"
+      },
+      {
+        "name": "Build",
+        "id": 39031659735,
+        "conclusion": "success",
+        "head_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39031659737,
+        "conclusion": "success",
+        "head_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39031659779,
+        "conclusion": "success",
+        "head_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25"
+      }
+    ],
+    "additional_exact_sha_run": {
+      "name": "DX11 Native Transport Isolated WARP",
+      "id": 39031656946,
+      "conclusion": "success",
+      "head_sha": "623df4c40cc4a81650a52a7bfdda1ad673433f25"
+    },
+    "runtime_validation": "UNTESTED",
+    "live_menu_vehicle_race_test": "NOT_PERFORMED",
+    "quest3_vdxr_hmd_test": "NOT_PERFORMED"
+  },
+  "next_action": "C6 complete only. Do not re-run prior exact SHA gates or claim gameplay/HMD PASS; any new integrated source feature requires a separate task and source evidence."
+}

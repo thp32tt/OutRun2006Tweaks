@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01226",
+  "production_id": "CONVERSION-DX11-01226",
+  "event_id": "CONVERSION-DX11-01226-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_CLIPPED_POINT_POLYGON_NATIVE_GPU",
+  "classification": "A_INCOMPLETE_NATIVE_GAME_FRAME_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "material_implementation_sha": "8ff1d90bc86808a12fb705da6fb09d03f51f6ad1",
+  "material_result_sha": "bdc4c26a593d97dc19b3a9ab75ec4745397be089",
+  "validation_bearing_result_sha": "bdc4c26a593d97dc19b3a9ab75ec4745397be089",
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+    "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp"
+  ],
+  "implementation": "Native FVF D3DFILL_POINT original D3D9 TRIANGLELIST/STRIP source triangle clipping creates actual native D3D11 POINTLIST post-frustum and six-user-plane intersection corners with homogeneous interpolation of source clip position, diffuse, specular, stage0/stage1 UV and clip distances. Original signed winding/cull and genuine IA indices respected before clipping; wholly invisible faces skipped; malformed/overflow/unknown data fail closed. Source and post-clip vertex GPU input ownership separated to preserve actual Draw semantics. Native GPU submission remains conditional and original D3D9 Draw/Present, DX9Ex fallback, gamepad/FFB/SkyGlow remain unmodified; DXVK frozen.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_FVF_POLYGON_SOURCE",
+      "FRUSTUM_AND_USER_PLANES_POST_CLIP_VERTEX_INTERPOLATION",
+      "SOURCE_FACE_CULL_WINDING",
+      "D3D11_REAL_GPU_POINTLIST_DRAW",
+      "ORIGINAL_D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "CLIPPED_POINT_VERTEX_SOURCE_TRANSLATION",
+      "DUAL_TEXTURE_COLOR_SPECULAR_PLANE_PAYLOAD",
+      "NATIVE_DRAW_SELECTED_VERTEX_STREAM_FIX",
+      "POSITIVE_NEGATIVE_POINT_CULL_REGRESSIONS",
+      "FIVE_UNWEAKENED_EXACT_SHA_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual per-vertex source homogeneous and user-plane intersection points integrated into GPU submission; DX11 Fast run 41809410249 SUCCESS and Win32 Build 41809410492 SUCCESS.",
+      "negative_regression": "Malformed late source indices, invalid W, clipped cull backfaces and excess vertices preserve prior destination/fail-closed; same indexed original D3D9 game fallback unaffected.",
+      "component_integration": "Clipped point interpolation C++ helper + original source cull precedence + real D3D11 submit GPU vertex reference + unit regression. Five unchanged exact-SHA Actions complete."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_final_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED_SOURCE_ONLY: native_draws>0, publishedBackbufferFrames>0, game menu/vehicle/race native desktop continuity and Quest3 HMD display NOT OBSERVED.",
+    "activation_guard_and_fallback": "Explicit opt-in native diagnostic; unsupported game Draws retain original D3D9 Draw/Present, input/FFB/SkyGlow and DX9Ex fallback; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate post-clipped authentic real-game FVF point polygon GPU submission without silently losing generated clipping corners, source raster semantics, source Draw or safety fallback.",
+    "acceptance_items": [
+      {
+        "id": "source_fvf_point_triangle_clip_gpu",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Authentic surviving FVF point polygon post-clip native vertex source and Draw/DrawIndexed preserve original culling, UV0/UV1, diffuse/specular and clip planes."
+      },
+      {
+        "id": "fail_closed_d3d9_fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Invalid indices/W/budget do not mutate native GPU point output; original D3D9 game Draw unaffected."
+      },
+      {
+        "id": "exact_sha_all_required_gates",
+        "category": "integrated_validation",
+        "expected_behavior": "All five mandatory Actions pass at validation-bearing SHA without weakened checks."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_fvf_point_triangle_clip_gpu": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ]
+    },
+    "fail_closed_d3d9_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ]
+    },
+    "exact_sha_all_required_gates": {
+      "status": "PASS_EXACT_SHA",
+      "run_ids": [
+        41809410249,
+        41809410228,
+        41809410492,
+        41809410446,
+        41809410402
+      ]
+    }
+  },
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41809410249,
+      "sha": "bdc4c26a593d97dc19b3a9ab75ec4745397be089",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41809410228,
+      "sha": "bdc4c26a593d97dc19b3a9ab75ec4745397be089",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41809410492,
+      "sha": "bdc4c26a593d97dc19b3a9ab75ec4745397be089",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41809410446,
+      "sha": "bdc4c26a593d97dc19b3a9ab75ec4745397be089",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41809410402,
+      "sha": "bdc4c26a593d97dc19b3a9ab75ec4745397be089",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "runtime_evidence": null,
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun gameplay, native published desktop frame or Quest 3/VDXR stereoscopic HMD test was performed. Build/CI results must not be promoted to runtime or full native renderer evidence.",
+  "real_game_draw_blocker": "Native gameplay published full frame and real game camera/menu/race contiguous GPU output have no direct runtime proof at this SHA; no runtime native_draws>0 or publishedBackbufferFrames>0 witness supplied.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Continue real original game menu/vehicle/race native Draw and OpenXR full-frame source connection; obtain independent matching-SHA game runtime counters and screenshots before promotion, preserve safe fallback.",
+  "source_and_repair_commits": [
+    {
+      "sha": "8ff1d90bc86808a12fb705da6fb09d03f51f6ad1",
+      "kind": "MATERIAL_CLIPPED_GAME_FVF_POINT_POLYGON_IMPLEMENTATION",
+      "summary": "Actual CPU post-clip vertices + original Draw link + C++ regressions."
+    },
+    {
+      "sha": "bdc4c26a593d97dc19b3a9ab75ec4745397be089",
+      "kind": "SAME_TASK_CAUSAL_CI_REPAIR_VALIDATION_RESULT",
+      "summary": "Actual GPU input alias/Draw source repair, source regression check unchanged, exact-SHA five-Gate SUCCESS."
+    }
+  ],
+  "record_type": "C6_RESULT_ONLY",
+  "score_note": "AI2 same unfinished FEATURE_ID source-stage integration; 0 new score for C6, CI repair and result repeat; AI1 untouched.",
+  "checkpoint": "C6_STATE"
+}

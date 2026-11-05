@@ -1,0 +1,123 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00735",
+  "production_id": "CONVERSION-DX11-00735",
+  "event_id": "CONVERSION-DX11-00735-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_GAME_COLOR_SEED_PRE_DRAW_INVALIDATION",
+  "feature_id": "DX11-FULL-GAME-COLOR-SEED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "149ee06415e3f688851ce0251d62755f00267ca3",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Game's successful full TARGET Clear records canonical device/backbuffer and color",
+      "First game Draw/DrawIndexed full native frame requires exact Clear source/target seed; contiguous draws reuse it",
+      "Partial or invalid successful game Clear before native Draw aborts frame; original D3D9 Draw/Present/gamepad remain authoritative"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      ".github/workflows/dx11-fast-structural.yml",
+      "tools/dx11_full_frame_color_seed_00735.cpp",
+      "tools/test_dx11_full_frame_color_seed_00735.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++ exact seeded Clear to Draw/Indexed and Python hook-to-native-source validation",
+      "negative_regression": "Missing/foreign/partial Clear and aborted pre-draw frame cannot publish full native output",
+      "component_integration": "D3D9 game Clear/Draw callsite, DX11 full native color, guarded D3D9 Present"
+    },
+    "conflict_keys": [
+      "DX11:FULL_GAME_COLOR_SEED_PRE_DRAW_INVALIDATION",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI verification only until Quest3 game testing",
+    "activation_guard_and_fallback": "Explicit diagnostic full opt-in; DX9Ex game Present/input safe on invalid native source"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-COLOR-SEED",
+    "goal": "Publish native full-size menu, vehicle and race frames only after the matching successful full D3D9 color Clear and preserve input/fallback when a later partial Clear interrupts first Draw.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_color_and_draw",
+        "expected_behavior": "Exact game D3D9 full TARGET Clear primes native full color at first Draw/Indexed, subsequent contiguous draws preserve color"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_clear_and_gamepad_fallback",
+        "expected_behavior": "Unseeded, wrong-device/backbuffer, partial or failed source path cannot publish synthetic native image; original D3D9 game/controller unchanged"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_ci",
+        "expected_behavior": "Focused portable C++ positive/negative and destructive Python integration test plus five same SHA mandatory Gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_full_frame_color_seed_00735.cpp",
+    "tools/test_dx11_full_frame_color_seed_00735.py",
+    "docs/automation/runs/CONVERSION-DX11-00735.json"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": "4d9e8b93e4f3336651866da25c2ac20b6f0bd7aa",
+  "validation_bearing_result_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad",
+  "ci_evidence": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38594582132,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38594582124,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    },
+    "Build": {
+      "run_id": 38594594021,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38594596660,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38594594115,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    }
+  },
+  "validation_note": "Five mandatory GitHub Actions gates passed on exactly a8808e0c0e50a01b2ad58afd68f4de2b1174fbad; actual Quest3/VDXR/gamepad run not performed, no gameplay/HMD PASS, no backend promotion. Same-TASK verifier repairs are not independent accomplishments."
+}

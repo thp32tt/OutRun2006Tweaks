@@ -1,0 +1,175 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00399",
+  "production_id": "CONVERSION-DX11-00399",
+  "event_id": "CONVERSION-DX11-00399-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "selected_work_item": "DX11_R261_PROGRAMMABLE_TEXTURE_RESOURCE_BEHAVIOR_PROOF",
+  "base_sha": "9af0352af265a12268e637a022ec8222b7c2e81e",
+  "result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+  "material_result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+  "source_implementation_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+  "validation_bearing_result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+  "result_marker": "[AUTO:CONVERSION-DX11-00399]",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R261_PROGRAMMABLE_TEXTURE_RESOURCE_BEHAVIOR_PROOF_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "summary": "R261 extends the validated R260 F18 geometry receipt with an exact current MANAGED texture-stage resource-behavior receipt. It binds the R260 geometry snapshot to NativeManagedTextureStageReadiness, requires every supplied required texture stage to have exact registered/shadow/resources/lifetime/device/descriptor/ready coverage, and revalidates the registry stage token against current membership/device/mirror generations. R259 now consumes R261 geometry+texture evidence while output-resource behavior and F21 remain fail-closed, so no native draw authority is created.",
+  "evidence": "Material/validation-bearing SHA c960d0a0f5f424604d8bb1e37b9985cce1bd7970 passed Backend Conversion Gate 37266088284 attempt 1. validate job 111623126134 and DX11 readiness smoke job 111624277384 both succeeded. The constant-buffer probe built and ran R261 indexed/non-indexed positive cases plus stale texture-stage and stale R260 geometry identity rejection. Artifact 11326860882 digest sha256:6aa62da21f0363dc3ec87b3e9abeab2cbaa06138d7e6b81b3f209a4f720f473c. No HMD/game runtime test was performed.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "309180079be574fa83405bcf788011662ff531fd",
+    "a683afa60756b1875e162fb88e4e81103effae06",
+    "46dc419f5057e186d94e3510c0ab550379b56be2",
+    "c960d0a0f5f424604d8bb1e37b9985cce1bd7970"
+  ],
+  "validation_run_id": 37266088284,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111623126134,
+  "readiness_smoke_job_id": 111624277384,
+  "artifact_id": 11326860882,
+  "artifact_digest": "sha256:6aa62da21f0363dc3ec87b3e9abeab2cbaa06138d7e6b81b3f209a4f720f473c",
+  "artifact_size_bytes": 2366687,
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "draw_dispatch_changed": false,
+    "dx9ex_branch_modified": false
+  },
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37266088284,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+      "validate_job_id": 111623126134,
+      "readiness_smoke_job_id": 111624277384,
+      "artifact_id": 11326860882,
+      "artifact_digest": "sha256:6aa62da21f0363dc3ec87b3e9abeab2cbaa06138d7e6b81b3f209a4f720f473c",
+      "artifact_size_bytes": 2366687
+    },
+    "r261_contract": {
+      "geometry_resource_behavior_exact": true,
+      "texture_resource_behavior_exact": true,
+      "supplied_required_texture_mask": "0x1",
+      "output_resource_behavior_proof": "MISSING",
+      "missing_resource_scope_mask": "0x4",
+      "full_f18_proof_present": false,
+      "r259_resource_behavior_proof_present": false,
+      "shader_translation_proof": "MISSING_F21",
+      "native_draw_path_activation_allowed": false,
+      "draw_dispatch_authorized": false,
+      "activation_snapshot_token": "0"
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": true,
+    "runtime_behavior_changed": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F18_RESOURCE_USAGE_LOCK_POOL_SEMANTICS",
+      "VR_BACKEND_SET05_F23_SAMPLE_EXACT_NOT_ACTIVATION_GATE"
+    ],
+    "evidence": "native_backend.hpp/cpp are VR risk paths, but R261 is dormant/readiness-only. DX9Ex, selector, OpenXR transport and production Draw* routing are unchanged. The supplied texture mask is explicitly not treated as shader semantic proof."
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Fetched branch HEAD 9af0352af265a12268e637a022ec8222b7c2e81e plus VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, conversion lane state and VR automation state. No prior CONVERSION-DX11-00399 run record existed. Durable next action from 00398 was exact managed texture-resource behavior after R260."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Existing R108-R110 NativeManagedTextureRegistry already provides exact current managed texture mirror/stage evidence including descriptor, shadow, lifetime, device, membership and mirror-generation token invalidation. The missing activation-review bridge was a receipt tying that current texture-stage evidence to R260 without claiming shader semantics or output-resource completeness.",
+      "review_lenses": {
+        "architecture": "Insert R261 between R260 and R259; preserve R239-R260 chain and avoid production routing.",
+        "ownership_lifetime": "Require exact registry-managed stage readiness and revalidate the stage snapshot against current membership/device/mirror generations.",
+        "stereo_correctness": "No projection, eye transport, HUD, pose, recenter or stereo resource ownership changes.",
+        "performance": "Dormant receipt/probe path only; no game render hot-path activation.",
+        "adversarial": "Reject stale R260 geometry token and stale texture-stage token; keep output F18 and F21 missing and activation token zero."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderTextureResourceBehaviorReadiness R261 plus compose/validate functions. R261 carries current R260 source lineage, validates every supplied required managed texture stage mask, leaves output-resource proof false with missingResourceScopeMask=0x4, and provides a separate 0x261 snapshot domain. R259 now consumes R261 geometry+texture evidence but still reports full F18 missing. Added indexed/non-indexed positive regressions and stale R260/texture-stage rejection."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+      "validation_run_id": 37266088284,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111623126134,
+      "readiness_smoke_job_id": 111624277384,
+      "artifact_id": 11326860882,
+      "artifact_digest": "sha256:6aa62da21f0363dc3ec87b3e9abeab2cbaa06138d7e6b81b3f209a4f720f473c",
+      "artifact_size_bytes": 2366687,
+      "evidence": "Exact SHA passed queue/baseline/transport/static/source-graph/dormant-boundary/census checks, Win32 configure/build/binary artifact, and full DX11 readiness smoke. Build and Run DX11 constant buffer probe both succeeded with R261 coverage."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+      "material_result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+      "source_implementation_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+      "validation_bearing_result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+      "result_marker": "[AUTO:CONVERSION-DX11-00399]",
+      "implementation_commits": [
+        "309180079be574fa83405bcf788011662ff531fd",
+        "a683afa60756b1875e162fb88e4e81103effae06",
+        "46dc419f5057e186d94e3510c0ab550379b56be2",
+        "c960d0a0f5f424604d8bb1e37b9985cce1bd7970"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R261 is a dormant resource-behavior evidence receipt only. It adds no selector route, Draw/DrawIndexed dispatch, NativeDrawPath activation or runtime candidate requiring distribution packaging."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "issue14_implementation_comment_id": 5988441696,
+      "issue14_validation_comment_id": 5988518549,
+      "exact_next_action": "Preserve validated R239-R261. Under a new TASK_ID, implement one exact output-resource behavior receipt for the current dormant candidate using already-proven surface mirror/pair identity where applicable, feed it into the F18 resource-behavior chain, and keep F21 plus all Draw/NativeDrawPath activation fail-closed. Any runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence."
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5988441696,
+    "validation_comment_id": 5988518549
+  },
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00399",
+    "production_id": "CONVERSION-DX11-00399",
+    "event_id": "CONVERSION-DX11-00399-E001",
+    "event_type": "dispatch",
+    "attempt": "1/3",
+    "lane": "DX11",
+    "target_branch": "vr-dx11-native-r71",
+    "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+    "source_implementation_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+    "validation_bearing_result_sha": "c960d0a0f5f424604d8bb1e37b9985cce1bd7970",
+    "validation_run_id": 37266088284,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111623126134,
+    "readiness_smoke_job_id": 111624277384,
+    "artifact_id": 11326860882,
+    "artifact_digest": "sha256:6aa62da21f0363dc3ec87b3e9abeab2cbaa06138d7e6b81b3f209a4f720f473c",
+    "implementation_comment_id": 5988441696,
+    "validation_comment_id": 5988518549
+  },
+  "exact_next_action": "Preserve validated R239-R261. Under a new TASK_ID, implement one exact output-resource behavior receipt for the current dormant candidate using already-proven surface mirror/pair identity where applicable, feed it into the F18 resource-behavior chain, and keep F21 plus all Draw/NativeDrawPath activation fail-closed. Any runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence."
+}

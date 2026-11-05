@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00026",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T06:24:53+09:00",
+  "base_sha": "33bd569366045ea92b1df570d9c4f44f2ca671f8",
+  "code_result_sha": "cc41fa170eec2bf130accd2be726b310b75c76b9",
+  "result_sha": "cc41fa170eec2bf130accd2be726b310b75c76b9",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R84 diagnostic-only fixed-function pixel-shader HLSL source prototype for R82/R83-ready states.",
+  "summary": "Added a fail-closed diagnostic HLSL pixel-shader source generator that only consumes R82/R83-ready fixed-function states. It supports the already-modeled SELECTARG1/SELECTARG2/MODULATE plus DIFFUSE/CURRENT/TEXTURE subset, requires 2D D3DRTYPE_TEXTURE for texture-consuming stages, fingerprints generated source, and records generated/pending evidence. It does not invoke D3DCompile, create or bind shader objects, or route native D3D11 draws.",
+  "evidence": [
+    "CONVERSION-DX11-00024 completed eight-stage texture resource exactness and selected a fixed-function shader-generation prototype as the next bounded task.",
+    "Backend Conversion Gate 36482214558 PASS on exact production SHA.",
+    "Build 36482220267 PASS on exact production SHA.",
+    "HUD Inspector 36482220175 PASS.",
+    "OpenXR VR architecture 36482220278 PASS on run attempt 2. Attempt 1 had a hosted-runner SDL FetchContent filesystem failure in C1 configure; re-running only the failed job succeeded without source changes.",
+    "No Quest 3/VDXR or in-game runtime validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/pipeline_translation.hpp",
+      "result": "Added diagnostic fixed-function pixel-shader prototype result/generator contract."
+    },
+    {
+      "path": "src/vr/d3d11/pipeline_translation.cpp",
+      "result": "Added fail-closed HLSL source generation for R82/R83-ready SELECTARG1/SELECTARG2/MODULATE fixed-function states and deterministic source hashing."
+    },
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Added generated/pending counters and per-signature source hash/size evidence; native shader readiness remains false."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Added R84 summary/signature/prototype evidence parsing."
+    },
+    {
+      "path": "tools/test_analyze_dx11_census.py",
+      "result": "Added R84 analyzer regression fixture."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added R84 diagnostic generator and fail-closed source-graph guards."
+    }
+  ],
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "EIGHT_TEXTURE_STAGE_DESCRIPTOR_BEHAVIOR_FORMAT_EXACTNESS_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "DECLARATION_AND_CONSERVATIVE_FVF_LAYOUT_READY_BLEND_ENCODINGS_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "EIGHT_STAGE_READY_SUBSET_CAN_EMIT_DIAGNOSTIC_HLSL_NOT_COMPILED_OR_BOUND",
+    "F21_shader_translation_readiness": "PROGRAMMABLE_TRANSLATION_OPEN_FIXED_FUNCTION_PROTOTYPE_DIAGNOSTIC_ONLY",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R84 only generates diagnostic HLSL source and fingerprints it. No shader compilation/binding/native draw path is active; semantic validation and exact-build Quest3/VDXR parity remain required."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36482214558,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "cc41fa170eec2bf130accd2be726b310b75c76b9",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10997420867,
+      "artifact_digest": "sha256:08732c4a2b1588e8facc69f998686f3a539992ffee5c36b2df58d51182984e39"
+    },
+    "build": {
+      "run_id": 36482220267,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "cc41fa170eec2bf130accd2be726b310b75c76b9",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 10997685362,
+      "binary_artifact_digest": "sha256:134e20eada3de6ef036d01f409910cd5422cf3f5c8137bccfb2f39f6326e7438"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36482220278,
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 2,
+      "validated_sha": "cc41fa170eec2bf130accd2be726b310b75c76b9",
+      "initial_transient_failure": "game-x86-c1-r29-r28-classify configure failed during SDL FetchContent due hosted-runner filesystem errors; single-job rerun succeeded without source changes.",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 10996894281,
+      "host_artifact_digest": "sha256:b6a3128760460fdc5954fa95638ce0a53f66327a62558759782e4a66f34a8eb9",
+      "c1_artifact_id": 10998006152,
+      "c1_artifact_digest": "sha256:8fd1e65cf075bddb4cafc78dd9d7eb61b974b0b9904512db74515a34d291997e"
+    },
+    "hud_inspector": {
+      "run_id": 36482220175,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "cc41fa170eec2bf130accd2be726b310b75c76b9",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10997515773,
+      "artifact_digest": "sha256:645afb018c4887bdc422b294ce12c8a79753707491c07be65fb1de007589d28b"
+    },
+    "pc_fast": {
+      "run_id": 36482214616,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5878314002,
+    "validation_comment_id": 5878962134
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. Next bounded DX11 work should validate R84 generated HLSL semantics offline or add a non-routing compilation probe with deterministic diagnostics. Do not bind shaders or mix programmable F21 translation into that task.",
+  "finalized_kst": "2026-09-29T06:24:53+09:00"
+}

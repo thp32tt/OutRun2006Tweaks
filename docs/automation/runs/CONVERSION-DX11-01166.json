@@ -1,0 +1,199 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01166",
+  "production_id": "CONVERSION-DX11-01166",
+  "event_id": "CONVERSION-DX11-01166-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_work_key": "DX11:RAW_AUTHENTIC_DRAW_TARGET_PRESENT_PIXEL_EVIDENCE",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "scoreboard_previous": 2188,
+  "scoreboard_new": 2189,
+  "development_time_percentages": "UNMEASURED",
+  "controller_runtime_adoption": "UNVERIFIED",
+  "source_base_sha": "24eae3e1175839a4596f3725ac48d737572211ba",
+  "implementation_source_sha": "701f0756c3ac9ad33b07182e63a90f83a15ff95c",
+  "validation_bearing_result_sha": "701f0756c3ac9ad33b07182e63a90f83a15ff95c",
+  "material_result_sha": "701f0756c3ac9ad33b07182e63a90f83a15ff95c",
+  "causal_ci_repair_shas": [],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_source_target_identity.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp"
+  ],
+  "implementation": "Capture COM-owned D3D9 render target identity when a genuine shader-bound native D3D11 GPU BEFORE/Draw/AFTER pair is queued; source-coincident presentation is allowed only when that actual Draw source RT is the original Present backbuffer with existing exact dimensions/crop/dirty coverage. Preserve opt-in legacy RAW fallback and original renderer, distinguish source-aligned visible RGB pixel count in the live diagnostic log, and add compiled positive/negative pointer-identity regression. No complete menu/car/race source coverage or stereo runtime proof.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_SOURCE_DRAW_AND_BACKBUFFER_IDENTITY",
+      "D3D11_NATIVE_GPU_BEFORE_DRAW_AFTER",
+      "SOURCE_DRAW_RT_COM_OWNERSHIP",
+      "ORIGINAL_BACKBUFFER_SOURCE_ALIGNED_DIRTY_PRESENT",
+      "D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "CPP_AUTHENTIC_DRAW_TIME_D3D9_RT_CAPTURE",
+      "CPP_NATIVE_GPU_SOURCE_ALIGNED_SUCCESSFUL_UPLOAD_PIXEL_ATTRIBUTION",
+      "CPP_CONSTEXPR_IDENTITY_POSITIVE_NEGATIVE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "When the captured source Draw D3D9 RT equals the original game Present backbuffer, matching size and dirty region, only actually uploaded native GPU changed pixels are counted source-aligned.",
+      "negative_regression": "Compiler-evaluated identity rejects distinct Draw/Present surfaces and either NULL pointer; missing identity preserves legacy RAW inset and no false positive source-aligned counter.",
+      "component_integration": "Native Draw callsite preserves source COM RT on enqueue; GPU pairing and D3D9 UpdateSurface consume that source provenance during Present, with independent source-aligned logging and unchanged fallback."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "src/vr/d3d11/native_game_raw_source_target_identity.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "OPT_IN_VISIBLE_PARTIAL_DIAGNOSTIC",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_BUILD_VERIFIED_INTEGRATED_DIAGNOSTIC_ONLY. Real game screen-aligned GPU pixel count, complete menu/car/race output, original input continuity, Quest3 two-eye and frame pacing NOT RUNTIME VERIFIED.",
+    "activation_guard_and_fallback": "DX11 RAW visual opt-in only; game original D3D9 remains authoritative, bad source COM/size/dirty/crop denied for source alignment, bounded legacy RAW inset instead, DX9Ex fallback and FFB untouched, DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_NATIVE_GAME_RENDERER_SOURCE_SLICE_ONLY",
+    "goal": "Preserve the actual D3D9 source Draw render-target identity across native GPU RAW capture and original game Present while separating real source-aligned GPU pixel output from fallback inset pixels.",
+    "acceptance_items": [
+      {
+        "id": "source_draw_rt_provenance",
+        "category": "end_to_end_behavior",
+        "behavior_area": "genuine original D3D9 Draw render-target identity",
+        "expected_behavior": "Only a real game-authored native Draw capture whose original source D3D9 RT equals the original Present backbuffer may place native pixels at original coordinates."
+      },
+      {
+        "id": "source_aligned_gpu_pixel_attribution",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native GPU RAW visible diagnostic output",
+        "expected_behavior": "Count and log source-coincident native GPU pixels separately from repositioned legacy RAW pixels and only after successful D3D9 UpdateSurface."
+      },
+      {
+        "id": "safe_inset_fallback_and_input",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex fallback and original input/output authority",
+        "expected_behavior": "Missing/foreign Draw RT, incompatible source/backbuffer dimensions or dirty crop never grant source-aligned placement; original bounded RAW inset and D3D9 original game/input/FFB stay available."
+      },
+      {
+        "id": "exact_sha_five_workflow_gate",
+        "category": "integrated_validation",
+        "behavior_area": "mandatory exact-source GitHub Actions",
+        "expected_behavior": "All five required push checks compile and validate the cohesive C++ change at the identical material SHA without CI-skip; Quest3/VDXR remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_draw_rt_provenance": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
+      ],
+      "validation_command": "Source capture integrated at begin_real_native_draw and exact Draw-target pointer identity guarded at Present; C++ constexpr identity positive/negative checks compiled in mandatory Win32 Build 40941325181 SUCCESS."
+    },
+    "source_aligned_gpu_pixel_attribution": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Source-aligned counter increments only after successful paint when firstAligned/secondAligned are source-proven; DX11 Fast 40941325199 and Build 40941325181 success at identical material SHA."
+    },
+    "safe_inset_fallback_and_input": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
+      ],
+      "validation_command": "Nonmatching/NULL capture RT identity preserves old dirty-bounded RAW preview and original D3D9 draw/input; compile-time negative regression and Backend Gate 40941325137 SUCCESS. Game/HMD runtime not asserted."
+    },
+    "exact_sha_five_workflow_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Five mandatory exact-SHA push runs successful: 40941325199;40941325137;40941325181;40941325121;40941325207."
+    }
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40941325199,
+        "head_sha": "701f0756c3ac9ad33b07182e63a90f83a15ff95c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40941325137,
+        "head_sha": "701f0756c3ac9ad33b07182e63a90f83a15ff95c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40941325181,
+        "head_sha": "701f0756c3ac9ad33b07182e63a90f83a15ff95c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40941325121,
+        "head_sha": "701f0756c3ac9ad33b07182e63a90f83a15ff95c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40941325207,
+        "head_sha": "701f0756c3ac9ad33b07182e63a90f83a15ff95c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "validation_layer": "SOURCE_AND_BUILD_VERIFIED_NOT_GAMEPLAY_OR_HMD",
+    "runtime_evidence": "No source-matched game desktop session or Quest3/VDXR runtime test at this result SHA. Real source-aligned GPU visible pixel count and user-observed menu/car/race remain unmeasured.",
+    "scoreboard": "AI2 previous confirmed GitHub SSOT 2188 + independently integrated source-D3D9-RT provenance and native GPU pixel attribution +1 = 2189. Scoreboard main commit b65146de3326c82653a1bdeee719e0f336f40950, same TASK retry/C6 +0."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_HEAD_AND_PREVIOUS_01165_EXACT_SHA",
+    "C1_REVIEW": "PASS_PRESENT_TIME_RT_NOT_DRAW_TIME_PROVENANCE",
+    "C2_IMPLEMENT": "PASS_3_CPP_FILES_SOURCE_COM_PINNING_NATIVE_VISIBLE_ATTRIBUTION_AND_STATIC_ASSERT",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_EXACT_SHA_GATES",
+    "C4_COMMIT": "PASS_MATERIAL_SHA_701f0756",
+    "C5_PACKAGE": "NOT_REQUIRED_NO_USER_RUNTIME_CANDIDATE_PROMOTION",
+    "C6_STATE": "PASS_AFTER_EXACT_SHA_CI_NO_ADDITIONAL_SCORE"
+  },
+  "next_unfinished": "Need a real-game test of RAW native source-aligned pixels at this exact SHA; full menu/vehicle/race native D3D11 frame completeness and Quest3 stereo are not established. The next independent DX11 integration remains under controller selection."
+}

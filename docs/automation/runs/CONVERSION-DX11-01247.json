@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01247",
+  "production_id": "CONVERSION-DX11-01247",
+  "event_id": "CONVERSION-DX11-01247-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "da2ead9dfcefbccf34e0d27e36b54a41f0a5a93a",
+  "result_sha": "c6fcd8c4a7fbccffeca420ab082348237df526b8",
+  "material_implementation_sha": "c6fcd8c4a7fbccffeca420ab082348237df526b8",
+  "material_result_sha": "c6fcd8c4a7fbccffeca420ab082348237df526b8",
+  "validation_bearing_result_sha": null,
+  "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
+  "classification": "B_EXACT_GATE_FAILURE_PREVIOUS_RUN_ACCEPTANCE_PROOF_AND_FULL_GATE_PLAN_FIELDS",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "SOURCE_AND_CAUSAL_CI_REPAIR",
+  "checkpoint": "C5_GATES_PENDING",
+  "score_change": 0,
+  "score_note": "Continuation of the same FVF native point-fill renderer feature; inherited 01246 policy metadata repair, source correction, regression, rerun and C6 are not independently scored.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "work_allocation_measured": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp"
+  ],
+  "implementation": "Genuine game D3D9 FVF D3DFILL_POINT Draw/DrawIndexed camera-plane crossings with two tiny positive-W corners can be erroneously discarded by absolute W>=1e-5. In the original native vertex-generation code select a representable per-face W clipping floor below the smallest positive original source W, preserve actual XY/Z/user plane clipping, interpolate native attributes and both texture stages, and fail closed for no-positive-W and malformed source indices. The original D3D9 Draw/input/FFB continues untouched.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW",
+      "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL"
+    ],
+    "integration_path": [
+      "ORIGINAL_GAME_D3D9_DRAW_DRAWINDEXED_FVF_CAMERA_CROSSING",
+      "PER_FACE_POSITIVE_W_SAFE_CLIP_INTERPOLATION",
+      "NATIVE_D3D11_FVF_POINTLIST_GPU_DRAW",
+      "NATIVE_GPU_PRE_POST_AND_ORIGINAL_D3D9_FALLBACK"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "REAL_FVF_CLIPPED_POINT_CXX_POSITIVE_W_SOURCE_CORRECTION",
+      "INDEXED_HOMOGENEOUS_USER_CLIP_AND_UV_CXX_REGRESSION",
+      "CAUSAL_PREVIOUS_TASK_POLICY_GATE_CONTRACT_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source commit c6fcd8c4a7fbccffeca420ab082348237df526b8 adds source-real tiny positive-W eye-crossing FVF point-fill geometry and deterministic C++ regression; local CI acceptance is PENDING, not PASS.",
+      "negative_regression": "C++ source regression checks invalid indexed source leaves previous native point plan unchanged, every-W-negative input fails closed, UV/user clip attributes remain bounded, and original D3D9 input/FFB/DX9Ex fallback code remains unchanged. Gate execution pending.",
+      "component_integration": "Source FVF clipped point helper is called by live_game_frame_bridge.cpp submit before native IA/VB/IB and GPU PRE/POST conditional publication; exact-SHA five mandatory workflows are retained and awaiting final repair SHA."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_PENDING_CI_ONLY. No genuine original-game menu/car/race desktop native visible output or Quest3/VDXR stereo runtime evidence on this material source SHA.",
+    "activation_guard_and_fallback": "Native path remains opt-in and full-frame publication fail-closed. Original D3D9 Draw/DrawIndexed, DX9Ex fallback, game input/FFB, device lifetime and frozen DXVK unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_POLYGON_TRIANGULATION",
+    "goal": "Carry original near-camera FVF point-filled triangle visible corners through exact native D3D11 source-authentic clipping and bounded safe GPU output while preserving fallback.",
+    "acceptance_items": [
+      {
+        "id": "original_game_eye_crossing_native_points",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ORIGINAL_FVF_EYE_CLIP_D3D11_POINTLIST",
+        "expected_behavior": "Tiny original positive-W corners remain in a camera-crossing native D3D11 GPU point-fill plan without bypassing source clipping."
+      },
+      {
+        "id": "source_payload_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_UV_USER_CLIP_INDEXED_TRANSACTION",
+        "expected_behavior": "Original user clip and two UV stages are preserved; invalid indexed source and all-negative-W triangle fail closed and retain original D3D9 Draw/input/FFB."
+      },
+      {
+        "id": "all_exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Five mandatory Actions pass the exact integrated source+causal-repair SHA; runtime is independently UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "source_and_repair_commits": [
+    {
+      "sha": "c6fcd8c4a7fbccffeca420ab082348237df526b8",
+      "kind": "MATERIAL_CXX_AND_REGRESSION",
+      "summary": "Original near-camera FVF source eye clip dynamic positive-W C++ conversion, user clip/UV/IA regressions."
+    }
+  ],
+  "validation_gate_runs": [],
+  "runtime_evidence": null,
+  "runtime_note": "No actual original game desktop menu, vehicle selection, race, or Quest3/VDXR session run. Native_draw_count and published_frame_count unmeasured.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "SOURCE_AUTHENTIC_NATIVE_GAME_FRAME_RUNTIME_NOT_MEASURED",
+  "native_game_draw_count": null,
+  "native_published_frame_count": null,
+  "code_changed_sha": "c6fcd8c4a7fbccffeca420ab082348237df526b8",
+  "next_implementation_action": "After successful exact-SHA CI, retain build verified vs HMD UNTESTED; extend real source native FVF/SM3 Draw->full game frame on next independently dispatched functionality."
+}

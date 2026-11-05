@@ -1,0 +1,102 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00754",
+  "production_id": "CONVERSION-DX11-00754",
+  "event_id": "CONVERSION-DX11-00754-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_MULTI_PARTIAL_DIRTY_PRESENT",
+  "feature_id": "DX11-MENU-CAR-RACE-MULTI-PARTIAL-DIRTY-PRESENT",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "785cbb575291fa9d7d229f4b325f93eed9e23df6",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_multi_dirty_upload.hpp",
+    "tools/dx11_multi_dirty_upload_probe_00754.cpp",
+    "tools/test_dx11_multi_dirty_upload_00754.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00754.json"
+  ],
+  "change_summary": "Native game-origin menu/car/race full-frame output now supports disjoint partial D3D9 dirty-region rectangles with per-tile GPU uploads; gap pixels and original D3D9/gamepad fallback remain unchanged.",
+  "feature_contract": {
+    "feature_id": "DX11-MENU-CAR-RACE-MULTI-PARTIAL-DIRTY-PRESENT",
+    "goal": "Extend same-Present native full-resolution game Draw/DrawIndexed publication to multiple partially dirty D3D9 Present rectangles without replacing any untouched pixel or gameplay input.",
+    "acceptance_items": [
+      {
+        "id": "multi-dirty-live-game-visible",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_d3d11_game_output_and_d3d9_multi_region_present",
+        "expected_behavior": "2-8 disjoint partially dirty rectangles are clipped to D3D9 Present source and each gets an exact pixel copy and UpdateSurface."
+      },
+      {
+        "id": "hole-safe-original-d3d9-gamepad",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_pixels_and_input",
+        "expected_behavior": "Missing, overlapping, forged-bound, oversized or off-crop rects reject native publication; all pixels between uploaded tiles and gamepad behavior stay D3D9-owned."
+      },
+      {
+        "id": "exact-sha-integrated-ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_ci_windows_openxr_hud",
+        "expected_behavior": "Portable pixel C++ tests, destructive source binding regressions and exact SHA DX11 Fast/Backend/Windows/OpenXR/HUD actions succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "multi-dirty-live-game-visible": "PENDING_EXACT_SHA",
+    "hole-safe-original-d3d9-gamepad": "PENDING_EXACT_SHA",
+    "exact-sha-integrated-ci": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Eligible native menu/vehicle/race frames are published into exact 2-8 source-clipped partial dirty tiles; unsupported states preserve D3D9/pad.",
+    "activation_guard_and_fallback": "Full opt-in disabled by default; invalid/overlap/short region, unsupported Draw, failed staging/map/lock/UpdateSurface preserves game D3D9 Present and gamepad with HMD untested.",
+    "conflict_keys": [
+      "DX11:FULLFRAME_MULTI_PARTIAL_DIRTY_PRESENT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "Game intercepted Draw/DrawIndexed -> guarded native full frame",
+      "Verify 2-8 disjoint D3D9 Present partial dirty tiles and current source crop",
+      "Same-Present D3D11 readback -> per-tile pitched BGRA copy and per-tile D3D9 UpdateSurface"
+    ],
+    "batch_components": [
+      "DX11-D3D9 real Present native multi-rect C++ publishing",
+      "Region contract and portable C++ pixel probe",
+      "Destructive regression and DX11 Fast workflow acceptance"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++17 selector and two-tile pitched BGRA copy preserving hole bytes",
+      "negative_regression": "Overlapping, mismatched bounds, invalid count/size, offscreen and unmapped crop negative cases; source mutation tests guard per-tile UpdateSurface path",
+      "component_integration": "D3D9 game Present partitionRects -> GameNativeMultiDirtyUpload -> D3D11 native readback -> D3D9 mapped upload exact tiles -> each UpdateSurface without hole overwrite"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD 785cbb5, 00753 C6 already complete",
+    "C1_REVIEW": "PASS multi-RECT partial D3D9 Present not accepted for native fullframe; unique multi-rect work key",
+    "C2_IMPLEMENT": "PASS C++ native game Present and per-tile upload, minimal probes",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "Material C++ and tests in same no-skip CI commit",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  }
+}

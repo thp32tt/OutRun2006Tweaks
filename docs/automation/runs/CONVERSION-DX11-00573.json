@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00573",
+  "production_id": "CONVERSION-DX11-00573",
+  "event_id": "CONVERSION-DX11-00573-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00573",
+  "base_sha": "5273de6ab7fbcd5c2afa164c2682f3b09cb8ebcd",
+  "work_key": "DX11:MENU_RACE_BLENDFACTOR_RGB_SUBTRACT_ADDSMOOTH_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real D3D9 game stage0 BLENDFACTORALPHA RGB + independent SUBTRACT / ADDSMOOTH alpha state intake",
+      "D3D11 compiled HLSL pixel shaders with device reset, Draw/DrawIndexed dispatch",
+      "Default-off opt-in readback inset; fallback D3D9 Draw/Present/input remains original"
+    ],
+    "batch_components": [
+      "D3D9 fixed-function state admission/capture and TEXTUREFACTOR normalization",
+      "HLSL shader compile/create/lifetime/Draw selector",
+      "Destructive link and math regressions, operand denials, CPU alpha examples"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two real game stage0 BLENDFACTORALPHA variants on native Draw/DrawIndexed",
+      "negative_regression": "Destructive source mutations and correct D3DTOP_ADDSMOOTH=11 fail-closed enum probes",
+      "component_integration": "game Draw->native HLSL PS->Draw/DrawIndexed->diagnostic GPU readback inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BLENDFACTOR_RGB_SUBTRACT_ADDSMOOTH_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BLENDFACTOR_INDEPENDENT_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "BLENDFACTORALPHA_RGB_INDEPENDENT_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_DIAGNOSTIC"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; actual menu/vehicle/race/gamepad/Quest3 VDXR is UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in only; default off, D3D9 game Draw/input/Present preserved"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "pipeline": {
+    "C0_RECOVER": "Recovered latest DX11 HEAD 5273de6a, AGENTS and DX11 policy, 00572 completed; no owned conflict",
+    "C1_REVIEW": "Missing BLENDFACTORALPHA RGB with separate SUBTRACT and ADDSMOOTH alpha modes",
+    "C2_IMPLEMENT": "Actual C++ shader/capture/compile/select/Draw and Python regression modifications",
+    "C3_VALIDATE": "Original 877e7f0 Build acceptance failed due stale 00564 negative literal and enum; fixed in bfd86e56, all five mandatory exact-SHA gates SUCCESS",
+    "C4_COMMIT": "C++ and test material 877e7f0; validation-bearing test fix bfd86e56; no CI skip on either",
+    "C5_PACKAGE": "NOT_REQUIRED; opt-in diagnostic, no user distribution or runtime promotion",
+    "C6_STATE": "Separate bookkeeping checkpoint after 5/5 completed gate SUCCESS; no duplicate CI/score"
+  },
+  "validation_evidence": {
+    "first_material_sha": "877e7f0f6b985750dfb47cbb5c2c61b703da5228",
+    "failed_initial_workflow": 38181553375,
+    "failed_initial_step": "Feature acceptance: DX11-SAFE-RETURN",
+    "failure_repair": "Update existing 00564 admission sentinel; fix ADDSMOOTH enum 11 vs ADDSIGNED2X enum 9",
+    "exact_sha": "bfd86e5695ed67a70a641a7f0ae680d9f15991d9",
+    "github_workflow_runs_observed": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38181641566,
+        "conclusion": "success",
+        "head_sha": "bfd86e5695ed67a70a641a7f0ae680d9f15991d9"
+      },
+      {
+        "name": "Build",
+        "run_id": 38181644641,
+        "conclusion": "success",
+        "head_sha": "bfd86e5695ed67a70a641a7f0ae680d9f15991d9"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38181644530,
+        "conclusion": "success",
+        "head_sha": "bfd86e5695ed67a70a641a7f0ae680d9f15991d9"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38181644478,
+        "conclusion": "success",
+        "head_sha": "bfd86e5695ed67a70a641a7f0ae680d9f15991d9"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38181641495,
+        "conclusion": "success",
+        "head_sha": "bfd86e5695ed67a70a641a7f0ae680d9f15991d9"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  },
+  "material_result_sha": "877e7f0f6b985750dfb47cbb5c2c61b703da5228",
+  "validation_bearing_result_sha": "bfd86e5695ed67a70a641a7f0ae680d9f15991d9",
+  "result_sha": "bfd86e5695ed67a70a641a7f0ae680d9f15991d9",
+  "next_action": "Independent follow-on native game render/input gap from latest GitHub HEAD, no duplicate TASK_ID. Quest3/VDXR and gamepad manual tests remain NEED_HMD_TEST. DXVK frozen.",
+  "state_persisted": true,
+  "updated_utc": "2026-10-11T22:56:14.289Z"
+}

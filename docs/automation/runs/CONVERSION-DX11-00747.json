@@ -1,0 +1,133 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00747",
+  "production_id": "CONVERSION-DX11-00747",
+  "event_id": "CONVERSION-DX11-00747-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_BGRA_D3D9_UPLOAD_LIFETIME",
+  "feature_id": "DX11-MENU-RACE-NATIVE-FRAME-BGRA-UPLOAD",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "base_head_sha": "0e9acc952a8d6a16946821a61b74958429035b29",
+  "material_result_sha": "cd4b6c7a0e8f0628b0613b62405a8c465825f68b",
+  "validation_bearing_result_sha": "c88e930e1db7a89397a083845357830342fbb11b",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "change_summary": "Real native full-game D3D11 Map to D3D9 SYSTEMMEM UpdateSurface now copies tightly visible BGRA pixels between independent row pitches; detects null, malformed, overflow, and failed D3D9 UnlockRect. Broken upload cache never publishes stale/partial menu/car/race pixels; original D3D9 Present/input retained.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_upload.hpp",
+    "tools/dx11_frame_upload_probe_00747.cpp",
+    "tools/test_dx11_frame_upload_00747.py",
+    "tools/test_dx11_game_frame_publication_00727.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Intercept genuine D3D9 menu/vehicle/race Draw/DrawIndexed and execute native D3D11 full-resolution output",
+      "D3D11 GPU fence and valid BGRA staging Map -> pitch-aware per-row copy into D3D9 CPU upload surface",
+      "Validated D3D9 UnlockRect -> backbuffer UpdateSurface or fail closed to original D3D9 Present/controller"
+    ],
+    "batch_components": [
+      "Live C++ native gameplay frame upload callsite and cache invalidation on failed D3D9 UnlockRect",
+      "Independent BGRA D3D11-to-D3D9 row transfer helper with overflow/pitch guards",
+      "Executable C++ nontrivial pitched buffer probe and Python integrated destructive regressions wired to exact-SHA CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "GitHub DX11 Fast #38641768824 5/5 SUCCESS at exact validation SHA c88e930e; live C++ integration plus BGRA padding executable test.",
+      "negative_regression": "00747 invalid pitch/null/overflow no-write probe plus destructive source mutation on failed UnlockRect and stale upload cache; original D3D9 gamepad fallback.",
+      "component_integration": "Native D3D11 Draw/DrawIndexed/color texture -> CopyResource/EVENT/Map -> pitched BGRA full-frame upload -> D3D9 UpdateSurface before same Present."
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_BGRA_D3D9_UPLOAD_LIFETIME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact SHA c88e930e DX11 Fast/Backend/Win32 Build/OpenXR/HUD all SUCCESS; Quest3/VDXR and actual gameplay screen parity UNTESTED.",
+    "activation_guard_and_fallback": "Native full frame remains explicit opt-in; malformed copy or failed D3D9 unlock discards upload and keeps original D3D9 Present/gamepad."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-NATIVE-FRAME-BGRA-UPLOAD",
+    "goal": "Reliably present full-resolution native D3D11 menu/car/race BGRA pixels through D3D9 game backbuffer despite differing CPU row pitches while preserving original Present/gamepad on upload failure.",
+    "acceptance_items": [
+      {
+        "id": "native-pitched-bgra-frame-transfer",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Each full-size D3D11 mapped BGRA row copies into D3D9 upload staging without leaking source/destination padding and publishes only after successful UnlockRect."
+      },
+      {
+        "id": "original-d3d9-input-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "input_and_fallback",
+        "expected_behavior": "Null/undersized/overflow mappings or failed D3D9 UnlockRect never invoke UpdateSurface and leave original D3D9 backbuffer and controller Present valid."
+      },
+      {
+        "id": "same-sha-integration-and-ci",
+        "category": "integrated_validation",
+        "behavior_area": "build_and_openxr",
+        "expected_behavior": "Executable padded-row copy tests, destructive source integration tests, and all mandatory exact SHA DX11 Fast, Backend, Build, OpenXR and HUD Gates SUCCESS."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-pitched-bgra-frame-transfer": "PASS",
+    "original-d3d9-input-safe-fallback": "PASS",
+    "same-sha-integration-and-ci": "PASS_EXACT_SHA"
+  },
+  "blocking_evidence": "Before this source commit, successful D3D9 LockRect with malformed nonnull mapping assumptions reached memcpy and D3D9 UnlockRect failure was ignored before UpdateSurface, allowing invalid native full-frame output rather than fail-closed original D3D9 game Present.",
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38641768824,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    },
+    "backend_conversion": {
+      "run_id": 38641768825,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    },
+    "windows_build": {
+      "run_id": 38641775822,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    },
+    "openxr_architecture": {
+      "run_id": 38641775486,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    },
+    "hud_inspector": {
+      "run_id": 38641775579,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub exact DX11 branch, AGENTS, policy and prior 00746 COMPLETE 5/5.",
+    "C1_REVIEW": "PASS native full-frame CPU mapping copy/UnlockRect loss and missing prior 00746 policy acceptance fields identified.",
+    "C2_IMPLEMENT": "PASS material C++ pitched BGRA Map->D3D9 upload/UnlockRect fallback and executable source probes.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast #38641768824, Backend #38641768825, Build #38641775822, OpenXR #38641775486, HUD #38641775579 all SUCCESS on c88e930e.",
+    "C4_COMMIT": "PASS: source material cd4b6c7; subsequent source+regressions validation SHA c88e930e, no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED user-controlled distribution; no HMD",
+    "C6_RESULT": "PASS: exact SHA 5/5 source/build validated; separate C6 bookkeeping, RUNTIME_VALIDATION=UNTESTED, no automatic HMD promotion."
+  },
+  "result_sha": "c88e930e1db7a89397a083845357830342fbb11b",
+  "result_note": "Integrated native BGRA D3D11-to-D3D9 full-backbuffer pitch-aware copy and UnlockRect/UpdateSurface fail-closed recovery; exact SHA five mandatory CI workflows SUCCESS. No real Quest3/VDXR/gamepad gameplay verification.",
+  "recorded_at_kst": "2026-10-15 06:50 KST"
+}

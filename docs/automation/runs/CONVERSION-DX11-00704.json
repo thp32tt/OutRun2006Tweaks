@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00704",
+  "production_id": "CONVERSION-DX11-00704",
+  "event_id": "CONVERSION-DX11-00704-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_STAGE1_CROSS_CHANNEL_RGB_MENU_RACE",
+  "work_key": "DX11:GAME_STAGE1_CROSS_CHANNEL_RGB",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Read live D3D9 game-authored Stage1 COLOROP 18..21 and strict FVF/operand state",
+      "Evaluate cross-channel RGB HLSL with separately admitted ALPHAOP and source constant buffer",
+      "Submit real game Draw/DrawIndexed to diagnostic native D3D11 target, preserve original DX9Ex Present and input fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_cross_channel_probe_00704.cpp",
+      "tools/test_dx11_stage1_cross_channel_00704.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Four D3D9 RGB formulas and 576 COLOROP source/modifier combinations, independent alpha and saturation",
+      "negative_regression": "Reject COLOROP-only ops in ALPHAOP, unknown texture/TEMP bits, missing diffuse and unsupported stage; original input/game Draw maintained",
+      "component_integration": "Live D3D9 Stage1 snapshot -> native HLSL RGB & alpha -> CB/Draw/DrawIndexed -> readback and visible diagnostic plus exact-SHA CI"
+    },
+    "conflict_keys": [
+      "DX11:GAME_STAGE1_CROSS_CHANNEL_RGB",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/portable probe/Windows build only; Quest3 menu/race pixel test NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME diagnostic opt-in; D3D9 Draw/Present/gamepad unchanged; unsupported states fail closed"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STAGE1_CROSS_CHANNEL_RGB_MENU_RACE",
+    "goal": "Deliver four real game Stage1 RGB cross-channel color transitions through native menu/vehicle/race Draw/DrawIndexed with independent alpha, regression and fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-cross-channel-rgb",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_source_native_hlsl_draw",
+        "expected_behavior": "COLOROP 18,19,20,21 capture and mirror to native pixel shader Draw/DrawIndexed"
+      },
+      {
+        "id": "independent-alpha-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_input_fvf_dx9ex",
+        "expected_behavior": "Cross-channel operations never accepted for ALPHAOP and unsupported states preserve D3D9 gameplay"
+      },
+      {
+        "id": "integrated-build-gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_python_windows_actions",
+        "expected_behavior": "576 admission cases, RGB equations, static mutations and exact-SHA GitHub gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live-cross-channel-rgb": "PASS",
+    "independent-alpha-fallback": "PASS",
+    "integrated-build-gates": "PASS"
+  },
+  "base_head_sha": "79c372403010ae88858e4d34881f0cbc57e69441",
+  "material_result_sha": "a3e03fc8829cafe510a4ab4d288efd83f686cc81",
+  "validation_bearing_result_sha": "a3e03fc8829cafe510a4ab4d288efd83f686cc81",
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_cross_channel_probe_00704.cpp",
+    "tools/test_dx11_stage1_cross_channel_00704.py",
+    "docs/automation/runs/CONVERSION-DX11-00704.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE preceding 00703 complete; 00704 unowned",
+    "C1_REVIEW": "DONE documented D3D9 COLOROP-only missing Stage1 18..21",
+    "C2_IMPLEMENT": "DONE CPU admission and native HLSL integration with focused probes",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast #38492231485, Backend #38492231534, Win32 Build #38492238363, OpenXR #38492238367, HUD #38492238354 all SUCCESS at a3e03fc8829cafe510a4ab4d288efd83f686cc81. Quest3/VDXR and gamepad UNTESTED",
+    "C4_COMMIT": "PASS: material 6 file SHA a3e03fc8829cafe510a4ab4d288efd83f686cc81 without CI-skip, exact SHA 5/5 Gates",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: 5/5 exact-SHA Gates SUCCESS; C6 separate [skip ci] bookkeeping; no HMD/gamepad validation"
+  },
+  "next_action": "Feature BUILD_VERIFIED. Controller choose new non-overlapping DX11 native rendering/input feature. Do not rerun/score this TASK_ID; Quest3/VDXR runtime remains UNTESTED.",
+  "state_persisted": true,
+  "gate_evidence": {
+    "validation_bearing_sha": "a3e03fc8829cafe510a4ab4d288efd83f686cc81",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38492231485,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38492231534,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38492238363,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38492238367,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38492238354,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  }
+}

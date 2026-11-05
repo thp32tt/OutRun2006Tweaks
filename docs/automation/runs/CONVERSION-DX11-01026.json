@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01026",
+  "production_id": "CONVERSION-DX11-01026",
+  "dispatch_event_id": "CONVERSION-DX11-01026-E001",
+  "event_id": "CONVERSION-DX11-01026-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01026",
+  "feature_id": null,
+  "work_key": null,
+  "work_class": "integration",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "source_head": "0aa210d3c9b785aa6c5ed2bab16396477633a9ed",
+  "material_result_sha": "0aa210d3c9b785aa6c5ed2bab16396477633a9ed",
+  "result_sha": "0aa210d3c9b785aa6c5ed2bab16396477633a9ed",
+  "validation_bearing_result_sha": "0aa210d3c9b785aa6c5ed2bab16396477633a9ed",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "ffb_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "At the exact material source commit, lower real SM3 boolean b# CALLNZ/LABEL/RET subroutines to bounded IF/ENDIF-guarded native shader instructions in the live programmable D3D11 Draw/DrawIndexed path. All five required GitHub push CI gates succeeded at the exact SHA. No HMD/gameplay validation performed.",
+  "recovery": {
+    "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+    "resolution": "Recreated the missing C6 run JSON from the exact original material commit, checked source-linked C++17 probe, and verified five existing GitHub Actions runs without source changes or CI rerun.",
+    "prior_record_found": false,
+    "feature_contract_source": "RECONSTRUCTED_FROM_COMMIT_AND_SOURCE_PROBE",
+    "previous_record_preservation": "NO_EXISTING_RECORD_TO_OVERWRITE",
+    "revalidation_performed": false
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live vs_3_0/ps_3_0 CALLNZ l#,b# -> validate boolean operand and nonrecursive subroutine target -> insert IF b# / expanded body / ENDIF",
+      "Existing native SM3 shader source/constant/texture materialization -> guarded real game D3D11 Draw/DrawIndexed; invalid flow remains D3D9Ex owned"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled C++17 probe verifies conditional nested, repeated and live b# guarded subroutine lowering order and correct IF/ENDIF boundaries.",
+      "negative_regression": "Invalid boolean operand, missing label, recursive cycle, malformed token, illegal DEF and instruction budget overflow fail closed.",
+      "component_integration": "native_backend.cpp -> native_sm3_subroutine_expansion.hpp -> native shader translation for intercepted real-game Draw/DrawIndexed"
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY; physical game frame and Quest3 remain UNTESTED",
+    "activation_guard_and_fallback": "Native guarded opt-in, unsupported path falls back to D3D9Ex; no claimed HMD input or FFB validation."
+  },
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Support authentic SM3 boolean CALLNZ l#,b# control flow in the native D3D11 programmable live-game shader Draw path, preserving b# predicate semantics and original D3D9Ex fallback for unsafe programs.",
+    "acceptance_items": [
+      {
+        "id": "sm3_callnz_native_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Live_SM3_Boolean_Conditional_Subroutine_Native_Draw",
+        "expected_behavior": "Valid CALLNZ with dynamic b# or DEFB predicate expands to a nested bounded IF/ENDIF native SM3 stream, preserving conditional TEMP/output writes before shader/Draw materialization."
+      },
+      {
+        "id": "original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Invalid_Conditional_SM3_D3D9Ex_Fallback",
+        "expected_behavior": "Malformed b# or call token, unknown label, recursion, illegal function body and expansion overflow reject native shader with the original D3D9Ex path intact."
+      },
+      {
+        "id": "same_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Compiled_CALLNZ_Probe_Five_Exact_SHA_Actions_Gates",
+        "expected_behavior": "C++17 positive/negative CALLNZ probe plus all five required GitHub Actions gates succeed on one unchanged material source SHA."
+      }
+    ]
+  },
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
+    "tools/dx11_sm3_conditional_call_probe_01026.cpp"
+  ],
+  "pending_items": [
+    "Physical Quest3/VDXR menu-to-race frame display, native Draw/frame counts, input/gamepad and FFB remain UNTESTED; GitHub CI does not prove real runtime gameplay."
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "No physical HMD/game native Draw and published-frame measurement for this SHA.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "0aa210d3c9b785aa6c5ed2bab16396477633a9ed",
+  "NEXT_IMPLEMENTATION_ACTION": "Validate real menu/car/race native draws and published frames on desktop/Quest3 separately; do not treat CI as runtime acceptance.",
+  "acceptance_results": {
+    "sm3_callnz_native_draw": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_sm3_conditional_call_probe_01026.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks CI: C++17 conditional CALLNZ probe with nested/repeated b# case; exact SHA run 39966867434"
+    },
+    "original_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
+        "tools/dx11_sm3_conditional_call_probe_01026.cpp"
+      ],
+      "validation_command": "Compiled source-linked negative probe for invalid operand/label/token, recursion, illegal DEF and size cap in exact SHA DX11 Fast Structural Checks run 39966867434"
+    },
+    "same_sha_gates": {
+      "status": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_sm3_conditional_call_probe_01026.cpp"
+      ],
+      "validation_command": "Exact SHA 0aa210d3c9b785aa6c5ed2bab16396477633a9ed: DX11 Fast 39966867434, Backend 39966867307, Build 39966867321, OpenXR 39966867231, HUD 39966867339; all completed success; no rerun"
+    }
+  },
+  "gate_evidence": {
+    "source_sha": "0aa210d3c9b785aa6c5ed2bab16396477633a9ed",
+    "material_source_sha": "0aa210d3c9b785aa6c5ed2bab16396477633a9ed",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39966867434,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39966867307,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39966867321,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39966867231,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39966867339,
+        "conclusion": "success"
+      }
+    },
+    "causal_repairs": []
+  },
+  "feature_ready": true
+}

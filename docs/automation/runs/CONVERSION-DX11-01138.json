@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01138",
+  "production_id": "CONVERSION-DX11-01138",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01138",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:DUAL_GPU_DRAW_REGION_CAPTURE",
+  "classification": "A_REAL_NATIVE_GAME_GPU_PIXEL_CAPTURE_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "source_base_sha": "d782d87618b430f03884ad1ea0970ed4d2fe4df7",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Make true live-game D3D11 geometry Draw GPU pixels visible in an explicit opt-in RAW diagnostic path by collecting and selecting two independent native viewport RGB regions without corrupting the original D3D9 game backbuffer.",
+    "acceptance_items": [
+      {
+        "id": "native_dual_game_gpu_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live game native GPU pixel output",
+        "expected_behavior": "One real source-owned game Draw produces two distinct native GPU BEFORE/AFTER pairs sharing a GPU EVENT and source epoch; select only physically changed source RGB."
+      },
+      {
+        "id": "source_write_lifetime_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 source color write and fallback safety",
+        "expected_behavior": "A later original source color write to either native tile retires the entire pair; unknown source, unavailable GPU and malformed region remain fail closed."
+      },
+      {
+        "id": "cxx_ci_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "portable GPU rectangle regression and exact SHA CI",
+        "expected_behavior": "Bounded C++17 tests exercise both regions and source-write invalidation; all five untouched mandatory GitHub Actions succeed at one source SHA."
+      }
+    ]
+  },
+  "validation_bearing_result_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+  "material_result_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+  "desktop_native_game": "UNTESTED",
+  "quest3_vdxr": "UNTESTED",
+  "development_time_percentages": "UNMEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW",
+      "D3D11_SOURCE_VIEWPORT_NATIVE_GPU_BEFORE_AFTER",
+      "TWO_DISTINCT_GPU_SUBREGION_READBACKS",
+      "D3D9_CANONICAL_PRESENT_PARTIAL_TILE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "NATIVE_REAL_GAME_GPU_DRAW_DUAL_TILE_CAPTURE",
+      "SOURCE_COLOR_WRITE_COVERS_BOTH_GPU_REGIONS",
+      "SAME_FENCE_SOURCE_EPOCH_AND_ZERO_RGB_REARM",
+      "PORTABLE_CXX17_POSITIVE_NEGATIVE_TEST"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two source-matched native D3D11 viewport/scissor pixel regions from ONE real D3D9 game Draw share a fence and the stronger actually observed RGB delta becomes the labeled RAW tile.",
+      "negative_regression": "Separate source color writes touching either tile revoke the GPU capture; stale Present, unknown regions, overflow, false-alternate and no-RAW-mode preserve original D3D9 and no full-game publication.",
+      "component_integration": "D3D9 game Draw interception -> native D3D11 Draw -> two ordered GPU staging pairs -> same fence and source Present -> bounded original D3D9 RAW diagnostic tile."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Only source-authentic GPU RGB diagnostic tile output may be credited; whole native menu/car/race scene and Quest3 HMD not yet proven.",
+    "activation_guard_and_fallback": "Explicit RAW visual opt-in; original D3D9 Draw, inputs, FFB, DX9Ex fallback, RT/viewport bounds and unsupported full-frame abort intact."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01138.json"
+  ],
+  "real_game_draw_blocker": "Awaiting source-matched real-game diagnostic runtime for native_draws and native_gpu_pixel_output; old 2026-10-28 pinned zero-native run cannot be extrapolated to new SHA.",
+  "initial_causal_ci_failures": [
+    {
+      "run_id": 40717768417,
+      "reason": "task JSON missing development_strategy before Fast tests"
+    },
+    {
+      "run_id": 40717769246,
+      "reason": "same task JSON policy failure before Backend compile"
+    }
+  ],
+  "checkpoint": "C6_STATE",
+  "full_dx11_renderer_complete": false,
+  "source_implementation_commit_sha": "d462cf76cb82590815d0a732c5c91423c98d9d8e",
+  "causal_source_safety_ci_repair_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+  "acceptance_results": {
+    "native_dual_game_gpu_capture": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp"
+      ],
+      "validation_command": "Build exact SHA 40dca25b70815d8226e4ecee6f99bbd9255d2324 run 40718424891 success; game/HMD not observed"
+    },
+    "source_write_lifetime_fallback": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate exact SHA 40dca25b70815d8226e4ecee6f99bbd9255d2324 run 40718423869 success; game/HMD not observed"
+    },
+    "cxx_ci_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "DX11 Fast Structural Checks exact SHA 40dca25b70815d8226e4ecee6f99bbd9255d2324 run 40718424613 success; game/HMD not observed"
+    }
+  },
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40718424613,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40718423869,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40718424891,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40718425135,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40718423294,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      }
+    ],
+    "windows_build_artifact": {
+      "id": 12829967710,
+      "name": "outrun2006tweaks-40dca25b70815d8226e4ecee6f99bbd9255d2324",
+      "digest": "sha256:29819e5740c95f92932117fcc8508abdb5f9a446c05155e3f42d050b4a7bbcb6",
+      "bytes": 5803503
+    },
+    "full_native_game_frame_complete": false,
+    "gameplay_visual_pass": false,
+    "runtime_evidence": "UNTESTED: real desktop menu/vehicle/race native pixel output and Quest 3 / VDXR were NOT run on this binary",
+    "development_time_distribution": "UNMEASURED",
+    "retries": "E001 initial CI record policy fail, E002 source safety and acceptance policy repair; one source feature with no duplicate point"
+  },
+  "completed_at_kst": "2026-10-29"
+}

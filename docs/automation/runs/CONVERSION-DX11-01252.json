@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01252",
+  "production_id": "CONVERSION-DX11-01252",
+  "event_id": "CONVERSION-DX11-01252-E001",
+  "event_type": "result",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "ad1e5af1b8075386cd1e00027f41a848077b41de",
+  "material_implementation_sha": "8a8cf067648708ee7b38632123a3dea402b43f83",
+  "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_MULTI_GPU_DRAW_WINDOWS",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
+  "classification": "A_EXISTING_FVF_FULL_SOURCE_CLIP_GROWTH_AND_REUSABLE_GPU_UPLOAD_B_CAUSAL_STATIC_GATE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "score_note": "01252 continues the same already-scored 01251 clipped FVF POINTLIST multi-D3D11-Draw source feature. Wider 13-plane source budget, bounded WRITE_DISCARD GPU streams, small source budget repair, source graph/acceptance repair, exact-SHA CI and C6 are one continuation; no independent score (+0).",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW",
+      "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_FVF_POINT_DRAW_DRAWINDEXED",
+      "ALL_HOMOGENEOUS_USER_EYE_CLIP_PLANES",
+      "SOURCE_BOUNDED_CPU_FAN_EXPANSION",
+      "WRITE_DISCARD_REUSED_D3D11_POINT_WINDOWS",
+      "ORDERED_NATIVE_GPU_DRAW_RGB_SOURCE_WITH_D3D9_FALLBACK"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CXX_FULL_POLYGON_CLIP_VERTEX_GROWTH_BUDGET",
+      "CXX_REUSED_DYNAMIC_GPU_VERTEX_WINDOW_UPLOAD",
+      "CXX_CLIPPED_LIVE_SOURCE_AND_GPU_WINDOW_REGRESSIONS",
+      "STATIC_SOURCE_AUDIT_CAUSAL_ALIGNMENT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Source/build test only until an exact game menu, vehicle selection and race desktop launch provides observable native GPU pixels; native full-frame parity and Quest3 HMD currently UNTESTED.",
+    "activation_guard_and_fallback": "Native mode is opt-in; any CPU clip, GPU Map or source validation failure aborts native frame publication and keeps actual original D3D9 Draw, DX9Ex renderer, game input and FFB unchanged; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Real original FVF 1100-face user-clipped Draw expands to 6600 preserved point shader vertices, plans 6144+456 GPU upload windows retaining payload UVs and original ordering.",
+      "negative_regression": "Malformed original index and source capacity fail closed; invalid GPU window preserves output args, and a failed later Map aborts native frame publication without altering the authoritative D3D9 draw.",
+      "component_integration": "D3D9 Draw -> game_fvf_clipped_point_vertices -> source envelope budget -> GPU WRITE_DISCARD windows -> D3D11 Draw with original OM/RT/depth; mandatory exact SHA gates in progress."
+    }
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_MULTI_GPU_DRAW_WINDOWS",
+    "goal": "Fully original-game FVF clipped point-fill triangles of any admitted triangle topology stream through native D3D11 point windows without arbitrary expansion truncation, extra GPU buffer allocation, or loss of source fallback.",
+    "acceptance_items": [
+      {
+        "id": "point_geometry_and_gpu_windows",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_geometry",
+        "expected_behavior": "Source FVF clip to complete point fan expansion, bounded reusable GPU IA windows and ordered D3D11 Draws."
+      },
+      {
+        "id": "transactional_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_input_and_source_safety",
+        "expected_behavior": "Any malformed IA, clipped source overrun or GPU write failure aborts partial native publication while original D3D9 Draw, input and FFB survive."
+      },
+      {
+        "id": "exact_source_gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_build_and_release_pipeline",
+        "expected_behavior": "Fast, Backend, Win32 Build, OpenXR, HUD pass on one exact validation-bearing commit; no claim of actual game/HMD runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "point_geometry_and_gpu_windows": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "Authentic FVF clipped source budget 42x/source triangle; bounded 6144+456 GPU upload regression; DX11 Fast Structural Checks 42021955044 SUCCESS and Windows Build 42021963248 SUCCESS on exact f25c32eedba89067e8bf2b375eb919db4691d6d5."
+    },
+    "transactional_game_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp",
+        "tools/verify_dx11_first_game_frame_boundary.py",
+        "tools/test_dx11_first_game_frame_regressions.py"
+      ],
+      "validation_command": "Original D3D9 source IB/capacity checks and GPU fail-closed, preserved input/FFB and no DXVK changes; Backend Gate 42021955366 SUCCESS + Windows Build 42021963248 SUCCESS exact SHA f25c32eedba89067e8bf2b375eb919db4691d6d5."
+    },
+    "exact_source_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tools/verify_dx11_first_game_frame_boundary.py",
+        "tools/test_dx11_first_game_frame_regressions.py"
+      ],
+      "validation_command": "GitHub exact f25c32eedba89067e8bf2b375eb919db4691d6d5: Fast 42021955044, Backend 42021955366, Windows Build 42021963248, OpenXR 42021963370, HUD 42021963232 all SUCCESS. No original game/HMD runtime performed."
+    }
+  },
+  "runtime_validation_notes": "No original physical OutRun menu/vehicle/race native GPU frame or Quest3/VDXR HMD session was run on this source. Build-only source acceptance; full native renderer and HMD promotion unverified.",
+  "feature_stage": "FEATURE_READY",
+  "result_sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+  "material_result_sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+  "validation_bearing_result_sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "work_allocation_measured": false,
+  "source_repair_shas": [
+    "8a8cf067648708ee7b38632123a3dea402b43f83",
+    "1ce82374f90252634946a28fb204ac84530e9e65",
+    "89aba07c36a9b00b7242b900522205a1423028ff",
+    "f25c32eedba89067e8bf2b375eb919db4691d6d5"
+  ],
+  "ci_exact_sha": {
+    "sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+    "fast": {
+      "id": 42021955044,
+      "conclusion": "success"
+    },
+    "backend": {
+      "id": 42021955366,
+      "conclusion": "success"
+    },
+    "build": {
+      "id": 42021963248,
+      "conclusion": "success"
+    },
+    "openxr": {
+      "id": 42021963370,
+      "conclusion": "success"
+    },
+    "hud": {
+      "id": 42021963232,
+      "conclusion": "success"
+    }
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01130",
+  "production_id": "CONVERSION-DX11-01130",
+  "event_id": "CONVERSION-DX11-01130-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01130",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SAME_PRESENT_ZERO_RGB_RECAPTURE",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "cdde5f07f2df9741f535e2286a8cdbdba34364c3",
+  "source_change_sha": "0cf63e09c58fa3f7338da7aedaacc4a7af0f2952",
+  "material_result_sha": "6ca12ccf7066a36bff2411a033a676845f200a7f",
+  "validation_bearing_result_sha": "6ca12ccf7066a36bff2411a033a676845f200a7f",
+  "result_sha": "6ca12ccf7066a36bff2411a033a676845f200a7f",
+  "implementation_commits": [
+    "0cf63e09c58fa3f7338da7aedaacc4a7af0f2952"
+  ],
+  "repair_commits": [
+    "6ca12ccf7066a36bff2411a033a676845f200a7f"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+    "src/vr/d3d11/native_game_raw_pixel_delta.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_gpu_source_epoch_test.cpp",
+    "tests/native_raw_pixel_provenance_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01129.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW",
+      "PAIRED_NATIVE_D3D11_BEFORE_AFTER_GPU_COPY",
+      "SOURCE_GAME_PRESENT_EPOCH",
+      "ZERO_RGB_EVENT_COMPLETE_RECAPTURE",
+      "VALID_POSITIVE_GPU_PIXEL_PRESENT_TILE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_TILE_NOT_FULL_NATIVE_GAME_FRAME"
+    ],
+    "batch_components": [
+      "CPP_SOURCE_EPOCH_ZERO_RGB_SAFE_REARM",
+      "CPP_REAL_GPU_EVENT_AND_MAPPED_RGB_DELTA_SCAN",
+      "CPP_SAME_PRESENT_BOUNDED_SOURCE_RECAPTURE",
+      "CPP_GAME_PRESENT_AUTHENTIC_RESULT_LOG",
+      "CXX17_POSITIVE_NEGATIVE_ZERO_RGB_AND_FENCE_TESTS",
+      "CAUSAL_INHERITED_01129_FULL_GATE_SCHEMA_REPAIR"
+    ],
+    "visible_frame_acceptance": "Exact source and build verified only. Opt-in 256x144 real native GPU diagnostic crop; no runtime proof of visible menu, car or race, native complete frame, or HMD stereo.",
+    "activation_guard_and_fallback": "Original D3D9 game Draw/Present, DX9Ex fallback, gamepad/FFB/SkyGlow and frozen DXVK unaffected; positive RGB data retained, pending GPU fence not reused, failed Map/query quarantined.",
+    "acceptance_proof": {
+      "positive_probe": "When a real native source Draw finishes GPU readback with zero RGB delta, same-Present staging is safely released for a subsequent real source Draw, up to two re-arms.",
+      "negative_regression": "Pending GPU EVENT, wrong source serial, invalid mapped pitch or COM/device failure cannot re-arm; a genuine positive RGB capture is held for its matched Present. Alpha-only change is RGB-inert.",
+      "component_integration": "Game D3D9 Draw and Present source serial, D3D11 pre/post copy, native typed readback RGB comparison, opt-in tile presentation and five exact-SHA push Actions gates all linked by real source code."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Permit the original game's later native D3D11 Draw to yield an authentic visible RGB diagnostic tile when the initial same-Present draw produced zero RGB, without overwriting positive pixels or reusing in-flight GPU resources.",
+    "acceptance_items": [
+      {
+        "id": "real_same_present_native_rgb_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Live D3D9 game Draw to paired native D3D11 GPU readback",
+        "expected_behavior": "Verified completed RGB-inert capture can be released for a later native draw in the same original game Present."
+      },
+      {
+        "id": "gpu_fence_identity_and_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GPU fence, mapped resource bounds, original D3D9 renderer",
+        "expected_behavior": "Positive RGB remains owned; pending/failed GPU copy does not mutate original game output or original input path."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Actions Windows build, OpenXR and render source tests",
+        "expected_behavior": "The unchanged five mandatory push Gate workflows pass on the same final material result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real_same_present_native_rgb_capture": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_pixel_delta.hpp",
+        "tests/native_raw_pixel_provenance_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #40644868164 PASS on exact result SHA; real game/HMD untested"
+    },
+    "gpu_fence_identity_and_original_fallback": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate #40644868274 and Win32 Build #40644868131 exact-SHA PASS"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40644868164",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40644868274"
+      ],
+      "validation_command": "Five required push workflows completed success at exact material SHA 6ca12ccf7066a36bff2411a033a676845f200a7f"
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40644868164,
+      "event": "push",
+      "head_sha": "6ca12ccf7066a36bff2411a033a676845f200a7f",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40644868274,
+      "event": "push",
+      "head_sha": "6ca12ccf7066a36bff2411a033a676845f200a7f",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40644868131,
+      "event": "push",
+      "head_sha": "6ca12ccf7066a36bff2411a033a676845f200a7f",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40644868187,
+      "event": "push",
+      "head_sha": "6ca12ccf7066a36bff2411a033a676845f200a7f",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40644868146,
+      "event": "push",
+      "head_sha": "6ca12ccf7066a36bff2411a033a676845f200a7f",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS source HEAD cdde5f07 and previous 01129 material commit; separate new first RGB-inert readback blockage",
+    "C1_REVIEW": "PASS native source ownership, fence and same-game Present epoch",
+    "C2_IMPLEMENT": "PASS actual C++ source and regression commit 0cf63e09",
+    "C3_VALIDATE": "PASS exact 5 required push Actions success at 6ca12ccf; initial inherited 01129 schema failure repaired causally under 01130",
+    "C4_COMMIT": "PASS nonforce material source implementation and causal repair with exact marker and no CI-skip",
+    "C5_PACKAGE": "PASS source-matched Win32 Build artifact ID 12797735643",
+    "C6_STATE": "Documentation only, post Gate, score delta +0; preserve validated result SHA and runtime UNTESTED"
+  },
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-6ca12ccf7066a36bff2411a033a676845f200a7f",
+    "artifact_id": 12797735643,
+    "run_id": 40644868131,
+    "digest": "sha256:cee10dfc56eb7a2337103c789edce347098ca274df1e66e46f7461d899226465"
+  },
+  "runtime_evidence": {
+    "native_draws": "UNTESTED_AT_THIS_SHA",
+    "native_gpu_pixel_output": "UNTESTED_AT_THIS_SHA",
+    "publishedBackbufferFrames": "UNTESTED_AT_THIS_SHA",
+    "gpu_desktop_frames": "UNTESTED_AT_THIS_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "score_change": 1,
+  "c6_score_change": 0,
+  "cumulative_ai2_score": 2080,
+  "scoreboard_authority": {
+    "repository": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "path": "AI_SCOREBOARD.md",
+    "scoreboard_commit": "5b76151e949da8f0efc953127d574b140844cb01",
+    "previous_confirmed_ai2": 2079,
+    "score_increment_for_distinct_source_and_exact_sha_gate": 1,
+    "score_increment_for_retry_and_c6": 0,
+    "new_confirmed_ai2": 2080
+  },
+  "next_action": "Source-matched real game opt-in RAW desktop run: require genuine native_draws>0 and native_gpu_pixel_output>0 on same SHA; compare menu/car/race then complete native frame and separate L/R OpenXR. No runtime PASS from CI alone.",
+  "c6_note": "Post validation bookkeeping only. Development effort proportions not measured. External controller runtime adoption NOT_VERIFIED."
+}

@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00632",
+  "production_id": "CONVERSION-DX11-00632",
+  "event_id": "CONVERSION-DX11-00632-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_COMPLEMENT_TEXTURE_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "9f5859c1f6e399e80397f59a10ea7296c46047ea",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game-authored D3D9 stage0 PM RGB/SELECTARG1 complemented texture-alpha source",
+      "Captured state -> compiled D3D11 inverted-alpha PS -> guarded Draw/DrawIndexed",
+      "Unsupported D3D9 state retains DX9Ex gamepad/render fallback"
+    ],
+    "batch_components": [
+      "D3D9 texture state capture/admission and modifier guard",
+      "Native HLSL shader creation/binding/reset",
+      "Destructive source and numeric regression wired to Fast and Backend CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Color still uses sampled texture-alpha for PM RGB, alpha uses 1-texture-alpha",
+      "negative_regression": "Wrong ALPHAOP/operand, shader disconnect and incorrect RGB complement fail",
+      "component_integration": "Live game GetTextureStageState -> native HLSL PS -> D3D11 DrawIndexed/Draw"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_COMPLEMENT_TEXTURE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Automated only; real menu/vehicle/race, Quest3/VDXR untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit diagnostic opt-in; DX9Ex safe fallback"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_inverse_texture_alpha_00632.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00632.json",
+    "tools/test_dx11_selectarg_tfactor_input_00587.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS HEAD and 00631 policy/claim",
+    "C1_REVIEW": "PASS unsupported complemented alpha observed in native selector code",
+    "C2_IMPLEMENT": "PASS C++ live capture, HLSL compile/native Draw, negative numeric tests",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend #38305353595, DX11 Fast #38305353584, Windows Build #38305358160, OpenXR #38305358153 and HUD #38305358168 ALL SUCCESS on 81b5c4130e11507585390b87bbf9e4febd82a5b3",
+    "C4_COMMIT": "PASS: original material 20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4; repaired source regression exact-SHA validation-bearing 81b5c4130e11507585390b87bbf9e4febd82a5b3",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; runtime Quest3/VDXR/menu/race/gamepad UNTESTED"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Completed 5/5 exact-SHA CI. Controller may allocate NEXT independent DX11 source feature; this task must not be rerun or rescored. Quest3/VDXR game screen, menu/vehicle/race, gamepad and safe fallback NEED_HMD_TEST.",
+  "failure_recovery": {
+    "first_material_sha": "20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4",
+    "first_failures": [
+      {
+        "workflow": "Backend Conversion Gate",
+        "run_id": 38305113776,
+        "step": "Verify DX11 native SELECTARG TFACTOR alpha 00587",
+        "cause": "test matched previous source-graph suffix without new strict inverse-alpha carveout"
+      },
+      {
+        "workflow": "Build",
+        "run_id": 38305118002,
+        "step": "Feature acceptance: DX11-SAFE-RETURN",
+        "cause": "test retained old source-graph suffix in first-frame regression"
+      }
+    ],
+    "repair": "Update exact required conjunct in legacy destructive source-graph tests; retain all original predicates, negative mutations and numeric evidence"
+  },
+  "material_result_sha": "20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4",
+  "material_implementation_sha": "20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4",
+  "validation_bearing_result_sha": "81b5c4130e11507585390b87bbf9e4febd82a5b3",
+  "result_sha": "81b5c4130e11507585390b87bbf9e4febd82a5b3",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38305353595,
+      "conclusion": "SUCCESS"
+    },
+    "dx11_fast": {
+      "run_id": 38305353584,
+      "conclusion": "SUCCESS"
+    },
+    "win32_build": {
+      "run_id": 38305358160,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "run_id": 38305358153,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38305358168,
+      "conclusion": "SUCCESS"
+    }
+  }
+}

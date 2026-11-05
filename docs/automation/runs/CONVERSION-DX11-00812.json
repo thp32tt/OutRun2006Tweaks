@@ -1,0 +1,122 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00812",
+  "production_id": "CONVERSION-DX11-00812",
+  "event_id": "CONVERSION-DX11-00812-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_DIRECT_TWO_EYE_RTV_PRODUCER",
+  "feature_id": "DX11-NATIVE-DIRECT-EYE-RTV-PRODUCER",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": "bd612d96175b451b95ebc28d98997f11a72d98bc",
+  "validation_bearing_result_sha": "41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866",
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py",
+    "tools/test_dx11_eye_copy_lifetime_00721.py",
+    "tools/test_dx11_eye_msaa_resolve_00695.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-NATIVE-DIRECT-EYE-RTV-PRODUCER",
+    "full_dx11_renderer_complete": false,
+    "goal": "Record separate native D3D11 left/right eye graphics commands directly into the generation-owned shared GPU ring RTs, replacing optional per-eye source Copy/Resolve when a live stereo recorder becomes available. Producer fence completion gates x64 OpenXR publication; never duplicate mono pixels.",
+    "acceptance_items": [
+      {
+        "id": "independent-dx11-eye-render",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_eye_ring",
+        "expected_behavior": "Native GPU recorder receives distinct left/right RTVs on owning D3D11 immediate context; left/right GPU pixels remain distinct through the shared ring."
+      },
+      {
+        "id": "failure-quarantine-and-ack",
+        "category": "fallback_regression",
+        "behavior_area": "native_gpu_eye_ring",
+        "expected_behavior": "Partial recorder or failed GPU fence quarantines entire ring; precise producer generation and host ACK retire only valid complete pairs, original DX9Ex input path untouched."
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_d3d11_host",
+        "expected_behavior": "Run all mandatory GitHub Actions on the same final revision while HMD/gamepad remains explicitly untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "independent-dx11-eye-render": "PASS_BUILD",
+    "failure-quarantine-and-ack": "PASS_BUILD",
+    "exact-sha-ci": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read latest branch HEAD, AGENTS.md, DX11 automation policy and prior 00811 OpenXR paired-eye copy work; selected non-overlapping native eye producer API.",
+    "C1_REVIEW": "The existing shared-eye ring had source-eye Copy/Resolve and a WARP probe but no direct native RTV command recorder. Avoided redoing already-PASS host XR eye array copy.",
+    "C2_IMPLEMENT": "Actual shared ring C++ renderer callback records two independent native RT eye commands on one immediate context, queues GPU ownership before callback and quarantines any partial draw; WARP tests exercise real GPU pixel outputs and ACK.",
+    "C3_VALIDATE": "Initial exact-SHA static CI exposed inherited single-source-region test boundaries. Same TASK_ID repaired scoped Copy/Resolve and direct RTV failure mutants without deleting preexisting safety checks. All required exact final SHA Gate workflows SUCCESS.",
+    "C4_COMMIT": "Material source bd612d96175b451b95ebc28d98997f11a72d98bc [AUTO:CONVERSION-DX11-00812]; CI repair 334a8ce546c90f400aa0d850d4098895cb9afe61 and 41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866 under same TASK_ID; this C6 result is separate bookkeeping only [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA. Quest3/VDXR/gamepad and game picture visual parity UNTESTED."
+  },
+  "evidence": {
+    "exact_sha": "41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866",
+    "exact_sha_gate_results": {
+      "DX11 Fast Structural Checks": {
+        "run_id": 38859269646,
+        "conclusion": "success",
+        "associated_commit_sha": "41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866"
+      },
+      "Build": {
+        "run_id": 38859277629,
+        "conclusion": "success",
+        "associated_commit_sha": "41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38859277724,
+        "conclusion": "success",
+        "associated_commit_sha": "41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38859277833,
+        "conclusion": "success",
+        "associated_commit_sha": "41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866"
+      },
+      "Backend Conversion Gate": {
+        "run_id": 38859269642,
+        "conclusion": "success",
+        "associated_commit_sha": "41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866"
+      }
+    },
+    "isolated_warp_prior_sha_note": "Independent WARP workflow succeeded on 334a8ce546c90f400aa0d850d4098895cb9afe61; final exact SHA Backend Gate builds/runs native transport probe. Do not misattribute prior-sha WARP run as exact-sha validation.",
+    "runtime_evidence": "NONE: no game/HMD execution"
+  },
+  "material_source_commits": [
+    "bd612d96175b451b95ebc28d98997f11a72d98bc"
+  ],
+  "repair_commits": [
+    "334a8ce546c90f400aa0d850d4098895cb9afe61",
+    "41ca6983a8fd0bd6db2e071f9d3b4fe9ecfa0866"
+  ],
+  "score": {
+    "run_key": "CONVERSION-DX11-00812",
+    "score_change": 0,
+    "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
+    "note": "Any verified new-feature +1 is recorded exclusively once in ai-dev-lab/AI_SCOREBOARD.md; C6 itself receives no extra point."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_game_independent_eye_producer",
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "WARP/direct GPU transport build-verification only; game menu, vehicle-selection and race eye camera routing are not yet HMD-proven.",
+    "next_connection": "Connect real per-eye game pose-driven Draw/DrawIndexed recorder to this render_eye_pair entrypoint; NEVER submit duplicated mono game color as stereo."
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01218",
+  "production_id": "CONVERSION-DX11-01218",
+  "event_id": "CONVERSION-DX11-01218-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SOURCE_FOG_RANGE_VERTEX_TABLE_STATE_DRAW_CONNECTIVITY",
+  "classification": "A_REAL_NATIVE_DRAW_REJECTION_AND_CAUSAL_HISTORICAL_GATE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "aba7f5781e6688d0a2c631fc3fae910b2d34067a",
+  "material_result_sha": "e4bb7dae5e785f1489bec1cd3e120e8714815c7e",
+  "validation_bearing_result_sha": "e4bb7dae5e785f1489bec1cd3e120e8714815c7e",
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp",
+    "tests/native_raw_fvf_fog_visual_test.cpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    "docs/automation/runs/CONVERSION-DX11-01217.json"
+  ],
+  "implementation": "Source-authenticated native FVF menu/car/race Draw TABLEFOG previously failed on an unused D3DRS_RANGEFOGENABLE COM getter or invalid inherited range DWORD even when TABLEFOG overrides vertex/range fog. A shared native_sm3_table_fog helper now selects equation-required range reads in both real FVF and SM3 Draw admission. FVF exact table-fog GPU PS and opt-in RAW FVF visual-only path skip ONLY unused range state; vertex-only fog still requires a valid successful source query. Added C++ positive/negative and cross-callsite static regression. Historical 01217 missing required strategy/feature acceptance metadata caused Backend Gate failure at 41576463425; repaired it without changing previously validated 01217 material SHA.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_FVF_TABLE_FOG_COM_EQUATION",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_FVF_TABLE_FOG_PIXEL_OUTPUT",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "REAL_D3D9_FOGTABLEMODE_FOGVERTEXMODE_SOURCE_QUERIES",
+      "FAMILY_SHARED_NATIVE_FVF_SM3_EQUATION_REQUIRED_STATE",
+      "NATIVE_D3D11_FIXED_FUNCTION_FOG_PIXEL_DRAW",
+      "DX9EX_AUTHORITATIVE_D3D9_PRESENT"
+    ],
+    "batch_components": [
+      "REAL_FVF_TABLE_OVER_VERTEX_COM_QUERY_FIX",
+      "SHARED_SM3_FVF_EQUATION_STATE_DISPATCH",
+      "RAW_DIAGNOSTIC_ONLY_STATE_ADMISSION",
+      "CXX_POSITIVE_NEGATIVE_FOG_REGRESSION",
+      "HISTORICAL_BACKEND_GATE_CAUSAL_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "An authenticated live FVF active table fog source Draw can enter native FVF PS without querying unrelated D3D9 RANGEFOGENABLE; true table fog source payload and DX11 fog GPU dispatch remain required.",
+      "negative_regression": "Vertex-only fog with unreadable, invalid, or absent RANGEFOGENABLE must still fail closed. RAW fog omission remains opt-in; invalid mode, consumed float, shader/device/RT/source, DX9Ex fallback remain protected.",
+      "component_integration": "live_game_sm3_table_fog.hpp native_game_fog_range_state_required -> live_game_frame_bridge.cpp FVF/SM3 D3D9 getters -> exact table-fog native D3D11 PS/RAW-only fallback; tests/native_raw_fvf_fog_visual_test.cpp and tools/dx11_live_sm3_table_zfog_01005.cpp with cross-callsite Python static test."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY. Exact SHA five Actions Gate SUCCESS; actual game native pixel output/menu->car->race complete D3D11 frame, gamepad visible frame and Quest3/VDXR stereoscopy UNTESTED.",
+    "activation_guard_and_fallback": "Only source-proven TABLEFOG state is admitted, no global fog disable; RAW mismatch only explicitly opted in; original D3D9 game Draw, input, FFB, SkyGlow, DX9Ex fallback, DXVK freeze protected."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Carry real D3D9 FVF table-fog menu/car/race game geometry into native D3D11 Draw without rejecting an unused inherited range-fog COM register; maintain exact source fallback and validation.",
+    "acceptance_items": [
+      {
+        "id": "source_table_fog_gpu_draw_connectivity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_D3D9_NATIVE_D3D11_FOG",
+        "expected_behavior": "Authentic FVF TABLEFOG uses live required state only, while connected SM3 and native pixel shader still consume validated equation values."
+      },
+      {
+        "id": "vertex_fog_and_raw_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9EX_INPUT_SOURCE_FOG",
+        "expected_behavior": "Required vertex-only range COM failure and invalid source equations still reject native parity and preserve the original D3D9 Draw/input/FFB."
+      },
+      {
+        "id": "same_sha_five_gate_validation",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "All five required CI workflows compile, run, and succeed at the identical final validation-bearing result commit SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_table_fog_gpu_draw_connectivity": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "validation_command": "Exact SHA DX11 Fast Structural Checks 41755259214 SUCCESS; Backend Conversion Gate 41755259267 SUCCESS; native source/rule test only, no actual game screenshot observed."
+    },
+    "vertex_fog_and_raw_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp",
+        "tests/native_raw_fvf_fog_visual_test.cpp",
+        "tools/dx11_live_sm3_table_zfog_01005.cpp"
+      ],
+      "validation_command": "C++ positive and negative source fog range states with original vertex-only fallback and opt-in RAW conditions, on matching SHA automated CI 41755259214/41755259267 SUCCESS."
+    },
+    "same_sha_five_gate_validation": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_fvf_fog_visual_test.cpp",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "validation_command": "All matching e4bb7dae5e785f1489bec1cd3e120e8714815c7e: DX11 Fast 41755259214, Backend 41755259267, Win32 Build 41755259342, OpenXR 41755259352, HUD Inspector 41755259224 SUCCESS. Additional Focus packaging run Build 41755266282/OpenXR 41755266284/HUD 41755266386 SUCCESS."
+    }
+  },
+  "validation_gate_runs": {
+    "DX11 Fast Structural Checks": 41755259214,
+    "Backend Conversion Gate": 41755259267,
+    "Build (Win32 Release)": 41755259342,
+    "OpenXR VR architecture": 41755259352,
+    "OutRun EXE HUD Inspector CI": 41755259224
+  },
+  "runtime_evidence": {
+    "native_game_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "gameplay_menu_car_race": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No new exact-SHA actual OutRun 2006 desktop/HMD launch, native RGB/published frame measurement, or Quest3/VDXR optical correctness result. CI success cannot be promoted to gameplay or HMD validation.",
+  "real_game_draw_blocker": "Source code now admits the table-over-vertex fog range dependency correctly, but the entire live source-call coverage, actual GPU pixel publication, contiguous menu/car/race, direct L/R OpenXR and HMD visual evidence remain unfinished.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Continue uncompleted full resolution native game Draw/DrawIndexed scene publication from actual game runtime rejection/source coverage evidence; preserve input/FFB and DX9Ex fallback. Separate HMD evidence.",
+  "checkpoint": "C6_STATE",
+  "record_type": "C6_RESULT_ONLY",
+  "score_note": "Same unfinished DX11 full-frame feature; source regression, exact-SHA Gates, 01217 historical CI metadata repair and C6 are not independently playable feature completion. AI2 score change +0; AI1 separate."
+}

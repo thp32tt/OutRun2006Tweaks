@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00518",
+  "production_id": "CONVERSION-DX11-00518",
+  "event_id": "CONVERSION-DX11-00518-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00518",
+  "work_key": "DX11:R221:LINEAR_OM_UAV_EYE_ISOLATION",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_uav_eye_guard.hpp:R221",
+    "tools/dx11_linear_buffer_mirror_probe.cpp:R221",
+    "tools/test_dx11_linear_uav_eye_r221.py:R221",
+    ".github/workflows/backend-conversion-gate.yml:R221"
+  ],
+  "base_sha": "0d7b80a7c69d5cac2d954f091cc2f03f47b79f4d",
+  "result_sha": "fc52481e828f669db148843d3bfbb5a9f0d25deb",
+  "material_result_sha": "fc52481e828f669db148843d3bfbb5a9f0d25deb",
+  "validation_bearing_result_sha": "fc52481e828f669db148843d3bfbb5a9f0d25deb",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "status": "BLOCKED_DEPENDENCY_R175",
+  "checkpoint": "C6_STATE",
+  "summary": "Opt-in real C++ linear OM UAV slot isolation with AddRef cleanup; WARP real second-eye green write and owned-eye red restore; native gameplay Draw still dormant",
+  "changed_files": [
+    "src/vr/d3d11/native_linear_uav_eye_guard.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_uav_eye_r221.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "pipeline": {
+    "C0": "PASS",
+    "C1": "PASS independent R221",
+    "C2": "PASS bundled C++ + WARP + static + workflow",
+    "C3": "SCOPED_R221_PASS; full exact-SHA Backend Conversion Gate 38026372029 FAILURE inherited R175 TEXCOORD6 COLOR0 BGRA; validate 114137965207 SUCCESS; R221 static step36 and WARP build/run steps37/38 SUCCESS; final smoke 114138889759 FAIL step85",
+    "C4": "PASS material fc52481e828f669db148843d3bfbb5a9f0d25deb with exact AUTO tag",
+    "C5": "NOT_REQUIRED",
+    "C6": "PASS evidence persisted after Gate completion; source validated-scoped but whole Gate FAIL; no HMD parity or native activation claim"
+  },
+  "blockers": [
+    "Exact-SHA full Gate failed in existing unrelated R175 COLOR0/TEXCOORD6 WARP probe (observed BGRA [128,0,16,255] expected [224,128,32,255]); R221 isolated static/WARP passed",
+    "R175 source/probe belongs to CONVERSION-DX11-00477, exclude from R221 ownership and never bypass",
+    "Quest3/VDXR runtime untested; no native gameplay Draw promotion"
+  ],
+  "next_action": "Do not repeat unchanged 00518 material SHA. Reconcile R175 owner CONVERSION-DX11-00477 separately; only after its valid independent fix/owner release, recover same TASK_ID and run required exact-SHA full Gate for new proper material source commit; otherwise park BLOCKED_DEPENDENCY_R175.",
+  "terminal": false,
+  "resume_cursor": "WAIT_INDEPENDENT_R175_OWNER_RELEASE",
+  "evidence": {
+    "material_commit": "fc52481e828f669db148843d3bfbb5a9f0d25deb",
+    "gate_run_id": 38026372029,
+    "gate_head_sha": "fc52481e828f669db148843d3bfbb5a9f0d25deb",
+    "gate_conclusion": "failure",
+    "win32_validate_job_id": 114137965207,
+    "win32_validate": "success",
+    "dx11_smoke_job_id": 114138889759,
+    "dx11_smoke": "failure",
+    "r221_source_static_step": 36,
+    "r221_source_static": "success",
+    "r221_warp_build_step": 37,
+    "r221_warp_build": "success",
+    "r221_warp_run_step": 38,
+    "r221_warp_run": "success",
+    "scoped_r221_result": "PASS_REAL_WARP",
+    "inherited_failed_step": 85,
+    "inherited_failed_step_name": "Run DX11 constant buffer probe",
+    "r175_failure_class": "R175_GENERIC_VARYING_MISMATCH",
+    "r175_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "r175_file": "tools/dx11_constant_buffer_probe.cpp",
+    "hmd_test_performed": false,
+    "native_gameplay_activation": false
+  },
+  "score_previous_confirmed": 1076,
+  "score_change": 0,
+  "score_new_confirmed": 1076,
+  "timestamp_kst": "2026-10-10T14:18:00+09:00",
+  "scoreboard_basis": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md AI2 1076 at 2026-10-10 14:09 KST (separate CONVERSION-DX9EX-00570 +1); 00518 has no PASS and awards +0"
+}

@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01066",
+  "production_id": "CONVERSION-DX11-01066",
+  "event_id": "CONVERSION-DX11-01066-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01066",
+  "classification": "A",
+  "feature_id": "DX11:NATIVE_STEREO_FLOAT32_CAMERA_EYE_SHADER_ROUTE",
+  "work_key": "DX11:NATIVE_STEREO_FLOAT32_CAMERA_EYE_SHADER_ROUTE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "score_note": "This is a bounded float32 typed-color source substage, NOT a new complete native renderer/gameplay achievement: previous AI2 cumulative unchanged; no duplicate feature-point award.",
+  "summary": "Real game authored R32G32 and R32G32B32 typeless native color texture RTVs now preserve their exact observed FLOAT RTV interpretation through both-eye shader preflight and native GPU camera Copy/Stretch conversion. Unsupported UINT/unknown/depth views reject fail-closed without native publication. Preserves existing D3D9Ex renderer, gamepad/FFB, stereo ring GPU fence and ACK. Five mandatory GitHub Actions succeeded at exact validation SHA; actual OutRun/Quest3 runtime remains UNTESTED.",
+  "material_result_sha": "e1da4063f247892592d7f64e7549b40de95a6faa",
+  "validation_bearing_result_sha": "f0deb817e98cdf96e11a72bf560475bd80cc3c99",
+  "changed_files": [
+    "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+    "tools/test_dx11_native_float_camera_pair_01066.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_FLOAT32_CAMERA_EYE_SHADER_ROUTE",
+    "goal": "Preserve real FLOAT32 two-/three-channel game camera color through exact typed RTV and both-eye native D3D11 shader postpass without guessing integer/depth resource reinterpretations or disturbing game D3D9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "float32_camera_rtv_shader_interpretation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "AUTHENTIC_FLOAT32_TYPED_GAME_RENDER_TARGET",
+        "expected_behavior": "Exact observed R32G32/R32G32B32 FLOAT camera RTV on a matching typeless allocation is selected for a genuine D3D11 GPU shader camera postpass."
+      },
+      {
+        "id": "unsupported_view_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "UNSUPPORTED_COLOR_VIEW_REJECTION_AND_GAME_INPUT",
+        "expected_behavior": "Unknown, unsigned integer, signed integer and depth/foreign RTV formats never masquerade as FLOAT color or bypass original D3D9Ex render/input/FFB fallback."
+      },
+      {
+        "id": "left_right_eye_gpu_transfer",
+        "category": "end_to_end_behavior",
+        "behavior_area": "INDEPENDENT_LEFT_RIGHT_NATIVE_GPU_EYE_TRANSFER",
+        "expected_behavior": "Both actual eye GPU passes perform typed device-capability preflight and original game RTV source shader sampling/Copy/Stretch into distinct OpenXR ring eyes."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_FIVE_GITHUB_ACTIONS",
+        "expected_behavior": "DX11 Fast/Backend/Windows Build/OpenXR/HUD all succeed on the unchanged exact validation-bearing SHA, with negative mutation regressions retained."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "GAME_AUTHORED_NATIVE_D3D11_COLOR_RT",
+      "PHYSICAL_FLOAT32_RTV_TYPED_INTERPRETATION",
+      "STEREO_BOTH_EYE_SHADER_SUPPORT_PREFLIGHT",
+      "NATIVE_GPU_COPY_OR_STRETCH_SHADER_TRANSFER",
+      "SHARED_OPENXR_STEREO_EYE_RING_FENCE_AND_ACK",
+      "DX9EX_GAME_RENDERING_INPUT_AND_FFB_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+      "tools/test_dx11_native_float_camera_pair_01066.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast 40190155926 SUCCESS on f0deb817 at exact SHA, executing newly added 01066 positive path linking observed FLOAT32 camera RTV preflight and native GPU eye shader.",
+      "negative_regression": "01066 source-link mutation tests remove exact view/type mapping, stereo GPU eye path or native Draw and must reject each mutant. Existing 01065 integer/depth/video rejection unchanged.",
+      "component_integration": "native_game_typed_camera_postpass.hpp -> native_game_stereo_submission.cpp both-eye typed GPU Copy/Stretch -> OpenXR ring producer+ACK, with unchanged D3D9Ex fallback and original input."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_FLOAT32_CAMERA_EYE_SHADER_ROUTE",
+      "DX11:STEREO_NATIVE_GAME_CAMERA_GPU_RING"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED; no physical eye pixel or game/menu/car/race proof",
+    "activation_guard_and_fallback": "Unsupported views and missing shader caps fail closed; no unverified DX11 automatic native promotion; original D3D9Ex/menu/gamepad/FFB retained; DXVK frozen."
+  },
+  "acceptance_results": {
+    "float32_camera_rtv_shader_interpretation": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Real typed RTV FLOAT2/FLOAT3 admission assertions and both-eye GPU shader source integration passed DX11 Fast 40190155926; physical game source observation UNTESTED.",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_native_float_camera_pair_01066.py"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks 40190155926 on exact f0deb817"
+    },
+    "unsupported_view_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "C++ constexpr asserts and negative source-link mutants reject UINT/unknown while keeping original D3D9Ex fallback; runtime input/FFB UNTESTED.",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_native_float_camera_pair_01066.py"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks 40190155926 on exact f0deb817"
+    },
+    "left_right_eye_gpu_transfer": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Both-eye source linkage and D3D11 W32 compile gates succeeded at exact SHA. Game/HMD output not observed.",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "src/vr/d3d11/native_game_stereo_submission.cpp"
+      ],
+      "validation_command": "DX11 Fast 40190155926 and Windows Build 40190155960 on exact f0deb817"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Fast 40190155926, Backend 40190155954, Build 40190155960, OpenXR 40190155919, HUD 40190155937 all SUCCESS on f0deb817e98cdf96e11a72bf560475bd80cc3c99; no game/HMD claim.",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01066.json"
+      ],
+      "validation_command": "All five GitHub Actions run conclusions on exact f0deb817"
+    }
+  },
+  "validation_history": [
+    {
+      "exact_sha": "e1da4063f247892592d7f64e7549b40de95a6faa",
+      "result": "FAIL",
+      "cause": "Observed DX11 Fast 40190046379 and Backend 40190046329 blocked at inherited 01065 C6 run record: feature_id and feature_contract.feature_id were both null. Not a C++/gameplay failure."
+    },
+    {
+      "exact_sha": "f0deb817e98cdf96e11a72bf560475bd80cc3c99",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Causal 01065 run-record identity repair only (not source) under same 01066; five required native DX11 Github Actions gate SUCCESS, including 01066 source mutation regression."
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "f0deb817e98cdf96e11a72bf560475bd80cc3c99",
+    "dx11_fast_run_id": 40190155926,
+    "backend_gate_run_id": 40190155954,
+    "windows_build_run_id": 40190155960,
+    "openxr_architecture_run_id": 40190155919,
+    "hud_inspector_run_id": 40190155937,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_conclusion": "success",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/native_game_stereo_submission.cpp",
+  "real_game_draw_blocker": "No physical OutRun 2006 menu->vehicle->race GPU camera RTV sample, per-eye native visible frame counts or Quest3/VDXR/HMD input+FFB observation at exact SHA. Keep native activation guarded.",
+  "next_implementation_action": "Continue a cohesive real game-authored D3D9 Draw/DrawIndexed to native stereo/OpenXR pipeline source stage, then obtain exact-launch OutRun menu/car/race+Quest3 evidence separately; do not score this bounded format-family change as a complete renderer.",
+  "runtime_note": "BUILD_VERIFIED only. RUNTIME_VALIDATION=UNTESTED, DXVK frozen; no assumption of game usage of FLOAT32 2/3-channel RTV or real GPU pixel parity.",
+  "c6_bookkeeping_only": true
+}

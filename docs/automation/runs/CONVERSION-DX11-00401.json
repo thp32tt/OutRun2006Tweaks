@@ -1,0 +1,215 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00401",
+  "production_id": "CONVERSION-DX11-00401",
+  "event_id": "CONVERSION-DX11-00401-E008",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "status": "COMPLETE",
+  "selected_work_item": "DX11_R263_PROGRAMMABLE_SHADER_SEMANTIC_TRANSLATION_RECEIPT",
+  "base_sha": "7a04e7d713207beb22fbf61b385590b1a374dddb",
+  "result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+  "material_result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+  "source_implementation_sha": "8af3c227945e177bb712370514792886984ceaf4",
+  "validation_bearing_result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+  "result_marker": "[AUTO:CONVERSION-DX11-00401]",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "summary": "R263 establishes a fail-closed F21 semantic-translation evidence receipt bound to exact R239 VS/PS source identity, current R242/R243 translated-object/input-layout lineage, translator revision and semantic-contract provenance, plus vertex/pixel, constant-register, sampler and stage-linkage exactness. R259 can consume such evidence in the validated static fixture, while NativeDrawPath/Draw/DrawIndexed remain hard-off. This task does not implement or wire a production D3D9 programmable-shader translator/evidence producer into the game path.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "162ff38d22211547d5cc87c0f55b4eb8ddb2cdfe",
+    "a3081fb9708fef957b675021726db189f1ab302e",
+    "fadf1e2bd0cdf772253ab38375ac98328500b94d",
+    "6a9fc27ece29fe720014afd141cf52fc7a37e6da",
+    "8af3c227945e177bb712370514792886984ceaf4"
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "draw_dispatch_changed": false,
+    "dx9ex_branch_modified": false,
+    "production_programmable_translator_enabled": false
+  },
+  "validation": {
+    "local_exact_sha_static": {
+      "sha": "8af3c227945e177bb712370514792886984ceaf4",
+      "conclusion": "PASS",
+      "checks": [
+        "git diff --check 7a04e7d..8af3c227",
+        "verify_dx11_source_graph.py",
+        "verify_dx11_activation_boundary.py",
+        "check_dx11_conversion_contract.py"
+      ]
+    },
+    "backend_conversion_gate": {
+      "conclusion": "PASS",
+      "run_id": 37272000311,
+      "run_attempt": 1,
+      "validation_job_id": 111640787656,
+      "readiness_smoke_job_id": 111641971972,
+      "head_sha": "8af3c227945e177bb712370514792886984ceaf4"
+    },
+    "r263_contract": {
+      "evidence_receipt_contract_exact": true,
+      "exact_r239_source_identity_required": true,
+      "current_r242_object_lineage_required": true,
+      "current_r243_input_layout_lineage_required": true,
+      "translator_revision_provenance_required": true,
+      "semantic_contract_provenance_required": true,
+      "vertex_semantics_required": true,
+      "pixel_semantics_required": true,
+      "constant_register_mapping_required": true,
+      "sampler_mapping_required": true,
+      "interface_linkage_required": true,
+      "incomplete_evidence_fails_closed": true,
+      "fixture_shader_translation_proof_present": true,
+      "fixture_missing_prerequisite_mask": "0x0",
+      "fixture_activation_prerequisites_satisfied": true,
+      "production_programmable_translator_implemented": false,
+      "production_shader_translation_evidence_present": false,
+      "native_draw_path_activation_allowed": false,
+      "draw_dispatch_authorized": false,
+      "activation_snapshot_token": 0,
+      "evidence_scope": "STATIC_FIXTURE_RECEIPT_ONLY"
+    },
+    "artifact": {
+      "id": 11328920612,
+      "name": "backend-autovalidated-vr-dx11-native-r71-8af3c227945e177bb712370514792886984ceaf4",
+      "digest": "sha256:173d76c42d68bfea4c384248107b91429ae5fafe2e311c700e561a47c2d09a1e",
+      "size_bytes": 2366686
+    },
+    "superseded_intermediate_runs": {
+      "reason": "Earlier same-task exact-SHA runs were cancelled by the workflow concurrency group after newer R263 hardening commits were pushed. They are not retries and do not increment ATTEMPT.",
+      "run_ids": [
+        37271610299,
+        37271981657,
+        37271987330,
+        37271994217
+      ],
+      "retry_incremented": false
+    }
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT plus preserved same-task material lineage without repeating completed R262/R263 work. Current user E008/CHAT_ROLLOVER=5 is a chat rollover, not a retry; ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R239-R262 prove source identity, object/layout ownership, constants and resources, but no production D3D9->D3D11 programmable semantic translator/evidence producer exists. R263 therefore must authenticate explicit provenance and semantic dimensions rather than infer F21 from shader-object presence."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Implemented R263 semantic-translation receipt and R259 consumption, then hardened it to require translator revision, semantic-contract identity, constant-register mapping, sampler mapping and stage-interface linkage. Added positive and interface/register/sampler/stale fail-closed regressions. Production translator wiring remains intentionally absent."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+      "validation_run_id": 37272000311,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111640787656,
+      "readiness_smoke_job_id": 111641971972,
+      "artifact_id": 11328920612,
+      "artifact_digest": "sha256:173d76c42d68bfea4c384248107b91429ae5fafe2e311c700e561a47c2d09a1e",
+      "evidence": "Exact-SHA Backend Conversion Gate passed source graph, dormant activation boundary, census regressions, Win32 build/binary and DX11 readiness smoke including the hardened R263 constant-buffer regressions. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+      "material_result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+      "source_implementation_sha": "8af3c227945e177bb712370514792886984ceaf4",
+      "validation_bearing_result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+      "result_marker": "[AUTO:CONVERSION-DX11-00401]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R263 is dormant semantic/readiness evidence and deliberately does not activate or package a runtime NativeDrawPath."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "implementation_comment_id": 5989211306,
+      "validation_comment_id": 5989302476,
+      "evidence": "Run record and lane state are reconciled to current user E008/CHAT_ROLLOVER=5, preserving validated material/CI evidence and RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00401",
+    "production_id": "CONVERSION-DX11-00401",
+    "event_id": "CONVERSION-DX11-00401-E008",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "lane": "DX11",
+    "target_branch": "vr-dx11-native-r71",
+    "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+    "source_implementation_sha": "8af3c227945e177bb712370514792886984ceaf4",
+    "validation_bearing_result_sha": "8af3c227945e177bb712370514792886984ceaf4",
+    "validation_run_id": 37272000311,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111640787656,
+    "readiness_smoke_job_id": 111641971972,
+    "artifact_id": 11328920612,
+    "artifact_digest": "sha256:173d76c42d68bfea4c384248107b91429ae5fafe2e311c700e561a47c2d09a1e",
+    "implementation_comment_id": 5989211306,
+    "validation_comment_id": 5989302476,
+    "chat_rollover": 5,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "exact_next_action": "Preserve validated R239-R263. Under a new DX11 TASK_ID, implement or integrate a production evidence producer/translator for the observed D3D9 programmable shader subset so R263 receives non-synthetic translator provenance and exact instruction/register/sampler/linkage evidence. Keep NativeDrawPath, Draw and DrawIndexed fail-closed until separate matching Quest 3/VDXR runtime evidence is available.",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R263_F21_EVIDENCE_RECEIPT_CONTRACT_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+  "validation_run_id": 37272000311,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111640787656,
+  "readiness_smoke_job_id": 111641971972,
+  "artifact_id": 11328920612,
+  "artifact_digest": "sha256:173d76c42d68bfea4c384248107b91429ae5fafe2e311c700e561a47c2d09a1e",
+  "artifact_size_bytes": 2366686,
+  "current_metadata_reconciliation": {
+    "authoritative": {
+      "event_id": "CONVERSION-DX11-00401-E008",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 5,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "superseded_record_metadata": [
+      {
+        "event_id": "CONVERSION-DX11-00401-E001",
+        "event_type": "dispatch"
+      },
+      {
+        "event_id": "CONVERSION-DX11-00401-E004",
+        "event_type": "rollover",
+        "chat_rollover": 3
+      },
+      {
+        "event_id": "CONVERSION-DX11-00401-E006",
+        "event_type": "rollover",
+        "chat_rollover": 4
+      }
+    ],
+    "reason": "The current user dispatch explicitly supplies E008/CHAT_ROLLOVER=5 and states the rollover is not a retry. It supersedes stale/concurrent E001/E004/E006 metadata only; material 8af3c227 and exact-SHA validation evidence are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "chat_rollover": 5,
+  "rollover_is_retry": false
+}

@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00988",
+  "production_id": "CONVERSION-DX11-00988",
+  "event_id": "CONVERSION-DX11-00988-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00988",
+  "feature_id": "DX11_GAME_EYE_GPU_POSTPASS_CHRONOLOGY",
+  "work_key": "DX11:GAME_EYE_GPU_POSTPASS_CHRONOLOGY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "8cb50b376be81a2d35167b696e3650882d7d3c98",
+  "material_result_sha": "7be209e6f95998ce15b7204abfc1fd78282fae7e",
+  "validation_bearing_result_sha": "f39ed291b719afffb614df525a23d455cf3a4db3",
+  "result_sha": "f39ed291b719afffb614df525a23d455cf3a4db3",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "code_change": "YES",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Full native-game GPU Copy/Stretch eye-provenance chronology source integrated and mandatory exact-SHA GitHub Actions 5/5 SUCCESS. Valid later unproven GPU postpasses remove precisely overwritten previously certified eye pixels; later genuine GPU repaint restores coverage. Preserve the original D3D9Ex/input/FFB/SkyGlow fallback and frozen DXVK; no hardware/game frame HMD observation. BUILD_VERIFIED, NEED_HMD_TEST; full playable DX11 renderer is not certified.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_eye_postpass_coverage.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_eye_postpass_overwrite_00988.cpp",
+    "tools/test_dx11_native_eye_postpass_overwrite_00988.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_GAME_EYE_GPU_POSTPASS_CHRONOLOGY",
+    "goal": "Maintain physically correct per-eye real-game GPU Copy/Stretch destination color chronology through unproven camera overlays, clipped overwrites and genuine later repaint before native OpenXR frame publication.",
+    "acceptance_items": [
+      {
+        "id": "native_gpu_eye_overlay_erase_and_repaint",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_eye_gpu_copy_stretch_chronology",
+        "expected_behavior": "Game-authored and GPU-executed proven Copy/Stretch eye patches update exact native-eye pixels; a later valid unproven Copy/Stretch removes prior destination proof, and authentic repaint restores only its real pixel region."
+      },
+      {
+        "id": "foreign_overlay_fragments_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "per_eye_source_provenance_and_d3d9_input_fallback",
+        "expected_behavior": "Unknown incoming GPU camera pixels never inherit prior full-eye coverage; overlapping holes, cropped/off-edge destinations and ledger saturation fail closed, with original game D3D9Ex rendering, input, FFB and SkyGlow preserved."
+      },
+      {
+        "id": "integrated_cpp_python_five_gate",
+        "category": "integrated_validation",
+        "behavior_area": "compiled_cpp_chronological_eye_ledger_native_replay_and_ci",
+        "expected_behavior": "C++ positive/negative overwrite/repaint region probe and Python replay-linkage test run in the DX11 Fast workflow, with unchanged Backend Conversion, Windows Build, OpenXR and HUD Inspector exact SHA gates. HMD requires independent testing."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_gpu_eye_overlay_erase_and_repaint": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "tools/dx11_native_eye_postpass_overwrite_00988.cpp",
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041256"
+      ],
+      "validation_command": "DX11 Fast g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_postpass_overwrite_00988.cpp; native XR Copy/Stretch end-to-end test"
+    },
+    "foreign_overlay_fragments_fallback": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "tools/dx11_native_eye_postpass_overwrite_00988.cpp",
+        "src/vr/d3d11/native_game_eye_postpass_coverage.hpp",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041256"
+      ],
+      "validation_command": "DX11 Fast C++ negative coverage clip, nested hole, overflow and verified re-paint plus untouched prior D3D9Ex regression"
+    },
+    "integrated_cpp_python_five_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "tools/test_dx11_native_eye_postpass_overwrite_00988.py",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041256",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041245",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041445",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041252",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041282"
+      ],
+      "validation_command": "DX11 Fast compiled C++ probe and Python replay linkage; exact SHA GitHub push events DX11 Fast/Backend/Win32 Build/OpenXR/HUD five mandatory workflows"
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE actual game-authored native Draw/Clear camera pixels and ordered SourceCopy/SourceStretch",
+      "D3D11_NATIVE_DRAW replay into native game camera and signed clipped GPU destination composite",
+      "VISIBLE_FRAME_OUTPUT per-eye exact pixel provenance chronology -> guarded full-resolution eye admission -> OpenXR producer with original D3D9 fallback"
+    ],
+    "batch_components": [
+      "C++ real native game GPU Copy/Stretch chronological invalidation and exact bounded region subtraction in XR stereo submission and eye coverage",
+      "Compileable C++ exact-pixel positive/negative tests, Python native draw replay source-linkage regression and unchanged exact-SHA five workflow integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ native XR eye postpass copy/stretches fill eye then a genuine replay repaints overwritten camera region and restores coverage",
+      "negative_regression": "Unproven later GPU overwrites create exact coverage holes; clipped/outside rect does not forge proof; saturation never certifies foreign pixels",
+      "component_integration": "NativeGameEyeDrawEncoder::replay_due_source_clears performs real GPU Copy/Stretch first and invalidates/repaints its NativeGameEyePostpassCoverage before native stereo eye frame publication"
+    },
+    "conflict_keys": [
+      "DX11:GPU_EYE_COPY_STRETCH_NATIVE_CAMERA_PROVENANCE",
+      "DX11:EYE_XR_HANDOFF"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_CI_PENDING; actual Quest3/VDXR game menu/car/race screen and native stereoscopy NOT_OBSERVED",
+    "activation_guard_and_fallback": "Fail closed on unknown pixels and excessive region fragmentation; original game D3D9Ex Draw/Present/gamepad/FFB/SkyGlow active, native release remains opt-in; frozen DXVK untouched."
+  },
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "ci": {
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "exact_sha": "f39ed291b719afffb614df525a23d455cf3a4db3",
+    "status": "PASS_EXACT_SHA",
+    "gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39678041256,
+        "sha": "f39ed291b719afffb614df525a23d455cf3a4db3",
+        "status": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041256"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39678041245,
+        "sha": "f39ed291b719afffb614df525a23d455cf3a4db3",
+        "status": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041245"
+      },
+      {
+        "name": "Build",
+        "id": 39678041445,
+        "sha": "f39ed291b719afffb614df525a23d455cf3a4db3",
+        "status": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041445"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39678041252,
+        "sha": "f39ed291b719afffb614df525a23d455cf3a4db3",
+        "status": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041252"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39678041282,
+        "sha": "f39ed291b719afffb614df525a23d455cf3a4db3",
+        "status": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39678041282"
+      }
+    ]
+  },
+  "score_change": 0,
+  "score": "AWARD_PENDING_SCOREBOARD_COMMIT",
+  "next_action": "Source+CI verified. Controller may select next independent incomplete DX11 source capability without replaying this TASK. User Quest3/VDXR menu->car->race hardware parity and input remain untested before runtime promotion; do not alter DXVK.",
+  "c6_code_change": "NO"
+}

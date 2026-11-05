@@ -1,0 +1,210 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01131",
+  "production_id": "CONVERSION-DX11-01131",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01131",
+  "requested_feature_id": null,
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:OBSERVED_FULL_PRESENT_DRAW_POPULATION",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_CI_REGRESSION_REGISTRATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "0489c5c5990aedc74953e89ae83f7977457e4994",
+  "source_change_sha": "45975c654a4bf79fd2f63b374ac777e826cc9ef6",
+  "material_result_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+  "validation_bearing_result_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+  "result_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+  "implementation_commits": [
+    "45975c654a4bf79fd2f63b374ac777e826cc9ef6"
+  ],
+  "gate_registration_commits": [
+    "a938c0e13ba1af3fd787e33fb8e64664cc48408c"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_source_probe.hpp",
+    "tests/native_raw_source_probe_schedule_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW_COUNT",
+      "SOURCE_PRESENT_POPULATION_OBSERVATION",
+      "ROTATING_NATIVE_D3D11_RAW_GPU_PROBE_WINDOW",
+      "BOUNDED_NATIVE_GPU_PIXEL_DIAGNOSTIC"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_TILE_NOT_FULL_NATIVE_GAME_FRAME"
+    ],
+    "batch_components": [
+      "CPP_OBSERVED_PRESENT_DRAW_COUNT_ROTATION",
+      "CPP_CLEAR_PRESENT_RESET_EPOCH_INTEGRATION",
+      "CXX17_POSITIVE_NEGATIVE_SOURCE_ORDINAL_REGRESSION",
+      "EXACT_SHA_FAST_GATE_REGISTRATION"
+    ],
+    "visible_frame_acceptance": "Build-verified opt-in diagnostic sampling covers varying observed D3D9 Draw populations; no native full-frame, menu/car/race visual, stereo or HMD proof.",
+    "activation_guard_and_fallback": "Only opt-in RAW diagnostic scheduling changes; original D3D9 renderer, DX9Ex fallback, input, FFB, GPU fence, native production fail-closed and frozen DXVK remain protected.",
+    "acceptance_proof": {
+      "positive_probe": "C++17 regression verifies a 2400-Draw observed Present, phase-5 ordinal 500, phase-12 ordinal 1200, later sampling after a real Clear and bounded gap/attempt behavior.",
+      "negative_regression": "Reject ordinals before selected window or below 96-Draw spacing; new 3-Draw population and uint64 max remain bounded; Reset clears stale population and uses first-frame fallback.",
+      "component_integration": "Real intercepted D3D9 game Clear/Present/Reset path updates production RAW schedule; production header test is registered in DX11 Fast at exact validated SHA, with successful CI and Win32 artifact."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Rotate authentic opt-in RAW native D3D11 game Draw probes across the observed original D3D9 Present source-Draw population while preserving ownership and safe fallback.",
+    "acceptance_items": [
+      {
+        "id": "observed_present_draw_population",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 game Draw and Present to RAW native sampling",
+        "expected_behavior": "Real previous-Present Draw count determines bounded phase-shifted source ordinal sampling beyond the old fixed early window."
+      },
+      {
+        "id": "source_epoch_reset_and_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Game Clear, Reset and native GPU probe ownership",
+        "expected_behavior": "Full Clear restarts attempt epoch without deleting prior Present population; device Reset drops stale population; original game and renderer paths remain unchanged."
+      },
+      {
+        "id": "exact_sha_regression_and_build_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Production source probe header, C++17 regression and GitHub Actions",
+        "expected_behavior": "Actual schedule regression and required CI build/architecture inspections succeed on the same validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "observed_present_draw_population": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_source_probe.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_source_probe_schedule_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #40651258870 completed success at a938c0e1; authentic game/HMD output untested"
+    },
+    "source_epoch_reset_and_original_fallback": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_source_probe.hpp",
+        "tests/native_raw_source_probe_schedule_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate #40651258914 and Build #40651258834 completed success at a938c0e1; runtime untested"
+    },
+    "exact_sha_regression_and_build_gates": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tests/native_raw_source_probe_schedule_test.cpp",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40651258870",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40651258834"
+      ],
+      "validation_command": "Five listed mandatory checks completed success at exact a938c0e13ba1af3fd787e33fb8e64664cc48408c (three push, two PR); supplemental native transport push success"
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40651258870,
+      "event": "push",
+      "head_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40651258914,
+      "event": "push",
+      "head_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40651258834,
+      "event": "push",
+      "head_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40651266872,
+      "event": "pull_request",
+      "head_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40651266814,
+      "event": "pull_request",
+      "head_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "supplemental_gate_results": [
+    {
+      "name": "DX11 Native Transport Isolated WARP",
+      "run_id": 40651258975,
+      "event": "push",
+      "head_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40651266800,
+      "event": "pull_request",
+      "head_sha": "a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-a938c0e13ba1af3fd787e33fb8e64664cc48408c",
+    "artifact_id": 12799881635,
+    "run_id": 40651258834,
+    "digest": "sha256:33aa6feebeb28ec3c4b486ecdb657a513359b5f1d9822d5ea60d1cd8194c6513"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS source base 0489c5c; target 01131 run JSON genuinely missing at validation-bearing SHA",
+    "C1_REVIEW": "PASS authentic source Present population and Clear/Reset epoch",
+    "C2_IMPLEMENT": "PASS source change 45975c654a4bf79fd2f63b374ac777e826cc9ef6",
+    "C3_VALIDATE": "PASS exact-SHA GitHub CI on a938c0e13ba1af3fd787e33fb8e64664cc48408c; five required checks listed, three push and two PR; no rerun during C6",
+    "C4_COMMIT": "PASS actual source plus fast-gate registration without CI skip",
+    "C5_PACKAGE": "PASS source-matched Windows Build artifact 12799881635",
+    "C6_STATE": "PASS missing JSON recovered by docs-only [skip ci] bookkeeping; no source modification, validation SHA or score delta"
+  },
+  "runtime_evidence": {
+    "real_game_draw_output": "UNTESTED",
+    "visible_full_native_frame": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "score_change": 0,
+  "c6_score_change": 0,
+  "scoreboard_update": "NONE_C6_BOOKKEEPING_ONLY",
+  "c6_note": "Record absent at initial validation SHA (RUN_RECORD_NOT_FOUND). Reconstructed from GitHub source commits, production C++17 regression, and exact-SHA Actions; preexisting 01131 contract/acceptance fields were not present to overwrite. FEATURE_ID was not supplied in dispatch; inherited existing DX11 milestone identity for repository schema validity, not a newly scored feature. [skip ci] record only; C6 no CI rerun and runtime/HMD UNTESTED."
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00871",
+  "production_id": "CONVERSION-DX11-00871",
+  "event_id": "CONVERSION-DX11-00871-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_GPU_ONLY_STEREO_POSTPASS_REPLAY",
+  "feature_id": "DX11:GAME_GPU_ONLY_STEREO_POSTPASS_REPLAY",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "e7f7ac130af831f6a0662102008a36d59b87ea3d",
+  "validation_bearing_result_sha": "618320d1c5c1684d0bbe73ac61a7a67515c17f5f",
+  "result_sha": "618320d1c5c1684d0bbe73ac61a7a67515c17f5f",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Game-authored live menu, car or race D3D11 stereo eye producer creates GPU-only per-eye color sources for native postpass",
+      "NativeGameEyeDrawEncoder Copy/Stretch admits GPU-only and single-sample UAV source into GPU CopyToSampled, crop and compatible color output",
+      "NativeGameStereoSubmission validates the same source conditions for separate L/R eye playback to the native eye ring, retaining native opt-in and D3D9Ex original fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stretch_source.hpp",
+      "tools/dx11_game_gpu_postpass_source_probe_00871.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "GPU-only DEFAULT copy textures, single-sample UAV camera outputs and RT/SRV sources are admitted to real per-eye native GPU postpass Copy/Stretch; CopyToSampled and clipped source regions remain available to distinct source-owned L/R eye passes.",
+      "negative_regression": "Copy-only MSAA, UAV-only MSAA, depth-only binds, zero samples, unresolvable sample format and invalid off-eye source crops reject safely; no implicit same-mono-frame stereo promotion and no modification of original game input, D3D9Ex Draw/Present or FFB.",
+      "component_integration": "NativeGameStereoSubmission::render_game_eye_passes reuses native_game_postpass_gpu_source with NativeGameEyeDrawEncoder::copy_game_surface and stretch_game_surface; the source admission matches actual per-eye GPU Replay / sampled intermediate rather than proxy desktop pixels."
+    },
+    "conflict_keys": [
+      "DX11:GAME_GPU_ONLY_STEREO_POSTPASS_REPLAY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "GPU-only game-eye postpass source integration is GitHub exact-SHA build verified; a complete menu/car/race native frame path, actual Quest3/VDXR L/R visuals, gamepad and 72Hz are not runtime proven.",
+    "activation_guard_and_fallback": "Original D3D9/DX9Ex Draw/Present/input/FFB/SkyGlow, existing native opt-in, separate eye ownership and DXVK freeze are preserved. Invalid source or MSAA rejects to game fallback."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_GPU_ONLY_STEREO_POSTPASS_REPLAY",
+    "goal": "Replay separately camera-authored GPU-only D3D11 game color sources through native per-eye Copy/Stretch GPU postpass for menu/car/race input frames without duplicating mono pixels or changing original game Draw/input fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "gpu_only_native_stereo_game_eye_source",
+        "expected_behavior": "Single-sample GPU copy-only and UAV game color sources are admitted consistently to both native eye replay preflight and encoder GPU Copy/Stretch postpass with proper sampled intermediate."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "invalid_msaa_depth_clipping_and_game_fallback",
+        "expected_behavior": "Invalid unsupported source binds, samples, MSAA resolve or crop fail-closed and leave D3D9Ex original game rendering and input/FFB untouched."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_mandatory_exact_sha_ci",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector conclude SUCCESS on precisely the same validation-bearing result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stretch_source.hpp",
+    "tools/dx11_game_gpu_postpass_source_probe_00871.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: existing source material e7f7ac13 on exact target GitHub HEAD, prior 00870 record misclassified and Backend Gate 39015335605 rejected that old C6 before compilation.",
+    "C1_REVIEW": "PASS: failure was 00870 policy metadata (unknown milestone, unsupported delivery target and null feature identity), not demonstrated C++ source compiler failure.",
+    "C2_IMPLEMENT": "PASS_EXISTING_SOURCE: initial 00871 material C++ implementation e7f7ac130af831f6a0662102008a36d59b87ea3d adds GPU-only native stereo postpass source support and regression probe.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: five mandatory GitHub Actions SUCCESS at 618320d1c5c1684d0bbe73ac61a7a67515c17f5f; causal 00870 policy metadata repair did not change prior material/validation SHAs.",
+    "C4_COMMIT": "PASS: game-source material e7f7ac13 and causal old run-record repair 618320d1 separately committed with [AUTO:CONVERSION-DX11-00871] and no CI-skip on validation-bearing SHA.",
+    "C5_PACKAGE": "NOT_REQUIRED: no runtime Quest3/VDXR certification or candidate distribution.",
+    "C6_STATE": "PASS_EXACT_SHA: this distinct bookkeeping-only [skip ci] record seals verified candidate, unchanged material/validation identity and score +0 for retry/C6."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "e7f7ac130af831f6a0662102008a36d59b87ea3d",
+    "validation_sha": "618320d1c5c1684d0bbe73ac61a7a67515c17f5f",
+    "causal_ci_repair_sha": "618320d1c5c1684d0bbe73ac61a7a67515c17f5f",
+    "failed_backend_run_id": 39015335605,
+    "exact_sha_ci": {
+      "validation_sha": "618320d1c5c1684d0bbe73ac61a7a67515c17f5f",
+      "workflows": {
+        "dx11_fast": {
+          "id": 39015513038,
+          "conclusion": "success"
+        },
+        "backend_conversion": {
+          "id": 39015513056,
+          "conclusion": "success"
+        },
+        "windows_build": {
+          "id": 39015515657,
+          "conclusion": "success"
+        },
+        "openxr": {
+          "id": 39015515678,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "id": 39015515697,
+          "conclusion": "success"
+        }
+      },
+      "runtime_validation": "UNTESTED"
+    },
+    "note": "Partial GPU stereo source stage BUILD_VERIFIED only, full renderer not complete; no real OutRun menu/car/race/HMD test."
+  },
+  "next_action": "Controller should select the next independent missing native full-graph game draw/eye/OpenXR integration area; no duplicate scoring, verification or C6 for this same task."
+}

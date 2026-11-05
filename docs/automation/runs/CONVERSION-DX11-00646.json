@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00646",
+  "production_id": "CONVERSION-DX11-00646",
+  "event_id": "CONVERSION-DX11-00646-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_SPARSE_INDEXED_VB",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "e46f21d3d1aa7c2d855c80d9b024c1325bac9c40",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live game D3D9 R30 indexed VB physical indices + generation-valid CPU shadow",
+      "bounded sparse VB vertex gather and stable remap -> native D3D11 DrawIndexed diagnostic inset"
+    ],
+    "batch_components": [
+      "live R30 and R26-safe physically sparse indexed VB capture under one shadow epoch lock",
+      "portable stable index compaction plus C++/source regressions for native DrawIndexed"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "5 indices across 100..200000 physical slots compact to 3 ordered native VB vertices; submit real game DrawIndexed",
+      "negative_regression": "reject invalid 0/>1536 indices, more than 128 distinct sparse vertices, invalid/discarded shadow spans; preserve original D3D9 draw/input",
+      "component_integration": "R30 VB+IB shadow -> compact native VB/IB -> existing game frame bridge -> D3D11 IA DrawIndexed and visible opt-in inset"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SPARSE_INDEXED_VB"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Code/static exact-SHA only; actual scene/gamepad/HMD still untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME diagnostic opt-in, game D3D9 return and input unmodified"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_sparse_index_draw_00646.py",
+    "docs/automation/runs/CONVERSION-DX11-00646.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "PASS: large indexed VB span rejected despite few used vertices",
+    "C2_IMPLEMENT": "PASS: sparse remap and epoch-fenced VB gather",
+    "C3_VALIDATE": "PASS_EXACT_SHA",
+    "C4_COMMIT": "PASS_MATERIAL_COMMIT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "All GitHub exact-SHA Gates SUCCESS; Quest3/VDXR menu, vehicle, race, gamepad runtime evidence remains UNTESTED. Start distinct DX11 code item without reopening this one. DXVK frozen.",
+  "material_result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9",
+  "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9",
+  "validation_bearing_result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38332577605,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "dx11_fast_structural": {
+      "id": 38332577606,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "windows_build": {
+      "id": 38332582698,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "openxr_architecture_push": {
+      "id": 38332577447,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "openxr_architecture_pr": {
+      "id": 38332582681,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "optional_hud_inspector": {
+      "id": 38332582676,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    }
+  }
+}

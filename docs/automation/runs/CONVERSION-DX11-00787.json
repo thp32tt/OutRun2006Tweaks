@@ -1,0 +1,123 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00787",
+  "production_id": "CONVERSION-DX11-00787",
+  "event_id": "CONVERSION-DX11-00787-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:SAME_PRESENT_NATIVE_GAME_MAP_RECOVERY",
+  "feature_id": "DX11-NATIVE-FULLFRAME-SAME-PRESENT-CPU-MAP-RECOVERY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "949c34dd448a138ab244db0a904acae036c48966",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_publication.hpp",
+    "tools/dx11_readback_map_probe_00745.cpp",
+    "tools/test_dx11_readback_map_00745.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-NATIVE-FULLFRAME-SAME-PRESENT-CPU-MAP-RECOVERY",
+    "goal": "Recover exact current live game Draw/DrawIndexed native D3D11 menu/vehicle/race frame publication after an EVENT completed but staging Map returned WAS_STILL_DRAWING, while preserving bounded gamepad-safe D3D9 Present fallback.",
+    "acceptance_items": [
+      {
+        "id": "current-frame-nonblocking-map-recovery",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_real_game_native_frame_D3D9_Present",
+        "expected_behavior": "Retry current full-frame CPU Map only after exact current GPU fence within 0.25ms and 128 attempts; accept genuinely ready data for existing UpdateSurface publication."
+      },
+      {
+        "id": "stale-error-original-game-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_original_gamepad_Draw_Present_readback_quarantine",
+        "expected_behavior": "Do not block, replay stale frames, retry inset or failed maps, or change D3D9/FFB input and SkyGlow on timeout/errors."
+      },
+      {
+        "id": "exact-sha-five-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "Compiled constexpr retry truth table and destructive source regressions plus all five mandatory GitHub Actions on the same validation-bearing SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Real D3D9 menu/vehicle/race game Draw and DrawIndexed mirrored into native full-frame D3D11 RTV with GPU EVENT fence",
+      "Current-Present staging CopyResource and nonblocking Map retry into original D3D9 UpdateSurface source and game-visible Present",
+      "Map pending, error, stale generation or timeout returns to untouched D3D9 Present/input"
+    ],
+    "batch_components": [
+      "C++ live_game_frame_bridge.cpp game Present GPU->CPU Map retry and provenance preserving publication",
+      "native_game_frame_publication.hpp bounded time/count admission policy",
+      "compiled positive/negative Map contract plus destructive source/fallback regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_readback_map_probe_00745.cpp success at 127 retries and 2499/10000000 ticks; actual C++ retries DO_NOT_WAIT Map with same-Present provenance",
+      "negative_regression": "tools/test_dx11_readback_map_00745.py plus tools/test_dx11_first_game_frame_regressions.py; pending/error/stale/inset/budget fail closed",
+      "component_integration": "D3D9 Draw and DrawIndexed => native D3D11 full-frame color => GPU fence => same-Present staging Map => bounded D3D9 UpdateSurface => original game Present/input"
+    },
+    "conflict_keys": [
+      "DX11:SAME_PRESENT_NATIVE_GAME_MAP_RECOVERY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "All five mandatory automated exact-SHA Gates SUCCESS on b465ec860f9d; actual game menu/vehicle/race/Quest3 hardware screen remains UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive disabled/default opt-in preserved; only current same-Present full-frame Map may retry; original D3D9 Draw/Present/gamepad, DX9Ex fallback/FFB/SkyGlow unchanged; DXVK frozen."
+  },
+  "acceptance_results": {
+    "current-frame-nonblocking-map-recovery": "PASS_BUILD",
+    "stale-error-original-game-fallback": "PASS_BUILD",
+    "exact-sha-five-gates": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Recovered HEAD 949c34dd and prior 00786 overlapping Present union; avoid owner conflict/DXVK.",
+    "C1_REVIEW": "Transient DO_NOT_WAIT CPU Map pending after successful exact-frame GPU EVENT silently discards otherwise ready menu/race full-frame native output.",
+    "C2_IMPLEMENT": "Real game frame bridge Map retry, frame publication admission and compiled/static negative regressions.",
+    "C3_VALIDATE": "Validation-bearing b465ec860f9d93ad6ed0bb0e3dd14b291ac8f90d: DX11 Fast #38792547419, Backend #38792547404 (validate+smoke), Win Build #38792560133, OpenXR #38792560025, HUD #38792560336 ALL SUCCESS. Real hardware runtime UNTESTED.",
+    "C4_COMMIT": "Material df9412d4d58d97ad4839770d918b2a6e85a65010, causal CI repairs b99b757f1dce3a5f7e5860fec59c1cd903de88ea and b465ec860f9d93ad6ed0bb0e3dd14b291ac8f90d; no forced update/CI-skip on validation-bearing.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "Exact SHA 5/5 automated success; Quest3/VDXR/gamepad/actual game UNTESTED. C6 bookkeeping separate [skip ci], no duplicate score."
+  },
+  "evidence": {
+    "runtime_testing": "Not performed; original game menu/vehicle/race and Quest3/VDXR/FFB untested",
+    "material_commit": "df9412d4d58d97ad4839770d918b2a6e85a65010",
+    "ci_repairs": [
+      "b99b757f1dce3a5f7e5860fec59c1cd903de88ea",
+      "b465ec860f9d93ad6ed0bb0e3dd14b291ac8f90d"
+    ],
+    "validation_bearing_result_sha": "b465ec860f9d93ad6ed0bb0e3dd14b291ac8f90d",
+    "fast_gate_run_id": 38792547419,
+    "backend_gate_run_id": 38792547404,
+    "windows_build_run_id": 38792560133,
+    "openxr_gate_run_id": 38792560025,
+    "hud_gate_run_id": 38792560336,
+    "fast_gate_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_gate_conclusion": "success",
+    "hud_gate_conclusion": "success",
+    "same_sha_verified": true,
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": "df9412d4d58d97ad4839770d918b2a6e85a65010",
+  "validation_bearing_result_sha": "b465ec860f9d93ad6ed0bb0e3dd14b291ac8f90d"
+}

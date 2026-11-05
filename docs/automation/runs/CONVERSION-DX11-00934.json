@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00934",
+  "production_id": "CONVERSION-DX11-00934",
+  "event_id": "CONVERSION-DX11-00934-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00934",
+  "feature_id": "LIVE_GAME_SM3_VERTEX_LIGHTING_DISTANCE_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "62f2b92ce85935e384daabbb7373fd1bbb8155bc",
+  "validation_bearing_result_sha": "62f2b92ce85935e384daabbb7373fd1bbb8155bc",
+  "score_change": 1,
+  "feature_contract": {
+    "feature_id": "LIVE_GAME_SM3_VERTEX_LIGHTING_DISTANCE_NATIVE_DRAW",
+    "goal": "D3D9 game-created SM3 VS LIT and DST lighting/distance bytecode to actual native D3D11 GPU shader and game Draw/DrawIndexed; original D3D9/DX9Ex input and FFB fallback preserved.",
+    "acceptance_items": [
+      {
+        "id": "native_vertex_lighting_distance",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_sm3_vertex_shader_native_gpu_draw",
+        "expected_behavior": "Decode VS3 LIT/DST, emit accurate D3D9 lighting exponent clamp and distance vector HLSL with destination masks through existing GPU VS/D3D11 Draw/DrawIndexed."
+      },
+      {
+        "id": "source_liveness_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "physical_temp_swizzles_and_pixel_stage_fallback",
+        "expected_behavior": "DST reads y/z from source0 and y/w from source1; LIT reads x/y/w as needed, rejects unwritten lanes, PS3 LIT/DST and malformed source fall back to original D3D9 render and gamepad/FFB."
+      },
+      {
+        "id": "same_sha_required_ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_source_compilation_and_regression",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Win32 Build, OpenXR, HUD Inspector all SUCCESS for validation-bearing code SHA; runtime HMD separately untested."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "Decode real intercepted D3D9 vs_3_0 LIT and DST with source-register swizzle and source mask ownership",
+      "Generate D3D11 native HLSL VS lighting/distance operations with D3D9 exponent clamp, source liveness and destination-mask writes",
+      "Submit through existing game-authored D3D11 Draw/DrawIndexed and retain original D3D9/DX9Ex/input/FFB fallback; HMD requires separate runtime evidence"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+      "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+      "tools/test_dx11_live_sm3_draw_00925.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source/semantic C++ tests and Win32 Build, all five Actions success on the same SHA.",
+      "negative_regression": "Pixel-stage lighting/distance rejected, partial TEMP physical masks checked, malformed operands fall back to original game.",
+      "component_integration": "Game vs_3_0 instruction decoding -> native C++ HLSL shader materializer -> live D3D11 GPU VS and Draw/DrawIndexed."
+    },
+    "conflict_keys": [
+      "DX11:SM3_NATIVE_VERTEX_LIGHTING_DISTANCE:00934"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Build verified; real Quest3 native full-frame menu/vehicle/race observation not performed.",
+    "activation_guard_and_fallback": "Diagnostic native opt-in only, game D3D9/DX9Ex render/input/FFB authoritative, DXVK remains frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub branch HEAD 9fc4a766; prior 00933 C6 complete; 00934 not present.",
+    "C1_REVIEW": "Existing live game VS3 decoder accepted LIT/DST but native materializer blocked both.",
+    "C2_IMPLEMENT": "Added actual VS3 LIT/DST native HLSL emission, D3D9 light exponent and per-operand TEMP source reads, vertex-only fallback, regression probe.",
+    "C3_VALIDATE": "Exact SHA 62f2b92c five required GitHub Actions completed success; game HMD UNTESTED.",
+    "C4_COMMIT": "62f2b92ce85935e384daabbb7373fd1bbb8155bc",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA_5_OF_5; SOURCE_BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Native full menu/vehicle/race game frame counters and HMD pixel evidence not collected.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "62f2b92ce85935e384daabbb7373fd1bbb8155bc",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue full game authored native VS/PS resource coverage and active input-safe full-frame game evidence under independent controller-owned feature; do not treat this build as HMD PASS.",
+  "acceptance_results": {
+    "native_vertex_lighting_distance": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "source_liveness_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "same_sha_required_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED",
+    "exact_sha": "62f2b92ce85935e384daabbb7373fd1bbb8155bc",
+    "ci_status": "PASS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "exact_sha_workflow_runs": {
+      "fast": {
+        "run_id": 39164550931,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39164551161,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39164554010,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39164554000,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39164554003,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  },
+  "score_policy": "One independent integrated native VS3 lighting/distance family source implementation; C6, CI, retry and any causal repair are the same task, no duplicate score."
+}

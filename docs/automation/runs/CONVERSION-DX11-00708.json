@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00708",
+  "production_id": "CONVERSION-DX11-00708",
+  "event_id": "CONVERSION-DX11-00708-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_STAGE0_TEMP_STAGE1_RGBA_MENU_RACE",
+  "work_key": "DX11:GAME_STAGE0_TEMP_STAGE1_RGBA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live D3D9 Stage0 RESULTARG=TEMP producer and Stage1 CURRENT/TEMP capture",
+      "D3D11 b1 shader register selection for Stage1 color, alpha, two- and three-input operators",
+      "Native Draw/DrawIndexed diagnostic game frame with original DX9Ex/gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_temp_probe_00708.cpp",
+      "tools/test_dx11_stage1_temp_00708.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "504 portable routed RGB/alpha and triadic TEMP cases",
+      "negative_regression": "TEMP without producer, unknown flags/source, stage2 and failed state capture preserve DX9Ex",
+      "component_integration": "D3D9 state -> b1 shader -> Draw/Indexed -> native diagnostic inset while D3D9 draw remains authoritative"
+    },
+    "conflict_keys": [
+      "DX11:GAME_STAGE0_TEMP_STAGE1_RGBA",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact-SHA build plus Quest3/VDXR menu/race HMD evidence separately required",
+    "activation_guard_and_fallback": "Native diagnostic remains opt-in, no gameplay promotion; incomplete TEMP provenance or mirror resources fall back to existing DX9Ex/gamepad"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STAGE0_TEMP_STAGE1_RGBA_MENU_RACE",
+    "goal": "Connect real game Stage0 TEMP register output into Stage1 CURRENT/TEMP RGB and independent alpha for diagnostic native Draw/Indexed and input-safe fallback.",
+    "acceptance_items": [
+      {
+        "id": "register-native-rgba",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_capture_to_HLSL_draw",
+        "expected_behavior": "TEMP producer distinct from vertex CURRENT flows through Stage1 two/three-input RGB/alpha"
+      },
+      {
+        "id": "register-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gamepad_original_D3D9",
+        "expected_behavior": "TEMP missing producer or invalid source/state keeps DX9Ex and input intact"
+      },
+      {
+        "id": "register-same-sha",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_python_windows_CI",
+        "expected_behavior": "504 portable positive cases, negative cases, structural integration and exact-SHA Gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "register-native-rgba": "PASS",
+    "register-fallback": "PASS",
+    "register-same-sha": "PASS"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_stage1_temp_probe_00708.cpp",
+    "tools/test_dx11_stage1_temp_00708.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00708.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE branch HEAD and 00707 C6 inspected",
+    "C1_REVIEW": "DONE Stage0 TEMP native register path missing",
+    "C2_IMPLEMENT": "DONE C++ state capture/HLSL register and test",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast 38501024891, Backend 38501024868, Build 38501030161, OpenXR 38501029999, HUD 38501030185 all SUCCESS at d19f0444340420600a44ff048bea572e44033986; HMD UNTESTED",
+    "C4_COMMIT": "PASS original material 9b91925ecd1120d744c60c93be608bbdd9d8dffb; same-TASK repair validation-bearing d19f0444340420600a44ff048bea572e44033986 (no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED exact SHA 5/5; separate [skip ci] bookkeeping; HMD UNTESTED"
+  },
+  "next_action": "BUILD_VERIFIED and NEED_HMD_TEST for real menu/vehicle/race Quest3/VDXR and gamepad; controller may select new independent DX11 feature, no rescore 00708.",
+  "state_persisted": true,
+  "base_head_sha": "8df54579838399be55c74c6c93c4156d6dd1c006",
+  "material_result_sha": "9b91925ecd1120d744c60c93be608bbdd9d8dffb",
+  "gate_evidence": {
+    "initial_material_sha": "9b91925ecd1120d744c60c93be608bbdd9d8dffb",
+    "fast_structural_initial": {
+      "id": 38500847665,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build_initial": {
+      "id": 38500852045,
+      "conclusion": "FAILURE",
+      "cause": "First-occurrence Stage1 fail-closed static negative-control collided with new TEMP predicate"
+    },
+    "validation_bearing_sha": "d19f0444340420600a44ff048bea572e44033986",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38501024891,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38501024868,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38501030161,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38501029999,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38501030185,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  },
+  "validation_bearing_result_sha": "d19f0444340420600a44ff048bea572e44033986"
+}

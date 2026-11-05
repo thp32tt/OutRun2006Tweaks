@@ -1,0 +1,219 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01168",
+  "production_id": "CONVERSION-DX11-01168",
+  "event_id": "CONVERSION-DX11-01168-E003",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_work_key": "DX11:REAL_D3D9_CANONICAL_COM_BACKBUFFER_NATIVE_RAW_PRESENT",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_INHERITED_C6_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_ready": "PASS_FEATURE_CI_SOURCE_ONLY",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "14d929e2d64da25a948784b5dc20ae8220ff8519",
+  "implementation_source_sha": "4207e72322d277e902bc3e11ce90fc1b9eeb7cc9",
+  "validation_bearing_result_sha": "7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+  "material_result_sha": "4207e72322d277e902bc3e11ce90fc1b9eeb7cc9",
+  "causal_ci_repair_shas": [
+    "7f5e9acf7e584f7d3eba6c0f56469daf762c8659"
+  ],
+  "score_change": 1,
+  "scoreboard_previous": 2192,
+  "scoreboard_new": 2193,
+  "scoreboard_commit": "af830aa6617921c5d458f43c9e3cc5adc64c118c",
+  "controller_runtime_adoption": "UNVERIFIED",
+  "development_time_percentages": "UNMEASURED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_source_target_identity.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01167.json",
+    "tools/test_dx11_autodev_policy.py"
+  ],
+  "implementation": "Resolve the real D3D9 render target captured at native source Draw and the original D3D9 Present backbuffer to their canonical IID_IUnknown identities. Different IDirect3DSurface9 interface handles representing the same COM object can authenticate conditional source-coincident D3D11 GPU RAW pixels; foreign/null/QueryInterface-failed COM identities reject coincident output and retain bounded opt-in RAW inset. Causal inherited 01167 C6 missing feature contract and native Draw/visible Present ordered policy stages repaired at exact-SHA 7f5e9a, including seven negative policy mutations. No complete gameplay/HMD/runtime claims.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_SOURCE_DRAW",
+      "CANONICAL_D3D9_RT_AND_PRESENT_IUNKNOWN",
+      "D3D11_NATIVE_GPU_PRE_DRAW_POST_RGB",
+      "AUTHENTIC_SOURCE_COINCIDENT_D3D9_PRESENT",
+      "ORIGINAL_D3D9_DX9EX_FALLBACK"
+    ],
+    "batch_components": [
+      "CPP_CANONICAL_IUNKNOWN_SOURCE_DRAW_PRESENT_BRIDGE",
+      "CPP_FAIL_CLOSED_FOREIGN_AND_NULL_BACKBUFFER_IDENTITY",
+      "CPP_COMPILED_POSITIVE_NEGATIVE_IDENTITY_REGRESSIONS",
+      "CAUSAL_HISTORIC_C6_POLICY_REGRESSION_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Distinct D3D9 interface surface pointers resolve to the same canonical IUnknown identity and permit authenticated opt-in native RGB at original coordinates.",
+      "negative_regression": "Foreign canonical IUnknown or null/unqueryable identity denies source-coincident native pixel attribution, preserving original game and bounded RAW inset.",
+      "component_integration": "NativeRawVisualPreview captures source Draw surface IUnknown and compares it with original Present backbuffer IUnknown, then maintains original GPU pixel crop/dirty checks; compiled native_raw_dual_tile_test proves identity admission/rejection."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_source_target_identity.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp",
+      "docs/automation/runs/CONVERSION-DX11-01167.json",
+      "tools/test_dx11_autodev_policy.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "OPT_IN_GPU_RAW_SOURCE_ALIGNED_DIAGNOSTIC",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_BUILD_VERIFIED_PARTIAL_RAW_DIAGNOSTIC_ONLY. Original desktop game pixel observation, full native menu/vehicle/race, physical Quest3 stereoscopy and frame pacing remain UNTESTED.",
+    "activation_guard_and_fallback": "Fail-closed explicit DX11 RAW opt-in; canonical COM identity, source size/crop/dirty proof and source RGB GPU capture remain mandatory. D3D9 original game/input/FFB and DX9Ex fallback protected; frozen DXVK unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "PARTIAL_NATIVE_GPU_RAW_GAME_FRAME_SOURCE_SLICE_NOT_FULL_RENDERER",
+    "goal": "Authenticate original game Draw and Present backbuffer as the same canonical COM object before placing real D3D11 native RGB pixels at their visible game coordinates with robust fail-closed fallback.",
+    "acceptance_items": [
+      {
+        "id": "canonical_game_draw_to_visible_present",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 live Draw to source-aligned D3D11 RGB output",
+        "expected_behavior": "Distinct IDirect3DSurface9 handles for one COM backbuffer allow source-aligned diagnostic GPU RGB only when canonical IUnknown matches."
+      },
+      {
+        "id": "foreign_and_null_identity_rejected",
+        "category": "fallback_regression",
+        "behavior_area": "identity and original game fallback",
+        "expected_behavior": "Distinct, missing or unqueryable canonical COM identities fail closed to the original RAW inset and preserve D3D9/DX9Ex input and FFB."
+      },
+      {
+        "id": "positive_negative_compiled_identity_regression",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native game backbuffer COM query correctness",
+        "expected_behavior": "Compiled C++ tests cover equivalent COM identity despite distinct D3D9 surface pointers, foreign identity and null inputs."
+      },
+      {
+        "id": "five_exact_sha_gates_and_ci_repair",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub exact-source workflow and inherited C6 policy contract",
+        "expected_behavior": "Five mandatory push GitHub Actions succeed for the same material validation SHA and historical C6 policy regression test remains fail closed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "canonical_game_draw_to_visible_present": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
+      ],
+      "validation_command": "Win32 Build push run 40960200166 SUCCESS on exact SHA; native game source RT and D3D9 Present IUnknown QueryInterface source verified."
+    },
+    "foreign_and_null_identity_rejected": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_source_target_identity.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks run 40960200115 SUCCESS; compiled fail-closed canonical identity tests cover null and foreign identity."
+    },
+    "positive_negative_compiled_identity_regression": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp",
+        "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
+      ],
+      "validation_command": "C++ static_assert and native_raw_dual_tile_test included in successful exact SHA 40960200166 Win32 Build and 40960200265 Backend Conversion Gate."
+    },
+    "five_exact_sha_gates_and_ci_repair": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01167.json",
+        "tools/test_dx11_autodev_policy.py"
+      ],
+      "validation_command": "python tools/test_dx11_autodev_policy.py; python tools/dx11_autodev_policy.py --check-latest; identical SHA all five mandatory push runs 40960200115, 40960200265, 40960200166, 40960200152, 40960200161 SUCCESS."
+    }
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40960200115,
+        "head_sha": "7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40960200265,
+        "head_sha": "7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40960200166,
+        "head_sha": "7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40960200152,
+        "head_sha": "7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40960200161,
+        "head_sha": "7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "bundles": [
+      {
+        "name": "outrun2006tweaks-7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+        "artifact_id": 12935777560
+      },
+      {
+        "name": "feature-dx11-first-game-frame-7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+        "artifact_id": 12935039739
+      },
+      {
+        "name": "HUD-inspector-game-7f5e9acf7e584f7d3eba6c0f56469daf762c8659",
+        "artifact_id": 12936022443
+      }
+    ],
+    "validation_layer": "SOURCE_AND_BUILD_VERIFIED_NOT_GAMEPLAY_OR_HMD",
+    "runtime_evidence": "No physical Quest3/VDXR or game screen visual runtime test. Source path and instrumentation are opt-in partial diagnostic; full playable native renderer not proven.",
+    "score_formula": "AI2 GitHub confirmed previous 2192 + unique 01168 canonical COM source-identity source/test implementation with mandatory 5/5 PASS +1 = 2193; same TASK rollover/CI repairs/C6/readback +0."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_4207_ORIGINAL_IMPLEMENTATION_AND_C6_01167_PROBLEM",
+    "C1_REVIEW": "PASS_BACKEND_GATE_40959236466_INHERITED_01167_CONTRACT_FAILURE",
+    "C2_IMPLEMENT": "PASS_4207_SOURCE_PLUS_7f5_CAUSAL_CONTRACT_REGRESSION_REPAIR",
+    "C3_VALIDATE": "PASS_FIVE_REQUIRED_GATES_ON_7f5e9a",
+    "C4_COMMIT": "PASS_4207_SOURCE_AND_7f5_REPAIR",
+    "C5_PACKAGE": "PASS_GITHUB_ACTIONS_BUILD_AND_DIAGNOSTIC_BUNDLES_PRESENT_NO_HMD_TEST",
+    "C6_STATE": "PASS_EXACT_SHA_RECEIPT"
+  },
+  "next_unfinished": "Observe actual OutRun native RAW GPU source-coincident game pixels with a matched desktop capture and probe full menu/vehicle/race coverage, stereo OpenXR handoff and Quest3/VDXR without treating GPU diagnostic primitives as full gameplay."
+}

@@ -1,0 +1,116 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00740",
+  "production_id": "CONVERSION-DX11-00740",
+  "event_id": "CONVERSION-DX11-00740-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:GAME_SOURCE_OWNER_FULL_CLEAR_REACQUISITION",
+  "feature_id": "DX11-LIVE-DRAW-PRESENT-DEVICE-OWNERSHIP-RECOVERY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "base_head_sha": "f84701451090e659379cdaaacd44a5623bdb716b",
+  "material_result_sha": "f0750c775995a7ab205e426b6e3af69c9a21cad3",
+  "validation_bearing_result_sha": "2b7fcc9ce719a6d9166464572878b4ce9b631502",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "change_summary": "Reconnect real menu/vehicle/race D3D9 source Draw/DrawIndexed ownership to the last actual game Present source, and recover from startup auxiliary-device claim on a verified whole-backbuffer color Clear before speculative DX11 output. Retire stale native readback generation; preserve original D3D9 HRESULT, Present, input and fail-closed unsupported native scene.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "tools/dx11_source_owner_handoff_probe_00740.cpp",
+    "tools/test_dx11_source_owner_handoff_00740.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "game-created D3D9 source Draw/DrawIndexed claims last actual owning game Present device, refusing foreign auxiliary draws without source ordinal pollution",
+      "successful full TARGET Clear reacquires source device before native draw; replaces game native color seed and resets batch continuity",
+      "native full-frame D3D11 Draw and same-Present output readback retain source generation; original DX9Ex, HRESULT and input remain authoritative"
+    ],
+    "batch_components": [
+      "D3D9 real Draw/DrawIndexed ownership and native GPU scene/full color Clear",
+      "D3D11 full frame provenance/Present ownership and generation invalidation",
+      "portable compiled source-owner C++ and destructive regression CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00740 C++ static and dynamic ownership probe verifies matched game output vs auxiliary Draw and startup Clear reacquisition.",
+      "negative_regression": "00740 destructive Python tests detect removing previous-Present affinity, verified full Clear-only owner transfer, generation invalidation, original fallback continuity.",
+      "component_integration": "Real game-native capture -> verified main game Clear -> same-source full-resolution D3D11 native Draw/DrawIndexed -> owned Present; never substitute original D3D9 gamepad/Draw."
+    },
+    "conflict_keys": [
+      "DX11:GAME_SOURCE_OWNER_FULL_CLEAR_REACQUISITION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Game-owned native Draw survives early auxiliary Draw and reacquires proven full-clear source in startup/menu transitions; exact same-Present output remains opt-in and Quest3 pixels unverified.",
+    "activation_guard_and_fallback": "Both OUTRUN_DX11_FIRST_GAME_FRAME and OUTRUN_DX11_FULL_GAME_FRAME remain explicit opt-in, unsupported draws retain original D3D9 Draw/Present/inputs."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-DRAW-PRESENT-DEVICE-OWNERSHIP-RECOVERY",
+    "goal": "Continuously route game-owned native full-resolution menu/car/race Draw streams through output ownership transitions without auxiliary D3D9 device claiming frames or breaking input-safe fallback.",
+    "acceptance_items": [
+      {
+        "id": "draw-present-owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Game-authored D3D9 Draw/DrawIndexed uses previously proven owner from Present and verified whole-backbuffer Clear recovery after auxiliary startup activity."
+      },
+      {
+        "id": "fallback-and-stale-eye",
+        "category": "fallback_regression",
+        "behavior_area": "source_fallback_input_and_transport",
+        "expected_behavior": "No foreign or partial Clear steals an active native batch, old GPU provenance retires on a legitimate handoff and original D3D9 HRESULT, Present and gamepad remain untouched."
+      },
+      {
+        "id": "exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "build_ci_openxr_hud",
+        "expected_behavior": "One validation-bearing SHA passes DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "draw-present-owner": "PASS",
+    "fallback-and-stale-eye": "PASS",
+    "exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "blocking_evidence": "A first-frame auxiliary Draw claims sourceGameDevice before the actual primary game backbuffer Clear; later main-game Draw or Present is rejected. Previous presentOutput owner affinity was not used in the source claim and foreign full Clear always returned before proof.",
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38613456934,
+      "conclusion": "success"
+    },
+    "backend_conversion": {
+      "run_id": 38613456817,
+      "conclusion": "success"
+    },
+    "windows_build": {
+      "run_id": 38613463801,
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "run_id": 38613463753,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38613463858,
+      "conclusion": "success"
+    }
+  },
+  "result_note": "Five mandatory GitHub Actions succeeded on exact validation-bearing SHA 2b7fcc9ce719a6d9166464572878b4ce9b631502. Material source commit f0750c775995a7ab205e426b6e3af69c9a21cad3. Verified build/source integration only; no actual Quest3/VDXR, real game pixels, gamepad or frame pacing evidence. No automatic backend promotion. C6 bookkeeping has no CI ownership or separate score."
+}

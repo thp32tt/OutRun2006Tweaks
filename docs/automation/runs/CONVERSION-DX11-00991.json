@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00991",
+  "production_id": "CONVERSION-DX11-00991",
+  "event_id": "CONVERSION-DX11-00991-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00991",
+  "feature_id": "DX11_NATIVE_PARTIAL_TARGET_CLEAR_MOSAIC_EYE_FRAME",
+  "work_key": "DX11:AUTHORED_PARTIAL_CLEAR_NATIVE_EYE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "f0f2769271eac40dbb74ebebc4568ef6ca5554c0",
+  "material_result_sha": "852b454a44a878d4dcddcd277b6a74d57a7d67a9",
+  "validation_bearing_result_sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37",
+  "result_sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "code_change": "YES",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Integrated genuine clipped D3D9 TARGET Clear mosaic -> exact native D3D11 left/right eye color-region ledger -> game-authored unpredicated on-eye Draw ordering -> guarded XR frame admission. Proven/unproven later camera GPU Copy/Stretch invalidates stale clear proof. The first material SHA had a legacy 00987 Python source-anchor failure; repaired the assertion without dropping checks at the final exact validation SHA. All unchanged mandatory Fast, Backend, Windows Build, OpenXR, HUD Actions succeed on that SHA; no game/Quest3/VDXR runtime observation, original DX9Ex/input/FFB/SkyGlow fallback unchanged, DXVK frozen.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_eye_postpass_coverage.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "tools/dx11_native_eye_partial_clear_frame_00991.cpp",
+    "tools/test_dx11_native_eye_partial_clear_frame_00991.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_native_eye_postpass_coverage_00987.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_NATIVE_PARTIAL_TARGET_CLEAR_MOSAIC_EYE_FRAME",
+    "goal": "Admit a real native stereo eye built by several actual clipped TARGET Clears, provided exact current pixels cover the whole eye and a real eligible on-eye geometry Draw follows the final Clear, without falsely certifying stale foreign camera pixels.",
+    "acceptance_items": [
+      {
+        "id": "native_partial_clear_mosaic_frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_game_TARGET_clips_to_native_eye_GPU_clear_then_Draw",
+        "expected_behavior": "Two or more truly executed disjoint partial TARGET Clears cover the whole native eye and genuine later unpredicated on-eye Draw unlocks existing stereo OpenXR publication."
+      },
+      {
+        "id": "foreign_GPU_overwrite_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "per_pixel_native_GPU_chronology_and_eye_coverage",
+        "expected_behavior": "Later unknown/proven camera Copy/Stretch removes Clear credit on exactly overwritten pixels; old Draw, offscreen-only Draw, predicated-only Draw or a clipped gap cannot publish, while DX9Ex game input/FFB remains authoritative."
+      },
+      {
+        "id": "source_CXX_python_5_gate",
+        "category": "integrated_validation",
+        "behavior_area": "actual_native_LR_frame_encoder_and_Actions",
+        "expected_behavior": "Portable C++ positive/negative coverage tests, Python game encoder/producer linkage and all five unchanged exact-SHA CI checks pass, Quest3 runtime independently UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_partial_clear_mosaic_frame": "PASS_EXACT_SHA",
+    "foreign_GPU_overwrite_and_fallback": "PASS_EXACT_SHA",
+    "source_CXX_python_5_gate": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE: clipped TARGET Clears + actual Draw ordinal",
+      "D3D11_NATIVE_DRAW: real physical L/R eye Clear rectangles, GPU Copy/Stretch and authored unpredicated eye Draw",
+      "VISIBLE_FRAME_OUTPUT: exact full-eye mosaic and strict native XR admission preserving original fallback"
+    ],
+    "batch_components": [
+      "C++ native eye GPU color chronology tracks authentic partial Clears plus later GPU postpass replacement",
+      "Real native stereo submission game Draw/DrawIndexed approval and shared evidence gate with C++/Python regression + five integrated Actions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two authentic left/right half-eye Clears, subsequent real native eye Draw, recovered GPU unknown pixels",
+      "negative_regression": "Stale on-eye Draw ordinal, predicated-only/offscreen-only draw, 1px Clear gap, and overwritten authentic Clear evidence must fail",
+      "component_integration": "NativeGameEyeDrawEncoder::clear_target_argb tracks successful physical clears and NativeGameStereoSubmission::render_game_eye_passes admits only complete current mosaic with genuine source Draw and existing XR safety gates"
+    },
+    "conflict_keys": [
+      "DX11:AUTHORED_PARTIAL_CLEAR_NATIVE_EYE_FRAME",
+      "DX11:EYE_XR_HANDOFF"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Strict opt-in / DX9Ex fallback; unknown GPU eye full replacement remains vetoed until fully physically repaired; no claim real HMD or desktop runtime."
+  },
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39691869726,
+        "conclusion": "success",
+        "sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39691869563,
+        "conclusion": "success",
+        "sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37"
+      },
+      {
+        "name": "Build",
+        "run_id": 39691869644,
+        "conclusion": "success",
+        "sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39691869581,
+        "conclusion": "success",
+        "sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39691869705,
+        "conclusion": "success",
+        "sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37"
+      }
+    ],
+    "optional_skipped": [
+      {
+        "name": "VR PC Fast Test Build",
+        "run_id": 39691869611,
+        "conclusion": "skipped",
+        "sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37"
+      }
+    ],
+    "first_material_sha_fast_failure": {
+      "sha": "852b454a44a878d4dcddcd277b6a74d57a7d67a9",
+      "run_id": 39691750479,
+      "cause": "legacy 00987 Python source string anchor assumed unparenthesized if, now separate mosaic OR",
+      "repair_sha": "27ad967d0fdb0f8069ffc18e8ef3c2143a363c37"
+    }
+  },
+  "score_change": 0,
+  "next_action": "Full-resolution real OutRun menu/car/race native Draw/DrawIndexed output and Quest3/VDXR presentation unobserved; controller to choose next independent safe DX11 implementation after BUILD_VERIFIED. Do not repeat task or score its C6 independently.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: exact source HEAD, 00990 finished, no active owner conflict at dispatch.",
+    "C1_REVIEW": "PASS: missing authentic segmented TARGET Clear native eye admission and exact geometric/stereo chronology gap.",
+    "C2_IMPLEMENT": "PASS: C++ native eye regions, encoder/supervisor real frame approval and portable regression material commit 852b454a44a878d4dcddcd277b6a74d57a7d67a9; causal exact-check fixture repair 27ad967d0fdb0f8069ffc18e8ef3c2143a363c37.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast 39691869726, Backend 39691869563, Windows Build 39691869644, OpenXR 39691869581, HUD 39691869705. All success at 27ad967d0fdb0f8069ffc18e8ef3c2143a363c37; HMD/desktop game runtime untested.",
+    "C4_COMMIT": "PASS: material SHA 852b454a44a878d4dcddcd277b6a74d57a7d67a9 and repaired validation-bearing SHA 27ad967d0fdb0f8069ffc18e8ef3c2143a363c37 with exact [AUTO:CONVERSION-DX11-00991], no CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: no actual game/HMD validated candidate claimed.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; independent test/score not added for bookkeeping; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "c6_code_change": "NO",
+  "score": {
+    "run_key": "CONVERSION-DX11-00991",
+    "c6_score_change": 0,
+    "award": "SEPARATE_AI_SCOREBOARD_SSOT_WRITE"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00042",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T18:19:27+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "72e37b69862d50d46188c35c5bad18e76db6479d",
+  "code_result_sha": "ee8bbfb8e3f37f468b509c17e71bd501ae6506d2",
+  "result_sha": "ee8bbfb8e3f37f468b509c17e71bd501ae6506d2",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R92 hosted DX11 fixed-function shader-stage linkage compatibility probe for Set 05 F21.",
+  "summary": "Added a hosted R92 probe that compiles the existing R84 fixed-function pixel-shader prototype and a diagnostic vertex shader, reflects both bytecodes, requires compatible COLOR0/TEXCOORD0 semantic-index/component-mask/type linkage, and requires a deliberate UINT COLOR0 mismatch to fail closed. The change does not enable native game shader binding or draw routing.",
+  "prerequisite": {
+    "task_id": "CONVERSION-DX11-00040",
+    "code_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "changes": [
+    {
+      "path": "tools/dx11_shader_linkage_probe.cpp",
+      "result": "Added R92 compiled VS-output/PS-input reflection compatibility probe with negative type-mismatch case."
+    },
+    {
+      "path": "cmake.toml",
+      "result": "Added dx11_shader_linkage_probe target with d3dcompiler/d3d11/dxguid linkage."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Added checked-in generated-equivalent dx11_shader_linkage_probe target."
+    },
+    {
+      "path": ".github/workflows/backend-conversion-gate.yml",
+      "result": "Added Build/Run DX11 shader linkage probe steps."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R92 source/build/workflow/reflection contract guards."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R92 proves only compiled shader interface compatibility for the diagnostic fixed-function subset. It does not implement D3D9 vertex transformation/lighting semantics, programmable shader translation, runtime shader binding, or HMD visual parity."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36547712731,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "ee8bbfb8e3f37f468b509c17e71bd501ae6506d2",
+      "evidence": "Build DX11 shader linkage probe PASS; Run DX11 shader linkage probe PASS."
+    },
+    "build": {
+      "run_id": 36547717281,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "ee8bbfb8e3f37f468b509c17e71bd501ae6506d2"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36547717217,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "ee8bbfb8e3f37f468b509c17e71bd501ae6506d2"
+    },
+    "hud_inspector": {
+      "run_id": 36547717547,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "ee8bbfb8e3f37f468b509c17e71bd501ae6506d2"
+    },
+    "pc_fast": {
+      "run_id": 36547712761,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit ee8bbfb8e3f37f468b509c17e71bd501ae6506d2 contains [AUTO:CONVERSION-DX11-00042] and no CI-skip directive.",
+    "Verify DX11 source graph PASS before compilation.",
+    "Backend Conversion Gate 36547712731 PASS including R92 build/run.",
+    "Build 36547717281 PASS.",
+    "OpenXR VR architecture 36547717217 PASS across all six jobs.",
+    "HUD Inspector 36547717547 PASS.",
+    "Issue #14 implementation comment 5887220118 and validation comment 5887312737 written.",
+    "No N100 workspace, PC fast runner, Quest3/VDXR, or in-game runtime execution was used."
+  ],
+  "blocker": null,
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN",
+    "implementation_comment_id": 5887220118,
+    "validation_comment_id": 5887312737
+  },
+  "resume_cursor": "R92 is automation-validated. Continue F21 only with another bounded non-routing shader-semantic prerequisite; do not promote shaderTranslationExact or native draw activation without complete translation and runtime evidence.",
+  "next_action": "Advance fixed-function vertex/transform semantic translation or programmable shader translation evidence while keeping NativeDrawPathActivationAllowed=false. Exact-build Quest3/VDXR remains mandatory before runtime promotion."
+}

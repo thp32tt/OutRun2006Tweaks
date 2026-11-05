@@ -1,0 +1,169 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00570",
+  "production_id": "CONVERSION-DX11-00570",
+  "event_id": "CONVERSION-DX11-00570-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00570",
+  "base_sha": "f7ebad3c12d53d851cdd2591db4c885a4f621ddf",
+  "work_key": "DX11:MENU_RACE_BLEND_RGB_ADD_ALPHA_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game D3D9 blend RGB and independent ADD alpha stage capture",
+      "TextureCapture -> two compiled D3D11 pixel shaders with Reset, Draw/DrawIndexed dispatch",
+      "GPU readback -> opt-in visible D3D9 diagnostic inset; DX9Ex game Draw/input/Present retained"
+    ],
+    "batch_components": [
+      "D3D9 state capture, ADD alpha operand validation and fail-closed native admission",
+      "Exact native HLSL PS variants with shader object ownership/device lifecycle and Draw selector",
+      "14 destructive source-link regression cases plus RGB/alpha admission and saturation numerical checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two independent game stage0 blend RGB + ADD alpha native PS paths with CPU RGBA cases",
+      "negative_regression": "14 destructive link mutations, wrong op/operand cases and saturating vs multiplicative alpha",
+      "component_integration": "Live D3D9 callsite -> TextureCapture -> native D3D11 Draw/DrawIndexed -> VISIBLE_FRAME_OUTPUT"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BLEND_RGB_ADD_ALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BLEND_ADD_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "BLEND_RGB_ADD_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Opt-in inset only, live menu/vehicle/race/Quest3/VDXR/gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in; default disabled; authoritative original DX9Ex game Draw/input/Present unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00570.json"
+  ],
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "pipeline": {
+    "C0_RECOVER": "GitHub exact head f7ebad3c12d53d851cdd2591db4c885a4f621ddf, previous 00569 C6 PASS",
+    "C1_REVIEW": "Independent BLEND RGB + ADD alpha not implemented in native PS path",
+    "C2_IMPLEMENT": "D3D9 capture, 2 HLSL/PS modes, lifecycle/Draw, 14 destructive negative regressions",
+    "C3_VALIDATE": "Exact SHA 8efbd34487e17ada21c823ee7f02eb22b2ec9364: GitHub check runs 19 SUCCESS, 2 SKIPPED; all completed, none failed",
+    "C4_COMMIT": "Material C++/tests/run record in one atomic commit, no CI-skip",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic-only",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA for 8efbd34487e17ada21c823ee7f02eb22b2ec9364; separate bookkeeping [skip ci]; Quest3/VDXR/gamepad UNTESTED"
+  },
+  "validation_bearing_result_sha": "8efbd34487e17ada21c823ee7f02eb22b2ec9364",
+  "material_result_sha": "8efbd34487e17ada21c823ee7f02eb22b2ec9364",
+  "result_sha": "8efbd34487e17ada21c823ee7f02eb22b2ec9364",
+  "state_persisted": true,
+  "c6_recovery_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "next_action": "Exact-SHA GitHub CI verified; no retry or duplicate scoring. Quest3/VDXR/gamepad HMD runtime test remains outstanding.",
+  "validation_evidence": {
+    "exact_sha": "8efbd34487e17ada21c823ee7f02eb22b2ec9364",
+    "github_checks": {
+      "total": 21,
+      "success": 19,
+      "skipped": 2,
+      "failed": 0,
+      "head_sha": "8efbd34487e17ada21c823ee7f02eb22b2ec9364",
+      "checks": [
+        {
+          "name": "DX11 FIRST_GAME_DRAW_FRAME diagnostic bundle",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904681/job/114585474606"
+        },
+        {
+          "name": "DX11 readiness smoke probes",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904595/job/114585112433"
+        },
+        {
+          "name": "game-x86-r26-hud-safe",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907328/job/114584103174"
+        },
+        {
+          "name": "host-x64",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907328/job/114584103065"
+        },
+        {
+          "name": "game-x86-c2-r30-hud",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907328/job/114584103052"
+        },
+        {
+          "name": "game-x86-safe-draw-compare",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907328/job/114584102982"
+        },
+        {
+          "name": "build-hud-inspector",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907345/job/114584102955"
+        },
+        {
+          "name": "game-x86",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907328/job/114584102942"
+        },
+        {
+          "name": "static-exe-analysis",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907345/job/114584102812"
+        },
+        {
+          "name": "game-x86-c1-r29-r28-classify",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907328/job/114584102801"
+        },
+        {
+          "name": "build (Win32, Release)",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177907346/job/114584102503"
+        },
+        {
+          "name": "game-x86-safe-draw-compare",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904681/job/114584094860"
+        },
+        {
+          "name": "host-x64",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904681/job/114584094832"
+        },
+        {
+          "name": "game-x86-c2-r30-hud",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904681/job/114584094828"
+        },
+        {
+          "name": "game-x86-r26-hud-safe",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904681/job/114584094808"
+        },
+        {
+          "name": "game-x86-c1-r29-r28-classify",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904681/job/114584094794"
+        },
+        {
+          "name": "game-x86",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904681/job/114584094669"
+        },
+        {
+          "name": "validate",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904595/job/114584094358"
+        },
+        {
+          "name": "fast",
+          "job_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38177904528/job/114584093928"
+        }
+      ]
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
+}

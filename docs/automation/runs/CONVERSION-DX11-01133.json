@@ -1,0 +1,223 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01133",
+  "production_id": "CONVERSION-DX11-01133",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01133",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:CANONICAL_SAME_PRESENT_TARGET_CLEAR_CAPTURE_EPOCH",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_SAME_TASK_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "936e3f9b7099f1a9c6ab1ea048ee49a60e30f381",
+  "source_change_sha": "3379cd68b85a7e9835949e26abaea0458b5abe99",
+  "material_result_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+  "validation_bearing_result_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+  "result_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+  "implementation_commits": [
+    "3379cd68b85a7e9835949e26abaea0458b5abe99"
+  ],
+  "causal_ci_repair_commits": [
+    "847785bc54bf3e6a192743d2d47d51348b6cd636",
+    "95d4f88564f42a9844a71d7a99d7118b9d6beae1"
+  ],
+  "gate_registration_commits": [
+    "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5"
+  ],
+  "bookkeeping_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_source_probe.hpp",
+    "tests/native_raw_gpu_source_epoch_test.cpp",
+    "tests/native_raw_source_probe_schedule_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01132.json",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "implementation_summary": "Authentic canonical whole TARGET Clear within one original game Present invalidates any preceding source-D3D11 RAW GPU pixel tile; in-flight staging survives until real GPU EVENT completion. A fresh post-Clear real native Draw may recapture, never map or publish old pre-Clear pixels. Limit four real native conversion attempts per original D3D9 Present across repeated Clears. Preserve original D3D9 rendering/input/FFB, DX9Ex fallback, frozen DXVK and fail-closed full native frame. Opt-in partial GPU diagnostic only.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CANONICAL_BACKBUFFER_TARGET_CLEAR",
+      "INVALIDATE_PRE_CLEAR_NATIVE_GPU_PIXEL_CAPTURE",
+      "GPU_EVENT_FENCED_SOURCE_REARM",
+      "POST_CLEAR_REAL_D3D11_NATIVE_DRAW_CAPTURE",
+      "RAW_PARTIAL_VISIBLE_PIXEL_DIAGNOSTIC"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_TILE_NOT_FULL_NATIVE_GAME_FRAME"
+    ],
+    "batch_components": [
+      "CPP_SAME_PRESENT_GPU_CAPTURE_EPOCH_INVALIDATION",
+      "CPP_NATIVE_CAPTURE_EVENT_FENCED_REARM",
+      "CPP_PRESENT_BOUND_SOURCE_PROBE_BUDGET",
+      "CPP17_POSITIVE_AND_NEGATIVE_CLEAR_FENCE_REGRESSIONS",
+      "EXACT_SHA_MANDATORY_CI_GATE_REGISTRATION"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED authentic same-Present canonical Clear/native Draw/GPU tile diagnostic ownership only; no observed menu/car/race full native frame, visible real game pixels or stereo/HMD outcome. Runtime UNTESTED.",
+    "activation_guard_and_fallback": "Opt-in RAW diagnostic only. Source authentic canonical D3D9 BackBuffer/whole TARGET Clear required. GPU EVENT owns in-flight staging through error/pending paths. Original D3D9 Draw, gamepad input, wheel FFB, DX9Ex fallback and DXVK freeze unchanged.",
+    "acceptance_proof": {
+      "positive_probe": "tests/native_raw_gpu_source_epoch_test.cpp proves canonical Clear revokes same-Present GPU tile and new post-Clear real native draw only queues after completed fence; schedule regression proves four-attempt budget renews on actual Present.",
+      "negative_regression": "GPU still pending cannot reuse staging; stale pre-Clear epoch cannot consume_for_present; no false rearm without fence; multiple successful Clear epochs cannot renew four-attempt budget, uint64 ordinal saturation unchanged.",
+      "component_integration": "Actual D3D9 observe_game_clear path calls the native GPU preview invalidation, real pre/post Draw GPU capture is fenced by source-present serial, and native probe schedule binds four-attempt lifetime to game Present, backed by two portable C++17 regressions and five same exact-SHA GitHub Actions PASS."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve authentic native D3D11 Draw pixel evidence across whole D3D9 game BackBuffer Clears inside one Present with GPU-fenced capture rearm and bounded real source attempts, without modifying game rendering or input.",
+    "acceptance_items": [
+      {
+        "id": "post_clear_native_gpu_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 whole TARGET Clear to native source Draw GPU capture",
+        "expected_behavior": "Old same-Present RGB tile becomes invalid on a verified canonical Clear and a fresh real post-Clear GPU Draw may produce a new fenced tile only after event retirement."
+      },
+      {
+        "id": "fallback_and_event_safety",
+        "category": "fallback_regression",
+        "behavior_area": "In-flight GPU staging and original DX9Ex/input safety",
+        "expected_behavior": "Pending copy is never reused, superseded pixels cannot be published, multiple whole Clears cannot inflate attempt count, and fallback rendering/input survives."
+      },
+      {
+        "id": "exact_sha_build_and_source_regressions",
+        "category": "integrated_validation",
+        "behavior_area": "Source C++17 regressions and GitHub Actions exact SHA",
+        "expected_behavior": "Both production-linked C++17 source regressions and all five mandatory Fast/Backend/Win32 Build/OpenXR/HUD checks pass on one identical validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "post_clear_native_gpu_capture": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "DX11 Fast #40666019849 success exact 95733840bfb4d7ea1c75f200d3fd6bf2a81622b5; real D3D9/HMD not executed"
+    },
+    "fallback_and_event_safety": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_source_probe.hpp",
+        "tests/native_raw_source_probe_schedule_test.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Backend #40666019851 and Build #40666019853 success exact 95733840bfb4d7ea1c75f200d3fd6bf2a81622b5; input/FFB/fallback retained"
+    },
+    "exact_sha_build_and_source_regressions": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tests/native_raw_gpu_source_epoch_test.cpp",
+        "tests/native_raw_source_probe_schedule_test.cpp"
+      ],
+      "validation_command": "Five exact source-SHA mandatory GitHub Actions PASS: Fast 40666019849, Backend 40666019851, Build 40666019853, OpenXR 40666031542, HUD 40666031463 at 95733840bfb4d7ea1c75f200d3fd6bf2a81622b5"
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40666019849,
+      "event": "push",
+      "head_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40666019851,
+      "event": "push",
+      "head_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40666019853,
+      "event": "push",
+      "head_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40666031542,
+      "event": "pull_request",
+      "head_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40666031463,
+      "event": "pull_request",
+      "head_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "supplemental_gate_results": [
+    {
+      "name": "DX11 Native Transport Isolated WARP",
+      "run_id": 40666020041,
+      "event": "push",
+      "head_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40666031324,
+      "event": "pull_request",
+      "head_sha": "95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-95733840bfb4d7ea1c75f200d3fd6bf2a81622b5",
+    "artifact_id": 12805684590,
+    "run_id": 40666019853,
+    "digest": "sha256:648460f2c52a77be02d5750672e69f198e4bcbb29228eca4aed14fd9fc1fa0b5"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS pinned latest source 936e3f9b and 01132 CI result; preceding docs had missing development_strategy",
+    "C1_REVIEW": "PASS identified same-Present canonical game TARGET Clear leaves older RAW source GPU tile and incorrectly renews four attempts",
+    "C2_IMPLEMENT": "PASS integrated game Clear to GPU capture epoch/fence/rearm and per-Present budget; source implementation 3379cd68",
+    "C3_VALIDATE": "PASS mandatory five exact material SHA 95733840bfb4d7ea1c75f200d3fd6bf2a81622b5; initial unrelated 01132 policy failure and same-task stale assertion corrected with causal CI commits; no same-SHA gate repetition",
+    "C4_COMMIT": "PASS real material implementation and causal CI repair commits, no CI skip on validation-bearing SHA; non-forced GitHub branch updates",
+    "C5_PACKAGE": "PASS exact source-matched Windows Build artifact 12805684590; HMD/real-game runtime UNTESTED",
+    "C6_STATE": "PASS docs-only result recording after exact-SHA five-Gate PASS, no rerun; same TASK_ID score not doubled"
+  },
+  "runtime_evidence": {
+    "real_game_draw_output": "UNTESTED",
+    "visible_native_rgb_pixels": "UNTESTED",
+    "full_native_game_frame": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "work_time_ratio": "NOT_MEASURED",
+  "score_change": 0,
+  "c6_score_change": 0,
+  "score_note": "C6/CI/rollover +0; one genuinely distinct source-integrated five-Gate PASS performance may be recorded once, separately in ai-dev-lab AI_SCOREBOARD.md.",
+  "c6_note": "Result SHA deliberately pinned to validation-bearing commit; this docs-only checkpoint is excluded from material validation. No source or workflow changes, frozen DXVK preserved; HMD UNTESTED."
+}

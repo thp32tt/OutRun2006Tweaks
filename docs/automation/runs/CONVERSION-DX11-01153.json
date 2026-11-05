@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01153",
+  "production_id": "CONVERSION-DX11-01153",
+  "event_id": "CONVERSION-DX11-01153-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_SM3_FVF:SOURCE_AUTHENTIC_FOG_NATIVE_VISUAL",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "4e54b63269348ab13207027a27c8f3a7aaae4228",
+  "material_result_sha": "b6055fb4c87b6ea8d276350f65c44bf8efc6615a",
+  "validation_bearing_result_sha": "b6055fb4c87b6ea8d276350f65c44bf8efc6615a",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    "docs/automation/runs/CONVERSION-DX11-01153.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_FVF_FOGENABLE_GETTERS_AND_EXACT_ZERO_DENSITY_PRODUCTION_DRAW",
+      "LIVE_SM3_SOURCE_FOG_MODES_AND_VERTEX_ONLY_EQUATION_FLOAT_GETTERS",
+      "RAW_PARTIAL_NATIVE_GPU_NOFOG_DRAW_ON_FAILED_W_PROJECTION_WITH_STRICT_FALLBACK"
+    ],
+    "batch_components": [
+      "FIXED_FUNCTION_GAME_FVF_LIVE_EXACT_INERT_TABLE_FOG_NATIVE_DRAW",
+      "PROGRAMMABLE_GAME_SM3_RAW_SOURCE_VERIFIED_PROJECTION_FAILURE_FALLBACK",
+      "POSITIVE_NEGATIVE_CPLUSPLUS_AND_SOURCE_INTEGRATION_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source EXP/EXP2 density=0 produces exact unmodified FVF RGB; RAW gets genuine native SM3 GPU Draw without a usable W projection and only where source modes/consumed floats are known.",
+      "negative_regression": "Nonzero/NaN density, invalid LINEAR interval, invalid mode, missing source getters and normal production W projection failure still reject; RAW cannot publish full native frame.",
+      "component_integration": "Real D3D9 GetRenderState/GetTransform -> native FVF or SM3 Draw -> opt-in RAW tile under original D3D9 and input/FFB fallback"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+      "tools/dx11_live_sm3_table_zfog_01005.cpp",
+      "tools/test_dx11_live_sm3_table_zfog_01005.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_INTEGRATED_CI_PENDING; native Draw/output visibility NOT verified on the exact user game binary. Runtime requires native_draws>0 and publishedBackbufferFrames>0 from one authentic game launch; RAW partial tile is visibly labeled and never counted as full-frame proof.",
+    "activation_guard_and_fallback": "Original D3D9Ex game pixels, controller input and FFB remain authoritative; full-frame source/target/poison/caps/stencil/resource/viewport admission fail closed. Only exact source-zero EXP/EXP2 is production-equivalent; unknown W projection may omit visual fog solely for separately enabled RAW tile."
+  },
+  "real_game_draw_blocker": "No new actual game source-matched Draw or published frame evidence; old b8dab362 was zero-native-draw",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Connect real game-authored fixed-function and programmable D3D9 fog source states to more native D3D11 pixel-producing Draws without weakening the full-frame source parity and DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "fvf_exact_inert_fog_native_game_rgb",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Real game fixed-function Draw -> native D3D11 RGB",
+        "expected_behavior": "Actual D3D9 EXP/EXP2 table density=0 admits native FVF Draw, nonzero or COM/NaN failure cannot fabricate no-fog parity."
+      },
+      {
+        "id": "sm3_raw_projection_failure_source_pixels",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Real game programmable native RAW tile",
+        "expected_behavior": "Explicit RAW source-authentic SM3 Draw can omit visually unsupported fog if W projection query fails, after actual enum and required source float query; no fake full-frame credit."
+      },
+      {
+        "id": "preserve_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9Ex game/input/FFB and native publication safety",
+        "expected_behavior": "Unknown or nonfinite fog equations, inactive RAW, invalid source/RT/DS/COM resources fail closed; no DXVK lane, original game Draw and FFB remain intact."
+      },
+      {
+        "id": "five_exact_sha_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub DX11 Windows native Build and automation gates",
+        "expected_behavior": "Validation-bearing exact SHA passes unchanged Fast, Backend, Win32 Build, OpenXR, HUD inspector; native gameplay is not claimed from CI."
+      }
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_PINNED_BASE",
+    "C1_REVIEW": "PASS_SOURCE_FOG_BLOCKER_SCOPE",
+    "C2_IMPLEMENT": "PASS_CPLUSPLUS_AND_HLSL_BINDINGS_INHERITED",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_EXACT_SHA_b6055fb4",
+    "C4_COMMIT": "PASS_SOURCE_5fc23727_AND_CAUSAL_RECORD_REPAIR_b6055fb4",
+    "C5_PACKAGE": "NO_SOURCE_MATCHED_DESKTOP_GAME_OR_QUEST3_RUNTIME_TEST",
+    "C6_STATE": "PASS_SEPARATE_CHECKPOINT_NO_ADDITIONAL_SCORE"
+  },
+  "evidence": {
+    "source_implementation_sha": "5fc23727cf6965285c569378de80a8626354a6b8",
+    "initial_ci_fast_run": 40830263394,
+    "initial_ci_backend_run": 40830263516,
+    "initial_ci_cause": "Required game-frame strategy / feature_contract omitted from 01153 report, not an actual source build failure.",
+    "requires_final_exact_sha_five_push_gates": true,
+    "original_material_source_commit": "5fc23727cf6965285c569378de80a8626354a6b8",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40830561662,
+        "head_sha": "b6055fb4c87b6ea8d276350f65c44bf8efc6615a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40830561660,
+        "head_sha": "b6055fb4c87b6ea8d276350f65c44bf8efc6615a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40830561642,
+        "head_sha": "b6055fb4c87b6ea8d276350f65c44bf8efc6615a",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40830561735,
+        "head_sha": "b6055fb4c87b6ea8d276350f65c44bf8efc6615a",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40830561636,
+        "head_sha": "b6055fb4c87b6ea8d276350f65c44bf8efc6615a",
+        "conclusion": "success"
+      }
+    ],
+    "scoreboard_commit": "3386a979e15b89006d79e27d22e20f7330464991",
+    "scoreboard_ai2_prior": 2148,
+    "scoreboard_ai2_delta": 1,
+    "scoreboard_ai2_new": 2149,
+    "runtime_evidence": "UNTESTED; no source-matched DX11 original game desktop native Draw/published-frame or Quest3/VDXR test"
+  },
+  "source_implementation_commit_sha": "5fc23727cf6965285c569378de80a8626354a6b8",
+  "c6": {
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "b6055fb4c87b6ea8d276350f65c44bf8efc6615a",
+    "source_implementation_sha": "5fc23727cf6965285c569378de80a8626354a6b8",
+    "bookkeeping_only": true,
+    "score_change": 0,
+    "checkpoint_message_has_ci_skip": true,
+    "ci_validated_source_commit_distinct": true,
+    "next_action": "No source-matched user desktop/HMD native pixels yet. Continue unfinished FULL_RESOLUTION_NATIVE_GAME_FRAME feature using fresh real-game evidence. Original D3D9/FFB input and DXVK frozen."
+  }
+}

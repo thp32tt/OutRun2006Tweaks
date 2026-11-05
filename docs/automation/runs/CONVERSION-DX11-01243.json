@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01243",
+  "production_id": "CONVERSION-DX11-01243",
+  "event_id": "CONVERSION-DX11-01243-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "adfb163e63de7e48da0fbbb1f61457d6c6462a3c",
+  "result_sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+  "material_implementation_sha": "8378856726ebc5ee722fc2bba461410700e8998d",
+  "material_result_sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+  "validation_bearing_result_sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+  "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+  "feature_identity_note": "Same inherited DX11 authentic FVF clipped game GPU capture/frame continuity feature as 01242. Align tiny-positive-W original Draw with GPU PRE/POST capture for polygon, line, point; causal same-task CI record and regression compilation repairs; no independent score.",
+  "classification": "A_INHERITED_LIVE_GAME_FVF_TINY_POSITIVE_W_CAPTURE_B_CONFIRMED_CI_REPAIRS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 0,
+  "score_note": "Inherited 01242 FVF source capture feature; same task CI repair and validation/bookkeeping, no new independently scored capability. AI2 scoreboard unchanged; AI1 separate.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_fvf_stroke_sampling.hpp",
+    "tests/native_raw_fvf_user_clip_capture_test.cpp",
+    "tests/native_raw_fvf_stroke_capture_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01242.json"
+  ],
+  "implementation": "Real original D3D9 FVF Draw/DrawIndexed positive homogeneous W below 1e-5 remains valid native D3D11 GPU PRE/POST capture sampling for triangle polygon, clipped wireframe, LINELIST/LINESTRIP and POINTLIST, including enabled authentic ClipDistance. Apply bounded synthetic eye-plane guard only to actual W<=0 crossings; retain all-zero/invalid IA/nonfinite user-plane rejection, source RT/epoch/native GPU RGB delta, original D3D9 Present/input/FFB/DX9Ex fallback and frozen DXVK. Add positive/negative capture regressions; exact CI causal repair normalized inherited 01242 canonical live path and fixed early test raster forward reference.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW",
+      "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_GAME_FVF_DRAW_DRAWINDEXED",
+      "D3D11_NATIVE_GPU_DRAW_WITH_POSITIVE_W",
+      "SOURCE_AUTHENTIC_TRIANGLE_LINE_POINT_GPU_RGB_PRE_POST",
+      "GUARDED_SOURCE_PRESENT_INPUT_FFB_FALLBACK"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "FVF_SOURCE_AUTHENTIC_POSITIVE_W_POLYGON_CXX",
+      "FVF_SOURCE_AUTHENTIC_POSITIVE_W_STROKE_CXX",
+      "TINY_W_TRIANGLE_USERCLIP_POSITIVE_NEGATIVE_TEST",
+      "TINY_W_POINT_LINE_INDEXED_POSITIVE_NEGATIVE_TEST",
+      "CAUSAL_INHERITED_CI_RECORD_AND_TEST_COMPILE_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native positive-W polygon/line/point source capture tests and DX11 Fast Structural Checks 41956424892 SUCCESS at 2067d9342996b8e3b3670ac903ca19af0b4d9762.",
+      "negative_regression": "Fully user-clipped, all-zero homogeneous, point W=0 and malformed source/index data remain fail closed in source C++ and source-only C++17 regressions.",
+      "component_integration": "original D3D9 captured FVF IA -> native_game_raw_fvf_clip_capture.hpp/native_game_raw_fvf_stroke_sampling.hpp -> native D3D11 GPU PRE/POST owned source crops -> only conditional original D3D9 Present visible diagnostic and fallback."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY; LIVE_D3D9_CALLSITE -> D3D11_NATIVE_DRAW -> conditional VISIBLE_FRAME_OUTPUT is a source integration path, not a measured runtime event. No real game menu/car/race native GPU pixels or Quest3 HMD tested.",
+    "activation_guard_and_fallback": "RAW diagnostic opt-in only; actual native GPU RGB, source RT/epoch and Present required. Original game input, wheel FFB, DX9Ex fallback/owners protected; DXVK frozen.",
+    "record_normalization": "01243 causal CI repair only: restore mandated canonical source-path stage identifiers for 01242's previously verified C++ path; does not add runtime or gameplay evidence, does not alter 01242 material SHA or score."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+    "goal": "Preserve original game FVF triangle, line and point Draw capture in native D3D11 for authentic very small positive homogeneous W while keeping conditional real GPU pixel publication and original input/FFB safety.",
+    "acceptance_items": [
+      {
+        "id": "original_fvf_tiny_w_polygon_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "AUTHENTIC_GAME_POLYGON_GPU_CAPTURE",
+        "expected_behavior": "Native D3D11 PRE/POST source raster captures valid original positive-W triangles and clipped wireframe despite W below 1e-5; genuine user ClipDistance remains active."
+      },
+      {
+        "id": "original_fvf_tiny_w_strokes_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GAME_INPUT_FFB_AND_STROKE_RASTER_SAFETY",
+        "expected_behavior": "Original positive-W line/point GPU capture samples genuine source geometry, while malformed homogeneous points, unknown indexed IA and all-clipped user planes remain safe without changing D3D9 fallback."
+      },
+      {
+        "id": "five_source_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "NATIVE_DX11_FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "All five mandated exact-SHA GitHub Actions succeed for the complete C++ and regression result, while physical game/HMD runtime remains separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "original_fvf_tiny_w_polygon_capture": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks run 41956424892 SUCCESS at exact SHA 2067d9342996b8e3b3670ac903ca19af0b4d9762"
+    },
+    "original_fvf_tiny_w_strokes_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_stroke_sampling.hpp",
+        "tests/native_raw_fvf_stroke_capture_test.cpp"
+      ],
+      "validation_command": "DX11 Fast run 41956424892 and Backend Conversion Gate run 41956424922 SUCCESS at exact SHA"
+    },
+    "five_source_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41956424892 SUCCESS; Backend Conversion Gate 41956424922 SUCCESS; Build 41956433265 SUCCESS; OpenXR VR architecture 41956433295 SUCCESS; OutRun EXE HUD Inspector CI 41956433296 SUCCESS"
+    }
+  },
+  "source_and_repair_commits": [
+    {
+      "sha": "8378856726ebc5ee722fc2bba461410700e8998d",
+      "kind": "MATERIAL_CXX_SOURCE_AND_REGRESSION",
+      "summary": "Actual original source FVF W-positive polygon/line/point GPU capture and positive/negative C++ regressions."
+    },
+    {
+      "sha": "ca58a50ff9df296f204219cca1e1be12bdfb3331",
+      "kind": "CAUSAL_PREVIOUS_C6_POLICY_RECORD_REPAIR",
+      "summary": "Canonicalize inherited 01242 source-path labels after exact Backend/Fast acceptance failure. No new functionality or score."
+    },
+    {
+      "sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+      "kind": "CAUSAL_REGRESSION_COMPILE_REPAIR_AND_FINAL_VALIDATION_SHA",
+      "summary": "Scope tiny-W wireframe test raster fixture to eliminate forward-reference compile error; exact-SHA five Gates success."
+    }
+  ],
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41956424892,
+      "sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41956424922,
+      "sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41956433265,
+      "sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41956433295,
+      "sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41956433296,
+      "sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "runtime_evidence": null,
+  "runtime_note": "No real desktop game/HMD run at this source SHA. NATIVE_GAME_DRAW_COUNT=UNTESTED; NATIVE_PUBLISHED_FRAME_COUNT=UNTESTED; Quest3/VDXR optical/frame pacing UNTESTED. Exact-SHA static/build/GPU smoke does NOT prove menu-to-race visible output.",
+  "c6_note": "C6 docs-only after all five exact source-SHA GitHub Actions SUCCESS. This checkpoint uses CI-skip only on docs commit; implementation/validation-bearing 2067d934 has no CI-skip. No duplicate CI or score; only hardware-specific conclusions remain UNTESTED.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "RUNTIME_GAME_VISIBLE_NATIVE_DRAW_AND_PUBLISHED_FULL_FRAME_NOT_YET_MEASURED_AT_RESULT_SHA",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "code_changed_sha": "2067d9342996b8e3b3670ac903ca19af0b4d9762",
+  "next_implementation_action": "Continue native full-resolution live menu/car/race Draw coverage and OpenXR eye integration in remaining unimplemented source; perform actual desktop/HMD testing separately, without treating static CI as runtime proof."
+}

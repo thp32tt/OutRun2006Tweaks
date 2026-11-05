@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00855",
+  "production_id": "CONVERSION-DX11-00855",
+  "event_id": "CONVERSION-DX11-00855-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_LONG_SOURCE_TIMELINE",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "SOURCE_IMPLEMENTED_GATE_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Replay longer real game-camera menu/vehicle/race source-ordered GPU Copy, Stretch and bounded Clear command sequences into independent native DX11 eye targets while validating format-conversion, MSAA and camera-source safety for BOTH eyes before GPU write; retain original D3D9Ex rendering/input/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_eye_long_game_timeline",
+        "expected_behavior": "12 chronological game-authored source commands per native L/R eye replay real array-sliced and GPU-only postpass pixels plus an interleaved bounded TargetRect Clear, no synthetic Draw evidence"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "bilateral_preflight_original_input",
+        "expected_behavior": "A late out-of-order or overflowing source command, unsupported format/MSAA or camera slice fails closed BEFORE either eye writes; original D3D9Ex Draw/input/FFB and frozen DXVK remain unchanged"
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_build_gates",
+        "expected_behavior": "Source final exact SHA must pass mandatory DX11 Fast, Backend Conversion, Windows Build, OpenXR, HUD and changed-component WARP without bypass; Quest3 real gameplay tracked separately as UNTESTED"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Original game-authored sequential D3D9 menu/car/race Draw and GPU Copy/Stretch/Clear postpasses captured as source timeline",
+      "Preflight BOTH native eye source textures/format/MSAA/camera slices; replay 12 sequential GPU commands into separate full-size DX11 native L/R RTV/DSV",
+      "Native GPU ring producer and guarded OpenXR host handoff with original D3D9Ex input/FFB and non-promoted diagnostic fallback"
+    ],
+    "batch_components": [
+      "native_game_stereo_submission.hpp extended bounded per-eye timeline from 8 to 32 events",
+      "native_game_stereo_submission.cpp GPU copy source typed format/MSAA bilateral preflight before any GPU eye write",
+      "dx11_native_transport_probe.cpp 12 mixed source postpasses WARP real camera pixels plus negative order/capacity admission and pixel-fixture nonoverlap"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "At material SHA 90865f75 Win32 WARP C++ compiles; one 12-event fixture readback collision at x0..7/y49 with later intended typed-format copy identified and scoped repair staged for exact-SHA replay; positive pixel/Gate PASS pending.",
+      "negative_regression": "Out-of-order final right-eye event and eye event count > bounded capacity are rejected before writing the first left eye; source admission rejects missing camera slices and unsupported format/MSAA. Final WARP/CI confirmation pending.",
+      "component_integration": "Live D3D9 game-callsite -> native D3D11 Draw/DrawIndexed and source-ordered Copy/Stretch/Clear -> two independent XR eye color/depth textures -> unchanged guarded GPU host path; runtime/Quest3 visual parity UNTESTED"
+    },
+    "conflict_keys": [
+      "DX11:GAME_LONG_SOURCE_TIMELINE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "C++ GPU timeline and WARP source integration under validation; actual full menu/vehicle/race visual pixel parity in Quest3/VDXR not yet demonstrated.",
+    "activation_guard_and_fallback": "Opt-in native draw producer only, reject any unsupported left/right source before GPU mutation; preserve original D3D9Ex Draw/Present, gamepad, FFB, SkyGlow and frozen DXVK."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "acceptance_results": {
+    "end2end": "PENDING_WARP_READBACK",
+    "fallback": "PENDING_EXACT_SHA",
+    "gates": "PENDING_EXACT_SHA"
+  },
+  "material_result_sha": "90865f755be08df5d56bc88a7381a27aa0ff5140",
+  "pipeline": {
+    "C0_RECOVER": "PASS: source and owner lease GitHub branch HEAD checked",
+    "C1_REVIEW": "PASS: twelve-event game GPU source chronology incomplete at eight and source copy bilateral format/MSAA admission missing",
+    "C2_IMPLEMENT": "PASS: material source commit 90865f755be08df5d56bc88a7381a27aa0ff5140 with native C++ renderer and mixed pixel regression",
+    "C3_VALIDATE": "PENDING: source compiled, exact WARP failed ONLY because ClearView fixture assumed BGRA though XR eye is RGBA (sample 68,136,204,255); source-graph token condition restored to literal executable require. Final exact-SHA full mandatory Gates and WARP pending.",
+    "C4_COMMIT": "PASS material, validation-bearing repair pending",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_FULL_EXACT_SHA"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "90865f755be08df5d56bc88a7381a27aa0ff5140",
+    "prior_material_native_warp_run_id": 38990448240,
+    "prior_material_native_warp_conclusion": "failure",
+    "prior_native_warp_root_cause": "Exact WARP run 38991468195 confirmed camera copies/scale/array R8G8B8A8 pixel bytes all match; source ClearView output RGBA [0x44,0x88,0xcc,0xff], fixture incorrectly expected BGRA [0xcc,0x88,0x44]. Repair checks true target format; no shader change.",
+    "prior_dx11_fast_run_id": 38990448355,
+    "prior_backend_run_id": 38990448273,
+    "prior_gate_root_cause": "00854 prior valid build record was missing required development_strategy fields; disjoint fix 9f50fe6c by other owner",
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST",
+    "additional_native_warp_failure_run_id": 38991468195,
+    "additional_dx11_source_graph_failure_run_id": 38991471711
+  },
+  "next_action": "Validate new exact SHA with DX11 Fast, Backend, Win32 Build, OpenXR, HUD, and isolated WARP. Only mark BUILD_VERIFIED/C6 after all required checks SUCCESS. Quest3/VDXR and real gamepad remain UNTESTED."
+}

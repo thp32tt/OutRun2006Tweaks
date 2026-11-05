@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00405",
+  "production_id": "CONVERSION-DX11-00405",
+  "event_id": "CONVERSION-DX11-00405-E005",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "status": "COMPLETE",
+  "selected_work_item": "DX11_R267_PROGRAMMABLE_SHADER_INTERFACE_SEMANTICS",
+  "base_sha": "bb48af41c4a56190868a2f6f8b39d03acf404bb7",
+  "result_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+  "material_result_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+  "source_implementation_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+  "validation_bearing_result_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+  "result_marker": "[AUTO:CONVERSION-DX11-00405]",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "summary": "R267 is the next fail-closed F21 evidence increment after R266. It will derive explicit shader-model-3 DCL interface semantic usage/index/register/write-mask provenance from exact R265/R266 evidence. Shader-model-2 or ambiguous declaration layouts remain unsupported, and this task does not authorize NativeDrawPath, Draw or DrawIndexed.",
+  "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00405.json"
+  ],
+  "implementation_commits": [
+    "1e8ee31d1378a49f8aea06599fdad17f199372ee",
+    "18d0599e94d435170a4288b051c67b779ae4b37d",
+    "ca06b03f4544357933f9d30ef146f4f834ce6464",
+    "7dbb454a29adbdd6f32d958f2a34f9bb490268e5",
+    "e457504def80eab5e14e70493c21e376f8b73bee",
+    "f3cc44fe18732fd0e6e887635a45aa9f5ef32cd2",
+    "2065c3012ac6e2d6ed0f7f5d18112a44548aec48",
+    "9ea634dab1be6bf313fc64b4f34ce6fba6fb90ec",
+    "eeaf15688f5ec19625a2e23c603e75feafd07371"
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "draw_dispatch_changed": false,
+    "dx9ex_branch_modified": false,
+    "r265_instruction_decoder_preserved": true,
+    "r266_register_semantics_preserved": true,
+    "sm2_interface_semantics_enabled": false,
+    "production_r263_semantic_proof_enabled": false
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "E005 rollover recovered current 00405 material work from GitHub. The branch already contained R267 contract/decoder/census commits through 7dbb454a29adbdd6f32d958f2a34f9bb490268e5; this rollover is not a retry, so ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R266 already supplies exact opcode/register/constant/sampler provenance. The smallest remaining semantic gap toward R263 is explicit inter-stage declaration semantics. R267 is limited to shader-model-3 DCL usage/index/register/write-mask evidence and must fail closed for shader-model-2 or ambiguous declaration forms."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "R267 SM3 DCL interface semantic evidence is wired into census identity and hardened against invalid declaration provenance. The decoder now requires the DCL info-token marker bit, validates sampler declaration texture type/reserved bits, rejects overlapping register-component declaration masks, and keeps SM2/ambiguous layouts fail-closed. Probes cover valid SM3 input/output/sampler evidence plus missing-marker, SM2, duplicate-semantic and overlapping-mask rejection. NativeDrawPath, Draw and DrawIndexed remain unchanged."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact-SHA Backend Conversion Gate 37286098253 completed SUCCESS for 4967465b47ca4abf65d79ddf4db4b3c302ac5d69. validate job 111685498220 and DX11 readiness smoke job 111687367069 both succeeded; the smoke includes the DX11 constant-buffer probe carrying the R267 regressions. Artifact 11334955436 digest sha256:9303d3653a8f6f1d386fa187b1fb9c43f5d2219364f35b9560edb25f3900c3e3. No real HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material R267 implementation, DCL exactness repair, regression guards and source-graph enforcement are committed through 4967465b47ca4abf65d79ddf4db4b3c302ac5d69 with [AUTO:CONVERSION-DX11-00405]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant semantic-evidence increment only; no runtime candidate or package identity is promoted."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "evidence": "E005 rollover metadata, material/validation SHA, exact-SHA CI receipts and fail-closed activation scope are persisted in this run record. NativeDrawPath, Draw and DrawIndexed remain unauthorized."
+    }
+  },
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00405",
+    "production_id": "CONVERSION-DX11-00405",
+    "event_id": "CONVERSION-DX11-00405-E005",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "lane": "DX11",
+    "target_branch": "vr-dx11-native-r71",
+    "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "exact_next_action": "R268 should consume exact R267 vertex-output/pixel-input interface semantics to derive fail-closed stage-linkage compatibility evidence toward the dormant R263 semantic-translation receipt. Do not enable NativeDrawPath, Draw or DrawIndexed without separate exact production proof.",
+  "validation": {
+    "exact_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+    "backend_conversion_gate": {
+      "run_id": 37286098253,
+      "conclusion": "success",
+      "validate_job_id": 111685498220,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 111687367069,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11334955436,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+      "artifact_digest": "sha256:9303d3653a8f6f1d386fa187b1fb9c43f5d2219364f35b9560edb25f3900c3e3"
+    }
+  }
+}

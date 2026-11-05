@@ -1,0 +1,142 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00541",
+  "production_id": "CONVERSION-DX11-00541",
+  "event_id": "CONVERSION-DX11-00541-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00541",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_SCISSOR_VIEWPORT_RS",
+  "base_sha": "c090e2c0c3bae7baf460b6fda090aa4e562968c9",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Observe game-authored D3D9 triangle Draw/DrawIndexed, query SCISSORTESTENABLE/GetScissorRect and intersect with active viewport",
+      "Conservatively map source scissor bounds into the 256x144 native inset and bind DX11 ScissorEnable RS state/RSSetScissorRects before real Draw",
+      "Retain original DX9Ex Draw/input and diagnostic-only UpdateSurface; invalid/empty rectangles fail closed"
+    ],
+    "batch_components": [
+      "C++ D3D9 game scissor capture with signed intersection and downsampling bounds",
+      "C++ D3D11 scissor rasterizer lifecycle, native rectangle binding and Draw/DrawIndexed use",
+      "Python negative mutation coverage and CPU geometry edge cases"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact material SHA 006c4f3 Build #38135852372 Win32 Release SUCCESS with four source acceptance steps; DX11 Fast #38135849959 SUCCESS. CPU viewport clip 200,100..600,500 in VP(100,50,800,600) maps to (32,12,160,108); real game GPU/HMD pixel untested.",
+      "negative_regression": "Initial SHA 60bc34b Build source regression failed because mutating X ceil left Y ceil still matched; corrected destructive test on 006c4f3; Build #38135852372 SUCCESS with DX11-SAFE-RETURN pass. Source clip rejects invalid/empty scissor/viewport and preserves DX9Ex Draw/input; no HMD.",
+      "component_integration": "D3D9 GetScissorRect + viewport signed clamp → conservative inset bounds → D3D11 scissor RasterizerState/RSSetScissorRects → actual Draw/DrawIndexed → opt-in UpdateSurface inset. Backend Conversion Gate #38135849986 validates exact SHA, OpenXR #38135852478 success. Game runtime untested."
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SCISSOR_VIEWPORT_RS",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SCISSOR_RS",
+      "tools/test_dx11_first_game_frame_regressions.py:SCISSOR_RS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and Win32 CI complete; real menu/vehicle/race native diagnostic inset pixels, input parity and Quest3 VDXR need hardware verification. No playable beta admission.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in only; NativeDrawPathActive stays false; source game Draw/input untouched; unsupported/malformed rectangles or D3D11 errors do not replace the D3D9 draw."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00541.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS fetched target HEAD, AGENTS.md, 00540 C6, policy and prior scissor rejection; no active 00541 owner found",
+    "C1_REVIEW": "PASS selected source D3D9 scissor -> D3D11 raster clip integration distinct from 00539/00540",
+    "C2_IMPLEMENT": "PASS C++ state capture, viewport clip, native RS binding and regression mutations",
+    "C3_VALIDATE": "PASS_EXACT_SHA 006c4f3: Backend Conversion Gate #38135849986 (validate + readiness) SUCCESS; Build #38135852372 SUCCESS (Win32 Release + 4 DX11 acceptance), OpenXR #38135852478 SUCCESS, Fast #38135849959 SUCCESS, HUD Inspector #38135852484 SUCCESS. No actual game/Quest3/VDXR proof.",
+    "C4_COMMIT": "PASS first source/test/run 60bc34b and exact material regression correction 006c4f3, both marked [AUTO:CONVERSION-DX11-00541], no CI-skip, non-force publish.",
+    "C5_PACKAGE": "NOT_REQUIRED source diagnostic only; production native gameplay disabled and no distribution binary requested.",
+    "C6_STATE": "PASS_EXACT_SHA original 006c4f3, separate [skip ci] bookkeeping now; exact material result preserved. AI2 score RUN_KEY 00541 awarded once +1, HMD UNTESTED."
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "PASS_SOURCE_CI",
+    "DX11-NATIVE-DRAW": "PASS_SOURCE_CI",
+    "DX11-VISIBLE-FRAME": "PASS_SOURCE_CI",
+    "DX11-SAFE-RETURN": "PASS_SOURCE_CI",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "runtime_evidence": "No real OutRun game/desktop/gamepad or Quest3/VDXR test performed; diagnostic only.",
+  "next_action": "New independent DX11 native menu/race implementation (COLORWRITE mask, alternate texture formats or programmable path) without repeating scissor/alpha task; HMD/gamepad/Quest3 tests remain pending.",
+  "feature_status": "SOURCE_INTEGRATED__HMD_PENDING",
+  "source_stage": "BUILD_VERIFIED__RUNTIME_HMD_GAME_NOT_TESTED",
+  "material_result_sha": "006c4f3eba8aa48165992aa681d7a7c1f49201f8",
+  "result_sha": "006c4f3eba8aa48165992aa681d7a7c1f49201f8",
+  "validation_bearing_result_sha": "006c4f3eba8aa48165992aa681d7a7c1f49201f8",
+  "material_source_shas": [
+    "60bc34babb5c6d427354603519a44024ced7cb20",
+    "006c4f3eba8aa48165992aa681d7a7c1f49201f8"
+  ],
+  "validation_history": [
+    {
+      "sha": "60bc34babb5c6d427354603519a44024ced7cb20",
+      "run_id": 38135765701,
+      "result": "FAIL_STATIC_NEGATIVE_MUTATION",
+      "note": "Source test erroneously allowed X-axis ceil mutation because Y-axis ceil remained; corrected C++-preserving test on final material SHA 006c4f3."
+    }
+  ],
+  "validation_gates": {
+    "backend_conversion": {
+      "run_id": 38135849986,
+      "name": "Backend Conversion Gate",
+      "head_sha": "006c4f3eba8aa48165992aa681d7a7c1f49201f8",
+      "conclusion": "SUCCESS"
+    },
+    "build": {
+      "run_id": 38135852372,
+      "name": "Build",
+      "head_sha": "006c4f3eba8aa48165992aa681d7a7c1f49201f8",
+      "conclusion": "SUCCESS",
+      "win32_release": "SUCCESS",
+      "source_acceptance": {
+        "DX11-LIVE-CALLSITE": "SUCCESS",
+        "DX11-NATIVE-DRAW": "SUCCESS",
+        "DX11-VISIBLE-FRAME": "SUCCESS",
+        "DX11-SAFE-RETURN": "SUCCESS"
+      }
+    },
+    "openxr": {
+      "run_id": 38135852478,
+      "name": "OpenXR VR architecture",
+      "head_sha": "006c4f3eba8aa48165992aa681d7a7c1f49201f8",
+      "conclusion": "SUCCESS"
+    },
+    "fast": {
+      "run_id": 38135849959,
+      "name": "DX11 Fast Structural Checks",
+      "head_sha": "006c4f3eba8aa48165992aa681d7a7c1f49201f8",
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38135852484,
+      "name": "OutRun EXE HUD Inspector CI",
+      "head_sha": "006c4f3eba8aa48165992aa681d7a7c1f49201f8",
+      "conclusion": "SUCCESS"
+    }
+  },
+  "score_change": 1,
+  "scoreboard": {
+    "repo": "thp32tt/ai-dev-lab",
+    "path": "AI_SCOREBOARD.md",
+    "run_key": "CONVERSION-DX11-00541",
+    "previous": 974,
+    "delta": 1,
+    "total": 975,
+    "commit_sha": "8f0b0bb89a7e83c6df29e20ca53b24d8dd10c0eb",
+    "confirmed_in_repo": "VERIFIED_REMOTE_ONCE"
+  }
+}

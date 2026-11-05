@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00905",
+  "production_id": "CONVERSION-DX11-00905",
+  "event_id": "CONVERSION-DX11-00905-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00905",
+  "feature_id": "DX11:NATIVE_PHYSICAL_CAMERA_VIEWPORT_SCISSOR_CLEAR_STEREO_GPU",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "score_run_key": "CONVERSION-DX11-00905",
+  "material_result_sha": "00df61ed06a675e4a54c043477a12481cc044f22",
+  "validation_bearing_result_sha": "18a0229c0bef486e5e239c39f15896d8be562d73",
+  "feature_contract": {
+    "goal": "Replay real D3D9 viewport/scissor/pRects-bounded auxiliary physical-mip game camera TARGET and depth/stencil Clears on the native D3D11 GPU into independent OpenXR L/R eyes without widening either camera or contaminating the original game.",
+    "acceptance_items": [
+      {
+        "id": "effective_camera_clear_coverage",
+        "expected_behavior": "Physical selected RTV/DSV mip view, game viewport, optional scissor and pRects determine exact full/partial/empty native GPU Clear extent."
+      },
+      {
+        "id": "gpu_warp_camera_pixels",
+        "expected_behavior": "Real Win32 WARP selected camera mip1 copies independent eye color into L/R ring, inside clear region updated and outside seed preserved."
+      },
+      {
+        "id": "safe_fallback_and_automation",
+        "expected_behavior": "Malformed coverage rejected fail-closed, original DX9Ex/input/FFB preserved, mandatory five exact head-SHA Actions successful."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "effective_camera_clear_coverage": "PASS_CXX_BUILD_AND_SOURCE_TAMPER_GUARD",
+    "gpu_warp_camera_pixels": "PASS_ISOLATED_WARP_PHYSICAL_MIP_LR_PIXEL_READBACK",
+    "safe_fallback_and_automation": "PASS_FIVE_EXACT_HEAD_SHA_GATES"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_camera_view.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/test_dx11_eye_partial_depth_activation.py"
+  ],
+  "validation_evidence": {
+    "material_sha": "00df61ed06a675e4a54c043477a12481cc044f22",
+    "validation_sha": "18a0229c0bef486e5e239c39f15896d8be562d73",
+    "mandatory_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39088416174,
+        "event": "push",
+        "conclusion": "success",
+        "validation_sha": "18a0229c0bef486e5e239c39f15896d8be562d73"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39088416222,
+        "event": "push",
+        "conclusion": "success",
+        "validation_sha": "18a0229c0bef486e5e239c39f15896d8be562d73"
+      },
+      {
+        "name": "Build",
+        "run_id": 39088416171,
+        "event": "push",
+        "conclusion": "success",
+        "validation_sha": "18a0229c0bef486e5e239c39f15896d8be562d73"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39088419083,
+        "event": "pull_request",
+        "conclusion": "success",
+        "validation_sha": "18a0229c0bef486e5e239c39f15896d8be562d73"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39088419073,
+        "event": "pull_request",
+        "conclusion": "success",
+        "validation_sha": "18a0229c0bef486e5e239c39f15896d8be562d73"
+      }
+    ],
+    "source_identical_isolated_warp": {
+      "run_id": 39088201584,
+      "sha": "00df61ed06a675e4a54c043477a12481cc044f22",
+      "conclusion": "success",
+      "note": "Only Python static contract checks changed after the C++ and WARP material SHA."
+    },
+    "backend_readiness_smoke": "success",
+    "runtime_validation": "UNTESTED"
+  },
+  "ci_repairs": [
+    {
+      "sha": "aa34adb359fd63260b795f1379c42b65a29ef7d2",
+      "cause": "Old static offscreen ClearView contract required raw region, not computed effective viewport/scissor rectangle."
+    },
+    {
+      "sha": "18a0229c0bef486e5e239c39f15896d8be562d73",
+      "cause": "Make tamper detector exact: unchecked_camera_clear_coverage substring must not satisfy the real owner call; assert outside-camera GPU pixel check."
+    }
+  ],
+  "runtime_validation_note": "OutRun2006 live menu/vehicle/race, actual gamepad/FFB, Quest3/VDXR frame pacing and HMD graphics UNTESTED. WARP physical GPU pixels are synthetic regression coverage, not playable confirmation.",
+  "pipeline": {
+    "C0_RECOVER": "Confirmed exact current GitHub HEAD c0949e71, 00904 C6 complete and 00905 previously absent; no shared work_key collision identified.",
+    "C1_REVIEW": "Identified physical game camera RTV and DSV Clears bypassed D3D9 viewport/scissor intersection.",
+    "C2_IMPLEMENT": "Implemented C++ camera Clear effective viewport/scissor/pRects GPU route with exact mip RTV/DSV and independent WARP GPU pixel regression, material 00df61ed.",
+    "C3_VALIDATE": "Isolated Win32 WARP #39088201584 success. Same-task causal Fast static contract repairs aa34adb3 and 18a0229c. All 5 GitHub required workflow runs with head_sha 18a0229c success.",
+    "C4_COMMIT": "Real source implementation and regression test committed without force and without CI-skip; CI repair commits retained same TASK_ID.",
+    "C5_PACKAGE": "NOT_REQUIRED; GitHub Windows Build action succeeded.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; controller result SHA=18a0229c; bookkeeping after verification only. Physical Quest3/VDXR runtime UNTESTED."
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00134",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T22:48:39+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "eb8f66479e8cb6ab603bc46ff0f5ba4a3806c320",
+  "result_sha": "47008654f22b060bcf296db9a5ff0ab401fc0bb9",
+  "validation_bearing_result_sha": "47008654f22b060bcf296db9a5ff0ab401fc0bb9",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R138_TARGET_65860_EXACT_CALL_ALIGNMENT",
+  "summary": "Added an exact-byte/manual-decode instruction-layout guard for guarded-GF target 0x65860 through aligned CALL 0x65874->0x285A0. The analyzer now fails closed unless the reviewed prefix bytes are contiguous and exact, the existing function-start guess remains 0x65860, the E8 is on the reviewed instruction boundary, the rel32 target decodes to 0x285A0, and the target remains in a mapped section. This proves call alignment only; semantic effect remains UNRESOLVED and ownership effect remains NONE.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "architecture": "Exact-EXE analyzer/verifier only; no renderer/backend activation.",
+    "ownership": "All five guarded GF hooks remain spacing-only; no ArmNextDraw or ScreenHud promotion.",
+    "stereo_correctness": "No WVP, projection, HUD or world classification changed.",
+    "performance": "CI-only exact-byte verification; no runtime hot-path work or telemetry added.",
+    "adversarial": "Any reviewed byte/layout/start-guess/E8/decoded-target/mapped-section drift fails the alignment proof instead of silently accepting a raw byte match."
+  },
+  "alignment_proof": {
+    "entry_rva": "0x65860",
+    "function_start_guess_rva": "0x65860",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "aligned_call_rva": "0x65874",
+    "decoded_call_target_rva": "0x285A0",
+    "call_target_section": ".text",
+    "status": "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "interpretation": "This proves the 0x65874 E8 is an instruction-aligned CALL in the reviewed 0x65860 prefix and decodes to 0x285A0. It does not identify helper semantics, prove HUD-specific behavior, or justify ScreenHud ownership."
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "R137 showed 0x65860 as a recurring broadly reused target with one outbound raw E8 candidate. R138 proves that candidate is aligned and exact without changing runtime semantics. Helper identity/effect remains unresolved, so guarded hooks remain spacing-only."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36723554454,
+      "conclusion": "success",
+      "validated_sha": "47008654f22b060bcf296db9a5ff0ab401fc0bb9",
+      "artifact_id": 11101443258,
+      "artifact_digest": "sha256:0fc13dae6f2a4f91d07868a310e2ca9d4e28ff1c4fb53a532dff813d56ec2d92"
+    },
+    "build": {
+      "run_id": 36723560630,
+      "conclusion": "success",
+      "validated_sha": "47008654f22b060bcf296db9a5ff0ab401fc0bb9"
+    },
+    "hud_inspector": {
+      "run_id": 36723560739,
+      "conclusion": "success",
+      "validated_sha": "47008654f22b060bcf296db9a5ff0ab401fc0bb9",
+      "analysis_artifact_id": 11101807209,
+      "analysis_artifact_digest": "sha256:4c49d2355b53d00b061be553f2e15356a992b0eaa1aaad171e88d6eb16fa20b6",
+      "game_artifact_id": 11102048098,
+      "game_artifact_digest": "sha256:a669a0a943d825ddb20d7399c4758095bbfc51fbf832840e6a7d50bc4a617858",
+      "evidence": "static-exe-analysis and build-hud-inspector passed. Static logs reported gf_target_alignment=0x00065860 status=EXACT_PREFIX_CALL_ALIGNMENT_PROVEN start_guess=0x00065860 layout_contiguous=True bytes_match=True call=0x00065874 target=0x000285A0 target_section=.text semantic_effect=UNRESOLVED."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36723560897,
+      "conclusion": "success",
+      "validated_sha": "47008654f22b060bcf296db9a5ff0ab401fc0bb9",
+      "evidence": "All six jobs passed."
+    },
+    "pc_fast": {
+      "run_id": 36723554429,
+      "conclusion": "skipped",
+      "validated_sha": "47008654f22b060bcf296db9a5ff0ab401fc0bb9"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5912516254,
+    "validation_comment_id": 5912647800,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact marker [AUTO:CONVERSION-DX11-00134] and no CI-skip directive.",
+    "The exact public EXE matched the complete manually reviewed 0x65860 prefix through 0x65879.",
+    "The E8 at 0x65874 is on the reviewed instruction boundary and decodes to 0x285A0 in .text.",
+    "Semantic effect remains UNRESOLVED and ownership effect remains NONE.",
+    "All five guarded GF hooks remain spacing-only and the R134 negative guard remains intact.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs passed on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R138 exact CALL alignment for target 0x65860 is automation-validated on the DX11 branch. Call 0x65874->0x285A0 is aligned and exact, but helper identity/effect is unresolved and no ScreenHud ownership change is justified.",
+  "next_action": "Keep all five guarded hooks spacing-only. Continue F13 with a separate bounded classification of helper 0x285A0 or another single target/call boundary, proving semantic effect before any ownership change."
+}

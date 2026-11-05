@@ -1,0 +1,98 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00720",
+  "production_id": "CONVERSION-DX11-00720",
+  "event_id": "CONVERSION-DX11-00720-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME",
+  "feature_id": "DX11-FULL-RESOLUTION-NATIVE-GAME-FRAME",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "observe live source D3D9 menu/vehicle/race Draw and DrawIndexed ordinals",
+      "submit fully contiguous source stream to game-size D3D11 render/depth target",
+      "publish GPU-fenced full output with D3D9 backbuffer/Present, preserving original input and Draw"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "tools/dx11_native_frame_batch_probe.cpp",
+      "tools/test_dx11_native_frame_batch_00671.py",
+      "tools/verify_dx11_first_game_frame_boundary.py",
+      "docs/automation/runs/CONVERSION-DX11-00720.json"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "original full-size native Draw/Indexed stage with paired present output, plus native C++ provenance and 9-draw regression",
+      "negative_regression": "an unsupported source Draw after 8 native Draws aborts even in full-mode; destructive helper mutation rejected; DX9Ex Draw/input remain intact",
+      "component_integration": "D3D9 observed callsite -> bounded contiguous native Draw/Indexed -> nonblocking full frame Present and correct full-frame guard verifier"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Guarded native full backbuffer path is source/CI evidence only; menu, car selection, race and Quest3 observed output require runtime test",
+    "activation_guard_and_fallback": "double opt-in OUTRUN_DX11_FIRST_GAME_FRAME plus OUTRUN_DX11_FULL_GAME_FRAME; original D3D9 Draw/Present and gamepad always execute; unsupported draws abort frame"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-RESOLUTION-NATIVE-GAME-FRAME",
+    "goal": "Complete live source game Draw/Indexed stream to full-size D3D11 native frame presentation with coherent late-draw failure handling and original D3D9 input fallback",
+    "acceptance_items": [
+      {
+        "id": "full-game-output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_full_frame",
+        "expected_behavior": "all supported game Draws reach full-size native frame and guarded Present"
+      },
+      {
+        "id": "unsupported-source-aborts",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_input",
+        "expected_behavior": "late unsupported or missing Draw invalidates native frame without affecting D3D9/gamepad"
+      },
+      {
+        "id": "exact-source-gates",
+        "category": "integrated_validation",
+        "behavior_area": "actions_cpp_regressions",
+        "expected_behavior": "same material source SHA passes all five required GitHub Actions suites"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "tools/dx11_native_frame_batch_probe.cpp",
+    "tools/test_dx11_native_frame_batch_00671.py",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-00720.json"
+  ],
+  "base_head_sha": "08ad5c6d17cc37a0b2aa0c599c206441490f89d7",
+  "previous_material_sha": "cd426a39620ece90779398c057d5c00867ae4d05",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "prior_failure": {
+    "backend_conversion_gate_run": 38535085962,
+    "reason": "latest 00719 C6 recovery record missing development_strategy",
+    "build_run": 38535092629,
+    "reason_build": "full-frame routing changed obsolete static boundary string, required updated guard audit"
+  },
+  "runtime_gate": "NEED_HMD_TEST"
+}

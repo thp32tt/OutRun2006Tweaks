@@ -1,0 +1,192 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01060",
+  "production_id": "CONVERSION-DX11-01060",
+  "event_id": "CONVERSION-DX11-01060-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01060",
+  "classification": "A",
+  "feature_id": "DX11:MULTI_DIRTY_PRESENT_REAL_GAME_BACKBUFFER_RECOVERY",
+  "work_key": "DX11:NATIVE_MULTI_DIRTY_GAME_FRAME_ATOMIC_READBACK",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "A complete multi-dirty native D3D11 menu/car/race frame now seeds its untouched pixels from the authentic current D3D9 backbuffer using guarded same-format scratch-GPU-RT readback if direct GetRenderTargetData is rejected. R30 nested hook suppression protects the bridge mutex; both failures veto any partial native upload; game D3D9 input, FFB and original fallback are unchanged. Runtime/HMD still UNTESTED.",
+  "material_result_sha": "06990acebcfd7e518374d48d3c88e5d07745d89e",
+  "validation_bearing_result_sha": "73e2e57a3e100a381eff13068f971b5b887340e3",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_cpu_tile_admission_01057.py",
+    "tools/test_dx11_overlap_dirty_game_present_00769.py",
+    "tools/test_dx11_multi_dirty_upload_00754.py",
+    "tools/test_dx11_extended_dirty_batch_00767.py"
+  ],
+  "feature_contract": {
+    "goal": "Preserve real D3D9 menu/car/race backbuffer pixels outside each native dirty region even if direct source GetRenderTargetData fails, while rejecting partial native publication and preserving original game fallback.",
+    "acceptance_items": [
+      {
+        "id": "multi_dirty_game_backbuffer_to_native_frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_SOURCE_TO_NATIVE_D3D11",
+        "expected_behavior": "Each real D3D9 multi-dirty menu/car/race backbuffer is fully seeded from its current game pixels, then verified native D3D11 dirty tiles are merged atomically"
+      },
+      {
+        "id": "private_gpu_rt_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_READBACK_AND_R30_REENTRANCY",
+        "expected_behavior": "Private exact-format GPU scratch-RT staging recovers rejected direct readback while fenced R30 StretchRect observation cannot re-enter the state mutex"
+      },
+      {
+        "id": "safe_dirty_upload_and_original_game",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_ORIGINAL_PRESENT_INPUT_FFB",
+        "expected_behavior": "If both real backbuffer readbacks or atomic upload fail, publish no partial native frame and preserve the original game D3D9 Present, FFB and input"
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS_EXACT_SHA",
+        "expected_behavior": "DX11 Fast, Backend, Windows Build, OpenXR and HUD Inspector succeed on the same final 01060 source-and-test SHA without claiming real Quest3 gameplay"
+      }
+    ],
+    "feature_id": "DX11:MULTI_DIRTY_PRESENT_REAL_GAME_BACKBUFFER_RECOVERY"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_D3D9_BACKBUFFER",
+      "DIRECT_OR_PRIVATE_GPU_RT_READBACK",
+      "CURRENT_FULL_FRAME_CPU_SEED",
+      "NATIVE_D3D11_DIRTY_REGION_ATOMIC_UPLOAD",
+      "ORIGINAL_D3D9_GAME_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_cpu_tile_admission_01057.py",
+      "tools/test_dx11_overlap_dirty_game_present_00769.py",
+      "tools/test_dx11_multi_dirty_upload_00754.py",
+      "tools/test_dx11_extended_dirty_batch_00767.py"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_MULTI_DIRTY_GAME_FRAME_ATOMIC_READBACK"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains opt-in. Any failure leaves original D3D9 Present/input untouched. DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "01060 source mutation regression PASS; 00754, 00769, 00767 and older fallback tests PASS in DX11 Fast",
+      "negative_regression": "Removing real backbuffer seed, nested R30 scope, private RT transfer, or success-gated frame upload makes source tests fail",
+      "component_integration": "R30 D3D9 Backbuffer -> private GPU RT + SYSTEMMEM full-frame seed -> dirty D3D11 pixels -> guarded D3D9 Present"
+    },
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "blocking_evidence": "Real D3D9 multi-region backbuffer direct GetRenderTargetData may fail; bounded private GPU RT under R30 scope must restore whole D3D9 source before any native partial pixel merge."
+  },
+  "validation_history": [
+    {
+      "sha": "06990acebcfd7e518374d48d3c88e5d07745d89e",
+      "fast_run_id": 40165940471,
+      "result": "FAIL",
+      "cause": "Pre-existing 00769 structural regression only accepted old inline direct-readback"
+    },
+    {
+      "sha": "160fcea5d828e13c6957f8a090015fac7e7a17ab",
+      "fast_run_id": 40166032034,
+      "result": "FAIL",
+      "cause": "00769 new source-order assertion excluded pre-direct fallback admission"
+    },
+    {
+      "sha": "831c7a77b0b08f631f69963599568ab0708d4424",
+      "fast_run_id": 40166145628,
+      "result": "FAIL",
+      "cause": "Pre-existing 00754 structural regression only accepted old inline direct-readback"
+    },
+    {
+      "sha": "5646d147ec5f99091d18e19991a9d8d41c70dbac",
+      "result": "SUPERSEDED_BY_CAUSAL_CI_REPAIR",
+      "cause": "Proactively repaired analogous inherited 00767 source-link assertion in same task"
+    },
+    {
+      "sha": "73e2e57a3e100a381eff13068f971b5b887340e3",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Five mandatory GitHub Actions completed SUCCESS on this exact source+test SHA"
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "73e2e57a3e100a381eff13068f971b5b887340e3",
+    "dx11_fast_run_id": 40166287560,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 40166287542,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 40166292412,
+    "windows_build_conclusion": "success",
+    "openxr_architecture_run_id": 40166292416,
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_run_id": 40166292398,
+    "hud_inspector_conclusion": "success",
+    "validation_scope": "Five mandatory GitHub Actions SUCCESS at one exact SHA; real OutRun menu/car/race, gamepad/FFB and Quest3 HMD remain UNTESTED",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/native_backend.cpp",
+  "real_game_draw_blocker": "Live complete menu->vehicle->race native D3D11 source Draw count, pixels and Quest3/VDXR playability are UNTESTED",
+  "next_implementation_action": "Continue native SM3/FVF Draw/DrawIndexed full game-frame source integration in a separately allocated feature, without promoting runtime until actual game/Quest3 test.",
+  "runtime_note": "No game/HMD hardware executed; source and exact-SHA builds do not establish visual or performance parity.",
+  "acceptance_results": {
+    "multi_dirty_game_backbuffer_to_native_frame": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01060 source-link and mutation assertions passed in DX11 Fast 40166287560 at 73e2e57a3e100a381eff13068f971b5b887340e3; real game/Quest3 UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_cpu_tile_admission_01057.py"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    },
+    "private_gpu_rt_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Private same-format RT, exact owner/extent/reset and R30 observer suppression source regressions passed on 73e2e57a3e100a381eff13068f971b5b887340e3; no device runtime proof",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_surface_full_readback.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    },
+    "safe_dirty_upload_and_original_game": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01060 multi-tile native atomic-merge regression with protected fallback passed; D3D9 runtime gameplay UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_multi_dirty_upload_00754.py",
+        "tools/test_dx11_extended_dirty_batch_00767.py"
+      ],
+      "validation_command": "python tools/test_dx11_extended_dirty_batch_00767.py"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Prior 01060 final source SHA 73e2e57a3e100a381eff13068f971b5b887340e3 verified successes: Fast 40166287560, Backend 40166287542, Windows 40166292412, OpenXR 40166292416, HUD 40166292398; HMD/game UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "docs/automation/runs/CONVERSION-DX11-01060.json"
+      ],
+      "validation_command": "GitHub REST workflow-runs?head_sha=73e2e57a3e100a381eff13068f971b5b887340e3"
+    }
+  },
+  "ci_policy_repair_note": "01061 Fast gate found inherited 01060 feature-acceptance schema omitted C6 feature ID, structured acceptance items/results, and explicit source-stage path; restored metadata from existing 01060 five-SHA PASS evidence without changing accepted source SHA or promoting runtime."
+}

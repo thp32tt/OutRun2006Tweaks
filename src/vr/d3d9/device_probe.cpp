@@ -9,11 +9,22 @@
 
 #include "hook_mgr.hpp"
 #include "game_addrs.hpp"
+#include "vr/d3d11/startup_census.hpp"
+#include "vr/d3d11/native_backend.hpp"
 
 namespace OutRunVRDeviceProbe
 {
     namespace
     {
+        bool Dx11CensusEnabled() noexcept
+        {
+            char value[8]{};
+            const DWORD length = GetEnvironmentVariableA(
+                "OUTRUN_VR_DX11_CENSUS", value,
+                static_cast<DWORD>(sizeof(value)));
+            return length > 0 && length < sizeof(value) && value[0] == '1';
+        }
+
         const char* DeviceTypeName(D3DDEVTYPE type) noexcept
         {
             switch (type)
@@ -54,15 +65,52 @@ namespace OutRunVRDeviceProbe
                     __uuidof(IDirect3DDevice9Ex), reinterpret_cast<void**>(&deviceEx));
                 const bool isEx = SUCCEEDED(exHr) && deviceEx;
 
-                LUID adapterLuid{};
-                bool luidValid = false;
-                IDirect3D9* d3d = nullptr;
-                IDirect3D9Ex* d3dEx = nullptr;
-                if (isEx && SUCCEEDED(deviceEx->GetDirect3D(&d3d)) && d3d &&
-                    SUCCEEDED(d3d->QueryInterface(__uuidof(IDirect3D9Ex),
-                        reinterpret_cast<void**>(&d3dEx))) && d3dEx &&
-                    SUCCEEDED(d3dEx->GetAdapterLUID(creation.AdapterOrdinal, &adapterLuid)))
-                    luidValid = true;
+                const auto dx11 = outrun::vr::dx11::inspect_source_device(device);
+                spdlog::info(
+                    "VR DX11 R71 census: observed={} size={}x{} sourceFormat={} nativeFormat={} msaa={} bootstrapCompatible={}",
+                    dx11.observed ? 1 : 0,
+                    dx11.width,
+                    dx11.height,
+                    static_cast<int>(dx11.source_format),
+                    static_cast<int>(dx11.native_format),
+                    static_cast<int>(dx11.multisample),
+                    dx11.native_bootstrap_compatible ? 1 : 0);
+
+                const LUID adapterLuid = dx11.adapter_luid;
+                const bool luidValid = dx11.adapter_luid_valid;
+
+                if (Dx11CensusEnabled())
+                {
+                    if (!dx11.native_bootstrap_compatible || !luidValid)
+                    {
+                        spdlog::warn(
+                            "VR DX11 R72 bootstrap probe skipped: compatible={} adapterLuidValid={}",
+                            dx11.native_bootstrap_compatible ? 1 : 0,
+                            luidValid ? 1 : 0);
+                    }
+                    else
+                    {
+                        outrun::vr::dx11::NativeBackend probe;
+                        outrun::vr::dx11::NativeBackendConfig config{};
+                        config.width = dx11.width;
+                        config.height = dx11.height;
+                        config.color_format = dx11.native_format;
+                        config.adapter_luid_valid = true;
+                        config.require_adapter_luid = true;
+                        config.adapter_luid = adapterLuid;
+
+                        const bool nativeReady = probe.initialize(config);
+                        const LUID selected = probe.selected_adapter_luid();
+                        spdlog::info(
+                            "VR DX11 R72 bootstrap probe: ready={} featureLevel=0x{:04X} selectedLuidValid={} selectedLuid={:08X}:{:08X}",
+                            nativeReady ? 1 : 0,
+                            static_cast<unsigned>(probe.feature_level()),
+                            probe.selected_adapter_luid_valid() ? 1 : 0,
+                            static_cast<std::uint32_t>(selected.HighPart),
+                            selected.LowPart);
+                        probe.shutdown();
+                    }
+                }
 
                 const DWORD flags = SUCCEEDED(creationHr) ? creation.BehaviorFlags : 0;
                 spdlog::info(
@@ -94,8 +142,6 @@ namespace OutRunVRDeviceProbe
                     spdlog::warn(
                         "VR D3D9 probe: plain IDirect3DDevice9 detected; zero-copy cross-process sharing is impossible. Exact-eye SBS/DesktopDup remains available; helper D3D9Ex bridge is the optimization path.");
 
-                if (d3dEx) d3dEx->Release();
-                if (d3d) d3d->Release();
                 if (deviceEx) deviceEx->Release();
                 if (backBuffer) backBuffer->Release();
                 return 0;

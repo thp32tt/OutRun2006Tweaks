@@ -1,0 +1,94 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00728",
+  "production_id": "CONVERSION-DX11-00728",
+  "event_id": "CONVERSION-DX11-00728-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:POST_CLEAR_GAME_FRAME",
+  "feature_id": "DX11-FULL-FRAME-TILED-CLEAR-SCENE",
+  "status": "BUILD_PENDING",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "f76ba342d5d1627c1044691679ee2c6cfa34dad8",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Successful D3D9 whole/tiled Clear -> native game frame render target background",
+      "Restart live D3D9 post-Clear Draw/DrawIndexed source ordinal and native batch",
+      "Submit only complete same-Present native full frame with original D3D9/gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_clear_coverage.hpp",
+      "tools/dx11_full_clear_resume_probe_00728.cpp",
+      "tools/test_dx11_full_clear_resume_00728.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 full implicit/rect/tiled Clear correctly backgrounds a fresh real native Draw source after prior pre-Clear draws",
+      "negative_regression": "Hole/crop/foreign/malformed Clear cannot restart failed scene and original D3D9 Present/input remain authoritative",
+      "component_integration": "D3D9 Clear hook + D3D11 native frame begin + full Draw/DrawIndexed + same Present fallback"
+    },
+    "conflict_keys": [
+      "DX11:POST_CLEAR_GAME_FRAME",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Static and CI only; native full-size post-Clear game output, Quest3/VDXR still untested",
+    "activation_guard_and_fallback": "Full mode opt-in only; reset after entire source Clear, partial/malformed leaves original game D3D9 Draw/input Present"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-FRAME-TILED-CLEAR-SCENE",
+    "goal": "Render genuine complete game menu, vehicle-select and race Draws after full tiled D3D9 Clear within same Present with correct native color and safe fallback.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_clear_draw",
+        "expected_behavior": "Complete 1/2/4 tile game Clear restarts contiguous live native Draw/DrawIndexed after prior stale scene"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "partial_clear_game_input",
+        "expected_behavior": "Partial/foreign/malformed Clear must not publish corrupted partial native pixels or affect original D3D9 game input"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "native_source_gate",
+        "expected_behavior": "C++17 coverage/batch checks, Python destructive hook tests, historical 00725 and exact SHA CI"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "A1": "PENDING",
+    "A2": "PENDING",
+    "A3": "PENDING"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_clear_coverage.hpp",
+    "tools/dx11_full_clear_resume_probe_00728.cpp",
+    "tools/test_dx11_full_clear_resume_00728.py",
+    "tools/test_dx11_game_clear_color_00725.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "packaging_status": "NOT_REQUIRED"
+}

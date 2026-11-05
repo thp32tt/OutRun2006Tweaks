@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01251",
+  "production_id": "CONVERSION-DX11-01251",
+  "event_id": "CONVERSION-DX11-01251-E005",
+  "event_type": "rollover",
+  "attempt": "3/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "540fb8eb540891d77b6867b13ad20dd605b196b1",
+  "result_sha": "7becb2fd830b08b8ff410eed1a1c783b408bd791",
+  "material_implementation_sha": "2a5a93d85e2c0d936180ca06489cbf17cc8ccaa4",
+  "material_result_sha": "7becb2fd830b08b8ff410eed1a1c783b408bd791",
+  "validation_bearing_result_sha": "7becb2fd830b08b8ff410eed1a1c783b408bd791",
+  "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_MULTI_GPU_DRAW_WINDOWS",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
+  "feature_stage": "FEATURE_READY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 1,
+  "score_note": "One new source-owned bounded multi-Draw native GPU window capability at 01251, distinct from the earlier already-scored clipped FVF point polygon correctness. Same TASK_ID build/CI repairs, feature-branch alternative, HMD untested, C6 bookkeeping and repeated Gates have no additional credit.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "implementation": "Real original D3D9 clipped FVF POINTLIST source Draw/DrawIndexed atomically preflights fully expanded CPU triangles, uses triangle-aligned bounded native GPU Draw windows across more than 6144 vertices, retains per-window original order/UV and handles malformed source IB, invalid capacity, late clip plane failures and out-of-budget triangles fail closed. Source graph guard path and Draw cardinality fixed causally, without relaxing opt-in diagnostics, DX9Ex authoritative fallback, game input or FFB.",
+  "feature_contract": {
+    "goal": "Original game D3D9 source-owned FVF clipped point-fill >6144 native vertices can be converted into a sequence of safe D3D11 Draw windows without duplicating or losing source triangles.",
+    "acceptance_items": [
+      {
+        "id": "native_gpu_point_windows",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Source FVF multi-window D3D11 GPU Draw keeps bounded triangle-aligned order and genuine source identity."
+      },
+      {
+        "id": "source_fallback_and_safety",
+        "category": "fallback_regression",
+        "expected_behavior": "Malformed original source indexes, unsupported plan or failed GPU state abort native output while retaining D3D9 authoritative path."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "expected_behavior": "Fast, Backend, Win32 Build, OpenXR and HUD all succeed on one exact source SHA; do not conflate CI with physical game/Quest HMD rendering."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_gpu_point_windows": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "python tools/verify_dx11_first_game_frame_boundary.py; python tools/test_dx11_first_game_frame_regressions.py; exact SHA DX11 Fast run 42014066069 SUCCESS"
+    },
+    "source_fallback_and_safety": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp",
+        "tools/verify_dx11_first_game_frame_boundary.py",
+        "tools/test_dx11_first_game_frame_regressions.py"
+      ],
+      "validation_command": "python tools/verify_dx11_source_graph.py; GitHub Backend Conversion Gate 42014066206 validate + DX11 readiness smoke probes SUCCESS"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tools/verify_dx11_first_game_frame_boundary.py",
+        "tools/test_dx11_first_game_frame_regressions.py"
+      ],
+      "validation_command": "GitHub exact 7becb2fd830b08b8ff410eed1a1c783b408bd791: Fast 42014066069; Backend 42014066206; Build 42014074034; OpenXR 42014073991; HUD 42014073966. All completed SUCCESS."
+    }
+  },
+  "ci_exact_sha": {
+    "sha": "7becb2fd830b08b8ff410eed1a1c783b408bd791",
+    "fast": {
+      "id": 42014066069,
+      "conclusion": "success"
+    },
+    "backend": {
+      "id": 42014066206,
+      "conclusion": "success"
+    },
+    "build": {
+      "id": 42014074034,
+      "conclusion": "success"
+    },
+    "openxr": {
+      "id": 42014073991,
+      "conclusion": "success"
+    },
+    "hud": {
+      "id": 42014073966,
+      "conclusion": "success"
+    }
+  },
+  "bundle_evidence": {
+    "backend_artifact_id": 13408779213,
+    "backend_artifact": "backend-autovalidated-7becb2fd830b08b8ff410eed1a1c783b408bd791",
+    "source_build_only": true,
+    "physical_game_frame_unverified": true
+  },
+  "runtime_validation_notes": "No actual original game menu/vehicle/race frame or Quest3 HMD test was performed. R175 TEXCOORD6 color parity and first playable native DX11 scene remain unproven; fail-closed diagnostics opt-in and DX9Ex fallback unchanged.",
+  "superseded_feature_branch": "feature/dx11-01251-backend-source-graph-path-fix",
+  "branch_conflict_handling": "The parallel target branch reached equivalent causal fixes independently. Feature ref diverged (behind>0); no unsafe force/duplicate promotion or extra score. Verified actual target exact SHA before C6."
+}

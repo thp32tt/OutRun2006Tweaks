@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00333",
+  "production_id": "CONVERSION-DXVK-00332",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00332-E001",
+  "event_type": "retry",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "02eabe9755e57de5dee49b65b0045d3d4b578d96",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00333]",
+  "selected_work_item": "DX11_R230_LATEST_BOOTSTRAP_OUTCOME_ORDER",
+  "summary": "R230 preserves interleaved bootstrap probe/skip ordering per source log so accumulated logs cannot let stale earlier bootstrap evidence masquerade as the latest session outcome. Historical per-kind provenance remains available, while LatestBootstrapOutcomeByLog and conflict diagnostics expose the most recent outcome without changing dormant activation policy.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00333.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD 02eabe9755e57de5dee49b65b0045d3d4b578d96. Read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md and Set05, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/VR_REGRESSION_KNOWLEDGE.json and docs/VR_PROBLEM_HISTORY.md. R229/00331 is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R229 stores latest completed bootstrap and latest skipped bootstrap in separate maps. If one physical log accumulates multiple process sessions and therefore contains both outcome types, the analyzer cannot state which outcome happened last; stale earlier probe evidence can coexist with a later skip and be over-read as current readiness evidence.",
+      "review_lenses": {
+        "architecture": "Keep the change in the offline census analyzer/test/verifier path only; no renderer, DX9Ex baseline, OpenXR transport or native draw routing changes.",
+        "ownership_lifetime": "No D3D9/D3D11 COM, Reset, resource generation, fence or consumer-ACK lifetime changes.",
+        "stereo_correctness": "No WVP, projection, HUD, sky/effects, recenter or menu behavior changes.",
+        "performance": "Offline parsing and report aggregation only; runtime hot path unchanged.",
+        "adversarial": "Exercise both probe-then-skip and skip-then-probe histories in separate logs. The latest outcome must follow textual event order, mixed history must be explicit, and all evidence must remain diagnostic-only with NativeDrawPath dormant."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added ordered BootstrapOutcomes with kind=probe/skip, LatestBootstrapOutcomeByLog, latest-outcome probe/skip counts, mixed-history conflict diagnostics and AllSourceLogsLatestBootstrapOutcomeIsProbe. Preserved existing historical Bootstrap/BootstrapSkipped and per-kind maps. Added two-direction ordering regression fixtures and source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "LOCAL_STATIC_PASS_EXACT_SHA_GATE_PENDING",
+      "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "evidence": "TDD RED reproduced the missing latest-outcome semantics. GREEN local validation passed py_compile, test_analyze_dx11_census.py, verify_dx11_source_graph.py, verify_dx11_activation_boundary.py, verify_dx11_dual_source_contract.py, verify_dx11_native_transport_contract.py, verify_vr_backend_disasm_contract.py, test_dx11_static_surface_contract.py, dx11_native_static_surface_contract_check.py with CI-equivalent paths, verify_vr_proven_baseline.py (44 guards), and git diff --check."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census analyzer evidence-integrity/reporting change only; no runtime binary behavior or distributable package identity change intended."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Publish the R230 material result without CI skip, require its exact-SHA Backend Conversion Gate, then persist PASS task/lane bookkeeping separately while keeping RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "DX11_R230_LATEST_BOOTSTRAP_OUTCOME_ORDER",
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "evidence": "No direct riskPath/problem-history match for tools/analyze_dx11_census.py, tools/test_analyze_dx11_census.py or tools/verify_dx11_source_graph.py. Changed paths are offline analyzer/test/verifier plus task bookkeeping only."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00333",
+    "production_id": "CONVERSION-DXVK-00332",
+    "event_id": "CONVERSION-DXVK-00332-E001",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish the R230 latest bootstrap-outcome ordering material result without CI skip and require its exact-SHA Backend Conversion Gate."
+}

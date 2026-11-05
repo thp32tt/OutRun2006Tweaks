@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01115",
+  "production_id": "CONVERSION-DX11-01115",
+  "event_id": "CONVERSION-DX11-01115-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01115",
+  "classification": "A_REAL_LIVE_NATIVE_FOG_ADMISSION_B_FAILED_REGRESSION_REPAIR",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_GAME_FOG_SOURCE_ADMISSION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "538c9d7d66d50abf29b628ecdfa2fb7da701c3eb",
+  "source_change_sha": "7c9301dcf036ee04a8e6ea633ed5f31b805b43cb",
+  "material_result_sha": "6a1dbc86f3510873936bd0a23dc8564c01ddfb26",
+  "validation_bearing_result_sha": "6a1dbc86f3510873936bd0a23dc8564c01ddfb26",
+  "result_sha": "6a1dbc86f3510873936bd0a23dc8564c01ddfb26",
+  "implementation_commits": [
+    "7c9301dcf036ee04a8e6ea633ed5f31b805b43cb",
+    "b607379fa5cab82c94d41a9b992618d30424cf57"
+  ],
+  "repair_commits": [
+    "6a1dbc86f3510873936bd0a23dc8564c01ddfb26"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-01114.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Correct a real native-game no-fog source admission defect in SM3 and FVF Draw branches, preserve every active-fog/D3D9 fallback, and capture bounded source-accurate rejection diagnostics for the observed zero-DX11-draw game while retaining full-resolution renderer integration.",
+    "acceptance_items": [
+      {
+        "id": "live_sm3_fvf_inert_fog_equation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_LIVE_SM3_FVF_NATIVE_DRAW_ROUTING",
+        "expected_behavior": "Actual D3D9 TABLEMODE=NONE and VERTEXMODE=NONE with source FOGENABLE enabled is admissible as an inert equation in both native SM3 and FVF draw paths, retaining opt-in and original game-source routing."
+      },
+      {
+        "id": "active_fog_getter_and_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ACTIVE_FOG_COM_QUERY_DX9EX_INPUT_FFB",
+        "expected_behavior": "Failed source getters, active vertex/table/range/W/Z/sRGB unsupported equations cannot promote a guessed GPU frame; negative mutation controls and original D3D9 gamepad/FFB fallback remain enforced."
+      },
+      {
+        "id": "exact_sha_five_gate_ci",
+        "category": "integrated_validation",
+        "behavior_area": "CXX_COMPILE_OPENXR_HUD_BACKEND_GATE",
+        "expected_behavior": "Same final validation-bearing source SHA passes DX11 Fast, Backend, Windows Build, OpenXR and HUD GitHub Actions, without asserting a real GPU desktop or HMD gameplay observation."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "blocking_evidence": "Real game user desktop session at b8dab362b9cc9072eafbd3307594a35ff5b8d413: 10,341,768 authentic D3D9 Draws, 0 native_draws, sm3_state_reject.fog=5,547. Source examination proved inert TABLEMODE=NONE/VERTEXMODE=NONE incorrectly depended on RANGEFOGENABLE in SM3 and all Fog was rejected in FVF; neither assertion is a new runtime measurement.",
+    "integration_path": [
+      "LIVE_D3D9_SM3_AND_FVF_FOG_GETTERS",
+      "EQUATION_ACCURATE_SAFE_NATIVE_DRAW_ADMISSION",
+      "BOUNDED_COM_AND_STATE_REJECTION_TELEMETRY",
+      "NATIVE_DRAW_AND_FULL_RES_FRAME_PATH_RETAINS_DX9EX_FALLBACK"
+    ],
+    "batch_components": [
+      "CXX_SHARED_FOG_EQUATION_AND_SM3_FVF_ADMISSION",
+      "CXX_LIVE_FOG_REJECTION_TELEMETRY",
+      "COMPILED_AND_DESTRUCTIVE_SOURCE_REGRESSIONS",
+      "SAME_TASK_CI_CAUSAL_TEST_REPAIR"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Build-only source integration; no new matching game-run native_draws, publishedBackbufferFrames or GPU desktop frames observed. Runtime game/HMD UNTESTED. Must test one new binary SHA for native_draws>0 and publishedBackbufferFrames>0 before any visual/native frame promotion.",
+    "activation_guard_and_fallback": "Native full game requires explicit opt-in; failed fog COM reads, unsupported active fog or other target/depth/shader/routing predicates fail closed to original game D3D9Ex Draw, gamepad, FFB, SkyGlow without DXVK lane changes.",
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast exact-SHA 40533931875 runs native C++ fog controls and FVF source linkage for inert NONE/NONE with inherited RANGEFOG; Windows Build 40533932008 success.",
+      "negative_regression": "Active vertex/table/W fog, invalid bounds, invalid source COM getters and dropped FVF fallback each fail the bounded C++/source destructive regressions; previous 00781/first-frame literal contracts repaired with new negative controls.",
+      "component_integration": "live_game_sm3_table_fog.hpp common admission -> live_game_frame_bridge.cpp true D3D9 shader-bound and FVF real game path with opt-in and runtime reason telemetry; no artificially invented native GPU Draw count."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:LIVE_GAME_FOG_SOURCE_ADMISSION"
+    ]
+  },
+  "acceptance_results": {
+    "live_sm3_fvf_inert_fog_equation": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_live_sm3_table_zfog_01005.cpp"
+      ],
+      "validation_command": "DX11 Fast 40533931875 and Windows Build 40533932008 success, exact SHA 6a1dbc86f3510873936bd0a23dc8564c01ddfb26; live game/HMD UNTESTED."
+    },
+    "active_fog_getter_and_source_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/test_dx11_live_sm3_table_zfog_01005.py",
+        "tools/test_dx11_first_game_frame_regressions.py",
+        "tools/test_dx11_main_stencil_clear_game_frame_00781.py"
+      ],
+      "validation_command": "DX11 Fast 40533931875 completed/success with source and destructive C++ negative controls; runtime untested."
+    },
+    "exact_sha_five_gate_ci": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533931875",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533931947",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533932008",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533931985",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533931916"
+      ],
+      "validation_command": "All five mandatory push GitHub Actions completed success on exactly 6a1dbc86f3510873936bd0a23dc8564c01ddfb26."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40533931875,
+      "head_sha": "6a1dbc86f3510873936bd0a23dc8564c01ddfb26",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533931875"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40533931947,
+      "head_sha": "6a1dbc86f3510873936bd0a23dc8564c01ddfb26",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533931947"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40533932008,
+      "head_sha": "6a1dbc86f3510873936bd0a23dc8564c01ddfb26",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533932008"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40533931985,
+      "head_sha": "6a1dbc86f3510873936bd0a23dc8564c01ddfb26",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533931985"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40533931916,
+      "head_sha": "6a1dbc86f3510873936bd0a23dc8564c01ddfb26",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40533931916"
+    }
+  ],
+  "runtime_evidence": {
+    "native_game_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "gpu_desktop_frame_count": "UNTESTED",
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_ffb": "UNTESTED",
+    "source_runtime_failure_reference": "b8dab362b9cc9072eafbd3307594a35ff5b8d413"
+  },
+  "c6_note": "C6 bookkeeping only after all five exact-SHA mandatory push Gates; independent original material feature source commits 7c9301dc and b607379f, causal same TASK_ID regression repair 6a1dbc86. Old pin showed native_draws=0 and Fog rejection; current real-game native counters UNTESTED, no HMD/Quest3 visual proof, no claims of native full-frame success. No CI-skip in validated source SHA, no DX9Ex/DXVK changes. Checkpoint/retry alone is not scored."
+}

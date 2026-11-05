@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01229",
+  "production_id": "CONVERSION-DX11-01229",
+  "event_id": "CONVERSION-DX11-01229-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_W0_POLYGON_NATIVE_GPU_PRE_POST_CAPTURE",
+  "classification": "A_REAL_SOURCE_DEFECT_IN_UNFINISHED_FULL_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "scoreboard_commit": "1e17d0f53b3b7827206639b0597b42df5cdd813d",
+  "score_calculation": "AI 2 previous confirmed 2562 + independent authentic FVF W0 original game GPU source repair +1 = 2563; CI/C6/retry +0.",
+  "material_implementation_sha": "3c0d36510cd918b0b4fabc821f78eff58ef744d9",
+  "material_result_sha": "4734b17abf8720accb743a4214cdcd9da07a6a7d",
+  "validation_bearing_result_sha": "4734b17abf8720accb743a4214cdcd9da07a6a7d",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "tests/native_raw_fvf_user_clip_capture_test.cpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01228.json"
+  ],
+  "implementation": "Actual game FVF native D3D11 RAW GPU PRE/POST clip capture now preserves legitimate finite W=0/XYZ-nonzero eye-crossing triangle source by homogeneous clipping instead of dropping it. Real triangle-list IA completeness and line/point separation prevent false triangle GPU raster claims. Invalid zero-vector, stale clip offset, malformed IA and all-negative source user planes fail closed. Original game D3D9 Draw/Present/input/FFB, DX9Ex fallback and DXVK freeze unchanged.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "ORIGINAL_GAME_FVF_W0_WVP_IA",
+      "D3D11_NATIVE_DRAW",
+      "GPU_SOURCE_PRE_POST_RGB_READBACK",
+      "VISIBLE_FRAME_OUTPUT",
+      "ORIGINAL_D3D9_PRESENT_FALLBACK"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_GAME_FVF_IA",
+      "NATIVE_D3D11_HOMOGENEOUS_EYE_AND_USER_CLIP_RASTER",
+      "ACTUAL_SOURCE_GPU_PRE_POST_RGB_COPY",
+      "D3D9_PRESENT_SAFE_FALLBACK"
+    ],
+    "batch_components": [
+      "SOURCE_CXX_W0_POLYGON_GPU_CAPTURE",
+      "POINT_LINE_AND_INCOMPLETE_TRIANGLE_IA_GUARD",
+      "TRUE_CLIP_DISTANCE_PAYLOAD_CPP_REGRESSION",
+      "EXACT_SHA_FIVE_REQUIRED_ACTIONS_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original game WVP triangle with W0 but finite nonzero XYZ clips and supplies the existing D3D11 GPU PRE/POST authentic RGB tile path; all required exact source CI success, runtime not observed.",
+      "negative_regression": "Projectively undefined zero vector, malformed source IA, incomplete triangle list, false point/line filled polygon and all-negative user planes fail closed.",
+      "component_integration": "Live D3D9 FVF geometry -> native D3D11 Draw -> RAW pixel capture in native_game_raw_fvf_clip_capture.hpp -> bounded native GPU RGB source -> guarded original Present fallback; positive/negative C++ regression executed on exact SHA."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY. Native C++ source and five exact-SHA GitHub checks successful; actual full game frame and binocular Quest 3 OpenXR runtime UNTESTED.",
+    "activation_guard_and_fallback": "Only existing opt-in RAW GPU diagnostic; never claim invented GPU RGB evidence or promote unfinished frame. Preserve original D3D9 Draw/Present/input/FFB, DX9Ex fallback and DXVK freeze."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve authentic original game FVF finite W=0 homogeneous camera-plane triangles in D3D11 GPU PRE/POST source raster sampling, with invalid IA rejection and D3D9 input/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_w0_polygon_gpu_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_FVF_TO_D3D11_NATIVE_GPU_RGB",
+        "expected_behavior": "The native GPU diagnostic uses the authentic source eye-plane-clipped triangle footprint rather than unbounded viewport sweep."
+      },
+      {
+        "id": "safe_zero_vector_and_ia_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_CLIP_AND_D3D9_FALLBACK",
+        "expected_behavior": "Reject invalid zero-vector, incomplete triangle-list and false line/point IA without changing original game pixels/input."
+      },
+      {
+        "id": "exact_sha_all_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Five required unchanged GitHub Actions succeed on one final validation-bearing result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_w0_polygon_gpu_capture": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp"
+      ],
+      "validation_command": "Fast 41831768893, Windows Build 41831777901 SUCCESS; real game runtime UNTESTED"
+    },
+    "safe_zero_vector_and_ia_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp"
+      ],
+      "validation_command": "Exact Fast 41831768893 and Backend 41831768914 SUCCESS"
+    },
+    "exact_sha_all_required_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Fast 41831768893, Backend 41831768914, Build 41831777901, OpenXR 41831777873, HUD 41831777878 SUCCESS"
+    }
+  },
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41831768893,
+      "sha": "4734b17abf8720accb743a4214cdcd9da07a6a7d",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41831768914,
+      "sha": "4734b17abf8720accb743a4214cdcd9da07a6a7d",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41831777901,
+      "sha": "4734b17abf8720accb743a4214cdcd9da07a6a7d",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41831777873,
+      "sha": "4734b17abf8720accb743a4214cdcd9da07a6a7d",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41831777878,
+      "sha": "4734b17abf8720accb743a4214cdcd9da07a6a7d",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "real_game_draw_blocker": "No observed real installed OutRun menu/car/race published native GPU pixels, Draw counts, or Quest 3/VDXR binocular runtime evidence.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Continue authentic original game native Draw/DrawIndexed full resolution menu/vehicle/race contiguous frame output, OpenXR stereo eye handoff; preserve DX9Ex fallback and request separate HMD test for promotion.",
+  "runtime_evidence": null,
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. C++/CI build PASS is not real desktop game or Quest 3/VDXR visual parity.",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "source_and_repair_commits": [
+    {
+      "sha": "3c0d36510cd918b0b4fabc821f78eff58ef744d9",
+      "kind": "MATERIAL_CXX_SOURCE_IMPLEMENTATION",
+      "summary": "Original W0 FVF polygon native GPU clipping source and C++ regression"
+    },
+    {
+      "sha": "5080eae43bcaf4b6fe1bdf474b0be0d578a0a0d2",
+      "kind": "SAME_TASK_CI_POLICY_AND_REGRESSION_REPAIR",
+      "summary": "Prior 01228 C6 policy contract and genuine regression Fast integration"
+    },
+    {
+      "sha": "7ad1849170537b5c1b05362846125e6e68ab657b",
+      "kind": "SAME_TASK_LEGACY_CPP_REGRESSION_REPAIR",
+      "summary": "Correct invalid all-W0 expectation to genuine all-zero vector"
+    },
+    {
+      "sha": "3af256e383dfacaa115aa1653d27434a728453e1",
+      "kind": "SAME_TASK_CXX_SOURCE_FIXTURE_REPAIR",
+      "summary": "Bind real user ClipDistance0 byte offset"
+    },
+    {
+      "sha": "4734b17abf8720accb743a4214cdcd9da07a6a7d",
+      "kind": "SAME_TASK_FINAL_VALIDATION_BEARING_TRIGGER_REPAIR",
+      "summary": "Fast workflow includes exact authentic user-clip regression source file"
+    }
+  ],
+  "score_note": "AI2 scoreboard at 1e17d0f5 confirmed 2562 +1 = 2563 independent W0 polygon GPU source correction. Same-task test/CI/checkpoint +0; AI1 unchanged."
+}

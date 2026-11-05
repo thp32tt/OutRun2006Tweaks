@@ -1,0 +1,81 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00723",
+  "production_id": "CONVERSION-DX11-00723",
+  "event_id": "CONVERSION-DX11-00723-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME",
+  "feature_id": "DX11-FULL-RESOLUTION-NATIVE-GAME-FRAME",
+  "status": "DONE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "real menu/car/race D3D9 Draw/DrawIndexed -> guarded D3D11 native full-size source frame",
+      "native GPU readback -> D3D9 backbuffer origin at source-cropped Present, with source crop applied only by original Present",
+      "strict crop, extent, dirty region, format and multisampling checks retain original D3D9 gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_present_region.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_native_frame_batch_probe.cpp",
+      "tools/test_dx11_native_frame_batch_00671.py",
+      "tools/test_dx11_game_present_crop_00698.py",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "full-resolution backbuffer native upload accepted for valid D3D9 menu/car/race source crops, positioned at (0,0) while original Present performs crop",
+      "negative_regression": "invalid/out-of-bounds/empty crops, mismatched full-native extents, MSAA/dirty/format changes fail closed; destructive mutants fail tests",
+      "component_integration": "actual game Draw/DrawIndexed frame GPU readback at full resolution -> crop-safe D3D9 UpdateSurface to game's backbuffer; original game Present/input unchanged"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "visible_frame_acceptance": "CI source and Win32 build verified; actual game menu/vehicle/race and Quest3/VDXR visual parity NOT RUN",
+    "activation_guard_and_fallback": "native full-frame opt-in only; source validity and strict backbuffer matching; original D3D9 Draw/Present/gamepad retained"
+  },
+  "base_head_sha": "5f0b21552aa794455a7332c8baa03be75f8e642f",
+  "material_result_sha": "6e352ae0ae286f046661c4e3c0691affb4a68422",
+  "intermediate_repair_sha": "41cc2a95cffbf12ff0bee16aebc89f34a142475b",
+  "validation_bearing_result_sha": "2c8d9eca17043f18f2344666924f6a9cc3d93d69",
+  "exact_sha_gates": {
+    "dx11_fast": {
+      "run_id": 38545875502,
+      "conclusion": "success"
+    },
+    "backend_conversion": {
+      "run_id": 38545875432,
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "windows_build": {
+      "run_id": 38545882316,
+      "conclusion": "success"
+    },
+    "openxr": {
+      "run_id": 38545882313,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38545882271,
+      "conclusion": "success"
+    }
+  },
+  "runtime_gate": "NEED_HMD_TEST",
+  "note": "Retain validation-bearing result commit as SHA owner of mandatory exact-SHA gates. C6 bookkeeping separate; do not infer real Quest3/VDXR image or gamepad pass."
+}

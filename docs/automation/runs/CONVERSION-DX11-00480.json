@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00480",
+  "production_id": "CONVERSION-DX11-00480",
+  "event_id": "CONVERSION-DX11-00480-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00480",
+  "lease_epoch": 1,
+  "work_key": "DX11:R178:INVALIDATED_ACQUIRED_SLOT_CANCEL_QUARANTINE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp:R178",
+    "tools/dx11_native_transport_probe.cpp:R178",
+    "tools/verify_dx11_native_transport_contract.py:R178"
+  ],
+  "status": "VALIDATION_IN_PROGRESS",
+  "checkpoint": "C3_VALIDATE",
+  "base_sha": "ae4f93ecb37ea9200ea783f8c5787e923021c512",
+  "controller_base_sha": "12e2591d4d468a2dc5e847e0094009db752ae651",
+  "material_result_sha": "670bf0e5e95abb43e8c852f50f8126c59fc9e07e",
+  "validation_bearing_result_sha": "670bf0e5e95abb43e8c852f50f8126c59fc9e07e",
+  "result_sha": "670bf0e5e95abb43e8c852f50f8126c59fc9e07e",
+  "automation_validation": "IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "changed_paths": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py"
+  ],
+  "summary": "R178 fixes shared-eye transport invalidation bypass: cancel_acquired_slot previously could release an Acquired slot after invalidate_lifetime(), allowing all_slots_idle and identity retag without proof of submitted GPU work completion. Require activation_ready before cancel, preserve stale state for hard retirement, and add Windows WARP negative regression and CI validate static contract.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub HEAD verified; no 00480 run/commit at start; 00477 owns R175; 00478 owns R176; 00479 owns R177; rollover attempt unchanged.",
+    "C1_REVIEW": "PASS: NativeSharedEyeRing::invalidate_lifetime intentionally retains busy acquired slots; cancel_acquired_slot omitted activation_ready unlike other lifecycle paths.",
+    "C2_IMPLEMENT": "PASS: independent R178 C++ fail-closed guard, WARP negative regression, Python static transport verifier; three substantive changed paths.",
+    "C3_VALIDATE": "RUNNING: exact material-SHA Backend Conversion Gate 37935799148, Win32 validate 113837789108 in progress; upstream R175 known failure may block shared smoke.",
+    "C4_COMMIT": "PASS: exact [AUTO:CONVERSION-DX11-00480] material commit 670bf0e5e95abb43e8c852f50f8126c59fc9e07e, fast-forward/CAS and remote HEAD verified; Issue14 #6081684845.",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant transport owner; no Quest3/VDXR release or native gameplay Draw promotion.",
+    "C6_STATE": "IN_PROGRESS: durable interim run, do not mark COMPLETE until CI validated."
+  },
+  "validation_run_id": 37935799148,
+  "validation_job_id": 113837789108,
+  "readiness_smoke_job_id": null,
+  "validation_evidence": {
+    "gate": "in_progress",
+    "r178_static": "pending",
+    "r178_warp": "pending",
+    "inherited_r175": "KNOWN_FAIL_128_0_16_255"
+  },
+  "issue14_comment_ids": [
+    6081684845
+  ],
+  "blockers": [
+    "Exact-SHA Gate in progress.",
+    "Independent owner 00477 R175 WARP BGRA failure was present before R178.",
+    "Quest3/VDXR runtime UNTESTED."
+  ],
+  "score_change": 0,
+  "score_reason": "No completed C3; do not score rollover, review or validation-pending work.",
+  "resume_cursor": "READ_BACKEND_GATE_37935799148_AND_RECORD_EXACT_SCOPED_RESULT",
+  "next_action": "Read Windows validation and smoke steps on exact R178 material SHA; preserve R175 owner. If R178 static and WARP transport PASS but inherited R175 FAIL, mark BLOCKED_UPSTREAM_R175_FULL_GATE and keep score +0; never claim Quest3/VDXR proof.",
+  "last_real_activity_at": "2026-10-09T22:18:35+09:00"
+}

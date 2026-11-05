@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00422",
+  "production_id": "CONVERSION-DX11-00422",
+  "event_id": "CONVERSION-DX11-00422-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R284_PROGRAMMABLE_SHADER_OBJECT_MATERIALIZATION_OWNERSHIP",
+  "base_sha": "93f423cdb00cbe902dd5f1bf896061b7efc8693f",
+  "result_sha": "66607a8efac42c4c662b84e966920293fc1c94ac",
+  "material_result_sha": "66607a8efac42c4c662b84e966920293fc1c94ac",
+  "validation_bearing_sha": "66607a8efac42c4c662b84e966920293fc1c94ac",
+  "validation_bearing_result_sha": "66607a8efac42c4c662b84e966920293fc1c94ac",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "validation_run_id": 37578450377,
+  "validation_run_attempt": 1,
+  "validation_job_id": 112652492807,
+  "readiness_smoke_job_id": 112653932390,
+  "artifact_id": 11463358829,
+  "artifact_digest": "sha256:7ee42b11294ddfd83766a66529251f79450abe21fa877a1330fc9c4fe281520b",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00422.json",
+  "implementation_commits": [
+    "66607a8efac42c4c662b84e966920293fc1c94ac"
+  ],
+  "issue14_comment_id": 6032003618,
+  "native_draw_path_activation_changed": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE",
+  "state_persisted": true,
+  "r284_programmable_shader_object_materialization_present": true,
+  "r283_dxbc_consumed": true,
+  "native_programmable_shader_object_created": true,
+  "native_programmable_shader_object_bound": false,
+  "shader_translation_exact_enabled": false,
+  "native_draw_path_activation_allowed": false,
+  "draw_dispatch_authorized": false,
+  "evidence_scope": "R284_SAME_DEVICE_OBJECT_CREATION_AND_R242_OWNERSHIP_ONLY",
+  "summary": "R284 consumes exact R283 DXBC, creates real same-device D3D11 vertex/pixel shader objects, and attaches them through the existing R240/R241/R242 cache/slot ownership path. The material commit is exact-SHA validated; no shader/context binding, shaderTranslationExact promotion, NativeDrawPath activation, Draw/DrawIndexed dispatch, HMD test, or normal-runtime claim is made.",
+  "evidence": [
+    "native_backend.hpp/.cpp add NativeProgrammableShaderObjectMaterializationEvidence plus materialize/validate functions sealed to exact R279/R280/R283 provenance.",
+    "R284 creates ID3D11VertexShader and ID3D11PixelShader only from exact R283 DXBC, then attaches through NativeProgrammableShaderPairCache::attach_translation_objects_for_observation.",
+    "The R284 materializer does not receive an ID3D11DeviceContext and explicitly keeps objectBindingAuthorized=false, so it cannot bind shaders or issue Draw/DrawIndexed.",
+    "tools/dx11_constant_buffer_probe.cpp WARP regression verifies same-device R242 ownership, immediate-context VS/PS remain unbound, foreign-device validation fails, and tampered R283 provenance is rejected before object creation.",
+    "tools/verify_dx11_source_graph.py statically guards the R284 creation/ownership boundary and existing dormant activation boundary.",
+    "Backend Conversion Gate 37578450377 completed SUCCESS for exact SHA 66607a8efac42c4c662b84e966920293fc1c94ac; validate 112652492807 and DX11 readiness smoke 112653932390 both succeeded.",
+    "Artifact 11463358829 digest sha256:7ee42b11294ddfd83766a66529251f79450abe21fa877a1330fc9c4fe281520b.",
+    "Issue #14 production ledger comment 6032003618 records the R284 change and next action.",
+    "No Quest 3/VDXR or in-game runtime test was performed."
+  ],
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "r283_dxbc_consumed": true,
+    "same_device_shader_objects_created": true,
+    "r242_ownership_receipt_created": true,
+    "native_programmable_object_bound": false,
+    "shader_translation_exact_enabled": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered branch HEAD 93f423cdb00cbe902dd5f1bf896061b7efc8693f, read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, lane state and 00421 durable result, and selected the exact R284 next action."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed R239/R240/R241/R242 ownership machinery, R279/R280 prerequisites, R283 DXBC materialization, regression knowledge and Issue #14 history; constrained scope to object creation/ownership only."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added exact R283-DXBC to D3D11 VS/PS object materialization, same-device/cache-slot attachment, tamper-evident R284 receipt, static guard and WARP regressions."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37578450377 SUCCESS; validate 112652492807 and readiness smoke 112653932390 SUCCESS, including R284 constant-buffer WARP probe. Runtime/HMD not tested."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit 66607a8efac42c4c662b84e966920293fc1c94ac contains [AUTO:CONVERSION-DX11-00422] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "No runtime package requested or justified for this static ownership slice."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "This durable run record and CONVERSION_LANE_STATE preserve exact material SHA, Gate/jobs/artifact, UNTESTED runtime state and the bounded next action."
+    }
+  },
+  "exact_next_action": "Implement bounded R285 live/native-device R284 ownership handoff plumbing: persist/reuse the programmable cache on the native DX11 device, materialize exact R283 DXBC for an observed pair, and supply the resulting exact R242 receipt to R275 while keeping pipeline binding, shaderTranslationExact, NativeDrawPath, Draw and DrawIndexed disabled.",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "66607a8efac42c4c662b84e966920293fc1c94ac",
+    "backend_conversion_gate": {
+      "run_id": 37578450377,
+      "conclusion": "success",
+      "validate_job_id": 112652492807,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112653932390,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11463358829,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-66607a8efac42c4c662b84e966920293fc1c94ac",
+      "artifact_digest": "sha256:7ee42b11294ddfd83766a66529251f79450abe21fa877a1330fc9c4fe281520b"
+    }
+  }
+}

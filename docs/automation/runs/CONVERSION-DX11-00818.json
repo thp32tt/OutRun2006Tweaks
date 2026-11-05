@@ -1,0 +1,149 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00818",
+  "production_id": "CONVERSION-DX11-00818",
+  "event_id": "CONVERSION-DX11-00818-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_STEREO_DIRECT_RTV_SUBMISSION",
+  "feature_id": "DX11-NATIVE-STEREO-DIRECT-RTV-OPENXR-FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": "b56a2632f0df26c88e3ffa230d80b0e5f2114f8e",
+  "validation_bearing_result_sha": "b6a0fa50c50d02300be6a6304440c1acfb34968e",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "CMakeLists.txt",
+    "cmake.toml",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/dx11-native-transport-isolated.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-NATIVE-STEREO-DIRECT-RTV-OPENXR-FRAME",
+    "full_dx11_renderer_complete": false,
+    "goal": "Allow a native D3D11 game stereo draw recorder to write two independent camera views into generation-owned shared RTV eyes and publish the exact two-eye Frame.v2 handoff only after GPU fence, without redundant eye GPU copy; preserve original D3D9Ex/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-direct-eye-renderer-to-transport",
+        "category": "source_integration",
+        "behavior_area": "native_game_stereo_submission",
+        "expected_behavior": "Acquired frame with valid distinct real game view signatures and pose uses NativeSharedEyeRing::render_eye_pair, then waits for the same producer EVENT before publishing."
+      },
+      {
+        "id": "real-gpu-eye-host-lifetime",
+        "category": "gpu_runtime_regression",
+        "behavior_area": "native_shared_eye_ring_and_host_frame",
+        "expected_behavior": "Isolated WARP outputs two different GPU pixel eyes; exact Frame.v2 metadata and ACK release preserve generation, frame, pose, and reject stale snapshots."
+      },
+      {
+        "id": "source-graph-build-and-five-ci",
+        "category": "integrated_validation",
+        "behavior_area": "windows_dx11_openxr_backend",
+        "expected_behavior": "cmkr-authoritative manifest links submission implementation; exact SHA five mandatory GitHub Actions and isolated WARP all pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-direct-eye-renderer-to-transport": "PASS_BUILD",
+    "real-gpu-eye-host-lifetime": "PASS_WARP",
+    "source-graph-build-and-five-ci": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW_RECORDER_ENTRY",
+      "NATIVE_SHARED_EYE_RTV",
+      "EXACT_FENCE_PUBLICATION",
+      "FRAME_V2_OPENXR_HANDOFF"
+    ],
+    "integration_path": [
+      "NativeGameStereoSubmission now exposes a production callback path into existing NativeSharedEyeRing dual RTV GPU writes; no mono eye duplication.",
+      "Exact pose and distinct eye view signatures required before recorder; existing try_publish()/attach_host_frame() retains producer EVENT and host ACK identity.",
+      "WARP regression proves two distinct eye GPU colors, metadata binding, rejection, and old ACK invalidation; original D3D9Ex fallback untouched."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp",
+      "cmake.toml",
+      "CMakeLists.txt"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Native Transport Isolated WARP complete; exactly five mandatory GitHub Actions SUCCESS at validation-bearing SHA.",
+      "negative_regression": "Reject invalid camera identity, pose, zero draw and null recorder before any GPU command; ACK stales cannot republish.",
+      "component_integration": "NativeGameStereoSubmission direct RTV producer to existing ring/publication path."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_DIRECT_RTV_SUBMISSION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Native stereo transport component build verified; real game full menu/car/race and Quest3 appearance were not observed; live game Draw callsite activation remains separate work.",
+    "activation_guard_and_fallback": "No backend promotion; original D3D9Ex Present, gamepad, FFB and frozen DXVK preserved."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read GitHub branch latest HEAD and exact 00816/00817 source ownership, AGENTS and policy.",
+    "C1_REVIEW": "Found NativeSharedEyeRing direct dual RTV rendering existed but NativeGameStereoSubmission exposed only extra-copy source-eye submit.",
+    "C2_IMPLEMENT": "Direct native stereo Draw recorder handoff plus WARP GPU/host metadata regression at b56a2632f0df26c88e3ffa230d80b0e5f2114f8e.",
+    "C3_VALIDATE": "First WARP LNK2019 because cmkr regenerated CMakeLists from missing cmake.toml target source; repaired authoritative manifest and exact SHA CI triggers at b6a0fa50c50d02300be6a6304440c1acfb34968e. Five mandatory gates and isolated WARP all SUCCESS. HMD/gamepad UNTESTED.",
+    "C4_COMMIT": "Material source b56a2632f0df26c88e3ffa230d80b0e5f2114f8e and causal build/CI repair b6a0fa50c50d02300be6a6304440c1acfb34968e had no CI-skip; this C6 record is bookkeeping [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA; runtime NEED_HMD_TEST and UNTESTED; full native renderer remains incomplete."
+  },
+  "evidence": {
+    "exact_sha": "b6a0fa50c50d02300be6a6304440c1acfb34968e",
+    "exact_sha_gate_results": {
+      "DX11 Fast Structural Checks": {
+        "status": "SUCCESS",
+        "run_id": 38876058208
+      },
+      "Backend Conversion Gate": {
+        "status": "SUCCESS",
+        "run_id": 38876058179
+      },
+      "Windows Build": {
+        "status": "SUCCESS",
+        "run_id": 38876064240
+      },
+      "OpenXR VR architecture": {
+        "status": "SUCCESS",
+        "run_id": 38876058202
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "status": "SUCCESS",
+        "run_id": 38876064303
+      },
+      "DX11 Native Transport Isolated WARP": {
+        "status": "SUCCESS",
+        "run_id": 38876058204
+      }
+    },
+    "ci_result": "SUCCESS_5_OF_5_PLUS_WARP",
+    "runtime_evidence": "NONE: no Quest3/VDXR live game/menu/car selection/race or gamepad session",
+    "source_owner": "AI2-ChatGPT2"
+  },
+  "material_source_commits": [
+    "b56a2632f0df26c88e3ffa230d80b0e5f2114f8e"
+  ],
+  "repair_commits": [
+    "b6a0fa50c50d02300be6a6304440c1acfb34968e"
+  ],
+  "score": {
+    "run_key": "CONVERSION-DX11-00818",
+    "score_change": 0,
+    "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
+    "note": "Development outcome may receive one score credit in ai-dev-lab; C6, repair, repeated CI and retry do not independently add points."
+  }
+}

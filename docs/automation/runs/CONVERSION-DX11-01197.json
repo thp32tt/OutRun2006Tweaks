@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01197",
+  "production_id": "CONVERSION-DX11-01197",
+  "event_id": "CONVERSION-DX11-01197-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:REAL_GAME_NATIVE_SOURCE_SWEEP_EVEN_GRID_REPAIR",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "9a4c31688e1be796f42725139743e7a605ed7071",
+  "implementation_source_sha": "da70c65b56697dea854960d0a8576f97157022e0",
+  "material_result_sha": "da70c65b56697dea854960d0a8576f97157022e0",
+  "validation_bearing_result_sha": "da70c65b56697dea854960d0a8576f97157022e0",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Fix genuine game GPU RAW diagnostic paired-tile source scan on EVEN-sized menu/car/race raster grids. Previous 2*ordinal stride aliased with grid cell count and, on multiples of four, the second half-grid crop skipped the same cells forever. Unit-stride traversal now reaches all valid source cells without changing full-frame admission, GPU fences, D3D9 source-aligned dirty Present, DX9Ex fallback, game input, FFB or frozen DXVK. Add full and clipped even 4x3-grid compile-time/runtime coverage, disjointness and wrap regressions.",
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_GPU_RAW_PRE_POST_TILE",
+      "AUTHENTIC_RASTER_CELL_SWEEP",
+      "ORIGINAL_D3D9_SOURCE_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "REAL_GAME_D3D11_GPU_SOURCE",
+      "DISJOINT_PAIRED_TILES",
+      "FULL_PERIOD_SOURCE_CELL_TRAVERSAL",
+      "OPT_IN_D3D9_PRESENT_SOURCE_PUBLICATION"
+    ],
+    "batch_components": [
+      "LIVE_GPU_RASTER_CELL_SCHEDULER_BUGFIX",
+      "EVEN_FULL_AND_CLIPPED_SOURCE_COVERAGE",
+      "POSITIVE_NEGATIVE_SOURCE_GPU_TILE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Even 4x3 full 2048x864 and clipped 3440x1440 source raster visit all twelve cells within twelve real sample ordinals, preserving disjoint GPU readbacks and wrap.",
+      "negative_regression": "A source tile cannot exceed real GPU RT bounds; paired crops cannot overlap or be fabricated; the existing 3440x1440 odd-grid, small RT and invalid RT regressions remain enforced.",
+      "component_integration": "The real Draw viewport+scissor chooses source-cell index before actual D3D11 PRE/POST staging capture; no change to Draw success gates or user-visible original D3D9 Present provenance."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; FULL_NATIVE_FRAME_NOT_ESTABLISHED; VISIBLE_FRAME_OUTPUT is the intended source-aligned original D3D9 Present integration endpoint and NOT a claim of observed runtime output. No game desktop or Quest3 test occurred.",
+    "activation_guard_and_fallback": "RAW opt-in default OFF, existing original D3D9 GPU fence/RT/Present safeguards and DX9Ex/input/FFB fallback unchanged.",
+    "blocking_evidence": "At source base 9a4c31688e1be796f42725139743e7a605ed7071, native_game_raw_dual_tile.hpp used firstIndex=(2*ordinal)%cells, which provably visits only 6/12 cells on a 4x3 authentic menu/car GPU raster. Implementation da70c65b56697dea854960d0a8576f97157022e0 replaces the aliased stride with ordinal%cells and adds compile-time positive/negative even-grid tests in tests/native_raw_dual_tile_test.cpp; five exact-SHA mandatory push CI success on that implementation. No game/HMD display was observed."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Repair native GPU RAW source-tile starvation on even game raster grids without falsely admitting partial pixels as full frame.",
+    "acceptance_items": [
+      {
+        "id": "authentic_even_raster_coverage",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_REAL_GAME_GPU_RASTER",
+        "expected_behavior": "Full and clipped even grids visit every authentic source capture cell without duplicates caused by stride alias."
+      },
+      {
+        "id": "bounded_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX11_GPU_SOURCE_D3D9_FALLBACK",
+        "expected_behavior": "Preserve authentic source clipping, disjoint paired tiles, GPU fences, dirty Present provenance and protected game fallback."
+      },
+      {
+        "id": "five_exact_sha_validation",
+        "category": "integrated_validation",
+        "behavior_area": "WINDOWS_DX11_OPENXR_HUD_CI",
+        "expected_behavior": "All five mandatory GitHub push Gates SUCCESS on the same material implementation SHA; gameplay/HMD untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "authentic_even_raster_coverage": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks SUCCESS 41298017959 and Backend Conversion Gate SUCCESS 41298017935"
+    },
+    "bounded_source_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate SUCCESS 41298017935 and Windows Build SUCCESS 41298017948"
+    },
+    "five_exact_sha_validation": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "All five required exact-SHA push Actions SUCCESS at da70c65b56697dea854960d0a8576f97157022e0"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41298017959,
+    "Backend Conversion Gate": 41298017935,
+    "Build": 41298017948,
+    "OpenXR VR architecture": 41298017931,
+    "OutRun EXE HUD Inspector CI": 41298017911
+  },
+  "validation_note": "Five push Actions SUCCESS at implementation exact SHA. C6 is separate docs-only bookkeeping commit; not an additional development outcome. No real game, full frame, stereo or HMD test was run. 2026-11-01 follow-up 01198: CI policy regression (41302727057, 41302727049) found missing blocking_evidence and VISIBLE_FRAME_OUTPUT strategy stage in this older C6 record; repaired without altering source SHA, historic 01197 five-gate receipts or scoring.",
+  "actual_runtime_evidence": "NOT_RUN_NO_GAME_DESKTOP_NO_QUEST3_VDXR",
+  "native_gpu_pixels_observed": "UNTESTED",
+  "full_menu_vehicle_race": "INCOMPLETE",
+  "separate_documentation_commit": true
+}

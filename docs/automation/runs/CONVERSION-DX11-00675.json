@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00675",
+  "production_id": "CONVERSION-DX11-00675",
+  "event_id": "CONVERSION-DX11-00675-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_DRAW_FULL_SCENE_WINDOW_COVERAGE",
+  "feature_id": "MENU_RACE_NATIVE_DRAW_WINDOW_COVERAGE",
+  "base_head_sha": "92b682c0bb1de6cf663f9fb3299f6195d65726ea",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live hooked D3D9 game Draw/DrawIndexed CPU vertex data goes through supported FVF/texture/state admission and native D3D11 Draw",
+      "Full-scene rotating probe cursor now scans eligible menu, vehicle-selection and race draw population instead of truncating at 64; explicit multiDraw batches reject interleaved distant ordinals",
+      "Asynchronous GPU EVENT-fenced native readback transfers pixels to original D3D9 inset; original D3D9 Draw/Present/gamepad fallback is preserved, Quest3 OpenXR output remains separate"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "tools/dx11_native_frame_batch_probe.cpp",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "CPU frame-batch probe covers 65,128,257,4096 eligible real-game draw ordinals and enforces contiguous eight-Draw window; live DrawIndexed/Draw hook remains bound",
+      "negative_regression": "Zero/shrinking and overflowing frame population fail closed; distant/noncontiguous calls and beyond-eight batch calls never join existing native scene frame; DX9Ex Draw/Present/gamepad untouched",
+      "component_integration": "Both game D3D9 Draw variants feed the same opt-in D3D11 frame target and asynchronously copy verified pixels back to the game diagnostic inset, with exact-SHA GitHub gates required"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_DRAW_FULL_SCENE_WINDOW_COVERAGE",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "OPENXR_HOST_NATIVE_STEREO_LINK_PENDING"
+    ],
+    "visible_frame_acceptance": "Native opt-in diagnostic CPU/GPU regression pending exact SHA; real menu/car/race scene and Quest3/VDXR remain NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Explicit OUTRUN_DX11_FIRST_GAME_FRAME and separate OUTRUN_DX11_FRAME_BATCH opt-ins only, default original D3D9 Draw/Present/gamepad intact"
+  },
+  "feature_contract": {
+    "feature_id": "MENU_RACE_NATIVE_DRAW_WINDOW_COVERAGE",
+    "goal": "Expand the native D3D11 game frame diagnostic from first-64-draw starvation to full menu/vehicle/race scene coverage with bounded contiguous Draw/DrawIndexed compositing, safe fallback and final exact-SHA integrated validation, without claiming live HMD output",
+    "acceptance_items": [
+      {
+        "id": "full-game-ordinal-coverage",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_scene_capture",
+        "expected_behavior": "Menu, vehicle and race candidate draws after ordinal 64 rotate into native Draw or DrawIndexed path and visible diagnostic frame"
+      },
+      {
+        "id": "contiguous-batch-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_gpu_frame_and_gamepad_fallback",
+        "expected_behavior": "At most 8 contiguous source draws, unsupported distant calls/overflows fail closed without skipping D3D9 Draw or gamepad"
+      },
+      {
+        "id": "scene-window-exact-gate",
+        "category": "integrated_validation",
+        "behavior_area": "native_render_and_async_readback",
+        "expected_behavior": "Exact-SHA fast structural, backend, Build, OpenXR and HUD gates and positive/negative frame batch probes succeed"
+      },
+      {
+        "id": "quest3-scene-parity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "quest3_openxr_projection",
+        "expected_behavior": "Live Quest3/VDXR menu-to-race stereo projection and gamepad tested in game after hardware validation"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "full-game-ordinal-coverage": "PENDING_EXACT_SHA",
+    "contiguous-batch-fallback": "PENDING_EXACT_SHA",
+    "scene-window-exact-gate": "PENDING_EXACT_SHA",
+    "quest3-scene-parity": "NEED_HMD_TEST"
+  },
+  "material_result_sha": "941d15a2fc33f7262643a188451a981526a4d298",
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "tools/dx11_native_frame_batch_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00675.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "64-draw sample cap starved later menu/car/race draws; earlier 00674 terminal run record triggers latest-only policy Gate while new feature is not recorded",
+    "C2_IMPLEMENT": "FULL_SCENE_PROBE_WITH_CONTIGUOUS_EIGHT_DRAW_GPU_BATCH",
+    "C3_VALIDATE": "GITHUB_EXACT_SHA_PENDING",
+    "C4_COMMIT": "MATERIAL_SOURCE_PLUS_EXECUTION_RECORD",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  }
+}

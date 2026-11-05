@@ -1,0 +1,213 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01178",
+  "production_id": "CONVERSION-DX11-01178",
+  "event_id": "CONVERSION-DX11-01178-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SPARSE_INTERLEAVED_GPU_RGB_SOURCE_ISLANDS",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_INHERITED_01177_CI_ACCEPTANCE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "c24810382edb15981ef2da5e1909a523fb36590b",
+  "implementation_source_sha": "724d0f39fa47e066cdc6bc52c0a7e42f23112700",
+  "validation_bearing_result_sha": "1e60e0f028f8c5120bd6f57d236f5a20fb775aad",
+  "material_result_sha": "1e60e0f028f8c5120bd6f57d236f5a20fb775aad",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01177.json"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "controller_runtime_adoption": "UNVERIFIED",
+  "development_time_percentages": "UNMEASURED",
+  "implementation": "C++ RAW opt-in native GPU PRE/POST source-aligned Present batching now splits sparse authentic RGB into fully RGB-changed solid runs before claiming original D3D9 destination ownership. Distinct interleaved source Draw pixels inside another Draw's unchanged bounding rectangle can be published as independent original-screen D3D9 UpdateSurface rectangles, max four islands with immutable per-upload SYSTEMMEM, authentic source/fence/dirty proof. Compiled A/B/A sparse 3-pixel, 2x2 block, duplicate, forged D3D9 dirty union, alpha-only regressions. Default native visual diagnostic stays OFF; original game Draw/input/FFB/SkyGlow, DX9Ex fallback, frozen DXVK preserved. Does not demonstrate full native game frame, runtime pixels or HMD.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "D3D11_GPU_PRE_POST_RGB",
+      "AUTHENTIC_D3D9_RGNDATA",
+      "SOLID_RGB_SOURCE_PIXEL_EXTRACTION",
+      "INDEPENDENT_ORIGINAL_SOURCE_UPLOADS",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "D3D11_GPU_PRE_POST_RGB",
+      "AUTHENTIC_D3D9_RGNDATA",
+      "SOLID_RGB_SOURCE_PIXEL_EXTRACTION",
+      "INDEPENDENT_ORIGINAL_SOURCE_UPLOADS",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CPP_NATIVE_RGB_SOLID_SOURCE_ISLAND_EXTRACTION",
+      "CPP_INTERLEAVED_GPU_DRAW_PRESENT_BATCH_INTEGRATION",
+      "COMPILED_THREE_DRAW_POSITIVE_AND_NEGATIVE_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original screen x=307 and x=351 authentic Draw A RGB plus original screen x=329 authentic Draw B RGB coexist in one 3-island opt-in RAW D3D9 Present despite overlapping full sampled source rectangles; exact 2x2 dense run maintains all four source pixels.",
+      "negative_regression": "Never claim unchanged sparse rectangle gaps, duplicate source/destination, forged original D3D9 dirty rcBound or alpha-only Draw; preserve original Draw/input/FFB and DX9Ex fallback.",
+      "component_integration": "Actual source-authentic D3D11 PRE/POST RGB delta and game canonical dirty Present through existing bounded 4-island staging and UpdateSurface; changes are partial debug output only, not proof of full game/HMD."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_COMPILED_AND_EXACT_SHA_CI_ONLY_OPT_IN_PARTIAL_RAW_GPU_SOURCE_PIXELS; no native entire menu/car/race frame or HMD confirmation",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC explicitly opt-in default OFF, source same-device and same-Present fence/dirty/format proof, original D3D9 input/FFB/SkyGlow and DX9Ex fallback untouched, DXVK frozen."
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41021010607,
+        "head_sha": "1e60e0f028f8c5120bd6f57d236f5a20fb775aad",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41021010502,
+        "head_sha": "1e60e0f028f8c5120bd6f57d236f5a20fb775aad",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 41021010615,
+        "head_sha": "1e60e0f028f8c5120bd6f57d236f5a20fb775aad",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41021010613,
+        "head_sha": "1e60e0f028f8c5120bd6f57d236f5a20fb775aad",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41021010610,
+        "head_sha": "1e60e0f028f8c5120bd6f57d236f5a20fb775aad",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "implementation_commit": "724d0f39fa47e066cdc6bc52c0a7e42f23112700",
+    "inherited_acceptance_record_repair_commit": "1e60e0f028f8c5120bd6f57d236f5a20fb775aad",
+    "inherited_acceptance_record_repair_path": "docs/automation/runs/CONVERSION-DX11-01177.json",
+    "runtime_evidence": "No matching real OutRun desktop or Quest3/VDXR run; runtime native Draw/published frame and fps count UNTESTED.",
+    "scoreboard_previous": 2216,
+    "score_change": 1,
+    "scoreboard_new": 2217,
+    "scoreboard_commit": "a3245fe55371e29aafd93d937a960db85c4a23e8"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_SOURCE_HEAD_c2481038",
+    "C1_REVIEW": "PASS_NATIVE_RGB_SPARSE_GAP_DRAW_OWNERSHIP_CONFLICT",
+    "C2_IMPLEMENT": "PASS_CPP_COMPILED_SPARSE_RGB_RUN_724d0f39",
+    "C3_VALIDATE": "PASS_FIVE_PUSH_GATES_SAME_EXACT_SHA_1e60e0f0",
+    "C4_COMMIT": "PASS_SOURCE_724d0f39_INHERITED_RECORD_REPAIR_1e60e0f0",
+    "C5_PACKAGE": "WINDOWS_BUILD_VERIFIED_NO_GAME_OR_HMD_SESSION",
+    "C6_STATE": "PASS_DOCS_ONLY_AFTER_FIVE_GATES"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "SOURCE_BUILD_VERIFIED_OPT_IN_PARTIAL_NATIVE_RGB_GAP_EXTRACTION_NOT_FULL_FRAME_OR_HMD",
+    "goal": "Preserve nonoverlapping RGB changes from interleaved genuine native D3D11 GPU game Draws at exact original D3D9 screen coordinates without stealing the unchanged interior of another source Draw RGB box.",
+    "acceptance_items": [
+      {
+        "id": "interleaved_real_gpu_rgb",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native Draw GPU RGB into original D3D9 Present",
+        "expected_behavior": "A sparse capture A and interleaved source B preserve all three true RGB pixels in independent original-coordinate source tiles."
+      },
+      {
+        "id": "dense_native_rectangle_preservation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Source aligned GPU rectangle extraction",
+        "expected_behavior": "Dense source 2x2 changed RGB is one native GPU RECT with preserved pixel channels and exact source offset."
+      },
+      {
+        "id": "safe_dirty_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Auth original D3D9 dirty and input fallback",
+        "expected_behavior": "Forged dirty rcBound, duplicate source or alpha-only changes cannot fabricate native output; original D3D9 fallback and input remain intact."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Windows OpenXR HUD conversion CI",
+        "expected_behavior": "All five required GitHub push workflows complete success on the same validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "interleaved_real_gpu_rgb": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate 41021010502 success at exact SHA"
+    },
+    "dense_native_rectangle_preservation": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 41021010607 and Build 41021010615 success at exact SHA"
+    },
+    "safe_dirty_and_fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend 41021010502 and HUD 41021010610 success at exact SHA"
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Completed success push workflows 41021010607,41021010502,41021010615,41021010613,41021010610 at 1e60e0f028f8c5120bd6f57d236f5a20fb775aad"
+    }
+  },
+  "score_change": 1,
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_ready": "PASS_SOURCE_CI_NEED_HMD_TEST",
+  "next_unfinished": "Native contiguous entire menu/car/race full frame and matching authentic real-game draw/published frame counts, native eye L/R OpenXR, original game input and Quest3/VDXR pacing tests remain incomplete.",
+  "notes": "Checkpoint-only documentation after 5/5 exact-SHA push gates; no HMD test. Original prior 01177 C6 acceptance correction is a dependency under this same TASK_ID and scores zero independently."
+}

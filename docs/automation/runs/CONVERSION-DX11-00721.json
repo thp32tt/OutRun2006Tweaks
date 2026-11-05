@@ -1,0 +1,96 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00721",
+  "production_id": "CONVERSION-DX11-00721",
+  "event_id": "CONVERSION-DX11-00721-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_STEREO_EYE_COPY_LIFETIME",
+  "feature_id": "DX11-NATIVE-STEREO-EYE-GPU-COPY-LIFETIME",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "actual D3D11 native game eye render-target textures owned by producer device",
+      "GPU CopyResource/ResolveSubresource pairs are ordered before producer EVENT fence and published shared handles",
+      "failed EVENT arming quarantines both in-flight eyes, prevents early cancellation/reuse and preserves original D3D9/gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_shared_eye_ring.hpp",
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+      "tools/test_dx11_eye_copy_lifetime_00721.py",
+      "tools/dx11_eye_copy_lifetime_probe_00721.cpp",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "portable C++ cases confirm only never-submitted slots can be cancelled and GPU copies progress to producer EVENT",
+      "negative_regression": "destructive copy queued flag / cancellation veto / failed EVENT quarantine mutations must fail in exact-source regression",
+      "component_integration": "producer native game eye pair copies and resolves -> exact fence/ACK shared eye slot -> OpenXR source handles; original D3D9 input unaffected"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_EYE_COPY_LIFETIME",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_shared_eye_ring.hpp",
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "safe eye copy lifetime is source/CI evidence, not physical Quest3/VDXR stereo gameplay proof",
+    "activation_guard_and_fallback": "native path opt-in, ring activation identity and fence gate; preserve original D3D9 Draw/Present/gamepad and no DXVK development"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-NATIVE-STEREO-EYE-GPU-COPY-LIFETIME",
+    "goal": "Ensure GPU-submitted native D3D11 left/right eye transfers cannot be cancelled or reused before OpenXR producer fence confirms their completion.",
+    "acceptance_items": [
+      {
+        "id": "stereo-transfer-fence",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_d3d11_shared_eye",
+        "expected_behavior": "Native left/right render targets enqueue complete GPU Copy/Resolve before producer EVENT and shared eye publication"
+      },
+      {
+        "id": "safe-native-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_input_and_generation",
+        "expected_behavior": "An EVENT arm failure quarantines outstanding GPU writes; pre-copy rejects can cancel without altering DX9Ex gamepad path"
+      },
+      {
+        "id": "same-sha-automation",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_exact_sha",
+        "expected_behavior": "Portable positive and destructive negative source probes plus five mandatory same-SHA GitHub gates pass"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+    "tools/dx11_eye_copy_lifetime_probe_00721.cpp",
+    "tools/test_dx11_eye_copy_lifetime_00721.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00721.json"
+  ],
+  "base_head_sha": "766e42f3e3c84a7e39bd47b473c146044d773a1b",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "runtime_gate": "NEED_HMD_TEST",
+  "pending_dependencies": [
+    "Quest 3/VDXR real-game stereo and gamepad validation requires user runtime"
+  ]
+}

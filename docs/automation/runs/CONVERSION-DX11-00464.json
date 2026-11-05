@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00464",
+  "production_id": "CONVERSION-DX11-00464",
+  "event_id": "CONVERSION-DX11-00464-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "a571ef2326b3f36db5a564af036ff2d864796984",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00464",
+  "lease_epoch": 1,
+  "work_key": "DX11:R156:OFFSCREEN_NATIVE_NONINDEXED_DRAW:src/vr/d3d11/native_backend.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.cpp:execute_fixed_function_nonindexed_direct_draw_probe",
+    "src/vr/d3d11/native_backend.hpp:R156",
+    "tools/dx11_constant_buffer_probe.cpp:R156"
+  ],
+  "selected_work_item": "DX11_R156_NATIVE_NONINDEXED_DRAW_WARP_OFFSCREEN_EXECUTION",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "de7aea0c4f8903a2e43612bc9188def105fdd200",
+  "material_result_sha": "de7aea0c4f8903a2e43612bc9188def105fdd200",
+  "validation_bearing_result_sha": "de7aea0c4f8903a2e43612bc9188def105fdd200",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "Add actual native D3D11 Draw execution bridge for sealed nonindexed offscreen probe plus WARP IA primitive-counter regression; native gameplay draw selector unchanged.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub base a571ef2326b3f36db5a564af036ff2d864796984; 00463 terminal PASS; 00464 absent at C0",
+    "C1_REVIEW": "PASS: selected independent native nonindexed offscreen Draw GPU proof; existing runtime Draw dormant",
+    "C2_IMPLEMENT": "PASS: offscreen preflight C++ and real WARP Draw plus IA primitive query; copied packet negative proof fixed",
+    "C3_VALIDATE": "PASS: exact-SHA de7aea0c4f8903a2e43612bc9188def105fdd200 Gate 37861869691; Win32 validate 113599259994 SUCCESS, DX11 readiness smoke 113600822562 SUCCESS, artifact 11586705734 digest sha256:e594e9e870588a735003506a33d2032aab62f9cd9a9924c6ccc7e1c5e3e0c2bd",
+    "C4_COMMIT": "PASS: C++/WARP material commits cd1de261bb9f3c26400a1130295179a16aca58a5, 99462cc2627518c2efc5c090c8c5bc3cf6150651, de7aea0c4f8903a2e43612bc9188def105fdd200 [AUTO:CONVERSION-DX11-00464]",
+    "C5_PACKAGE": "NOT_REQUIRED: no live game native Draw, only WARP isolated offscreen probe, no deployable release candidate",
+    "C6_STATE": "PASS: exact material CI and issue #14 persisted; GitHub durable run/lane state; runtime UNTESTED"
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "static_validation": "PASS: one related source check per changed material + Win32 build + WARP probe",
+  "state_persisted": true,
+  "next_action": "00464 terminal; do not rerun. Controller assigns a distinct DX11 work_key only after atomic owner-lease confirmation. Consider isolated indexed native DrawIndexed WARP execution proof without runtime activation. Quest3/VDXR runtime proof required before native Draw promotion.",
+  "blockers": [
+    "Quest3/VDXR hardware runtime UNTESTED"
+  ],
+  "last_real_activity_at": "2026-10-09T00:03:02.385Z",
+  "last_activity_evidence": "Exact material de7aea0c4f8903a2e43612bc9188def105fdd200 Gate 37861869691 SUCCESS; Win32 113599259994 SUCCESS; DX11 WARP smoke 113600822562 SUCCESS; artifact 11586705734",
+  "validation_bearing_sha": "de7aea0c4f8903a2e43612bc9188def105fdd200",
+  "automation_validation_detail": "EXACT_SHA_WIN32_VALIDATE_AND_DX11_WARP_SMOKE_SUCCESS",
+  "validation_run_id": 37861869691,
+  "validation_job_id": 113599259994,
+  "readiness_smoke_job_id": 113600822562,
+  "artifact_id": 11586705734,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-de7aea0c4f8903a2e43612bc9188def105fdd200",
+  "artifact_digest": "sha256:e594e9e870588a735003506a33d2032aab62f9cd9a9924c6ccc7e1c5e3e0c2bd",
+  "issue14_material_comment_id": 6071222833,
+  "issue14_repair_comment_id": 6071360310,
+  "issue14_comment_id": 6071222833,
+  "validation_issue14_comment_id": 6071459780,
+  "implementation_commits": [
+    "cd1de261bb9f3c26400a1130295179a16aca58a5",
+    "99462cc2627518c2efc5c090c8c5bc3cf6150651",
+    "de7aea0c4f8903a2e43612bc9188def105fdd200"
+  ],
+  "failed_intermediate_gates": [
+    {
+      "sha": "cd1de261bb9f3c26400a1130295179a16aca58a5",
+      "run_id": 37860799759,
+      "stage": "SOURCE_GRAPH",
+      "result": "FAIL",
+      "reason": "native Draw activation boundary protected"
+    },
+    {
+      "sha": "99462cc2627518c2efc5c090c8c5bc3cf6150651",
+      "run_id": 37860951475,
+      "stage": "WARP_CONSTANT_BUFFER_PROBE",
+      "result": "FAIL",
+      "reason": "copied packet startVertexLocation field not validated"
+    }
+  ],
+  "recorded_at_utc": "2026-10-09T00:03:02.385Z"
+}

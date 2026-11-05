@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00337",
+  "production_id": "CONVERSION-DXVK-00336",
+  "event_id": "CONVERSION-DXVK-00336-E005",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R232_LATEST_STARTUP_SUMMARY_PAIRING_R226_GUARD_REPAIR_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "9e56431ea950237f91e08b33b776e7d7d0769158",
+  "result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+  "validation_bearing_result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+  "result_marker": "[AUTO:CONVERSION-DX11-00337]",
+  "selected_work_item": "DX11_R232_LATEST_STARTUP_SUMMARY_PAIRING",
+  "summary": "R232 prevents a periodic census summary from an older process epoch in an accumulated source log from being used as current translation-exactness evidence after a newer startup. Historical LatestSummariesByLog remains available, while CurrentSummariesByLog and LatestStartupSummaryByLog fail closed when the latest startup has no subsequent summary.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00337.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD 9e56431ea950237f91e08b33b776e7d7d0769158. Read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md and Set05, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REGRESSION_KNOWLEDGE.json and VR_PROBLEM_HISTORY.md. R225-R231 durable work is preserved and was not repeated.",
+      "resume_evidence": "Rollover resumed from authoritative GitHub repair/result state without repeating completed R232 implementation or repair. Current dispatch is CONVERSION-DX11-00337-E003, CHAT_ROLLOVER=3, ATTEMPT=1/3; rollover is not a retry. RESUME_REASON=Retry persisted after one recovery attempt."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R226 chooses the latest periodic summary independently per source log, but an accumulated log ending startupA/summaryA/startupB still exposes summaryA as current exactness evidence. R231 already binds bootstrap outcomes to the latest startup epoch; periodic summaries need the same fail-closed epoch pairing.",
+      "review_lenses": {
+        "architecture": "Offline DX11 census analyzer/test/verifier only; vr-d3d9ex-focus and runtime renderer routing remain untouched.",
+        "ownership_lifetime": "No D3D9/D3D11 COM, resource generation, Reset, fence or consumer-ACK lifetime changes.",
+        "stereo_correctness": "No WVP, projection, HUD, sky/effects, recenter or eye-rendering changes.",
+        "performance": "Offline log parsing/report aggregation only; runtime hot path unchanged.",
+        "adversarial": "Accumulated-log fixture proves an older exact summary is retained historically but excluded from current exactness after a newer startup; a second log with a post-startup summary remains current."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added per-log latest summary line positions; LatestStartupSummaryByLog and CurrentSummariesByLog; current-summary missing/completeness diagnostics; exactness aggregation now consumes only current summaries for logs with startup epochs while legacy logs without startup markers retain their latest summary; added R232 regression fixture and source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R232_LATEST_STARTUP_SUMMARY_PAIRING_R226_GUARD_REPAIR_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1905 run 37167333846 completed success for repair/result SHA 53a5ee95137b0d83dc8d5c79c875e1195ce0eae4. validate job 111332904235 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R232 census analyzer checks, then configured/built Win32, verified the binary and uploaded artifact 11290061062. DX11 readiness smoke job 111333692075 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:67cdc516352f03e884df66af78f0b77ba06ed543999de855df95951ef948dfa2. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+      "validation_bearing_result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+      "result_marker": "[AUTO:CONVERSION-DX11-00337]",
+      "implementation_commits": [
+        "6a892a28871c809f0f72b48a9007dedcead5efdb",
+        "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4"
+      ],
+      "source_implementation_sha": "6a892a28871c809f0f72b48a9007dedcead5efdb",
+      "repair_result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+      "failed_validation_bearing_sha": "6a892a28871c809f0f72b48a9007dedcead5efdb",
+      "failed_validation_run_id": 37167255238,
+      "failed_validation_job_id": 111332663424,
+      "repair_count": 1
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census evidence-integrity/reporting and verifier compatibility repair only; no runtime distributable identity change."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37167333846,
+      "validation_job_id": 111332904235,
+      "readiness_smoke_job_id": 111333692075,
+      "artifact_id": 11290061062,
+      "artifact_digest": "sha256:67cdc516352f03e884df66af78f0b77ba06ed543999de855df95951ef948dfa2",
+      "implementation_comment_id": 5975282925,
+      "repair_comment_id": 5975292340,
+      "validation_comment_id": 5975353204,
+      "exact_next_action": "Preserve R225-R232 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+      "dispatch_metadata_correction_comment_id": 5975367051
+    }
+  },
+  "regression_assessment": {
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "runtime_risk_paths_touched": false,
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping only. No direct runtime regression riskPath is modified; NativeDrawPath remains dormant."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00337",
+    "production_id": "CONVERSION-DXVK-00336",
+    "event_id": "CONVERSION-DXVK-00336-E005",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Preserve R225-R232 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "repair_history": [
+    {
+      "repair": 1,
+      "failed_result_sha": "6a892a28871c809f0f72b48a9007dedcead5efdb",
+      "run_id": 37167255238,
+      "job_id": 111332663424,
+      "failure": "DX11 R226 multi-log summary scope drift: R226 summary completeness evidence",
+      "fix": "Update R226 source-graph guard to the historical completeness variable all_source_logs_have_periodic_summary introduced by R232."
+    }
+  ],
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37167333846,
+      "run_number": 1905,
+      "result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+      "conclusion": "success",
+      "validate_job_id": 111332904235,
+      "readiness_smoke_job_id": 111333692075,
+      "artifact_id": 11290061062,
+      "artifact_digest": "sha256:67cdc516352f03e884df66af78f0b77ba06ed543999de855df95951ef948dfa2"
+    }
+  },
+  "authoritative_dispatch_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DX11-00337",
+      "event_id": "CONVERSION-DX11-00337-E003",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DXVK-00336",
+      "event_id": "CONVERSION-DXVK-00336-E005",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "reason": "The current user-issued queue event in this chat is authoritative. Concurrent bookkeeping incorrectly rewrote the dispatch as a rollover. This correction changes dispatch metadata only; material/result SHA, exact-SHA Gate #1905 evidence, artifact identity, C0-C6 completion and RUNTIME_VALIDATION are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+    "issue14_correction_comment_id": 5975367051
+  }
+}

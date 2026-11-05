@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00639",
+  "production_id": "CONVERSION-DX11-00639",
+  "event_id": "CONVERSION-DX11-00639-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_SIGNED_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "c15e432e22d6ed69b758834d53237333c773e2b5",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Intercept a game-authored stage0 PM RGB draw with signed/2x alpha from texture and live D3DRS_TEXTUREFACTOR (complement retained)",
+      "Capture exact texture factor + alpha operator and select native signed-factor pixel shader without altering game D3D9 draw or gamepad input",
+      "Compile & bind independent saturating HLSL PS through native D3D11 Draw/DrawIndexed diagnostic target"
+    ],
+    "batch_components": [
+      "D3D9 stage0 signed/2x TFACTOR operation predicates, fail-closed source/factor capture and complemented factor constant",
+      "Native D3D11 signed/2x saturating shaders, pipeline ownership and Draw/DrawIndexed dispatch",
+      "Destructive source graph plus 20480 numeric regressions in both fast/full GitHub Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3DTOP_ADDSIGNED/ADDSIGNED2X texture plus regular/complemented TFACTOR alpha preserve texture-PM RGB and saturate independently before AlphaGate",
+      "negative_regression": "Reject wrong operand source/order, invalid flags and unreadable factor, preserving original D3D9 draw/input",
+      "component_integration": "GetTextureStageState / GetRenderState -> TextureCapture -> alphaParams.w -> PS signed saturation -> native Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_SIGNED_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native game Draw C++/HLSL implemented; exact-SHA GitHub Actions build/static/semantic smoke verified. Game menu, vehicle selection, race, gamepad and Quest3/VDXR NOT visually tested.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in only; default DX9Ex input/gameplay fallback unchanged."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_signed_factor_00639.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00639.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest 00638 C6 and 00639 distinct work key; original HEAD c15e432e",
+    "C1_REVIEW": "PASS: new signed TFACTOR stage0 PM RGB path disjoint from 00638 scaled factors",
+    "C2_IMPLEMENT": "PASS: live game D3D9 signed factor read/complement, native D3D11 saturating PS pair, Draw/DrawIndexed, fail-closed DX9Ex fallback",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast #38319198547, Backend Gate validate + readiness #38319198732, Win32 Build #38319204652, OpenXR #38319204512, HUD #38319204451 all SUCCESS on a0217cf5; N100 SHA-pinned focused Python test 20480 numeric PASS",
+    "C4_COMMIT": "PASS: material source and validation-bearing SHA a0217cf5c62b3215fd3675131ae51d9f138b435b, no force and no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED: no gameplay/HMD visual parity or user acceptance",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: GitHub exact-SHA CI all SUCCESS, runtime gameplay NEED_HMD_TEST; no automatic backend promotion"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No runtime acceptance; diagnostic opt-in only"
+  },
+  "next_action": "00639 exact-SHA C6 sealed. Continue distinct MENU_TO_RACE_NATIVE_FRAME and native gamepad/menu/race wiring; hardware parity NEED_HMD_TEST. DXVK frozen.",
+  "material_implementation_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b",
+  "material_result_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b",
+  "validation_bearing_result_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b",
+  "result_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b",
+  "completed_at": "2026-10-13T08:05:30+09:00",
+  "validation_runs": {
+    "dx11_fast": {
+      "run_id": 38319198547,
+      "conclusion": "SUCCESS",
+      "head_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b"
+    },
+    "backend_conversion_gate": {
+      "run_id": 38319198732,
+      "conclusion": "SUCCESS",
+      "head_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b"
+    },
+    "windows_build": {
+      "run_id": 38319204652,
+      "conclusion": "SUCCESS",
+      "head_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b"
+    },
+    "openxr": {
+      "run_id": 38319204512,
+      "conclusion": "SUCCESS",
+      "head_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b"
+    },
+    "hud_inspector": {
+      "run_id": 38319204451,
+      "conclusion": "SUCCESS",
+      "head_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b"
+    }
+  },
+  "evidence": {
+    "validation_bearing_result_sha": "a0217cf5c62b3215fd3675131ae51d9f138b435b",
+    "backend_gate_run_id": 38319198732,
+    "backend_gate_conclusion": "success",
+    "dx11_fast_run_id": 38319198547,
+    "dx11_fast_conclusion": "success",
+    "windows_build_run_id": 38319204652,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 38319204512,
+    "openxr_conclusion": "success",
+    "hud_run_id": 38319204451,
+    "hud_conclusion": "success",
+    "static_destructive_graph_mutations": 18,
+    "numeric_test_cases": 20480,
+    "runtime_validation": "UNTESTED",
+    "controller_runtime_adoption": "NOT_VERIFIED"
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01188",
+  "production_id": "CONVERSION-DX11-01188",
+  "event_id": "CONVERSION-DX11-01188-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_GPU_RGB_PACKED_ISLAND_PRESENT_STAGING",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_SAME_TASK_CAUSAL_CI_REPAIR",
+  "source_base_sha": "bcd5fd6bc5582af672107a60655d44b66508b8b5",
+  "implementation_source_sha": "304fd42582f29ac3d1e8acf6af9ddad0f7c73fb8",
+  "material_result_sha": "304fd42582f29ac3d1e8acf6af9ddad0f7c73fb8",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_color_transport.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp",
+    "tools/test_package_dx11_first_game_frame.py"
+  ],
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "implementation": "Genuine source-authenticated native Draw pre/post RGB islands are packed into tile-sized D3D9 SYSTEMMEM surfaces. The source RECT is local (0,0,w,h), while UpdateSurface destination retains original game coordinates. Cached target surfaces are recreated on differing island extent/format; invalid pitch/extent and partial publication fail closed. Preserves BGRA/RGBA/XRGB, original game input/FFB/DX9Ex fallback, opt-in RAW default OFF and frozen DXVK. This is partial GPU source integration, not a verified complete native game frame.",
+  "validation": {
+    "exact_sha": "bda328fcfde7075ff16c3843f5b0e29340457312",
+    "required_push_workflows_result": "5/5 completed success on identical validation-bearing SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41221177823,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "bda328fcfde7075ff16c3843f5b0e29340457312",
+        "event": "push"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41221177904,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "bda328fcfde7075ff16c3843f5b0e29340457312",
+        "event": "push"
+      },
+      {
+        "name": "Build",
+        "run_id": 41221177917,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "bda328fcfde7075ff16c3843f5b0e29340457312",
+        "event": "push"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41221177868,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "bda328fcfde7075ff16c3843f5b0e29340457312",
+        "event": "push"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41221177824,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "bda328fcfde7075ff16c3843f5b0e29340457312",
+        "event": "push"
+      }
+    ],
+    "runtime_game_and_quest3": "UNTESTED",
+    "source_commit": "304fd42582f29ac3d1e8acf6af9ddad0f7c73fb8",
+    "ci_causal_repair_commits": [
+      "72403c2ec25d0e5540e3159d3efd7b9dd3c419ba",
+      "bda328fcfde7075ff16c3843f5b0e29340457312"
+    ],
+    "deferred_reason": "RUN_RECORD_NOT_FOUND"
+  },
+  "safety": {
+    "raw_opt_in_default_off": true,
+    "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
+    "dxvk": "FROZEN_UNMODIFIED",
+    "native_game_full_frame": "NOT_CLAIMED",
+    "scoring": "This C6 bookkeeping action must not add score or duplicate earlier same-task material achievement."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_DRAW",
+      "SOURCE_AUTHENTIC_D3D11_GPU_RGB_PRE_POST",
+      "PACKED_TILE_D3D9_SYSTEMMEM_STAGING",
+      "ORIGINAL_PIXEL_COORDINATE_D3D9_PRESENT_UPDATESURFACE"
+    ],
+    "visible_frame_acceptance": "PARTIAL_NATIVE_SOURCE_RGB_PRESENT_PATH_VERIFIED_BY_CODE_AND_EXACT_SHA_CI_ONLY; REAL_GAME_FULL_FRAME_AND_HMD_UNTESTED",
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "RAW opt-in default OFF, native RGB origin and bounds proof, safe original game D3D9/DX9Ex fallback; DXVK unchanged",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_RGB_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "REAL_GPU_RGB_SOURCE_ISLAND_PACKING",
+      "TILE_LOCAL_D3D9_SYSTEMMEM_STAGING_AND_PRESENT",
+      "MULTI_ISLAND_POSITIVE_AND_BOUNDS_NEGATIVE_TESTS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01188 original native RGB packed transfer regression proves local 3x2 and 1x1 source islands reach the original D3D9 destination coordinates without scaling, under the prior five-gate exact SHA bda328fcfde7075ff16c3843f5b0e29340457312.",
+      "negative_regression": "01188 regression rejects invalid source dimensions and lock pitches before publishing; two-phase preflight rejects a later failed surface without committing earlier islands.",
+      "component_integration": "Previously implemented canonical original-game D3D9 Draw -> D3D11 native PRE/POST RGB -> packed SYSTEMMEM island -> original D3D9 Present UpdateSurface path. Not a complete native frame or live Quest3 evidence."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_color_transport.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_changed_crop_present_test.cpp"
+    ]
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Copy only authentic native GPU RGB source islands via tile-sized packed staging into original game Present coordinates, without claiming full native game frame.",
+    "scope": "PARTIAL_SOURCE_AUTHENTIC_OPT_IN_DIAGNOSTIC_ONLY",
+    "acceptance_items": [
+      {
+        "id": "packed_source_tile_transfer",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native Draw RGB to original D3D9 Present",
+        "expected_behavior": "Pack genuine changed RGB source islands in local tile surfaces while preserving original destination coordinates."
+      },
+      {
+        "id": "safe_tile_extent_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 staging allocation/reuse and safety",
+        "expected_behavior": "Reject malformed pitch/extent, recreate mismatched cached surfaces, and preserve incomplete-commit and original game fallback protections."
+      },
+      {
+        "id": "exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "5 required GitHub Push Actions",
+        "expected_behavior": "All five push workflows succeed for the same validation-bearing SHA; HMD remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "packed_source_tile_transfer": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_color_transport.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "5/5 exact bda328fcfde7075ff16c3843f5b0e29340457312 push CI, including packed byte transport regression."
+    },
+    "safe_tile_extent_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp",
+        "tools/test_package_dx11_first_game_frame.py"
+      ],
+      "validation_command": "5/5 exact bda328fcfde7075ff16c3843f5b0e29340457312 push CI, including source bounds, dimension and protected RGB border safety checks."
+    },
+    "exact_sha_required_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/test_package_dx11_first_game_frame.py",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "5/5 required push success at bda328fcfde7075ff16c3843f5b0e29340457312: 41221177823, 41221177904, 41221177917, 41221177868, 41221177824."
+    }
+  },
+  "record_recovery": {
+    "reason": "RUN_RECORD_NOT_FOUND",
+    "source_of_material_result_sha": "GitHub implementation commit",
+    "source_of_feature_contract": "Reconstructed from 01188 implementation source and inherited 01187 milestone contract, not a pre-existing 01188 JSON",
+    "source_of_acceptance_results": "Exact-SHA success and corresponding checked-in regression sources"
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "validation_bearing_result_sha": "bda328fcfde7075ff16c3843f5b0e29340457312",
+  "runtime_validation": "UNTESTED"
+}

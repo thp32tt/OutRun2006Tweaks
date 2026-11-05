@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00658",
+  "production_id": "CONVERSION-DX11-00658",
+  "event_id": "CONVERSION-DX11-00658-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_A8_L8_A8L8_MIP_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "3a17d98493e6ba518da582bd8340d4212a6e91ac",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 game A8/L8/A8L8 texture source + sampler state",
+      "row/mip BGRA expansion -> immutable native D3D11 SRV",
+      "game Draw/DrawIndexed diagnostic inset on Present"
+    ],
+    "batch_components": [
+      "live C++ format admission and decoded mips in game bridge",
+      "portable D3D9 alpha/luminance decoder C++",
+      "CPU pixel stride/mip tests, destructive live-link test and CI gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "A8 missing RGB=000; L8 RGB=luminance alpha=255; A8L8 L low-byte alpha high-byte, all native SRV mip rows",
+      "negative_regression": "Unproven sRGB luminance, invalid source pitch, unsupported default-pool formats -> unchanged original game D3D9 Draw",
+      "component_integration": "D3D9 texture LockRect -> per-mip BGRA8 unpack -> D3D11 CreateTexture2D/SRV -> sampled game Draw -> bounded diagnostic Present"
+    },
+    "conflict_keys": [
+      "DX11:GAME_A8_L8_A8L8_MIP_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY; actual game pixels/gamepad/Quest3/VDXR NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME remains explicitly opt-in; original DX9Ex game draws and input retained, unsupported sRGB/fmt fallback"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_luminance_texture.hpp",
+    "tools/dx11_game_luminance_probe.cpp",
+    "tools/test_dx11_native_luminance_texture_00658.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00658.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS source and prior 00657 C6 at HEAD",
+    "C1_REVIEW": "PASS missing A8/L8/A8L8 live texture sampling; D3D9 official channel defaults checked",
+    "C2_IMPLEMENT": "PASS game C++ source, per-mip format decoder + test",
+    "C3_VALIDATE": "LOCAL_CPU_PROBE_PASS; EXACT_SHA_GATE_PENDING",
+    "C4_COMMIT": "PENDING_REMOTE_PUBLICATION",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "static_regression": "LOCAL_CPU_PASS",
+    "compile_build": "PENDING_EXACT_SHA",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "ed4d019b3bf19c7f0f46befd4ffb18d4d4ce3198",
+  "result_sha": null,
+  "next_action": "Check exact SHA GitHub 5 gates and repair actual failures; keep Quest3/VDXR and gamepad UNTESTED."
+}

@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00357",
+  "production_id": "CONVERSION-DX11-00357",
+  "event_id": "CONVERSION-DX11-00357-E004",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R243_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "616a66d73de36e2b3c7efa7dc91efcae85d4f30d",
+  "result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+  "validation_bearing_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+  "result_marker": "[AUTO:CONVERSION-DX11-00357]",
+  "selected_work_item": "DX11_R243_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT",
+  "summary": "R243 adds a fail-closed programmable input-layout ownership receipt on top of an exact validated R242 translated-object receipt. Attachment requires exact input-layout metadata plus a same-device ID3D11InputLayout and the current R240/R241/R242 snapshots; identical reattachment is idempotent while changed descriptor metadata, replacement objects, foreign-device layouts, stale object receipts and device-generation reuse fail closed. The unit does not bind IA state, route Draw*, or claim programmable shader translation/constants completeness.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00357.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT and resumed the interrupted R243 transaction without repeating completed R242 work. R242's durable next action selected this bounded programmable input-linkage/input-layout ownership boundary. Current authoritative dispatch is CONVERSION-DX11-00357-E002 rollover; CHAT_ROLLOVER=2 is not a retry, so ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R242 seals exact same-device translated VS/PS object ownership but has no separate receipt for the IA input-layout object and exact descriptor metadata. Set05 F19/F21 require input-layout/shader readiness to remain an independent fail-closed activation boundary.",
+      "review_lenses": {
+        "architecture": "Extend the dormant per-device programmable cache owner with a separate R243 input-layout receipt; do not create a production translator or draw caller.",
+        "ownership_lifetime": "Bind the layout receipt to current R240 cache, R241 slot and R242 object snapshots plus same-device ID3D11InputLayout identity; clear automatically with entry/device reinitialize.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter or draw routing semantics change.",
+        "performance": "No production hot-path caller; only dormant per-entry ComPtr/identity/receipt metadata and hosted probe work.",
+        "adversarial": "Reject missing/stale R242 receipts, same-metadata replacement COM objects, foreign-device layouts and prior device generations; prove same-object idempotence and fresh receipt after reset."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderInputLayoutReadiness, attach/readiness/snapshot APIs, per-entry owned ID3D11InputLayout plus exact descriptor identity and monotonic receipt generation. WARP/source-graph coverage includes the R242 prerequisite, exact attachment, idempotence, changed-descriptor/stride rejection, replacement-object rejection, foreign-device rejection, stale-object rejection and device-generation invalidation."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R243_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "local_auxiliary_validation": "PASS",
+      "evidence": "Local auxiliary PASS. Exact-SHA Backend Conversion Gate #1944 run 37185242813 SUCCESS for 10b31af774b8ef1472d63869a72abf726bfd63c3. Validate job 111385693555 passed source/static contracts, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111386277798 passed, including build/run of dx11_constant_buffer_probe covering the R243 receipt boundary. Artifact 11296882293 digest sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0. No Quest 3/VDXR runtime test was performed.",
+      "validation_run_id": 37185242813,
+      "validation_run_number": 1944,
+      "validation_job_id": 111385693555,
+      "readiness_smoke_job_id": 111386277798,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11296882293,
+      "artifact_digest": "sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+      "validation_bearing_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+      "source_implementation_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+      "result_marker": "[AUTO:CONVERSION-DX11-00357]",
+      "implementation_commits": [
+        "10b31af774b8ef1472d63869a72abf726bfd63c3"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R243 is a dormant input-layout ownership/receipt boundary. It adds no production shader translation, IA binding, Draw* routing, transport change or runtime distributable behavior."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37185242813,
+      "validation_job_id": 111385693555,
+      "readiness_smoke_job_id": 111386277798,
+      "artifact_id": 11296882293,
+      "artifact_digest": "sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0",
+      "implementation_comment_id": 5977627098,
+      "validation_comment_id": 5977688286,
+      "exact_next_action": "Release CONVERSION-DX11-00357 as complete. Preserve R239 programmable identity, R240 per-device cache, R241 translation-slot ownership, R242 translated-object receipt and R243 exact input-layout receipt semantics; keep NativeDrawPath dormant. The next independent programmable-shader unit may add one bounded fail-closed programmable constant-state ownership/readiness boundary consuming validated R243 evidence, without draw routing.",
+      "dispatch_correction_comment_id": 5977669570
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F19_INPUT_LAYOUT_READINESS",
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant native_backend ownership plus hosted WARP probe only; no D3D9 hook, stereo renderer, transport, OpenXR submission or production NativeDrawPath caller changes."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00357",
+    "production_id": "CONVERSION-DX11-00357",
+    "event_id": "CONVERSION-DX11-00357-E004",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "rollover_is_retry": false,
+    "source": "CURRENT_USER_QUEUE",
+    "chat_rollover": 3,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "material_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "source_implementation_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "validation_bearing_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "validation_run_id": 37185242813,
+    "validation_job_id": 111385693555,
+    "readiness_smoke_job_id": 111386277798,
+    "artifact_id": 11296882293,
+    "artifact_digest": "sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0",
+    "implementation_comment_id": 5977627098,
+    "dispatch_correction_comment_id": 5977704132,
+    "validation_comment_id": 5977688286,
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false
+  },
+  "exact_next_action": "Release CONVERSION-DX11-00357 as complete. Preserve R239 programmable identity, R240 per-device cache, R241 translation-slot ownership, R242 translated-object receipt and R243 exact input-layout receipt semantics; keep NativeDrawPath dormant. The next independent programmable-shader unit may add one bounded fail-closed programmable constant-state ownership/readiness boundary consuming validated R243 evidence, without draw routing.",
+  "material_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+  "source_implementation_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37185242813,
+      "run_number": 1944,
+      "result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+      "conclusion": "success",
+      "validate_job_id": 111385693555,
+      "readiness_smoke_job_id": 111386277798,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11296882293,
+      "artifact_digest": "sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5977627098,
+    "dispatch_correction_comment_id": 5977669570,
+    "validation_comment_id": 5977688286
+  },
+  "dispatch_reconciliation": {
+    "authoritative": {
+      "production_id": "CONVERSION-DXVK-00356",
+      "event_id": "CONVERSION-DXVK-00356-E006",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "superseded_concurrent_metadata": {
+      "production_id": "CONVERSION-DX11-00357",
+      "event_id": "CONVERSION-DX11-00357-E002",
+      "event_type": "rollover",
+      "chat_rollover": 2
+    },
+    "reason": "The current controller queue message in this task is authoritative. Concurrent rollover bookkeeping at c43e58a3d955eeaff7e721880a66b3b72b4af12c used stale dispatch metadata; it does not change the material result or exact-SHA validation evidence."
+  },
+  "rollover_is_retry": false,
+  "chat_rollover": 3,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "material_origin_dispatch": {
+    "production_id": "CONVERSION-DXVK-00356",
+    "event_id": "CONVERSION-DXVK-00356-E006",
+    "event_type": "retry",
+    "note": "Inherited producer metadata from the initial material publication; superseded by the current authoritative E002 rollover dispatch. Material and validation-bearing SHA are unchanged."
+  },
+  "rollover_metadata_correction": {
+    "corrected_from": {
+      "task_id": "CONVERSION-DX11-00357",
+      "production_id": "CONVERSION-DX11-00357",
+      "event_id": "CONVERSION-DX11-00357-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false
+    },
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00357",
+      "production_id": "CONVERSION-DX11-00357",
+      "event_id": "CONVERSION-DX11-00357-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "dispatch_source": "CURRENT_USER_QUEUE",
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "reason": "Current user-issued E004 / CHAT_ROLLOVER=3 dispatch is authoritative. This chat rollover does not increment ATTEMPT. Existing R243 material/result SHA, exact-SHA Gate #1944 evidence, C0-C6 completion and RUNTIME_VALIDATION=UNTESTED remain unchanged.",
+    "dispatch_correction_comment_id": 5977704132,
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

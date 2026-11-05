@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01201",
+  "production_id": "CONVERSION-DX11-01201",
+  "event_id": "CONVERSION-DX11-01201-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SOURCE_INDEXED_FVF_GPU_RGB_CAPTURE",
+  "classification": "A_LIVE_GAME_RENDER_INDEXED_FVF_GPU_CAPTURE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "6423b4f6d5e2ea02068953c734582bd02d5cc651",
+  "implementation_source_sha": "135223c0d4f64b5309d8073212ecda2f90e7fdb4",
+  "material_result_sha": "135223c0d4f64b5309d8073212ecda2f90e7fdb4",
+  "validation_bearing_result_sha": "135223c0d4f64b5309d8073212ecda2f90e7fdb4",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "implementation": "Actual live FVF D3D11 DrawIndexed forwards the same authoritative IA index stream to opt-in native GPU PRE/POST RGB source-footprint capture; only referenced NativeVertex.clip positions contribute. Previously ignored, off-target VB vertices widened the raster and could steer both 512x288 source GPU readback windows away from authentic right-side menu, vehicle or HUD geometry. Invalid active index, zero/unknown indexed stream and invalid active homogeneous W fail closed to the old whole-viewport sampling. Genuine native Draw, D3D9 Present, COM RT identity, RGB delta, GPU fences, original gamepad/FFB, DX9Ex fallback and DXVK freeze remain intact. No full native game frame or HMD runtime proof.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "AUTHENTIC_LIVE_D3D9_FVF_INDEXED_DRAW",
+      "NATIVE_D3D11_INDEXED_DRAW",
+      "SOURCE_INDEXED_FVF_GPU_PRE_POST_RGB",
+      "ORIGINAL_D3D9_SOURCE_PRESENT"
+    ],
+    "integration_path": [
+      "LIVE_NATIVE_FVF_INDEX_STREAM",
+      "ACTIVE_VERTEX_CLIP_SPACE_RASTER",
+      "SOURCE_GPU_PRE_POST_RGB_TILE_CAPTURE",
+      "ORIGINAL_D3D9_PRESENT"
+    ],
+    "batch_components": [
+      "FVF_NATIVE_IA_INDEX_PROVENANCE",
+      "REFERENCED_VERTEX_RASTER_SELECTION",
+      "SAFE_MALFORMED_INDEX_FALLBACK_AND_CXX_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Genuine 3440x1440 off-center FVF indexed menu/HUD triangle only uses indexed right-side NativeVertex.clip positions; source GPU 512x288 swept capture covers the actual raster. Native C++17 regression and Fast Structural 41316809751 SUCCESS.",
+      "negative_regression": "Out-of-range IA index, partial/null index stream, invalid active W revert to old whole-viewport capture without reading invalid VB memory; unused invalid vertex does not reject a valid index Draw. Regression passes at same source SHA.",
+      "component_integration": "submit(State&, NativeVertex, indices, indexCount) forwards actual IA indices to NativeRawFvfClipSpan consumed by queue_before_draw PRE GPU readback; POST DrawIndexed source RGB, RT identity and original D3D9 Present are unchanged."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; partial authentic GPU RGB readback window, no native full menu->vehicle->race frame claim, desktop and Quest3 UNTESTED",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in default OFF; retain source COM identity, raster bounds, original game D3D9 Draw/Present, GPU event ownership, DX9Ex input/FFB/SkyGlow and frozen DXVK."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Connect the real live FVF DrawIndexed IA index ownership to native D3D11 RAW GPU PRE/POST RGB capture and select only source referenced triangle pixels while preserving fail-closed original game/Present/input on malformed indices.",
+    "acceptance_items": [
+      {
+        "id": "clip_native_source_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_FVF_TO_D3D11_GPU",
+        "expected_behavior": "Exact source DrawIndexed IA index buffer selects only referenced native FVF clip-space vertices and a correctly positioned genuine GPU RGB readback on the game-sized target."
+      },
+      {
+        "id": "unknown_geometry_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_RENDER_PRESENT_INPUT",
+        "expected_behavior": "Unsupported or out-of-range IA indices, malformed active homogeneous positions or missing stream retain whole-viewport readback; original D3D9 Draw, Present and input remain untouched."
+      },
+      {
+        "id": "source_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_CI_OPENXR_WIN32",
+        "expected_behavior": "Five mandatory GitHub Actions push workflows complete SUCCESS at the one exact source SHA without CI-skip; desktop/Quest3 runtime remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "clip_native_source_draw": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exact SHA 135223c0d4f64b5309d8073212ecda2f90e7fdb4 native_raw_dual_tile_test C++17 plus DX11 Fast 41316809751 SUCCESS"
+    },
+    "unknown_geometry_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "At exact SHA 135223c0d4f64b5309d8073212ecda2f90e7fdb4: malformed indexed IA and positive unused-VB vertex negative regressions on Fast 41316809751 SUCCESS"
+    },
+    "source_sha_five_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exact SHA 135223c0d4f64b5309d8073212ecda2f90e7fdb4 five push Actions SUCCESS: 41316809751, 41316809756, 41316809695, 41316809743, 41316809721"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41316809751,
+    "Backend Conversion Gate": 41316809756,
+    "Build": 41316809695,
+    "OpenXR VR architecture": 41316809743,
+    "OutRun EXE HUD Inspector CI": 41316809721
+  },
+  "optional_workflows": [
+    {
+      "name": "VR PC Fast Test Build",
+      "run_id": 41316809713,
+      "conclusion": "skipped",
+      "mandatory": false
+    }
+  ],
+  "validation_note": "All five mandatory push Actions SUCCESS on exact implementation SHA 135223c0d4f64b5309d8073212ecda2f90e7fdb4. The docs-only C6 commit has [skip ci], is NOT validation-bearing, and scores +0 independently. Real game desktop/Quest3/VDXR RUNTIME_VALIDATION=UNTESTED.",
+  "actual_runtime_evidence": "NOT_RUN_NO_GAME_DESKTOP_NO_QUEST3_VDXR",
+  "native_gpu_pixels_observed": "UNTESTED",
+  "full_menu_vehicle_race": "INCOMPLETE",
+  "next_feature_action": "In one exact-SHA user game run measure native_draws, source-coincident actual GPU RGB pixels and published full frames; extend complete source coverage and separate L/R OpenXR only with fail-closed native ownership.",
+  "separate_documentation_commit": true,
+  "recorded_at": "2026-11-01 23:45 KST"
+}

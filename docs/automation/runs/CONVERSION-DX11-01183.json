@@ -1,0 +1,195 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01183",
+  "production_id": "CONVERSION-DX11-01183",
+  "event_id": "CONVERSION-DX11-01183-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_GPU_RGB_SOURCE_ALIGNED_PRESENT_ISLAND_BOUNDED_CPU_STAGE",
+  "classification": "A_SOURCE_IMPLEMENTATION_B_CAUSAL_PACKAGE_CONTRACT_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "b5fdbf9f1bc9a165a8b21e7673ee0c2bddf675fa",
+  "implementation_source_sha": "12ab8e4f6fcc55232409cb16d42c2c056ae25156",
+  "validation_bearing_result_sha": "8b741d4c85456ff3bd09244af39190a446e256ef",
+  "material_result_sha": "8b741d4c85456ff3bd09244af39190a446e256ef",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_color_transport.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    "tools/test_package_dx11_first_game_frame.py"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "controller_runtime_adoption": "UNVERIFIED",
+  "development_time_percentages": "UNMEASURED",
+  "implementation": "The opt-in native D3D11 original-game GPU PRE/POST RGB source-aligned D3D9 UpdateSurface path now converts only each of up to four independently validated source island rectangles instead of repeatedly converting the entire captured 256x144 surface. Original physical D3D9 Present source coordinates, row pitches, RGBA/BGRA order, XRGB opacity, unchanged alpha-only RGB semantics, and protected magenta incomplete diagnostic edge remain intact. The bounded helper rejects malformed rectangles/pitches and never writes outside the admitted source island. Native game Draw/HUD/OpenXR stereo full-frame and runtime parity remain unproven.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_GAME_D3D9_DRAW",
+      "D3D11_GPU_PRE_POST_RGB",
+      "CANONICAL_SOURCE_BACKBUFFER_IDENTITY",
+      "VERIFIED_PRESENT_CROP_OR_DIRTY_REGION",
+      "FOUR_DISJOINT_GPU_RGB_SOURCE_ISLANDS",
+      "BOUNDED_PER_ISLAND_CPU_PIXEL_CONVERSION",
+      "SOURCE_COINCIDENT_D3D9_UPDATESURFACE",
+      "EXPLICIT_RAW_PARTIAL_VISIBLE_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CPP_BOUNDED_SOURCE_ISLAND_RGB_TRANSPORT",
+      "CPP_REAL_PRESENT_PAINT_CALLSITE_INTEGRATION",
+      "COMPILED_PADDED_PITCH_RGB_ALPHA_BOUNDARY_REGRESSION",
+      "CAUSAL_PACKAGE_STATIC_CONTRACT_UPDATE_SAME_TASK"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "RGBA and BGRA mapped authentic RGB pixels and two disjoint upload islands retain source byte order, offset, alpha/XRGB policy and magenta guard.",
+      "negative_regression": "Invalid pitch, empty/out-of-bounds GPU tile and alpha-only color fail closed; untouched source pixels outside the tile remain unchanged.",
+      "component_integration": "NativeRawVisualPreview::present() uses native_raw_copy_present_island() at UpdateSurface staging with original GPU PRE/POST captures, source tile and fenced Present evidence."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_color_transport.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp",
+      "tools/test_package_dx11_first_game_frame.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_CI_OPT_IN_PARTIAL_GPU_RGB_ONLY_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "RAW opt in OFF by default, original D3D9 input/FFB/SkyGlow and DX9Ex fallback untouched, DXVK frozen."
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS EXACT SAME SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41057504113,
+        "head_sha": "8b741d4c85456ff3bd09244af39190a446e256ef",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41057504134,
+        "head_sha": "8b741d4c85456ff3bd09244af39190a446e256ef",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 41057504286,
+        "head_sha": "8b741d4c85456ff3bd09244af39190a446e256ef",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41057504298,
+        "head_sha": "8b741d4c85456ff3bd09244af39190a446e256ef",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41057504140,
+        "head_sha": "8b741d4c85456ff3bd09244af39190a446e256ef",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "implementation_commit": "12ab8e4f6fcc55232409cb16d42c2c056ae25156",
+    "ci_causal_package_repair_commit": "8b741d4c85456ff3bd09244af39190a446e256ef",
+    "ci_repair_note": "Original source commit OpenXR packaging negative-source test searched the prior inline magenta-border implementation. Updated its assertions to verify the actually invoked bounded helper, destination/source bounds, authentic PRE/POST RGB delta and guarded magenta BGR writes. No guard deleted or overridden. Previous OpenXR SHA failed; final source+repair SHA passes all five required gates.",
+    "build_artifact_id": 12978157640,
+    "dx11_diagnostic_bundle_artifact_id": 12978630231,
+    "runtime_evidence": "No game desktop, gamepad, GPU native Draw/Present or Quest3/VDXR HMD run on this validation-bearing SHA; RUNTIME_VALIDATION=UNTESTED.",
+    "source_only_limit": "Bounded GPU RGB partial RAW opt-in, not a full native menu-car-race frame, native stereo/OpenXR game source, or measured frame-rate improvement."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD_OWNER_CONFLICT_CHECK",
+    "C1_REVIEW": "PASS_WASTED_WHOLE_CAPTURE_REPEAT_CONVERSION_ON_FOUR_REAL_ISLANDS",
+    "C2_IMPLEMENT": "PASS_CPP_IMPLEMENTATION_12ab8e4f6fcc",
+    "C3_VALIDATE": "PASS_FIVE_EXACT_SHA_PUSH_GATES_8b741d4c8545",
+    "C4_COMMIT": "PASS_SOURCE_TEST_AND_CAUSAL_CI_REPAIR",
+    "C5_PACKAGE": "PASS_EXACT_SHA_GITHUB_ARTIFACT_CREATED_NO_RUNTIME",
+    "C6_STATE": "PASS_DOCS_ONLY_RECORD_AFTER_FIVE_GATES"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Limit native GPU RGB source-coincident Present staging to each original D3D9 game-authenticated island while preserving identical visible source bytes and fail-closed original game fallback.",
+    "scope": "OPT_IN_PARTIAL_NATIVE_GPU_RGB_SOURCE_CI_ONLY",
+    "acceptance_items": [
+      {
+        "id": "bounded_authenticated_island_stage",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native D3D11 PRE/POST RGB to D3D9 source-coincident UpdateSurface",
+        "expected_behavior": "Each bounded original-game Present island is converted without repeatedly staging unchanged capture pixels."
+      },
+      {
+        "id": "reject_invalid_and_preserve_unselected",
+        "category": "fallback_regression",
+        "behavior_area": "Original-game source bytes, alpha, border and memory safety",
+        "expected_behavior": "Malformed source extents/pitches fail closed; independent real RGB, magenta incomplete frame, alpha semantics and untouched pixels remain intact."
+      },
+      {
+        "id": "exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11 Backend Windows OpenXR HUD and Fast",
+        "expected_behavior": "Five required push GitHub Actions complete/success on one exact validation-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "bounded_authenticated_island_stage": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_color_transport.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41057504113 and Backend Conversion Gate 41057504134; original exact-SHA 8b741d4c85456ff3bd09244af39190a446e256ef"
+    },
+    "reject_invalid_and_preserve_unselected": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp",
+        "tools/test_package_dx11_first_game_frame.py"
+      ],
+      "validation_command": "Backend Conversion Gate 41057504134 and OpenXR VR architecture 41057504298; original exact-SHA 8b741d4c85456ff3bd09244af39190a446e256ef"
+    },
+    "exact_sha_required_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "41057504113,41057504134,41057504286,41057504298,41057504140"
+    }
+  },
+  "score_change": 1,
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_ready": "PASS_SOURCE_CI_NEED_DESKTOP_GAME_AND_HMD_TEST",
+  "next_unfinished": "Source-matched desktop game native Draw and published native frame counts; continuous actual menu, vehicle and race native output; separate native GPU L/R OpenXR and Quest3/VDXR runtime verification."
+}

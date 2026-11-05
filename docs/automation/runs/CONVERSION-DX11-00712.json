@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00712",
+  "production_id": "CONVERSION-DX11-00712",
+  "event_id": "CONVERSION-DX11-00712-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_STAGE1_MATCHED_TEXTURE_RGB_ALPHA_GAME_DRAW",
+  "work_key": "DX11:STAGE1_MATCHED_TEXTURE_OPERAND",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "real D3D9 COLOROP/ALPHAOP/ARG0 D3DTA_TEXTURE from game-authored menu and race draws",
+      "verified resource/UV/sampler match -> native stage1 RGB/alpha HLSL -> Draw/DrawIndexed",
+      "mismatched state and invalid operand => original D3D9/normal gamepad draw path"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_texture_operand_probe_00712.cpp",
+      "tools/test_dx11_stage1_texture_operand_00712.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "matched textured RGB/alpha SELECT/2-input/3-input with modifier and TEMP variants",
+      "negative_regression": "resource/UV/sampler mismatch, unsupported bits and missing TEMP producer preserve DX9Ex",
+      "component_integration": "D3D9 live capture + HLSL sampled texture operand + native Draw/DrawIndexed and safe fallback"
+    },
+    "conflict_keys": [
+      "DX11:STAGE1_MATCHED_TEXTURE_OPERAND",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR HMD/real game not run; needs HMD tests",
+    "activation_guard_and_fallback": "diagnostic opt-in; stage1 must sample same stage0 texture/UV/sampler, otherwise DX9Ex"
+  },
+  "feature_contract": {
+    "feature_id": "LIVE_STAGE1_MATCHED_TEXTURE_RGB_ALPHA_GAME_DRAW",
+    "goal": "Enable matching game-authored Stage1 TEXTURE operands for menu/vehicle/race RGB and independently computed alpha on native Draw/Indexed without changing original D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-rgb-alpha",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_capture_shaders",
+        "expected_behavior": "one-,two-,three-operand texture RGB/alpha reaches PS and native Draw/Indexed"
+      },
+      {
+        "id": "fallback-unchanged",
+        "category": "fallback_regression",
+        "behavior_area": "original_D3D9_gamepad",
+        "expected_behavior": "nonmatching textures/sampler/UV and unsupported operators reject native"
+      },
+      {
+        "id": "exact-sha-build",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_windows_openxr_ci",
+        "expected_behavior": "targeted static/matrix probes and five exact SHA GitHub gates"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_texture_operand_probe_00712.cpp",
+    "tools/test_dx11_stage1_texture_operand_00712.py",
+    "docs/automation/runs/CONVERSION-DX11-00712.json"
+  ],
+  "base_head_sha": "a9a65339a1c0b53cd4fe263b6c38d884e3b1f9b5",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "next_action": "Same TASK repair: exact live game path token and preserve strict pre-00712 mutation-count proofs; wait five required GitHub gates before C6. Quest3/VDXR runtime UNTESTED.",
+  "state_persisted": true
+}

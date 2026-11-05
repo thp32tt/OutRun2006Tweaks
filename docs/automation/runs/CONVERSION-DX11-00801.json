@@ -1,0 +1,146 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00801",
+  "production_id": "CONVERSION-DX11-00801",
+  "event_id": "CONVERSION-DX11-00801-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:R23_NATIVE_EYE_IDENTITY_AND_RGB10_GAME_OUTPUT",
+  "feature_id": "DX11-R23-DIRECT-STEREO-COLOR10-INTEGRATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "402680659bb5bfe53bc43cdf55a0c119f3e73bb5",
+  "material_result_sha": "ab29c214ed1713c88ace17235539b02d0ba04e80",
+  "validation_bearing_result_sha": "997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4",
+  "changed_files": [
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-R23-DIRECT-STEREO-COLOR10-INTEGRATION",
+    "goal": "Carry actual 10-bit native DX11 menu/vehicle/race game stereo through the production R23 DirectGPU eye copy, nonblocking pixel inspection and OpenXR projection while rejecting same-allocation or mixed-format eye frames without replacing original D3D9 controls.",
+    "acceptance_items": [
+      {
+        "id": "direct-r23-stereo-bootstrap",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R23_gameplay_bootstrap_to_native_openxr",
+        "expected_behavior": "The production x64 R23 host admits independent nonzero stereo handles and rejects an identical source pair before considering native-game OpenXR bootstrap."
+      },
+      {
+        "id": "canonical-game-eye-pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R23_DirectGPU_gpu_hold_copy",
+        "expected_behavior": "Actual held left/right GPU copies require distinct canonical IUnknown allocations, even if two texture interface pointers differ."
+      },
+      {
+        "id": "10bit-gpu-pixel-evidence",
+        "category": "fallback_regression",
+        "behavior_area": "DirectGPU_RGB10_nonblocking_pixel_inspection",
+        "expected_behavior": "Native R10G10B10A2 packed GPU sources decode RGB channel bits correctly while null buffers and mixed-format eye pairs remain denied; original D3D9 Draw/input/FFB and SBS fallback remain untouched."
+      },
+      {
+        "id": "five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "The existing compiled WARP native direct-eye smoke and all required exact-SHA GitHub Gates succeed without enabling native gameplay by default."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "direct-r23-stereo-bootstrap": "PASS_EXACT_SHA",
+    "canonical-game-eye-pair": "PASS_EXACT_SHA",
+    "10bit-gpu-pixel-evidence": "PASS_EXACT_SHA",
+    "five-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Live game-created D3D9->native D3D11 full-size left and right GPU resources admitted through exact shared-handle bootstrap",
+      "Production R23 host imports and canonical-identity checks separate left/right GPU resources before CopyResource into OpenXR-owned hold",
+      "Nonblocking RGB10 source pixel inspection decodes real source format; direct R23 projection uses existing 2-eye transport or original SBS fallback"
+    ],
+    "batch_components": [
+      "Production x64 R23 DirectGPU bootstrap, identity and hold texture CopyResource C++ code",
+      "Shared GPU-eye 10-bit pixel decode and supported source format C++ implementation",
+      "Compiled Windows WARP native DirectGPU eye smoke positive and negative cases"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled WARP smoke: separate GPU textures and correctly decoded red/green/blue packed RGB10 source pixels; 10-bit pair admitted.",
+      "negative_regression": "Alias/missing GPU eyes, equal handles, mixed 10/8-bit formats, missing pixel buffers rejected; native projection never enabled by this commit.",
+      "component_integration": "Native D3D11 game eye -> R23 DirectGPU source import and canonical pair validation -> host hold CopyResource -> RGB10 source pixel inspection -> OpenXR stereo route; DX9Ex input/FFB remains authoritative."
+    },
+    "conflict_keys": [
+      "DX11:R23_NATIVE_EYE_IDENTITY_AND_RGB10_GAME_OUTPUT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT",
+      "OPENXR_PROJECTION",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/Windows CI only; matching Quest3/VDXR game/menu/race images untested.",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains default-off; original D3D9 Draw/Present/gamepad/FFB/SkyGlow/DX9Ex fallback preserved; DXVK untouched."
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 402680659bb5bfe53bc43cdf55a0c119f3e73bb5; 00800 C6 finished, 00799 remains separate in-flight bridge scope.",
+    "C1_REVIEW": "Production vrhost CMake builds main_r23.cpp; R23 bootstrap did not reject equal eye handles; R23 hold compared texture interface pointers, not canonical IUnknown; RGB10 source was supported for OpenXR but not decoded by R23 pixel inspector.",
+    "C2_IMPLEMENT": "C++ host bootstrap, R23 DirectGPU hold and packed 10-bit game pixel implementation with compiled WARP smoke; no native activation changes.",
+    "C3_VALIDATE": "PASS_EXACT_SHA after documented R23 gameplay path acceptance repair on validation-bearing 997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4; DX11 Fast/Backend/Windows Build/OpenXR/HUD all five SUCCESS.",
+    "C4_COMMIT": "Material C++/host/test result ab29c214ed1713c88ace17235539b02d0ba04e80; cause-limited CI acceptance repair 997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4, no CI skip on either validation-bearing commit.",
+    "C5_PACKAGE": "NOT_REQUIRED: direct gameplay backend not promoted without HMD.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED at exact source/acceptance SHA 997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4; this separate [skip ci] bookkeeping commit cannot replace the validation-bearing SHA. RUNTIME_VALIDATION=UNTESTED, NEED_HMD_TEST."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00801",
+    "score_change": 1,
+    "score_status": "AWARDED_ONCE_VERIFIED_EXACT_SHA",
+    "scoreboard_previous": 1407,
+    "scoreboard_total": 1408,
+    "scoreboard_commit": "ef6c072d9c78a5792ab2cfa974add1c6ab8b19e9",
+    "note": "Score +1 once for original independent C++ host/eye/packed RGB10 feature and final five exact SHA gates. E003 policy repair and C6 bookkeeping are +0; no retry/rollover duplicate."
+  },
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "exact_sha_gate_results": {
+      "DX11 Fast": {
+        "run_id": 38835931859,
+        "conclusion": "success",
+        "head_sha": "997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4"
+      },
+      "Backend Conversion": {
+        "run_id": 38835931845,
+        "conclusion": "success",
+        "head_sha": "997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4"
+      },
+      "Windows Build": {
+        "run_id": 38835936086,
+        "conclusion": "success",
+        "head_sha": "997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4"
+      },
+      "OpenXR": {
+        "run_id": 38835936039,
+        "conclusion": "success",
+        "head_sha": "997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4"
+      },
+      "HUD Inspector": {
+        "run_id": 38835936068,
+        "conclusion": "success",
+        "head_sha": "997aa0ec23de05afa9f6e04cce3bb6efc52c1ab4"
+      }
+    }
+  }
+}

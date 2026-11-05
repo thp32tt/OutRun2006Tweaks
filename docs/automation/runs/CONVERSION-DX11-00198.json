@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00198",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "577428818fecb85b5c22d9f862ac7d56086bb671",
+  "staged_source_commits": [
+    "376aa39ed0a2fa16d59355fb924d4c58e9c2432e",
+    "2cade8d137c707407172210b64c8c296345310fe"
+  ],
+  "result_sha": "ad80a0c743a2d248a63a979479751d3da7f350b3",
+  "validation_bearing_result_sha": "ad80a0c743a2d248a63a979479751d3da7f350b3",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R198_182331_CONTROL_FLOW_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00196 captured 96 exact bytes beginning at 0x182331 and explicitly left exact decode as the next runnable F13 unit. The entire 96-byte window forms a contiguous 30-instruction prefix ending exactly at uncaptured target 0x182391, so this is the smallest evidence-complete follow-up. DXVK-00197 independently proved the same public-EXE control-flow shape; DX11 validation remains independent.",
+  "summary": "ATTEMPT=1 complete. Validation-bearing result ad80a0c743a2d248a63a979479751d3da7f350b3 exact-decodes all 30 instructions in the canonical-EXE 0x182331..0x182390 capture. Predecessor branch 0x18232A->0x182331 lands on an exact instruction boundary; all nine branch/jump targets decode arithmetically; internal targets 0x182365/0x182386/0x182348 align to decoded instruction starts; call 0x18238A->0x1888EC decodes exactly and matches R196 raw provenance. Backend Conversion Gate, Build, HUD Inspector and OpenXR all passed. Bytes at 0x182391 and later forward targets remain uncaptured; function-entry/callee/render semantics remain unresolved. No runtime source changed and no Quest 3/VDXR or in-game test was performed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00198.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Validation-bearing result ad80a0c743a2d248a63a979479751d3da7f350b3 contains exact marker [AUTO:CONVERSION-DX11-00198] and has no CI-skip directive.",
+    "Base 577428818fecb85b5c22d9f862ac7d56086bb671 is the completed CONVERSION-DX11-00196 bookkeeping descendant; validation-bearing ancestor f62c2ac243ab80b32ff785257f0fcba0834d82de captured exact bytes 0x182331..0x182390.",
+    "Backend Conversion Gate 36805223684 validate job 110187966949 PASS on exact result SHA. Queue automation/HMD baseline/one-click/backend disassembly/session-regression/DX11 transport/source-graph/census contracts, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes and binary verification all succeeded.",
+    "Backend Gate artifact 11137029018 digest sha256:34846b2ea420c27965664fba3ba7894b07d126d17279ed8b5e323795caae406f.",
+    "HUD Inspector 36805228519 PASS. static job 110188083960 emitted EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN with predecessor/provenance exact, layout_contiguous=True, bytes_match=True, instruction_count=30, end=0x182391, incoming 0x18232A->0x182331 boundary=True, branch_targets_match=True, internal_boundaries=True, and call 0x18238A->0x1888EC raw=True.",
+    "Exact branch/jump targets are 0x182336->0x182365, 0x18234F->0x18895E, 0x182360->0x18896B, 0x182365->0x18239F, 0x182376->0x18239F, 0x182380->0x182386, 0x182384->0x182348, 0x182388->0x182348 and 0x18238F->0x1823AC. Only targets inside the captured window are promoted to exact instruction boundaries.",
+    "HUD proof preserves incoming_status=EXACT_182331_INCOMING_BRANCH_TARGET_BOUNDARY_PROVEN, end_target_status=REACHED_182391_TARGET_BYTES_NOT_CAPTURED, function_entry=UNRESOLVED_AT_182331_182391_AND_FORWARD_TARGETS, semantic_effect=BOUNDED_CONTROL_FLOW_AND_CALL_TARGET_ONLY, call_semantics=UNRESOLVED and ownership_effect=NONE.",
+    "Canonical replacement EXE SHA-256 remained 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "HUD analysis artifact 11136888807 digest sha256:24db5356598962bfc69804725b2badd730f6f5f19642b5458c3ba34fd059e16d; HUD inspector game artifact 11136749950 digest sha256:bf4751f7aa26a8082d861bbabcad699396129755e6a7f695c54bcdd2b8db23eb.",
+    "Build 36805228590 PASS on exact result SHA; binary artifact 11137313182 digest sha256:1b18cf3ec06d5dd8572ad859af8ca3fcc513c82e8156e4d831a5ac131a7b8d14; wheel-source artifact 11137218347 digest sha256:c4f92f4152e8a2c965c3c8b395e5ee9aaae9cd136e7c6846d57e063a0264d0dc.",
+    "OpenXR VR architecture 36805228530 PASS on exact result SHA with all 6/6 jobs successful. Host artifact 11137123169 digest sha256:6a382987217b4931788230ebf46ba964fe8d46cb428550a649291b39d2239349.",
+    "VR PC Fast Test Build 36805223675 was skipped by branch policy and is not runtime validation.",
+    "Regression/history review found no runtime source change: protected R51 world stereo/HUD paths and Issue #13 runtime problem state are unchanged.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00197",
+    "source_result_sha": "de598aafacfe3a92fafb640b8c6eb9191fbdbedb",
+    "source_validation_state_at_selection": "PASS",
+    "source_proof_target": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+    "reason": "Reuse only the bounded exact-byte control-flow proof design on the shared canonical EXE. DX11 depends on its own R196 predecessor and independent exact-result GitHub Actions."
+  },
+  "proof_contract": {
+    "predecessor_proof_status": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "predecessor_provenance_status": "EXACT_EXE_182331_TO_182391_PROVENANCE_CAPTURED",
+    "start_rva": "0x00182331",
+    "end_rva": "0x00182391",
+    "instruction_count": 30,
+    "incoming_branch": "0x0018232A->0x00182331",
+    "incoming_target_is_instruction_boundary": true,
+    "branches": [
+      "0x00182336->0x00182365",
+      "0x0018234F->0x0018895E",
+      "0x00182360->0x0018896B",
+      "0x00182365->0x0018239F",
+      "0x00182376->0x0018239F",
+      "0x00182380->0x00182386",
+      "0x00182384->0x00182348",
+      "0x00182388->0x00182348",
+      "0x0018238F->0x001823AC"
+    ],
+    "branch_targets_match": true,
+    "internal_branch_targets_on_boundaries": true,
+    "call": "0x0018238A->0x001888EC",
+    "call_target_matches": true,
+    "raw_call_candidate_present": true,
+    "status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+    "incoming_target_status": "EXACT_182331_INCOMING_BRANCH_TARGET_BOUNDARY_PROVEN",
+    "end_target_status": "REACHED_182391_TARGET_BYTES_NOT_CAPTURED",
+    "function_entry_status": "UNRESOLVED_AT_182331_182391_AND_FORWARD_TARGETS",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_CALL_TARGET_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector or package behavior changes.",
+    "ownership": "Exact bounded control-flow proof does not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless R194/R196 predecessors remain exact, all 30 instruction chunks are contiguous/exact through exclusive end 0x182391, internal branch targets land on decoded instruction starts, and the only E8 call matches raw provenance. It refuses to assign boundary/function identity at uncaptured 0x182391 or later forward targets."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182331_TO_182391_PROVENANCE_CAPTURED",
+    "after": "PARTIAL_PLUS_182331_CONTROL_FLOW_PREFIX_PROVEN",
+    "runtime_claim": false
+  },
+  "blocker": "The exact 0x182331..0x182390 control-flow prefix and incoming branch-target boundary at 0x182331 are now durable. Bytes beginning at 0x182391, and forward targets 0x18239F/0x1823AC plus external targets 0x18895E/0x18896B, remain outside this captured decode. Their instruction-boundary/function identities, call semantics and all ScreenHud/world/render ownership remain unresolved.",
+  "next_action": "Capture fresh exact-EXE bytes beginning at 0x182391, preferably long enough to cover local forward targets 0x18239F and 0x1823AC, before assigning their instruction-boundary or function identity. Runtime remains UNTESTED.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T11:26:44+09:00",
+  "runtime_claim": "NONE",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36805223684,
+      "job_id": 110187966949,
+      "conclusion": "success",
+      "validated_sha": "ad80a0c743a2d248a63a979479751d3da7f350b3",
+      "artifact_id": 11137029018,
+      "artifact_digest": "sha256:34846b2ea420c27965664fba3ba7894b07d126d17279ed8b5e323795caae406f"
+    },
+    "build": {
+      "run_id": 36805228590,
+      "conclusion": "success",
+      "validated_sha": "ad80a0c743a2d248a63a979479751d3da7f350b3",
+      "artifact_id": 11137313182,
+      "artifact_digest": "sha256:1b18cf3ec06d5dd8572ad859af8ca3fcc513c82e8156e4d831a5ac131a7b8d14",
+      "source_snapshot_artifact_id": 11137218347,
+      "source_snapshot_artifact_digest": "sha256:c4f92f4152e8a2c965c3c8b395e5ee9aaae9cd136e7c6846d57e063a0264d0dc"
+    },
+    "hud_inspector": {
+      "run_id": 36805228519,
+      "conclusion": "success",
+      "validated_sha": "ad80a0c743a2d248a63a979479751d3da7f350b3",
+      "static_analysis_job_id": 110188083960,
+      "analysis_artifact_id": 11136888807,
+      "analysis_artifact_digest": "sha256:24db5356598962bfc69804725b2badd730f6f5f19642b5458c3ba34fd059e16d",
+      "game_artifact_id": 11136749950,
+      "game_artifact_digest": "sha256:bf4751f7aa26a8082d861bbabcad699396129755e6a7f695c54bcdd2b8db23eb",
+      "proof_status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+      "proof_predecessor_status": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+      "proof_predecessor_exact": true,
+      "proof_provenance_status": "EXACT_EXE_182331_TO_182391_PROVENANCE_CAPTURED",
+      "proof_provenance_exact": true,
+      "proof_layout_contiguous": true,
+      "proof_all_instruction_bytes_match": true,
+      "proof_instruction_count": 30,
+      "proof_end_rva": "0x00182391",
+      "proof_incoming_branch": "0x0018232A->0x00182331",
+      "proof_incoming_target_is_instruction_boundary": true,
+      "proof_branch_targets_match": true,
+      "proof_internal_branch_targets_on_boundaries": true,
+      "proof_call": "0x0018238A->0x001888EC",
+      "proof_call_target_matches": true,
+      "proof_raw_call_candidate_present": true,
+      "proof_incoming_target_status": "EXACT_182331_INCOMING_BRANCH_TARGET_BOUNDARY_PROVEN",
+      "proof_end_target_status": "REACHED_182391_TARGET_BYTES_NOT_CAPTURED",
+      "proof_function_entry_status": "UNRESOLVED_AT_182331_182391_AND_FORWARD_TARGETS",
+      "proof_semantic_effect": "BOUNDED_CONTROL_FLOW_AND_CALL_TARGET_ONLY",
+      "proof_call_semantics": "UNRESOLVED",
+      "proof_ownership_effect": "NONE"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36805228530,
+      "conclusion": "success",
+      "validated_sha": "ad80a0c743a2d248a63a979479751d3da7f350b3",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11137123169,
+      "host_artifact_digest": "sha256:6a382987217b4931788230ebf46ba964fe8d46cb428550a649291b39d2239349"
+    },
+    "pc_fast": {
+      "run_id": 36805223675,
+      "conclusion": "skipped",
+      "validated_sha": "ad80a0c743a2d248a63a979479751d3da7f350b3",
+      "policy": "Branch policy skipped PC fast runner; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "376aa39ed0a2fa16d59355fb924d4c58e9c2432e",
+      "message": "dx11: stage 0x182331 control-flow prefix",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "validation_result": "superseded_by_result_gate"
+    },
+    {
+      "sha": "2cade8d137c707407172210b64c8c296345310fe",
+      "message": "dx11: stage 0x182331 control-flow verifier",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "validation_result": "superseded_by_result_gate"
+    },
+    {
+      "sha": "ad80a0c743a2d248a63a979479751d3da7f350b3",
+      "message": "dx11: prove 0x182331 control-flow prefix [AUTO:CONVERSION-DX11-00198]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5923411390,
+    "validation_comment_id": 5923504696,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  }
+}

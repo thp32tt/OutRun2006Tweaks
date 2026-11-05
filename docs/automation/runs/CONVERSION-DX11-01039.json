@@ -1,0 +1,197 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01039",
+  "production_id": "CONVERSION-DX11-01039",
+  "event_id": "CONVERSION-DX11-01039-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01039",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_TYPED_MRT_CAMERA_GPU_POSTPASS",
+  "work_key": "DX11:LIVE_TYPED_MRT_CAMERA_GPU_POSTPASS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Game-authored D3D11 offscreen RTV typed view format survives real Draw/Clear provenance to GPU copy/stretch shader sampling and MSAA resolve, with untracked mixed-view or foreign camera fail closed.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_TYPED_MRT_CAMERA_GPU_POSTPASS",
+    "goal": "Carry actually rendered camera MRT color interpretation into GPU postpass for native left/right eye",
+    "acceptance_items": [
+      {
+        "id": "typed_camera",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_MRT_TO_GPU_STRETCH",
+        "expected_behavior": "Real game typed RTV backing typeless camera texture uses matching DX11 shader sample view"
+      },
+      {
+        "id": "array_mip",
+        "category": "source_correctness",
+        "behavior_area": "EXACT_CAMERA_SUBRESOURCE",
+        "expected_behavior": "Color view provenance keyed by exact resource, slice and mip through Draw and Clear and GPU resolve"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9EX_ORIGINAL_GAME_FALLBACK",
+        "expected_behavior": "Mismatched typed camera views and unobserved typeless source reject native postpass; original input/FFB unaffected"
+      },
+      {
+        "id": "gate",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_GITHUB_CI",
+        "expected_behavior": "Same validation SHA mandatory DX11 Fast, Backend, Build, OpenXR and HUD gates all succeed"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "genuine D3D9 menu/vehicle/race auxiliary RTV Draw and Clear",
+      "DX11 color provenance with typed camera interpretation",
+      "D3D11 SRV or typed GPU scratch and point/linear shader Stretch",
+      "native left/right OpenXR GPU output"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+      "tools/test_dx11_typed_camera_postpass_01039.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "static shader typed RTV contract and actual live source Draw/Clear/Stretch route tested by DX11 fast+Windows build",
+      "negative_regression": "wrong typeless/typed view combos and mixed camera interpretations return UNKNOWN/quarantine",
+      "component_integration": "Live game MRT source provenance selects real SRV interpretation in GPU Copy/Stretch and MSAA resolve into per-eye OpenXR output"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_TYPED_MRT_CAMERA_GPU_POSTPASS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_ONLY_UNTESTED",
+    "activation_guard_and_fallback": "DX9Ex original input/FFB fail closed; no DXVK source writes",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_EYE_GPU_POSTPASS",
+      "OPENXR_GPU_HANDOFF",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_goal_validation": "VISIBLE_FRAME_OUTPUT is the required planned final stage, NOT proof of a rendered real-game pixel. Runtime/HMD remain UNTESTED."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+    "tools/test_dx11_typed_camera_postpass_01039.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01039.json",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_dx11_game_camera_compact_postpass_00984.py",
+    "tools/test_dx11_game_offscreen_clear_postpass_00983.py",
+    "tools/test_dx11_game_offscreen_color_overflow_01037.py"
+  ],
+  "material_result_sha": "9f61761e224c0623c380321af472755fcc89ee6b",
+  "validation_bearing_result_sha": "9f61761e224c0623c380321af472755fcc89ee6b",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Preserve 01039 as built source-stage C6; continue next independent genuine D3D9 game Draw to D3D11 native visible menu/race frame integration. Runtime UNTESTED.",
+  "full_dx11_renderer_complete": false,
+  "material_commit_history": [
+    "05a03c4e6d876a15f25b6f864ce539dc9fb24093",
+    "725380d7bddc0dad660a0e9183b22bee6054f03e",
+    "cb24ce582b1058c53e04a46882e439fe75551031",
+    "9f61761e224c0623c380321af472755fcc89ee6b"
+  ],
+  "validation_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 40043624442,
+      "head_sha": "9f61761e224c0623c380321af472755fcc89ee6b",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40043624442"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 40043624551,
+      "head_sha": "9f61761e224c0623c380321af472755fcc89ee6b",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40043624551"
+    },
+    "Build": {
+      "run_id": 40043624547,
+      "head_sha": "9f61761e224c0623c380321af472755fcc89ee6b",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40043624547"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 40043624483,
+      "head_sha": "9f61761e224c0623c380321af472755fcc89ee6b",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40043624483"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 40043624462,
+      "head_sha": "9f61761e224c0623c380321af472755fcc89ee6b",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40043624462"
+    }
+  },
+  "feature_ready": false,
+  "c6_summary": "5/5 required GitHub Actions SUCCESS at the identical material SHA for real game offscreen typed camera RTV to GPU SRV/Resolve source integration. No Quest 3, gameplay visible-frame, or HMD runtime verification.",
+  "acceptance_results": {
+    "typed_camera": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_typed_camera_postpass_01039.py"
+      ],
+      "validation_command": "python tools/test_dx11_typed_camera_postpass_01039.py; GitHub Fast #40043624442 SUCCESS"
+    },
+    "array_mip": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_stereo_submission.hpp",
+        "tools/test_dx11_game_offscreen_clear_postpass_00983.py"
+      ],
+      "validation_command": "GitHub Fast #40043624442 SUCCESS; Windows Build #40043624547 SUCCESS; camera per-mip/slice source association source-only"
+    },
+    "fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/verify_dx11_activation_boundary.py",
+        "tools/test_dx11_game_offscreen_color_overflow_01037.py"
+      ],
+      "validation_command": "python tools/verify_dx11_activation_boundary.py; GitHub Build #40043624547 SUCCESS; runtime fallback UNTESTED"
+    },
+    "gate": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_typed_camera_postpass_01039.py"
+      ],
+      "validation_command": "GitHub Fast #40043624442, Backend #40043624551, Build #40043624547, OpenXR #40043624483, HUD #40043624462: all SUCCESS @ 9f61761e224c0623c380321af472755fcc89ee6b"
+    }
+  }
+}

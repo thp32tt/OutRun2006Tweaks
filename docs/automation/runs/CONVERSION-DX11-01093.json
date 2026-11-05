@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01093",
+  "production_id": "CONVERSION-DX11-01093",
+  "event_id": "CONVERSION-DX11-01093-E003",
+  "event_type": "rollover",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01093",
+  "classification": "A_LIVE_GAME_FVF_POINT_WIRE_NATIVE_DRAW_WITH_CAUSAL_CI_TEST_REPAIRS",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:FVF_POLYGON_POINT_WIRE_NATIVE_GPU_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_base_sha": "27174cd5c7eab5a0f906a3ff0f89edb527734832",
+  "source_change_sha": "ba16223fb1ec6c269c9b290120d5b75ee879f8bf",
+  "material_result_sha": "ba16223fb1ec6c269c9b290120d5b75ee879f8bf",
+  "validation_bearing_result_sha": "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9",
+  "result_sha": "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9",
+  "implementation_commits": [
+    "ba16223fb1ec6c269c9b290120d5b75ee879f8bf"
+  ],
+  "repair_commits": [
+    "24c49f64c90cfaa6170aa754c3b33802cfccf0ca",
+    "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9"
+  ],
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/vr/dx11_live_fvf_polygon_modes.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01092.json",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_main_stencil_clear_game_frame_00781.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Render original game-authored D3D9 fixed-function FVF POINT/WIREFRAME/SOLID triangle draw calls through native full-resolution D3D11 with source-corner ordering, strict raster admission, guarded same-frame output and unchanged D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_fvf_triangle_raster",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_RENDER_DRAW",
+        "expected_behavior": "Connect live D3D9 game FVF TRIANGLELIST/STRIP/FAN POINT, WIREFRAME and SOLID fill to native D3D11 Draw/DrawIndexed with source polygon corners preserved."
+      },
+      {
+        "id": "source_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GAME_VERTEX_INPUT_FFB_FALLBACK",
+        "expected_behavior": "Fail closed on unknown topology, unsafe cull/point/line states, source index errors, budget overflow and non-full-frame non-solid raster; keep original D3D9/DX9Ex gameplay, input and FFB."
+      },
+      {
+        "id": "full_same_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "NATIVE_BUILD_EXACT_SHA",
+        "expected_behavior": "All five mandatory push GitHub Actions completed/success on exact native source plus causal test repair SHA while Quest3/HMD runtime remains UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_FVF_DRAW_CALLSITE",
+      "TRIANGLE_CORNER_EXPANSION_AND_RASTER_STATE_PREFLIGHT",
+      "NATIVE_D3D11_POINT_OR_TRIANGLE_IA_GPU_DRAW",
+      "VISIBLE_FRAME_RUNTIME_UNTESTED"
+    ],
+    "batch_components": [
+      "LIVE_FVF_TO_D3D11_GAME_GPU_DRAW",
+      "SOURCE_CORNER_AND_INDEX_PREFLIGHT",
+      "POSITIVE_NEGATIVE_CXX_AND_CI_GATE_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual live D3D9 FVF triangle point/wire/solid native GPU Draw integration in live_game_frame_bridge.cpp and checked-in C++ triangle corner regression passing exact-SHA structural gate.",
+      "negative_regression": "Invalid source indices, unsafe point sizes, non-solid diagnostic raster, cull/line AA/LASTPIXEL, nonadmitted modes and over-budget indices retain original D3D9/DX9Ex renderer.",
+      "component_integration": "Original D3D9 FVF game Draw -> authentic triangle points or wire raster admission -> D3D11 full-frame native IA Draw/DrawIndexed -> guarded output with original D3D9 fallback."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:FVF_POLYGON_POINT_WIRE_NATIVE_GPU_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "GitHub exact-SHA source/CI verified; no observed Quest3/VDXR game/native pixels, gameplay or FPS; runtime UNTESTED.",
+    "activation_guard_and_fallback": "Native mode opt-in; fail closed on unmirrored game state. Original D3D9/DX9Ex Present, gamepad, FFB, SkyGlow and frozen DXVK preserved."
+  },
+  "acceptance_results": {
+    "live_fvf_triangle_raster": {
+      "status": "PASS_FEATURE_CI",
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_fvf_polygon_modes.cpp -o /tmp/dx11_fvf_01093 && /tmp/dx11_fvf_01093",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_polygon_modes.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "note": "Source integrated and focused C++ test performed in exact-SHA Fast Structural Checks; hardware UNTESTED."
+    },
+    "source_safe_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "validation_command": "python tools/test_dx11_first_game_frame_regressions.py; python tools/test_dx11_main_stencil_clear_game_frame_00781.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_fvf_polygon_modes.cpp -o /tmp/dx11_fvf_01093 && /tmp/dx11_fvf_01093",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_polygon_modes.cpp",
+        "tools/test_dx11_first_game_frame_regressions.py",
+        "tools/test_dx11_main_stencil_clear_game_frame_00781.py"
+      ],
+      "note": "Same-SHA Fast/Build succeeded after causal exact-source negative regression repair. Unsupported original game states retain D3D9/DX9Ex."
+    },
+    "full_same_sha_ci": {
+      "status": "PASS_EXACT_SHA",
+      "validation_command": "GitHub Actions push exact SHA c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9: Fast 40371990609; Backend 40371990919; Build 40371990726; OpenXR 40371990618; HUD 40371990767",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990609",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990919",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990726",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990618",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990767"
+      ],
+      "note": "All five required workflows success on identical source and repair commit; documentation [skip ci] does not change validation SHA."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40371990609,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990609"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40371990919,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990919"
+    },
+    {
+      "name": "Build",
+      "run_id": 40371990726,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990726"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40371990618,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990618"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40371990767,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40371990767"
+    }
+  ],
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "blocked_reason_resolved": "RUN_RECORD_NOT_FOUND",
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "c6_source_validation_sha": "c9a8abc26633fcba63c2fe644c4c8c2f86c2afa9",
+  "c6_record_recovery_note": "01093 JSON absent on latest exact-SHA branch HEAD; this C6 record reconstructs original material, feature contract, acceptance results and five push-success jobs from source history. No earlier JSON values existed to overwrite.",
+  "score_change": 0,
+  "task_new_source_achievement_score_for_c6": 0,
+  "ai2_previous_confirmed_cumulative_score": 1991,
+  "ai2_new_confirmed_cumulative_score": 1991,
+  "score_note": "AI2 GitHub SSOT confirmed 1991 + C6 bookkeeping +0 = 1991. No duplicate scoring; scoreboard unchanged.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. Actual OutRun menu/car/race native visible pixels, Quest3/VDXR stereo/FPS and HMD execution not tested.",
+  "next_implementation_action": "Future independent gameplay/HMD validation needs actual real-game pixels and counts. No source edits or CI rerun for this completed C6 bookkeeping."
+}

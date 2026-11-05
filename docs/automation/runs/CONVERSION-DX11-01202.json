@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01202",
+  "production_id": "CONVERSION-DX11-01202",
+  "event_id": "CONVERSION-DX11-01202-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:VISIBLE_ASSEMBLED_FVF_SOURCE_GPU_RASTER",
+  "classification": "A_REAL_FVF_TRIANGLE_GPU_RASTER_AND_B_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "298e48d8fb1b5997294be1286c2e9b522b0e4fac",
+  "implementation_source_sha": "4d6bea4078304886fc4964dd2656fbebb40604a1",
+  "material_result_sha": "4d6bea4078304886fc4964dd2656fbebb40604a1",
+  "validation_bearing_result_sha": "c750e91658f5d675aca9e80d683a9bffb75d8b8a",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "implementation": "Real game FVF native D3D11 Draw/DrawIndexed PRE/POST GPU source capture uses authentic triangle-list/strip/fan assembly, indexed source vertices and x/y/z D3D11 clip volume. Fully offscreen, near-depth-clipped and zero-area source triangles cannot steer a bounded 512x288 GPU RGB tile away from the source game menu, vehicle or HUD raster. Outward 2px source margin and numerical NDC edge clamp preserve boundary pixels consistently across compilers; unsafe indices/W or non-solid/depth-clip-disabled raster retains legacy full-viewport GPU sampling. Original D3D9 Draw/Present, SkyGlow, input, FFB, DX9Ex fallback and frozen DXVK retained. NOT complete full-frame game/HMD output.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_LIVE_D3D9_FVF_LIST_STRIP_FAN",
+      "D3D11_NATIVE_DRAW",
+      "ACTUAL_GPU_PRE_POST_DRAW_RGB",
+      "ORIGINAL_D3D9_SOURCE_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "LIVE_D3D9_SOURCE_FVF_IA",
+      "D3D11_NATIVE_DRAW_INDEXED_LIST_STRIP_FAN",
+      "TRIANGLE_NDC_XY_Z_SOURCE_FOOTPRINT",
+      "BOUND_PRE_POST_GPU_RGB",
+      "ORIGINAL_SOURCE_PRESENT"
+    ],
+    "batch_components": [
+      "TRIANGLE_ASSEMBLY_AND_CLIP_VOLUME",
+      "NATIVE_PRE_POST_RASTER_INTEGRATION",
+      "SAFETY_FALLBACK_AND_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source real FVF triangles assembled with native topology, clips against all six D3D11 planes, and source GPU raster remains bounded near 3440x1440 real-game right side; native C++ regression succeeds Fast 41323288943.",
+      "negative_regression": "Invalid indexed source, nonfinite W, offscreen/depth-clipped triangles, degenerate polygons, depth-clip-disabled raster fall back safely, preserving original Draw and Present; compiler precision NDC edge repaired on final SHA.",
+      "component_integration": "Live native Draw and DrawIndexed feed NativeRawFvfClipSpan actual topology to NativeRawVisualPreview::queue_before_draw, paired GPU PRE/POST source pixels with a two-pixel capture border; no fabricated GPU pixel/Present proof."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; the VISIBLE_FRAME_OUTPUT stage is the original D3D9 Present source diagnostic, not native complete menu->race/HMD acceptance",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in default OFF; retain source COM RT and GPU query identity, D3D9 Draw/Present, input/FFB/SkyGlow, DX9Ex fallback and frozen DXVK."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Improve real D3D9-source native FVF Draw and DrawIndexed GPU PRE/POST capture attribution by assembling source triangles and clipping authentic x/y/z clip volumes across menu/vehicle/race frames without changing the original D3D9 game renderer.",
+    "acceptance_items": [
+      {
+        "id": "source_visible_raster",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_TO_D3D11_GPU",
+        "expected_behavior": "Real native FVF triangles from list, strip and fan provide a valid clipped source footprint for authentic GPU PRE/POST RGB evidence."
+      },
+      {
+        "id": "safe_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_DRAW_PRESENT_INPUT_FALLBACK",
+        "expected_behavior": "Malformed source indexes, invalid W and unmirrored raster states retain full-viewport source capture and original D3D9 and DX9Ex fallback."
+      },
+      {
+        "id": "five_gate_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS_BUILD_OPENXR",
+        "expected_behavior": "Five mandatory push Actions succeed at final validation-bearing SHA; hardware Quest3/VDXR remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_visible_raster": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exact SHA c750e91658f5d675aca9e80d683a9bffb75d8b8a five push Actions SUCCESS; Focused native_raw_dual_tile_test C++17 Fast 41323288943"
+    },
+    "safe_source_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exact SHA c750e91658f5d675aca9e80d683a9bffb75d8b8a five push Actions SUCCESS; Source fail-closed and original D3D9 Draw/Present retained; Fast 41323288943"
+    },
+    "five_gate_exact_sha": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exact SHA c750e91658f5d675aca9e80d683a9bffb75d8b8a five push Actions SUCCESS; All 5 required gate runs 41323288943, 41323288956, 41323289011, 41323289133, 41323289029"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41323288943,
+    "Backend Conversion Gate": 41323288956,
+    "Build": 41323289011,
+    "OpenXR VR architecture": 41323289133,
+    "OutRun EXE HUD Inspector CI": 41323289029
+  },
+  "optional_workflows": [
+    {
+      "name": "VR PC Fast Test Build",
+      "run_id": 41323288959,
+      "conclusion": "skipped",
+      "mandatory": false
+    }
+  ],
+  "validation_note": "Five mandatory push GitHub Actions PASS at exact causal source+CI repair SHA c750e91658f5d675aca9e80d683a9bffb75d8b8a. Original material source SHA 4d6bea4078304886fc4964dd2656fbebb40604a1; intermediate f723b8e, b2702d, 1468bd are same-task metadata/regression diagnosis and score +0. Final source numerical NDC repair c750e916. Docs-only C6 [skip ci] is NOT validation-bearing. No desktop game or Quest3/VDXR testing performed.",
+  "actual_runtime_evidence": "NOT_RUN_NO_DESKTOP_GAME_NO_QUEST3_VDXR",
+  "native_gpu_pixels_observed": "UNTESTED",
+  "full_menu_vehicle_race": "INCOMPLETE",
+  "next_feature_action": "Complete menu->vehicle->race visible full native frame source coverage and L/R OpenXR runtime; retain fail-closed DX9Ex fallback. No HMD acceptance until actual Quest3/VDXR game runtime.",
+  "separate_documentation_commit": true,
+  "recorded_at": "2026-11-02 01:05 KST"
+}

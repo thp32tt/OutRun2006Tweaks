@@ -1,0 +1,118 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00545",
+  "production_id": "CONVERSION-DX11-00545",
+  "event_id": "CONVERSION-DX11-00545-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00545",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_REAL_D3D9_TRIANGLESTRIP",
+  "base_sha": "dfa7c54f8464ee8aa5297632f25154945d92e636",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Capture actual game-authored D3D9 DrawPrimitive/DrawIndexedPrimitive VB/IB/UP triangle strips (P+2 source elements)",
+      "Validate bounded source span, live buffer shadows and index ownership before DX11 upload",
+      "Choose D3D11 TRIANGLESTRIP in native Draw/DrawIndexed, copy diagnostic inset while preserving original D3D9 rendering and gamepad input"
+    ],
+    "batch_components": [
+      "R30 plus R26-safe intercepted VB/IB/UP triangle-strip producer integration",
+      "Shared bounded triangle-list/strip source element contract and standalone C++17 CPU positive/negative fixture",
+      "Native D3D11 topology and live bridge source/index count consumer with static regression mutations"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "GitHub exact material SHA 154b77eb: Backend Conversion Gate #38141597089 validate + DX11 readiness smoke SUCCESS; Win32 Build #38141601508 SUCCESS; OpenXR #38141601512/#38141597049 SUCCESS; DX11 Fast #38141597102 SUCCESS; HUD Inspector #38141601505 SUCCESS. HMD/game pixels UNTESTED.",
+      "negative_regression": "Source mutation regression and live D3D9 VB/IB/UP count guard: strip P+2 vs triangle list 3P; checked in exact SHA Win32 Build; no gamepad interception or native activation. No Quest3/VDXR runtime proof.",
+      "component_integration": "game-authored D3D9 list/strip VB/IB/UP -> byte-accurate source element count -> native D3D11 list/strip IA -> Draw/DrawIndexed -> opt-in diagnostic inset; DX9Ex game draw/input preserved"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_REAL_D3D9_TRIANGLESTRIP",
+      "src/vr/d3d9/stereo_renderer_r30.cpp:R30ObserveNative",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp:R30ObserveNative",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:TOPOLOGY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_TRIANGLESTRIP_VERTEX_INDEX_SOURCE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-level actual Draw/DrawIndexed strip integration and portable CPU count verified; game menu/car/race pixels, controls and Quest3/VDXR require hardware test",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic only; original DX9Ex Draw/Present/gamepad always runs; no native production activation"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00545.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD dfa7c54f8464ee8aa5297632f25154945d92e636 and 00544 C6; prior texture work not repeated",
+    "C1_REVIEW": "PASS missing triangle-strip VB/IB/UP path and native IA; R175 owner not touched",
+    "C2_IMPLEMENT": "PASS live game triangle strip source snapshot and native Draw/DrawIndexed topology",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Win32 Build #38141601508, Backend Gate #38141597089 2 jobs, OpenXR architecture #38141601512, DX11 Fast #38141597102 all SUCCESS on material 154b77ebd801cef0f53a10126e7cbd08b02f1eae; HMD/game pixels UNTESTED",
+    "C4_COMMIT": "PASS material 154b77ebd801cef0f53a10126e7cbd08b02f1eae [AUTO:CONVERSION-DX11-00545] no CI skip; separate C6 bookkeeping [skip ci] after exact Gate",
+    "C5_PACKAGE": "NOT_REQUIRED, diagnostic experiment only",
+    "C6_STATE": "PASS_EXACT_SHA, COMPLETE_BUILD_VERIFIED; real game menu/vehicle/race and Quest3/VDXR HMD and gamepad proof NEED_HMD_TEST. No production backend promotion."
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "PASS_SOURCE_EXACT_SHA_BUILD",
+    "DX11-NATIVE-DRAW": "PASS_SOURCE_EXACT_SHA_BUILD",
+    "DX11-VISIBLE-FRAME": "NEED_GAME_TEST",
+    "DX11-SAFE-RETURN": "PASS_SOURCE_EXACT_SHA_BUILD",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "runtime_evidence": "No HMD or actual game test; gamepad input remains D3D9-owned",
+  "next_action": "Controller assigns new non-conflicting DX11 menu-to-race native integration task, preserving this exact SHA. Quest3/VDXR real-game pixels/gamepad remain NEED_HMD_TEST; DXVK frozen.",
+  "controller_runtime_adoption": "NOT_VERIFIED",
+  "material_result_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+  "validation_bearing_result_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+  "result_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "state_persisted": true,
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "run_id": 38141597089,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "win32_build": {
+      "run_id": 38141601508,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success"
+    },
+    "openxr": {
+      "run_id": 38141601512,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success"
+    },
+    "dx11_fast": {
+      "run_id": 38141597102,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38141601505,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success"
+    }
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01079",
+  "production_id": "CONVERSION-DX11-01079",
+  "event_id": "CONVERSION-DX11-01079-E001",
+  "event_type": "c6_bookkeeping_after_exact_sha_gate",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01079",
+  "classification": "A",
+  "work_key": "DX11:SM3_BOUNDED_EXTENDED_INSTANCE_GPU_UPLOAD",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "material_result_sha": "0188c3b687d96a7d847b004c1058aa9429ac6ac9",
+  "validation_bearing_result_sha": "0188c3b687d96a7d847b004c1058aa9429ac6ac9",
+  "implementation_commits": [
+    "0188c3b687d96a7d847b004c1058aa9429ac6ac9"
+  ],
+  "repair_commits": [],
+  "score_change": 0,
+  "score_award_event": false,
+  "ai2_previous_confirmed_cumulative_score": 1967,
+  "ai2_new_confirmed_cumulative_score": 1967,
+  "score_note": "AI2 SSOT 1967 + 0 = 1967; one unfinished DX11 full-resolution game-frame feature source integration, not independently scored on passing CI or C6; no actual game or Quest3 runtime observation.",
+  "summary": "Real D3D9 programmable SM3 indexed-instanced menu/car/race Draw source path can now conditionally submit 129-256 original instances in bounded 32 MiB native GPU FLOAT4 vertex batches when additional total traffic <=64 MiB. Global D3D9 INSTANCEDATA divisors, original per-instance connected Draw/DrawIndexed boundaries, VS/PS, GPU-index reuse, failed-source rollback, and D3D9Ex gamepad/FFB/SkyGlow fallback are retained. 192-instance portable C++ and negative fallback regression added and five required push workflows succeeded at exact material SHA; no OutRun/Quest3/VDXR runtime executed.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_sm3_extended_instance_01079.cpp",
+    "tools/test_dx11_sm3_extended_instance_01079.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Continue unfinished native D3D11 shader-bound game Draw/DrawIndexed integration to accept additional real source-instanced geometry with original source and fallback semantics; actual full-frame game/HMD acceptance remains outstanding.",
+    "acceptance_items": [
+      {
+        "id": "extended_gpu_chunked_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_SM3_MULTISTREAM_D3D11_DRAW",
+        "expected_behavior": "When an authentic source instance product exceeds one transient GPU allocation, 129-256 instances whose total native packed bytes <=64 MiB submit through bounded multi-instance D3D11 uploads with original per-instance primitive/index boundaries."
+      },
+      {
+        "id": "safe_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_INSTANCEDATA_DIVISOR_AND_D3D9EX",
+        "expected_behavior": "Invalid or over-budget source instances, missing records and failed GPU uploads prevent native frame publication; historical <=128 path and original D3D9Ex game input/FFB remain intact."
+      },
+      {
+        "id": "five_gates_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "FAST_BACKEND_WIN32_OPENXR_HUD",
+        "expected_behavior": "Five mandatory GitHub Actions push checks succeed against exactly the same validation-bearing material SHA, with no CI skip on that commit."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "extended_gpu_chunked_draw": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "safe_source_fallback": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "five_gates_exact_sha": "PASS_EXACT_SHA"
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast",
+      "run_id": 40250503403,
+      "status": "success",
+      "sha": "0188c3b687d96a7d847b004c1058aa9429ac6ac9",
+      "event": "push"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40250503521,
+      "status": "success",
+      "sha": "0188c3b687d96a7d847b004c1058aa9429ac6ac9",
+      "event": "push"
+    },
+    {
+      "name": "Windows Build",
+      "run_id": 40250503523,
+      "status": "success",
+      "sha": "0188c3b687d96a7d847b004c1058aa9429ac6ac9",
+      "event": "push"
+    },
+    {
+      "name": "OpenXR",
+      "run_id": 40250503427,
+      "status": "success",
+      "sha": "0188c3b687d96a7d847b004c1058aa9429ac6ac9",
+      "event": "push"
+    },
+    {
+      "name": "HUD Inspector",
+      "run_id": 40250503417,
+      "status": "success",
+      "sha": "0188c3b687d96a7d847b004c1058aa9429ac6ac9",
+      "event": "push"
+    }
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "REAL_D3D9_SM3_INDEXEDDATA_INSTANCEDATA_SOURCE",
+      "BOUNDED_NATIVE_FLOAT4_PACKING_AND_GPU_UPLOAD",
+      "ORIGINAL_INSTANCE_DRAW_DRAWINDEXED",
+      "GUARDED_FULL_GAME_GPU_FRAME",
+      "DX9EX_FAIL_CLOSED_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_sm3_extended_instance_01079.cpp",
+      "tools/test_dx11_sm3_extended_instance_01079.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast push 40250503403 compiled and ran the portable 192-instance native GPU chunk case and live source integration checks; required four other push Gates all succeeded at same SHA.",
+      "negative_regression": "Portable compile assertions reject 257 source instances, extended >64 MiB streams and arithmetic overflow. Source integration/static checks retain missing instance-record rollback, original native index/Draw conditions and DX9Ex opt-in fail-closed behavior.",
+      "component_integration": "Intercepted shader-bound original D3D9 indexed and unindexed Draw -> D3D9 stream divisors -> FLOAT4 repack -> source-aligned native GPU chunk -> D3D11 DrawIndexed/Draw under opt-in -> preserved D3D9Ex fallback; no optical validation."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_BOUNDED_EXTENDED_INSTANCE_GPU_UPLOAD"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED only, actual menu/car/race frames and physical Quest3/VDXR stereo or input/FFB parity UNTESTED.",
+    "activation_guard_and_fallback": "Native path remains explicitly opt-in and fail closed; original D3D9Ex Draw/Present, gamepad/FFB/SkyGlow untouched; DXVK frozen."
+  },
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "c6_status_reconciliation": "five push workflows all SUCCESS on validation-bearing 0188c3b687d96a7d847b004c1058aa9429ac6ac9; C6 doc-only follow-up must not change validation material SHA",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no game launch, native published-frame measurement, OpenXR Quest3 optics or measured performance/FFB input run. No playable full native renderer claim.",
+  "next_implementation_action": "Continue cohesive real menu->car->race native D3D11 full-frame draw/presentation and L/R OpenXR GPU handoff, require actual physical runtime evidence before playable claim."
+}

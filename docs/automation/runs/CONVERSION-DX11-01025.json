@@ -1,0 +1,183 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01025",
+  "production_id": "CONVERSION-DX11-01025",
+  "dispatch_event_id": "CONVERSION-DX11-01025-E001",
+  "event_id": "CONVERSION-DX11-01025-E001",
+  "event_type": "dispatch",
+  "classification": "A",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01025",
+  "feature_id": "DX11:LIVE_SM3_CALL_SUBROUTINE_NATIVE_DRAW",
+  "work_key": "DX11:LIVE_SM3_CALL_SUBROUTINE_NATIVE_DRAW",
+  "work_class": "integration",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "source_head": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+  "material_result_sha": "d30d3c93e91277b2edeeeb5f93252926aee0dfa5",
+  "result_sha": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+  "validation_bearing_result_sha": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "ffb_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Source implementation: bound nonrecursive VS/PS SM3 CALL/LABEL/RET shader subroutines inline into actual programmable constant/texture/native D3D11 Draw path with bounded execution and D3D9Ex fallback; real game/HMD untested.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game SM3 CALL/LABEL/RET program -> bounded acyclic instruction stream expansion -> existing TEMP/const/texture shader materializer",
+      "Native programmable shader cache/materialized VS+PS -> real intercepted D3D9 Draw/DrawIndexed -> guarded full frame target"
+    ],
+    "batch_components": [
+      "Native shader subroutine expansion C++ source/header",
+      "Game SM3 shader integration and cache revision",
+      "Portable C++ positive/negative regression added to required DX11 Fast Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 nested and repeated authentic CALL expansion order and shader-source integration",
+      "negative_regression": "Missing labels, invalid registers, recursive cycles, CALLNZ, malformed return and illegal DEF bodies fail closed",
+      "component_integration": "native_backend.cpp -> native_sm3_subroutine_expansion.hpp -> native live Draw/DrawIndexed materialization"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY; game frame and Quest3 remain untested",
+    "activation_guard_and_fallback": "Native opt-in and original D3D9Ex input/FFB/render fallback preserved; DXVK frozen"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_CALL_SUBROUTINE_NATIVE_DRAW",
+    "goal": "Materialize real vs_3_0 and ps_3_0 CALL/LABEL/RET shader subroutines through the existing native game programmable VS/PS, constants, textures and guarded Draw/DrawIndexed path.",
+    "acceptance_items": [
+      {
+        "id": "sm3_subroutine_game_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Real_Menu_Car_Race_Programmable_Shader_ControlFlow_Native_Draw",
+        "expected_behavior": "Bounded nested and repeated unconditional SM3 CALL subroutines inline correctly before live game native GPU Draw/DrawIndexed shader materialization"
+      },
+      {
+        "id": "original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Invalid_Subroutine_Call_Graph_D3D9Ex_Fallback",
+        "expected_behavior": "Recursive CALL, unknown labels, malformed operands, unsupported CALLNZ and unterminated RET reject native shader without disturbing D3D9Ex input, FFB or rendering"
+      },
+      {
+        "id": "same_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Compiled_Subroutine_Game_Shader_Five_Exact_SHA_Gates",
+        "expected_behavior": "Portable C++ positive and negative probe succeeds; all five mandatory GitHub Actions validate exact material commit SHA"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_sm3_subroutine_probe_01025.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01025.json"
+  ],
+  "pending_items": [
+    "Physical Quest3/VDXR native first visible game frame, input/gamepad/FFB and menu-car-race gameplay UNTESTED"
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Game shader CALL paths translated at source level but no matching real game native Draw+published-frame measurement",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "d30d3c93e91277b2edeeeb5f93252926aee0dfa5",
+  "NEXT_IMPLEMENTATION_ACTION": "Physical Quest3/VDXR menu-car-race native Draw+published-frame measurements remain UNTESTED; preserve DX9Ex fallback.",
+  "acceptance_results": {
+    "sm3_subroutine_game_draw": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_sm3_subroutine_probe_01025.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks: SM3 subroutine probe + source graph and masked shader regression"
+    },
+    "original_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
+        "tools/dx11_sm3_subroutine_probe_01025.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_subroutine_probe_01025.cpp"
+    },
+    "same_sha_gates": {
+      "status": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_sm3_subroutine_probe_01025.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "GitHub Actions exact SHA 4520c743: Fast 39963301582, Backend 39963301463, Win32 39963301548, OpenXR 39963308934, HUD 39963308551"
+    }
+  },
+  "gate_evidence": {
+    "source_sha": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+    "material_source_sha": "d30d3c93e91277b2edeeeb5f93252926aee0dfa5",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39963301582,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39963301463,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39963301548,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39963308934,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39963308551,
+        "conclusion": "success"
+      }
+    },
+    "causal_repairs": [
+      {
+        "sha": "348cc4b268dbae468f7a3376abc92a60c4b1db0f",
+        "reason": "SM3 shader cache V15 regression expectation"
+      },
+      {
+        "sha": "8a2b5f7437a28f8e41be92e2b444d055bf06b947",
+        "reason": "R283 source graph and MOVA provenance V15"
+      },
+      {
+        "sha": "e9d22ba0f2989b5079d8200b704f12cf0515b22d",
+        "reason": "masked SM3 V15 test expectation"
+      },
+      {
+        "sha": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+        "reason": "repeated nested CALL execution order probe"
+      }
+    ]
+  },
+  "feature_ready": true
+}

@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00709",
+  "production_id": "CONVERSION-DX11-00709",
+  "event_id": "CONVERSION-DX11-00709-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_STAGE1_SIGNED_DP3_MENU_RACE",
+  "work_key": "DX11:STAGE1_SIGNED_DP3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 Stage1 RGB DP3 live source/current/TEMP and alpha capture",
+      "HLSL signed-dot RGB and independent alpha via game Draw/DrawIndexed",
+      "Original DX9Ex and input preserve fallback on invalid flags/ALPHAOP/Stage2"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_dotproduct_probe_00709.cpp",
+      "tools/test_dx11_stage1_dotproduct_00709.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "560 live source/modifier cases plus signed saturation reference",
+      "negative_regression": "ALPHAOP DP3 and missing TEMP reject; bumpmap/unknown source remain D3D9",
+      "component_integration": "live game state -> native shader constant -> native game Draw/Indexed diagnostic while DX9Ex remains authoritative"
+    },
+    "conflict_keys": [
+      "DX11:STAGE1_SIGNED_DP3",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "GitHub build does not establish Quest3/game parity",
+    "activation_guard_and_fallback": "Native diagnostic opt-in; unsupported inputs retain original D3D9/gamepad"
+  },
+  "feature_contract": {
+    "feature_id": "LIVE_STAGE1_SIGNED_DP3_MENU_RACE",
+    "goal": "Menu/race Stage1 signed RGB DP3 via native Draw/Indexed, independent alpha and DX9Ex fail-closed",
+    "acceptance_items": [
+      {
+        "id": "game-dp3",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_D3D9_stage1_to_HLSL",
+        "expected_behavior": "RGB signed dot in native diag draw with alpha independently selected"
+      },
+      {
+        "id": "game-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_gamepad_D3D9",
+        "expected_behavior": "ALPHAOP DP3, missing TEMP and unknown states retain DX9Ex"
+      },
+      {
+        "id": "exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_ci",
+        "expected_behavior": "560 cases, negative mutations and exact-SHA Gates"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_dotproduct_probe_00709.cpp",
+    "tools/test_dx11_stage1_dotproduct_00709.py",
+    "docs/automation/runs/CONVERSION-DX11-00709.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE branch 482f58f7, prior 00708 scope and active work reviewed",
+    "C1_REVIEW": "DONE Stage1 native DOTPRODUCT3 RGB missing (independent alpha retained)",
+    "C2_IMPLEMENT": "DONE C++ admission+HLSL DOTPRODUCT3 and 560-case C++/Python regressions",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast 38502675564; Backend 38502675524 (validate+smoke); Build 38502680647; OpenXR 38502680660; HUD 38502680675 all SUCCESS at ece36d166fd94e8c0af1e4c06a34881bd33eb16b; Quest3 UNTESTED",
+    "C4_COMMIT": "PASS original material f6665b69a60f6688c65047df6adcf887a3397c29; same TASK legacy-negative regression repair validation-bearing ece36d166fd94e8c0af1e4c06a34881bd33eb16b; no CI-skip on validation SHA",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED exact-SHA 5/5; separate [skip ci] checkpoint; runtime UNTESTED"
+  },
+  "base_head_sha": "482f58f729b4c819875d70569e78e73f3298407a",
+  "next_action": "Build verified at validation-bearing SHA; original DX9Ex/gamepad authoritative. NEED_HMD_TEST for Quest3/VDXR menu/vehicle/race; controller select next independent feature; no rescore 00709.",
+  "material_result_sha": "f6665b69a60f6688c65047df6adcf887a3397c29",
+  "validation_bearing_result_sha": "ece36d166fd94e8c0af1e4c06a34881bd33eb16b",
+  "acceptance_results": {
+    "game-dp3": "PASS",
+    "game-fallback": "PASS",
+    "exact-sha": "PASS"
+  },
+  "gate_evidence": {
+    "initial_material_sha": "f6665b69a60f6688c65047df6adcf887a3397c29",
+    "validation_bearing_sha": "ece36d166fd94e8c0af1e4c06a34881bd33eb16b",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38502675564,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38502675524,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38502680647,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38502680660,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38502680675,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  },
+  "state_persisted": true
+}

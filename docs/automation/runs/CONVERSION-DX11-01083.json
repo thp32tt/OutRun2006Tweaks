@@ -1,0 +1,200 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01083",
+  "production_id": "CONVERSION-DX11-01083",
+  "event_id": "CONVERSION-DX11-01083-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01082",
+  "classification": "A_REAL_GAME_DRAW_COVERAGE",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SM3_NONINSTANCED_LINEAR_GPU_CHUNK_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "quest3_playable": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_change_sha": "34658b9be8204ef5374c94215b2e416150e8a2fa",
+  "material_result_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+  "validation_bearing_result_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+  "source_base_sha": "ba185aaf9b36a1295514a745080a2fe140d2dacd",
+  "implementation_commits": [
+    "34658b9be8204ef5374c94215b2e416150e8a2fa"
+  ],
+  "repair_commits": [
+    "0b92706497098316a49f24b10e0c84d6a0725f4d"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+    "tools/dx11_sm3_connected_chunk_01083.cpp",
+    "tools/test_dx11_sm3_connected_chunk_01083.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "summary": "Native full-frame shader-bound D3D9 nonindexed connected LINESTRIP/TRIANGLESTRIP GPU uploads segment long game streams with a repeated seam, even TRIANGLESTRIP parity, live Draw and original D3D9Ex fallback. The previous 01082 C6 exact-SHA policy field was a confirmed causal CI acceptance failure and is repaired without disabling Gate checks. Game/HMD untested.",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Maintain actual game shader-bound native D3D11 menu/vehicle/race connected strip rendering across packed multi-stream GPU upload boundaries while protecting original primitive topology and fail-closed gameplay/input fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_connected_strip_native_gpu",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_RENDER_DRAW",
+        "expected_behavior": "Live game SM3 nonindexed long LINESTRIP/TRIANGLESTRIP uses seam-preserving bounded D3D11 GPU Draw windows with even triangle parity."
+      },
+      {
+        "id": "connected_strip_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GAME_SOURCE_RESOURCE_AND_INPUT_FALLBACK",
+        "expected_behavior": "Packed multi-stream source windows use absolute offsets, indexed/instanced/wireframe/point/fan remains original D3D9Ex, failed later uploads abort native publication."
+      },
+      {
+        "id": "exact_sha_five_gate",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_GITHUB_ACTIONS",
+        "expected_behavior": "Five required push GitHub Actions validate the same final material source/result SHA, with no CI skip and no hardware pass claim."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_connected_strip_native_gpu": {
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+        "tools/dx11_sm3_connected_chunk_01083.cpp"
+      ],
+      "validation_command": "DX11 Fast C++ real-source strip-window primitive parity and Windows Build both SUCCESS at exact SHA; no actual HMD/game runtime."
+    },
+    "connected_strip_source_fallback": {
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
+      "evidence_paths": [
+        "tools/dx11_sm3_connected_chunk_01083.cpp",
+        "tools/test_dx11_sm3_connected_chunk_01083.py",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Portable strip seam/triangle parity and absolute dual-stream input, negative indexed/fan/malformed tests in Fast SUCCESS. Native runtime remains untested."
+    },
+    "exact_sha_five_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Five required push GitHub Actions completed/success on 0b92706497098316a49f24b10e0c84d6a0725f4d."
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_D3D9_SM3_CONNECTED_SOURCE_DRAW",
+      "SOURCE_MIRRORED_MULTI_STREAM_VERTEX_WINDOW",
+      "SEAM_AND_PARITY_SAFE_NATIVE_GPU_UPLOAD",
+      "LIVE_D3D11_DRAW",
+      "FULL_RESOLUTION_FRAME_OUTPUT_PENDING_RUNTIME",
+      "DX9EX_INPUT_FFB_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+      "tools/dx11_sm3_connected_chunk_01083.cpp",
+      "tools/test_dx11_sm3_connected_chunk_01083.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native shader-bound game bridge uses bounded repeated-seam GPU Draw with C++ geometry parity and source byte window comparison.",
+      "negative_regression": "Reject indexed, fan, wire/point, instanced, capacity and oversized windows; preserve D3D9Ex original game draw/input on failure.",
+      "component_integration": "Real game D3D9 LINESTRIP/TRIANGLESTRIP callsite to decoded multi-stream chunk, D3D11 IA and GPU Draw, existing full-size output and fail-closed frame batching."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_CONNECTED_GPU_WINDOW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Implemented native source path only: no matching game menu/car/race capture or native published frame evidence; user Quest3/VDXR test required.",
+    "activation_guard_and_fallback": "NativeDrawPathActive opt-in only; D3D9/DX9Ex source renderer, original input/FFB, SkyGlow, DXVK frozen branch unchanged."
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40271478943,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478943"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40271478952,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478952"
+    },
+    {
+      "name": "Build",
+      "run_id": 40271478977,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478977"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40271478933,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478933"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40271478958,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478958"
+    }
+  ],
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "c6_source_validation_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+  "source_implementation_time_ratio": "NOT_MEASURED",
+  "analysis_time_ratio": "NOT_MEASURED",
+  "ci_time_ratio": "NOT_MEASURED",
+  "ai2_previous_confirmed_cumulative_score": 1971,
+  "ai2_new_confirmed_cumulative_score": 1972,
+  "task_new_source_achievement_score": 1,
+  "score_change": 0,
+  "score_award_event": false,
+  "score_note": "C6_NOT_COMPLETE hold resolved at exact-SHA GitHub Actions push PASS on c361c71d7c8145769f180fe0e054ce43cc926ab9. This is a C6-only bookkeeping update, not a new source achievement. AI2 already earned 01083 +1 exactly once; no additional points. AI2 cumulative 1972.",
+  "score_ssot_ref": "thp32tt/ai-dev-lab@main:AI_SCOREBOARD.md",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun menu/car/race or Quest3/VDXR HMD gameplay test; exact-SHA GitHub CI success does not prove real VR output.",
+  "next_implementation_action": "Continue full source-wide real game menu/vehicle/race native Draw coverage and L/R OpenXR GPU handoff under new independent owner, preserving DXVK freeze/DX9Ex fallback and original input/FFB. Do not rerun this 01083 SHA Gates or score C6.",
+  "c6_previous_hold_reason": "C6_NOT_COMPLETE",
+  "c6_previous_hold_resolved": true
+}

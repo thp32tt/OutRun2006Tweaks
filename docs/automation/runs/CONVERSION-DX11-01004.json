@@ -1,0 +1,194 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01004",
+  "production_id": "CONVERSION-DX11-01004",
+  "event_id": "CONVERSION-DX11-01004-E001",
+  "event_type": "recovery",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01004",
+  "work_key": "DX11:LIVE_GAME_SM3_SHADER_AND_BLEND_CACHE_SAFE_LRU",
+  "feature_id": "DX11:LIVE_GAME_SM3_SHADER_AND_BLEND_CACHE_SAFE_LRU",
+  "work_class": "integration",
+  "milestone_id": "full_resolution_native_game_frame",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "source_head": "4fd4b523fdb3dc8badab8925662862469c72e1d4",
+  "material_result_sha": "d48bb4f9474cba22d1dc9e70c4dcfba22eadaae8",
+  "causal_ci_repair_shas": [
+    "b99dc445334386374e315e8a3e4417925488b59c",
+    "b9d0e7610fa5d454a395901de2b857b034a6e6b3",
+    "641ce8a00c022b4bb4edeee042e43a16ce5d4633"
+  ],
+  "validation_bearing_result_sha": "641ce8a00c022b4bb4edeee042e43a16ce5d4633",
+  "result_sha": "641ce8a00c022b4bb4edeee042e43a16ce5d4633",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "score_change_on_bookkeeping": 0,
+  "score_change": 0,
+  "summary": "C6-only recovery: original 01004 JSON was absent on the target branch and at the exact validation SHA. The existing material C++/test commit implements bounded, create-before-retire LRU replacement for actual live programmable SM3 shader/input-layout/constant-buffer and D3D11 blend residents so additional real menu/car/race shader identities do not fail solely at the 64-resident cap. Same-task CI repairs restored inherited 01003 policy metadata and updated inherited 00925 destructive assertions; final Python syntax fix produced the exact validation SHA. All five mandatory GitHub Actions succeeded at that SHA. This separate [skip ci] bookkeeping record neither edits the renderer nor reruns CI, changes the validation-bearing SHA, or awards points. Source/build verified only; in-game pixels, native Draw/publication counters, Quest3/VDXR, HMD and input remain UNTESTED.",
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_live_shader_cache.hpp",
+    "tools/dx11_live_shader_cache_01004.cpp",
+    "tools/test_dx11_live_shader_cache_01004.py"
+  ],
+  "causal_ci_repair_files": [
+    "docs/automation/runs/CONVERSION-DX11-01003.json",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_GAME_SM3_SHADER_AND_BLEND_CACHE_SAFE_LRU",
+    "source": "RECONSTRUCTED_FROM_GITHUB_MATERIAL_AND_EXACT_SHA_CI; ORIGINAL_RUN_RECORD_NOT_FOUND",
+    "goal": "Retain actual intercepted native menu/car/race programmable SM3 game Draw support beyond 64 distinct shader/declaration and blend combinations by bounded creation-safe LRU replacement, without sacrificing existing GPU bindings or original D3D9Ex rendering/input/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_sm3_program_lru_after_gpu_creation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_shader_program_input_layout_and_constant_buffer",
+        "expected_behavior": "Compile/Create* fully succeeds before a resident shader program is retired; the 65th valid SM3 combination is not rejected solely on resident count, and recency follows successfully admitted game Draws."
+      },
+      {
+        "id": "live_game_blend_lru_fallback_and_reset",
+        "category": "fallback_regression",
+        "behavior_area": "native_blend_GPU_state_and_D3D9Ex_fallback",
+        "expected_behavior": "The blend family uses the same bounded LRU after successful CreateBlendState; failed creation preserves existing residents and bound COM state, Reset clears cache provenance, and D3D9Ex output/input/FFB fallback remains guarded."
+      },
+      {
+        "id": "destructive_cache_regression_five_same_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "source_destructive_negative_tests_and_GitHub_Actions",
+        "expected_behavior": "Positive and destructive shader/blend eviction tests stay integrated in DX11 Fast; DX11 Fast, Backend, Build, OpenXR and HUD succeed on one exact validation SHA without a claim of runtime gameplay/HMD evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_sm3_program_lru_after_gpu_creation": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_live_shader_cache.hpp",
+        "tools/dx11_live_shader_cache_01004.cpp"
+      ],
+      "validation_command": "DX11 Fast 39741961720 and Build 39741961714; exact SHA 641ce8a00c022b4bb4edeee042e43a16ce5d4633; actual menu/car/race runtime UNTESTED"
+    },
+    "live_game_blend_lru_fallback_and_reset": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_live_shader_cache.hpp",
+        "tools/test_dx11_live_shader_cache_01004.py"
+      ],
+      "validation_command": "DX11 Fast 39741961720, Backend 39741961755, Build 39741961714; exact SHA 641ce8a00c022b4bb4edeee042e43a16ce5d4633; hardware DX9Ex fallback UNTESTED"
+    },
+    "destructive_cache_regression_five_same_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "tools/test_dx11_live_shader_cache_01004.py",
+        "tools/dx11_live_shader_cache_01004.cpp",
+        "tools/test_dx11_live_sm3_draw_00925.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Five required GitHub Actions SUCCESS: DX11 Fast 39741961720, Backend 39741961755, Build 39741961714, OpenXR 39741961754, HUD 39741961717; 641ce8a00c022b4bb4edeee042e43a16ce5d4633; no CI rerun"
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Live intercepted D3D9 game programmable SM3 Draw/DrawIndexed -> D3D11 shader program/input-layout/constant buffer native cache and GPU Draw path",
+      "On new real-game shader/declaration or blend combinations -> fully create D3D11 resources -> bounded LRU retirement -> admit the following game draw",
+      "Existing D3D9Ex Draw/Present/input/FFB fallback and Reset remain guarded; native full-game output and Quest3 observation are separately required"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "Actual shader/IA/constant-buffer and blend resident recency integration in live_game_frame_bridge.cpp",
+      "Reusable bounded LRU helper in native_game_live_shader_cache.hpp",
+      "Positive, destructive negative and C++ eviction regression in required DX11 Fast"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++ LRU test and structural integration tests; five exact-SHA Actions SUCCESS at 641ce8a00c022b4bb4edeee042e43a16ce5d4633; not a real game/HMD observation",
+      "negative_regression": "Removing shader or blend eviction after successful Create* or restoring unconditional >=64 rejection breaks integrated 01004 and repaired inherited 00925 assertions.",
+      "component_integration": "Interception and native SM3 Draw pipeline -> bounded live shader/blend GPU cache -> subsequent native Draw admission with original D3D9Ex game path intact."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SM3_SHADER_AND_BLEND_CACHE_SAFE_LRU",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY; REAL_GAME_NATIVE_DRAW/PUBLISHED_FRAMES_AND_QUEST3_HMD=UNTESTED",
+    "activation_guard_and_fallback": "No new unconditional native activation; compile/Create failures keep valid cache residents; existing D3D9Ex Draw/Present, original input and FFB remain authoritative on failure."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "material_source_commit": "d48bb4f9474cba22d1dc9e70c4dcfba22eadaae8",
+    "causal_ci_repair_shas": [
+      "b99dc445334386374e315e8a3e4417925488b59c",
+      "b9d0e7610fa5d454a395901de2b857b034a6e6b3",
+      "641ce8a00c022b4bb4edeee042e43a16ce5d4633"
+    ],
+    "validation_bearing_exact_sha": "641ce8a00c022b4bb4edeee042e43a16ce5d4633",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39741961720,
+        "conclusion": "success",
+        "sha": "641ce8a00c022b4bb4edeee042e43a16ce5d4633"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39741961755,
+        "conclusion": "success",
+        "sha": "641ce8a00c022b4bb4edeee042e43a16ce5d4633"
+      },
+      {
+        "name": "Build",
+        "run_id": 39741961714,
+        "conclusion": "success",
+        "sha": "641ce8a00c022b4bb4edeee042e43a16ce5d4633"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39741961754,
+        "conclusion": "success",
+        "sha": "641ce8a00c022b4bb4edeee042e43a16ce5d4633"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39741961717,
+        "conclusion": "success",
+        "sha": "641ce8a00c022b4bb4edeee042e43a16ce5d4633"
+      }
+    ],
+    "note": "Checked existing run IDs on the exact SHA; three CI repair commits were part of task 01004. VR PC Fast Test Build skipped is non-mandatory. This C6-only [skip ci] commit must not replace this validation-bearing SHA."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: docs/automation/runs/CONVERSION-DX11-01004.json absent from branch and validation SHA (RUN_RECORD_NOT_FOUND); original material and test/CI history recovered from GitHub.",
+    "C1_REVIEW": "PASS: inspected material 01004 native programmable shader/blend cache integration, inherited 01003 metadata fix and 00925 source-test repair.",
+    "C2_IMPLEMENT": "ALREADY_DONE at material SHA d48bb4f9474cba22d1dc9e70c4dcfba22eadaae8; no source change in C6.",
+    "C3_VALIDATE": "PASS: five mandatory GitHub Actions at exact SHA 641ce8a00c022b4bb4edeee042e43a16ce5d4633 (DX11 Fast 39741961720, Backend 39741961755, Build 39741961714, OpenXR 39741961754, HUD 39741961717); no rerun. HMD/game runtime UNTESTED.",
+    "C4_COMMIT": "ALREADY_DONE at material and same-task CI repair commits; this is a separate docs-only [skip ci] result commit, not a new validation-bearing source SHA.",
+    "C5_PACKAGE": "NOT_REQUIRED; no forced runtime/gameplay or hardware validation.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA recorded in a separate [skip ci] bookkeeping run JSON."
+  },
+  "feature_stage": "BUILD_VERIFIED_NEED_REAL_GAME_AND_HMD_TEST",
+  "real_game_draw_blocker": "EXACT_SOURCE_REAL_GAME_SHADER_BOUND_NATIVE_DRAW_AND_NATIVE_PUBLISHED_FRAME_COUNTS_UNTESTED",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "No further source changes for this C6 task; next ongoing feature must demonstrate exact-SHA real native menu/car/race Draw/publication and then HMD/VDXR output before declaring gameplay complete."
+}

@@ -1,0 +1,191 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01232",
+  "production_id": "CONVERSION-DX11-01232",
+  "event_id": "CONVERSION-DX11-01232-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "dispatch_feature_id": null,
+  "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+  "feature_identity_note": "Dispatch FEATURE_ID=None; retained previously established 01231 continuing native FVF source clipping/frame ordinal feature identity required by repository acceptance contract. No separate scoring unit.",
+  "classification": "C_PASS_EXACT_SHA_C6_RUN_RECORD_NOT_FOUND",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "score_change": 0,
+  "score_note": "No new development score: C6 record restore for 01232 only; material source, causal repair, CI and bookkeeping one existing task.",
+  "material_implementation_sha": "5fcdbca70bada459178d7f0f5c367cdcf24b7243",
+  "material_result_sha": "5fcdbca70bada459178d7f0f5c367cdcf24b7243",
+  "validation_bearing_result_sha": "01f0e0bcc81a60da5afd8dff26797237ef866520",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_fvf_clipped_draw.hpp",
+    "tests/native_raw_fvf_user_clip_capture_test.cpp"
+  ],
+  "implementation": "Authentic original-game indexed/linear FVF Draw source uses bounded homogeneous polygon intersection of combined D3D11 scissor and enabled user-clip halfspaces, maintaining pixel-neutral source ordinal and GPU sampling budget while keeping ambiguous/visible Draw, original game D3D9 Present/input/FFB, DX9Ex fallback and DXVK freeze. Same-TASK W<=0 failure repaired at validated SHA.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_FVF_CLIP_AND_RS_SCISSOR",
+      "D3D11_NATIVE_DRAW",
+      "REAL_SOURCE_ORDINAL_OR_PROVEN_NO_PIXEL_GPU_NO_OP",
+      "VISIBLE_FRAME_OUTPUT",
+      "ORIGINAL_D3D9_PRESENT_FALLBACK"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_FVF_IA",
+      "BOUND_NATIVE_RS_VIEWPORT_SCISSOR_CLIP",
+      "CONTIGUOUS_GAME_FRAME_ORDINAL_AND_PIXEL_WRITING_D3D11_DRAW",
+      "GPU_RGB_PRE_POST_STAGING_WHEN_POTENTIALLY_VISIBLE",
+      "ORIGINAL_D3D9_DRAW_PRESENT_INPUT_FFB_FALLBACK"
+    ],
+    "batch_components": [
+      "ACTUAL_GAME_FVF_MULTIPLANE_CXX_INTERSECTION",
+      "SOURCE_DRAW_ORDINAL_AND_NATIVE_GPU_CONTINUITY",
+      "W0_FAIL_CLOSED_SOURCE_REPAIR",
+      "INDEXED_USER_CLIP_LINE_FRAME_REGRESSION",
+      "EXACT_SHA_FIVE_GITHUB_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source FVF scissor/user ClipDistance multi-plane empty raster and full source ordinal C++ regression PASS in exact Fast Gate 41859190816.",
+      "negative_regression": "W<=0 native eye-plane crossing failed initial Fast 41859008430, then was repaired and PASS at exact 01f0e0b. Visible/unknown source remains native game Draw/D3D9 fallback.",
+      "component_integration": "native_game_fvf_clipped_draw.hpp connects through existing live_game_frame_bridge.cpp to native_game_frame_batch.hpp, with indexed/line/clip/ordinal C++ regression."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY, NOT real game visual/HMD output; RUNTIME_VALIDATION=UNTESTED",
+    "activation_guard_and_fallback": "Fail closed on unsupported original IA, missing bound clip/scissor evidence, user-plane ambiguity, possible visible pixels or GPU output state; keep original D3D9 Draw/Present/input/FFB, DX9Ex fallback, owner lease and DXVK freeze."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:AUTHENTIC_FVF_SCISSOR_EMPTY_DRAW_AND_FRAME_CONTINUITY",
+    "goal": "Maintain authentic D3D9 FVF menu, car-selection and race source Draw/DrawIndexed ordinal continuity across intersection of enabled D3D11 scissor and source user clip planes, while keeping true/uncertain native GPU pixels and original D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "multiplane_hidden_source_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_FVF_TO_D3D11_FRAME",
+        "expected_behavior": "Draw/DrawIndexed with source-authentic clip halfspaces disjoint only in their intersection remains a proven pixel-neutral source ordinal in game frame sequence."
+      },
+      {
+        "id": "homogeneous_clipping_gpu_continuity",
+        "category": "integrated_behavior",
+        "behavior_area": "NATIVE_D3D11_FVF_CLIP_AND_GPU_FRAME",
+        "expected_behavior": "Bounded multi-plane homogeneous intersections exclude fully invisible source polygons while uncertain crossings retain native Draw and GPU source capture."
+      },
+      {
+        "id": "source_eye_and_user_plane_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_FALLBACK_INPUT_FFB",
+        "expected_behavior": "Genuine finite W=0 or nonpositive-W corners, invalid source, enabled nonfinite ClipDistance and visible geometry never obtain an unsafe no-op certificate."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Five mandatory Actions SUCCESS on the original validation-bearing source/repair SHA without repeating CI; gameplay/HMD runtime is UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "multiplane_hidden_source_draw": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_fvf_clipped_draw.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp",
+        "src/vr/d3d11/native_game_frame_batch.hpp"
+      ],
+      "validation_command": "Fast Gate 41859190816 SUCCESS, exact 01f0e0bcc81a60da5afd8dff26797237ef866520, original game runtime UNTESTED."
+    },
+    "homogeneous_clipping_gpu_continuity": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_fvf_clipped_draw.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Fast 41859190816, Backend 41859190786, Build 41859201035 SUCCESS on exact 01f0e0bcc81a60da5afd8dff26797237ef866520."
+    },
+    "source_eye_and_user_plane_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_fvf_clipped_draw.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp"
+      ],
+      "validation_command": "Fast Gate 41859190816 SUCCESS after W<=0 causal source fix on exact 01f0e0bcc81a60da5afd8dff26797237ef866520."
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_fvf_clipped_draw.hpp",
+        "tests/native_raw_fvf_user_clip_capture_test.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Fast 41859190816, Backend 41859190786, Build 41859201035, OpenXR 41859201188, HUD 41859201200 SUCCESS on 01f0e0bcc81a60da5afd8dff26797237ef866520."
+    }
+  },
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41859190816,
+      "sha": "01f0e0bcc81a60da5afd8dff26797237ef866520",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41859190786,
+      "sha": "01f0e0bcc81a60da5afd8dff26797237ef866520",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41859201035,
+      "sha": "01f0e0bcc81a60da5afd8dff26797237ef866520",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41859201188,
+      "sha": "01f0e0bcc81a60da5afd8dff26797237ef866520",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41859201200,
+      "sha": "01f0e0bcc81a60da5afd8dff26797237ef866520",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "real_game_draw_blocker": "No real installed OutRun menu/car/race or Quest3/VDXR HMD runtime evidence for this exact binary SHA.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Separate material dispatch only; do not rerun five exact-SHA Gates for this C6 result.",
+  "runtime_evidence": null,
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. Static/compile CI PASS is not game-visible or optical/HMD PASS.",
+  "source_and_repair_commits": [
+    {
+      "sha": "5fcdbca70bada459178d7f0f5c367cdcf24b7243",
+      "kind": "MATERIAL_CXX_SOURCE_IMPLEMENTATION",
+      "summary": "Multi-plane authentic FVF clip and frame ordinal C++ implementation with focused regression."
+    },
+    {
+      "sha": "01f0e0bcc81a60da5afd8dff26797237ef866520",
+      "kind": "SAME_TASK_CAUSAL_CXX_SOURCE_REPAIR_AND_VALIDATION_BEARING_SHA",
+      "summary": "Preserve W<=0 uncertain eye crossing, plane fraction guard and exact five Actions SUCCESS."
+    }
+  ],
+  "record_reconstruction_note": "File was absent (RUN_RECORD_NOT_FOUND); material SHA, contract and acceptance for 01232 reconstructed from immutable code/test and previous related feature record, not overwritten. Validation SHA unchanged."
+}

@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00013",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "base_sha": "9b9cad1a69e64443b4401198c517320520df1869",
+  "code_result_sha": "b50209d4e7f0f4273e0b8022d4fbda487c9a04f0",
+  "result_sha": "b50209d4e7f0f4273e0b8022d4fbda487c9a04f0",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R77 MANAGED CPU-shadow/reset-generation lifetime state and passive evidence model for F18.",
+  "summary": "Added a fail-closed ManagedMirrorLifetimeState: successful MANAGED writes advance CPU-shadow version and invalidate mirror readiness; successful Reset advances the modeled device generation while preserving CPU-shadow validity/version and leaving generation-bound mirrors stale. R30/R26-safe Reset paths report successful resets to the census. Analyzer/source-graph contracts cover R77. Windows max-macro compile failure was repaired without changing the model.",
+  "failure_context": {
+    "cancelled_run_id": 36454610451,
+    "cancelled_run_diagnosis": "Intermediate SHA 2e5d8996... was superseded by later same-task commits; no failed job existed.",
+    "actual_compile_failure_sha": "fcd7467def13c614bda7cacb4131c779d2bc9986",
+    "actual_compile_failure": "Windows SDK max macro intercepted std::numeric_limits<std::uint64_t>::max(), producing C4003/C2589/C2059.",
+    "corrective_commit": "b50209d4e7f0f4273e0b8022d4fbda487c9a04f0"
+  },
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "MANAGED_LIFETIME_STATE_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "OPEN",
+    "F21_shader_translation_readiness": "OPEN",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "reason": "R77 is lifetime/evidence modeling only. Live D3D11 resource mirror ownership, F19/F21 readiness and Quest3/OpenXR exact-build runtime parity remain prerequisites."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36455419719,
+      "conclusion": "success",
+      "validated_sha": "b50209d4e7f0f4273e0b8022d4fbda487c9a04f0",
+      "artifacts": [
+        {
+          "id": 10984963962,
+          "name": "backend-autovalidated-vr-dx11-native-r71-b50209d4e7f0f4273e0b8022d4fbda487c9a04f0",
+          "digest": "sha256:d2cb8cda0e7ee05aea10133a91c846eff13298205bf7bd70feb4a7efff8e44d3",
+          "size_in_bytes": 2320247,
+          "expired": false
+        }
+      ]
+    },
+    "build": {
+      "run_id": 36455425011,
+      "conclusion": "success",
+      "validated_sha": "b50209d4e7f0f4273e0b8022d4fbda487c9a04f0",
+      "artifacts": [
+        {
+          "id": 10985845053,
+          "name": "wheel-source-5029e17dda2ef19c388de42d0ed309530d8aa959",
+          "digest": "sha256:27ef8714d9906215f1c39272fc6add482a3aa88f774381279e98a6291eae8274",
+          "size_in_bytes": 231591,
+          "expired": false
+        },
+        {
+          "id": 10984439911,
+          "name": "outrun2006tweaks-5029e17dda2ef19c388de42d0ed309530d8aa959",
+          "digest": "sha256:a684584f60561bfa073859777e24c1371f4ea338020437b0885d1daa52228077",
+          "size_in_bytes": 4967088,
+          "expired": false
+        }
+      ]
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36455424863,
+      "conclusion": "success",
+      "validated_sha": "b50209d4e7f0f4273e0b8022d4fbda487c9a04f0",
+      "artifacts": [
+        {
+          "id": 10985318230,
+          "name": "outrun-vr-host-x64",
+          "digest": "sha256:20b692269b43563a3353ace813a3eb2325df8f6c076accf966dbce6314a857f0",
+          "size_in_bytes": 399946,
+          "expired": false
+        },
+        {
+          "id": 10985018786,
+          "name": "outrun2006-vr-x86-c1-r29-r28-classify",
+          "digest": "sha256:38b61df7a0149490fd78b5abac709a6626c0f5deeaee2de7f2d6dab6f7f506b3",
+          "size_in_bytes": 2280064,
+          "expired": false
+        },
+        {
+          "id": 10984909105,
+          "name": "outrun2006-vr-x86-r26-only-diagnostic-DO-NOT-PACKAGE",
+          "digest": "sha256:7a92041389536f073530236b5d733f83a5821edd915f963778e5c401bf34a488",
+          "size_in_bytes": 2275004,
+          "expired": false
+        },
+        {
+          "id": 10984739341,
+          "name": "outrun2006-vr-x86-safe-draw-compare",
+          "digest": "sha256:d935c0eb55bb754a48547b611b49c7b0e12fabc884d9cb722455940e5f89f60e",
+          "size_in_bytes": 2274975,
+          "expired": false
+        },
+        {
+          "id": 10984544973,
+          "name": "outrun2006-vr-x86-r26-hud-safe",
+          "digest": "sha256:39d5bf850691879efe558ac8ef89cecf27ef70b1faefb4d9987788d637abad41",
+          "size_in_bytes": 2320278,
+          "expired": false
+        },
+        {
+          "id": 10984469720,
+          "name": "outrun2006-vr-x86-c2-r30-hud",
+          "digest": "sha256:1408edef94016d2e2e4dce0b01166681054dfe444f0be22de278da091b023c6c",
+          "size_in_bytes": 2315543,
+          "expired": false
+        }
+      ]
+    },
+    "hud_inspector": {
+      "run_id": 36455425226,
+      "conclusion": "success",
+      "validated_sha": "b50209d4e7f0f4273e0b8022d4fbda487c9a04f0",
+      "artifacts": [
+        {
+          "id": 10985835015,
+          "name": "HUD-inspector-game-5029e17dda2ef19c388de42d0ed309530d8aa959",
+          "digest": "sha256:decd6e47bee36e29cccb2bb6b8f36d6389e326b33951551a89465715fb7551c1",
+          "size_in_bytes": 2297600,
+          "expired": false
+        },
+        {
+          "id": 10984638501,
+          "name": "OR2006C2C-EXE-HUD-analysis-5029e17dda2ef19c388de42d0ed309530d8aa959",
+          "digest": "sha256:d1f395d6e712fa3c0b470c33c06597068f6300a6719db6e116e261d23635741b",
+          "size_in_bytes": 20494,
+          "expired": false
+        }
+      ]
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5874692041,
+    "validation_comment_id": 5874874690
+  },
+  "next_action": "Proceed with a bounded F19 vertex declaration/FVF to D3D11 input-layout readiness gate. Keep native draw disabled; F21 shader translation and Quest3/VDXR exact-build parity remain open."
+}

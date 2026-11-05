@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00998",
+  "production_id": "CONVERSION-DX11-00998",
+  "event_id": "CONVERSION-DX11-00998-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00998",
+  "work_key": "DX11:LIVE_GAME_SURFACE_COPY_SHADER_INPUT_BINDING_CONTINUITY",
+  "feature_id": "DX11_NATIVE_GAME_GPU_SURFACE_REPLAY_SRV_CONTINUITY",
+  "work_class": "integration",
+  "milestone_id": "full_resolution_native_game_frame",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "d1fc6ab10346808e663a9fa2973f8a41f51b776b",
+  "material_result_sha": "a7230720978edc81728ddf5343450343de6df32b",
+  "causal_ci_repair_sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c",
+  "validation_bearing_result_sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c",
+  "result_sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "score_change_on_bookkeeping": 0,
+  "summary": "Actual native D3D11 live-game post-Draw UpdateSurface/StretchRect replay now detaches/restores only SRVs aliasing the GPU copy destination across VS/PS/GS/HS/DS/CS without damaging unrelated shader inputs, native MRT and PS/CS UAV outputs or DX9Ex/input/FFB fallback. WARP GPU pixel+bound SRV+output regression, negative source regression, full 5/5 required GitHub Actions gate SUCCESS on exact 8ae4b79b. One compile failure on original material a7230720 repaired under same TASK_ID by renaming conflicting test-local identifiers. Real menu/car/race gameplay/Quest3/VDXR NOT TESTED; no full renderer promotion.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_gpu_output_preserve.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_native_desktop_gpu_output_probe.cpp",
+    "tools/test_dx11_game_surface_copy_00886.py"
+  ],
+  "causal_ci_repair_files": [
+    "tools/dx11_native_desktop_gpu_output_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_NATIVE_GAME_GPU_SURFACE_REPLAY_SRV_CONTINUITY",
+    "acceptance_items": [
+      {
+        "id": "native_shader_input_alias_restore",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GPU_copy_D3D11_shader_read_binding",
+        "expected_behavior": "Unbind and restore only destination-matching shader resource views across six programmable stages on actual native D3D9 postdraw copy."
+      },
+      {
+        "id": "preserve_original_fallback_and_outputs",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_game_input_DX9Ex_MRT_UAV",
+        "expected_behavior": "Unrelated game SRVs, complete MRT/PS/CS UAV outputs and D3D9 original input/FFB remain unmodified by temporary native GPU copy."
+      },
+      {
+        "id": "gpu_pixels_and_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Win32_WARP_copy_and_full_required_gate",
+        "expected_behavior": "WARP proves changed destination color and restored shader inputs/outputs with source negative regression and five mandatory exact-SHA Actions passes."
+      }
+    ],
+    "goal": "Preserve native D3D11 gameplay shader resource aliases across real D3D9 post-draw GPU surface copy while maintaining complete MRT/UAV output state and untouched original input/fallback."
+  },
+  "acceptance_results": {
+    "native_shader_input_alias_restore": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_gpu_output_preserve.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_native_desktop_gpu_output_probe.cpp"
+      ],
+      "validation_command": "WARP tools/dx11_native_desktop_gpu_output_probe.cpp (isolated WARP run 39713789280, exact SHA 8ae4b79b60e3bea0185dcafea658a99055ce0a0c)"
+    },
+    "preserve_original_fallback_and_outputs": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_game_surface_copy_00886.py"
+      ],
+      "validation_command": "python tools/test_dx11_game_surface_copy_00886.py (DX11 Fast run 39713789318, exact SHA 8ae4b79b60e3bea0185dcafea658a99055ce0a0c)"
+    },
+    "gpu_pixels_and_exact_sha_ci": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "tools/dx11_native_desktop_gpu_output_probe.cpp",
+        "tools/test_dx11_game_surface_copy_00886.py"
+      ],
+      "validation_commit": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c",
+      "validation_command": "Five required GitHub Actions: DX11 Fast 39713789318, Backend Conversion 39713789274, Windows Build 39713789261, OpenXR 39713794530, HUD Inspector 39713794463 on SHA 8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
+    }
+  },
+  "validation_runs": {
+    "DX11 Fast": {
+      "run_id": 39713789318,
+      "conclusion": "success",
+      "sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
+    },
+    "Backend Conversion": {
+      "run_id": 39713789274,
+      "conclusion": "success",
+      "sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
+    },
+    "Windows Build": {
+      "run_id": 39713789261,
+      "conclusion": "success",
+      "sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
+    },
+    "OpenXR": {
+      "run_id": 39713794530,
+      "conclusion": "success",
+      "sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
+    },
+    "HUD Inspector": {
+      "run_id": 39713794463,
+      "conclusion": "success",
+      "sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
+    },
+    "Isolated WARP": {
+      "run_id": 39713789280,
+      "conclusion": "success",
+      "sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
+    }
+  },
+  "next_implementation_action": "Continue native menu->car->race source frames, game-authored VS/PS Draw/DrawIndexed and GPU OpenXR eye transport; obtain separate matching in-game/Quest3 evidence before gameplay promotion.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Intercept original game D3D9 UpdateSurface and StretchRect after Draw into native full-resolution game frame",
+      "Detach only aliased VS/PS/GS/HS/DS/CS SRVs and preserve all MRT and PS/CS UAV bindings while writing native GPU color",
+      "Restore complete shader-input and output state before later game Draw/DrawIndexed and guarded frame publication"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "Real native game D3D11 GPU copy destination shader-input owner preservation in live_game_frame_bridge and native_game_gpu_output_preserve",
+      "Win32 WARP GPU-pixel SRV/MRT/UAV preservation test and Python postdraw source-negative regression",
+      "Causal build repair at exact validated 8ae4b79b for probe-local name collisions without altering required checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact 8ae4b79b isolated WARP readback verifies green destination, red copied tile and preserved aliasing SRV/restored MRT/PS and CS UAVs.",
+      "negative_regression": "Native shader input aliases detach only on destination match; unrelated SRVs and failed D3D9 copy preserve original DX9Ex game Present, input and FFB.",
+      "component_integration": "R30 intercepted D3D9 surface postpass -> live_game_frame_bridge staging -> scoped shader input and OM/UAV preservation -> D3D11 native color CopySubresourceRegion -> subsequent guarded Draw."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SURFACE_COPY_SHADER_INPUT_BINDING_CONTINUITY",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED. Exact SHA 8ae4b79b has 5/5 required GitHub Actions PASS; no real menu/car/race or Quest3 game evidence.",
+    "activation_guard_and_fallback": "Only opt-in and proven D3D9 copy to owned complete native color; device loss or unsupported source abort native publication, original D3D9 input, FFB, SkyGlow and fallback unchanged."
+  }
+}

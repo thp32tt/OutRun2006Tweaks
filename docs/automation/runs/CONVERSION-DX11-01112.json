@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01112",
+  "production_id": "CONVERSION-DX11-01112",
+  "event_id": "CONVERSION-DX11-01112-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01112",
+  "classification": "A_REAL_GAME_ZERO_PIXEL_POST_DRAW_TARGET_Z_CONTINUITY",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:POST_DRAW_CLIPPED_EMPTY_TARGET_Z_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "5aef3d66988ed4e34b10f77eff7474e16c3c29d1",
+  "source_change_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+  "material_result_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+  "validation_bearing_result_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+  "result_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+  "implementation_commits": [
+    "cc56319dd37d9661a8b1b42f7d8aed69c005627f"
+  ],
+  "repair_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_post_draw_sparse_clear_01110.cpp",
+    "tools/test_dx11_post_draw_sparse_clear_01110.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve authentic native menu/car/race Draw frames through successful D3D9 post-Draw TARGET|Z and Z-only Clears whose full source region union clips to zero pixels; no invented GPU color/depth writes and no unneeded D32 availability requirement, with original D3D9 and input fail-closed fallback.",
+    "acceptance_items": [
+      {
+        "id": "target_z_zero_pixel_frame_continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ORIGINAL_SOURCE_TARGET_Z_CLEAR_TO_NATIVE_FRAME",
+        "expected_behavior": "A canonical D3D9 Clear that writes no target/depth/stencil pixels preserves pending native Draw frame without probing unused D32, while actual nonempty source regions still take paired color/Z GPU replay."
+      },
+      {
+        "id": "main_depth_owner_and_sparse_negative",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_OWNER_VIEWPORT_DEPTH_COMPATIBILITY",
+        "expected_behavior": "Reject foreign COM surfaces, malformed 128th rectangle, wrong source owner or nonempty unsupported D32; retain source pixel gap correctness and original D3D9 renderer/gamepad/FFB."
+      },
+      {
+        "id": "five_exact_sha_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "SOURCE_CXX_WIN32_BACKEND_OPENXR_HUD",
+        "expected_behavior": "Five mandatory GitHub push Actions at one material exact SHA all completed/success; Quest 3 game pixels remain UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "SOURCE_CANONICAL_MAIN_RT_AND_MAIN_DSV_AUTHENTICATION",
+      "128_SOURCE_RECTANGLE_ATOMIC_VIEWPORT_INTERSECTION",
+      "TARGET_Z_AND_Z_ONLY_EMPTY_CLEAR_NATIVE_NO_WRITE",
+      "NONEMPTY_D3D11_GPU_RECTANGLE_REPLAY_AND_DX9EX_FALLBACK"
+    ],
+    "batch_components": [
+      "CXX_LIVE_GAME_TARGET_Z_EMPTY_REGION_SOURCE_CONTINUATION",
+      "CXX_LIVE_GAME_Z_ONLY_EARLY_AUTHENTICATED_EMPTY_REPLAY",
+      "COMPILED_SPARSE_SOURCE_PIXEL_AND_MALFORMED_OWNER_NEGATIVES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native D3D9 Clear bridge returns true for a fully clipped authentic 128-rect post-Draw TARGET|Z or Z-only call without needless D32 GPU dependency; pixel oracle tools/dx11_post_draw_sparse_clear_01110.cpp passes DX11 Fast run 40505682714.",
+      "negative_regression": "Sparse mixed 127 off-viewport and 1 in-viewport remains real GPU pixel write; malformed late source rect rejects before mutation; original main device, RT/DSV, viewport and MRT source constraints remain enforced. DX11 Fast, Backend, Build, OpenXR and HUD compiled unchanged exact SHA.",
+      "component_integration": "real src/vr/d3d11/live_game_frame_bridge.cpp preserve_game_partial_target_clear + observe_game_depth_clear now classify full source union before optional native DSV/raster requirements; no new native Draw claim and no headset screenshot."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Build only; no actual OutRun menu/car/race frame evidence or Quest 3/VDXR hardware test. The integration path names source callsite -> D3D11 native Draw -> publishable output architecture only; no measured game pixels.",
+    "activation_guard_and_fallback": "Existing opt-in native route, canonical COM/device/RT/DSV owner checks, no MRT, original D3D9Ex Draw/Present/input/FFB fallback, no DXVK changes.",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:POST_DRAW_CLIPPED_EMPTY_TARGET_Z_GAME_FRAME"
+    ]
+  },
+  "acceptance_results": {
+    "target_z_zero_pixel_frame_continuity": {
+      "status": "PASS_BUILD",
+      "validation_command": "Compiled sparse positive pixel mask plus source graph checks; Fast 40505682714.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_post_draw_sparse_clear_01110.cpp",
+        "tools/test_dx11_post_draw_sparse_clear_01110.py"
+      ]
+    },
+    "main_depth_owner_and_sparse_negative": {
+      "status": "PASS_BUILD",
+      "validation_command": "128 offscreen source and 127+1 on-screen authentic source negative/mixed; malformed 128th atomic negative, Fast 40505682714.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_post_draw_clear_batch.hpp",
+        "tools/dx11_post_draw_sparse_clear_01110.cpp"
+      ]
+    },
+    "five_exact_sha_integrated_gates": {
+      "status": "PASS_EXACT_SHA",
+      "validation_command": "Five push workflow runs on cc56319dd37d9661a8b1b42f7d8aed69c005627f all completed/success.",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682714",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505683011",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682576",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682691",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682566"
+      ]
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40505682714,
+      "head_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682714"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40505683011,
+      "head_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505683011"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40505682576,
+      "head_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682576"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40505682691,
+      "head_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682691"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40505682566,
+      "head_sha": "cc56319dd37d9661a8b1b42f7d8aed69c005627f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682566"
+    }
+  ],
+  "runtime_evidence": {
+    "native_game_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "c6_note": "C6 is docs-only [skip ci] bookkeeping descendant, never source result. Material C++ implementation/result SHA cc56319d five exact push Gates PASS. No duplicate CI and no game/HMD runtime claim; source patch still requires real OutRun menu/car/race and Quest3/VDXR testing. In 01113 same-feature failing CI, repair documented contract metadata to enumerated actual code integration path and per-acceptance existing artifact URLs; no new claims, no new task score, original exact-SHA 01112 validation and runtime UNTESTED unchanged."
+}

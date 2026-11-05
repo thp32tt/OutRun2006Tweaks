@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00331",
+  "production_id": "CONVERSION-DX11-00331",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00331-E004",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "0094fa2723ccb4a1ec1210b5191c95f1c82b6d04",
+  "result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+  "validation_bearing_result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+  "result_marker": "[AUTO:CONVERSION-DX11-00331]",
+  "selected_work_item": "DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE",
+  "summary": "R229 preserves explicit R72 bootstrap-probe skip telemetry in the offline DX11 census analyzer. Per-log reports now distinguish a fail-closed bootstrap skip caused by compatibility/adapter-LUID gating from genuinely missing or truncated bootstrap evidence, while keeping NativeDrawPath dormant and all evidence diagnostic-only.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00331.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD 0094fa2723ccb4a1ec1210b5191c95f1c82b6d04. Read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md and Set05, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/VR_REGRESSION_KNOWLEDGE.json, docs/VR_PROBLEM_HISTORY.md and recent Issue #14 production ledger. R228/00329 is durable and was not repeated.",
+      "resume_evidence": "Rollover resumed from authoritative GitHub material/result state without repeating completed R229 implementation or local validation. Current dispatch is CONVERSION-DX11-00331-E004, CHAT_ROLLOVER=3, ATTEMPT=1/3; rollover is not a retry. RESUME_REASON=Retry persisted after one recovery attempt."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R72 runtime telemetry explicitly logs 'bootstrap probe skipped: compatible=<0|1> adapterLuidValid=<0|1>' when the native bootstrap probe is fail-closed before initialize(), but analyze_dx11_census.py ignored that record. R228 therefore made an explicit compatibility/LUID rejection indistinguishable from absent/truncated bootstrap evidence in multi-log coverage.",
+      "review_lenses": {
+        "architecture": "Keep the fix in the offline census analyzer/test/verifier path; no renderer, DX9Ex baseline, OpenXR transport or native draw routing changes.",
+        "ownership_lifetime": "No D3D9/D3D11 COM, Reset, resource generation, fence or consumer-ACK lifetime changes.",
+        "stereo_correctness": "No WVP, projection, HUD, sky/effects, recenter or menu behavior changes.",
+        "performance": "Offline parsing/report aggregation only; runtime hot path unchanged.",
+        "adversarial": "Two recognized logs are used: one completed bootstrap probe and one explicit skipped probe. The analyzer must preserve the skip reason and count both logs as having a bootstrap outcome without claiming both completed a bootstrap probe or enabling activation."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added BOOTSTRAP_SKIP_RE; BootstrapSkipped and LatestBootstrapSkipByLog provenance; LogsWithBootstrapSkip/LogsWithBootstrapOutcome and explicit outcome-completeness flags; regression fixture for one ready and one explicitly skipped log; source-graph drift guards. Existing AllSourceLogsHaveBootstrap remains false for a skipped probe, DiagnosticOnly remains true, ActivationProof remains false, and NativeDrawPathActivationAllowed remains false."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Local TDD/static validation already passed before publication. Exact-SHA Backend Conversion Gate #1895 run 37163356290 completed success for fd43c98a4c39a5e1b7a1bb713168e430474b5522. validate job 111321207835 passed queue/baseline/structure/disassembly/session, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R229 census-analyzer checks, then configured/built Win32, verified the binary and uploaded artifact 11288601499. DX11 readiness smoke job 111322040281 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline handoff probes. Artifact digest sha256:28507754c46fa1be652f52274c38cdf2de75bc3a8d7853be5cd0b254436d993e. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+      "validation_bearing_result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+      "result_marker": "[AUTO:CONVERSION-DX11-00331]",
+      "implementation_commits": [
+        "fd43c98a4c39a5e1b7a1bb713168e430474b5522"
+      ],
+      "source_implementation_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census analyzer evidence-integrity/reporting change only; no runtime binary behavior or distributable package identity change intended."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37163356290,
+      "validation_job_id": 111321207835,
+      "readiness_smoke_job_id": 111322040281,
+      "artifact_id": 11288601499,
+      "artifact_digest": "sha256:28507754c46fa1be652f52274c38cdf2de75bc3a8d7853be5cd0b254436d993e",
+      "implementation_comment_id": 5974783042,
+      "validation_comment_id": 5974850660,
+      "exact_next_action": "Preserve R225 per-log signature isolation, R226 per-log summary aggregation, R227 startup/bootstrap provenance, R228 per-log startup/bootstrap coverage and R229 explicit bootstrap-skip outcome provenance; keep NativeDrawPath dormant and inspect the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE",
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "evidence": "No matching runtime regression riskPath/problem-history ownership for tools/analyze_dx11_census.py, tools/test_analyze_dx11_census.py or tools/verify_dx11_source_graph.py. Changed paths are offline analyzer/test/verifier plus task bookkeeping only."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00331",
+    "production_id": "CONVERSION-DX11-00331",
+    "event_id": "CONVERSION-DX11-00331-E004",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "source": "CURRENT_USER_QUEUE",
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "exact_next_action": "Preserve R225 per-log signature isolation, R226 per-log summary aggregation, R227 startup/bootstrap provenance, R228 per-log startup/bootstrap coverage and R229 explicit bootstrap-skip outcome provenance; keep NativeDrawPath dormant and inspect the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37163356290,
+      "run_number": 1895,
+      "result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+      "conclusion": "success",
+      "validate_job_id": 111321207835,
+      "readiness_smoke_job_id": 111322040281,
+      "artifact_id": 11288601499,
+      "artifact_digest": "sha256:28507754c46fa1be652f52274c38cdf2de75bc3a8d7853be5cd0b254436d993e"
+    }
+  },
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "authoritative_dispatch_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00330",
+      "event_id": "CONVERSION-DXVK-00330-E001",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DX11-00331",
+      "event_id": "CONVERSION-DX11-00331-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false
+    },
+    "reason": "The current user-supplied controller rollover is authoritative. The initial cross-lane DXVK retry dispatch is bookkeeping-only; material result, validation-bearing SHA, exact-SHA gate evidence and RUNTIME_VALIDATION are unchanged.",
+    "material_result_sha_unchanged": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+    "validation_bearing_result_sha_unchanged": "fd43c98a4c39a5e1b7a1bb713168e430474b5522"
+  }
+}

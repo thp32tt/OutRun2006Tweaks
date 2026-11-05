@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00007",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "recorded_kst": "2026-09-28T18:23:11+09:00",
+  "base_sha": "28147c3ea3854dfa16f8b7c0e6e2e8e7a075e466",
+  "code_result_sha": "2e48bff6eb0d0ec955e39c1c373bd44df8313cec",
+  "result_sha": "2e48bff6eb0d0ec955e39c1c373bd44df8313cec",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R74 passive VB/IB Lock/Unlock mutation telemetry bridge for F18, reusing the existing R30 buffer hook family without enabling native DX11 draw ownership.",
+  "summary": "Recovered a concurrent same-task R74 implementation from GitHub and did not duplicate it. Successful source VB/IB Lock->Unlock pairs are classified as write, READONLY, DISCARD-write and NOOVERWRITE-write evidence. The existing mutationTelemetryRequired blocker remains fail-closed, NativeDrawPathActivationAllowed remains false, and no new D3D9 hook family was installed. Texture mutation plus MANAGED CPU-shadow/reset-generation modeling remain open.",
+  "source_commits": [
+    "2e48bff6eb0d0ec955e39c1c373bd44df8313cec"
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/runtime_census.hpp",
+      "result": "Added passive VB/IB Lock, Unlock and release-cleanup observation APIs."
+    },
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Added R74 per-resource pending-lock evidence and successful write/READONLY/DISCARD/NOOVERWRITE Unlock counters while retaining fail-closed activation semantics."
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "result": "Bridged the existing R30 VB/IB hook path to R74 mutation observation; no additional hook family was installed."
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "result": "Applied the same observation bridge to the R26-safe R30 buffer hook path without changing native draw ownership."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Extended census parsing to R74 mutation evidence while keeping NativeDrawPathActivationAllowed=false."
+    },
+    {
+      "path": "tools/test_analyze_dx11_census.py",
+      "result": "Added R74 regression coverage proving mutation observations do not clear mutationTelemetryRequired."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added structural guards for the R74 observer API, R30 bridges, counters and analyzer contract."
+    }
+  ],
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "VB_IB_LOCK_UNLOCK_TELEMETRY_IMPLEMENTED_TEXTURE_UPDATE_AND_MANAGED_RESET_MODEL_OPEN",
+    "F19_input_layout_readiness": "OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "OPEN",
+    "F21_shader_translation_readiness": "OPEN",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "reason": "R74 records source mutation evidence only. D3D11 mirror update classification, texture LockRect/UpdateTexture coverage, MANAGED CPU-shadow/reset-generation survival, input-layout/shader readiness and exact-build Quest 3/OpenXR visual parity remain prerequisites."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36402469640,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "2e48bff6eb0d0ec955e39c1c373bd44df8313cec",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10960849206,
+      "artifact_digest": "sha256:2ef9209981a4be3ba6dff6faf46afabe045a1bf097c17ef24b8c4c1187cd28df"
+    },
+    "build": {
+      "run_id": 36402477449,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "2e48bff6eb0d0ec955e39c1c373bd44df8313cec",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 10960598592,
+      "binary_artifact_digest": "sha256:c979c3c2524ae352e12ef2bbce3f6ac2d6df88b08d77e3468c5a0439fa14840e"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36402477435,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "2e48bff6eb0d0ec955e39c1c373bd44df8313cec",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS"
+    },
+    "hud_inspector": {
+      "run_id": 36402477553,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "2e48bff6eb0d0ec955e39c1c373bd44df8313cec",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10961062692,
+      "artifact_digest": "sha256:25673149e85e7f4b0c0d4fc9a13df3209a54181d595da5d9cf1297c2b4626f0c"
+    }
+  },
+  "validation_notes": [
+    "Exact SHA 2e48bff6eb0d0ec955e39c1c373bd44df8313cec passed Backend Conversion Gate 36402469640 including DX11 source-graph, R74 analyzer regression and Win32 build.",
+    "Build 36402477449 completed successfully including Win32 compilation, built VR payload verification and binary upload.",
+    "OpenXR VR architecture 36402477435 completed successfully for host-x64 and all five Win32 game jobs.",
+    "HUD Inspector 36402477553 completed static EXE analysis and Win32 build successfully.",
+    "A redundant exact-SHA Build run 36402857566 was cancelled; the successful exact-SHA Build 36402477449 is the validation authority.",
+    "AUTOMATION_VALIDATION=PASS is limited to static/CI/build evidence and does not assert in-game behavior.",
+    "RUNTIME_VALIDATION=UNTESTED because no Quest 3/HMD/in-game execution was performed.",
+    "No N100 local clone/worktree and no PC Fast runner were used.",
+    "Issue #14 comment 5867105528 is the canonical exact-SHA validation ledger entry; recovery-created comment 5867095779 is marked SUPERSEDED/DUPLICATE."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5867005901,
+    "validation_comment_id": 5867105528,
+    "redundant_rollover_validation_comment_id": 5867095779,
+    "redundant_comment_status": "SUPERSEDED_DUPLICATE"
+  },
+  "rollover_recovery": {
+    "status": "RECOVERED_WITHOUT_DUPLICATION",
+    "note": "CHAT_ROLLOVER=5 re-read the current GitHub branch, canonical run record, exact-SHA Actions results and Issue #14 implementation/validation ledger. The R74 source implementation and C6 validation/state sealing were already complete, so no source work, CI rerun, or validation ledger event was duplicated. This commit records the rollover-5 recovery only."
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false. In the next bounded DX11 task, classify supported VB/IB Lock flags against concrete D3D11 mirror update semantics, then add texture LockRect/UpdateTexture mutation coverage and a MANAGED CPU-shadow/reset-generation model. F19/F21 input-layout and shader/fixed-function readiness remain open. Do not claim runtime/visual parity or promote native draw ownership before exact-build Quest 3/VDXR validation.",
+  "finalized_kst": "2026-09-28T19:02:00+09:00"
+}

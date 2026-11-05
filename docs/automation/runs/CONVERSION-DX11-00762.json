@@ -1,0 +1,130 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00762",
+  "production_id": "CONVERSION-DX11-00762",
+  "event_id": "CONVERSION-DX11-00762-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_FRAME_VIEWPORT_CLIPPED_COLOR_DEPTH_CLEAR",
+  "feature_id": "DX11-FULL_FRAME_VIEWPORT_CLIPPED_COLOR_DEPTH_CLEAR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "d8fff2dd6f3687c460041c3449ec0af8a9cc0b39",
+  "source_implementation_sha": "6b3fc23eed18b8863a10f3bee45cda015ba132a6",
+  "material_result_sha": "86fe0f492a99d771bec6303f6511fca1212c2b03",
+  "validation_bearing_result_sha": "86fe0f492a99d771bec6303f6511fca1212c2b03",
+  "changed_files": [
+    "src/vr/d3d11/native_game_clear_coverage.hpp",
+    "tools/dx11_full_clear_clipped_00762.cpp",
+    "tools/test_dx11_full_clear_clipped_00762.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "change_summary": "Restore verified full-size native menu/vehicle/race D3D9 TARGET or Z clear admission when game D3DRECTs extend outside the viewport but clip to cover every pixel; bind actual game Clear seed to native Draw/DrawIndexed continuity. Reject gaps, reversed rectangles, partial viewport, unknown target and retain original DX9Ex Draw/Present/gamepad fallback.",
+  "feature_contract": {
+    "feature_id": "DX11-FULL_FRAME_VIEWPORT_CLIPPED_COLOR_DEPTH_CLEAR",
+    "goal": "Admit full-backbuffer game-authored color/depth Clears clipped to physical viewport, preserve the canonical color/depth seed through real native D3D11 Draw/DrawIndexed and guarded publication, and fail closed for incomplete Clears without modifying original D3D9 input/Present.",
+    "acceptance_items": [
+      {
+        "id": "clipped-full-target-clear-native-game-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_d3d9_clear_to_native_d3d11_draw",
+        "expected_behavior": "A full game viewport painted by oversized or tiled D3D9 Clear rectangles is recognized as full, preserving successful color/depth seeds for contiguous real game Draw and DrawIndexed."
+      },
+      {
+        "id": "incomplete-or-malformed-clear-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "dx9ex_clear_draw_present_input_fallback",
+        "expected_behavior": "Reject partial coverage, holes, reversed rectangles, invalid viewport and invalid rectangles while preserving original D3D9 Draw, Present and gamepad execution."
+      },
+      {
+        "id": "five-exact-sha-integrated-gates",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_windows_openxr_hud_full_gate",
+        "expected_behavior": "All five required GitHub checks succeed on the same non-CI-skipped validation-bearing SHA; actual Quest3/VDXR screen evidence remains independent and untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "clipped-full-target-clear-native-game-draw": "PASS",
+    "incomplete-or-malformed-clear-fallback": "PASS",
+    "five-exact-sha-integrated-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_VIEWPORT_CLIPPED_COLOR_DEPTH_CLEAR",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "DX9EX_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source/static and Win32 build confirm clipped full-target color/depth Clear feeds guarded native Draw/DrawIndexed and Present; real game pixels/Quest3 remain UNTESTED.",
+    "activation_guard_and_fallback": "Diagnostic/full-game explicit opt-in and original D3D9 Clear/Draw/Present/gamepad maintained; unsupported or incomplete regions fail closed without backend promotion.",
+    "integration_path": [
+      "Actual R9 original game Clear recognizes D3D9-clipped D3DRECT union on full backbuffer",
+      "Successful real source TARGET and Z Clear seed feed canonical D3D11 full-resolution RTV/DSV for game Draw/DrawIndexed",
+      "Existing same-Present native output and original D3D9 fallback remain guarded"
+    ],
+    "batch_components": [
+      "D3D9 color and depth whole-target coverage implementation",
+      "C++ real game Clear-to-Draw/DrawIndexed positive/negative behavioral proof",
+      "Python destructive cross-component source checks and mandatory DX11 Fast GitHub wiring"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled clipped oversized/tiled D3D9 color/depth Clear plus subsequent native unindexed/indexed Draw continuity.",
+      "negative_regression": "Compiled partial coverage, gap, invalid/reversed/external rectangles and viewport fail-closed; Python destructive source checks preserve D3D9 hook.",
+      "component_integration": "Original R9 Clear->coverage->color/depth native seed->full game Draw/DrawIndexed->same-Present game output and DX9Ex fallback."
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_VIEWPORT_CLIPPED_COLOR_DEPTH_CLEAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Checked authenticated GitHub latest head and existing 00761 owner; selected disjoint full viewport Clear coverage.",
+    "C1_REVIEW": "Discovered D3D9 clipped game Clears with oversized rectangles falsely rejected from native color/depth baseline.",
+    "C2_IMPLEMENT": "C++ viewport-clipped Clear union implementation with real Draw/DrawIndexed integration and negative coverage.",
+    "C3_VALIDATE": "Compiled portable C++ locally; repaired destructive CI regressions; full five GitHub Actions gates SUCCESS at exact source result SHA.",
+    "C4_COMMIT": "Source-bearing non-force GitHub commit 86fe0f492a99d771bec6303f6511fca1212c2b03 with [AUTO:CONVERSION-DX11-00762].",
+    "C5_PACKAGE": "NOT_REQUIRED: real Quest3/VDXR release candidate not confirmed.",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "evidence": {
+    "exact_sha": "86fe0f492a99d771bec6303f6511fca1212c2b03",
+    "required_checks": {
+      "DX11 Fast Structural Checks": {
+        "run_id": 38700463442,
+        "conclusion": "success"
+      },
+      "Backend Conversion Gate": {
+        "run_id": 38700463307,
+        "conclusion": "success"
+      },
+      "Build": {
+        "run_id": 38700469547,
+        "conclusion": "success"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38700469544,
+        "conclusion": "success"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38700469584,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "source_only_limit": "No actual OutRun menu/car/race visuals, input device/gamepad or Quest3/VDXR HMD testing; no production promotion."
+  }
+}

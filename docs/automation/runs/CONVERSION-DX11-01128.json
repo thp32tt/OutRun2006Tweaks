@@ -1,0 +1,209 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01128",
+  "production_id": "CONVERSION-DX11-01128",
+  "event_id": "CONVERSION-DX11-01128-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01128",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:PRESENT_EPOCH_STALE_GPU_RETIRE",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "0482bcc826c5efeca63a243068597ef955dc934c",
+  "source_change_sha": "92fff241933cc5cb599ed86fbb42599090291bfc",
+  "material_result_sha": "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+  "validation_bearing_result_sha": "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+  "result_sha": "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+  "implementation_commits": [
+    "92fff241933cc5cb599ed86fbb42599090291bfc"
+  ],
+  "repair_commits": [
+    "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_gpu_source_epoch_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01127.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_LIVE_D3D9_GAME_DRAW",
+      "NATIVE_D3D11_GPU_DRAW_PAIRED_READBACK",
+      "GAME_PRESENT_SERIAL_BOUNDED_GPU_EVENT",
+      "MATCHED_GPU_PIXEL_SOURCE",
+      "OPT_IN_D3D9_PRESENT_TILE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_TILE_NOT_COMPLETE_NATIVE_GAME_FRAME"
+    ],
+    "batch_components": [
+      "CXX_GPU_SOURCE_PRESENT_EPOCH_BINDING",
+      "CXX_LATE_GPU_COPY_RETIRE_WITHOUT_FOREIGN_FRAME_UPLOAD",
+      "CXX_SOURCE_GAME_PRESENT_SERIAL_INTEGRATION_AND_LOGGING",
+      "PORTABLE_POSITIVE_NEGATIVE_EPOCH_REGRESSION",
+      "CAUSAL_HISTORICAL_01127_SCHEMA_GATE_REPAIR"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED ONLY: source-bound native D3D11 Draw paired GPU copy can contribute authentic RAW opt-in partial tile on the exact same original D3D9 Present; real game's displayed native pixel evidence, complete native menu/car/race and stereo Quest3/VDXR NOT TESTED.",
+    "activation_guard_and_fallback": "Opt-in RAW visual diagnostic only. Production/full native frame remains fail-closed; original D3D9 Draw/Present, DX9Ex fallback, gamepad and FFB unchanged; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Source serial 7 readback consumed for the matching game Present 7 exactly once and subsequent Present cannot reuse it; complete GPU copy retains the existing authentic pre/post RGB path.",
+      "negative_regression": "Source serial 8 GPU copy still in flight at later Present 9 is not eligible for publication, even if the D3D11 event becomes complete; stale epoch and wrap cannot accept foreign pixels, pending resources remain in use until retired.",
+      "component_integration": "Actual native D3D11 post-Draw event and D3D9 before_game_present now share a source Present serial; late completion returns StaleGpuCopy before Map or UpdateSurface with bounded telemetry. All five exact-SHA required push Gates succeeded."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Enforce exact game-owned Present epoch over native GPU Draw paired-color readback, so a delayed diagnostic GPU copy cannot overlay stale pixels on another game's menu, car selection or race frame, without promoting partial output.",
+    "acceptance_items": [
+      {
+        "id": "native_gpu_copy_exact_present_epoch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "AUTHENTIC_NATIVE_DRAW_GPU_PRESENT_SERIAL",
+        "expected_behavior": "Only the original game Present serial consumes paired native GPU readback; same-frame GPU output remains eligible."
+      },
+      {
+        "id": "late_completion_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9EX_ORIGINAL_FRAME_GAMEPAD_FFB",
+        "expected_behavior": "Retire delayed GPU event without Map/UpdateSurface on later game frame; preserve DX9Ex game renderer, input and FFB."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS_EXACT_SHA_BINARY",
+        "expected_behavior": "DX11 Fast, Backend, Windows Build, OpenXR and HUD Inspector succeed at one identical causal-repaired source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_gpu_copy_exact_present_epoch": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #40633066686 success at 808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0; original real-game screen UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    "late_completion_safe_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "Backend #40633066752 and Windows Build #40633066650 completed success at exact SHA; device/HMD runtime UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40633066686",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40633066752"
+      ],
+      "validation_command": "Five unchanged push workflow gates completed SUCCESS at exact material result SHA 808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40633066686,
+      "event": "push",
+      "head_sha": "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40633066752,
+      "event": "push",
+      "head_sha": "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40633066650,
+      "event": "push",
+      "head_sha": "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40633066667,
+      "event": "push",
+      "head_sha": "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40633066689,
+      "event": "push",
+      "head_sha": "808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS remote HEAD 0482bcc826c5efeca63a243068597ef955dc934c; inspect 01127 source and existing C6, select authentic RAW frame ownership defect.",
+    "C1_REVIEW": "PASS GPU wait timeout can preserve pending staging until a future D3D9 Present; prior GPU output could be misattributed across scene frames.",
+    "C2_IMPLEMENT": "PASS substantial 4-file native source exact Present epoch integration, delayed readback discard, logging and portable positive/negative regression at 92fff241933cc5cb599ed86fbb42599090291bfc.",
+    "C3_VALIDATE": "PASS exact-SHA five mandatory push Gate workflows on 808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0; original 92fff CI failed inherited 01127 schema, later causally repaired.",
+    "C4_COMMIT": "PASS implementation source commit 92fff241933cc5cb599ed86fbb42599090291bfc and causal CI repair 808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0 non-force, exact [AUTO:CONVERSION-DX11-01128] no CI skip.",
+    "C5_PACKAGE": "PASS source-matched Windows Build Artifact 12792218616 for 808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0; game/HMD runtime UNTESTED.",
+    "C6_STATE": "PASS separate documentation-only bookkeeping commit after five Gate successes; retains validation-bearing material SHA; score already counted once +1, C6 +0."
+  },
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-808b8bbd2bfbe6b8fbb6a5104f296d1bd1088db0",
+    "artifact_id": 12792218616,
+    "run_id": 40633066650
+  },
+  "runtime_evidence": {
+    "native_draws": "UNTESTED_AT_THIS_SHA",
+    "native_gpu_pixel_output": "UNTESTED_AT_THIS_SHA",
+    "publishedBackbufferFrames": "UNTESTED_AT_THIS_SHA",
+    "gpu_desktop_frames": "UNTESTED_AT_THIS_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "score_change": 1,
+  "c6_score_change": 0,
+  "cumulative_ai2_score": 2073,
+  "scoreboard_authority": {
+    "repository": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "path": "AI_SCOREBOARD.md",
+    "scoreboard_commit": "03410ff16d45004864466cef9ba9c8572ef794a9",
+    "previous_confirmed_ai2": 2072,
+    "score_increment_for_distinct_source_and_exact_sha_gate": 1,
+    "score_increment_for_retry_and_c6": 0,
+    "new_confirmed_ai2": 2073
+  },
+  "next_action": "Run exact-source user desktop menu->car->race RAW diagnostic for real Draw and visible GPU pixels; continue full genuine D3D11 native frame/VR L-R OpenXR; RUNTIME_VALIDATION stays UNTESTED without original game/Quest3 evidence.",
+  "c6_note": "Only one integrated new functional source integrity repair is scored. Historical 01127 acceptance schema repair, CI retest, replay, status and documentation are part of same 01128 and +0. Actual development time proportions were not measured."
+}

@@ -1,4 +1,94 @@
+# 2026-10-28 USER OVERRIDE — EARLY VISIBLE DX11 DIAGNOSTIC EVEN IF GRAPHICS ARE BROKEN
+
+**Newest DX11 runtime-first instruction.** Do not require complete pixel/scene parity before offering the user a native D3D11 rendering test. The immediate user goal is to SEE actual D3D11 GPU-rendered game geometry/pixels, **even if fog, colors, depth, textures, HUD and missing geometry are visually wrong**, so that evidence can drive incremental fixes. This overrides a blanket "never publish incomplete native pixels" policy ONLY for a separately labeled, explicit experimental diagnostic mode. It does **not** override safety of pointer/resource bounds, source identity, device loss, fence lifetime, input, FFB, protected DX9Ex behavior, or required CI.
+
+1. First create an explicitly opt-in, separately packaged `DX11_RAW_VISUAL_DIAGNOSTIC` entry point (default OFF) on the DX11 lane; keep the ordinary/full-correctness path fail-closed. Distinguish runtime provenance for source/native Draw, native texture/RT creation, copy, real DX11 GPU-generated pixel extent, and what the user actually sees. Make the output unmistakably different from DX9Ex-host compatibility transport (label/overlay or evidence markers).
+2. Allow known **visual-only semantic mismatches** such as unsupported live Fog within this experimental mode by deliberately omitting fog contribution on the native *diagnostic output only*, while preserving original D3D9 game Draw and rendering. Record original live Fog state/caps and log `DX11_VISUAL_MISMATCH_FOG` and bypass count. Never invent/admit invalid COM/shader/buffer/format/RT/depth/resource identities, invalid vertices or device synchronization; don't globally modify the game's Fog.
+3. In this experimental mode, display a partial/native diagnostic GPU result without requiring full source draw coverage. Isolate any incomplete picture in a clearly identified, independently owned output region/surface or safe dedicated debug present path; do not silently replace the complete production backbuffer with a partially accumulated texture. If no visible GPU pixel can be shown, log the exact missing stage and fix that stage before further code expansion.
+4. Build one runnable source-matched test package with separate `RUN_DX11_RAW_VISUAL.cmd` and `RUN_DX9EX_CONTROL.cmd`, distinct session logs; maintain existing GPU desktop (mono) vs Quest3/OpenXR stereo distinction. Expect artifacts; objective is native `Draw>0`, `native_gpu_pixel_output>0`, and **visible diagnostic evidence**. Later restore parity/complete frame, then native L/R OpenXR.
+5. A static/WARP/CI PASS alone is not visible-game runtime PASS; leave `RUNTIME_VALIDATION=UNTESTED` until real game evidence. Keep existing unfinished FEATURE_ID/TASK_ID, protected DX9Ex/DXVK, exact-SHA five Gates, no point duplication, and external controller adoption `UNVERIFIED`.
+
+# 2026-10-28 USER RUNTIME OVERRIDE — ZERO NATIVE DX11 DRAWS: FOG ROOT-CAUSE FIRST
+
+**Newest DX11 instruction; supersedes older task-selection and CI-as-milestone habits only.** Scope: `vr-dx11-native-r71`. Read `docs/automation/DX11_NATIVE_ZERO_DRAW_RUNTIME_20261028.md` and the latest branch HEAD before allocating work. The user's real native GPU desktop run at source SHA `b8dab362b9cc9072eafbd3307594a35ff5b8d413` recorded original D3D9 Draws **10,341,768**, `eligible_state_draws=2,194`, `native_draws=0`, `desktop_insets=0`, `gpu_desktop_frames=0`, SM3 `sm3_state_reject.fog=5,547` and `target_seed=1`, `bootstrapCompatible=1`, `full_frame_mode=1`, `skipped_poisoned_draws=10,329,042`. Verdict `NO_NATIVE_FULL_FRAME_EVIDENCE`. This is real **failed native desktop runtime evidence** at the *pinned* SHA, NOT proof about any later SHA. Native Quest3 stereo remains untested.
+
+1. **P0 implement first, not review loops.** Continue the latest unfinished cohesive `DX11:FIRST_LIVE_GAME_NATIVE_FRAME` / `DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME` feature and existing TASK_ID/owner lease. Inspect `live_game_frame_bridge.cpp::submit_live_sm3_game_draw` state/Fog gate and `live_game_sm3_table_fog.hpp::native_sm3_table_zfog_admission` together with fixed-function `supported_game_state`, poison and routing gates. The immediate proven rejection bucket is SM3 Fog; do not infer its precise subcause from the count alone.
+2. **Identify exact live failure then fix it in production C++/HLSL.** Distinguish Fog COM query failure, D3D9 FOGENABLE, table/vertex/range/Z/W caps, sRGB and equation bounds with bounded authentic live source telemetry and positive/negative regressions. `-nofog` was present in `RUN_ARGS.txt` but was insufficient; do not treat a launch flag as actual live state. Translate only proven safe source semantics. Never remove/bypass Fog, depth, stencil, target, shader, render or publication safety checks to inflate Draw counters; do not fabricate pixels.
+3. **Prove one actual native GPU Draw, then a published entire frame.** Acceptance on a NEW exact binary SHA: real `native_draws>0` AND `publishedBackbufferFrames>0` in ONE user game run; GPU desktop specifically requires `gpu_desktop_frames>0`. Next check menus, vehicle selection and sustained race/complete source coverage. Then native separate L/R and direct OpenXR GPU handoff, followed by Quest 3/VDXR optical and pacing validation. The D3D9Ex game -> D3D11 OpenXR host compatibility transport is NOT native D3D11 game output.
+4. **Stop proliferating independent R-series microtasks.** When Fog is fixed, address the next actual rejection/target-seed/poison condition within the SAME unfinished feature. Source changes must be substantive, not a diagnostic/doc-only score milestone. Do small deterministic regressions while editing; unchanged mandatory five exact-SHA GitHub Actions once per integrated candidate or real causal repair. CI PASS is BUILD_VERIFIED only, not visual/HMD PASS.
+5. **Existing regressions and work ownership remain protected.** Do not modify DXVK, DX9Ex protected fallback, master or unrelated lanes; keep game input/FFB and fallback. No unsupported branch reset, force-push, or CI suppression. Log `CODE_CHANGED_SHA`, `REAL_GAME_DRAW_BLOCKER`, `native_draws`, published-frame counts, user-test source SHA and next implementation. No new unique score without a genuinely independent qualifying achievement; same-task retry / C6 / run-result re-report +0. External controller adoption is NOT_VERIFIED without actual controller inspection.
+
+# 2026-10-18 USER OVERRIDE — ACTUAL DX11 GAMEPLAY FIRST, REUSE OPEN SOURCE, STOP VERIFICATION LOOPS
+
+**This is the latest DX11 override and supersedes the 2026-10-16 requirement to defer ALL game tests until the entire native source graph is complete.** Target: `vr-dx11-native-r71` only. The acceptance target is OutRun 2006 menu -> vehicle selection -> driving rendered by real native D3D11 Draw/DrawIndexed, not a D3D9Ex render forwarded through a D3D11 OpenXR host. Do not rename that transport `dx11` as native game rendering.
+
+**Known failed real-game evidence (2026-10-18):** 15,548,388 observed D3D9 source draws, `eligible_state_draws=0`, `native_draws=0`, `desktop_insets=0`. Backbuffer 3440x1440. The existing diagnostic admits restricted fixed-function FVF calls but rejects actual bound programmable VS/PS. Treat `native_draws=0` as the highest-priority engineering blocker; graphics frame-rate tuning and additional invariant-only R-series tasks have zero priority until real native rendering is observed.
+
+1. **P0 — Make a real D3D11 game draw happen.** Use the already-intercepted game Draw/DrawIndexed path and existing `src/vr/d3d11/native_backend.cpp`, `runtime_census.cpp`, and `live_game_frame_bridge.cpp`. Bind *actual* game's VS/PS, constant registers, FVF or vertex declaration, VB/IB, texture and per-Draw render state. Diagnose rejection reasons for genuine shader-bound draws and implement the missing translation, not simply suppress safety checks. Build a small cohesive C++/HLSL source change spanning interception+translation+output. Original D3D9Ex renderer/input/FFB remains fail-closed fallback.
+2. **P1 — Show an entire real frame and enable short game tests EARLY.** First evidence boundary: `eligible_state_draws>0` AND `native_draws>0` AND native output/published frames `>0`, all from one actual game launch with exact source SHA. Then extend contiguous native menu -> car -> race output and require a complete-source ordinal/coverage accounting; do not label a handful of native draws as fully native gameplay. After one integrated candidate passes bounded CI, provide a desktop game test immediately instead of postponing all runtime evidence until stereo and HUD are finished. Retain safe DX9Ex rollback.
+3. **P2 — Connect actual native D3D11 stereo to OpenXR.** Distinct L/R per-eye native game geometry, GPU-to-GPU texture handoff, source generation, synchronization and ACK; eliminate D3D11->CPU->D3D9 copyback as production output. Verify with Quest 3/VDXR only when an actual native candidate exists.
+4. **P3 — Fix visual bugs then optimize frame pacing.** HUD/flare/shadows/markers/menus, Reset and 72Hz. Do NOT chase 120Hz/SSAA/copy performance while all native draw counters are zero.
+5. **Reuse existing OSS before reinventing conversion.** Primary direct precedent: DXUP (`misyltoad/dxup`, D3D9->D3D11, zlib, archived 2019); inspect its D3D9 device/resource/shader/FF state translation as a bounded reference or isolated compatibility prototype, not an unverified binary replacement. DXVK (`doitsujin/dxvk`, zlib) supplies proven D3D9 shader/resource/constant/lifetime semantics but is a Vulkan backend, not a substitute for required D3D11 output. HlslDecompiler (`AndresTraks/HlslDecompiler`, MIT) supplies SM1..5 bytecode disassembly/decompilation for shader mapping. D3D9On12 (MIT) is **reference-only** and must NOT revive DX12 work. dgVoodoo2 is not an approved code import without verifying actual source, license and integration rights. Record exact upstream versions and license notices for incorporated code; avoid wholesale imports and duplicate DLL hooking.
+6. **No more endless check/review/score loops.** Every autonomous source cycle must choose the earliest uncompleted actual game-frame blocker and perform substantive C++/HLSL/host implementation. Prohibit a new independently scored production ID for a guard, one render state, one texture format, a review, status update or a C6 recheck. Continue one unfinished cohesive FEATURE_ID/TASK_ID. Run targeted compile/unit checks only after meaningful source edits; run the existing mandatory five exact-SHA Gates once on each integrated candidate or on a real causal CI repair. A failed CI warrants repair, not a new milestone. No skipping/weakening required CI.
+7. **Stop conditions:** only verified conflicting live owner lease, absent tooling, genuine irrecoverable evidence-backed technical blocker or a user-needed hardware session. If no native draw is admitted, choose a concrete missing shader/resource/callsite implementation from that failure; never claim `COMPLETE_BUILD_VERIFIED` means gameplay or award an independent new feature score for a compiler-only tweak.
+8. **Reporting:** Each resume/rollover persists the same FEATURE_ID with `NEXT_SOURCE_FILE`, `REAL_GAME_DRAW_BLOCKER`, `NATIVE_GAME_DRAW_COUNT`, `NATIVE_PUBLISHED_FRAME_COUNT`, `CODE_CHANGED_SHA`, and `NEXT_IMPLEMENTATION_ACTION`. Unobserved counts must be `UNTESTED`, never invented zero or success. Deployment of any external Docker/Portainer controller requires independent proof; changing this repository alone does not reconfigure it.
+
+# 2026-10-16 USER OVERRIDE — COMPLETE DX11 SOURCE GRAPH BEFORE GAME/HMD TEST
+
+**Authoritative for DX11 A / `vr-dx11-native-r71` and subsequent task dispatch.** The user has explicitly prioritized completing the entire native DX11 implementation over the repeated per-feature test cycle. Preserve existing task IDs, branch/lease ownership, fail-closed DX9Ex rendering/input/FFB, isolated DXVK and exact-SHA final CI.
+
+1. **Source phase first.** Continue actual C++/HLSL/host changes until the linked game Draw/DrawIndexed -> native full-sized color/depth/stencil/textures/shaders -> Present and separate L/R GPU eye targets -> OpenXR producer/consumer fence/ACK/source generations are integrated. Cover menu, car selection and sustained race, graphics Reset/resource invalidation and original inputs. The existing GPU->CPU->D3D9 readback may remain a guarded diagnostic/desktop fallback but is NOT the completed VR renderer.
+2. **No independent micro-feature cycles.** Keep one cohesive source-completion workstream and resume the existing owner/task when unfinished. Do not allocate a new scored TASK_ID for individual formats, state variants, tests, run-record repairs or per-commit review. Commit meaningful implementation checkpoints but do not treat each as a new completed renderer feature.
+3. **Test only at the right boundary.** During source integration use narrow local/compile/static or deterministic unit checks to catch errors without repeated expensive end-to-end test builds. Run the unchanged mandatory five exact-SHA GitHub Actions (DX11 Fast, Backend, Windows Build, OpenXR, HUD) on the completed integrated source candidate; repair real failures at the same feature identity. Then prepare ONE genuine full-frame native candidate for real game/HMD visual and performance testing. Do not bypass required GitHub policies or mark unfinished C++ runtime tested.
+4. **Acceptance is evidence based.** SOURCE_INTEGRATED means the full mono/LR/OpenXR source graph exists and coheres; BUILD_VERIFIED requires exact-SHA gates; RUNTIME_OBSERVED requires a matching real-game menu/car/race session; QUEST3_PLAYABLE requires validated 3D stereo/HUD/controls/frame pacing. Do not claim a percentage or gameplay completion on source/CI alone.
+5. **Deployment boundary.** GitHub repository policy is durable guidance, not evidence that the user's external Docker/Portainer chat controller has consumed/redeployed it. Do not claim its schedule changed unless separately verified.
+
+# 2026-10-14 USER OVERRIDE — DX11 FULL GAME SOURCE FIRST (HIGHEST PRIORITY)
+
+**Authoritative for DX11 Native A / `vr-dx11-native-r71`.** Supersedes older DX11 task-selection, review-frequency and diagnostic-inset priorities where they conflict. Keep domain isolation, task/owner leases, honest runtime status and final exact-SHA safety/compile Gates.
+
+## Actual deliverable, not diagnostic churn
+1. **P0: IMPLEMENT full-resolution native D3D11 game output first.** Replace the opt-in 256x144 inset-only endpoint with a guarded real-game D3D9 Draw/DrawIndexed -> D3D11 resource/shader/RT -> native full-frame output/presentation path. Connect menu -> vehicle selection -> sustained race in one integrated feature-sized source batch. An inset/WARP probe, one enum/format, a new guard or a passed CI alone is never "DX11 conversion completed."
+2. **P1: Close ONLY confirmed blockers of the full-frame pipeline.** Bind real programmable VS/PS, constants, buffers/textures, alpha/depth/blend and Reset/lifetime needed by live Draw/Present. Handle inherited R175 shader parity as a blocking dependency when relevant; honor owner handoff. No speculative standalone R-series probes, speculative micro-optimizations or redundant research ahead of P0.
+3. **P2: Connect native L/R eye targets to OpenXR, then preserve gamepad, HUD/marker/flare/shadow/camera and performance.** Real Quest3/VDXR parity and 72Hz frame pacing are acceptance checks, never inferred from source/CI success.
+4. Existing unfinished TASK_ID/FEATURE_ID retains ownership across commits, CI repairs, retries and chat rollover. Prioritize meaningful C++/HLSL/host source diffs rather than check-only, planning-only or bookkeeping-only runs. Do not create new scored IDs for individual state variants/tests.
+
+## Faster validation cadence without false success
+- **C2 implementation first:** review only confirmed source blockers. During a cohesive source batch use narrow compile/static/unit checks **when necessary**; do not launch the expensive full Windows/OpenXR/HUD matrix after every micro-edit or repeat an unchanged review/CI SHA.
+- **One final exact-SHA integration gate per cohesive feature:** retain all mandatory DX11 Fast, Backend, Win32 Build, OpenXR and HUD checks with positive/negative fallback tests. Failed Gates require a causal code/test repair under the SAME TASK_ID and one new validation-bearing SHA; never skip required CI, weaken guards, or label partial results complete.
+- Keep C0-C6 as compact durable checkpoints, not separate source-development deliverables. Lightweight five-minute persistence may continue without triggering heavy validation or interrupting C2. Package only a user-testable candidate; no forced HMD run after every code change.
+- **Safe promotion:** `NativeDrawPathActive=false`/opt-in until actual full-game output and hardware parity are demonstrated; existing D3D9/DX9Ex Draw/Present/input must remain valid fallback. `RUNTIME_VALIDATION=UNTESTED` until a matching real game/Quest3 run is documented. DX9Ex C isolated, DXVK B frozen, DX12 excluded.
+- **Source-only policy edits do not deploy an external Docker controller.** Any controller selecting future tasks must apply this ordering/cadence explicitly. Never claim deployment without proof.
+
+# 2026-10-13 USER OVERRIDE — FEATURE-SIZED AUTONOMOUS DELIVERY (ACTIVE)
+
+New DX11 production TASK_IDs from 00672 onward are **functional feature units**, not per-texture-format, per-render-state, per-helper, per-guard, or per-test microtasks. A feature is an independently meaningful integrated renderer capability with a finite end-to-end acceptance contract, its safe fallback, regression evidence, and final exact-SHA GitHub build gates. Group related formats/state permutations and their source + HLSL + Draw/DrawIndexed binding + positive/negative tests into one feature; do not allocate one new scored task for each enum/format/failure. DX11 Native A remains active, DX9Ex C independent, DXVK B frozen.
+
+Before dispatch, reconcile the previous TASK_ID, FEATURE_ID, work_key and owner lease. If the previous feature is not complete, continue it under its original TASK_ID across source subcommits, CI repairs, retries and chat rollovers. Never create a replacement TASK_ID merely because a single material commit passed CI, a different pixel format was implemented, or C6 is pending. Each new feature contract must describe a user-observable/integrated outcome and at least three independently testable acceptance items spanning end-to-end implementation, safe fallback/regression and same-SHA integrated validation, with at least two real subsystems/behavior domains. For DONE_BUILD_VERIFIED, all build-verifiable items must pass; HMD/Quest3 acceptance remains separately UNTESTED until measured. Critical crash/CI blockers can be handled separately only with concrete evidence and a bounded integrated restoration goal.
+
+**Implementation enforcement:** `docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json` and `tools/dx11_autodev_policy.py` reject incomplete micro-feature contracts for new run records from 00672, while grandfathering earlier TASK_IDs. This policy does not reload the external Docker controller; its dispatch code must also enforce the same unit/owner rules before creating IDs. A GitHub policy commit alone is not live deployment evidence.
+
 # OutRun2 VR Development Execution Contract
+
+## DX11 first real game frame — latest user directive, 2026-10-10
+
+For DX11 production tasks starting at CONVERSION-DX11-00537, the feature outcome is **R175 unblocked and a real OutRun D3D9 Draw routed to a safely enabled native D3D11 visible game frame**, not more independent WARP/guard/Rxxx tasks. This DX11-specific priority supersedes the generic C2 guidance to commit a small fix and move on. Keep C0-C6, 5-minute GitHub checkpoints, 30-minute chat rollover, source owner/lease isolation, exact-SHA final CI, and RUNTIME_VALIDATION=UNTESTED without actual game/HMD evidence.
+
+First inspect R175 existing owner CONVERSION-DX11-00477; fix the real shader parity bug only after verifiable release/transfer, never bypass or weaken CI. Otherwise continue the disjoint live Draw callsite→resource/shader→D3D11 Draw→visible frame integration in a single feature. Treat individual WARP fixtures as necessary internal evidence only, not completed deliverables. Controlled diagnostic opt-in and DX9Ex fallback are mandatory until real gameplay parity is established. The governing machine-readable acceptance contract is docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json.
+
+## Execution location and N100 disk budget policy — 2026-10-08
+
+This policy applies to all AI agents, chats, scheduled automation and retries working on this branch. It restricts **where** work happens; it does not supersede backend/domain isolation, exact-SHA validation, GitHub-only job contracts or runtime test requirements.
+
+1. **First priority, GitHub:** use the authenticated GitHub connector/API for source of truth, file reads/edits, history, branches, commits and GitHub Actions CI/artifacts. Do not clone to inspect files that the connected GitHub tool can fetch. For conversion jobs explicitly marked GitHub-only, remain GitHub-only.
+2. **First priority, ChatGPT-local:** use the ChatGPT ephemeral local runtime for analysis, temporary files, transformations and supporting tests that can run there. Remove disposable local outputs after use. Do not infer that a GitHub-only job permits local Git state as authority.
+3. **Second priority, N100:** use N100 only when GitHub/ChatGPT-local cannot do a necessary task, or the task requires an N100-resident running service, user-owned file, hardware or network context. Keep N100 operations lightweight and scoped; avoid repeated large builds, bulk scans, image conversion and storage duplication.
+4. **Default-deny new N100 checkouts:** do not run `git clone`, `git worktree add`, duplicate full trees or download HD DDS/large archives to N100 just to investigate or build. An exception requires a documented `N100_EXCEPTION_REASON`, exact user-owned target path, estimated maximum bytes, necessity, and cleanup condition. Reuse an existing checkout if safe rather than create another.
+5. **Temporary checkout cleanup:** after a justified N100 exception, remove temporary copies only after checking (a) owner UID of all affected files, (b) `git status --porcelain` is clean, (c) HEAD and any branch-local commits are preserved on authenticated GitHub or explicitly retained, (d) no active process or worktree depends on them, and (e) source/destination are within the approved account workspace. Prefer `git worktree remove` *without force* for linked worktrees. If any condition is uncertain, preserve and report the blocker.
+6. **Never delete:** files owned by other users, uncommitted/unpushed work, credentials, source-of-truth asset masters, production Docker volumes, active queues, persistent artifacts or running service dependencies. Do not run blanket `docker system prune --volumes`, `git clean -fdx`, `git reset --hard` or recursive cleanup without specific verified scope.
+7. **Storage evidence:** for necessary N100 work record before/after available disk, paths and bytes added/removed, ownership, retained data and cleanup outcome. Prefer GitHub Actions artifacts for validated build outputs over N100 copies; preserve `RUNTIME_VALIDATION=UNTESTED` until actual hardware testing.
+8. **No retroactive deletion authorization:** this policy does not itself authorize removing existing worktrees, clones or data. Future cleanup must independently validate every deletion against the safeguards above.
+
 
 This file defines the default execution model for substantial work in this repository, especially the OutRun2 VR/OpenXR backends and build matrix.
 
@@ -125,6 +215,38 @@ Do not rerun a completed batch unless a relevant input changed. Mark only affect
 - Record every component SHA used by a package; integration HEAD alone is not package identity.
 - Do not silently substitute fallback backends or fake A-F variants.
 
+
+## DX11 integration-first auto-development (effective from CONVERSION-DX11-00531, 2026-10-10)
+
+This section is an **operative DX11 task-selection and acceptance rule**, overriding the generic "one small coherent fix" advice for choosing independent new DX11 production achievements. It does not relax isolation, C0-C6, exact-SHA GitHub Actions, dormant gameplay Draw, runtime proof, single-writer CAS or other safety rules.
+
+1. Before allocating a NEW DX11 work_key, read `docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json`, `docs/VR_DX11_NATIVE_PLAN.md`, the latest task record and active owner/lease. The existing task 00530 is grandfathered; do not restart or steal it. Prefer a complete mono D3D9-command-to-D3D11-WARP-draw-to-pixel vertical slice over another unrelated per-state guard.
+2. Prioritize the R175 known independent WARP blocker **only when its owner is released or safely fenced**. While it is actively owned or blocked without new evidence, select a nonconflicting path that connects at least two real producer-to-consumer components. Do not reopen 00477 or duplicate R175 ownership on another task ID simply to satisfy priority.
+3. For every new DX11 task >=00531, add `development_strategy` to its durable run record before the validation-bearing commit: `work_class`, `milestone_id`, `integration_path` (>=2 connected stages), `batch_components` (>=2 substantive components), `acceptance_proof` (positive GPU/source proof, negative regression, component integration), `conflict_keys`, and `full_gate_plan=one_validation_bearing_sha`. For blocker/safety/CI work add concrete `blocking_evidence`.
+4. Reject new independent tasks that only add one readiness flag, one defensive guard, a static test string, one compile, bookkeeping, or a review; allow a safety repair only with a reproducible failure and explicit integration/unblocking proof. Complete one cohesive source+test+integration batch before scheduling its final exact-SHA full Gate; lightweight static and targeted WARP checks may run while developing. Do not repeatedly compile every micro-edit.
+5. Run `python tools/dx11_autodev_policy.py --check-run docs/automation/runs/<TASK_ID>.json` before publication, and record its result. The DX11 `Backend Conversion Gate` and lightweight workflow recheck the newest task from this threshold; do not delete/skip either gate. A scoped WARP PASS with inherited R175 Gate FAIL is `SCOPED_PASS/FULL_GATE_FAIL`, not automation PASS, and gets no score. Keep `RUNTIME_VALIDATION=UNTESTED` absent a genuine HMD/game test.
+6. Do **not** enable native gameplay Draw or intercept extra live hooks until explicit production admission and Quest 3/VDXR parity evidence. DX9Ex remains protected. If an external Docker/Portainer controller does not consume this policy, mark its runtime adoption NOT_VERIFIED: repository policy does not silently hot-patch the running controller.
+
+## Backend development priority override — 2026-09-29
+
+This section is the current backend-allocation policy and overrides older backend-priority text elsewhere in this repository when the two conflict.
+
+- **DX11 Native is the primary implementation/performance lane** (nominal engineering allocation about 50%).
+- **DXVK is the secondary implementation/performance lane** (nominal engineering allocation about 40%) and remains isolated until exact-build Quest 3/VDXR evidence is available.
+- **DX9Ex is maintenance/reference only** (normally <=10%). Do not spend autonomous cycles on new DX9Ex performance tuning or feature expansion. Keep it as the protected visual/regression baseline and fallback; change it only for a critical crash/regression, a deterministic baseline verifier, or work strictly required to compare/unblock DX11/DXVK.
+- **DX12/D3D9On12 is frozen/reference-only.** Do not autonomously implement, build, package, optimize, or promote it unless the user explicitly reopens that lane.
+- Distribution performance work must target hardware below the development RTX 4070. Do not claim a minimum GPU until measured; prioritize scalable PERFORMANCE/BALANCED/QUALITY profiles, frame-time stability, transport/copy/wait reduction, and 72 Hz viability on lower-tier hardware.
+- Single-pass/multiview remains a later optimization candidate only after graphics, lifecycle, selector and two-pass runtime gates are stable.
+- Build/CI success is not runtime or low-end performance proof. Quest 3/VDXR exact-build evidence remains required for visual, pacing and performance claims.
+- Stale queue/history text that still describes active DX9Ex performance or DX12 development must not create new autonomous work; preserve it as history until explicitly reconciled.
+
+
+## HDR / floating-point render pipeline design
+
+For DXVK/DX11 work that touches render-target formats, exposure/SkyGlow preservation, post-processing, tone mapping, color spaces, reflection surfaces, or final OpenXR color output, read `docs/VR_HDR_RENDER_PIPELINE_DESIGN.md` before implementation.
+
+Key constraints: preserve restored Xbox exposure/SkyGlow semantics; use selective provenance-driven FP16 promotion rather than blanket render-target upgrades; keep reflection/UI/depth/transport surfaces deny-by-default; tone-map the Quest 3/VDXR path exactly once; and keep runtime claims `UNTESTED` until matching HMD evidence exists. The design document does not authorize native draw-path activation or relax any branch-local conversion gate.
+
 ## Interactive chat default
 
 When a user asks to review, fix, build, package, or continue this OutRun2 VR project in chat, follow this contract automatically.
@@ -174,3 +296,36 @@ The repository has an interactive Windows self-hosted fast-build path in .github
 - PC-fast output is PC_FAST_INCREMENTAL_NOT_FINAL_CI. It never advances the protected runtime baseline and never replaces canonical hosted validation or final packaging.
 - Outside that evening test session, scheduled A/N100/B/C/D work, daytime/manual development, review, CI validation, packaging and ordinary direct-chat edits must not use [pc-build]. When the evening session ends, stop using [pc-build] immediately so the user's PC remains uninvolved.
 
+
+
+## Controller conversion TASK completion override — 2026-10-02
+
+For controller-dispatched DX11/DXVK conversion tasks, the normal task boundary is **one selected work item through the complete C0→C6 pipeline**, not one review/checkpoint.
+
+- C0 RECOVER, C1 REVIEW, C2 IMPLEMENT, C3 VALIDATE, C4 COMMIT, C5 PACKAGE (or explicit reasoned NOT_REQUIRED), and C6 STATE must all be represented in the current TASK run record before normal release.
+- C0-only recovery, C1-only review, plan/status text, state-only commits, and single checkpoint commits are nonterminal. Continue the same TASK_ID.
+- C2 requires substantive repository work outside task/state bookkeeping: source, tool, test, workflow, or disassembly-evidence implementation. If runtime hardware is unavailable, continue independent GitHub-only static/source/disassembly/CI work.
+- C3 must record validation evidence for the C2 work. Build/CI evidence is not Quest 3/VDXR runtime proof; runtime may remain UNTESTED.
+- C5 may be NOT_REQUIRED only with an explicit reason.
+- C6 must persist durable continuation state and an exact next action.
+- docs/automation/runs/<TASK_ID>.json uses conversion pipeline schema 2 and is controller completion evidence.
+- Partial C0→C6 checkpoints exist for interruption/recovery only and do not satisfy normal TASK completion.
+- After the full-pipeline result passes its exact-SHA Backend Conversion Gate, the controller should release that TASK and immediately continue with the next independent work item in the same backend lane.
+
+This branch-local override narrows the general bounded-run rule: boundedness still applies inside each stage, but it must not be used to stop normally after C0/C1 or after a bookkeeping checkpoint while independent implementation work remains.
+## DX11 conversion-branch state override
+
+This branch is a dedicated conversion lane. Before substantial work, read `docs/CONVERSION_LANE_STATE.json` after fetching the current GitHub HEAD.
+
+For this branch, the precedence is:
+1. current GitHub HEAD;
+2. `docs/CONVERSION_LANE_STATE.json`;
+3. the current durable `docs/automation/runs/<TASK_ID>.json`;
+4. this `AGENTS.md`;
+5. inherited/historical `docs/VR_AUTODEV_STATE.json`.
+
+The inherited VR_AUTODEV_STATE may contain older DX9Ex/global project policy. It must not overwrite current DX11 conversion-lane status or priority.
+
+Development is GitHub-only. Missing local PC, RenderDoc, local OpenXR runtime, or an installed Skill is not a blocker for repository source/static/disassembly/GitHub Actions work. Installed Skills are optional helpers only and never completion authority.
+
+A stable assistant response that only reconstructs state, reviews, or describes the next step is not task completion. Continue the same TASK_ID to durable repository work/commit; runtime-only claims remain UNTESTED until user Quest 3/VDXR evidence exists.

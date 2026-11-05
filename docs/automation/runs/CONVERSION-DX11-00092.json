@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00092",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T06:45:19+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "0a2eb0373932935db23a68c3dd3130b8ace3b8c6",
+  "initial_result_sha": "7bbc6f825a400778c25ad620c92c4146ae6d1d5d",
+  "result_sha": "7bbc6f825a400778c25ad620c92c4146ae6d1d5d",
+  "validation_bearing_result_sha": "7bbc6f825a400778c25ad620c92c4146ae6d1d5d",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13 R120 bounded live adoption of the shared disassembly producer map for the eight canonical DispRank put_clip_sprite callsites.",
+  "summary": "R120 continues live closure of Set04/F13 without widening HUD ownership. The eight DispRank clip callsites at 0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0, 0xB9FFC, 0xBA01E, 0xBA035 and 0xBA052 are now exact-RVA template instantiations. Probe-19 handoff, ScopedProducerSemantic and direct SpriteNode pinning derive their RenderScope through GameSemantic::ClassifyCriticalProducer -> DisasmContract::ClassifyCriticalProducer, and each instantiation compile-time requires ScreenHud. The separate DispRank sprani callsite 0xB9DA6 is outside the canonical shared range and remains intentionally unchanged.",
+  "source_commits": [
+    "7bbc6f825a400778c25ad620c92c4146ae6d1d5d"
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_range_widened": false,
+    "disp_rank_sprani_0xB9DA6_changed": false,
+    "affected_producer_family": "DispRank put_clip_sprite exact callsites only"
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "src/hooks_uiscaling.cpp and render_semantics.hpp are protected runtime-risk paths. R120 does not create new HUD ownership or widen a semantic range; it replaces duplicated ScreenHud literals for eight already-canonical DispRank clip callsites with the shared classifier. The existing R51 runtime evidence also shows producer tagging alone does not prove visual convergence because semantic ownership may arrive after the c64/WVP boundary. Quest3/VDXR runtime validation therefore remains required."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36634587539,
+      "conclusion": "success",
+      "validated_sha": "7bbc6f825a400778c25ad620c92c4146ae6d1d5d",
+      "artifact_id": 11063499700,
+      "artifact_digest": "sha256:6c670d31798a40ccaf335d6c204bfa480ac0ed9cca21811a2afd9f2195d762fc",
+      "evidence": "Queue/baseline/one-click checks PASS; R120 backend disassembly contract PASS; DX11 transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes PASS; input-layout/shader/linkage/constant-buffer/native-transport probes PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36634592265,
+      "conclusion": "success",
+      "validated_sha": "7bbc6f825a400778c25ad620c92c4146ae6d1d5d"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36634592259,
+      "conclusion": "success",
+      "validated_sha": "7bbc6f825a400778c25ad620c92c4146ae6d1d5d",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36634592336,
+      "conclusion": "success",
+      "validated_sha": "7bbc6f825a400778c25ad620c92c4146ae6d1d5d",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36634587587,
+      "conclusion": "skipped",
+      "validated_sha": "7bbc6f825a400778c25ad620c92c4146ae6d1d5d"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5899468616,
+    "validation_comment_id": 5899583033,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact controller marker [AUTO:CONVERSION-DX11-00092] and contains no CI-skip directive.",
+    "Exactly three source/verifier paths changed; no vr-d3d9ex-focus source or native DX11 draw/transport routing changed.",
+    "All eight converted DispRank clip callsites are within the canonical 0x000B9E00-0x000BA100 ScreenHud producer range and are individually compile-time checked.",
+    "The out-of-range DispRank sprani callsite 0xB9DA6 was deliberately not folded into the shared map or widened by inference.",
+    "The backend disassembly verifier rejects reintroduction of the legacy untemplated DispRank clip callback.",
+    "Backend Conversion Gate, normal Build, HUD Inspector and all six OpenXR architecture jobs pass on the same validation-bearing result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R120 is automation-validated but runtime-untested. TimeAttack plus eight DispRank clip callsites now consume the shared producer map at runtime, while Set04/F13 remains partially open for other exact producer families and the out-of-range DispRank sprani path.",
+  "next_action": "Continue Set04/F13 only with another independently proven producer family whose exact caller RVAs already have canonical shared provenance. Do not widen the producer map to absorb 0xB9DA6 without separate evidence. F15 projected semantic expressiveness remains an independent follow-up. Do not claim HMD visual correctness without exact-build Quest3/VDXR evidence."
+}

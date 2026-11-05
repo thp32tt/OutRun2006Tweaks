@@ -1,0 +1,94 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00722",
+  "production_id": "CONVERSION-DX11-00722",
+  "event_id": "CONVERSION-DX11-00722-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME",
+  "feature_id": "DX11-FULL-RESOLUTION-NATIVE-GAME-FRAME",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "game-created source D3D9 Clear and SetRenderTarget(0) events are forwarded by actual shared R9 hook chain, preserving original game Draw/Present/input",
+      "canonical IUnknown RT0 identity and substantive Clear flags avoid cancelling native native Draw/Indexed menu/vehicle/race frame on alias or no-op transitions",
+      "genuine RT0 switches and color/Z/stencil Clears still abort incomplete full-resolution D3D11 GPU frame before desktop Present"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_game_scene_boundary_00696.py",
+      "tools/dx11_native_frame_batch_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "source canonical COM identity preserves same RT0 across aliases, no-op zero-flags Clear preserves current native game frame, all real game Draw/Present and input unchanged",
+      "negative_regression": "genuine RT0 change or color/Z/stencil Clear must cancel native full game frame; destructive source alias, reference Release and zero-flag mutations rejected",
+      "component_integration": "live game R9 callbacks -> GameNativeFrameBatch scene_boundary -> full native D3D11 target to guarded readback and original D3D9 fallback"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "src/vr/d3d9/stereo_renderer.cpp",
+      "tools/test_dx11_game_scene_boundary_00696.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI full frame boundary correctness only. Actual native game menu, vehicle selection, sustained race and Quest3/VDXR screenshots remain to be tested",
+    "activation_guard_and_fallback": "native full-game pixel publication is explicitly opt-in; canonical surface identity and no-op Clear do not disrupt scene, real scene transition invalidates batch; original D3D9 gamepad Draw and Present always execute"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-RESOLUTION-NATIVE-GAME-FRAME",
+    "goal": "Maintain coherent native full-size game frame across menu/vehicle/race RT aliases and no-op Clears while invalidating real scene boundaries and preserving input-safe D3D9 fallback",
+    "acceptance_items": [
+      {
+        "id": "canonical-native-scene-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_full_frame",
+        "expected_behavior": "same COM RT0 alias and zero-flags Clear retain captured game native Draw/Indexed frame before Present"
+      },
+      {
+        "id": "game-owned-scene-abort",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_input",
+        "expected_behavior": "real target switches and color/depth/stencil Clears discard stale native GPU pixels but never alter D3D9 HRESULT/input"
+      },
+      {
+        "id": "exact-sha-validation",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_cpp",
+        "expected_behavior": "destructive structural regression and mandatory DX11 Fast, Backend, Windows Build, OpenXR, HUD checks at exact source SHA"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "tools/test_dx11_game_scene_boundary_00696.py",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "tools/dx11_native_frame_batch_probe.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00722.json"
+  ],
+  "base_head_sha": "ba468ecdd59cb8906ee527e4f552393a79eb70a2",
+  "previous_material_sha": "658d7f7ac6022d435e2d373076958f46992edda2",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "runtime_gate": "NEED_HMD_TEST",
+  "note": "Initial 00722 commit inadvertently duplicated pre-existing R9 scene hooks; corrected material SHA restores the redundant R30 hooks and changes real R9 alias/no-op handling. RUNTIME_VALIDATION=UNTESTED."
+}

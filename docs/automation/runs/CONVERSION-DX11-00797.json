@@ -1,0 +1,117 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00797",
+  "production_id": "CONVERSION-DX11-00797",
+  "event_id": "CONVERSION-DX11-00797-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_PREDRAW_PARTIAL_COLORFILL_ORDERED_NATIVE_REPLAY",
+  "feature_id": "DX11-LIVE-PREDRAW-COLORFILL-FULLFRAME-CONTINUITY",
+  "status": "VALIDATION_IN_PROGRESS",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "373bf3167db06daa0008ff81dae61a14627efe8a",
+  "material_result_sha": "19dae0556e660d0717d275e5f9b8e8348068bc0a",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "tools/dx11_native_frame_batch_probe.cpp",
+    "tools/test_dx11_source_owner_handoff_00740.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-PREDRAW-COLORFILL-FULLFRAME-CONTINUITY",
+    "goal": "Carry actual game-authored pre-Draw partial ColorFill tiles between a valid full D3D9 TARGET Clear and first native game Draw through an ordered D3D11.1 RTV ClearView replay, preserving game menu, car selection and race background composition and original fallback.",
+    "acceptance_items": [
+      {
+        "id": "ordered-predraw-colorfill-gpu-replay",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_ColorFill_to_D3D11_real_game_Draw",
+        "expected_behavior": "Store multiple canonical pre-Draw fills in CPU bounded queue; apply ordered ClearView before first native game Draw, preserving RGB and X8 opaque destination alpha."
+      },
+      {
+        "id": "source-owner-lifetime-and-original-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Game_input_D3D9_Present_Canonical_backbuffer",
+        "expected_behavior": "Reject foreign owner, malformed bounds, capacity overflow and missing D3D11.1. Retire tiles on full Clear, device Reset, Present, source mutation and scene boundary; preserve original D3D9 Draw, gamepad, FFB."
+      },
+      {
+        "id": "five-required-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "All mandatory GitHub Actions gates succeed at same validation-bearing source SHA with native positive/negative regression; physical HMD remains UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Original successful D3D9 full TARGET Clear establishes exact canonical device/backbuffer epoch",
+      "Original pre-Draw ColorFill detour caches bounded ordered tiles until first real native Draw/DrawIndexed",
+      "First native Draw performs full RTV seed then D3D11.1 ClearView per cached game ColorFill before vertex/fragment emission",
+      "Current-Present full-resolution native frame uses existing D3D9 image upload and gamepad/FFB fallback"
+    ],
+    "batch_components": [
+      "D3D9 game ColorFill producer observation and per-owner pre-Draw queue",
+      "D3D11.1 native fullframe RTV ordered replay before first Draw, source/Reset lifetime handling",
+      "Portable C++ queue negative/positive test and ownership destructive regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two overlapping pre-Draw ColorFills remain in authored order and X8 alpha becomes opaque in first native full-frame scene.",
+      "negative_regression": "Foreign device/backbuffer, malformed/overflow tile, D3D11.0 context and Reset/Present/source mutation do not paint stale native pixels or alter D3D9 input.",
+      "component_integration": "Live D3D9 full Clear + ColorFill hook -> native full-size RTV seed + ordered D3D11.1 ClearView -> live Draw/Indexed -> current Present."
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_PREDRAW_PARTIAL_COLORFILL_ORDERED_NATIVE_REPLAY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "FULL_GAME_CLEAR",
+      "PREDRAW_COLORFILL",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source integration + exact-SHA Actions only, not observed real game menus, car selection, race or Quest3 stereo.",
+    "activation_guard_and_fallback": "NativeDrawPathActive dormant/opt-in; reject unsupported context/owner/tiles; never suppress real D3D9 calls, original input/FFB/SkyGlow and DX9Ex preserved; DXVK frozen."
+  },
+  "acceptance_results": {
+    "ordered-predraw-colorfill-gpu-replay": "PENDING_CI",
+    "source-owner-lifetime-and-original-fallback": "PENDING_CI",
+    "five-required-exact-sha-gates": "PENDING_CI"
+  },
+  "pipeline": {
+    "C0_RECOVER": "HEAD 373bf316, previous 00796 exact-SHA PASS; selected disjoint live D3D9 pre-Draw ColorFill area.",
+    "C1_REVIEW": "Confirmed pre-Draw partial ColorFill currently returns false; post-Draw path already uses ClearView. Need correct pre-Draw scene ordering before first native Draw.",
+    "C2_IMPLEMENT": "Material 19dae055 adds game-owned bounded tile queue, first native RTV ordered ClearView replay, Reset/new Clear/Present invalidation and C++ positive/negative tests.",
+    "C3_VALIDATE": "Initial material Fast failed inherited 00740 literal-string matcher after necessary scoping block; repair keeps both foreign/normal owner destructive checks. Five final exact SHA gates PENDING.",
+    "C4_COMMIT": "Material source 19dae055; pending source-preserving CI policy/test causal repair commit includes this record and 00740 test.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING exact SHA and real HMD UNTESTED. No score until confirmed all Gates."
+  },
+  "evidence": {
+    "material_commit": "19dae0556e660d0717d275e5f9b8e8348068bc0a",
+    "observed_fast_initial_failure": {
+      "run_id": 38825642293,
+      "reason": "00740 source owner handoff checks old single-line if !foreignSource / if foreignSource clear strings, now conditional block plus preDraw tiles discard"
+    },
+    "runtime_test": false
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00797",
+    "score_change": 0,
+    "score_status": "PENDING; only after material feature and all mandatory exact SHA Gate PASS"
+  }
+}

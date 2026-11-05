@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00641",
+  "production_id": "CONVERSION-DX11-00641",
+  "event_id": "CONVERSION-DX11-00641-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_CURRENT_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "c8cda5e1d83901a5af2cb793e83e19ed311165f3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Read real game D3D9 PM RGB and BLENDCURRENTALPHA TEXTURE/TFACTOR in Draw/DrawIndexed",
+      "Capture D3DRS_TEXTUREFACTOR high byte and independent ARG2 complement or fail closed",
+      "Compile/select PM CURRENT HLSL PS, set native alpha constant, dispatch D3D11 Draw/DrawIndexed"
+    ],
+    "batch_components": [
+      "D3D9 source/state capture, exact guard, complement and DX9Ex fallback",
+      "D3D11 HLSL PS, shader initialization/lifetime and native Draw/DrawIndexed binding",
+      "Destructive source graph plus 12800 numeric cases in full and fast CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PM RGB uses original TEXTURE.a; alpha = TEXTURE.a*CURRENT.a + TFACTOR.a*(1-CURRENT.a), optional complemented factor",
+      "negative_regression": "Reject swapped/modified D3D9 operands, bad RGB Arg2, invalid operator or failed factor read; DX9Ex gamepad untouched",
+      "component_integration": "D3D9 GetTextureStageState and GetRenderState -> native PS constant and HLSL -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_CURRENT_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "D3D11 source integration/regression only. Game menu, selection, race, gamepad and Quest3/VDXR untested.",
+    "activation_guard_and_fallback": "Only OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic; original D3D9 Draw/gamepad preserved."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_current_factor_00641.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00641.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: current 00640 C6 and distinct work_key",
+    "C1_REVIEW": "PASS: missing D3DTOP_BLENDCURRENTALPHA/TFACTOR",
+    "C2_IMPLEMENT": "PASS: real game state capture + HLSL native Draw",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38323129683 SUCCESS; DX11 Fast Structural Checks #38323129691 SUCCESS on 77e6df4978893ed7c2e2c7041d226f95fcd80df5.",
+    "C4_COMMIT": "PASS: material source implementation f51d8dc5fb4a5c93e4da44ffb0fdbcef4fb0d728; validation-bearing repair/result 77e6df4978893ed7c2e2c7041d226f95fcd80df5 (no CI-skip on result).",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: PASS_EXACT_SHA; runtime Quest3/VDXR and gamepad UNTESTED. No backend promotion."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No runtime gameplay/HMD evidence"
+  },
+  "next_action": "C6 complete. Do not re-run this TASK_ID; hardware-only Quest3/VDXR gameplay/menu-to-race and input validation remains UNTESTED.",
+  "validation_bearing_result_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5",
+  "material_result_sha": "f51d8dc5fb4a5c93e4da44ffb0fdbcef4fb0d728",
+  "material_implementation_sha": "f51d8dc5fb4a5c93e4da44ffb0fdbcef4fb0d728",
+  "result_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5",
+  "validation_bearing_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5",
+  "completed_at": "2026-10-12T23:49:11.925Z",
+  "git_actions": {
+    "backend_conversion_gate": {
+      "run_id": 38323129683,
+      "conclusion": "success",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "dx11_fast_structural": {
+      "run_id": 38323129691,
+      "conclusion": "success",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "windows_build": {
+      "run_id": 38323133499,
+      "conclusion": "cancelled",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "openxr_architecture": {
+      "run_id": 38323133551,
+      "conclusion": "cancelled",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "hud_inspector": {
+      "run_id": 38323133768,
+      "conclusion": "cancelled",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "vr_pc_fast_test_build": {
+      "run_id": 38323129685,
+      "conclusion": "skipped",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00286",
+  "production_id": "CONVERSION-DX11-00286",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "event_id": "CONVERSION-DX11-00286-E001",
+  "event_type": "rollover",
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "status": "WAIT_DURABLE_RESULT",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "6ca6d2a3019e421bee52c7f9d8b0fcfc0d4eb2b3",
+  "source_implementation_sha": "6ca6d2a3019e421bee52c7f9d8b0fcfc0d4eb2b3",
+  "repair_sha": "da11b99a249679d41d11ec8b8b3f60c8509d89a7",
+  "result_marker": "[AUTO:CONVERSION-DX11-00286]",
+  "selected_work_item": "DX11_SURFACE_FORMAT_PROVENANCE_STATIC_GUARD",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub branch HEAD da11b99a249679d41d11ec8b8b3f60c8509d89a7, AGENTS.md conversion override, lane state, source and repair commits. ATTEMPT preserved at 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "High-risk render-surface format/color-space promotions require explicit SCENE_COLOR/EFFECT_COLOR provenance, alpha preservation, and source-format fallback evidence; runtime evidence remains separate."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        ".github/workflows/backend-conversion-gate.yml",
+        "tools/dx11_native_static_surface_contract_check.py",
+        "tools/test_dx11_static_surface_contract.py",
+        "tools/dx11_fixed_function_shader_semantics.cpp"
+      ],
+      "commits": [
+        "6ca6d2a3019e421bee52c7f9d8b0fcfc0d4eb2b3",
+        "da11b99a249679d41d11ec8b8b3f60c8509d89a7"
+      ],
+      "summary": "Added DX11 surface-format provenance analyzer/regression/CI gate, then repaired readiness smoke MSVC compile contract without changing runtime activation."
+    },
+    "C3_VALIDATE": {
+      "status": "PARTIAL_HOSTED_CI_IN_PROGRESS",
+      "static_evidence": "Build run 37042538592 passed HMD baseline, one-click structure, backend disassembly, DX11 source graph, DX11 census analyzer, wheel source/math static steps before Win32 configure.",
+      "workflow_runs": [
+        37042538592,
+        37042538660,
+        37042538657
+      ],
+      "binary_build_success_claimed": false,
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "6ca6d2a3019e421bee52c7f9d8b0fcfc0d4eb2b3",
+        "da11b99a249679d41d11ec8b8b3f60c8509d89a7"
+      ],
+      "marker_present": true
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static analyzer/test/workflow hardening and compile-contract repair only; no frozen runtime candidate was requested or justified."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_id": 5958003431,
+      "exact_next_action": "Observe the exact retaining-descendant Backend Conversion Gate and hosted Build result. If the gate passes, mark automation_validation PASS and release this task; if it fails, repair only the concrete failing contract under the same TASK_ID and ATTEMPT=1/3. Do not repeat completed C2 work."
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PENDING",
+    "reason": "Hosted workflows were still in progress at the rollover recovery observation."
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5958003431
+}

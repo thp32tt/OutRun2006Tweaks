@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00329",
+  "production_id": "CONVERSION-DX11-00329",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00329-E002",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R228_MULTI_LOG_STARTUP_BOOTSTRAP_COVERAGE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "93188a1ee1e406cce65e6c4e9c3448925223462c",
+  "result_sha": "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b",
+  "validation_bearing_result_sha": "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b",
+  "result_marker": "[AUTO:CONVERSION-DX11-00329]",
+  "selected_work_item": "DX11_R228_MULTI_LOG_STARTUP_BOOTSTRAP_COVERAGE_EVIDENCE",
+  "summary": "R228 extends R227 source-log provenance with per-log latest Startup/Bootstrap maps and explicit completeness accounting. Multi-session reports can now distinguish complete startup/bootstrap evidence from partial or truncated sessions without inferring missing evidence; the coverage remains diagnostic-only and NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00329.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD 93188a1ee1e406cce65e6c4e9c3448925223462c. Read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REGRESSION_KNOWLEDGE.json, VR_PROBLEM_HISTORY.md and Issue #14. R227 is durable and was not repeated.",
+      "resume_evidence": "Rollover resumed from authoritative GitHub material/result state without repeating completed R228 implementation or exact-SHA validation. Current dispatch is CONVERSION-DX11-00329-E002, CHAT_ROLLOVER=2, ATTEMPT=1/3; rollover is not a retry. RESUME_REASON=Retry persisted after one recovery attempt."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R227 attaches source_log to Startup/Bootstrap entries, but the report still exposes only global lists. Consumers cannot directly determine which recognized logs have no startup/bootstrap record, and repeated records require ad-hoc scanning to identify the latest per session.",
+      "review_lenses": {
+        "architecture": "Keep the fix inside the offline DX11 census analyzer/test/verifier; no runtime renderer, OpenXR, DX9Ex, transport or native draw routing changes.",
+        "ownership_lifetime": "No COM/device/resource/reset/present lifetime changes.",
+        "stereo_correctness": "No WVP, projection, HUD, sky/effect or recenter behavior changes.",
+        "performance": "Offline report aggregation only; runtime hot path is unchanged.",
+        "adversarial": "Two recognized logs are supplied; one has repeated bootstrap records and the other has no bootstrap record. The report must select the latest bootstrap for the complete log and expose incomplete coverage without inventing evidence."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added LatestStartupByLog, LatestBootstrapByLog and StartupBootstrapCoverage with explicit per-source completeness flags, exported the same coverage under ActivationEvidence as DiagnosticOnly/ActivationProof=false, added a partial-session regression fixture, and added source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R228_MULTI_LOG_STARTUP_BOOTSTRAP_COVERAGE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1893 run 37161771723 completed success for ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b. validate job 111316514072 passed queue/baseline/structure/disassembly, session analysis, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R228 census-analyzer checks, then configured/built Win32, verified the binary and uploaded artifact 11287374239. DX11 readiness smoke job 111317342901 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline handoff probes. Artifact digest sha256:c5993a9e72fc9a540463b182015738f191258c20595d6e07ef737f84ef32da65. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b",
+      "validation_bearing_result_sha": "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b",
+      "result_marker": "[AUTO:CONVERSION-DX11-00329]",
+      "implementation_commits": [
+        "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b"
+      ],
+      "source_implementation_sha": "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline analyzer evidence-integrity/reporting change only; no runtime binary behavior or distributable package identity change intended."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37161771723,
+      "validation_job_id": 111316514072,
+      "readiness_smoke_job_id": 111317342901,
+      "artifact_id": 11287374239,
+      "artifact_digest": "sha256:c5993a9e72fc9a540463b182015738f191258c20595d6e07ef737f84ef32da65",
+      "implementation_comment_id": 5974584749,
+      "validation_comment_id": 5974642968,
+      "exact_next_action": "Preserve R225 per-log signature isolation, R226 per-log summary aggregation, R227 startup/bootstrap provenance and R228 per-log startup/bootstrap coverage evidence; keep NativeDrawPath dormant and inspect the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "DX11_R228_MULTI_LOG_STARTUP_BOOTSTRAP_COVERAGE_EVIDENCE",
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping only. No runtime source, transport, protected DX9Ex baseline or HMD-visible behavior changes."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00329",
+    "production_id": "CONVERSION-DX11-00329",
+    "event_id": "CONVERSION-DX11-00329-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "source": "CURRENT_USER_QUEUE",
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "exact_next_action": "Preserve R225 per-log signature isolation, R226 per-log summary aggregation, R227 startup/bootstrap provenance and R228 per-log startup/bootstrap coverage evidence; keep NativeDrawPath dormant and inspect the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37161771723,
+      "run_number": 1893,
+      "result_sha": "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b",
+      "conclusion": "success",
+      "validate_job_id": 111316514072,
+      "readiness_smoke_job_id": 111317342901,
+      "artifact_id": 11287374239,
+      "artifact_digest": "sha256:c5993a9e72fc9a540463b182015738f191258c20595d6e07ef737f84ef32da65"
+    }
+  },
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "authoritative_dispatch_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00328",
+      "event_id": "CONVERSION-DXVK-00328-E002",
+      "event_type": "rollover",
+      "attempt": "1/3"
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DX11-00329",
+      "event_id": "CONVERSION-DX11-00329-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false
+    },
+    "reason": "The current user-supplied controller rollover is authoritative. The stale cross-lane DXVK dispatch was bookkeeping-only; material result, validation-bearing SHA, exact-SHA gate evidence and RUNTIME_VALIDATION are unchanged.",
+    "material_result_sha_unchanged": "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b",
+    "validation_bearing_result_sha_unchanged": "ded73b81b06b57344d2d92ba2bb4f6a1a04c4b4b"
+  }
+}

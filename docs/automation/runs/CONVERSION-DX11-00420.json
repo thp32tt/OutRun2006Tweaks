@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00420",
+  "production_id": "CONVERSION-DX11-00420",
+  "event_id": "CONVERSION-DX11-00420-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R282_PROGRAMMABLE_TARGET_MATERIALIZATION_CONTRACT",
+  "base_sha": "9ddb98b6c4dbfbafa2e56f95a5682bb99d4feb7a",
+  "result_sha": "83cdcf0dffee715ad6501ca5b0a374c1523c067c",
+  "material_result_sha": "83cdcf0dffee715ad6501ca5b0a374c1523c067c",
+  "validation_bearing_sha": "83cdcf0dffee715ad6501ca5b0a374c1523c067c",
+  "validation_bearing_result_sha": "83cdcf0dffee715ad6501ca5b0a374c1523c067c",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "validation_run_id": 37567893658,
+  "validation_run_attempt": 1,
+  "validation_job_id": 112619702569,
+  "readiness_smoke_job_id": 112621090705,
+  "artifact_id": 11458974754,
+  "artifact_digest": "sha256:6c295872fbcd33f5d33e61c9cedaae8ee9fccecfeb856e3f810f7d6e6d23e32c",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00420.json",
+  "implementation_commits": [
+    "83cdcf0dffee715ad6501ca5b0a374c1523c067c"
+  ],
+  "issue14_comment_id": 6030529105,
+  "native_draw_path_activation_changed": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE",
+  "summary": "R282 adds a diagnostic-only programmable target-bytecode materialization contract. It seals deterministic compiler provenance (entrypoint main, target profiles vs_4_0/ps_4_0, strictness + O3 flags) to exact R281 artifact-receipt and R276 semantic-plan identities, while explicitly leaving target bytecode unmaterialized and compilation/object creation unauthorized.",
+  "evidence": [
+    "native_backend.hpp/.cpp define and validate NativeProgrammableShaderTargetMaterializationContractEvidence with deterministic entrypoint/profile/compile-flag identities.",
+    "runtime_census.cpp derives, hashes and logs signature-attributable R282 materialization-contract evidence while keeping sig.shaderTranslationExact=false.",
+    "analyze_dx11_census.py correlates R282 and advances the missing prerequisite to R283_TARGET_BYTECODE_MATERIALIZATION when the exact contract exists but bytes remain unmaterialized.",
+    "tools/test_analyze_dx11_census.py, tools/dx11_constant_buffer_probe.cpp and tools/verify_dx11_source_graph.py cover R282 positive and stale-R281 rejection paths.",
+    "Exact-SHA Backend Conversion Gate 37567893658 completed success for 83cdcf0dffee715ad6501ca5b0a374c1523c067c; validate 112619702569 and DX11 readiness smoke 112621090705 both succeeded.",
+    "Artifact 11458974754 digest sha256:6c295872fbcd33f5d33e61c9cedaae8ee9fccecfeb856e3f810f7d6e6d23e32c.",
+    "Issue #14 production change ledger event 6030529105 records the material change."
+  ],
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "target_bytecode_materialized": false,
+    "compilation_authorized": false,
+    "native_programmable_object_created": false,
+    "native_programmable_object_bound": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "shader_translation_exact_enabled": false,
+    "object_creation_authorized": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered current GitHub HEAD 9ddb98b6c4dbfbafa2e56f95a5682bb99d4feb7a after sealing 00419 C6; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, VR state and branch-local lane state."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Confirmed R281 sealed target artifact receipt identities but did not define deterministic target compiler profile/entrypoint/flags required to materialize matching bytes."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R282 target materialization contract, production census evidence, analyzer correlation, source-graph guard and hosted regression probes without compiling programmable target bytecode."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Backend Conversion Gate 37567893658 exact SHA success; validate 112619702569 and DX11 readiness smoke 112621090705 succeeded; artifact 11458974754 produced. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit 83cdcf0dffee715ad6501ca5b0a374c1523c067c contains [AUTO:CONVERSION-DX11-00420] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R282 is diagnostic-only and intentionally performs no programmable target compilation, shader object creation or native draw activation."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Durable run/lane state preserves exact result SHA, Gate/jobs/artifact, Issue #14 ledger entry, UNTESTED runtime status and next independent action."
+    }
+  },
+  "exact_next_action": "Implement a bounded R283 translated programmable-source/bytecode materialization step for the currently proven supported semantic subset, prove produced target bytes match the exact R281/R282 receipt/compile-contract provenance, and keep CreateVertexShader/CreatePixelShader plus NativeDrawPath/Draw/DrawIndexed disabled.",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "83cdcf0dffee715ad6501ca5b0a374c1523c067c",
+    "backend_conversion_gate": {
+      "run_id": 37567893658,
+      "conclusion": "success",
+      "validate_job_id": 112619702569,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112621090705,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11458974754,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-83cdcf0dffee715ad6501ca5b0a374c1523c067c",
+      "artifact_digest": "sha256:6c295872fbcd33f5d33e61c9cedaae8ee9fccecfeb856e3f810f7d6e6d23e32c"
+    }
+  }
+}

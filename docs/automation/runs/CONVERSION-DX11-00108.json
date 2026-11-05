@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00108",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T10:06:15+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "15f09d4df551d76eade8a9520f973d7fdea1ec68",
+  "source_prep_sha": "d959a61fc8895b861c8be01776988e1af237048d",
+  "result_sha": "73d1f494d34e6235a90ebad8fa9a612ab0ee01cb",
+  "validation_bearing_result_sha": "73d1f494d34e6235a90ebad8fa9a612ab0ee01cb",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13 R127 bounded live adoption of the shared producer map for the remaining four GhostGap ForceLeft/ForceRight spacing-state hooks at 0xBE045, 0xBE083, 0xBE0A5 and 0xBE067.",
+  "summary": "R127 preserves the existing ForceLeft/ForceRight ScalingType transitions at the four remaining GhostGap spacing-state hooks while replacing their spacing-only bindings with exact caller-RVA templates. Each template derives immediate next-draw ScreenHud ownership from GameSemantic::ClassifyCriticalProducer(CallerRva) and compile-time requires the canonical shared producer map. All four RVAs are already covered consistently by the canonical GhostGap SCREEN_HUD range 0xBD900-0xBE100 in disasm_render_contract.hpp, analyze_outrun_exe.py and hud_semantics.hpp. No semantic range was widened.",
+  "source_commits": [
+    "d959a61fc8895b861c8be01776988e1af237048d",
+    "73d1f494d34e6235a90ebad8fa9a612ab0ee01cb"
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_range_widened": false,
+    "affected_producer_family": "DispGhostGap four bounded ForceLeft/ForceRight sites only",
+    "putghostgap_info_0xBDE3A_changed": false,
+    "putghostgap_sub_0xBDAE8_changed": false,
+    "option_arrow_changed": false,
+    "text_glyph_changed": false,
+    "disp_rank_sprani_0xB9DA6_changed": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "src/hooks_uiscaling.cpp is a protected runtime-risk path. This change preserves existing spacing-state transitions, does not widen SCREEN_HUD ownership or alter D3D/OpenXR transport, and only arms the immediate next draw from four already-canonical GhostGap producer RVAs. Hosted CI cannot prove HMD HUD convergence or protected world-stereo behavior."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36652934264,
+      "conclusion": "success",
+      "validated_sha": "73d1f494d34e6235a90ebad8fa9a612ab0ee01cb",
+      "artifact_id": 11071766176,
+      "artifact_digest": "sha256:7fac26b89c4ab0061efe061e2ac9ef3929f96db9a412b3fc0769581bf3da8e55",
+      "evidence": "Queue/baseline/one-click checks PASS; R127 backend disassembly contract PASS; DX11 transport/source-graph/census checks PASS; Win32 build PASS; DX11 semantic/probe checks and binary verification PASS."
+    },
+    "build": {
+      "run_id": 36652937879,
+      "conclusion": "success",
+      "validated_sha": "73d1f494d34e6235a90ebad8fa9a612ab0ee01cb",
+      "evidence": "Generic Win32 Release build completed successfully on the validation-bearing result SHA."
+    },
+    "hud_inspector": {
+      "run_id": 36652937885,
+      "conclusion": "success",
+      "validated_sha": "73d1f494d34e6235a90ebad8fa9a612ab0ee01cb",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36652937803,
+      "conclusion": "success",
+      "validated_sha": "73d1f494d34e6235a90ebad8fa9a612ab0ee01cb",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36652934242,
+      "conclusion": "skipped",
+      "validated_sha": "73d1f494d34e6235a90ebad8fa9a612ab0ee01cb"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5901973789,
+    "validation_comment_id": 5902035396,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact controller marker [AUTO:CONVERSION-DX11-00108] and contains no CI-skip directive.",
+    "0xBE045, 0xBE083, 0xBE0A5 and 0xBE067 all lie inside canonical GhostGap SCREEN_HUD range 0xBD900-0xBE100.",
+    "The shared producer map, analyzer and hud_semantics catalog agree on that GhostGap range.",
+    "The R127 callback template preserves the existing SpriteSpacingForceLeft/Right state transition before arming shared-map ScreenHud ownership.",
+    "The verifier requires all four exact R127 template instantiations and rejects restoration of the four legacy spacing-only hook bindings.",
+    "No producer range was widened and no unrelated producer family was converted.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and OpenXR 6/6 all pass on the same validation-bearing result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R127 is automation-validated but runtime-untested. TimeAttack, DispRank clip, GoalTime, C2CTestSlipstream, C2CDontLoseGF, DispGearPosition, PutGhostGapInfo 0xBDE3A, PutGhostGapInfo_sub 0xBDAE8 and all four GhostGap ForceLeft/Right sites now consume the shared producer map at runtime.",
+  "next_action": "Continue Set04/F13 only with another independently proven producer sub-family or move to the next runnable review-index priority. Do not widen producer ranges for OptionArrow/TextGlyph/DispRank sprani without separate disassembly provenance. Do not claim HMD visual correctness without exact-build Quest3/VDXR evidence."
+}

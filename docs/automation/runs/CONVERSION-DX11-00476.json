@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00476",
+  "production_id": "CONVERSION-DX11-00476",
+  "event_id": "CONVERSION-DX11-00476-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00476",
+  "lease_epoch": 1,
+  "work_key": "DX11:R171:LIVE_NONINDEXED_IA_VS_PS_PROVENANCE:src/vr/d3d11/native_backend.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.cpp:R171",
+    "src/vr/d3d11/native_backend.hpp:R171",
+    "tools/dx11_constant_buffer_probe.cpp:R171"
+  ],
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "2ebd5811bc340f3cd2e51d7d4030402ecb6aace4",
+  "material_result_sha": "a315481f0656ee07369e721f59752b513fb3ba37",
+  "validation_bearing_result_sha": "a315481f0656ee07369e721f59752b513fb3ba37",
+  "result_sha": "a315481f0656ee07369e721f59752b513fb3ba37",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "R171 nonindexed Draw live InputLayout/VS/PS exact identity",
+  "summary": "R171 native DX11 diagnostic nonindexed Draw preflight now enforces exact same-device live IA input-layout, vertex shader and pixel shader object identity instead of accepting arbitrary non-null bindings. Isolated WARP negative probes detach layout/PS and substitute foreign live VS, then restore exact bindings and execute nonindexed Draw. Actual gameplay native Draw remains dormant.",
+  "evidence": {
+    "predecessor_task": "CONVERSION-DX11-00475",
+    "predecessor_last_sha": "2ebd5811bc340f3cd2e51d7d4030402ecb6aace4",
+    "predecessor_gate_id": 37878511227,
+    "predecessor_gate_status": "SUCCESS",
+    "predecessor_c6_record": "NOT_FOUND",
+    "previous_review": "R156 live object identity gap; disjoint R171 semantic work_key"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: base GitHub HEAD 2ebd5811bc340f3cd2e51d7d4030402ecb6aace4, 00475 exact-SHA Gate 37878511227 SUCCESS; 00476 remote claim adb243e91da521e9591231fe3eb6e7194998b34e via fast-forward CAS",
+    "C1_REVIEW": "PASS: R156 nonindexed Draw preflight could accept live alternate IA/VS/PS objects; selected R171 with separate semantic work-key",
+    "C2_IMPLEMENT": "PASS: actual C++ source+header and WARP negative tests in three files, source SHA a315481f0656ee07369e721f59752b513fb3ba37",
+    "C3_VALIDATE": "PASS: exact material SHA Gate 37901281938 both Win32 validate 113724193750 and DX11 smoke 113725917363 SUCCESS, artifact 11603015408; one relevant static contract read-back 11/11 PASS",
+    "C4_COMMIT": "PASS: GitHub material source commit a315481f0656ee07369e721f59752b513fb3ba37 [AUTO:CONVERSION-DX11-00476] (no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED: diagnostic WARP-only proof, no native gameplay activation or runtime packaging/promotion",
+    "C6_STATE": "PASS: run record and lane state fast-forward CAS checkpoint committed separately after exact-SHA Gate SUCCESS; runtime UNTESTED"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "next_action": "Do not rescore/repeat 00476. Select a new independently claimed task to diagnose R170 generated fixed-function DIFFUSE/COLOR0 fragment mismatch; exact-build Quest3/VDXR gameplay input/HUD/stereo/pacing HMD remains NEED_HMD_TEST; no native gameplay Draw promotion.",
+  "resume_cursor": "TERMINAL_COMPLETE",
+  "state_persisted": true,
+  "updated_at_kst": "2026-10-09 16:59 KST",
+  "blockers": [
+    "Game/Quest3/VDXR gameplay and rendering runtime UNTESTED; native gameplay Draw dormant.",
+    "00475 R170 DIFFUSE COLOR0 remains quarantined, predecessor run C6 record absent."
+  ],
+  "validation_bearing_sha": "a315481f0656ee07369e721f59752b513fb3ba37",
+  "static_validation": "PASS: exact-SHA remote source assertions 11/11; Backend Conversion Gate 37901281938 SUCCESS on material SHA; Windows validate 113724193750 SUCCESS; DX11 readiness smoke 113725917363 SUCCESS including dx11_constant_buffer_probe build+run.",
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "validation_run_id": 37901281938,
+  "validation_job_id": 113724193750,
+  "readiness_smoke_job_id": 113725917363,
+  "artifact_id": 11603015408,
+  "artifact_digest": "sha256:a687d002f040304e8379af0e765c9cae7aee6bcdfb399b32da37674194e73d82",
+  "implementation_commits": [
+    "a315481f0656ee07369e721f59752b513fb3ba37"
+  ],
+  "issue14_comment_id": 6076795984,
+  "last_real_activity_at": "2026-10-09T16:59:18+09:00",
+  "last_activity_evidence": "Exact-SHA Backend Conversion Gate 37901281938 succeeded with both jobs; R171 WARP probe run passed."
+}

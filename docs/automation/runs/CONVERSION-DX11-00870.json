@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00870",
+  "production_id": "CONVERSION-DX11-00870",
+  "event_id": "CONVERSION-DX11-00870-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:STEREO_GAME_OM_PIXEL_UAV_RESTORE",
+  "feature_id": "DX11:STEREO_GAME_OM_PIXEL_UAV_RESTORE",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "5ce6b119e796c9d904f02d5e106d3a8241785fd1",
+  "validation_bearing_result_sha": "a0c2137ff898a352b399e936e610b1e17c1634a4",
+  "result_sha": "a0c2137ff898a352b399e936e610b1e17c1634a4",
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Live D3D11 game menu/car/race color and pixel/compute UAV postpasses before native OpenXR L/R GPU copy",
+      "Capture and detach OM MRT/depth/pixel UAV plus CS UAV outputs before same-frame eye CopyResource/ResolveSubresource",
+      "Restore original game OM/CS UAV bindings, append counters, and D3D9Ex Draw/Present/input/FFB fallback after eye submission"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "tools/test_dx11_eye_copy_lifetime_00721.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Existing C++ source saves RTV/DSV, OM pixel UAVs and CS UAVs and restores OM/CS output state with preserved append/consume counters across native stereo GPU copy; source/CI verification passed.",
+      "negative_regression": "Targeted mutation assertions reject removal of OM pixel UAV capture, OM UAV restoration, correct pixel UAV start slot, and UINT(-1) counter preservation.",
+      "component_integration": "ScopedStereoSourceOutputs in NativeSharedEyeRing::submit_eye_pair wraps the game-owned texture GPU eye transfer; original stereo fence and D3D9Ex game fallback remain in place."
+    },
+    "conflict_keys": [
+      "DX11:STEREO_GAME_OM_PIXEL_UAV_RESTORE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "OM/CS UAV state preservation has source- and five-gate CI proof only; real OutRun menu/car/race stereo pixels and Quest3/VDXR gamepad session remain untested.",
+    "activation_guard_and_fallback": "Native L/R ring GPU ownership/fence and original D3D9Ex Draw/Present/input/FFB fallback are preserved; DXVK lane untouched.",
+    "blocking_evidence": "Previous native stereo game-eye source restoration used RTV-only OMSetRenderTargets, which could discard OM pixel UAV postpass bindings. Existing material commit corrects this GPU output-state regression."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:STEREO_GAME_OM_PIXEL_UAV_RESTORE",
+    "goal": "Preserve live game OM pixel UAV, MRT/depth and CS UAV bindings plus unchanged UAV append counters across native GPU left/right OpenXR eye CopyResource/ResolveSubresource.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_owned_pixel_uavs_across_native_stereo_eye_copy",
+        "expected_behavior": "Native stereo eye source GPU transfer detaches writable OM/CS source aliases and restores the caller's MRT/depth/OM pixel UAV and CS UAV slots with unchanged counters."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "om_cs_output_regression_and_original_d3d9ex_preservation",
+        "expected_behavior": "Negative tests reject removed OM/CS UAV restoration or counter resets; original D3D9Ex game Draw/Present, controller/FFB fallback and native EVENT fence remain unchanged."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_github_actions_at_exact_source_sha",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR architecture and HUD Inspector all complete SUCCESS for the identical specified validation SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/test_dx11_eye_copy_lifetime_00721.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: target run JSON was missing (GitHub 404) at the exact validation SHA; this is a reconstructed source-evidence run record, with no prior feature_contract or acceptance_results file to overwrite.",
+    "C1_REVIEW": "PASS_SOURCE_EVIDENCE: retrieved original C++ material commit and subsequent source regression test correction; no new C6 source changes.",
+    "C2_IMPLEMENT": "PASS_EXISTING_SOURCE: material commit 5ce6b119e796c9d904f02d5e106d3a8241785fd1 fixes game OM pixel UAV and CS UAV output preservation; C6 is bookkeeping only.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: all five mandatory GitHub workflow runs at a0c2137ff898a352b399e936e610b1e17c1634a4 are completed SUCCESS; optional VR PC Fast Test Build was SKIPPED.",
+    "C4_COMMIT": "PASS_EXISTING_SOURCE: 5ce6b119e796c9d904f02d5e106d3a8241785fd1 carries the actual OM UAV C++ implementation [AUTO:CONVERSION-DX11-00870]; a0c2137ff898a352b399e936e610b1e17c1634a4 corrects the source test NameError with the same task marker. C6 is a distinct [skip ci] record-only commit.",
+    "C5_PACKAGE": "NOT_REQUIRED: no HMD deployment, runtime certification or distributable package from C6.",
+    "C6_STATE": "PASS_EXACT_SHA: newly restored run record marks COMPLETE_BUILD_VERIFIED against the unchanged CI-bearing SHA; no duplicate score or runtime pass."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "5ce6b119e796c9d904f02d5e106d3a8241785fd1",
+    "validation_sha": "a0c2137ff898a352b399e936e610b1e17c1634a4",
+    "source_commit_message": "fix(dx11): preserve OM pixel UAVs across live stereo game-eye GPU copies [AUTO:CONVERSION-DX11-00870]",
+    "validation_commit_message": "fix(dx11-ci): initialize native stereo submission before OM UAV regressions [AUTO:CONVERSION-DX11-00870]",
+    "run_record_recovery": "RUN_RECORD_NOT_FOUND: file absent on target GitHub branch. The feature contract and acceptance results are reconstructed from verified source/CI evidence; no existing fields were replaced.",
+    "exact_sha_ci": {
+      "validation_sha": "a0c2137ff898a352b399e936e610b1e17c1634a4",
+      "workflows": {
+        "dx11_fast": {
+          "id": 39013253741,
+          "conclusion": "success"
+        },
+        "backend_conversion": {
+          "id": 39013253736,
+          "conclusion": "success"
+        },
+        "windows_build": {
+          "id": 39013258030,
+          "conclusion": "success"
+        },
+        "openxr": {
+          "id": 39013258142,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "id": 39013257997,
+          "conclusion": "success"
+        }
+      },
+      "optional_vr_pc_fast": {
+        "id": 39013253753,
+        "conclusion": "skipped"
+      },
+      "note": "All mandatory runs confirmed with identical head_sha by read-only GitHub Actions results; no CI or build rerun.",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "next_action": "Do not rerun this C6 or award another score for existing material; separate game/Quest3 stereo runtime work remains UNTESTED."
+}

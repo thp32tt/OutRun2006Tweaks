@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00666",
+  "production_id": "CONVERSION-DX11-00666",
+  "event_id": "CONVERSION-DX11-00666-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_FENCE_SUBMISSION_FLUSH",
+  "feature_id": "NATIVE_STEREO_EYE_OUTPUT",
+  "base_head_sha": "bf1936473bd9cec32ddbfbaa9687f1c23bebc45a",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "native D3D11 producer eye writes and EVENT End on immediate context",
+      "nonblocking producer Flush queues exact EVENT before ProducerPending",
+      "WARP host-ready publication without any test-side Flush, then identity-bound ACK retirement"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.cpp producer EVENT submission",
+      "tools/dx11_native_transport_probe.cpp no-helper-flush WARP publication regression",
+      "tools/verify_dx11_native_transport_contract.py ordering/mutation guard"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Existing WARP published-frame and exact ACK suites run with no helper Flush; producer End then Flush then Pending",
+      "negative_regression": "static contract rejects missing/reordered Flush and helper-side Flush; foreign contexts and stale ACK continue denied",
+      "component_integration": "D3D11 native eye producer EVENT -> explicit submit -> DONOTFLUSH query -> Published handles -> host ACK"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_FENCE_SUBMISSION_FLUSH",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "EVENT_QUERY_HANDOFF",
+      "CONSUMER_PUBLICATION_ACK"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_WARP_ONLY; real Quest3/VDXR stereo not observed",
+    "activation_guard_and_fallback": "Existing lifetime identity, exact query, publication, ACK and DX9Ex gameplay fallback remain intact; no implicit native activation"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00666.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS bf1936473bd9cec32ddbfbaa9687f1c23bebc45a: 00665 A8P8 independent, existing CI in progress",
+    "C1_REVIEW": "PASS producer EVENT polling DONOTFLUSH relied on probe-side Flush absent from API caller",
+    "C2_IMPLEMENT": "PASS immediate producer context queues EVENT and eye writes without helper flush",
+    "C3_VALIDATE": "PASS_EXACT_SHA: d8967d39e426237820dc2d7ec5638bc01966ffed Backend, Fast, Build, OpenXR, HUD and isolated Native Transport WARP all SUCCESS; first material CI failure repaired before this exact SHA",
+    "C4_COMMIT": "PASS material 43e74b61a5693a89fe9df07df298cd5ad863a5f7, validation-bearing d8967d39e426237820dc2d7ec5638bc01966ffed",
+    "C5_PACKAGE": "NOT_REQUIRED; no user HMD/gamepad runtime verification",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "DX11_NATIVE_TRANSPORT_ISOLATED_WARP_SUCCESS",
+    "static_regression": "DX11_FAST_AND_BACKEND_EXACT_SHA_SUCCESS",
+    "compile_build": "BUILD_AND_OPENXR_EXACT_SHA_SUCCESS",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": "43e74b61a5693a89fe9df07df298cd5ad863a5f7",
+  "validation_bearing_result_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+  "result_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+  "next_action": "C6 complete, HMD/Quest3/VDXR/gamepad not tested. Begin next separate independent developer work item instead of rerunning this TASK_ID.",
+  "ci_evidence": [
+    {
+      "name": "Build",
+      "run_id": 38371548610,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38371548624,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38371548658,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Native Transport Isolated WARP",
+      "run_id": 38371543363,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38371543364,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38371543361,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    }
+  ]
+}

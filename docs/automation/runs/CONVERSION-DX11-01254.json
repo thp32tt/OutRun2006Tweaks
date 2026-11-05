@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01254",
+  "production_id": "CONVERSION-DX11-01254",
+  "event_id": "CONVERSION-DX11-01254-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "b0f5687d8e76a8635a8bc1f96ab3d88210135af2",
+  "material_implementation_sha": "d444e72a75958d952f4774986127e9f538e352b0",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:LIVE_FVF_SM3_TABLE_FOG_SRGB_COLOR",
+  "classification": "A_LIVE_GAME_NATIVE_FVF_SM3_COLOR_FOG_TO_SRGB_TARGET_IMPLEMENTATION_B_CAUSAL_PREVIOUS_C6_GATE_CHECK_FAILURE",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_SOURCE_AND_CI_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "score_change": 0,
+  "score_note": "Live original game FVF/SM3 native color path integration continuation; same task CI repair and incomplete runtime +0; no independent feature-scoring claim.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME:LIVE_FVF_SM3_TABLE_FOG_SRGB_COLOR"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_GAME_FVF_AND_PROGRAMMABLE_DRAW_STATE",
+      "AUTHENTIC_SOURCE_TABLE_FOG_AND_SRGB_READS",
+      "LINEAR_D3D11_NATIVE_PS_TABLE_FOG_COMPOSITION",
+      "PAIRED_D3D11_SRGB_RTV_GPU_DRAW",
+      "ORIGINAL_D3D9_GAME_FALLBACK_AND_NATIVE_VISIBLE_FRAME_EVIDENCE"
+    ],
+    "batch_components": [
+      "CXX_FVF_AND_SM3_ACTUAL_GAME_FOG_GPU_STATE_INTEGRATION",
+      "CXX_PAIRED_NATIVE_SRGB_RTV_ADMISSION_WITH_BLEND_FALLBACK",
+      "CXX_POSITIVE_NEGATIVE_PIXEL_FOG_EQUATION_REGRESSIONS",
+      "PYTHON_REAL_GAME_CALLSITE_TARGET_AND_BACKEND_STATIC_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original D3D9 FVF/SM3 source ACTIVE EXP EXP2 LINEAR table equations on validated unblended sRGB RT0 retain exact GPU linear fog then sRGB RTV encoding; native Draw/DrawIndexed callsite maintained.",
+      "negative_regression": "Original blended active fog, missing native sRGB RTV, unknown fog COM source, missing target, unsupported projection, and malformed equations fail closed and never publish an unverified native full frame.",
+      "component_integration": "Live original game D3D9 Draw/DrawIndexed source Fog state → native D3D11 C++ admission + HLSL post-PS linear fog → original corresponding sRGB D3D11 render target GPU RGB → guarded frame/present output and D3D9 DX9Ex FFB/input fallback."
+    },
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Source C++ and exact-SHA five-Gate build only, not source-authenticated complete menu/car/race runtime until user desktop source 1:1 game evidence. Actual native visible game frame/HMD remains UNTESTED.",
+    "activation_guard_and_fallback": "Only explicit full-game opt-in, authenticated D3D9 Fog/RT/viewport/shader/caps; per-draw paired sRGB RTV and unblended state; unsupported cases retain real original D3D9 Draw, DX9Ex gamepad/input/FFB and safe reset. DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve authentic real-game programmable and FVF native GPU color composition, including Fog equations and per-Draw linear/sRGB output, across actual menu, car selection and race while retaining game input, original D3D9 fallback and safety controls.",
+    "acceptance_items": [
+      {
+        "id": "game_fvf_sm3_native_color",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_game_native_gpu_raster",
+        "expected_behavior": "Authentic source FVF/SM3 table Fog RGB reaches native D3D11 shader and paired sRGB RT0 without double encoding; main Draw stays source-ordered."
+      },
+      {
+        "id": "unproved_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_input_and_source_safety",
+        "expected_behavior": "Unsupported live Fog/blend/source COM/caps/target avoids full-frame native promotion, retaining original D3D9 Draw input and FFB."
+      },
+      {
+        "id": "integrated_exact_source_gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_game_release_validation",
+        "expected_behavior": "At final exact SHA require Fast, Backend, Win32 Build, OpenXR and HUD PASS before BUILD_VERIFIED; HMD game runtime still UNTESTED."
+      }
+    ]
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00999",
+  "production_id": "CONVERSION-DX11-00999",
+  "event_id": "CONVERSION-DX11-00999-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00999",
+  "work_key": "DX11:FULL_FRAME_NATIVE_D3D11_TO_D3D9EX_GPU_READ_CONSUMER_ACK",
+  "feature_id": "DX11_NATIVE_SHARED_DESKTOP_D3D9_CONSUMER_FENCE",
+  "work_class": "integration",
+  "milestone_id": "full_resolution_native_game_frame",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "1549a0e72c5c2c531f9072d155cd75110f569f3c",
+  "material_result_sha": "a145225ba70613f5c10073a5004a4e859cca3a89",
+  "causal_ci_repair_shas": [
+    "27a414b0ce8b057fccbc67e4614a77bfad4f97c3",
+    "b980bc15bc6d0d67752c3d952d45ef1420f03775"
+  ],
+  "validation_bearing_result_sha": "b980bc15bc6d0d67752c3d952d45ef1420f03775",
+  "result_sha": "b980bc15bc6d0d67752c3d952d45ef1420f03775",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "score_change_on_bookkeeping": 0,
+  "score_change": 0,
+  "summary": "Native D3D11 full-resolution game color shared-desktop fallback now protects a real D3D9Ex GPU reader after each shared StretchRect: IDirect3DQuery9 EVENT is issued on successful and failed/rolled-back consumers, polled before any next shared native GPU Copy/Resolve, with original D3D9 Draw/Present/gamepad/FFB authoritative on pending/faulted completion. Negative mutation source regression runs in DX11 Fast. Inherited 00998 C6 policy omissions caused exact CI failures on a145225b/27a414b; causally repaired with 27a414b and b980bc1 without weakening gates. Five required exact-SHA GitHub Actions success on b980bc1. Actual menu/car/race, Quest3/VDXR desktop/HMD outcome UNTESTED, no renderer promotion.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "causal_ci_repair_files": [
+    "docs/automation/runs/CONVERSION-DX11-00998.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_NATIVE_SHARED_DESKTOP_D3D9_CONSUMER_FENCE",
+    "goal": "Ensure every full-resolution real native D3D11 game GPU frame sent to the original D3D9Ex shared desktop survives asynchronous consumer StretchRect reads before source reuse, with fail-closed fallback and exact-SHA automated regressions.",
+    "acceptance_items": [
+      {
+        "id": "consumer_read_after_native_gpu_frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_D3D11_shared_GPU_texture_to_D3D9Ex_StretchRect",
+        "expected_behavior": "Create and issue D3D9Ex EVENT after actual shared desktop StretchRect; poll it before overwriting the same D3D11 shared texture next Present."
+      },
+      {
+        "id": "rollback_and_input_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_D3D9_backbuffer_and_input_FFB",
+        "expected_behavior": "An unfinished/failed D3D9 GPU read or failed native blit retains game-owned Draw/Present, original inputs, FFB and per-tile rollback without publishing stale native pixels."
+      },
+      {
+        "id": "linked_regression_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "source_negative_regression_and_Windows_GitHub_CI",
+        "expected_behavior": "DX11 Fast runs mutation guard and all five mandatory build/integration workflows succeed on a single exact source/result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "consumer_read_after_native_gpu_frame": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_shared_desktop.hpp",
+        "tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py"
+      ],
+      "validation_command": "DX11 Fast run 39717558383 at exact b980bc15; source mutation verifies D3D9Ex EVENT read-fence creation, issuing and polling order (hardware untested)."
+    },
+    "rollback_and_input_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_shared_desktop.hpp",
+        "tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py"
+      ],
+      "validation_command": "DX11 Fast Python negative mutation and Win32 Build run 39717558351 at b980bc15; original input/FFB unmodified by C++ integration."
+    },
+    "linked_regression_five_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast 39717558383, Backend 39717558350, Build 39717558351, OpenXR 39717558391, HUD 39717558460 all success at exact b980bc15."
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "game-authored D3D9 Draw/DrawIndexed -> native full-size D3D11 frame output",
+      "native D3D11 GPU Copy/Resolve -> original D3D9Ex shared color texture -> D3D9Ex StretchRect actual game desktop",
+      "D3D9Ex consumer EVENT completion -> safe native texture reuse; original Present and controls remain fallback"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "D3D9Ex EVENT consumer ACK and shared native GPU copy scheduling in actual C++ presentation bridge",
+      "Failure-path original game tile rollback and correct D3D9 GPU read retirement for next frame",
+      "Negative source mutation regression integrated into mandatory DX11 Fast workflow and causal inherited exact-CI record restoration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast source mutation PASS and Windows Build successful at exact b980bc15; no real D3D9 hardware execution claimed.",
+      "negative_regression": "Consumer EVENT queried before next native GPU copy, incomplete S_FALSE leaves fallback; native StretchRect error triggers original D3D9 tile rollback and consumer signal.",
+      "component_integration": "Live native game Present -> native shared D3D11 color GPU frame -> D3D9Ex StretchRect -> D3D9 GPU EVENT acknowledgment -> next GPU write gated; original DX9Ex input/FFB preserved."
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_NATIVE_D3D11_TO_D3D9EX_GPU_READ_CONSUMER_ACK",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_PASS_EXACT_SHA_NEED_REAL_GAME; zero runtime observations asserted neither draw count nor visible frames.",
+    "activation_guard_and_fallback": "Diagnostic opt-in source and generation/owner guards; busy or failed D3D9Ex read-fence retains original D3D9 Present/gamepad/FFB/SkyGlow and no DXVK development."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "material_source_commit": "a145225ba70613f5c10073a5004a4e859cca3a89",
+    "causal_policy_repair_shas": [
+      "27a414b0ce8b057fccbc67e4614a77bfad4f97c3",
+      "b980bc15bc6d0d67752c3d952d45ef1420f03775"
+    ],
+    "validation_bearing_exact_sha": "b980bc15bc6d0d67752c3d952d45ef1420f03775",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39717558383,
+        "conclusion": "success",
+        "sha": "b980bc15bc6d0d67752c3d952d45ef1420f03775"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39717558350,
+        "conclusion": "success",
+        "sha": "b980bc15bc6d0d67752c3d952d45ef1420f03775"
+      },
+      {
+        "name": "Build",
+        "run_id": 39717558351,
+        "conclusion": "success",
+        "sha": "b980bc15bc6d0d67752c3d952d45ef1420f03775"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39717558391,
+        "conclusion": "success",
+        "sha": "b980bc15bc6d0d67752c3d952d45ef1420f03775"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39717558460,
+        "conclusion": "success",
+        "sha": "b980bc15bc6d0d67752c3d952d45ef1420f03775"
+      }
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS latest GitHub HEAD 1549a0e7, previous 00998 exact CI success but inherited C6 acceptance broken.",
+    "C1_REVIEW": "PASS game D3D9Ex shared source reader was not acknowledged before subsequent native D3D11 GPU writes.",
+    "C2_IMPLEMENT": "PASS C++ D3D9 consumer EVENT, fail-closed fallback, rollback, Python mutation regression at material a145225b.",
+    "C3_VALIDATE": "PASS required five exact b980bc15 GitHub Actions; actual Quest3/VDXR and game screen UNTESTED.",
+    "C4_COMMIT": "PASS material a145225b, inherited 00998 causal policy fixes 27a414b and validation-bearing b980bc15, no CI skip on these commits.",
+    "C5_PACKAGE": "NOT_REQUIRED; end-user controlled deployment and in-game Quest3 testing are separate.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST; docs only after all required exact-SHA gates passed."
+  },
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_implementation_action": "Continue native menu->car->race GPU Draw/DrawIndexed and per-eye OpenXR output, preserving D3D9Ex fallback until matching real-game Quest3/VDXR proof."
+}

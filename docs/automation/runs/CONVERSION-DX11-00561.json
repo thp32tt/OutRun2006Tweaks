@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00561",
+  "production_id": "CONVERSION-DX11-00561",
+  "event_id": "CONVERSION-DX11-00561-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00561",
+  "base_sha": "612a6bf3dffd63596de726a7e42df833ac9a063b",
+  "work_key": "DX11:MENU_RACE_STAGE0_INDEPENDENT_MIN_MAG_FILTER_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live OutRun D3D9 sampler MIN/MAG independent capture on game Draw",
+      "D3D11 exact four-way MIN/MAG MIP_POINT sampler binding and real native Draw/DrawIndexed",
+      "Existing opt-in asynchronous diagnostic readback to game backbuffer"
+    ],
+    "batch_components": [
+      "C++ live game independent MIN/MAG sampler state capture and acceptance",
+      "C++ D3D11 sampler mapping plus existing SRV/PS/Draw binding",
+      "Python destructive producer-consumer regression for four filter pairs"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Four independent D3D9 POINT/LINEAR MIN/MAG pairs map to exact D3D11 sampler and native Draw",
+      "negative_regression": "Unsupported ANISOTROPIC and MIP!=NONE rejected; destructive source/consumer mutations fail",
+      "component_integration": "Game sampler GetSamplerState -> TextureCapture -> D3D11 CreateSamplerState -> PSSetSamplers native Draw -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_INDEPENDENT_MIN_MAG_FILTER_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:STAGE0_MIN_MAG_FILTER"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_INDEPENDENT_MIN_MAG_SAMPLER",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST game menu/vehicle/race visuals Quest3/VDXR/gamepad",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact opt-in; original D3D9 DX9Ex Draw/Present/input always executes"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00561.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Read GitHub latest branch, AGENTS.md, DX11 policy, 00551-00560 work keys and last exact verified SHA",
+    "C1_REVIEW": "Source D3D9 supports independently specified POINT/LINEAR MIN and MAG but diagnostic rejected min!=mag despite four exact D3D11 modes",
+    "C2_IMPLEMENT": "Capture independent D3D9 min/mag and bind all four matching D3D11 MIP_POINT samplers; retain existing live game draw, SRV and fallback",
+    "C3_VALIDATE": "PASS_EXACT_SHA 76470ff58620d3654a6535a6a841d16dc851d1b0: Backend Conversion Gate #38164977498 SUCCESS (validate + readiness smoke); Win32 Release Build #38164982199 SUCCESS; DX11 Fast Structural #38164977407 SUCCESS; OpenXR #38164977400/#38164982217 SUCCESS; OutRun HUD Inspector #38164982221 SUCCESS; new D3D9 MIN/MAG source-to-Draw regression included in Build; hardware UNTESTED.",
+    "C4_COMMIT": "Non-skipped validation-bearing C++/regression/run material commit 76470ff58620d3654a6535a6a841d16dc851d1b0; separate C6 checkpoint bookkeeping after exact Gate success.",
+    "C5_PACKAGE": "NOT_REQUIRED before real HMD/game visuals",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED, PASS_EXACT_SHA exact 76470ff58620d3654a6535a6a841d16dc851d1b0; source code implemented, game menu/race/Quest3/VDXR/gamepad NEED_HMD_TEST; original DX9Ex Draw/Present/input fallback preserved."
+  },
+  "runtime_evidence": "No physical Quest3/VDXR, game menu/vehicle/race visual or controller evidence; no runtime success claim.",
+  "next_action": "C6 closed; do not rerun/rescore this TASK_ID. Controller should allocate next independent remaining DX11 game draw/input feature; hardware Quest3/VDXR/gamepad NEED_HMD_TEST.",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "validation_bearing_result_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+  "material_result_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+  "result_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+  "state_persisted": true,
+  "feature_contract": {
+    "scope": "Real game D3D9 MIN/MAG independent POINT/LINEAR sampler pairs -> native D3D11 exact MIP_POINT SRV/PS/Draw/DrawIndexed diagnostic inset",
+    "source_material_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+    "validation_bearing_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+    "runtime_acceptance": "Quest3/VDXR menu/vehicle/race/gamepad NEED_HMD_TEST"
+  },
+  "acceptance_results": {
+    "source_and_negative_regression": "Independent MIN/MAG four pair exact mapping and source-to-sampler/Draw destructive mutations; out-of-scope filters/mip fail closed",
+    "backend_conversion_gate": "SUCCESS",
+    "build": "SUCCESS",
+    "openxr_vr_architecture": "SUCCESS",
+    "dx11_fast_structural": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "exact_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+    "runtime_validation": "UNTESTED"
+  },
+  "validation_evidence": {
+    "exact_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+    "github_actions": [
+      {
+        "run_id": 38164977498,
+        "name": "Backend Conversion Gate",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164982199,
+        "name": "Build",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164977407,
+        "name": "DX11 Fast Structural Checks",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164977400,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164982217,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164982221,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
+}

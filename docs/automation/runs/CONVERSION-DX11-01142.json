@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01142",
+  "production_id": "CONVERSION-DX11-01142",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01142",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:FRAGMENTED_DIRTY_UNION",
+  "classification": "A_SOURCE_MATCHED_RAW_GPU_TILE_DIRTY_UNION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "source_base_sha": "027e9c9b8e115b67626e54267f4959fa506d542c",
+  "source_implementation_commit_sha": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+  "material_result_sha": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+  "validation_bearing_result_sha": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+  "development_time_percentages": "UNMEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "INTERCEPTED_D3D9_GAME_DRAW",
+      "D3D11_NATIVE_GPU_BEFORE_AFTER_PIXEL_CAPTURE",
+      "D3D9_VALIDATED_FRAGMENTED_RGNDATA_UNION",
+      "SOURCE_MATCHED_GPU_RGB_TILE_IN_PARTIAL_DIRTY_PRESENT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CXX_NATIVE_DIRTY_UNION_COVERAGE",
+      "BOUNDED_PAIRWISE_FRAGMENTED_RECT_CANDIDATES",
+      "SOURCE_MATCHED_GPU_TILE_PLACEMENT",
+      "CXX17_POSITIVE_NEGATIVE_FRAGMENTED_DIRTY_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 48x48 dirty repaint split into adjacent 24x48 or 48x24 rectangles admits one source-backed 32x32 RAW GPU diagnostic tile using exact verified union; source RT and real GPU Draw remain required",
+      "negative_regression": "One-pixel repaint gap, invalid outlier exceeding backbuffer, and forged or partial RGNDATA cannot authorize RAW diagnostic publication; bounded pair candidates do not bypass full-union validation",
+      "component_integration": "Existing opt-in native D3D11 before/after real game Draw RGB evidence -> exact D3D9 dirty region union admission -> original partial Present UpdateSurface; unchanged DX9Ex fallback"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC:FRAGMENTED_DIRTY_UNION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Opt-in INCOMPLETE RAW GPU diagnostic tile only; neither full game scene nor native stereo is verified",
+    "activation_guard_and_fallback": "Default-off RAW diagnostic, guarded D3D9 painted regions, DX9Ex/gamepad/FFB/SkyGlow preserved; DXVK frozen"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_present_coverage_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01142.json"
+  ],
+  "real_game_draw_blocker": "New exact-SHA game/Quest3 run is UNTESTED; native_draws, native_gpu_pixel_output, publishedBackbufferFrames and menu/car/race coverage are not known for this build",
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40755270512,
+        "head_sha": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40755265870,
+        "head_sha": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40755265821,
+        "head_sha": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40755265827,
+        "head_sha": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40755265849,
+        "head_sha": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+        "conclusion": "success"
+      }
+    ],
+    "source_implementation": "Fragmented D3D9 RGNDATA union and bounded pair candidate placement, with genuine source GPU RGB preview path preserved. Source and test files committed on original validation-bearing SHA.",
+    "build_evidence": "All five mandatory push workflows returned success at identical exact validation SHA. No CI rerun requested or triggered for the validation-bearing source SHA.",
+    "runtime_evidence": "UNTESTED: no source-matched GPU-desktop game output or Quest3/VDXR HMD observation; no native frame/pixel counter can be inferred from CI.",
+    "desktop_native_game": "UNTESTED",
+    "quest3_vdxr": "UNTESTED",
+    "full_native_game_frame_complete": false,
+    "duplicate_task_score_change": 0,
+    "bookkeeping_only": true,
+    "prior_work_contract_reference": "docs/automation/runs/CONVERSION-DX11-01141.json"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Carry real, source-matched D3D11 GPU RGB diagnostic pixels through fragmented authenticated D3D9 partial-dirty Presents without accepting holes or claiming a complete native frame.",
+    "acceptance_items": [
+      {
+        "id": "fragmented_painted_union_gpu_preview",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11 Draw RGB to split RGNDATA game Present",
+        "expected_behavior": "Adjoining original D3D9 dirty rectangles can jointly cover the selected limited RAW GPU preview destination, and only fully union-covered destination pixels can be updated."
+      },
+      {
+        "id": "strict_partial_dirty_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Conservative D3D9 partial Presents and game fallback",
+        "expected_behavior": "Gaps, bad source geometry, invalid or forged dirty members and unpainted pixels fail closed, preserving DX9Ex/gamepad/FFB and no full-frame publication."
+      },
+      {
+        "id": "fragmented_union_exact_sha_regressions",
+        "category": "integrated_validation",
+        "behavior_area": "C++17 compile-time source regressions and mandatory CI",
+        "expected_behavior": "Split horizontal and vertical dirty unions, isolated outlier and invalid gap cases are verified by exact-SHA CI while real game and HMD remain UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "fragmented_painted_union_gpu_preview": "PASS_BUILD",
+    "strict_partial_dirty_fallback": "PASS_BUILD",
+    "fragmented_union_exact_sha_regressions": "PASS_EXACT_SHA"
+  },
+  "c6": {
+    "reason": "RUN_RECORD_NOT_FOUND",
+    "action": "CREATE_MISSING_RUN_RECORD",
+    "bookkeeping_commit_separate_from_validation": true,
+    "validation_sha_immutable": "bc5de1a151c5e6897960280f2ad8082961aab4ff",
+    "ci_rerun": false,
+    "source_changes": false
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00833",
+  "production_id": "CONVERSION-DX11-00833",
+  "event_id": "CONVERSION-DX11-00833-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_POST_DRAW_GPU_COPY_MRT_RESTORE",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "R30_GAME_MENU_VEHICLE_RACE_STEREO_SOURCE_CALLBACK_PENDING",
+  "material_result_sha": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+  "validation_bearing_result_sha": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+  "source_material_commits": [
+    "b68f529c91e4dde037d00f149fb8952a79f82b7f",
+    "f2f8420035d7b822ac92fbcc2677b62ea54b8042"
+  ],
+  "previous_record_repair_commit": "3b36a2fe6855b46f87cd5a091f146c0d4df5449e",
+  "packaging_status": "NOT_REQUIRED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "goal": "Replay source-owned, unscaled GPU game intermediate copies into independently drawn full-size L/R native D3D11 eye frame outputs after real eye Draws, preserving every active output-merger MRT and DSV, original D3D9 fallback and per-eye draw provenance. R30 full-scene hook callback and actual Quest3 runtime remain unfinished.",
+    "full_dx11_renderer_complete": false,
+    "acceptance_items": [
+      {
+        "id": "source-owned-post-draw-gpu-eye-copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_d3d11_eye_gpu_copy_command_stream",
+        "expected_behavior": "After genuine left/right encoder Draws a same-device game intermediate source is copied to the respective native eye GPU texture without any CPU staging or manufactured Draw counters."
+      },
+      {
+        "id": "mrt-dsv-preservation-and-dx9ex-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_render_target_lifetime_and_original_d3d9_path",
+        "expected_behavior": "Invalid, out-of-bounds and foreign copies are rejected; successful source-MRT GPU copies restore all eight OM RTVs and eye DSV while retaining untouched original D3D9 Draw, input and FFB."
+      },
+      {
+        "id": "warp-pixels-and-five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "warp_stereo_gpu_pixel_and_github_actions",
+        "expected_behavior": "Real WARP left/right eye GPU copy and MRT-restore regression passes, together with five mandatory exact-SHA GitHub workflows on a non-CI-skipped final material commit."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source-owned-post-draw-gpu-eye-copy": "PASS_BUILD",
+    "mrt-dsv-preservation-and-dx9ex-fallback": "PASS_BUILD",
+    "warp-pixels-and-five-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Source-owned same-device GPU menu/car intermediate can be copied into per-eye color post-Draw without readback.",
+      "Scoped OM restore retains all game/HUD MRT outputs and exact per-eye DSV across live CopySubresourceRegion; the original D3D9 path remains untouched.",
+      "WARP fixture binds the source as MRT1 and confirms independent L/R GPU output plus complete OM restore.",
+      "R30 real game stereo callback and matched Quest3 scene/FFB performance still require integration and runtime validation."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native Transport Isolated WARP #38926845053 SUCCESS: actual post-Draw blue patch GPU pixels for both eyes, separate Draw evidence and preserved additional MRT attachment; final exact-SHA mandatory GitHub gates 5/5 SUCCESS.",
+      "negative_regression": "Invalid/out-of-range surface copies reject, producer GPU copies leave D3D9 game result intact and do not invent draws, source RT1 plus depth target restored, no DXVK or DX9Ex source edits.",
+      "component_integration": "Native game-eye encoder source-copy GPU workload, scoped OM restoration, real WARP per-eye probe and existing OpenXR eye ring transport."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_POST_DRAW_GPU_COPY_MRT_RESTORE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native eye post-Draw GPU copy is covered at full eye resolution and left/right WARP pixels; actual R30 menu/vehicle/race callback and Quest3-visible stereo frame have NOT been demonstrated.",
+    "activation_guard_and_fallback": "Original D3D9/DX9Ex Draw/Present, input, FFB and SkyGlow remain the default; copied source requires same native D3D11 immediate device, correct RTV/DSV, single mip/array, matching format and bounded pixel box. No automatic backend promotion.",
+    "remaining_implementation": [
+      "Connect authentic R30 captured menu/vehicle/race Draw/DrawIndexed and per-eye camera data to the native ring command recorder.",
+      "Validate real Quest3/VDXR stereo HUD/gamepad/FFB and frame pacing, then gate any activation. DXVK remains frozen."
+    ]
+  },
+  "original_ci_failure": {
+    "run_id": 38926096316,
+    "head_sha": "b68f529c91e4dde037d00f149fb8952a79f82b7f",
+    "conclusion": "failure",
+    "reason": "Older CONVERSION-DX11-00832.json missing strategy visible_frame_acceptance and activation_guard_and_fallback; repaired via 3b36a2fe [skip ci]."
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38926844917,
+      "head_sha": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38926844882,
+      "head_sha": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+      "conclusion": "success"
+    },
+    "Windows Build": {
+      "run_id": 38926853619,
+      "head_sha": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38926853731,
+      "head_sha": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38926853647,
+      "head_sha": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38926845053,
+      "head_sha": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+      "conclusion": "success"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "Recover failing Backend #38926096316; prior 00833 GPU copy material b68f was valid code but 00832 record omitted mandatory admission fields.",
+    "C1_REVIEW": "Differentiate stale 00832 acceptance record from actual copy path MRT1..RT7 loss after GPU game intermediate surface copy.",
+    "C2_IMPLEMENT": "Fix predecessor 00832 metadata separately, then implement all-OM-RTV/DSV copy restoration and true source-MRT GPU WARP regression as 00833 material C++ change.",
+    "C3_VALIDATE": "Final non-skipped material SHA f2f842 exactly passes all five mandatory GitHub workflow runs and native WARP GPU copy regression.",
+    "C4_COMMIT": "f2f8420035d7b822ac92fbcc2677b62ea54b8042",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA; R30 actual stereo callback unfinished; Quest3 game runtime UNTESTED."
+  }
+}

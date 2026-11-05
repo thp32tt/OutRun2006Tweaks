@@ -1,0 +1,200 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01169",
+  "production_id": "CONVERSION-DX11-01169",
+  "event_id": "CONVERSION-DX11-01169-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_work_key": "DX11:SOURCE_ALIGNED_SMALL_DIRTY_GPU_RGB_PRESENT",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_ready": "PASS_FEATURE_CI_SOURCE_ONLY",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "48a5a4c166b1fd1bd37261dcbb3d7c9884944537",
+  "implementation_source_sha": "e63a715d6179a171667888f5f378c4969177241c",
+  "validation_bearing_result_sha": "e63a715d6179a171667888f5f378c4969177241c",
+  "material_result_sha": "e63a715d6179a171667888f5f378c4969177241c",
+  "causal_ci_repair_shas": [],
+  "score_change": 1,
+  "scoreboard_previous": 2194,
+  "scoreboard_new": 2195,
+  "scoreboard_commit": "ba96bec8184fee79f5693b78571125d861139c99",
+  "controller_runtime_adoption": "UNVERIFIED",
+  "development_time_percentages": "UNMEASURED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Implement real native D3D11 GPU PRE/Draw/POST changed-RGB source-aligned D3D9 Present for original menu/vehicle dirty islands smaller than the native 256x144 capture. Re-sample authenticated RGB deltas, intersect same original game source pixel coordinates with exact validated dirty rectangles, select nonzero original RGB crop, and UpdateSurface only from matching native GPU bytes with fail-closed fallback. Compiled RGB/alpha-only, malformed union and foreign/disjoint dirty tests. Neither D3D9 input/FFB nor protected DX9Ex/DXVK game backends changed.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_BEFORE_AFTER_RGB_DELTA",
+      "OPT_IN_SOURCE_ALIGNED_DIAGNOSTIC_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CPP_NATIVE_GPU_RGB_SOURCE_DIRTY_CROP",
+      "CPP_SOURCE_PRESENT_LIVE_CROP_INTEGRATION",
+      "CPP_COMPILED_RGB_AND_FAIL_CLOSED_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native RGB at original D3D9 screen location survives a genuine sub-tile dirty Present island without changing source pixel identity.",
+      "negative_regression": "Alpha-only GPU difference, malformed dirty rcBound, foreign/disjoint D3D9 repaint, or RGB-inert capture never authorizes source-aligned publication.",
+      "component_integration": "NativeRawChangedPixelWindow counts source subrectangle PRE/POST pixels; native_game_raw_present_coverage.hpp authenticates original D3D9 dirty crop; native_game_raw_visual_diagnostic.hpp maps real native GPU capture to original source-aligned UpdateSurface; compiled native_raw_dual_tile_test.cpp covers both paths."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_BEFORE_AFTER_RGB_DELTA",
+      "OPT_IN_SOURCE_ALIGNED_DIAGNOSTIC_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_BUILD_VERIFIED_PARTIAL_NATIVE_RAW_DIAGNOSTIC_ONLY; original real game menu/race/native full frame and Quest3 optical runtime remain UNTESTED",
+    "activation_guard_and_fallback": "Opt-in RAW only; exact native Draw PRE/POST changed RGB, D3D9 canonical COM Draw RT to Present, source extent, original dirty proof and source pixel identity remain required. Missing/invalid source falls back to protected D3D9/DX9Ex. FFB/input unchanged; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "PARTIAL_NATIVE_GPU_RAW_GAME_FRAME_NOT_FULL_NATIVE_RENDERER",
+    "goal": "Preserve actual source-aligned D3D11 native GPU RGB source pixels across small authentic D3D9 Present dirty islands without inventing/stretched pixels, changing production output or claiming runtime HMD proof.",
+    "acceptance_items": [
+      {
+        "id": "authentic_small_dirty_rgb_present",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live D3D9 Draw -> D3D11 GPU RGB -> original D3D9 Present",
+        "expected_behavior": "Partial native RGB captured at genuine source screen coordinates can be presented within an intersecting source D3D9 dirty region even if the full capture window is outside that region."
+      },
+      {
+        "id": "dirty_union_rgb_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "authenticated D3D9 present dirty union and RGB evidence",
+        "expected_behavior": "Malformed or disjoint dirty repaint, alpha-only or zero RGB changes do not create apparent native GPU output."
+      },
+      {
+        "id": "compiled_partial_crop_regression",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native RAW source RGB partial crop contract",
+        "expected_behavior": "Compiled tests prove sourceX/sourceY to D3D9 destination mapping and restricted original dirty crop with precise native RGB accounting."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "mandatory five push GitHub Actions",
+        "expected_behavior": "All five mandatory push gates success at identical material source SHA without HMD/real game runtime promotion."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "authentic_small_dirty_rgb_present": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp"
+      ],
+      "validation_command": "Win32 Build push run 40966837386 success at exact material SHA; real game/HMD UNTESTED."
+    },
+    "dirty_union_rgb_fail_closed": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate push run 40966837380 success; compiled dirty union and RGB/alpha-only negative regressions."
+    },
+    "compiled_partial_crop_regression": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Build push run 40966837386 success (compiled C++ source RGB partial crop regressions)."
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/backend-conversion-gate.yml"
+      ],
+      "validation_command": "Five mandatory push workflow runs 40966837479, 40966837380, 40966837386, 40966837282, 40966837285 all SUCCESS on e63a715d6179a171667888f5f378c4969177241c"
+    }
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40966837479,
+        "head_sha": "e63a715d6179a171667888f5f378c4969177241c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40966837380,
+        "head_sha": "e63a715d6179a171667888f5f378c4969177241c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40966837386,
+        "head_sha": "e63a715d6179a171667888f5f378c4969177241c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40966837282,
+        "head_sha": "e63a715d6179a171667888f5f378c4969177241c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40966837285,
+        "head_sha": "e63a715d6179a171667888f5f378c4969177241c",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "validation_layer": "SOURCE_AND_BUILD_VERIFIED_PARTIAL_RAW_NOT_GAMEPLAY_OR_HMD",
+    "runtime_evidence": "Actual desktop GPU native Draw->changed RGB source game frame and Quest3/VDXR HMD runtime NOT TESTED at exact SHA; previous desktop zero draw evidence was at older SHA only.",
+    "score_formula": "AI2 previous confirmed GitHub SSOT 2194 + distinct real source-aligned small dirty game native RGB integration +1 = 2195; retry/C6/readback +0; AI1 separately tracked."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_LATEST_GITHUB_HEAD_48a5a4_AND_RECENT_01168_C6_NO_COLLISION",
+    "C1_REVIEW": "PASS_SMALLEST_AUTHENTIC_D3D9_DIRTY_ISLAND_MISSED_BY_FULL_CAPTURE_COVERAGE",
+    "C2_IMPLEMENT": "PASS_REAL_NATIVE_GPU_RGB_SOURCE_DIRTY_CROP_CPP_AND_COMPILED_REGRESSION",
+    "C3_VALIDATE": "PASS_FIVE_GITHUB_PUSH_GATES_IDENTICAL_E63A715D",
+    "C4_COMMIT": "PASS_MATERIAL_e63a715d6179a171667888f5f378c4969177241c",
+    "C5_PACKAGE": "PASS_WIN32_BUILD_CI_NO_GAME_OR_QUEST3_PROMOTION",
+    "C6_STATE": "PASS_CHECKPOINT_AFTER_FIVE_GATES"
+  },
+  "next_unfinished": "Need actual source-matched real desktop native Draw>0, native GPU changed pixels>0, source-aligned displayed output and complete mono menu/car/race frame observed in a user game run; subsequently separate native L/R GPU eye output and Quest3/VDXR performance/optical testing. RUNTIME_VALIDATION=UNTESTED."
+}

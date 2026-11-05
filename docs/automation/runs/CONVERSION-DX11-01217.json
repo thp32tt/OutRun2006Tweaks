@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01217",
+  "production_id": "CONVERSION-DX11-01217",
+  "event_id": "CONVERSION-DX11-01217-E001",
+  "lane": "DX11",
+  "branch": "vr-dx11-native-r71",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "classification": "A_UNFINISHED_REAL_GAME_NATIVE_SOURCE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "043d64999a6bcff5bb8c877ecc64d8773f787b59",
+  "validation_bearing_result_sha": "043d64999a6bcff5bb8c877ecc64d8773f787b59",
+  "source_base_sha": "cc0848210874e5eb098eb7e9054219afc2094500",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Real broad single FVF game polygon: preserve rotating original GPU PRE/POST first source tile; choose physically disjoint second GPU readback from source-authenticated clipped polygon interior before AABB fallback, rotate genuine center/edge interior samples. Source W/scissor/RT, GPU RGB delta, original D3D9 Present epoch, input/FFB, DX9Ex fallback and DXVK freeze remain enforced.",
+  "test_proof": "Positive broad clipped triangle second GPU source ROI and full-range first sweep, rejected offscreen scissor, malformed homogeneous W, disjoint source extents, existing list/strip/sparse/large polygon regressions. Synthetic source geometry tests only; no actual game pixels fabricated.",
+  "gate_results": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 41400789108,
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 41400789095,
+      "conclusion": "success"
+    },
+    "Build (Win32 Release)": {
+      "run_id": 41400789123,
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 41400789115,
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 41400789080,
+      "conclusion": "success"
+    }
+  },
+  "runtime_evidence": {
+    "hmd_test": "UNTESTED",
+    "game_native_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "gameplay_menu_car_race": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+  "real_game_draw_blocker": "Genuine game GPU RGB/published full native frame remains without matching real-game runtime evidence; this is opt-in RAW source capture, not full DX11 menu/car/race display.",
+  "score_change": 0,
+  "score_reason": "Same unfinished full-frame feature incremental source+regression stage; CI/C6 not an independent completed/playable renderer.",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "note": "Controller external adoption NOT_VERIFIED. DX11 exact source result is the material SHA above, not this docs-only commit.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SOURCE_NATIVE_FVF_CLIPPED_POLYGON",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_GPU_PRE_POST_RGB",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "LIVE_D3D9_FVF_POLYGON_AND_INDEXED_SOURCE",
+      "CLIPPED_NATIVE_D3D11_GPU_PRE_POST_RGB",
+      "D3D9_ORIGINAL_PRESENT_FALLBACK"
+    ],
+    "batch_components": [
+      "SOURCE_CLIPPED_BROAD_POLYGON_SECOND_INTERIOR",
+      "ROTATING_AUTHENTIC_GPU_READBACK",
+      "POSITIVE_NEGATIVE_CXX_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original real-game FVF clipped broad polygon exposes disjoint authenticated interior for the second native GPU PRE/POST capture while first tile continues its source raster sweep.",
+      "negative_regression": "Out-of-scissor polygon, malformed homogeneous W, overlapping GPU crops and unknown source state fail closed with the original game Draw/Present/input authoritative.",
+      "component_integration": "native_game_raw_fvf_island_sampling.hpp -> native_game_raw_visual_diagnostic.hpp -> original D3D9 Present; tests/native_raw_dual_tile_test.cpp."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY. Same-SHA synthetic CI source validation, not an observed native menu/car/race frame, real GPU pixel or Quest3/OpenXR result.",
+    "activation_guard_and_fallback": "RAW diagnostic opt-in only; native production path fail closed; DX9Ex game input/FFB/render fallback preserved, DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Select disjoint native D3D11 PRE/POST GPU readback tiles from a real source-clipped broad FVF game polygon without weakening original game rendering or source identity.",
+    "acceptance_items": [
+      {
+        "id": "broad_clipped_source_interior",
+        "category": "end_to_end_behavior",
+        "behavior_area": "DX11_GAME_GPU_SOURCE",
+        "expected_behavior": "Rotate real clipped game polygon interior origins while preserving source raster sweep."
+      },
+      {
+        "id": "real_game_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_IDENTITY",
+        "expected_behavior": "Invalid geometry, source scissor, clip W and overlapping copy regions preserve original Draw/Present."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "Five required Actions workflows succeed at the identical validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "broad_clipped_source_interior": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Recorded original DX11 Fast source gate 41400789108 SUCCESS; synthetic polygon/geometry tests; live native GPU remains UNTESTED."
+    },
+    "real_game_source_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Recorded original Backend gate 41400789095 SUCCESS at 043d64999a6bcff5bb8c877ecc64d8773f787b59; original game output protected."
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Original recorded 01217 exact SHA 043d64999a6bcff5bb8c877ecc64d8773f787b59 five Gate successes 41400789108/41400789095/41400789123/41400789115/41400789080. Historical metadata repair only, not new native runtime evidence."
+    }
+  },
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false
+}

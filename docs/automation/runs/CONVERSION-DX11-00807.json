@@ -1,0 +1,150 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00807",
+  "production_id": "CONVERSION-DX11-00807",
+  "event_id": "CONVERSION-DX11-00807-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP",
+  "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "fe5bb898fb8ea3fe7af12edc43cdc208635d6cb8",
+  "material_result_sha": "3d4a3e847ef42d2aa8d6efd8805c713aa51ba053",
+  "validation_bearing_result_sha": "3d4a3e847ef42d2aa8d6efd8805c713aa51ba053",
+  "changed_files": [
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "src/vr/d3d11/native_game_shared_desktop_rollback.hpp",
+    "tests/vr/dx11_native_shared_desktop_admission.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+    "full_dx11_renderer_complete": false,
+    "goal": "Continue native menu/car/race GPU shared-desktop publication with exact original D3D9Ex per-tile backups and partial native GPU StretchRect failure restoration.",
+    "acceptance_items": [
+      {
+        "id": "original-game-tile-snapshots",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_full_resolution_gpu_desktop_output",
+        "expected_behavior": "Back up each proven game dirty tile before any native GPU desktop writes, without touching unrelated HUD pixels in the union."
+      },
+      {
+        "id": "restore-game-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_game_backbuffer_and_input",
+        "expected_behavior": "Restore every possibly modified tile on failed cross-API native GPU StretchRect; preserve default-off native opt-in, D3D9Ex rendering, input and FFB."
+      },
+      {
+        "id": "five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "Five unchanged mandatory GitHub Actions succeed at one validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "original-game-tile-snapshots": "PASS_BUILD",
+    "restore-game-fallback": "PASS_BUILD",
+    "five-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "Real game Draw/DrawIndexed -> D3D11 BGRA full-size native color",
+      "Present proof -> GPU shared D3D9Ex exact dirty tiles",
+      "Pre-blit D3D9Ex original tile snapshots -> per-tile failure restoration"
+    ],
+    "batch_components": [
+      "Actual native_game_shared_desktop.hpp multi-dirty GPU publication rollback",
+      "Portable backup-plan implementation and positive/negative overlap, distant-HUD and invalid bounds assertions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable local C++17 rollback-plan test PASS and all five exact-SHA GitHub Actions SUCCESS.",
+      "negative_regression": "Bounds/count/null cases rejected; overlapping and sparse disjoint dirty tile footprints checked. Hardware partial failure UNTESTED.",
+      "component_integration": "Original D3D9 Draw/DrawIndexed remains active; D3D11 GPU output overlays exact D3D9Ex tiles after original D3D9Ex snapshots, with source preservation and per-tile error rollback."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED only; actual Quest3/VDXR menu/car/race visual and performance UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive default false; existing DX9Ex input/FFB and DXVK freeze preserved."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Recovered 00806 complete GPU multi-dirty path at HEAD fe5bb898.",
+    "C1_REVIEW": "Found oversized union backup and rollback of multiple distant native GPU dirty tiles.",
+    "C2_IMPLEMENT": "Implemented exact D3D9Ex per-tile original snapshots and failure restoration; added source-linked portable regressions.",
+    "C3_VALIDATE": "PASS_EXACT_SHA for all five mandated GitHub Actions on source SHA 3d4a3e84; real Quest3 UNTESTED.",
+    "C4_COMMIT": "[AUTO:CONVERSION-DX11-00807] non-CI-skip material source commit 3d4a3e84.",
+    "C5_PACKAGE": "NOT_REQUIRED; no HMD playable package.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED for scoped GPU original-pixel rollback, not full native stereo renderer."
+  },
+  "evidence": {
+    "exact_sha_gate_results": {
+      "DX11 Fast": {
+        "run_id": 38848534346,
+        "conclusion": "success",
+        "head_sha": "3d4a3e847ef42d2aa8d6efd8805c713aa51ba053"
+      },
+      "Backend Conversion": {
+        "run_id": 38848534357,
+        "conclusion": "success",
+        "head_sha": "3d4a3e847ef42d2aa8d6efd8805c713aa51ba053"
+      },
+      "Windows Build": {
+        "run_id": 38848538397,
+        "conclusion": "success",
+        "head_sha": "3d4a3e847ef42d2aa8d6efd8805c713aa51ba053"
+      },
+      "OpenXR": {
+        "run_id": 38848534325,
+        "conclusion": "success",
+        "head_sha": "3d4a3e847ef42d2aa8d6efd8805c713aa51ba053"
+      },
+      "HUD Inspector": {
+        "run_id": 38848538360,
+        "conclusion": "success",
+        "head_sha": "3d4a3e847ef42d2aa8d6efd8805c713aa51ba053"
+      }
+    },
+    "extra_workflows": [
+      {
+        "name": "OpenXR VR architecture (additional)",
+        "run_id": 38848539021,
+        "conclusion": "success"
+      },
+      {
+        "name": "VR PC Fast Test Build",
+        "run_id": 38848534311,
+        "conclusion": "skipped",
+        "required_for_five_gate_acceptance": false
+      }
+    ],
+    "runtime_evidence": "NONE - Quest3/VDXR and gamepad runtime not tested"
+  },
+  "material_source_commits": [
+    "3d4a3e847ef42d2aa8d6efd8805c713aa51ba053"
+  ],
+  "score": {
+    "run_key": "CONVERSION-DX11-00807",
+    "score_change": 0,
+    "score_status": "NO_INDEPENDENT_FEATURE_COMPLETION_SCORE",
+    "note": "Continuation/hardening of previous GPU shared-desktop feature and separate C6 are not independent scored completion; no scoreboard update."
+  }
+}

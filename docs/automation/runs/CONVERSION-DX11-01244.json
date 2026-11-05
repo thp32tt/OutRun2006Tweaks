@@ -1,0 +1,176 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01244",
+  "production_id": "CONVERSION-DX11-01244",
+  "event_id": "CONVERSION-DX11-01244-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "7c56a0f1f0660d15ff497b5df24f98a925aa844c",
+  "result_sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+  "material_implementation_sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+  "material_result_sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+  "validation_bearing_result_sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+  "feature_id": "DX11:LIVE_FVF_POINT_FILL_TINY_POSITIVE_W_SOURCE_INTEGRATION",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL_W",
+  "classification": "A_ACTUAL_NATIVE_GAME_CXX_POINTFILL_DRAW_PATH_COMPLETION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "score_change": 1,
+  "score_note": "New connected D3D9 FVF point-fill lowering/native clipped POINTLIST source acceptance (not 01243 PRE/POST sampler). AI2 2593 +1 =2594, scoreboard commit 068c9409d7c444bb73dfbbbe36a072040a800bce; no point on C6, retry or duplicate Gate.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+    "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp"
+  ],
+  "implementation": "Native original game FVF point-filled indexed face-cull and clipped/interpolated point vertices now accept all finite strictly-positive homogeneous W, including W<1e-5, without distorting source user clip and native GPU/Present requirements. Synthetic W>=1e-5 eye plane only for original source triangles crossing nonpositive W; preserve bounded original D3D9/FFB/fallback for invalid IA/user-plane/zero homogeneous points.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW",
+      "DX11:LIVE_FVF_POINT_FILL_TINY_POSITIVE_W_SOURCE_INTEGRATION"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_FVF_TRIANGLE_DRAW_DRAWINDEXED",
+      "LIVE_NATIVE_FVF_FACE_CULL_AND_HOMOGENEOUS_POINT_FILL_CLIPPING",
+      "D3D11_NATIVE_POINTLIST_GPU_DRAW",
+      "AUTHENTIC_SOURCE_GPU_RGB_PRE_POST_AND_CONDITIONAL_D3D9_PRESENT"
+    ],
+    "batch_components": [
+      "INDEXED_TRIANGLE_SOURCE_CULL_TINY_POSITIVE_W_CXX",
+      "INTERPOLATED_CLIPPED_POINT_FILL_TINY_POSITIVE_W_CXX",
+      "SOURCE_POSITIVE_NEGATIVE_INDEXED_USERCLIP_AND_EYE_TESTS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "acceptance_proof": {
+      "positive_probe": "Native FVF tiny-positive-W index+interpolated clipping regression; Fast run 41962534023 SUCCESS",
+      "negative_regression": "W=0 incomplete source, all-zero vector, malformed index and user-plane NaN fall back; Fast run SUCCESS",
+      "component_integration": "Both affected functions are called by live_game_frame_bridge.cpp native game Draw conversion; exact SHA Backend/Build/OpenXR/HUD Gates SUCCESS"
+    },
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRE_POST_RGB_SOURCE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY: original D3D9 Draw/DrawIndexed FVF point-filled source -> native D3D11 POINTLIST Draw -> authentic native GPU source RGB PRE/POST -> conditional original D3D9 Present fallback; previously reported exact-SHA build only, no measured game-visible menu/vehicle/race pixels or Quest3 HMD.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in and original source/RT/epoch/pixel provenance are required for diagnostic publication; no production native renderer promotion. Native IA, interpolation, point clipping and raster failure retain original game D3D9 Draw, input, wheel FFB, DX9Ex fallback; DXVK remains frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FVF_POINT_FILL_TINY_POSITIVE_W_SOURCE_INTEGRATION",
+    "goal": "Preserve original D3D9 FVF menu/race point-filled geometry through D3D11 native Draw and CPU interpolation for valid W>0, with original D3D9 input and DX9Ex fallback unchanged.",
+    "acceptance_items": [
+      {
+        "id": "native_pointfill_original_source_w",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_AUTHENTIC_POINTFILL_DRAW",
+        "expected_behavior": "Original D3D9 FVF tiny-positive W indexed source face cull/point fill accepted by real D3D11 point lowering."
+      },
+      {
+        "id": "native_pointfill_clip_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "FVF_POINT_FILL_SOURCE_HOMOGENEOUS_CLIPPING",
+        "expected_behavior": "Original source W<=0 crossing preserves bounded eye-plane clipping and user-plane/interpolated attributes, invalid original IA fails closed."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_BACKEND_BUILD_OPENXR_HUD",
+        "expected_behavior": "Exact source SHA five mandatory Gates succeed; real game and Quest3 HMD still untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_pointfill_original_source_w": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #41962534023 SUCCESS at exact source SHA"
+    },
+    "native_pointfill_clip_safe_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_clip.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #41962534023 SUCCESS; Backend Conversion Gate #41962533999 SUCCESS"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #41962534023 SUCCESS; Backend Conversion Gate #41962533999 SUCCESS; Build #41962534046 SUCCESS; OpenXR VR architecture #41962534081 SUCCESS; OutRun EXE HUD Inspector CI #41962533974 SUCCESS"
+    }
+  },
+  "source_and_repair_commits": [
+    {
+      "sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+      "kind": "MATERIAL_CXX_SOURCE_AND_REGRESSION",
+      "summary": "Original live D3D9 FVF point-fill native Draw tiny-positive-W source conversion and regressions."
+    }
+  ],
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41962534023,
+      "sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41962533999,
+      "sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41962534046,
+      "sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41962534081,
+      "sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41962533974,
+      "sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "runtime_evidence": null,
+  "runtime_note": "No real desktop original OutRun game run or Quest3/VDXR HMD at this source SHA; native_draw_count, actual full frame visible publication and HMD pacing UNTESTED. Static CI/Win32 build does not prove actual gameplay parity.",
+  "c6_note": "C6 bookkeeping re-aligned to checkpoint=C6_STATE for already-verified native FVF point-fill material SHA 0d837095e4c22262c1f87122b39e4aab87f93cbe; previous hold C6_NOT_COMPLETE resolved. Mandatory five exact-SHA Gates previously SUCCESS; no source, CI or material SHA change; original score history preserved without duplicate credit. RUNTIME_VALIDATION=UNTESTED.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "NATIVE_REAL_GAME_MENU_VEHICLE_RACE_VISIBLE_FRAME_RUNTIME_NOT_MEASURED",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "code_changed_sha": "0d837095e4c22262c1f87122b39e4aab87f93cbe",
+  "next_implementation_action": "Continue missing real menu -> vehicle selection -> race native game Draw/Present and OpenXR stereo integration from latest HEAD, keep DX9Ex fallback/FFB and DXVK frozen; physical HMD test separate.",
+  "prior_hold_reason": "C6_NOT_COMPLETE",
+  "prior_hold_resolution": "C6_PASS_EXACT_SHA_RECORDED",
+  "inherited_causal_ci_repair": "01245 Fast/Backend identified omitted 01244 gameplay source path/visible acceptance/fallback C6 contract fields; source SHA, historical 5-Gate PASS, prior score and runtime UNTESTED unchanged. This is no independent source achievement."
+}

@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00867",
+  "production_id": "CONVERSION-DX11-00867",
+  "event_id": "CONVERSION-DX11-00867-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_STEREO_CONDITIONAL_OUTPUT",
+  "feature_id": "DX11:NATIVE_STEREO_CONDITIONAL_OUTPUT",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "87ab22b03c33489770cd775279f3b734bd7aeef3",
+  "validation_bearing_result_sha": "87ab22b03c33489770cd775279f3b734bd7aeef3",
+  "result_sha": "87ab22b03c33489770cd775279f3b734bd7aeef3",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Native game Draw/DrawIndexed with full-size L/R eye OM targets",
+      "Independent game eye GPU Clear/Copy/Stretch command replay",
+      "Shared OpenXR producer eye ring/fence ACK while D3D9Ex desktop input path remains authoritative"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Win32 WARP transport fixture verifies two genuine native L/R game-eye draws, ordered GPU TARGET Clear pixels, GPU copy/stretch, predicate/SO isolation and caller state restore.",
+      "negative_regression": "Foreign and invalid eye outputs fail closed; original D3D9Ex and input/FFB path remain untouched, and preexisting WARP pixel fail 00847 is repaired without removing assertion.",
+      "component_integration": "Shared immediate-context SO/predicate capture/isolation/restoration spans live game Draw, per-eye postpass, native GPU eye transport, and caller OpenXR/desktop state."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_CONDITIONAL_OUTPUT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-integrated GPU L/R eye output and WARP pixel equality only; full live-game menu-to-race source route and Quest3/VDXR visual gameplay acceptance remain unverified.",
+    "activation_guard_and_fallback": "Native D3D11 remains opt-in and guarded. Original D3D9Ex draw, input, force feedback and SkyGlow fallback are not changed; DXVK lane frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_CONDITIONAL_OUTPUT",
+    "goal": "Ensure native full-resolution left/right game Draw/DrawIndexed, chronological GPU clear/copy/stretch replay and OpenXR eye handoff isolate borrowed host predication and stream-output state without changing DX9Ex gameplay fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_lr_game_eye_and_gpu_postpass",
+        "expected_behavior": "Both independently captured game-eye GPU draw and ordered clear/Copy/Stretch pixels are present despite inherited host occlusion predicate or stream-output writer."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "shared_host_pipeline_and_d3d9ex_input_fallback",
+        "expected_behavior": "The host's original predicate/SO bindings are restored without resetting append cursor, unsupported eye commands reject, and dormant native D3D9Ex/FFB path remains unaffected."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_native_transport_full_ci",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Win32 Build, OpenXR, HUD and transport WARP complete successfully at one exact source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00866.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub target HEAD and latest task owner/history; no overlapping work_key or unrelated DXVK edits.",
+    "C1_REVIEW": "PASS: inherited host occlusion-predication/stream-output bindings were not isolated around actual native L/R Draw/DrawIndexed and source GPU postpass.",
+    "C2_IMPLEMENT": "PASS: source commit cceaa7eb42827200ed4d0ce20aae0ca33c6f2599; real WARP GPU clear pixel failure repaired by source commit 87ab22b03c33489770cd775279f3b734bd7aeef3. Same task ID.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: all five mandatory GitHub workflow runs and additional isolated transport WARP SUCCESS at exact final material source SHA; no Quest3/gamepad session performed.",
+    "C4_COMMIT": "PASS: source-bearing commit 87ab22b03c33489770cd775279f3b734bd7aeef3 includes [AUTO:CONVERSION-DX11-00867] and no CI skip. Earlier material cceaa7eb42827200ed4d0ce20aae0ca33c6f2599.",
+    "C5_PACKAGE": "NOT_REQUIRED: no user-playable promotion or package claimed without actual Quest3/VDXR/runtime test.",
+    "C6_STATE": "PASS_EXACT_SHA: this separate skip-ci bookkeeping commit does not replace source validation SHA or award independent score."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "initial_source_sha": "cceaa7eb42827200ed4d0ce20aae0ca33c6f2599",
+    "preexisting_00866_policy_contract_repair": "efbc75074fa3e5824b625f0cb00fb4787f316fef",
+    "source_failure_repair_sha": "87ab22b03c33489770cd775279f3b734bd7aeef3",
+    "material_sha": "87ab22b03c33489770cd775279f3b734bd7aeef3",
+    "validation_sha": "87ab22b03c33489770cd775279f3b734bd7aeef3",
+    "initial_failures": {
+      "fast_backend": "Prior C6 00866 run-record lacked development_strategy; recorded repaired under same 00867 CI causal repair, preserving prior 00866 material/validation SHA.",
+      "warp": "Initial WARP 00847 actual GPU TARGET Clear mismatch when game callback left predication/SO active before final-source timeline tail; source fixed under 00867."
+    },
+    "exact_sha_ci": {
+      "dx11_fast": {
+        "run_id": 39008316998,
+        "conclusion": "success"
+      },
+      "backend_conversion": {
+        "run_id": 39008317085,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39008320493,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39008320452,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39008320449,
+        "conclusion": "success"
+      },
+      "isolated_transport_warp": {
+        "run_id": 39008317015,
+        "conclusion": "success"
+      },
+      "exact_sha": "87ab22b03c33489770cd775279f3b734bd7aeef3"
+    },
+    "runtime_validation": "UNTESTED"
+  },
+  "next_action": "C6 complete for bounded stereo conditional-output restoration; subsequent controller work should implement remaining game menu/vehicle/race full-frame native source graph, not claim Quest3 gameplay success or reopen DXVK."
+}

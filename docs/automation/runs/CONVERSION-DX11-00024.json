@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00024",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T05:13:50+09:00",
+  "base_sha": "86794aa783d23feb069644aca18a0522ff3b039c",
+  "code_result_sha": "5e1de7244e0eafc70132db35dd8d9953789cad79",
+  "result_sha": "5e1de7244e0eafc70132db35dd8d9953789cad79",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R83 extend texture resource exactness/descriptor observation from stages 0/1 to all eight D3D9 texture stages.",
+  "summary": "Extended passive DX11 texture-resource observation and exactness across D3D9 stages 0..7. Each stage now records bound/observed resource type, pool, usage and format. Resource behavior and format exactness are evaluated per bound stage and represented by present/exact masks. R82 fixed-function readiness now requires a bound exact resource only for a supported stage whose color/alpha operation actually selects D3DTA_TEXTURE; stage index alone is no longer a blocker. Per-stage texture evidence and bound/exact/pending counters were added. No shader generation or native draw activation was enabled.",
+  "evidence": [
+    "CONVERSION-DX11-00022 identified texture resource exactness beyond stages 0/1 as the direct prerequisite to safely widen F20 fixed-function readiness.",
+    "R83 keeps all existing resource behavior, mutation telemetry and MANAGED CPU-shadow requirements fail-closed while applying them to all eight bound texture stages.",
+    "Backend Conversion Gate 36476979576 PASS on exact production SHA.",
+    "Build 36476988897 PASS on exact production SHA.",
+    "OpenXR VR architecture 36476988967 PASS across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36476988964 PASS.",
+    "No Quest 3/VDXR or in-game runtime validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/pipeline_translation.hpp",
+      "result": "Extended fixed-function readiness API with texture resource present/exact masks."
+    },
+    {
+      "path": "src/vr/d3d11/pipeline_translation.cpp",
+      "result": "Replaced blanket stage>=2 rejection with per-stage D3DTA_TEXTURE dependency on bound exact resource masks."
+    },
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Added eight-stage TextureStageResourceState observation, per-stage behavior/format exactness, present/exact masks, texture resource counters and per-signature stage logs; readiness is computed after resource exactness."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Added R83 summary/signature compatibility, textureStageResource counters and per-stage texture resource parsing."
+    },
+    {
+      "path": "tools/test_analyze_dx11_census.py",
+      "result": "Added R83 regression fixture proving stage 7 resource evidence parsing and stage>=2 resource-ready fixed-function evidence."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added structural guards for eight-stage texture resource state, resource masks/counters and analyzer evidence."
+    }
+  ],
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "EIGHT_TEXTURE_STAGE_DESCRIPTOR_BEHAVIOR_FORMAT_EXACTNESS_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "DECLARATION_AND_CONSERVATIVE_FVF_LAYOUT_READY_BLEND_ENCODINGS_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "EIGHT_STAGE_OBSERVED_CONSERVATIVE_READINESS_RESOURCE_MASKED_SHADER_EMISSION_NOT_IMPLEMENTED",
+    "F21_shader_translation_readiness": "FAIL_CLOSED_FINGERPRINTED_TRANSLATION_NOT_IMPLEMENTED",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_BY_FAIL_CLOSED_RESOURCE_LAYOUT_SHADER_AND_FFP_READINESS_GATES_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R83 extends resource exactness/readiness evidence only. It emits no fixed-function shader; programmable F21 translation, live D3D11 resource mirror ownership and exact-build Quest3/VDXR parity remain prerequisites."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36476979576,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5e1de7244e0eafc70132db35dd8d9953789cad79",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10994285624,
+      "artifact_digest": "sha256:146eee7fb5a1673e149bd781c629d6214893f5fe744c73535de81addd6224382"
+    },
+    "build": {
+      "run_id": 36476988897,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5e1de7244e0eafc70132db35dd8d9953789cad79",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 10994232941,
+      "binary_artifact_digest": "sha256:d6a12698c3397cb5f8350d7ad7fd140a286fa5fa2dd620afc504cdba1643aa33"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36476988967,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5e1de7244e0eafc70132db35dd8d9953789cad79",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 10993364440,
+      "host_artifact_digest": "sha256:437fbd4b0b8964f211908db1014c1725afd5aa988d25a7a5a12aff885496d9e9"
+    },
+    "hud_inspector": {
+      "run_id": 36476988964,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5e1de7244e0eafc70132db35dd8d9953789cad79",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10994560100,
+      "artifact_digest": "sha256:d1a95ded36208f3e6e307b1ea35e30a63e21a162464b77b7e84e70ae53f6fc05"
+    },
+    "pc_fast": {
+      "run_id": 36476979582,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5877580800,
+    "validation_comment_id": 5877678250
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. In the next bounded DX11 task, prototype fixed-function shader generation that consumes only R82/R83-ready states, without mixing in F21 programmable shader translation. Any generated shader path must remain non-routing/diagnostic until semantic validation and exact-build Quest3/VDXR parity are proven.",
+  "finalized_kst": "2026-09-29T05:13:50+09:00"
+}

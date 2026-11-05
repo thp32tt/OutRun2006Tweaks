@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00592",
+  "production_id": "CONVERSION-DX11-00592",
+  "event_id": "CONVERSION-DX11-00592-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00592",
+  "work_key": "DX11:MENU_RACE_NATIVE_MAXMIPLEVEL_LOD",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Read game-authored D3DSAMP_MAXMIPLEVEL and MIPFILTER in live D3D9 source Draw admission",
+      "Carry the minimum source mip level through TextureCapture and validate against all live readable texture levels",
+      "Mirror all D3D9 source mip data into native D3D11 and set sampler MinLOD to real game MAXMIPLEVEL",
+      "Bind D3D11 PS sampler in guarded game-sourced Draw/DrawIndexed desktop inset while preserving source Draw"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp game mip admission/capture/native sampler + Draw",
+      "tools/test_dx11_native_maxmiplevel_00592.py source-chain and destructive regression proof",
+      ".github/workflows/backend-conversion-gate.yml exact-SHA test and prior source regression updates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game-authored nonzero MAXMIPLEVEL 1..levels-1 survives full CPU mip copy and maps to D3D11 MinLOD in native Draw/DrawIndexed",
+      "negative_regression": "Reject out-of-range game level; reject MAXMIPLEVEL without mip filtering, bias and inaccessible auto-generated mip chains; 17 deliberate broken source mutations",
+      "component_integration": "GetSamplerState(MAXMIPLEVEL) -> TextureCapture.maxMipLevel -> source GetLevelCount/LockRect -> D3D11 sampler MinLOD -> PSSetSamplers -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_MAXMIPLEVEL_LOD",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:MAXMIPLEVEL_MINLOD"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source + exact-SHA CI only; in-game pixels and Quest3/VDXR require HMD",
+    "activation_guard_and_fallback": "Diagnostic-only opt-in; original D3D9 Draw, Present, and gamepad remain unchanged, DXVK frozen"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_maxmiplevel_00592.py",
+    "tools/test_dx11_native_mip_chain_00589.py",
+    "tools/test_dx11_native_mip_linear_00590.py",
+    "tools/test_dx11_native_address_mirror_00591.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00592.json"
+  ],
+  "base_head_sha": "a05616f8cc768aedca569bfc11640838bc34bb13",
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No HMD-runtime candidate approval"
+  },
+  "runtime_evidence": null,
+  "material_result_sha": "8e92c45f4651b5d1eb6dabab5e6fa18da315d16c",
+  "validation_bearing_result_sha": "35c53e153d4499183443b743ada849632549319c",
+  "result_sha": "35c53e153d4499183443b743ada849632549319c",
+  "c6_basis_head_sha": "35c53e153d4499183443b743ada849632549319c",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38208364972,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38208364929,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38208367837,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38208367849,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38208367813,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    }
+  ],
+  "local_validation": [
+    "Game D3D9 MAXMIPLEVEL -> D3D11 sampler MinLOD -> guarded native Draw/DrawIndexed source integration",
+    "11 texture-level boundary ranges, min/mag/mip compatibility; 17 destructive native chain mutations",
+    "Prior 00589/00590/00591 source regressions and first-game-frame negative controls preserved",
+    "Exact-SHA GitHub Backend Conversion Gate validate + DX11 readiness smoke SUCCESS",
+    "Win32 Build, DX11 Fast, OpenXR PR, HUD Inspector all SUCCESS"
+  ],
+  "next_action": "NEED_HMD_TEST: Quest3/VDXR menu/vehicle/race native diagnostic inset image and gamepad validation; native gameplay remains opt-in diagnostic, not promoted; select other distinct incomplete DX11 feature on next independent task"
+}

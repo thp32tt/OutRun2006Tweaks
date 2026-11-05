@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00567",
+  "production_id": "CONVERSION-DX11-00567",
+  "event_id": "CONVERSION-DX11-00567-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00567",
+  "base_sha": "4a4c6405abb510aedec0d87d0ed689e86eb903c9",
+  "work_key": "DX11:MENU_RACE_SUBTRACT_INDEPENDENT_ALPHA_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "D3D9 live GetTextureStageState RGB SUBTRACT and chosen alpha",
+      "HLSL PS native Draw/DrawIndexed plus async readback and D3D9 UpdateSurface visible output",
+      "Original DX9Ex input/game Present preserved"
+    ],
+    "batch_components": [
+      "C++ D3D9 stage0 state capture and fail-closed operation admission",
+      "C++ shader compile/create/recreation/Draw dispatch",
+      "Python per-link destructive mutation and CPU RGBA tests",
+      "Native D3D9 SUBTRACT RGB + MODULATE alpha shader/state bridge with fail-closed operand checking"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Live SUBTRACT RGB with SELECTARG1/2 or MODULATE alpha admitted to guarded native Draw",
+      "negative_regression": "Destructive C++ bridge/HLSL link mutations, invalid alpha inputs and unsupported ops remain DX9Ex",
+      "component_integration": "D3D9 live draw capture -> PS -> D3D11 Draw/DrawIndexed -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SUBTRACT_INDEPENDENT_ALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SUBTRACT_SELECTED_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SUBTRACT_SELECTED_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "D3D9 native Draw readback to bounded desktop visible inset (VISIBLE_FRAME_OUTPUT); menu/vehicle/race and Quest3 NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in only, DX9Ex input/Draw/Present authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00567.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Retry #2: exact failed Backend Conversion Gate #38174105827 at 239fbf272945bed349276bc42c3ee6cbd92218d7",
+    "C1_REVIEW": "Gate's VISIBLE_FRAME_OUTPUT token absent; same FEATURE adds stage-0 SUBTRACT RGB with MODULATE alpha",
+    "C2_IMPLEMENT": "Native C++ HLSL PS, state capture, operand validation, pipeline lifecycle/dispatch plus destructive/CPU tests",
+    "C3_VALIDATE": "Exact validation-bearing e33af6e71ec658a8214e4296bdb3ac889cbe00f8 Backend Conversion Gate #38174460369, DX11 Fast #38174460395, Win32 Build #38174463800, OpenXR #38174463830, HUD #38174463818 SUCCESS",
+    "C4_COMMIT": "Material e33af6e71ec658a8214e4296bdb3ac889cbe00f8 [AUTO:CONVERSION-DX11-00567] (no CI-skip)",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic only; CI build artifact on exact SHA",
+    "C6_STATE": "PASS_EXACT_SHA build verified, real game/Quest3/VDXR/gamepad NEED_HMD_TEST; bookkeeping in separate [skip ci] commit"
+  },
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "Next independent DX11 FEATURE_ID for menu/vehicle/race native path after controller assignment; Quest3+VDXR/gamepad opt-in visual acceptance NEED_HMD_TEST",
+  "state_persisted": true,
+  "failure_context": {
+    "failed_gate_run_id": 38174105827,
+    "failed_head_sha": "239fbf272945bed349276bc42c3ee6cbd92218d7",
+    "failed_step": "Verify DX11 integration-first auto-development acceptance",
+    "error": "gameplay path must connect real D3D9 callsite through native Draw to visible frame output",
+    "repair": "Required VISIBLE_FRAME_OUTPUT after D3D11_NATIVE_DRAW; native RGB SUBTRACT + MODULATE alpha implementation"
+  },
+  "validation_bearing_result_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8",
+  "material_result_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8",
+  "evidence": {
+    "backend_conversion_gate": {
+      "run_id": 38174460369,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "dx11_fast": {
+      "run_id": 38174460395,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "win32_build": {
+      "run_id": 38174463800,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "openxr": {
+      "run_id": 38174463830,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "hud_inspector": {
+      "run_id": 38174463818,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "runtime_quest3": "UNTESTED",
+    "runtime_gamepad": "UNTESTED"
+  }
+}

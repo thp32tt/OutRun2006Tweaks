@@ -1,0 +1,165 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00349",
+  "production_id": "CONVERSION-DX11-00349",
+  "event_id": "CONVERSION-DX11-00349-E007",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R239_PROGRAMMABLE_SHADER_PAIR_CACHE_IDENTITY_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "a3e427d71e1e5158d81a1e523214b9098db8a893",
+  "result_sha": "608ce868987d8ae943d152f09097f7af0fce79ff",
+  "validation_bearing_result_sha": "608ce868987d8ae943d152f09097f7af0fce79ff",
+  "result_marker": "[AUTO:CONVERSION-DX11-00349]",
+  "selected_work_item": "DX11_R239_PROGRAMMABLE_SHADER_PAIR_CACHE_IDENTITY",
+  "summary": "R239 seals R238 programmable VS/PS byte-size, D3D9 version-token and bytecode-hash evidence into a deterministic stage-typed fail-closed cache identity for the future translator/object cache. It does not translate shader bytecode, create/bind D3D11 programmable shaders, or activate NativeDrawPath.",
+  "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "tools/dx11_shader_object_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00349.json"
+  ],
+  "evidence": {
+    "failure_context_inspected": {
+      "run_id": 37176002720,
+      "run_number": 1926,
+      "head_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
+      "conclusion": "failure",
+      "failure_step": "Verify one-click structure contract",
+      "disposition": "ALREADY_REPAIRED_AND_SUPERSEDED_BY_SUCCESSFUL_EXACT_SHA_GATE_1927"
+    },
+    "prior_attempt_validation": {
+      "run_id": 37176221784,
+      "run_number": 1927,
+      "result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+      "conclusion": "success",
+      "validate_job_id": 111359261265,
+      "readiness_smoke_job_id": 111360027023,
+      "artifact_id": 11293786625,
+      "artifact_digest": "sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132"
+    },
+    "current_head_at_recovery": "a3e427d71e1e5158d81a1e523214b9098db8a893"
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub-only DX11 lane at a3e427d71e1e5158d81a1e523214b9098db8a893; read AGENTS.md, docs/CONVERSION_LANE_STATE.json, review index/Set05, queue contract, DX11 native plan, regression knowledge/problem history and Issue #14. Explicit failure run 37176002720 was inspected and is already repaired/superseded by exact-SHA Gate #1927; R238 was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R238 provides pair inventory but there is no source-level stage-typed cache identity contract for the next programmable translator/object-cache step. A future cache must not alias VS/PS roles, incomplete observation, mixed pairs, invalid bytecode sizes/version tokens, or missing hashes.",
+      "review_lenses": {
+        "architecture": "Add identity/readiness only in pipeline translation plus the existing hosted shader-object probe; no translator or draw routing.",
+        "ownership_lifetime": "No COM ownership, shader-object lifetime, resource lifetime or cache storage is introduced.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/recenter semantics change.",
+        "performance": "No runtime hot-path caller is added; the helper is dormant and probe-driven.",
+        "adversarial": "Explicitly prove mixed pair, incomplete observation, invalid VS stage token, non-DWORD-aligned bytecode and zero hash fail closed; prove stable key and hash-sensitive key change."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added ProgrammableShaderFunctionIdentity, fail-closed ProgrammableShaderPairCacheIdentity and deterministic stage-tagged cache-key sealing; extended dx11_shader_object_probe with positive/determinism/hash-sensitivity and negative boundary cases; added source-graph drift guards. Pre-gate source-graph reread corrected the R239 guard to use the existing SHADER_OBJECT_PROBE symbol before canonical exact-SHA validation."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R239_PROGRAMMABLE_SHADER_PAIR_CACHE_IDENTITY_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1931 run 37177810982 completed success for 608ce868987d8ae943d152f09097f7af0fce79ff. validate job 111364014276 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, VR session regressions, DX11 native transport, dual-source, static-surface, source-graph including the R239 contract guard, dormant activation, census analyzer, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111364668476 passed fixed-function shader, input-layout/signature, input-layout object, R239 shader-object build/run, shader linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact 11292984656 digest sha256:2358ccb6a078f9c86f863aa96a4a8c855252a4af2cb4b1244179967effc69101. No Quest 3/VDXR runtime test was performed.",
+      "validation_run_id": 37177810982,
+      "validation_job_id": 111364014276,
+      "readiness_smoke_job_id": 111364668476,
+      "artifact_id": 11292984656,
+      "artifact_digest": "sha256:2358ccb6a078f9c86f863aa96a4a8c855252a4af2cb4b1244179967effc69101"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "608ce868987d8ae943d152f09097f7af0fce79ff",
+      "validation_bearing_result_sha": "608ce868987d8ae943d152f09097f7af0fce79ff",
+      "source_implementation_sha": "608ce868987d8ae943d152f09097f7af0fce79ff",
+      "result_marker": "[AUTO:CONVERSION-DX11-00349]",
+      "implementation_commits": [
+        "c539dcbe7b5e29ac89bef54bdf4eeb956b4e5e9e",
+        "608ce868987d8ae943d152f09097f7af0fce79ff"
+      ],
+      "pre_gate_superseded_sha": "c539dcbe7b5e29ac89bef54bdf4eeb956b4e5e9e",
+      "pre_gate_supersede_reason": "Verifier symbol typo was detected before canonical exact-SHA validation; corrected descendant 608ce868987d8ae943d152f09097f7af0fce79ff is the validation-bearing material result."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable shader identity/cache-readiness source and hosted probes only; no runtime distributable identity is promoted by R239."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37177810982,
+      "validation_job_id": 111364014276,
+      "readiness_smoke_job_id": 111364668476,
+      "artifact_id": 11292984656,
+      "artifact_digest": "sha256:2358ccb6a078f9c86f863aa96a4a8c855252a4af2cb4b1244179967effc69101",
+      "implementation_comment_id": 5976661412,
+      "validation_comment_id": 5976708083,
+      "exact_next_action": "Release CONVERSION-DX11-00349 E007 attempt 2/3 as complete. Preserve R238 inventory plus R239 stage-typed cache identity and keep NativeDrawPath dormant. The next independent task may add a dormant per-device programmable translation/object-cache owner that consumes R239 identity without draw routing; Quest 3/VDXR runtime proof remains separate."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "pipeline_translation and hosted/static shader-object readiness probe only; no production caller, D3D9 hook, stereo renderer, OpenXR transport or NativeDrawPath routing is changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00349",
+    "production_id": "CONVERSION-DX11-00349",
+    "event_id": "CONVERSION-DX11-00349-E007",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "previous_attempt": {
+    "attempt": "1/3",
+    "work_item": "DX11_R238_PROGRAMMABLE_SHADER_PAIR_INVENTORY",
+    "material_result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+    "validation_bearing_result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R238_PROGRAMMABLE_SHADER_PAIR_INVENTORY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "runtime_validation": "UNTESTED",
+    "repair_count": 1,
+    "canonical_success_gate": {
+      "run_id": 37176221784,
+      "run_number": 1927,
+      "result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+      "conclusion": "success",
+      "validate_job_id": 111359261265,
+      "readiness_smoke_job_id": 111360027023,
+      "artifact_id": 11293786625,
+      "artifact_digest": "sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132"
+    }
+  },
+  "exact_next_action": "Release CONVERSION-DX11-00349 E007 attempt 2/3 as complete. Preserve R238 inventory plus R239 stage-typed cache identity and keep NativeDrawPath dormant. The next independent task may add a dormant per-device programmable translation/object-cache owner that consumes R239 identity without draw routing; Quest 3/VDXR runtime proof remains separate.",
+  "pre_gate_superseded_material_sha": "c539dcbe7b5e29ac89bef54bdf4eeb956b4e5e9e",
+  "pre_gate_supersede_reason": "Source-graph verifier symbol typo found before canonical Gate completion; descendant commit corrects verifier only. Any older cancelled run is SUPERSEDED, not task failure.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37177810982,
+      "run_number": 1931,
+      "result_sha": "608ce868987d8ae943d152f09097f7af0fce79ff",
+      "conclusion": "success",
+      "validate_job_id": 111364014276,
+      "readiness_smoke_job_id": 111364668476,
+      "shader_object_probe": "build_success/run_success",
+      "artifact_id": 11292984656,
+      "artifact_digest": "sha256:2358ccb6a078f9c86f863aa96a4a8c855252a4af2cb4b1244179967effc69101"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5976661412,
+    "validation_comment_id": 5976708083
+  }
+}

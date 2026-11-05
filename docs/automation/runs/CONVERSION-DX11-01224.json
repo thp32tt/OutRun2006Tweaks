@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01224",
+  "production_id": "CONVERSION-DX11-01224",
+  "event_id": "CONVERSION-DX11-01224-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_POINT_CULL_GPU_CAPTURE",
+  "classification": "B_EXACT_SHA_GATE_FAILURE_CAUSAL_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "material_implementation_sha": "fe7897ad4b544281fc624285939fa08702414ab6",
+  "material_result_sha": "a96fc82fea72045bf3228cdbf4734a6b2138ab51",
+  "validation_bearing_result_sha": "a96fc82fea72045bf3228cdbf4734a6b2138ab51",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01223.json"
+  ],
+  "implementation": "Real D3D9 FVF triangle list and strip native POINTLIST source winding/culling integration from material source SHA, plus exact CI failure repair: historic 01223 C6 canonical source path declaration and the original indexed-strip cull-mode regression test expectation. Original D3D9 and input/FFB/SkyGlow remain unchanged; this stage does not prove complete native gameplay frames.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "ORIGINAL_D3D9_FVF_TRIANGLES",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_WINDING_FILTERED_POINTLIST",
+      "NATIVE_GPU_RAW_PRE_POST_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT",
+      "ORIGINAL_D3D9_PRESENT_FALLBACK"
+    ],
+    "integration_path": [
+      "D3D9_FVF_GAME_SOURCE_IA",
+      "SOURCE_CLIP_AND_CULL_TO_NATIVE_POINT_INDICES",
+      "D3D11_DRAWINDEXED_NATIVE_RAW_GPU_CAPTURE",
+      "D3D9_SAFE_PRESENT_FALLBACK"
+    ],
+    "batch_components": [
+      "REAL_GAME_FVF_POINT_CULL_SOURCE",
+      "INDEXED_LIST_AND_STRIP_NEGATIVE_REGRESSION",
+      "HISTORICAL_C6_CAUSAL_POLICY_REPAIR",
+      "FIVE_UNWEAKENED_EXACT_SHA_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Indexed CW/CCW D3D9 triangle list and alternating strip produce original visible source corner occurrences after safe front/back filtering in the native D3D11 POINTLIST path.",
+      "negative_regression": "Clipped/degenerate/invalid-index/nonfinite source is rejected before GPU write and the original D3D9 render/input path is never replaced.",
+      "component_integration": "src/vr/d3d11/live_game_frame_bridge.cpp + live_game_fvf_point_cull.hpp -> tests/vr/dx11_live_fvf_point_cull.cpp -> all five GitHub Actions on exact repair SHA."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY. LIVE_D3D9_CALLSITE/D3D11_NATIVE_DRAW/VISIBLE_FRAME_OUTPUT are conditional implemented codepath labels, NOT witnessed real-game display. Actual native Draw, full native menu/car/race frame publication and Quest3 output remain UNTESTED.",
+    "activation_guard_and_fallback": "Existing DX11_RAW_VISUAL_DIAGNOSTIC explicit opt-in and fail-closed native state remain; original D3D9 renderer/Present, gamepad/FFB/SkyGlow and DX9Ex fallback protected; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Continue real OutRun2006 D3D9 FVF game primitive to native D3D11 GPU pipeline integration with source triangle point culling and uncompromised DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "source_fvf_triangle_winding_pointlist",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_D3D9_FVF_SOURCE_TO_D3D11_NATIVE_POINT_DRAW",
+        "expected_behavior": "Game-authored FVF triangle list/strip applies original CW/CCW triangle culling before bounded native D3D11 POINTLIST DrawIndexed, retaining source IA occurrences."
+      },
+      {
+        "id": "invalid_source_preserves_d3d9",
+        "category": "fallback_regression",
+        "behavior_area": "CLIP_INDEX_AND_ORIGINAL_GAME_FALLBACK",
+        "expected_behavior": "Invalid source indices, near-plane/user-plane clip, nonfinite clip, degenerate triangles and overflowing point expansion never authorize native GPU pixels and leave the original D3D9 game draw intact."
+      },
+      {
+        "id": "same_sha_required_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_GAME_SOURCE_AND_CI",
+        "expected_behavior": "All five mandatory DX11 exact-source GitHub Actions gates pass on the causal repair SHA without disabling compiler, policy, native or negative regressions."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_fvf_triangle_winding_pointlist": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "DX11 Fast #41794451718 and Windows Build #41794451766 SUCCESS at exact source SHA."
+    },
+    "invalid_source_preserves_d3d9": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_fvf_point_cull.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "Real safe-fallback negative regressions preserved; Fast #41794451718 and Backend #41794451731 SUCCESS at exact repair SHA."
+    },
+    "same_sha_required_five_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tests/vr/dx11_live_fvf_point_cull.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Fast 41794451718, Backend 41794451731, Build 41794451766, OpenXR 41794451887, HUD 41794451717: all SUCCESS at exact repair SHA."
+    }
+  },
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41794451718,
+      "sha": "a96fc82fea72045bf3228cdbf4734a6b2138ab51",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41794451731,
+      "sha": "a96fc82fea72045bf3228cdbf4734a6b2138ab51",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41794451766,
+      "sha": "a96fc82fea72045bf3228cdbf4734a6b2138ab51",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41794451887,
+      "sha": "a96fc82fea72045bf3228cdbf4734a6b2138ab51",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41794451717,
+      "sha": "a96fc82fea72045bf3228cdbf4734a6b2138ab51",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "runtime_evidence": null,
+  "runtime_note": "No exact-SHA OutRun desktop run or Quest3/VDXR HMD session. CI shows source/build safety only, not an observed native GPU pixel, published full game frame or stereo gameplay.",
+  "real_game_draw_blocker": "SOURCE_VERIFIED_RUNTIME_UNTESTED: Native D3D11 live-game Draw>0 and GPU-published entire menu/car/race frame remain unobserved at this source SHA.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Controller to allocate distinct follow-on material game-frame integration after this task terminal; verify real-game native Draw/full-size pixels and stereo OpenXR only with source-matched user tests.",
+  "record_type": "C6_RESULT_ONLY",
+  "source_and_repair_commits": [
+    {
+      "sha": "fe7897ad4b544281fc624285939fa08702414ab6",
+      "kind": "MATERIAL_CPP_NATIVE_FVF_POINT_CULL_IMPLEMENTATION",
+      "summary": "Game-authored FVF triangle CW/CCW cull -> GPU POINTLIST integration with portable positive/negative regression."
+    },
+    {
+      "sha": "a96fc82fea72045bf3228cdbf4734a6b2138ab51",
+      "kind": "SAME_TASK_EXACT_SHA_FAILURE_REPAIR_VALIDATION_BEARING_RESULT",
+      "summary": "Inherited 01223 C6 policy path correction and indexed-strip test expectation repair; exact SHA five required Gates SUCCESS."
+    }
+  ],
+  "score_note": "AI2 same-task retry/CI repair/C6: +0; no duplicated independent achievement or AI1 change.",
+  "checkpoint": "C6_STATE"
+}

@@ -1,0 +1,151 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00806",
+  "production_id": "CONVERSION-DX11-00806",
+  "event_id": "CONVERSION-DX11-00806-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP",
+  "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "b4256acc92ea3af77d25a4fb5de4e54ee05156b9",
+  "material_result_sha": "257b3ca24b55caa3fc0b3faa528145c1fce74e6b",
+  "validation_bearing_result_sha": "257b3ca24b55caa3fc0b3faa528145c1fce74e6b",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "src/vr/d3d11/native_game_shared_desktop_admission.hpp",
+    "tests/vr/dx11_native_shared_desktop_admission.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+    "goal": "Continue the real game menu/car/race full-resolution native DX11-to-D3D9Ex GPU desktop integration by publishing proven disjoint dirty rectangles as exact GPU tiles in the same Present and restoring original D3D9 pixels if multi-blit publication fails.",
+    "full_dx11_renderer_complete": false,
+    "acceptance_items": [
+      {
+        "id": "gpu-multi-dirty-tiles",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_menu_vehicle_race_full_resolution_output",
+        "expected_behavior": "Native D3D11 game output copies each proven bounded dirty tile through D3D11 CopySubresourceRegion and matches each tile with D3D9Ex StretchRect on the game Present; disjoint gaps keep original D3D9-authored pixels."
+      },
+      {
+        "id": "rollback-and-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_gpu_to_d3d9ex_owned_destination",
+        "expected_behavior": "Reject malformed/incomplete multi-dirty regions and restore original D3D9 game pixels after partial multi-blit failure; preserve opt-in, original input/FFB and native/DX9Ex fallback."
+      },
+      {
+        "id": "five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR architecture, and HUD Inspector all succeed on precisely the same source validation SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "gpu-multi-dirty-tiles": "PASS_BUILD",
+    "rollback-and-safe-fallback": "PASS_BUILD",
+    "five-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "Existing real-game D3D9 Draw/DrawIndexed is captured by the native DX11 full-frame path",
+      "Accept proven multi-dirty tiles and use D3D11 per-tile GPU source copies followed by same-Present D3D9Ex StretchRect on exact tiles",
+      "Back up original D3D9 backbuffer union before non-atomic multi-blit writes; restore original on failure and preserve default-off native activation and game input/FFB fallback"
+    ],
+    "batch_components": [
+      "Integrate native shared GPU multi-dirty selection at actual before_game_present D3D9 callsite",
+      "Add per-rectangle D3D11 GPU CopySubresourceRegion, D3D9Ex StretchRect, and rollback of original backbuffer union",
+      "Add portable positive/negative multi-dirty admission regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector GitHub Actions all succeeded for the exact material SHA; no physical HMD or gameplay visual testing.",
+      "negative_regression": "Portable source tests cover disjoint tiles and denial of unproven dirty bounds; hardware-specific partial StretchRect rollback behavior remains runtime untested.",
+      "component_integration": "Real game Draw/DrawIndexed -> complete D3D11 BGRA game output -> proven multi-dirty GPU subresource copies -> D3D9Ex tile StretchRect on original game Present, with D3D9 content rollback on failures. Native stereo/OpenXR complete game renderer remains unfinished."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Exact-SHA source/build validation only; Quest 3/VDXR menu/car/race visual output not observed in this task.",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains default false; original game D3D9/DX9Ex rendering/input/FFB and DXVK freeze remain authoritative unless explicitly activated."
+  },
+  "pipeline": {
+    "C0_RECOVER": "C6-only recovery: vr-dx11-native-r71 at material validation SHA 257b3ca24b55caa3fc0b3faa528145c1fce74e6b; expected docs/automation/runs/CONVERSION-DX11-00806.json absent (RUN_RECORD_NOT_FOUND).",
+    "C1_REVIEW": "Read committed 00806 code diff and checked prior 00805 run schema and acceptance contract format; no changes to the material source.",
+    "C2_IMPLEMENT": "Already in material commit 257b3ca24b55caa3fc0b3faa528145c1fce74e6b: bounded multi-dirty exact GPU tiles, D3D9Ex multi-blit restoration and portable admission regressions; no implementation in this C6-only reconciliation.",
+    "C3_VALIDATE": "PASS_EXACT_SHA for 257b3ca24b55caa3fc0b3faa528145c1fce74e6b: five required GitHub Actions SUCCESS. Runtime Quest3/VDXR UNTESTED. No CI jobs re-run by this C6 task.",
+    "C4_COMMIT": "Existing non-[skip ci] material source commit 257b3ca24b55caa3fc0b3faa528145c1fce74e6b; C6 result follows as a separate [skip ci] documentation-only bookkeeping commit.",
+    "C5_PACKAGE": "NOT_REQUIRED: no binary release or HMD validation/promotion requested.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED for scoped multi-dirty native DX11 shared-desktop integration only; full native stereo game renderer and hardware runtime not verified."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00806",
+    "score_change": 0,
+    "score_status": "NO_NEW_SCORE_C6_BOOKKEEPING",
+    "note": "C6 exact-SHA result recording/recovery is not a new implementation achievement; no AI_SCOREBOARD.md update and no duplicate credit."
+  },
+  "evidence": {
+    "exact_sha_gate_results": {
+      "DX11 Fast": {
+        "run_id": 38846651403,
+        "conclusion": "success",
+        "head_sha": "257b3ca24b55caa3fc0b3faa528145c1fce74e6b"
+      },
+      "Backend Conversion": {
+        "run_id": 38846651429,
+        "conclusion": "success",
+        "head_sha": "257b3ca24b55caa3fc0b3faa528145c1fce74e6b"
+      },
+      "Windows Build": {
+        "run_id": 38846658690,
+        "conclusion": "success",
+        "head_sha": "257b3ca24b55caa3fc0b3faa528145c1fce74e6b"
+      },
+      "OpenXR": {
+        "run_id": 38846658673,
+        "conclusion": "success",
+        "head_sha": "257b3ca24b55caa3fc0b3faa528145c1fce74e6b"
+      },
+      "HUD Inspector": {
+        "run_id": 38846658701,
+        "conclusion": "success",
+        "head_sha": "257b3ca24b55caa3fc0b3faa528145c1fce74e6b"
+      }
+    },
+    "extra_workflows": [
+      {
+        "name": "VR PC Fast Test Build",
+        "run_id": 38846651412,
+        "conclusion": "skipped",
+        "required_for_five_gate_acceptance": false
+      }
+    ],
+    "runtime_evidence": "NONE: Quest 3 / VDXR real game HMD session not performed",
+    "c6_record_recovery": {
+      "cause": "RUN_RECORD_NOT_FOUND",
+      "action": "Created missing 00806 run record from exact committed source, five GitHub Actions outcomes and prior run schema. No existing 00806 feature_contract or acceptance_results were overwritten."
+    }
+  },
+  "material_source_commits": [
+    "257b3ca24b55caa3fc0b3faa528145c1fce74e6b"
+  ]
+}

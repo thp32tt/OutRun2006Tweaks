@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00600",
+  "production_id": "CONVERSION-DX11-00600",
+  "event_id": "CONVERSION-DX11-00600-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00600",
+  "work_key": "DX11:MENU_RACE_ALPHA_COMPARE8",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "f1cfb129b01088355412280fa17022157263741c",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live D3D9 ALPHAFUNC/ALPHAREF capture for menu/vehicle/race Draw calls",
+      "D3D9 8-bit alpha quantization and all eight D3DCMPFUNC in real native D3D11 pixel shader",
+      "Native fixed-function PS/OM/Draw and original input-safe DX9Ex fallback kept unchanged"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_alpha_compare_00600.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "8*256*256 reference comparisons and exact-SHA Windows build",
+      "negative_regression": "22 destructive source mutations, unsupported state guarded",
+      "component_integration": "GetRenderState -> OutputCapture -> AlphaParams -> AlphaGate -> native indexed/nonindexed Draw"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_ALPHA_COMPARE8",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:ALPHA_FUNC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR/gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; unchanged D3D9 draw/input"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_alpha_compare_00600.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00600.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Opt-in diagnostic; actual Quest3/VDXR gameplay and controller parity not tested"
+  },
+  "next_action": "Controller assigns next independent menu-to-race native Draw integration; do not repeat 00600, pending actual Quest3/VDXR visual/menu/gamepad parity",
+  "validation_bearing_result_sha": "d2c6933379f23fe10167ebae6f6688b4926cfd3b",
+  "result_sha": "d2c6933379f23fe10167ebae6f6688b4926cfd3b",
+  "material_commit_sha": "f0f5f35dc9e3c8de7db9d0cfed45ff05af627a23",
+  "repair_commit_shas": [
+    "ed479b0a327d364f565c4cbaadbce14eb92e6475",
+    "d2c6933379f23fe10167ebae6f6688b4926cfd3b"
+  ],
+  "verified_ci": {
+    "backend_conversion_gate": {
+      "id": 38222574083,
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "build": {
+      "id": 38222580177,
+      "conclusion": "success"
+    },
+    "dx11_fast_structural": {
+      "id": 38222574095,
+      "conclusion": "success"
+    },
+    "openxr_architecture_push": {
+      "id": 38222574105,
+      "conclusion": "success"
+    },
+    "openxr_architecture_pr": {
+      "id": 38222580178,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "id": 38222580188,
+      "conclusion": "success"
+    },
+    "vr_pc_fast": {
+      "id": 38222574195,
+      "conclusion": "skipped",
+      "required": false
+    }
+  },
+  "defect_repaired": {
+    "signature": "MSVC C2026 HLSL raw string too big at live_game_frame_bridge.cpp line 374",
+    "original_raw_chars": 16499,
+    "repaired_raw_chars": 15920,
+    "repaired_in_sha": "d2c6933379f23fe10167ebae6f6688b4926cfd3b",
+    "source_semantics": "all eight D3DCMPFUNC preserved"
+  },
+  "validation_notes": "Windows GitHub Actions compile/static/readiness SUCCESS at exact result SHA only; NOT actual gameplay or HMD PASS"
+}

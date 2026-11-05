@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01203",
+  "production_id": "CONVERSION-DX11-01203",
+  "event_id": "CONVERSION-DX11-01203-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SOURCE_AUTHENTIC_DISJOINT_FVF_GPU_CAPTURE",
+  "classification": "A_NEW_GAME_RENDER_SOURCE_INTEGRATION_B_SAME_TASK_CAUSAL_TEST_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "a5bcea617c9d4d8d5613679bb271fe3a7d20e4bf",
+  "implementation_source_sha": "0c806a7c2e94fd96849f8ec9bc64d777e72f2d6b",
+  "material_result_sha": "0c806a7c2e94fd96849f8ec9bc64d777e72f2d6b",
+  "validation_bearing_result_sha": "b05367f2a70e5a7c7e40c9315bf086e7d46213fc",
+  "same_task_causal_regression_repair_sha": "b05367f2a70e5a7c7e40c9315bf086e7d46213fc",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "desktop_game_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "implementation": "Native GPU RAW PRE/POST FVF triangle-list/strip/fan source-indexed capture now rotates through real per-primitive GPU raster islands, choosing up to two physically disjoint 512x288 source capture regions instead of placing both within potentially empty merged bounding rect. Whole-IA safe validation first, plus authenticated viewport/scissor and RT intersection; preserve broad sweep for unknown and bad source geometry, original D3D9 Draw/Present, input/FFB/SkyGlow, DX9Ex fallback and frozen DXVK. No GPU frame/pixel observation in game.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "regression_repair": "The new scissor negative C++ fixture incorrectly forbade two vertically disjoint authentic GPU samples inside one tall source island; repaired to exclude only samples beyond source-scissor horizontal region. Same TASK_ID and +0 independent result.",
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41327285190,
+    "Backend Conversion Gate": 41327285213,
+    "Build": 41327285228,
+    "OpenXR VR architecture": 41327285280,
+    "OutRun EXE HUD Inspector CI": 41327285186
+  },
+  "exact_sha_gate_conclusions": [
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS"
+  ],
+  "optional_workflows": [
+    {
+      "name": "VR PC Fast Test Build",
+      "run_id": 41327285221,
+      "conclusion": "skipped",
+      "mandatory": false
+    }
+  ],
+  "score_change": 1,
+  "score_note": "One independent source-renderer integration only; causal same-task CI/test repair, C6 checkpoint and retry +0.",
+  "next_feature_action": "Complete true native menu->car selection->race frame rendering and eventually separate native L/R OpenXR. Desktop game/HMD evidence required for promotion.",
+  "recorded_at": "2026-11-02 02:01 KST",
+  "gameplay_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_FVF_SOURCE_IA",
+      "D3D11_NATIVE_DRAW",
+      "TWO_DISJOINT_SOURCE_RGB_GPU_PRE_POST",
+      "ORIGINAL_D3D9_SOURCE_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_MENU_RACE_SOURCE_FVF_TRIANGLES",
+      "NATIVE_GPU_PRE_POST_SOURCE_RASTER_CROPS",
+      "SOURCE_RGB_DIRTY_AND_PRESENT_IDENTITY",
+      "D3D9_ORIGINAL_PRESENT"
+    ],
+    "batch_components": [
+      "SOURCE_TRIANGLE_ISLAND_RASTER_SELECTION",
+      "TWO_DISJOINT_REAL_GPU_PIXEL_CAPTURES",
+      "SAFE_SCISSOR_AND_INDEX_VALIDATION",
+      "CXX_FVF_SOURCE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original game D3D9 FVF list/strip/fan source triangles with two separated native GPU RGB islands guide independent 512x288 PRE/POST source captures, proven by native_raw_dual_tile_test; exact-SHA Fast 41327285190 SUCCESS.",
+      "negative_regression": "Scissor excludes off-target triangle source islands; malformed active FVF index, invalid clip W, non-solid or depth-clip-untrusted raster fail closed to previous broad source sweep without synthetic GPU pixels. Same-task C++ regression assertion repair included at b05367f.",
+      "component_integration": "NativeRawFvfClipSpan from actual D3D11 Draw/DrawIndexed integrates with GPU PRE/POST sampling under source RTV identity, original D3D9 Present, unchanged input/FFB/DX9Ex fallback."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; VISIBLE_FRAME_OUTPUT denotes original D3D9 source diagnostic Present and not full native menu/race or Quest3 gameplay acceptance.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in default OFF; bounded authenticated game source COM/RT identity, source rectangles, GPU fences and original D3D9 Draw/Present preserved; input, FFB, SkyGlow, DX9Ex fallback and frozen DXVK unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Advance genuine game FVF menu, car-selection, HUD and race native GPU PRE/POST raster capture by locating both disjoint source-authentic primitive islands without accidentally sampling the empty merged bounding rectangle or publishing partial native RGB as a full game frame.",
+    "acceptance_items": [
+      {
+        "id": "authentic_island_gpu_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_TO_D3D11_GPU",
+        "expected_behavior": "Actual D3D11 source raster sampling selects separated original FVF Draw triangle RGB GPU islands without fabricated pixels."
+      },
+      {
+        "id": "strict_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_D3D9_PRESENT_AND_INPUT",
+        "expected_behavior": "Malformed indexed or clipped raster retains safe previous sampling, original D3D9 renderer and unaffected gamepad/FFB fallback."
+      },
+      {
+        "id": "exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_CI_AND_SOURCE_VALIDATION",
+        "expected_behavior": "Five mandatory GitHub Actions push gates pass for the exact prior C++ regression-repaired SHA, without claiming game or HMD runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "authentic_island_gpu_capture": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exact validation-bearing SHA b05367f2a70e5a7c7e40c9315bf086e7d46213fc; all mandatory push Actions 41327285190, 41327285213, 41327285228, 41327285280, 41327285186 SUCCESS; focused native_raw_dual_tile_test covered by DX11 Fast Structural Checks 41327285190."
+    },
+    "strict_original_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exact validation-bearing SHA b05367f2a70e5a7c7e40c9315bf086e7d46213fc; all mandatory push Actions 41327285190, 41327285213, 41327285228, 41327285280, 41327285186 SUCCESS; focused native_raw_dual_tile_test covered by DX11 Fast Structural Checks 41327285190."
+    },
+    "exact_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exact validation-bearing SHA b05367f2a70e5a7c7e40c9315bf086e7d46213fc; all mandatory push Actions 41327285190, 41327285213, 41327285228, 41327285280, 41327285186 SUCCESS; focused native_raw_dual_tile_test covered by DX11 Fast Structural Checks 41327285190."
+    }
+  }
+}

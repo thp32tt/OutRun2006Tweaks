@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01037",
+  "production_id": "CONVERSION-DX11-01037",
+  "event_id": "CONVERSION-DX11-01037-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01037",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
+  "work_key": "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
+  "feature_branch": "feature/dx11-01037-offscreen-postpass-overflow",
+  "feature_base_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Authentic native GPU offscreen game camera Draw/Clear writes beyond 32 tracked rectangles must not enter GPU OpenXR COPY/STRETCH as untouched source; original D3D9 gameplay preserved.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
+    "goal": "Preserve authenticated native camera pixels and fail closed on pixel evidence loss before L/R GPU transport",
+    "acceptance_items": [
+      {
+        "id": "normal",
+        "behavior_area": "CAMERA_GPU_COPY_STRETCH",
+        "expected_behavior": "Authentic proven camera regions and truly untouched postpasses remain supported",
+        "category": "end_to_end_behavior"
+      },
+      {
+        "id": "overflow",
+        "behavior_area": "CAMERA_SOURCE_LEDGER",
+        "expected_behavior": "Unrecorded 33rd real GPU source writes and split-Clear regions cannot be treated as untouched",
+        "category": "source_correctness"
+      },
+      {
+        "id": "fallback",
+        "behavior_area": "GAME_D3D9_INPUT",
+        "expected_behavior": "Unproven XR eye postpass rejected without changing original D3D9 Draw/input/FFB",
+        "category": "fallback_regression"
+      },
+      {
+        "id": "gate",
+        "behavior_area": "EXACT_SHA_GITHUB_ACTIONS",
+        "expected_behavior": "Native camera C++/Python regression plus successful same SHA GitHub Fast, Build, OpenXR, HUD and Backend Gates; runtime remains UNTESTED.",
+        "category": "integrated_validation"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "game D3D9 Draw/Clear",
+      "native camera RTV GPU pixel evidence",
+      "overflow-aware persistent per-eye source provenance",
+      "GPU COPY/STRETCH OpenXR L/R with DX9Ex fallback"
+    ],
+    "batch_components": [
+      "native_game_offscreen_color_provenance.hpp",
+      "native_game_stereo_submission.hpp",
+      "native_game_stereo_submission.cpp",
+      "dx11_game_offscreen_color_overflow_01037.cpp",
+      "test_dx11_game_offscreen_color_overflow_01037.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "32 contiguous real-source tiles permit native GPU postpass",
+      "negative_regression": "33rd unrecorded allocation and overflowing split-Clear prevent any false eye attribution",
+      "component_integration": "both NativeGameEyeDrawEncoder COPY and filtered STRETCH guarded by shared state"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
+      "src/vr/d3d11/native_game_stereo_submission.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_ONLY_RUNTIME_UNTESTED: real game camera GPU Draw/Clear then COPY/STRETCH source evidence only. No proven R30 callback, visible game frame, or HMD pixel output.",
+    "activation_guard_and_fallback": "native diagnostic opt-in; no DXVK; original D3D9 source Draw/FFB unchanged",
+    "blocking_evidence": "Backend Conversion Gate run 40036246823 failed source-policy acceptance at 030d80d; queued eligible offscreen Draw had silent returns on unprovable RTV/viewport/scissor capture, allowing an untracked camera write to be regarded as untouched by native postpass. Fast Structural run 40036856843 also found 00988 regression still expecting direct admissibility call; current source routes through overflow-aware allows_postpass. Fast Structural 40036989780 rejected stale 00986 direct-admissibility guard text; source now correctly rejects via overflow-aware allows_postpass.",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_offscreen_color_overflow_01037.cpp",
+    "tools/test_dx11_game_offscreen_color_overflow_01037.py",
+    "docs/automation/runs/CONVERSION-DX11-01037.json",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_native_eye_postpass_overwrite_00988.py",
+    "tools/test_dx11_game_camera_safe_composite_00986.py"
+  ],
+  "material_result_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+  "validation_bearing_result_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "C6 SOURCE_ONLY verified; preserve R175 ownership and continue real D3D9 Draw to native D3D11 Draw to visible game frame integration. Do not claim HMD/gameplay PASS.",
+  "full_dx11_renderer_complete": false,
+  "acceptance_results": {
+    "normal": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+        "tools/dx11_game_offscreen_color_overflow_01037.cpp",
+        "tools/test_dx11_game_offscreen_color_overflow_01037.py"
+      ],
+      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o /tmp/dx11_camera_overflow_01037 && /tmp/dx11_camera_overflow_01037; GitHub DX11 Fast Structural #40037241520 SUCCESS"
+    },
+    "overflow": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+        "tools/dx11_game_offscreen_color_overflow_01037.cpp",
+        "tools/test_dx11_game_offscreen_color_overflow_01037.py"
+      ],
+      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o /tmp/dx11_camera_overflow_01037 && /tmp/dx11_camera_overflow_01037; GitHub DX11 Fast Structural #40037241520 SUCCESS"
+    },
+    "fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+        "tools/dx11_game_offscreen_color_overflow_01037.cpp",
+        "tools/test_dx11_game_offscreen_color_overflow_01037.py"
+      ],
+      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o /tmp/dx11_camera_overflow_01037 && /tmp/dx11_camera_overflow_01037; GitHub DX11 Fast Structural #40037241520 SUCCESS"
+    },
+    "gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+        "tools/dx11_game_offscreen_color_overflow_01037.cpp",
+        "tools/test_dx11_game_offscreen_color_overflow_01037.py"
+      ],
+      "validation_command": "GitHub Actions all five exact SHA SUCCESS: DX11 Fast Structural Checks #40037241520; Build #40037241587; OpenXR VR architecture #40037241529; OutRun EXE HUD Inspector CI #40037245142; Backend Conversion Gate #40037241547"
+    }
+  },
+  "feature_ready": true,
+  "feature_last_head": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+  "ci_validation_runs": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40037241520,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037241520"
+    },
+    {
+      "name": "Build",
+      "run_id": 40037241587,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037241587"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40037241529,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037241529"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40037245142,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037245142"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40037241547,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037241547"
+    }
+  ],
+  "c6_summary": "Five mandatory GitHub exact-SHA Gates SUCCESS on 8af76f66d472c00a3b63d8771ca27b8376e3ea4b; untracked native camera Draw/partial Clear provenance fails closed before GPU COPY/STRETCH while original D3D9Ex Draw/input/FFB remain authoritative. Source-only stage; live game native L/R output and Quest3 HMD untested.",
+  "ci_failure_cause": null
+}

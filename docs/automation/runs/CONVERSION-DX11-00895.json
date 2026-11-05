@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00895",
+  "production_id": "CONVERSION-DX11-00895",
+  "event_id": "CONVERSION-DX11-00895-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": 1,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00895",
+  "feature_id": "DX11:NATIVE_STENCIL_READONLY_GAME_DRAW_CONTINUITY",
+  "work_key": "DX11:FULLFRAME:GAME_STENCIL_READONLY_DRAW_CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "base_sha": "cd9b8cb9b558a5d7a3393cf206398d52bdf93626",
+  "material_result_sha": "b8d155ded421ef8a0555a09ddbda7b53644d30ab",
+  "validation_bearing_result_sha": "013558cbd8c61dab9bcbc3b96c7bd360bb495865",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STENCIL_READONLY_GAME_DRAW_CONTINUITY",
+    "goal": "Preserve genuine full-size D3D9 menu, vehicle-selection and race Draw/DrawIndexed source chronology when stencil testing has nonzero write mask but all front and CCW operations KEEP; preserve auxiliary camera/depth isolation and original D3D9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "real_readonly_stencil_source_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_d3d9_game_source_draw",
+        "expected_behavior": "The live D3D9 Draw observer consumes proven read-only stencil no-color/no-Z calls as exact source ordinals before/after genuine native game GPU draws."
+      },
+      {
+        "id": "auxiliary_camera_stencil_identity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "menu_vehicle_offscreen_rendering",
+        "expected_behavior": "An offscreen game camera keeps auxiliary depth and MRT isolation while correctly recognizing front/CCW KEEP read-only stencil tests."
+      },
+      {
+        "id": "writeable_stencil_dx9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_input_ffb_fallback",
+        "expected_behavior": "Any front/CCW mutating stencil operation, unknown mask, foreign depth or active MRT write preserves the original D3D9 Draw/Present and fails closed for native output."
+      },
+      {
+        "id": "same_sha_full_build_gates",
+        "category": "integrated_validation",
+        "behavior_area": "github_windows_source_graph",
+        "expected_behavior": "Fast source/destructive regressions, Backend, Win32 Release Build, OpenXR and HUD Inspector all pass on one exact source SHA without skipping mandatory Gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Authentic D3D9 game render state front/CCW stencil readback -> source observer chronological no-output Draw admission",
+      "D3D9 aux menu/vehicle camera Z/MRT isolation -> native D3D11 frame Draw/DrawIndexed continuation",
+      "Same source SHA five required GitHub Actions + destructive regression; physical Quest3/VDXR runtime remains untested"
+    ],
+    "batch_components": [
+      "C++ live game render-state and source no-write chronological Draw/Indexed path",
+      "C++ offscreen camera stencil/depth evidence and 00768/00784 source-ordinal coverage",
+      "00770/00778/00779 legacy destructive regression connectivity repair without weakening safety or source gates"
+    ],
+    "conflict_keys": [
+      "DX11:GAME_STENCIL_READONLY_DRAW_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and Win32 BUILD_VERIFIED only for read-only stencil source Draw continuity in opt-in native full frame; actual game menu/car/race visual OpenXR output, HMD and gamepad UNTESTED. Full DX11 renderer still incomplete.",
+    "activation_guard_and_fallback": "Keep prior explicit opt-in, exact owner/target/depth/MRT provenance, fail-closed native publication, original D3D9Ex Draw/Present/input/FFB and frozen DXVK untouched.",
+    "acceptance_proof": {
+      "positive_probe": "Real C++ live bridge now queries D3DRS_STENCILFAIL/ZFAIL/PASS, TWOSIDEDSTENCILMODE and CCW operations; all KEEP with nonzero writable mask is treated as a no-output source ordinal while game Draw and indexed raster paths remain intact. Native C++ source probes pass.",
+      "negative_regression": "Invalid front/CCW mutation, ignored stencil source guard, false extra MRT/color mask and auxiliary Z identity destructive source mutations are rejected by Fast regression suite 39067725875.",
+      "component_integration": "src/vr/d3d11/live_game_frame_bridge.cpp + native_game_offscreen_pass.hpp with native_game_frame_batch.hpp, 00768/00770/00778/00779/00784 tests; five exact-SHA required Windows/backend/OpenXR/HUD Gates SUCCESS at 013558cb."
+    }
+  },
+  "acceptance_results": {
+    "real_readonly_stencil_source_draw": "PASS_BUILD",
+    "auxiliary_camera_stencil_identity": "PASS_BUILD",
+    "writeable_stencil_dx9ex_fallback": "PASS_BUILD",
+    "same_sha_full_build_gates": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_offscreen_pass.hpp",
+    "tools/dx11_no_target_write_draw_probe_00768.cpp",
+    "tools/dx11_readonly_masked_main_game_00784.cpp",
+    "tools/test_dx11_readonly_masked_main_game_00784.py",
+    "tools/test_dx11_no_target_write_draw_00768.py",
+    "tools/test_dx11_x8_alpha_only_game_draw_00770.py",
+    "tools/test_dx11_offscreen_masked_mrt_stencil_00779.py",
+    "tools/test_dx11_auxiliary_depth_draw_00778.py",
+    "docs/automation/runs/CONVERSION-DX11-00894.json"
+  ],
+  "validation_evidence": {
+    "material_sha": "b8d155ded421ef8a0555a09ddbda7b53644d30ab",
+    "validation_sha": "013558cbd8c61dab9bcbc3b96c7bd360bb495865",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39067725875,
+        "conclusion": "success",
+        "validation_sha": "013558cbd8c61dab9bcbc3b96c7bd360bb495865"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39067725877,
+        "conclusion": "success",
+        "validation_sha": "013558cbd8c61dab9bcbc3b96c7bd360bb495865"
+      },
+      {
+        "name": "Build",
+        "run_id": 39067728590,
+        "conclusion": "success",
+        "validation_sha": "013558cbd8c61dab9bcbc3b96c7bd360bb495865"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39067728541,
+        "conclusion": "success",
+        "validation_sha": "013558cbd8c61dab9bcbc3b96c7bd360bb495865"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39067728661,
+        "conclusion": "success",
+        "validation_sha": "013558cbd8c61dab9bcbc3b96c7bd360bb495865"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "blocking_evidence": "Native source ordinal/Win32 build proof only: live Quest3/VDXR and game/menu/race HMD screens plus gamepad/FFB behavior not tested; full DX11 native renderer completion not asserted."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Recovered exact previous 00894 C6, source branch HEAD cd9b8cb9 and no concurrent code edits on owned paths.",
+    "C1_REVIEW": "Identified live D3D9 stencil nonzero write-mask all-KEEP read-only Draw/Indexed no-output continuity abort in menu/car/race; preserved DX9Ex fallback.",
+    "C2_IMPLEMENT": "Material C++ both-face stencil read-only predicate wired into real game and offscreen camera source observers, with source ordinals and positive/negative regressions. Source commits bb0bf88f/b8d155de.",
+    "C3_VALIDATE": "Exact validation-bearing SHA 013558cb passed DX11 Fast, Backend, Windows Build, OpenXR architecture, HUD Inspector 5/5. Actual HMD and original game runtime UNTESTED.",
+    "C4_COMMIT": "Source commits bb0bf88f + b8d155de; exact validation-bearing result commit 013558cb; preceding C++ declaration and CI regression input repairs attributed to same 00895 task.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "BUILD_VERIFIED source game Draw continuity, not full renderer or Quest3; separate bookkeeping after exact five required GitHub Gates success, no repeat score for retries."
+  }
+}

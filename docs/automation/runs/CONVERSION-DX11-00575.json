@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00575",
+  "production_id": "CONVERSION-DX11-00575",
+  "event_id": "CONVERSION-DX11-00575-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00575",
+  "base_sha": "33e2c876008205cce1db4c9ac092cc51182b6100",
+  "work_key": "DX11:MENU_RACE_BLEND_TEXTURE_DIFFUSE_SCALED_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "live game D3D9 texture-stage capture/admission with independent RGB and alpha operands",
+      "compiled native D3D11 PS state/Draw or DrawIndexed to opt-in readback inset"
+    ],
+    "batch_components": [
+      "C++ D3D9 state capture with four HLSL variations",
+      "native D3D11 PS lifecycle/selection and destructive regression tests"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "four new game-sourced RGB blend + 2X/4X alpha variants",
+      "negative_regression": "40 source-link/math mutations and 10 operand cases",
+      "component_integration": "live game D3D9 Draw to native shader and D3D11 Draw/DrawIndexed and opt-in visible inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BLEND_TEXTURE_DIFFUSE_SCALED_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:TEXTURE_DIFFUSE_SCALE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_BLEND_SCALED_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST only after successful exact-sha CI; game/menu/race parity and input UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in diagnostic only; original D3D9 draw/Present/input continue; unsupported draws DX9Ex"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_scaled_blend_alpha_00575.py",
+    "docs/automation/runs/CONVERSION-DX11-00575.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub 33e2c876008205cce1db4c9ac092cc51182b6100",
+    "C1_REVIEW": "Missing independent texture/diffuse RGB factor blended with scaled alpha despite existing factor RGB variants",
+    "C2_IMPLEMENT": "4 native HLSL and PS state variants, live stage0 capture/selector, 40 regression mutations",
+    "C3_VALIDATE": "GitHub Actions SUCCESS at exact validation-bearing material SHA b2b219500e40e81422c883bdef94d500e34dac9f; runtime HMD/gamepad UNTESTED",
+    "C4_COMMIT": "source and integrated regressions in material commit",
+    "C5_PACKAGE": "NOT_REQUIRED opt-in, no distribution",
+    "C6_STATE": "PASS_EXACT_SHA — COMPLETE_BUILD_VERIFIED; exact SHA b2b219500e40e81422c883bdef94d500e34dac9f; runtime UNTESTED"
+  },
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "CI build verified; Quest3/VDXR HMD and gamepad runtime validation remains UNTESTED. No further CI requested.",
+  "validation_bearing_result_sha": "b2b219500e40e81422c883bdef94d500e34dac9f"
+}

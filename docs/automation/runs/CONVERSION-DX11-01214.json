@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01214",
+  "production_id": "CONVERSION-DX11-01214",
+  "event_id": "CONVERSION-DX11-01214-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_SPARSE_DIAGONAL_GPU_SOURCE_RGB",
+  "classification": "A_UNFINISHED_NATIVE_GAME_GPU_CAPTURE_AND_B_EXACT_CI_POLICY_INPUT_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "score_change": 0,
+  "source_base_sha": "912333011f58a44a07a98af854837a583318c723",
+  "material_result_sha": "0f12dff6a609511616194c7b3068e0918a7672a5",
+  "validation_bearing_result_sha": "7736b6de542224a3c5298718fed82c500a856672",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Source-authentic FVF clipped polygon centroid and farthest-vertex blended interior now supply TWO non-overlapping genuine source regions in one D3D11 PRE/POST GPU Draw; phase 1 reverses placement and later phases continue source GPU sweep. No synthetic pixel proof, no unchanged D3D9 Present/input/FFB/DX9Ex fallback change. C++ regression checks dual clipped interior coordinates, phase reversal, bounds, invalid W and scissor. Complete native menu/car/race frames and HMD unverified.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SOURCE_NATIVE_FVF_CLIPPED_POLYGON",
+      "D3D11_NATIVE_DRAW",
+      "TWO_INDEPENDENT_INTERIOR_GPU_PREPOST",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "D3D9_REAL_FVF_VERTEX_CLIP_AND_SCISSOR",
+      "TWO_D3D11_NATIVE_POLYGON_INTERIOR_GPU_PREPOST_COPIES",
+      "NONOVERLAPPING_SOURCE_COINCIDENT_PRESENT"
+    ],
+    "batch_components": [
+      "REAL_CLIPPED_SOURCE_SECOND_INTERIOR_POINT",
+      "DUAL_GPU_PREPOST_COPY_SOURCE_SELECTION_AND_PHASE_ROTATION",
+      "POSITIVE_NEGATIVE_SOURCE_TRIANGLE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two disjoint real clipped polygon interior GPU PRE/POST sampling tiles for same source FVF triangle, with next-phase swap",
+      "negative_regression": "Empty scissor, zero W and clamped non-disjoint tiles cannot prove two independent native RGB regions",
+      "component_integration": "native_game_raw_fvf_clip_capture.hpp authentic clipping -> native_game_raw_fvf_island_sampling.hpp -> native_game_raw_visual_diagnostic.hpp GPU before/after copy"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY after exact-SHA Gate; actual game RGB, contiguous menu/car/race image and Quest3/VDXR remain UNTESTED; not complete native game frame",
+    "activation_guard_and_fallback": "Only explicit RAW diagnostic; original D3D9 game draw/present/gamepad, FFB, SkyGlow and DX9Ex fallback remain authoritative; DXVK frozen"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Produce two disjoint authentic GPU PRE/POST source interior regions on clipped skinny native FVF source triangles, maintain subsequent GPU sweeps and original game safety without claiming full native frame parity.",
+    "acceptance_items": [
+      {
+        "id": "dual_polygon_interior_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_GAME_GPU_SOURCE_RGB",
+        "expected_behavior": "D3D11 GPU captures two disjoint physical regions inside one real clipped FVF polygon where the old viewport sweep missed actual RGB"
+      },
+      {
+        "id": "source_geometry_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_INPUT_FFB",
+        "expected_behavior": "Original D3D9/gamepad/FFB fallback and invalid W, scissor and overlaps remain fail-closed"
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "Five GitHub Actions exact SHA succeed for integrated C++ source; real HMD and game image remain separately untested"
+      }
+    ]
+  },
+  "prior_failure_cause": "First material SHA 0f12dff6a609511616194c7b3068e0918a7672a5 Fast 41383833520 and Backend 41383833665 failed before compile on 01213 historical record missing acceptance_results. Verified 01213's five original exact-SHA CI runs SUCCESS; now restore only factual historical acceptance evidence. No test/CI policy check suppression.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real-game GPU desktop or Quest3/VDXR HMD test performed at exact SHA; this is opt-in native RAW GPU source capture source-stage, not a complete playable menu/car/race native frame or stereo output.",
+  "acceptance_results": {
+    "dual_polygon_interior_capture": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks run 41384093391 SUCCESS, exact SHA 7736b6de542224a3c5298718fed82c500a856672; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tests/native_raw_dual_tile_test.cpp, then execute /tmp/dx11_raw_dual_tile. Positive two authentic clipped polygon interior tiles and phase swap. Does not claim real-game visible RGB."
+    },
+    "source_geometry_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 41384093391 SUCCESS at SHA 7736b6de542224a3c5298718fed82c500a856672; invalid W/scissor and disjoint GPU capture bounds negative C++ tests. Source change limited to RAW sampling geometry; original D3D9 Present, input and FFB unchanged."
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "GitHub Actions all 5 mandatory runs SUCCESS at exact SHA 7736b6de542224a3c5298718fed82c500a856672: DX11 Fast 41384093391, Backend Conversion 41384093340, Windows Build 41384093394, OpenXR Architecture 41384093337, OutRun EXE HUD Inspector 41384093351. Quest3/VDXR runtime and native full menu/race visuals remain UNTESTED."
+    }
+  },
+  "validation_gate_runs": {
+    "DX11 Fast Structural Checks": 41384093391,
+    "Backend Conversion Gate": 41384093340,
+    "Build (Win32 Release)": 41384093394,
+    "OpenXR VR architecture": 41384093337,
+    "OutRun EXE HUD Inspector CI": 41384093351
+  },
+  "checkpoint": "C6_STATE",
+  "record_type": "C6_RESULT_ONLY",
+  "score_note": "No independent full DX11 gameplay capability completion; existing DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME feature remains unfinished. 01214 source + 01213 CI record repair + full gate + C6 count +0, no duplicate AI2 score.",
+  "ci_repair_summary": "Initial 01214 0f12dff6 Fast 41383833520/Backend 41383833665 failed policy preflight: inherited 01213 terminal feature record lacked three acceptance_results despite its original five exact-SHA SUCCESS. Exact GitHub proof repaired under same 01214 in 7736b6de; five 01214 mandatory Gates SUCCESS. No CI-skip on material or validation-bearing result; C6 docs-only is separate."
+}

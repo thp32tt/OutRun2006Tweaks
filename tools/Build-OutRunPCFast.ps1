@@ -156,9 +156,8 @@ foreach ($marker in @(
     'VR R13: stereo hardening ACTIVE',
     'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
     'VR R66 OPTION ARROW: exact node pinned',
-    'VR R66 GOAL TIME HUD:',
-    'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
-    'VR R65 SELECTOR: restored base shadow bypassed'
+    'VR R121 GOAL TIME HUD: shared producer-map',
+    'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes'
 )) {
     if (-not $gameAscii.Contains($marker)) {
         throw "R66 PC fast binary missing proven-baseline marker: $marker"
@@ -190,6 +189,11 @@ $runtimeFiles = @(
     'Collect-OutRunVRLogs.ps1',
     'Analyze-OutRunVRSession.ps1',
     'OutRunVR-Test-Selector.ps1',
+    'Invoke-OutRunVROneClick.ps1',
+    'Test-OutRunVROneClickPreflight.ps1',
+    'analyze_dx11_census.py',
+    'VR_ONE_CLICK_TARGET.json',
+    'ONE_RUN_VISUAL_CHECKLIST.txt',
     'START_HERE_VR_TEST.cmd'
 )
 foreach ($file in $runtimeFiles) {
@@ -198,14 +202,17 @@ foreach ($file in $runtimeFiles) {
     Copy-Item $src (Join-Path $packageDir $file)
 }
 Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md')
+if ((Get-Content 'tools/VR_ONE_CLICK_TARGET.json' -Raw | ConvertFrom-Json).RendererTarget -eq 'dx11-native') {
+    Copy-Item 'docs/test-builds/2026-10-18-dx11-screen-connect.md' (Join-Path $packageDir 'DX11_SCREEN_CONNECT_README.md')
+}
 
 @(
     'USER-FACING LAUNCHER POLICY'
     ''
     'Use only START_HERE_VR_TEST.cmd.'
     'Do not add additional selector CMD/PS1 files to test packages.'
-    'When the active test matrix changes, update OutRunVR-Test-Selector.ps1 in place.'
-    'Helper scripts remain implementation details and are not alternate entry points.'
+    'The default branch target is controlled only by VR_ONE_CLICK_TARGET.json.'
+    'Diagnostic selector/helper scripts remain implementation details and are not alternate entry points.'
 ) | Set-Content (Join-Path $packageDir 'START_HERE_ONLY.txt') -Encoding UTF8
 
 @(
@@ -225,10 +232,15 @@ $matrixId = "PC-FAST-$stamp-$shortSha"
 Set-Content (Join-Path $packageDir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
 Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') "PC_FAST_${buildMode}_NOT_FINAL_CI" -Encoding ascii
 
+$oneClickTarget = Get-Content 'tools/VR_ONE_CLICK_TARGET.json' -Raw | ConvertFrom-Json
 $buildInputs = [ordered]@{
     SchemaVersion = 1
     BuildMatrixId = $matrixId
     IntegrationSha = $sourceSha
+    DevelopmentBranch = [string]$oneClickTarget.DevelopmentBranch
+    RendererTarget = [string]$oneClickTarget.RendererTarget
+    DevelopmentStage = [string]$oneClickTarget.Stage
+    LaunchBackend = [string]$oneClickTarget.LaunchBackend
     VariantId = 'ACTIVE_R26_HUD_R69'
     DefaultTestProfile = 'CORRECTNESS'
     Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')

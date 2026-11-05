@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01097",
+  "production_id": "CONVERSION-DX11-01097",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01097",
+  "classification": "A_FULL_GAME_CONNECTED_POLYGON_SOURCE_TO_NATIVE_GPU_WINDOWS",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_GAME_CONNECTED_FAN_STRIP_6142_SOURCE_GPU_WINDOWS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "58cbfd4797614e0eaac259d05f7c323ab01be8c1",
+  "source_change_sha": "8842bad5cea79f4f7e30874dcb8735a36b7e186e",
+  "material_result_sha": "8842bad5cea79f4f7e30874dcb8735a36b7e186e",
+  "validation_bearing_result_sha": "d609bd844fa01e75457de5f0f99e970d52ed6a24",
+  "result_sha": "d609bd844fa01e75457de5f0f99e970d52ed6a24",
+  "implementation_commits": [
+    "8842bad5cea79f4f7e30874dcb8735a36b7e186e"
+  ],
+  "repair_commits": [
+    "a02971278673e48dfacf86acf0d9cdb74c001447",
+    "e6292b3bed2fdde74e4c425026cc6342faae1922",
+    "b3b27bd2ca020fe0ecbab2efb720083bf03be8fe",
+    "74dfa9bceecf8e5db2656254a65c5ad4cc763708",
+    "d609bd844fa01e75457de5f0f99e970d52ed6a24"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "tests/vr/dx11_live_fvf_polygon_windows.cpp",
+    "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    "tools/test_dx11_sparse_index_draw_00646.py",
+    "tools/test_dx11_live_fvf_polygon_windows_01094.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Admit up to 6142 genuine D3D9 connected TRIANGLESTRIP and TRIANGLEFAN source primitives (6144 source VB/IB elements), and link them to existing bounded native D3D11 FVF/SM3 GPU windows without relaxing independent topology, malformed-index, DX9Ex fallback or input/FFB protections.",
+    "acceptance_items": [
+      {
+        "id": "connected_source_limits",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_SOURCE_TO_NATIVE_GPU_SUBMIT",
+        "expected_behavior": "Source fan and strip at 6142 triangles admit exactly 6144 original elements; 6143 rejects; downstream bounded native indexed windows retain fan center/rim and strip alternating global winding."
+      },
+      {
+        "id": "negative_source_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_PREFLIGHT_AND_DX9EX_FALLBACK",
+        "expected_behavior": "Nonconnected topology limit stays 2048; late invalid indices, whole-IB scan removal and unsafe source-to-GPU submissions fail closed; native aborts on failure and original D3D9 Draw/input/FFB remain authoritative."
+      },
+      {
+        "id": "required_five_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "NATIVE_BUILD_AND_OPENXR_HUD_GATES",
+        "expected_behavior": "The five required push GitHub Actions complete successfully on the exact validation-bearing source SHA, independently of unexecuted game and HMD tests."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "connected_source_limits": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_primitive_span.hpp",
+        "tests/vr/dx11_live_fvf_polygon_windows.cpp",
+        "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp",
+        "tools/dx11_game_primitive_span_probe.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks push run 40407464232 at d609bd844fa01e75457de5f0f99e970d52ed6a24; checked-in connected fan/strip source cap and GPU window regression only, no real-game/HMD frame proof"
+    },
+    "negative_source_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/test_dx11_sparse_index_draw_00646.py",
+        "tools/test_dx11_live_fvf_polygon_windows_01094.py",
+        "tests/vr/dx11_live_fvf_polygon_windows.cpp",
+        "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks push run 40407464232 at d609bd844fa01e75457de5f0f99e970d52ed6a24; source cap +1, corrupted-tail, whole-IB source preflight and targeted abort negative regressions"
+    },
+    "required_five_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464232",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464224",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464352",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464199",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464243"
+      ],
+      "validation_command": "Required five GitHub Actions push runs completed/success at exact d609bd844fa01e75457de5f0f99e970d52ed6a24: DX11 Fast 40407464232, Backend 40407464224, Build 40407464352, OpenXR 40407464199, HUD 40407464243"
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40407464232,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "d609bd844fa01e75457de5f0f99e970d52ed6a24",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464232"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40407464224,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "d609bd844fa01e75457de5f0f99e970d52ed6a24",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464224"
+    },
+    {
+      "name": "Build",
+      "run_id": 40407464352,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "d609bd844fa01e75457de5f0f99e970d52ed6a24",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464352"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40407464199,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "d609bd844fa01e75457de5f0f99e970d52ed6a24",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464199"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40407464243,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "d609bd844fa01e75457de5f0f99e970d52ed6a24",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40407464243"
+    }
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "COMPACT_CONNECTED_SOURCE_SPAN",
+      "D3D11_FVF_OR_SM3_INDEXED_GPU_WINDOWS",
+      "GUARDED_FRAME_OUTPUT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Opt-in native path; original D3D9/DX9Ex fallback, input, gamepad and FFB authoritative; no runtime promotion from static/CI alone.",
+    "visible_frame_acceptance": "Original game menu/car/race screen, real Quest3/VDXR eye output, game FPS and final native frame parity not tested."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered task source history and required run results from GitHub; prior 01097 JSON absent.",
+    "C1_REVIEW": "PASS: distinct connected fan/strip source ceiling and bounded GPU window contract grounded in material implementation commit.",
+    "C2_IMPLEMENT": "PASS: existing material C++ source implementation 8842bad5cea79f4f7e30874dcb8735a36b7e186e; no source changes in C6.",
+    "C3_VALIDATE": "PASS: five required GitHub push Actions completed/success at exact d609bd844fa01e75457de5f0f99e970d52ed6a24; no new CI run.",
+    "C4_COMMIT": "PASS: implementation and causal existing gate/test repairs retained; current commit is record-only.",
+    "C5_PACKAGE": "NOT_REQUIRED: no new executable/package generated in C6.",
+    "C6_STATE": "PASS: reconstructed previously absent task run JSON after exact SHA checks; validation-bearing source SHA d609bd844fa01e75457de5f0f99e970d52ed6a24 retained; no CI rerun."
+  },
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "terminal_gameplay_verified": false,
+  "blocked_reason_resolved": "RUN_RECORD_NOT_FOUND",
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "d609bd844fa01e75457de5f0f99e970d52ed6a24",
+  "c6_does_not_revalidate_source": true,
+  "c6_record_recovery_note": "RUN_RECORD_NOT_FOUND: target 01097 JSON was missing at both branch HEAD and validation SHA. Material commit, source acceptance contract and five CI push run results reconstructed from GitHub repository history; no preexisting 01097 JSON content overwritten.",
+  "score_change": 0,
+  "ai2_previous_confirmed_cumulative_score": 1996,
+  "ai2_new_confirmed_cumulative_score": 1996,
+  "scoreboard_ssot_repo": "thp32tt/ai-dev-lab",
+  "score_note": "GitHub AI_SCOREBOARD.md 2026-10-27 07:07:37 KST AI2 confirmed 1996. This 01097 C6 record-only recovery/retry earns +0; do not duplicate material task score.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: actual OutRun game, Quest3/VDXR HMD pixels, playback controls and FPS not executed."
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00404",
+  "production_id": "CONVERSION-DX11-00404",
+  "event_id": "CONVERSION-DX11-00404-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS",
+  "selected_work_item": "DX11_R266_PROGRAMMABLE_SHADER_REGISTER_SEMANTICS",
+  "base_sha": "789d23168678334ce049a755f5b15e9fd532c9a3",
+  "result_sha": "PENDING",
+  "material_result_sha": "PENDING",
+  "source_implementation_sha": "PENDING",
+  "validation_bearing_result_sha": "PENDING",
+  "result_marker": "[AUTO:CONVERSION-DX11-00404]",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "summary": "R266 extends validated R265 with fail-closed SM2/SM3 opcode-specific destination/source/declaration register semantics, relative-address operand evidence, normalized constant-bank provenance and sampler references. It remains dormant translation evidence only and does not authorize NativeDrawPath, Draw or DrawIndexed.",
+  "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00404.json"
+  ],
+  "implementation_commits": [
+    "1d7bdc0d7ba37cc596eb81fca15441543064b52a"
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "draw_dispatch_changed": false,
+    "dx9ex_branch_modified": false,
+    "r265_instruction_decoder_preserved": true,
+    "full_hlsl_translation_enabled": false,
+    "production_r263_semantic_proof_enabled": false
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered current GitHub SSOT after the 00403 rollover, read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, conversion lane state, completed 00403 run record, regression knowledge/history and Issue #14 production-ledger contract."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R265 proves exact instruction/raw-operand boundaries but deliberately omits opcode-specific destination/source roles, register bank/index/modifier/addressing semantics and constant/sampler provenance. R266 is the smallest executable next F21 evidence unit."
+    },
+    "C2_IMPLEMENT": {
+      "status": "IN_PROGRESS",
+      "evidence": "R266 register-semantics evidence types/declaration were added at 1d7bdc0d7ba37cc596eb81fca15441543064b52a; implementation, production census wiring and regressions remain in progress."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "IN_PROGRESS"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant source/census translation-evidence increment only; no runtime candidate or package identity is promoted."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "exact_next_action": "Complete R266 implementation/census/probe/source-graph verifier, run the exact-SHA Backend Conversion Gate, then persist PASS evidence and C6 state. Keep NativeDrawPath, Draw and DrawIndexed unauthorized."
+}

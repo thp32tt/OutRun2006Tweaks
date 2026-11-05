@@ -1,0 +1,122 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00548",
+  "production_id": "CONVERSION-DX11-00548",
+  "event_id": "CONVERSION-DX11-00548-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00548",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_STAGE0_TEX2_UV_SELECTION",
+  "base_sha": "cb43e94ec5e699650b6964eaa77b1dfc8514736f",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game D3D9 TEX2 FVF VB/IB/UP vertex data decoded with two UV slots and safe stride",
+      "Stage-0 D3DTSS_TEXCOORDINDEX 0/1 passed into native selected-UV D3D11 texture shader Draw/DrawIndexed",
+      "GPU output queued into diagnostic Present inset while original D3D9 rendering/input is unchanged"
+    ],
+    "batch_components": [
+      "Portable FVF TEX2 byte decoder and selector",
+      "Live fixed-function stage0 texture coordinate admission and native pixel draw",
+      "Portable positive/negative C++ probe and static mutation regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact-SHA 897b6949 source+test integration: Backend Gate #38145871363 validate+DX11 readiness smoke SUCCESS; Win32 Build #38145874488 SUCCESS; DX11 Fast #38145871361 SUCCESS; OpenXR #38145871337/#38145874489 SUCCESS; HUD #38145874500 SUCCESS. Portable probe source added; game pixels UNTESTED.",
+      "negative_regression": "TEX1 UV1, undersized TEX2 stride, TEX3, nondefault coordinate dimensions, and selector mutation rejected",
+      "component_integration": "D3D9 TEX2 game vertex -> bounded snapshot -> stage-0 selected UV -> DX11 native textured Draw -> visible diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_TEX2_UV_SELECTION",
+      "src/vr/d3d11/live_game_fvf_layout.hpp:TEX2",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:TEXCOORDINDEX"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "TEX2_DUAL_UV_SNAPSHOT",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source integrated; exact-SHA Windows build and Quest3/VDXR in-game pixels pending",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic only; original DX9Ex Draw/Present/gamepad unchanged; no live native promotion"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_fvf_layout_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00548.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS cb43e94ec5e699650b6964eaa77b1dfc8514736f; prior 00547 complete",
+    "C1_REVIEW": "PASS TEX2 and stage0 UV1 unsupported",
+    "C2_IMPLEMENT": "IMPLEMENTED game TEX2 decoder to native Draw integration",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Gate #38145871363 validate+DX11 readiness smoke SUCCESS; Win32 Build #38145874488 SUCCESS; DX11 Fast #38145871361 SUCCESS; OpenXR #38145871337/#38145874489 SUCCESS; HUD #38145874500 SUCCESS",
+    "C4_COMMIT": "PASS material/validation-bearing result 897b6949ea9ca3ce5fa16c44e8c32db8bc10e444 (no CI-skip)",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS exact-SHA source/build verified; Quest3/VDXR real-game/menu/car/race pixels and controller UNTESTED"
+  },
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "runtime_evidence": "Quest3/VDXR game and controller not executed",
+  "controller_runtime_adoption": "NOT_VERIFIED",
+  "material_result_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+  "validation_bearing_result_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+  "result_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+  "state_persisted": true,
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "run_id": 38145871363,
+      "head_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+      "status": "SUCCESS",
+      "jobs": "validate + DX11 readiness smoke SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38145871363"
+    },
+    "windows_build": {
+      "run_id": 38145874488,
+      "head_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+      "status": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38145874488"
+    },
+    "dx11_fast_structural": {
+      "run_id": 38145871361,
+      "head_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+      "status": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38145871361"
+    },
+    "openxr_architecture": [
+      {
+        "run_id": 38145871337,
+        "head_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38145874489,
+        "head_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+        "status": "SUCCESS"
+      }
+    ],
+    "hud_inspector": {
+      "run_id": 38145874500,
+      "head_sha": "897b6949ea9ca3ce5fa16c44e8c32db8bc10e444",
+      "status": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38145874500"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  },
+  "next_action": "New independent DX11 native integration work may proceed. Real game menu/vehicle/race and Quest3/VDXR visual/controller validation remains NEED_HMD_TEST; do not reuse 00548 for score."
+}

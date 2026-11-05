@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00631",
+  "production_id": "CONVERSION-DX11-00631",
+  "event_id": "CONVERSION-DX11-00631-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_SELECTARG1_VERTEX_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "990240af96456591f28a66dd3429a1e3a630fd3c",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game D3D9 PM RGB + SELECTARG1/ALPHAARG1 DIFFUSE/CURRENT",
+      "Native C++ capture -> compiled D3D11 PM diffuse-alpha pixel shader -> Draw/DrawIndexed",
+      "Unmodified vertex alpha only; other ops/modifiers retain original DX9Ex/gamepad path"
+    ],
+    "batch_components": [
+      "C++ stage0 SOURCE admission and vertex demand",
+      "C++ TextureCapture routing to native PM diffuse-alpha shader",
+      "Destructive regression plus numeric parity with Backend/Fast CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real game DRAW accepts PM RGB and unmodified SELECTARG1 diffuse/current alpha, using compiled native shader",
+      "negative_regression": "Modified operands, changed ALPHAOP, wrong capture/shader fail destructive test; fallback retained",
+      "component_integration": "Live GetTextureStageState -> TextureCapture -> D3D11 PS -> diagnostic DrawIndexed/Draw"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_SELECTARG1_VERTEX_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI source only: actual game/Quest3 and input untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in; unsupported state and gamepad remain original DX9Ex"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_diffuse_arg1_00631.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00631.json",
+    "tools/test_dx11_stage0_pm_factor_00619.py",
+    "tools/test_dx11_stage0_pm_modulate_00620.py",
+    "tools/test_dx11_selectarg_tfactor_input_00587.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub authoritative HEAD, policy, previous run and ownership checked",
+    "C1_REVIEW": "PASS: real-game PM RGB SELECTARG1 DIFFUSE/CURRENT alpha unimplemented",
+    "C2_IMPLEMENT": "PASS: game-authored stage0 source -> native PM diffuse alpha PS -> Draw/DrawIndexed; preserved DX9Ex/gamepad fallback",
+    "C3_VALIDATE": "PASS_EXACT_SHA: backend #38303107254, Fast #38303107541, Build #38303113219, OpenXR #38303113236, HUD #38303113232 all SUCCESS on validation-bearing SHA",
+    "C4_COMMIT": "PASS: original real-code material d34cae0ec3a5d94ff3defc1fde5805104a4b0404 plus source-verifier repairs; validation-bearing 1c2141297bdc72c83a9a4f48be47c95c6a548397",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED pending Quest3/VDXR menu/race/gamepad evidence"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Independent new DX11 development can continue. This task MUST NOT be rescored or redone. Menu/vehicle/race HMD image and gamepad transitions remain NEED_HMD_TEST; default DX9Ex fallback must remain.",
+  "material_result_sha": "d34cae0ec3a5d94ff3defc1fde5805104a4b0404",
+  "material_implementation_sha": "d34cae0ec3a5d94ff3defc1fde5805104a4b0404",
+  "result_sha": "1c2141297bdc72c83a9a4f48be47c95c6a548397",
+  "validation_bearing_result_sha": "1c2141297bdc72c83a9a4f48be47c95c6a548397",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38303107254,
+      "conclusion": "SUCCESS"
+    },
+    "dx11_fast": {
+      "run_id": 38303107541,
+      "conclusion": "SUCCESS"
+    },
+    "win32_build": {
+      "run_id": 38303113219,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "run_id": 38303113236,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38303113232,
+      "conclusion": "SUCCESS"
+    }
+  },
+  "failure_recovery": {
+    "initial_failed_result_sha": "d34cae0ec3a5d94ff3defc1fde5805104a4b0404",
+    "initial_failures": [
+      "Fast 00619 adjacency regression",
+      "Backend 00587 legacy source-graph substring",
+      "Windows Build SAFE-RETURN source pattern"
+    ],
+    "repair_commits": [
+      "2fde617108ced4f3aebfd21470800383e4e578aa",
+      "1c2141297bdc72c83a9a4f48be47c95c6a548397"
+    ],
+    "repair_result_sha": "1c2141297bdc72c83a9a4f48be47c95c6a548397"
+  }
+}

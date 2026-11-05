@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01050",
+  "production_id": "CONVERSION-DX11-01050",
+  "event_id": "CONVERSION-DX11-01050-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01050",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_PREDRAW_CPU_GDI_GAME_SURFACE",
+  "work_key": "DX11:MENU_CAR_RACE_PRE_DRAW_CPU_GDI_BACKBUFFER",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "c0fbc5d2447934b617724f28853bd08bb84ac442",
+  "validation_bearing_result_sha": "c0fbc5d2447934b617724f28853bd08bb84ac442",
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Support authentic pre-first-D3D11-Draw D3D9 backbuffer LockRect/UnlockRect and GetDC/ReleaseDC color writes after game full Clear: capture successful complete current D3D9 pixels and seed following native SM3/FVF Draw without stale writable tickets; reject foreign/open/failed writes and retain original D3D9 game/input/FFB/Present. Build and Quest3 runtime not yet proven.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_native_predraw_cpu_surface_01050.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01050.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_PREDRAW_CPU_GDI_GAME_SURFACE",
+    "goal": "Mirror actual pre-first-native-Draw D3D9 LockRect/GetDC authored menu, vehicle and race backbuffer writes into subsequent D3D11 SM3/FVF color while preserving original fallback and source chronology.",
+    "acceptance_items": [
+      {
+        "id": "predraw_lock_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_D3D9_CPU_BACKBUFFER",
+        "expected_behavior": "A successful game-owned partial LockRect/UnlockRect on canonical cleared backbuffer captures all final full game color before first native Draw."
+      },
+      {
+        "id": "predraw_gdi_chain",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_D3D11_FIRST_DRAW",
+        "expected_behavior": "A later GetDC/ReleaseDC before first native Draw refreshes complete D3D9 backbuffer pixels without stale open CPU write ticket."
+      },
+      {
+        "id": "fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_INPUT_FFB_PRESENT",
+        "expected_behavior": "Wrong owner or rect, open writes, unavailable readback, failed completion and post-first-Draw without native target retain unchanged original D3D9 Draw/Present/input and invalidate DX11 snapshot."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "All five mandatory DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD checks pass for this exact validation-bearing result commit."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_D3D9_GAME_BACKBUFFER_CLEAR",
+      "LIVE_D3D9_LOCKRECT_GETDC",
+      "D3D9_AUTHENTIC_CPU_WRITE_FINISH",
+      "D3D9_BACKBUFFER_COLOR_SNAPSHOT",
+      "NATIVE_D3D11_SM3_FVF_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_native_predraw_cpu_surface_01050.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 backbuffer full Clear -> LockRect/UnlockRect partial write -> second GetDC/ReleaseDC -> complete pre-Draw seed -> SM3/FVF native first Draw and safe original game Present.",
+      "negative_regression": "Unfinished/foreign/mismatched CPU/GDI tickets, unsupported backbuffer extent, failed readback/finish and active native writes never publish invented DX11 pixels.",
+      "component_integration": "D3D9 locked game CPU authoring + bounded staging snapshot + native SM3/FVF first Draw with ticket retirement; original D3D9 Present/input/FFB survives."
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_PRE_DRAW_CPU_GDI_BACKBUFFER"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "Diagnostic NativeDrawPathActive opt-in only; original D3D9/gamepad/FFB/Present unchanged for every unsupported or failed source write; DXVK frozen."
+  },
+  "acceptance_results": {
+    "predraw_lock_capture": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_native_predraw_cpu_surface_01050.cpp"
+      ],
+      "validation_command": "g++ targeted regression 01050 and Windows Build #40082814911 PASS at exact SHA"
+    },
+    "predraw_gdi_chain": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_native_predraw_cpu_surface_01050.cpp"
+      ],
+      "validation_command": "DX11 Fast #40082814976 and Windows Build #40082814911 at exact SHA"
+    },
+    "fail_closed": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_native_predraw_cpu_surface_01050.cpp"
+      ],
+      "validation_command": "DX11 Fast 01050 and existing 01049/00887 negative tests #40082814976 PASS"
+    },
+    "exact_sha_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Fast #40082814976; Backend #40082815004; Build #40082814911; OpenXR #40082814923; HUD #40082814915"
+    }
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "Native pre-Draw LockRect/GetDC write did not admit an owned CPU ticket or close it after current full D3D9 snapshot.",
+  "next_implementation_action": "Resolve exact-SHA mandatory GitHub Gate if it reports an actual failure; runtime HMD remains UNTESTED.",
+  "c6_reconciliation_reason": "FIVE_MANDATORY_GATES_EXACT_SHA_AFTER_MATERIAL_IMPLEMENTATION",
+  "c6_gate_results": {
+    "validation_sha": "c0fbc5d2447934b617724f28853bd08bb84ac442",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40082814976,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40082815004,
+      "event": "push"
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40082814911,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40082814923,
+      "event": "push"
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40082814915,
+      "event": "push"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "status": "SUCCESS",
+      "run_id": 40082814930,
+      "event": "push"
+    },
+    "note": "All five mandatory exact-SHA Gates PASS; separate WARP PASS. Actual menu/vehicle/race and Quest3/VDXR runtime UNTESTED; source implementation only. Bookkeeping [skip ci] separated from material SHA."
+  },
+  "runtime_note": "No actual OutRun desktop launch, Quest3/VDXR HMD session or native pixel/frame evidence at exact SHA; RUNTIME_VALIDATION=UNTESTED."
+}

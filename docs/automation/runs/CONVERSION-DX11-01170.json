@@ -1,0 +1,196 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01170",
+  "production_id": "CONVERSION-DX11-01170",
+  "event_id": "CONVERSION-DX11-01170-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SOURCE_ALIGNED_DIFFERENT_SIZE_DUAL_GPU_DIRTY_PRESENT",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_ready": "PASS_FEATURE_CI_SOURCE_ONLY",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "controller_runtime_adoption": "UNVERIFIED",
+  "source_base_sha": "a0730511f8c0bd1b834278f8628e72b4acec8b82",
+  "implementation_source_sha": "27b5774b0da12ca6aadcb29db828056cf4ef890b",
+  "validation_bearing_result_sha": "27b5774b0da12ca6aadcb29db828056cf4ef890b",
+  "material_result_sha": "27b5774b0da12ca6aadcb29db828056cf4ef890b",
+  "causal_ci_repair_shas": [],
+  "c6_checkpoint_is_validation_bearing": false,
+  "scoreboard_previous": 2196,
+  "score_change": 1,
+  "scoreboard_new": 2197,
+  "scoreboard_commit": "8ece54f0d1b1da9805b8e9ca1761f8760a8eac43",
+  "development_time_percentages": "UNMEASURED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "C++ opt-in RAW D3D11 native Draw source-aligned partial game output: allow two independent RGB-verified native GPU Draw dirty island crops of different dimensions to retain original D3D9 pixel coordinates in one Present. Distinct authentic source crop and full D3D9 dirty union are required for each; reject invalid, empty, negative and overlapping regions. Preserve legacy equal-size requirement for displaced and mixed fallback tile placement. Compiled positive/negative real pixel-source/dirty-coverage regressions. No DXVK, DX9Ex fallback, game input or FFB code changed.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "REAL_D3D11_NATIVE_DRAW",
+      "GPU_PRE_POST_RGB",
+      "CANONICAL_D3D9_DIRTY_PRESENT",
+      "OPT_IN_PARTIAL_DIAGNOSTIC"
+    ],
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "visible_frame_acceptance": "ONLY_SOURCE_BUILD_PARTIAL_NATIVE_RAW; NO_REAL_DESKTOP_GAME_OR_HMD_SCREEN_PROOF",
+    "activation_guard_and_fallback": "RAW_EXPLICIT_OPT_IN; original D3D9 source identity, original dirty union and RGB evidence fail-closed; native full coverage and OpenXR stereo not claimed.",
+    "batch_components": [
+      "CPP_NATIVE_RAW_TWO_DIFFERENT_SIZE_GPU_DIRTY_CROP_ADMISSION",
+      "CPP_SOURCE_ALIGNED_DIRTY_PRESENT_PAIR_INTEGRATION",
+      "CPP_COMPILED_DUAL_RGB_DIRTY_AND_LEGACY_NEGATIVE_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two independent original-game source-coordinate D3D11 GPU RGB Draw crops of different sizes are retained at disjoint D3D9 dirty Present islands.",
+      "negative_regression": "Overlapping, empty, negative-coordinate and mixed/displaced unequal-size crops remain rejected; native full-frame or HMD success is not claimed.",
+      "component_integration": "src/vr/d3d11/native_game_raw_present_coverage.hpp joins authenticated source-aligned native Draw RGB crops to true D3D9 Present dirty union; src/vr/d3d11/native_game_raw_visual_diagnostic.hpp consumes the pair predicate; tests/native_raw_dual_tile_test.cpp compiles and exercises positive/negative paths."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_PRE_POST_RGB",
+      "CANONICAL_D3D9_DIRTY_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "PARTIAL_NATIVE_GPU_RAW_NOT_FULL_GAME",
+    "acceptance_items": [
+      {
+        "id": "dual_distinct_size_source_output",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Two different-size independently authentic native GPU dirty RGB Draw source crops remain visible together at disjoint original D3D9 game coordinates.",
+        "behavior_area": "native D3D11 game Draw RGB to source-coincident D3D9 dirty Present"
+      },
+      {
+        "id": "legacy_nonoverlap_fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Mixed/displaced tiles retain equal dimensions; overlap, negative/zero coordinates reject.",
+        "behavior_area": "protected displaced RAW pair fallback and pixel bounds"
+      },
+      {
+        "id": "compiled_rgb_dirty_islands",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Compiled regressions verify two differently shaped D3D9 dirty union islands, original RGB source coordinates, and negative guards.",
+        "behavior_area": "compiled authentic RGB dirty-island source coordinate regression"
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "expected_behavior": "Five mandatory push CI workflows succeed at identical source SHA.",
+        "behavior_area": "mandatory exact-source five push GitHub Actions"
+      }
+    ],
+    "goal": "Preserve two independently authenticated different-size source-coincident native D3D11 GPU RGB Draw crops through real disjoint D3D9 dirty Present islands, with original game pixels, legacy fail-closed placement, and exact-SHA compile/gate evidence; partial RAW only, not full game/HMD."
+  },
+  "acceptance_results": {
+    "dual_distinct_size_source_output": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp"
+      ],
+      "validation_command": "Build 40973911522 PASS exact SHA"
+    },
+    "legacy_nonoverlap_fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Gate 40973911614 PASS exact SHA"
+    },
+    "compiled_rgb_dirty_islands": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Build 40973911522 PASS exact SHA"
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Five push workflows passed on 27b5774b0da12ca6aadcb29db828056cf4ef890b"
+    }
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40973911464,
+        "head_sha": "27b5774b0da12ca6aadcb29db828056cf4ef890b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40973911614,
+        "head_sha": "27b5774b0da12ca6aadcb29db828056cf4ef890b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40973911522,
+        "head_sha": "27b5774b0da12ca6aadcb29db828056cf4ef890b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40973911455,
+        "head_sha": "27b5774b0da12ca6aadcb29db828056cf4ef890b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40973911568,
+        "head_sha": "27b5774b0da12ca6aadcb29db828056cf4ef890b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "validation_layer": "SOURCE_AND_BUILD_VERIFIED_PARTIAL_RAW_NOT_REAL_GAMEPLAY_OR_HMD",
+    "runtime_evidence": "No matching source SHA real desktop game native Draw>0, published frame or Quest3/VDXR optical evidence.",
+    "score_formula": "AI2 previous 2196 + one distinct real native GPU dual differently sized D3D9 source crop output +1 = 2197; same TASK C6/retry +0"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_PINNED_HEAD_A0730511",
+    "C1_REVIEW": "PASS_ACTUAL_TWO_CROPS_SIZE_MISMATCH",
+    "C2_IMPLEMENT": "PASS_CPP_SOURCE_AND_COMPILED_REGRESSION",
+    "C3_VALIDATE": "PASS_FIVE_PUSH_EXACT_SHA",
+    "C4_COMMIT": "PASS_MATERIAL_27b5774b0da12ca6aadcb29db828056cf4ef890b",
+    "C5_PACKAGE": "PASS_WIN32_BUILD_NOT_HMD",
+    "C6_STATE": "PASS_DOC_ONLY"
+  },
+  "next_unfinished": "Real game/HMD verification needed for native GPU Draw>0, published complete menu/car/race frame and native L/R OpenXR, independently from source CI."
+}

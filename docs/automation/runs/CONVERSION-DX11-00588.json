@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00588",
+  "production_id": "CONVERSION-DX11-00588",
+  "event_id": "CONVERSION-DX11-00588-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00588",
+  "base_sha": "33e0ed92b39b0a0a0955f402e69a6622352a28f1",
+  "work_key": "DX11:MENU_RACE_SELECTARG2_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Capture live OutRun D3D9 stage0 SELECTARG2 with ALPHAARG2=TFACTOR independently from texture/diffuse RGB",
+      "Read D3DRS_TEXTUREFACTOR high byte and bind existing D3D11 PS to game native Draw/DrawIndexed diagnostic 256x144 inset"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp: live alphaArg2 capture/admission and actual shader Draw select",
+      "tools/test_dx11_selectarg_tfactor_arg2_00588.py + backend gate CI integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "18 negative mutation checks, 512 alpha-factor numeric cases, source selector-priority tests; exact-SHA Backend Gate validates and Windows Release Build SUCCESS",
+      "negative_regression": "004-00587 existing game-frame/alpha regressions, fail-closed TFACTOR gate, selector precedence repaired and exact 00588 test SUCCESS",
+      "component_integration": "Game D3D9 stage0 -> selector -> texture-factor constant -> native D3D11 PS -> Draw/DrawIndexed -> visible diagnostic inset; gamepad/Present retained"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SELECTARG2_TFACTOR_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SELECTARG2_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI/build only; Quest3/VDXR menu-to-race actual visuals and gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic; native gameplay disabled by default; original D3D9 Draw/Present/input preserved"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_selectarg_tfactor_arg2_00588.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "material_result_sha": "4edac8fba9a0b23f04706f34f059a68ad08bd285",
+  "validation_bearing_result_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a",
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Source integration validated on GitHub; no Quest3/VDXR hardware promotion"
+  },
+  "next_action": "NEED_HMD_TEST only for Quest3/VDXR gameplay/menu/vehicle selection/race and gamepad parity; controller allocate next independent DX11 feature without re-running this TASK_ID. DXVK frozen.",
+  "repair_shas": [
+    "8b2f7c67a49230c1992808eceb1f16aed077f94a"
+  ],
+  "result_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a",
+  "c6_basis_head_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a",
+  "local_validation": [
+    "live D3D9 stage-0 alphaArg2 TFACTOR wired to existing PS constant and DX11 Draw/DrawIndexed",
+    "18 mutation/512 alpha factor cases validated in Backend Gate on exact 8b2f7c67",
+    "DX11 Fast Structural CI SUCCESS; Win32 Release Build SUCCESS"
+  ],
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38202906032,
+      "conclusion": "success",
+      "validation_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38202909367,
+      "conclusion": "success",
+      "validation_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38202906020,
+      "conclusion": "success",
+      "validation_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38202905954,
+      "conclusion": "success",
+      "validation_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38202909357,
+      "conclusion": "success",
+      "validation_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38202909392,
+      "conclusion": "success",
+      "validation_sha": "8b2f7c67a49230c1992808eceb1f16aed077f94a"
+    }
+  ]
+}

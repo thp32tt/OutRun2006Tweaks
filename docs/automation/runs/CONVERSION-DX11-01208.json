@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01208",
+  "production_id": "CONVERSION-DX11-01208",
+  "event_id": "CONVERSION-DX11-01208-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_EYE_PLANE_FVF_CLIPPED_GPU_SOURCE",
+  "classification": "A_REAL_UNFINISHED_NATIVE_GAME_SOURCE_RENDER_CAPTURE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "9806b4d89777702599345699f9c5b1cd05ffc1cc",
+  "implementation_source_sha": "4d4471e28d766e7791c46abbbdb385e7d3e6139c",
+  "material_result_sha": "4d4471e28d766e7791c46abbbdb385e7d3e6139c",
+  "validation_bearing_result_sha": "4d4471e28d766e7791c46abbbdb385e7d3e6139c",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "desktop_game_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Real D3D9-authored FVF triangles straddling the homogeneous camera/near plane can have a W<0 source corner yet visible original game pixels. Bound and clip actual source triangle against native D3D11 homogeneous x/y/z/W planes, then apply the existing game-authenticated viewport/scissor and native D3D11 PRE/POST GPU RGB capture islands. Preserve positive W original fast path, zero/nonfinite W and malformed IA fail-closed, actual GPU RGB/fence/source RT identity and D3D9 Draw/Present/input/FFB and DX9Ex fallback. This does not prove a playable full-frame/native stereo game.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_SOURCE_FVF_TRIANGLE",
+      "D3D11_NATIVE_DRAW",
+      "HOMOGENEOUS_EYE_PLANE_CLIP",
+      "SOURCE_SCISSOR_AND_GPU_RGB_CAPTURE",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "D3D9_AUTHENTIC_CLIPSPACE_VERTICES",
+      "BOUNDED_HOMOGENEOUS_CLIP_AND_NDC_RASTER",
+      "NATIVE_FVF_SOURCE_GPU_TILE_CAPTURE",
+      "PROTECTED_ORIGINAL_PRESENT_AND_FALLBACK"
+    ],
+    "batch_components": [
+      "HOMOGENEOUS_FVF_SOURCE_TRIANGLE_CLIPPING",
+      "NATIVE_SOURCE_GPU_ISLAND_POSITIVE_NEGATIVE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast Structural Checks 41352767127 SUCCESS; actual test native_raw_fvf_clip_capture_regression crossing W<0 front/behind source GPU tile selection. Windows Build 41352767128 SUCCESS.",
+      "negative_regression": "Fully-behind triangle, W=0/nonfinite source and malformed IA rejected; previous positive W/viewport/scissor/FFB/source RT/fence guards retained.",
+      "component_integration": "Native_FVF_geometry_header is consumed by shipping source-authenticated D3D11 PRE/POST capture guide and exercised via native_raw_fvf_island_dual_draw_tile; full five exact-SHA push Actions SUCCESS."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY: The PRE/POST native D3D11 GPU RGB islands from clipped real game FVF Draws are experimental opt-in partial pixels on original D3D9 Present; the full native frame, menu/race parity and Quest 3 stereo remain UNTESTED.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC explicit opt-in/default OFF; unknown/malformed W or native scissor/raster state retains original viewport GPU sampling; original D3D9 Draw, input, FFB/SkyGlow and protected DX9Ex fallback unchanged; DXVK frozen."
+  },
+  "acceptance_results": {
+    "homogeneous_eye_plane_clip": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41352767127 SUCCESS exact source SHA 4d4471e28d766e7791c46abbbdb385e7d3e6139c; real native_raw_dual_tile_test.cpp C++ FVF eye-plane regression"
+    },
+    "source_gpu_tile_and_negative_regression": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41352767127 SUCCESS and Windows Build 41352767128 SUCCESS at exact source SHA 4d4471e28d766e7791c46abbbdb385e7d3e6139c"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "All five mandatory push workflows SUCCESS on 4d4471e28d766e7791c46abbbdb385e7d3e6139c",
+      "validation_command": "Exact-SHA five required push Actions: Fast 41352767127, Backend 41352767111, Build 41352767128, OpenXR 41352767174, HUD 41352767162; all SUCCESS on 4d4471e28d766e7791c46abbbdb385e7d3e6139c",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ]
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41352767127,
+    "Backend Conversion Gate": 41352767111,
+    "Build": 41352767128,
+    "OpenXR VR architecture": 41352767174,
+    "OutRun EXE HUD Inspector CI": 41352767162
+  },
+  "exact_sha_gate_conclusions": [
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS"
+  ],
+  "runtime_note": "No actual Windows OutRun game or HMD or Quest3/VDXR visual/native stereo runtime validation; source/WARP/CI cannot certify full native game rendering. RUNTIME_VALIDATION=UNTESTED.",
+  "score_note": "Independent source implementation and exact five gates +1 only once; repeat, C6/checkpoint and future same-source verification +0. AI1 unchanged.",
+  "recorded_at": "2026-11-02 KST",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Admit authentic game FVF triangles crossing the homogeneous eye plane to native D3D11 PRE/POST GPU RGB captures without treating the partial diagnostic as full-game or HMD validation.",
+    "acceptance_items": [
+      {
+        "id": "homogeneous_eye_plane_clip",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_REAL_GAME_GPU_RGB",
+        "expected_behavior": "Finite original D3D9 FVF triangles crossing W sign contribute their clipped screen raster to the real game native GPU capture and D3D9-authenticated Present path."
+      },
+      {
+        "id": "source_gpu_tile_and_negative_regression",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_INPUT_FFB",
+        "expected_behavior": "W=0, nonfinite IA, behind-camera triangles or unknown raster states cannot promote a fake native frame; retain unchanged source identity, original input/FFB and DX9Ex fallback."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "BUILD_FAST_OPENXR_HUD",
+        "expected_behavior": "All five mandatory GitHub Actions checked at source-exact SHA; desktop game/Quest3 visual validation kept UNTESTED."
+      }
+    ]
+  }
+}

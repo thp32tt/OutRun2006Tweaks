@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01046",
+  "production_id": "CONVERSION-DX11-01046",
+  "event_id": "CONVERSION-DX11-01046-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01046",
+  "classification": "A",
+  "feature_id": "DX11:POST_DRAW_FULL_COLORFILL_NATIVE_EPOCH",
+  "work_key": "DX11:COLORFILL_NATIVE_SCENE_EPOCH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "FEATURE_READY",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "8598a8adc5b03256ecb9ef1c28d48ba8d043d1af",
+  "summary": "Authentic full-backbuffer D3D9 ColorFill after color-only native Draw retires the previous native scene and seeds a fresh contiguous same-Present Draw epoch. Later depth-dependent draws, missing original Draw coverage, poisoned batches and unowned ColorFill fall back to D3D9. Real game/HMD output untested.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "tools/dx11_native_full_colorfill_resume_01046.cpp",
+    "tools/test_dx11_full_colorfill_resume_01046.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_full_colorfill_resume_01046.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:POST_DRAW_FULL_COLORFILL_NATIVE_EPOCH",
+    "goal": "Continue real menu/car/race native Draw output after an authentic source full-backbuffer color overwrite without publishing stale geometry or inventing game depth.",
+    "acceptance_items": [
+      {
+        "id": "live_epoch_resumption",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_DRAW_SOURCE",
+        "expected_behavior": "Source full ColorFill after genuine depth-free Draws starts new RTV seed and next game Draw at original ordinal."
+      },
+      {
+        "id": "source_order_and_depth",
+        "category": "fallback_regression",
+        "behavior_area": "GAME_SCENE_ORDERING",
+        "expected_behavior": "Full frame publication consumes exact new epoch ordinals while old Draws remain retired; depth-dependent calls reject."
+      },
+      {
+        "id": "dx9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_INPUT",
+        "expected_behavior": "Invalid, clipped, depth/stencil, foreign and poisoned source continues original D3D9 Draw/Present/input/FFB."
+      },
+      {
+        "id": "integrated_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_ACTIONS",
+        "expected_behavior": "Five required GitHub Actions succeed at one result SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "authentic full backbuffer ColorFill and new contiguous game scene epoch",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "tools/dx11_native_full_colorfill_resume_01046.cpp",
+      "tools/test_dx11_full_colorfill_resume_01046.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real ColorFill observer sets authentic new native RTV seed; C++ regression verifies subsequent source Draw admitted and frame publishable.",
+      "negative_regression": "C++ checks poisoned, unobserved, Z-writing and duplicate fills reject, with original draw+input fallback untouched.",
+      "component_integration": "Source original D3D9 ColorFill COM backbuffer -> native Draw epoch tracker -> next real DX11 GPU Draw and same Present."
+    },
+    "conflict_keys": [
+      "DX11:COLORFILL_NATIVE_SCENE_EPOCH"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY_CANDIDATE; game frame and HMD not tested",
+    "activation_guard_and_fallback": "explicit full-game opt-in only; depth, provenance, original full-coverage and source ordinal guards; D3D9 authoritative."
+  },
+  "acceptance_results": {
+    "live_epoch_resumption": {
+      "status": "SOURCE_IMPLEMENTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_frame_batch.hpp"
+      ],
+      "validation_command": "tools/dx11_native_full_colorfill_resume_01046.cpp; final CI pending"
+    },
+    "source_order_and_depth": {
+      "status": "SOURCE_IMPLEMENTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_frame_batch.hpp",
+        "tools/dx11_native_full_colorfill_resume_01046.cpp"
+      ],
+      "validation_command": "C++ positive and negative unit regression"
+    },
+    "dx9ex_fallback": {
+      "status": "SOURCE_IMPLEMENTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_full_colorfill_resume_01046.py"
+      ],
+      "validation_command": "source hook fallback and compile CI pending"
+    },
+    "integrated_exact_sha": {
+      "status": "PENDING_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "five workflow gate same exact SHA"
+    }
+  },
+  "ci_failure_repair": "e46c5f0 Fast: inherited 00671 source-contiguity mutation required ordinal == consumed expression; changed to exact bounded sourceEpochStart shift, preserving rejection for skipped Draw and UINT64 overflow. Backend/Win32 source graph: historical first-frame safety check requires original depth predicate shape; preserved original expression preceded by stricter post-ColorFill depth refusal. Existing tests/gates not removed.",
+  "feature_ready": true,
+  "c6_reconciliation_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_gate_results": {
+    "validation_sha": "8598a8adc5b03256ecb9ef1c28d48ba8d043d1af",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40069268805
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40069268816
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40069268828
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40069268850
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40069268809
+    },
+    "note": "GitHub Actions exact-SHA verification only; no matching game/Quest3 runtime verification."
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00700",
+  "production_id": "CONVERSION-DX11-00700",
+  "event_id": "CONVERSION-DX11-00700-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_STAGE1_OPERAND_MODIFIERS_MENU_RACE",
+  "work_key": "DX11:GAME_STAGE1_CURRENT_TFACTOR_MODIFIERS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real D3D9 FVF menu/vehicle/race Draw/DrawIndexed stage-1 COLOR/ALPHA argument observation",
+      "CPU fail-closed CURRENT/TFACTOR flags -> D3D11 stage1 RGB/alpha HLSL + live constant buffer and native Draw/DrawIndexed",
+      "Diagnostic GPU readback/source crop Present with original D3D9 Draw/Present/gamepad authoritative"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_factor_probe.cpp",
+      "tools/test_dx11_stage1_operands_00700.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "512 stage1 operand variants across 8 RGB/alpha ops, two real captured arguments, current/factor sources and 4 modifier masks each",
+      "negative_regression": "Unknown stage-1 sources and unknown bits rejected; downstream stage2 disabled, original DX9Ex Draw and input preserved; destructive wiring mutations",
+      "component_integration": "D3D9 game stage-state capture through native stage1 HLSL and PS cbuffer -> Draw/DrawIndexed; C++17 and exact SHA Windows Gate"
+    },
+    "conflict_keys": [
+      "DX11:GAME_STAGE1_CURRENT_TFACTOR_MODIFIERS",
+      "src/vr/d3d11/live_game_stage1_factor.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-level native game UI RGB/alpha stage1 modifiers integrated into diagnostic inset; actual Quest3 game pixels UNTESTED",
+    "activation_guard_and_fallback": "Default native inactive, explicit OUTRUN_DX11_FIRST_GAME_FRAME=1 only; unknown operands, textures and bit masks fall back to original D3D9 Draw/Present/input"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STAGE1_OPERAND_MODIFIERS_MENU_RACE",
+    "goal": "Deliver stage-1 CURRENT/TFACTOR complement and alpha-replicate game UI/race fades into real native Draw/DrawIndexed with safe D3D9 input fallback and exact-SHA compilation.",
+    "acceptance_items": [
+      {
+        "id": "native-stage1-rgb-alpha-modifiers",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_shader_and_fixed_function_native_draw",
+        "expected_behavior": "Supported stage1 RGB and separate alpha operand flags flow from game D3D9 state to PS constant buffer and HLSL native Draw/DrawIndexed"
+      },
+      {
+        "id": "unknown-operand-original-d3d9",
+        "category": "fallback_regression",
+        "behavior_area": "game_input_and_dx9ex_fallback",
+        "expected_behavior": "Stage1 texture/diffuse/temp/unknown-bit/unsupported downstream stages remain original D3D9 Draw and unaffected input"
+      },
+      {
+        "id": "integrated-512-case-ci",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_shader_source_and_windows_build",
+        "expected_behavior": "512 C++17 positive variations, negative selectors, destructive integration Python checks, same-SHA Windows build and full Gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-stage1-rgb-alpha-modifiers": "PASS",
+    "unknown-operand-original-d3d9": "PASS",
+    "integrated-512-case-ci": "PASS"
+  },
+  "base_head_sha": "b6c3b2b92ee7f874f2f286cf5ed4cc7c6049fe80",
+  "material_result_sha": "0a635524c587561a23aef4a29760d5833d8c8563",
+  "validation_bearing_result_sha": "40d7537e519e3e2966669ddc4b4e00b1ebf5eeaf",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "tools/dx11_game_stage1_factor_probe.cpp",
+    "tools/test_dx11_stage1_operands_00700.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE head b6c3b2b; 00699 gates confirmed",
+    "C1_REVIEW": "DONE stage1 operand modifier fallback gap",
+    "C2_IMPLEMENT": "DONE C++/HLSL/native Draw integration at 0a635524c587561a23aef4a29760d5833d8c8563",
+    "C3_VALIDATE": "PASS same validation-bearing exact SHA 40d7537e519e3e2966669ddc4b4e00b1ebf5eeaf: DX11 Fast #38482318823; Backend #38482318812 validate+readiness smoke; Windows Build #38482323949; OpenXR #38482325268; HUD #38482323758, all SUCCESS. HMD/gamepad UNTESTED.",
+    "C4_COMMIT": "PASS material 0a635524c587561a23aef4a29760d5833d8c8563, validation-bearing 40d7537e519e3e2966669ddc4b4e00b1ebf5eeaf (no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED: no user HMD/runtime validation or deployable package claim",
+    "C6_STATE": "COMPLETE BUILD_VERIFIED; 3/3 build acceptance PASS, 5/5 exact SHA Actions SUCCESS, Quest3/VDXR/gamepad UNTESTED; later C6 documentation commit separately [skip ci] without changing result SHA."
+  },
+  "next_action": "Start the next independent DX11 real menu/vehicle/race Draw/DrawIndexed incomplete integration feature under a new task; original D3D9 gamepad and native diagnostic safe fallback remain authoritative. Quest3/VDXR runtime is NEED_HMD_TEST, not a development blocker.",
+  "state_persisted": true,
+  "gate_evidence": {
+    "validation_bearing_sha": "40d7537e519e3e2966669ddc4b4e00b1ebf5eeaf",
+    "dx11_fast_structural_checks": {
+      "id": 38482318823,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38482318812,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "validate SUCCESS",
+        "DX11 readiness smoke probes SUCCESS"
+      ]
+    },
+    "windows_build": {
+      "id": 38482323949,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38482325268,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38482323758,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  }
+}

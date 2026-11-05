@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00032",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T08:11:47+09:00",
+  "base_sha": "c510e94dbad7fa371d529534ad0f318b08de5eca",
+  "code_result_sha": "09361c415754cf7f5b8ad86c64870333b3132ca3",
+  "result_sha": "09361c415754cf7f5b8ad86c64870333b3132ca3",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R87 broaden deterministic hosted semantic coverage for the already-supported F20 fixed-function subset.",
+  "summary": "Extended the existing R86 fixed-function HLSL semantic smoke without changing production renderer/runtime/shader-generator code. Added zero-active-stage diffuse passthrough; a three-stage chain reaching stage 2 with SELECTARG2, TEXCOORD5, linear filtering and clamp addressing; plus explicit fail-closed reason checks for a disabled-stage hole, D3DTA_COMPLEMENT, D3DTTFF_COUNT2 and D3DTEXF_ANISOTROPIC. Supported cases must generate HLSL and pass the existing non-routing D3DCompile ps_4_0 probe.",
+  "evidence": [
+    "CONVERSION-DX11-00030 completed R86 semantic smoke and selected broader deterministic coverage within the supported F20 subset as the next runtime-independent task.",
+    "Backend Conversion Gate 36494998131 PASS on exact production SHA, including R87 source-graph verification, semantic smoke build and semantic smoke execution.",
+    "Build 36495001792 PASS on exact production SHA.",
+    "OpenXR VR architecture 36495001805 PASS across all six jobs.",
+    "HUD Inspector 36495001796 PASS.",
+    "PC Fast 36494998133 skipped and N100 was not used.",
+    "No Quest 3/VDXR, game execution or GPU shader binding validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "tools/dx11_fixed_function_shader_semantics.cpp",
+      "result": "Added R87 supported semantic cases and specific fail-closed readiness reason assertions; all supported cases use the existing non-routing D3DCompile probe."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Upgraded semantic-smoke static contract to R87 tokens covering SELECTARG2, stage2/TEXCOORD5, supported linear/clamp state and explicit fail-closed reason cases."
+    }
+  ],
+  "semantic_cases": {
+    "supported": [
+      "zero active fixed-function stages: generated shader returns diffuse current and emits no texture declarations",
+      "existing diffuse passthrough",
+      "existing single-stage texture MODULATE",
+      "existing two-stage CURRENT chain",
+      "three-stage chain reaching stage 2 with SELECTARG2, texture stage 2 exact resource, TEXCOORD5, LINEAR filtering and CLAMP addressing"
+    ],
+    "fail_closed": [
+      "stage 0 disabled while stage 1 active -> FixedFunctionUnsupportedStageChain",
+      "D3DTA_COMPLEMENT modifier -> FixedFunctionUnsupportedArgument",
+      "D3DTTFF_COUNT2 -> FixedFunctionUnsupportedTextureTransform",
+      "D3DTEXF_ANISOTROPIC -> FixedFunctionUnsupportedSamplerFilter",
+      "existing texture resource present without exact bit -> FixedFunctionShaderPrototypeUnsupportedNotReady",
+      "existing D3DRTYPE_CUBETEXTURE -> FixedFunctionShaderPrototypeUnsupportedResourceType"
+    ]
+  },
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "EIGHT_TEXTURE_STAGE_DESCRIPTOR_BEHAVIOR_FORMAT_EXACTNESS_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "DECLARATION_AND_CONSERVATIVE_FVF_LAYOUT_READY_BLEND_ENCODINGS_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "SUPPORTED_SUBSET_HAS_GENERATION_COMPILER_AND_BROADER_DETERMINISTIC_SEMANTIC_SMOKE_NATIVE_BINDING_NOT_ENABLED",
+    "F21_shader_translation_readiness": "PROGRAMMABLE_TRANSLATION_OPEN_FIXED_FUNCTION_OFFLINE_ONLY",
+    "F22_sampling_signature_saturation": "OPEN_RUNTIME_CENSUS_COVERAGE_LIMITS_REMAIN",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED_AND_OFFLINE_EVIDENCE_SEPARATED_FROM_RUNTIME"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R87 only strengthens offline deterministic semantic/compiler evidence. It does not execute shaders on a D3D11 device, bind native shaders, prove live resource mirrors, translate F21 programmable shaders or establish exact-build Quest3/VDXR parity."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36494998131,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "09361c415754cf7f5b8ad86c64870333b3132ca3",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "r87_semantic_smoke_build": "PASS",
+      "r87_semantic_smoke_run": "PASS",
+      "artifact_id": 11003405973,
+      "artifact_digest": "sha256:61fd0160c750cd4491c454e1f414828b8c228a458cd51785a40f6ed27205f253"
+    },
+    "build": {
+      "run_id": 36495001792,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "09361c415754cf7f5b8ad86c64870333b3132ca3",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 11003132250,
+      "binary_artifact_digest": "sha256:b7947418f4735a29e77784c0db0adae6c5dc06947be4756c6d751dd0998e5623"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36495001805,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "09361c415754cf7f5b8ad86c64870333b3132ca3",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 11002064839,
+      "host_artifact_digest": "sha256:e354035e92ba754d15812e7f6cb6f7cb5790513998906af039a4ef99694d7621"
+    },
+    "hud_inspector": {
+      "run_id": 36495001796,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "09361c415754cf7f5b8ad86c64870333b3132ca3",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 11002694525,
+      "artifact_digest": "sha256:a8b7a07f61e423ac727138f1039c20914a893800d0b57e93c05871e88541f230"
+    },
+    "pc_fast": {
+      "run_id": 36494998133,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5880191483,
+    "validation_comment_id": 5880400741
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. Hosted semantic coverage for the current F20 subset is stronger, but runtime census/GPU evidence is still absent. The next runtime-independent bounded DX11 task should address another open activation prerequisite, preferably an F19 input-layout edge such as currently fail-closed FVF blend-weight/index encodings, while keeping F21 programmable shader translation separate.",
+  "finalized_kst": "2026-09-29T08:11:47+09:00"
+}

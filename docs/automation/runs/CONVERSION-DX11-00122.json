@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00122",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T20:27:57+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "0c294fb61c75e759ac590e53ce58ba781691d653",
+  "result_sha": "9ed4b2d51703bb4eb809abcd89adb242524a9270",
+  "validation_bearing_result_sha": "9ed4b2d51703bb4eb809abcd89adb242524a9270",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R132_C2CSPEECHBUBBLE_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Seven exact generic C2CSpeechBubble position-correction edges at 0x96AC7, 0x96B14, 0x96B39, 0x96B94, 0x96BE1, 0x96C10 and 0x96C6A now preserve their existing ESP0 AddSpriteSpacing behavior while deriving immediate next-draw ScreenHud ownership from the shared backend-neutral producer map. Compile-time assertions require all seven RVAs to remain canonical ScreenHud and the backend verifier requires all seven exact templated bindings while rejecting the legacy spacing-only callbacks. The existing canonical range 0x96A80-0x96D00 is unchanged.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "provenance": "All seven installed generic C2CSpeechBubble RVAs lie inside shared contract/analyzer/runtime catalog range 0x96A80-0x96D00 classified C2CSpeechBubble/HUD_GF_SPEECH/ScreenHud. The individual RVAs are not separately enumerated in the exact anchor inventory, so the claim is bounded to range classification plus installed hook identity.",
+    "behavior_preservation": "Every converted edge retains AddSpriteSpacing((float*)(ctx.esp), false) before semantic handoff.",
+    "scope_control": "Only the seven generic C2CSpeechBubble position hooks change; GF heart/no-effect hooks and unrelated HUD/world families remain untouched.",
+    "regression_safety": "Changed paths intersect protected R50/R51 world-stereo, white-HUD and vehicle-rank risk paths; hosted CI is not HMD proof.",
+    "validation": "Compile-time exact-RVA ScreenHud assertions plus backend verifier requirements and explicit legacy-binding rejection fail closed on semantic drift."
+  },
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "gf_heart_hooks_modified": false,
+    "uncertain_no_effect_hooks_modified": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-WHITE-HUD-DIPLOPIA-001",
+      "VR-R50-VEHICLE-RANK-ANCHOR-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001",
+      "VR-R51-VEHICLE-RANK-ANCHOR-001"
+    ],
+    "reason": "This is a bounded ownership-source substitution for seven already-range-proven ScreenHud position-correction callsites. It preserves the existing ESP0 correction and does not widen producer semantics, touch GF-heart/uncertain hooks, enable native DX11 draw ownership, alter D3D9 render policy, or alter OpenXR transport. Hosted CI cannot prove Quest3/VDXR visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36708085100,
+      "conclusion": "success",
+      "validated_sha": "9ed4b2d51703bb4eb809abcd89adb242524a9270",
+      "artifact_id": 11092688843,
+      "artifact_digest": "sha256:d4d0e213a4cb457e704c104077c57d5331bd7e5d26f766d9fa50afb7a025c906",
+      "evidence": "Mandatory conversion gate passed, including backend disassembly/source-graph checks, Win32 build path and DX11 semantic/object/linkage/constant-buffer/native-transport probes."
+    },
+    "build": {
+      "run_id": 36708091785,
+      "conclusion": "success",
+      "validated_sha": "9ed4b2d51703bb4eb809abcd89adb242524a9270",
+      "evidence": "Generic Win32 Release build completed successfully."
+    },
+    "hud_inspector": {
+      "run_id": 36708091928,
+      "conclusion": "success",
+      "validated_sha": "9ed4b2d51703bb4eb809abcd89adb242524a9270",
+      "evidence": "static-exe-analysis and build-hud-inspector both passed."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36708091847,
+      "conclusion": "success",
+      "validated_sha": "9ed4b2d51703bb4eb809abcd89adb242524a9270",
+      "evidence": "All six jobs passed: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify and game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36708085242,
+      "conclusion": "skipped",
+      "validated_sha": "9ed4b2d51703bb4eb809abcd89adb242524a9270"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5910151512,
+    "validation_comment_id": 5910242884,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact marker [AUTO:CONVERSION-DX11-00122] and contains no CI-skip directive.",
+    "All seven exact RVAs lie inside the existing canonical shared C2CSpeechBubble ScreenHud range 0x96A80-0x96D00.",
+    "The original AddSpriteSpacing((float*)(ctx.esp), false) correction remains on every converted edge.",
+    "The backend verifier requires all seven C2CSpeechBubble_AdjustPositionESP0AndHud template bindings and rejects restoration of all seven legacy spacing-only hook bindings.",
+    "The existing canonical range 0x96A80-0x96D00 was not added, widened or reclassified.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs passed on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R132 generic C2CSpeechBubble shared producer-map adoption is automation-validated on the DX11 branch. Runtime visual behavior remains untested.",
+  "next_action": "Continue F13 only with another independently proven producer sub-family. Keep C2CSpeechBubbleGF heart and uncertain/no-effect hooks excluded until immediate draw ownership is separately proven. Do not widen producer ranges. Exact-build Quest3/VDXR evidence remains required for visual correctness."
+}

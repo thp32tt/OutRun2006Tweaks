@@ -1,0 +1,195 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01120",
+  "production_id": "CONVERSION-DX11-01120",
+  "event_id": "CONVERSION-DX11-01120-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01120",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
+  "classification": "A_SOURCE_IMPLEMENTATION_AND_C6_EXACT_SHA_BOOKKEEPING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "3a13e19670ca871b3666125a4bf3c55c1d4dad17",
+  "source_change_sha": "bcdab7e29a7ed2971c4ccffe77c494d3b1f43d0e",
+  "material_result_sha": "bcdab7e29a7ed2971c4ccffe77c494d3b1f43d0e",
+  "validation_bearing_result_sha": "15fbb3f0c1361167157576212334b20856c8f1d8",
+  "result_sha": "15fbb3f0c1361167157576212334b20856c8f1d8",
+  "implementation_commits": [
+    "bcdab7e29a7ed2971c4ccffe77c494d3b1f43d0e",
+    "15fbb3f0c1361167157576212334b20856c8f1d8"
+  ],
+  "repair_commits": [],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Real SM3/FVF native D3D11 game Draw pre/post GPU region RGB-delta diagnostic, user-selectable RAW vs DX9Ex control, keep incomplete native frame fail-closed.",
+    "acceptance_items": [
+      {
+        "id": "authentic_gpu_draw_pixel_delta",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_DRAW_GPU_SOURCE",
+        "expected_behavior": "Same source-owned GPU region sampled before and after actual native Draw; no fake pixels from static clear or alpha-only changes."
+      },
+      {
+        "id": "protected_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9EX_INPUT_FFB_AND_FRAME",
+        "expected_behavior": "Original D3D9 game/input/FFB, full-frame admission, DXVK freeze and opt-in-only diagnostic retained; no stereo promotion."
+      },
+      {
+        "id": "source_matched_package_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "RAW_CONTROL_PACKAGE_FIVE_GATES",
+        "expected_behavior": "Separate RAW and DX9Ex control CMD files, tagged logs, five mandatory exact-SHA push GitHub workflow gates successful."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "authentic_gpu_draw_pixel_delta": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_pixel_delta.hpp",
+        "tests/native_raw_pixel_provenance_test.cpp"
+      ],
+      "runtime_validation": "UNTESTED"
+    },
+    "protected_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/RUN_DX9EX_CONTROL.cmd"
+      ],
+      "runtime_validation": "UNTESTED"
+    },
+    "source_matched_package_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "tools/RUN_DX11_RAW_VISUAL.cmd",
+        "tools/RUN_DX9EX_CONTROL.cmd",
+        "tools/Run-DX9ExFocusTest.ps1",
+        ".github/workflows/build.yml",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40581498980",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40581499049",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40581498869",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40581498951",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40581498919"
+      ]
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40581498980,
+      "event": "push",
+      "head_sha": "15fbb3f0c1361167157576212334b20856c8f1d8",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40581499049,
+      "event": "push",
+      "head_sha": "15fbb3f0c1361167157576212334b20856c8f1d8",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40581498869,
+      "event": "push",
+      "head_sha": "15fbb3f0c1361167157576212334b20856c8f1d8",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40581498951,
+      "event": "push",
+      "head_sha": "15fbb3f0c1361167157576212334b20856c8f1d8",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40581498919,
+      "event": "push",
+      "head_sha": "15fbb3f0c1361167157576212334b20856c8f1d8",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "runtime_evidence": {
+    "native_draws": "UNTESTED",
+    "native_gpu_pixel_output": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-15fbb3f0c1361167157576212334b20856c8f1d8",
+    "artifact_id": 12769553428,
+    "run_id": 40581498869
+  },
+  "pipeline": {
+    "C2_IMPLEMENT": "PASS source code bcdab7e29a7ed2971c4ccffe77c494d3b1f43d0e, integration 15fbb3f0c1361167157576212334b20856c8f1d8",
+    "C3_VALIDATE": "PASS five mandatory exact-SHA push Gates",
+    "C4_COMMIT": "PASS material source and test package commits",
+    "C5_PACKAGE": "BUILD_VERIFIED runtime UNTESTED",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "c6_note": "RUN_RECORD_NOT_FOUND: created missing run record only. This docs-only [skip ci] bookkeeping commit is NOT a validation-bearing result. Original material_result_sha and the existing feature contract identity and acceptance evidence retained. No CI rerun. CI acceptance metadata repair by following task 01121: add missing authoritative 01120 strategy/changed_files without changing prior exact-SHA build or score.",
+  "score_change": 0,
+  "external_controller_adoption": "UNVERIFIED",
+  "next_action": "Need matching original-game/HMD session before any runtime/pass or native full-renderer promotion.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_pixel_delta.hpp",
+    "tests/native_raw_pixel_provenance_test.cpp",
+    "tools/RUN_DX11_RAW_VISUAL.cmd",
+    "tools/RUN_DX9EX_CONTROL.cmd",
+    "tools/Run-DX9ExFocusTest.ps1",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/build.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_NATIVE_D3D11_GPU_DRAW",
+      "PAIRED_BEFORE_AFTER_GPU_TEXTURE_COPY",
+      "ASYNC_READBACK_AND_SOURCE_D3D9_VISIBLE_DIAGNOSTIC_TILE",
+      "SPLIT_RUN_DX11_RAW_AND_DX9EX_CONTROL"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "SM3_FVF_PAIRED_PRE_POST_NATIVE_GPU_DRAW_COPY",
+      "ACTUAL_GPU_RGB_DELTA_EVIDENCE",
+      "DISTINCT_NATIVE_RAW_VS_DX9EX_CONTROL_PACKAGE",
+      "PORTABLE_GPU_PIXEL_POSITIVE_NEGATIVE_REGRESSION"
+    ],
+    "visible_frame_acceptance": "Source/build-verified opt-in RAW 256x144 GPU tile ONLY; real native game display and Quest3 stereo remain RUNTIME_VALIDATION=UNTESTED.",
+    "activation_guard_and_fallback": "Original D3D9 game, input/FFB, DX9Ex and DXVK freeze protected; diagnostic must be explicitly enabled, complete native frame publication remains fail-closed.",
+    "acceptance_proof": {
+      "positive_probe": "Native source SM3/FVF Draw paired D3D11 GPU pre/post texture copies compare real RGB changes and expose opt-in magenta tile; original source game Draw remains authoritative.",
+      "negative_regression": "No fake pixel output from static clear, unchanged RGB or alpha-only mutation; original DX9Ex control runner keeps native flags disabled and original input/FFB.",
+      "component_integration": "live_game_frame_bridge SM3/FVF -> paired D3D11 GPU readback -> raw original-game tile -> distinct RAW and DX9Ex control launchers packaged by Build."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  }
+}

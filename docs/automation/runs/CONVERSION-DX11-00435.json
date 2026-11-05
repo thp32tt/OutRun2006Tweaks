@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00435",
+  "production_id": "CONVERSION-DX11-00435",
+  "event_id": "CONVERSION-DX11-00435-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "c03c487d1989df9bea8c9984f6e85e874e2f5a6b",
+  "result_sha": "212f7b7b99a350490dfb033842118c9716321119",
+  "material_result_sha": "212f7b7b99a350490dfb033842118c9716321119",
+  "validation_bearing_result_sha": "212f7b7b99a350490dfb033842118c9716321119",
+  "selected_work_item": "DX11_R298_NONINDEXED_CANDIDATE_PAYLOAD_TAMPER_REGRESSION",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R298 adds the missing non-indexed dormant-candidate payload-integrity regression: mutating R256 startLocation while retaining its snapshot token must fail R257 payload validation. The source-graph verifier now requires this regression token. Native draw activation remains unchanged.",
+  "changed_paths": [
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "9d08a82cf5c243bfb6c2dd8ccd3716bb24deb1f8",
+    "212f7b7b99a350490dfb033842118c9716321119"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: read current GitHub HEAD, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, conversion state and regression/change ledgers",
+    "C1_REVIEW": "PASS: selected asymmetric non-indexed R257 payload-tamper coverage gap after R297 indexed guard",
+    "C2_IMPLEMENT": "PASS: added R298 non-indexed startLocation tamper regression and source-graph registration",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37651412927; validate job 112895954471 SUCCESS; DX11 readiness smoke probes job 112898415482 SUCCESS, including constant-buffer probe",
+    "C4_COMMIT": "PASS: material/validation-bearing result 212f7b7b99a350490dfb033842118c9716321119 contains [AUTO:CONVERSION-DX11-00435]",
+    "C5_PACKAGE": "NOT_REQUIRED: bounded diagnostic regression/verifier change only; no runtime binary candidate requested",
+    "C6_STATE": "PASS: durable task record and lane-state bookkeeping persisted after exact-SHA Gate"
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37651412927,
+    "validation_job_id": 112895954471,
+    "readiness_smoke_job_id": 112898415482,
+    "artifact_id": 11496284586,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-212f7b7b99a350490dfb033842118c9716321119",
+    "artifact_digest": "sha256:1269438e252c70a52db0957846be65519910025230fb46097e89881141d05cbc",
+    "issue14_comment_id": 6042086769
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_test_required": false,
+  "next_action": "From the current DX11 branch HEAD, select the next smallest independent production source-revalidation/receipt-integrity gap after R298; keep production activation fail-closed and do not bind programmable shaders or authorize native Draw/DrawIndexed without exact receipt evidence."
+}

@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00624",
+  "production_id": "CONVERSION-DX11-00624",
+  "event_id": "CONVERSION-DX11-00624-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_MODULATE4X_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "base_head_sha": "838cdcf36d3faef1bed3a2463a78f5d413d57e7a",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live D3D9 stage0 PM RGB / separate MODULATE4X alpha capture",
+      "D3D11 native shader creation, Draw and DrawIndexed selection",
+      "Diagnostic opt-in inset; unsupported game states return to DX9Ex"
+    ],
+    "batch_components": [
+      "New PM/4X native HLSL pixel shader and lifecycle",
+      "Live texture stage strict capture through native Draw/DrawIndexed",
+      "Numeric and destructive source mutations in DX11 Fast"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real callsite PM4X state selects shader through native Draw, 256 math probes",
+      "negative_regression": "Modified ALPHAOP/operands and disconnected capture/shader fail CI",
+      "component_integration": "D3D9 Draw interception -> D3D11 shader -> visible diagnostic frame"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_MODULATE4X_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED after exact CI only; native visual parity NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in, unsupported D3D9 Draw and gamepad input unaffected"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_modulate4x_00624.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00624.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest 00623 commit and Actions checked",
+    "C1_REVIEW": "PASS: PM/4X stage0 alpha not implemented",
+    "C2_IMPLEMENT": "PASS: native game draw path extended",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate 38285824983 (validate + smoke), DX11 Fast 38285825058, Windows Build 38285830967, OpenXR push 38285825209 / PR 38285830991, HUD Inspector 38285831024; all SUCCESS",
+    "C4_COMMIT": "PASS: material commit 8691c24ea797fa0378e698ef16ba55c56d84e0f3 includes actual renderer C++/HLSL, source mutants, numeric regressions, CI",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA / BUILD_VERIFIED; no game/HMD/gamepad runtime evidence"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "00624 C6 completed on exact material SHA. No retry on this TASK_ID. Continue distinct unfinished native DX11 code in next task; Quest3/VDXR/gamepad validation NEED_HMD_TEST; DXVK remains frozen.",
+  "material_result_sha": "8691c24ea797fa0378e698ef16ba55c56d84e0f3",
+  "validation_bearing_result_sha": "8691c24ea797fa0378e698ef16ba55c56d84e0f3",
+  "result_sha": "8691c24ea797fa0378e698ef16ba55c56d84e0f3",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38285824983,
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38285825058,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38285830967,
+    "openxr_push_conclusion": "success",
+    "openxr_push_run_id": 38285825209,
+    "openxr_pr_conclusion": "success",
+    "openxr_pr_run_id": 38285830991,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38285831024,
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST",
+    "material_sha": "8691c24ea797fa0378e698ef16ba55c56d84e0f3"
+  }
+}

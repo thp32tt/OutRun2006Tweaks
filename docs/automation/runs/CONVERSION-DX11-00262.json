@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00262",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "a42d8915904a0d0ecbc1bbcbcefc69d99fa8a0fb",
+  "result_sha": "ad406a7947bea8870c3ac1de8415f116b564ed35",
+  "validation_bearing_result_sha": "ad406a7947bea8870c3ac1de8415f116b564ed35",
+  "source_commits": [
+    "bb7395e43b565d35cf71c8777a6b0365edb69572",
+    "54013c7c16028896c6cd316576a376fd7bb3dbdb",
+    "b46c895302445b1fc2c50fad12ce9a7dcdbcb879",
+    "ad406a7947bea8870c3ac1de8415f116b564ed35"
+  ],
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_DORMANT_ACTIVATION_BOUNDARY_GATE",
+  "selection_reason": "CONVERSION-DX11-00258 selected maintenance of the DX11 activation evidence boundary. Current source already fail-closes resource introspection/behavior, input-layout and shader readiness and has generation/ACK native transport probes, but Backend Conversion Gate did not directly reject accidental native D3D11 Draw* dispatch.",
+  "summary": "ATTEMPT=1 added a CI-only fail-closed DX11 activation boundary. The new verifier rejects native D3D11 Draw* dispatch, requires census output to remain diagnostic/non-exhaustive with NativeDrawPathActivationAllowed=false, and rejects native backend/shared-eye dependencies from the validated D3D9 draw bridge. It is wired explicitly into Backend Conversion Gate and is also invoked by verify_dx11_source_graph.py so normal Build validates the same invariant. No game/runtime draw routing was activated and no HMD/game runtime test was performed.",
+  "changed_paths": [
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00262.json"
+  ],
+  "conversion_changed_paths": [
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "evidence": [
+    "C0 recovered vr-dx11-native-r71 HEAD a42d8915904a0d0ecbc1bbcbcefc69d99fa8a0fb directly from GitHub and found CONVERSION-DX11-00258 as the latest task checkpoint; no 00260/00262 result record existed.",
+    "Current runtime_census.cpp already starts resourcesExact from resourceIntrospectionComplete, gates exact samples on resourcesExact/inputLayoutExact/shaderTranslationExact, observes eight fixed-function stages, hashes the 1/64 draw ordinal to avoid fixed-phase alias, and keeps census evidence non-exhaustive.",
+    "Current native_shared_eye_ring uses producer/consumer PID, run generation, transport generation, producer EVENT completion, immutable published snapshots and identity/slot/frame ACK retirement. Its cumulative ack.frameId >= frameId rule is intentional and is covered by the WARP probe as same-generation cumulative ACK behavior.",
+    "The verifier rejects any native src/vr/d3d11/*.cpp D3D11 Draw/DrawIndexed/DrawInstanced/DrawIndexedInstanced/Indirect dispatch, requires analyzer ActivationProof=false, ExhaustiveDrawCoverage=false, DiagnosticOnly=true and NativeDrawPathActivationAllowed=false, and rejects native backend/shared-eye dependencies from stereo_renderer_r7.inc.",
+    "Issue #14 direct-change ledger was appended for validation-bearing result SHA 54013c7c16028896c6cd316576a376fd7bb3dbdb.",
+    "Candidate b46c895302445b1fc2c50fad12ce9a7dcdbcb879 was rejected by exact-SHA Build run 36915930514 because the source-graph chaining edit contained literal \\\\n text and failed Python parsing before build; this was a candidate-construction defect, not a runtime-source defect.",
+    "Corrected candidate ad406a7947bea8870c3ac1de8415f116b564ed35 replaces the literal escape sequence with real newlines. ATTEMPT remains 1/3 because correction stayed within the same task attempt.",
+    "Exact-SHA Build run 36916229290, OpenXR VR architecture run 36916229257 and HUD Inspector run 36916229238 are registered for corrected candidate ad406a7947bea8870c3ac1de8415f116b564ed35."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_05:F23",
+    "VR_BACKEND_100_REVIEW_SET_07:F26",
+    "CONVERSION-DX11-00258"
+  ],
+  "validation": {
+    "backend_conversion_gate": {
+      "head_sha": "ad406a7947bea8870c3ac1de8415f116b564ed35",
+      "conclusion": "pending"
+    },
+    "build": {
+      "run_id": 36916229290,
+      "head_sha": "ad406a7947bea8870c3ac1de8415f116b564ed35",
+      "conclusion": "in_progress"
+    },
+    "openxr_architecture": {
+      "run_id": 36916229257,
+      "head_sha": "ad406a7947bea8870c3ac1de8415f116b564ed35",
+      "conclusion": "pending"
+    },
+    "hud_inspector": {
+      "run_id": 36916229238,
+      "head_sha": "ad406a7947bea8870c3ac1de8415f116b564ed35",
+      "conclusion": "pending"
+    }
+  },
+  "blocker": "Exact-SHA GitHub Actions validation for corrected candidate ad406a7947bea8870c3ac1de8415f116b564ed35 is pending; do not claim AUTOMATION_VALIDATION=PASS until required gates report success.",
+  "next_action": "Consume exact-SHA GitHub Actions results for ad406a7947bea8870c3ac1de8415f116b564ed35. Require Verify DX11 source graph (which now calls the activation-boundary verifier) to pass. If required gates pass, update AUTOMATION_VALIDATION=PASS and keep RUNTIME_VALIDATION=UNTESTED.",
+  "checkpoint": "C3_VALIDATION_PENDING",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE"
+}

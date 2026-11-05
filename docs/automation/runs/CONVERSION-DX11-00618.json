@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00618",
+  "production_id": "CONVERSION-DX11-00618",
+  "event_id": "CONVERSION-DX11-00618-E003",
+  "event_type": "retry",
+  "target_branch": "vr-dx11-native-r71",
+  "lane": "DX11",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_STAGE0_PM_RGB_DIFFUSE_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+  "status": "MATERIAL_REPAIR_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_MATERIAL_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA_GATE",
+  "runtime_validation": "UNTESTED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live game D3D9 stage0 PM RGB + SELECTARG2 alpha",
+      "native pixel shader/alpha gate",
+      "D3D11 Draw/DrawIndexed",
+      "opt-in desktop inset"
+    ],
+    "batch_components": [
+      "PM RGB+DIFFUSE alpha HLSL translation",
+      "D3D9 capture/native shader gating and draw selection",
+      "negative mutations and RGB/alpha numeric probe"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "256 RGBA tuples with retained diffuse alpha",
+      "negative_regression": "6 destructive source/header mutations plus fallback checks",
+      "component_integration": "game-authored D3D9 stage0 PM RGB/SELECTARG2 mapped to independent native DX11 PS and Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_STAGE0_PM_RGB_DIFFUSE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "PM_RGB_SELECTARG2_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED/NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME exact opt-in; DX9Ex game draw/input untouched on rejected states"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_stage0_pm_diffuse_00618.py",
+    "tools/test_dx11_stage0_premultiplied_00617.py",
+    "tools/test_dx11_selectarg_tfactor_input_00587.py",
+    "tools/test_dx11_selectarg_tfactor_arg2_00588.py"
+  ],
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Publish prepared material repair after Backend #38272221660 finishes (workflow cancel-in-progress=true), then verify exact-SHA Gate, Build, DX11 Fast, OpenXR, HUD. RUNTIME_VALIDATION=UNTESTED.",
+  "failure_context": {
+    "backend_gate_run": 38270537945,
+    "backend_gate": "FAIL: missing canonical LIVE_D3D9_CALLSITE/D3D11_NATIVE_DRAW/VISIBLE_FRAME_OUTPUT path",
+    "build_run": 38270544526,
+    "build": "FAIL: legacy mixed_links exact-string assertion at line 621 no longer matched safe PM diffuse-alpha exclusion",
+    "fast_run": 38270537968,
+    "fast": "FAIL: identical DX11 run metadata contract",
+    "followup_backend_gate_run": 38271400561,
+    "followup_backend_gate": "FAIL: 00582 legacy static matcher requires parenthesized alphaNeedsDiffuse AND ALPHAARG2 condition; preserve test compatibility without changing semantics",
+    "followup_build_run": 38271406713,
+    "followup_build": "FAIL: 00617 negative mutation falsely passed because 00618 helper duplicated former header token; scope check to intended helper",
+    "followup2_backend_gate_run": 38271777677,
+    "followup2_backend_gate": "FAIL 00587 expected obsolete ALPHAARG1 condition string without 00618 PMDiffuse exemption",
+    "followup2_build_run": 38271782698,
+    "followup2_build": "FAIL old 00558 shader-completeness string missing new PMDiffuse PS and outdated allowlist string",
+    "followup3_build_run": 38272226087,
+    "followup3_build": "FAIL: test 00558 mistakenly rejects an old substring that legitimately remains inside the new, more restrictive PM diffuse-alpha allowlist; remove negative substring check, preserve positive complete denylist requirement"
+  }
+}

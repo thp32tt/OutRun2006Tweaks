@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00876",
+  "production_id": "CONVERSION-DX11-00876",
+  "event_id": "CONVERSION-DX11-00876-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_NATIVE_FULL_EYE_TARGET_RECT_D3D11_BASELINE_CLEAR",
+  "feature_id": "DX11:GAME_NATIVE_FULL_TARGET_RECT_CLEAR_REPLAY",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "bc6b757a8c065d05d6d2f73d063c8c45d8b3d920",
+  "validation_bearing_result_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5",
+  "result_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Replay source-authored full-eye TARGET rectangles during genuine left/right native D3D11 Draw/DrawIndexed game-eye streams using the base D3D11.0 ClearRenderTargetView GPU operation.",
+      "Preflight both native eyes with the same full-versus-partial region classification: only truly cropped original TARGET Clears require D3D11.1 ClearView; invalid/out-of-bounds rectangles fail closed before GPU recording.",
+      "Retain authored full-color-clear draw-order evidence, reject a final clear without following geometry, preserve matching game draw/view/pose evidence and original DX9Ex rendering/input/FFB."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+      "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ header and compiled C++ regression admit exact whole-eye 3440x1440 and 1920x1080 TARGET rectangles without an ID3D11DeviceContext1 dependency; actual encoder dispatch now uses ClearRenderTargetView for full-eye rectangles.",
+      "negative_regression": "Partial/offset/out-of-bounds TARGET rectangles retain the D3D11.1 ClearView plus bounded preflight; zero-sized/invalid regions and blank full clear without later geometry remain rejected; original game D3D9 output is unmodified.",
+      "component_integration": "Shared whole-eye predicate connects the native source timeline replay, actual GPU color clear, per-eye preflight and draw-after-clear authored color evidence."
+    },
+    "conflict_keys": [
+      "DX11:GAME_NATIVE_FULL_EYE_TARGET_RECT_D3D11_BASELINE_CLEAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact-SHA source and automated Windows/VR/transport checks succeeded; real game menu/vehicle/race Quest3 OpenXR stereo frames remain UNTESTED.",
+    "activation_guard_and_fallback": "Do not promote native stereo or DXVK; unsupported partial clears reject without reinterpreting the whole eye, preserve DX9Ex fallback, original input/FFB and source view/pose evidence."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_NATIVE_FULL_TARGET_RECT_CLEAR_REPLAY",
+    "goal": "Allow real game-authored full-screen TARGET rectangle Clears to seed native left and right D3D11 color frames on baseline D3D11.0 devices while keeping cropped menu/HUD Clears correctly bounded, ordered and fail-closed.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_authored_stereo_full_target_clear_gpu_replay",
+        "expected_behavior": "Full-eye game TARGET rectangles use the native D3D11.0 color RTV clear during two independent native eye game draw command streams."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "partial_eye_clear_and_dx9ex_fallback",
+        "expected_behavior": "Cropped or invalid game TARGET rectangles cannot silently mutate the entire eye without D3D11.1 ClearView; stereo Draw/pose and original DX9Ex fallback remain intact."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_five_mandatory_build_gates",
+        "expected_behavior": "Fast, Backend, Windows Build, OpenXR and HUD Inspector all conclude success for exactly one validation-bearing SHA including causal metadata repair."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub original HEAD c436327a and 00875 existing material/C6 checked; separate 00876 functional source path selected.",
+    "C1_REVIEW": "PASS: NativeGameEyeDrawEncoder required ID3D11DeviceContext1 for original full-size TARGET Clear rectangles even though D3D11.0 supports full RTV Clears; full-eye preflight also wrongly required ClearView.",
+    "C2_IMPLEMENT": "PASS: bc6b757a8c065d05d6d2f73d063c8c45d8b3d920, full-size source-authored ClearRenderTargetView gameplay GPU replay and partial-region fail-closed preflight; positive/negative C++ assertions.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: d7d923f72f97161ea32c10ea78924dcde0431de5, five mandatory GitHub Actions SUCCESS; initial material SHA Fast/Backend failed on unrelated previous 00875 feature_id=null C6 record, repaired only that identity under this same TASK, no gate removed.",
+    "C4_COMMIT": "PASS: material bc6b757a8c065d05d6d2f73d063c8c45d8b3d920 message contains [AUTO:CONVERSION-DX11-00876]; separate causal CI record repair d7d923f72f97161ea32c10ea78924dcde0431de5 (not an independent feature or score).",
+    "C5_PACKAGE": "NOT_REQUIRED: not a user-testable Quest3/VDXR native renderer package; native activation remains off.",
+    "C6_STATE": "PASS_EXACT_SHA: BUILD_VERIFIED only; HMD and gamepad runtime untested; record in separate [skip ci] bookkeeping commit, preserving validation-bearing SHA."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "bc6b757a8c065d05d6d2f73d063c8c45d8b3d920",
+    "validation_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5",
+    "causal_ci_repair_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5",
+    "causal_ci_repair": "Corrected 00875 C6 feature_id only; preserved that task's material_result_sha, previous exact SHA and existing acceptance.",
+    "five_mandatory_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39023856897,
+        "conclusion": "success",
+        "head_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39023856879,
+        "conclusion": "success",
+        "head_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5"
+      },
+      {
+        "name": "Build",
+        "id": 39023859629,
+        "conclusion": "success",
+        "head_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39023859667,
+        "conclusion": "success",
+        "head_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39023859658,
+        "conclusion": "success",
+        "head_sha": "d7d923f72f97161ea32c10ea78924dcde0431de5"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "live_menu_vehicle_race_test": "NOT_PERFORMED",
+    "quest3_vdxr_hmd_test": "NOT_PERFORMED"
+  },
+  "next_action": "Do not rerun 00876 exact-SHA CI or award retry/C6 points; next independent source integration belongs to the controller."
+}

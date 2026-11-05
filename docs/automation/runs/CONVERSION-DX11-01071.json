@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01071",
+  "production_id": "CONVERSION-DX11-01071",
+  "event_id": "CONVERSION-DX11-01071-E002",
+  "event_type": "c6_bookkeeping",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01071",
+  "classification": "A+B",
+  "work_key": "DX11:LIVE_GAME_PIXEL_NEUTRAL_BEFORE_MESH_ADMISSION",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "b5948fb0fc1cbe71e0c4d1300bfb2d534ba35e4d",
+  "validation_bearing_result_sha": "44a2133c649c1559a0f352000f5b4d5e9feb8852",
+  "implementation_commits": [
+    "b5948fb0fc1cbe71e0c4d1300bfb2d534ba35e4d"
+  ],
+  "repair_commits": [
+    "faafb2b392bdbfc2a4e7331e55e5a37d5ba353ff",
+    "cfa83311d9d99f1c5263cb410d0698f10dee6b7a",
+    "94480f6894d55210c89b2ba75e339434638c6727",
+    "08f969294daa78bbbb9a34824c116755ba05f461",
+    "44a2133c649c1559a0f352000f5b4d5e9feb8852"
+  ],
+  "score_change": 0,
+  "score_award_event": false,
+  "score_note": "Unfinished DX11 full-resolution native menu/car/race renderer; 01071 implements one source-stage continuity repair. Regression/CI/C6 are same-feature changes, not separately scored. Account AI2 scoreboard baseline remains 1963.",
+  "summary": "Move the bounded 2048-primitive mesh snapshot check after proven D3D9 zero-write/scissor-clipped and isolated offscreen menu/car/race Draw/DrawIndexed observer cases. Authentic pixel-neutral large commands consume their exact game source ordinals without synthetic GPU Draw; unknown topologies and any unrepresentable pixel-producing large Draw still abort the native full-frame publication. DX9Ex game Draw/input/FFB retained. Existing 01070 feature contract plus 00755/00764 order-dependent negative tests repaired. Source stage and five exact-SHA Actions verified; actual HMD/game output UNTESTED.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    "tools/test_dx11_full_frame_empty_draw_00755.py",
+    "tools/test_dx11_game_clipped_draw_00764.py",
+    "docs/automation/runs/CONVERSION-DX11-01070.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate game-authored native Draw/DrawIndexed across large pixel-neutral menu/car/race source commands without losing full-resolution source ordinals, preserving bounded GPU admission, original D3D9Ex fallbacks, and the five mandatory exact-SHA GitHub Actions gates. Full-playable game/HMD parity remains unfinished.",
+    "acceptance_items": [
+      {
+        "id": "game_authored_source_continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_DRAW_INDEXED_MENU_CAR_RACE_SOURCE",
+        "expected_behavior": "Authenticated zero-write clipped/offscreen game Draws keep their exact original source ordinals without fake native GPU draws."
+      },
+      {
+        "id": "native_bounded_gpu_geometry",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_D3D11_SHADER_AND_IA_DRAW_ADMISSION",
+        "expected_behavior": "True pixel-producing menu/car/race Draw and DrawIndexed continue through the existing primitive mesh cap and live native shader/resource binding."
+      },
+      {
+        "id": "unsupported_writer_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9EX_INPUT_AND_NATIVE_PUBLICATION_FAIL_CLOSED",
+        "expected_behavior": "Unknown topologies or oversized pixel writers cannot publish an incomplete native frame and leave original D3D9 Draw/input/FFB unchanged."
+      },
+      {
+        "id": "exact_sha_five_actions",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_DX11_FAST_BACKEND_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "The five unmodified mandatory GitHub Actions pass against the same validation-bearing source SHA; no HMD/game output is inferred."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "D3D9_GAME_DRAW_INDEXED_SOURCE",
+      "PIXEL_NEUTRAL_OUTPUT_CLASSIFICATION",
+      "NATIVE_SOURCE_ORDINAL_PRESERVATION",
+      "D3D11_GPU_SHADER_DRAW_AND_FRAME",
+      "D3D9EX_FAIL_CLOSED"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_first_game_frame_regressions.py",
+      "tools/dx11_game_primitive_span_probe.cpp",
+      "tools/test_dx11_full_frame_empty_draw_00755.py",
+      "tools/test_dx11_game_clipped_draw_00764.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "The existing 00755/00764 scoped source regressions and DX11 Fast Structural Checks succeeded at validation SHA 44a2133c.",
+      "negative_regression": "Malformed topology, oversized true pixel-producing native mesh, absent source color Clear, lost ordinal and scissor mutations all remain negative controls; native fallback preserved.",
+      "component_integration": "Live D3D9 Draw/Indexed observer chooses provable no-target-write before native mesh read, while native Draw shader/resources and full-frame Present remain opt-in and fail closed. Full native menu/car/race HMD UNTESTED."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED; FULL_GAMEPLAY_FRAME_AND_NATIVE_STEREO_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive=false by default; unsupported draws abort native publication, original game D3D9Ex rendering, gamepad, FFB and SkyGlow remain authoritative; DXVK remains frozen."
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast",
+      "run_id": 40213446254,
+      "status": "success",
+      "sha": "44a2133c649c1559a0f352000f5b4d5e9feb8852"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40213446260,
+      "status": "success",
+      "sha": "44a2133c649c1559a0f352000f5b4d5e9feb8852"
+    },
+    {
+      "name": "Windows Build",
+      "run_id": 40213449946,
+      "status": "success",
+      "sha": "44a2133c649c1559a0f352000f5b4d5e9feb8852"
+    },
+    {
+      "name": "OpenXR",
+      "run_id": 40213449945,
+      "status": "success",
+      "sha": "44a2133c649c1559a0f352000f5b4d5e9feb8852"
+    },
+    {
+      "name": "HUD Inspector",
+      "run_id": 40213449964,
+      "status": "success",
+      "sha": "44a2133c649c1559a0f352000f5b4d5e9feb8852"
+    }
+  ],
+  "acceptance_results": {
+    "game_authored_source_continuity": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Existing exact-SHA DX11 Fast source regressions 00755/00764, first-game frame regressions and Win32 compilation passed. D3D9 source ordinals and native GPU behavior were not observed in an actual game session.",
+      "validation_command": "DX11 Fast 40213446254; Windows Build 40213449946",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_full_frame_empty_draw_00755.py",
+        "tools/test_dx11_game_clipped_draw_00764.py"
+      ]
+    },
+    "native_bounded_gpu_geometry": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Code-level native bounded mesh admission, shader/resource binding and Draw/DrawIndexed integration compiled and source regressions passed at validation SHA. No measured game-authored native Draw count or real scene parity.",
+      "validation_command": "DX11 Fast 40213446254; Windows Build 40213449946; Backend Conversion 40213446260",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_game_primitive_span_probe.cpp",
+        "tools/test_dx11_first_game_frame_regressions.py"
+      ]
+    },
+    "unsupported_writer_original_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Negative source tests preserve fail-closed native frame admission for invalid topologies and oversized pixel-producing draws. Original D3D9Ex, input and FFB unchanged by the submitted observer patch; physical fallback not retested.",
+      "validation_command": "DX11 Fast 40213446254; Backend Conversion 40213446260",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_first_game_frame_regressions.py",
+        "tools/test_dx11_game_clipped_draw_00764.py"
+      ]
+    },
+    "exact_sha_five_actions": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "The five required Actions concluded SUCCESS against exact SHA 44a2133c649c1559a0f352000f5b4d5e9feb8852: DX11 Fast 40213446254, Backend 40213446260, Windows Build 40213449946, OpenXR 40213449945, HUD 40213449964. No repeated build or real-game/HMD test.",
+      "validation_command": "GitHub Actions five required workflow runs at unchanged validation SHA",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01071.json"
+      ]
+    }
+  }
+}

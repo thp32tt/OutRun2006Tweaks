@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00414",
+  "production_id": "CONVERSION-DX11-00414",
+  "event_id": "CONVERSION-DX11-00414-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 0,
+  "rollover_is_retry": false,
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R276_SOURCE_DERIVED_SEMANTIC_TRANSLATION_PLAN",
+  "base_sha": "0e343f3d28f2222fd7cf4455a6a8150eec2c2d89",
+  "result_sha": "df1db98476b12a4af80ed4c290e18669f40c8e4a",
+  "source_implementation_sha": "df1db98476b12a4af80ed4c290e18669f40c8e4a",
+  "material_result_sha": "df1db98476b12a4af80ed4c290e18669f40c8e4a",
+  "validation_bearing_result_sha": "df1db98476b12a4af80ed4c290e18669f40c8e4a",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "summary": "R276 replaces R275 probe-supplied translated semantic hashes/revision/contract/exactness fixtures with a deterministic diagnostic semantic translation-plan evidence producer derived from exact R271 source semantics, R268 interface linkage and R273 source-mapping provenance. R275 consumes the typed R276 plan while shader creation/binding, shaderTranslationExact and native Draw activation remain off.",
+  "evidence": [
+    "native_backend.hpp/cpp add NativeProgrammableShaderSemanticTranslationPlanEvidence with deterministic R271/R268/R273 provenance convergence, target VS/PS semantic identities, translator revision/semantic contract hashes and snapshot validation.",
+    "R275 now consumes only the typed R276 plan plus exact R242/R273 ownership instead of loose translated semantic hash/revision/contract/exactness parameters.",
+    "dx11_constant_buffer_probe covers R276 positive derivation, stale R273 rejection, R275 typed-plan sealing and stale R276 snapshot rejection.",
+    "verify_dx11_source_graph.py enforces the R276 producer/validator, typed R275 consumption, removal of stale loose scalar API and continued production shaderTranslationExact=false boundary.",
+    "Exact-SHA Backend Conversion Gate 37475790320: validate 112310710125 SUCCESS and DX11 readiness smoke 112313312439 SUCCESS, including constant-buffer probe.",
+    "Artifact 11418453935 digest sha256:e45e0e597fb31f5119c7e704f65df7be78dc5553f5edb86cbad11b1601ed11d2."
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "shader_translation_exact_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD 0e343f3d28f2222fd7cf4455a6a8150eec2c2d89; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, inherited VR state/regression history and prior 00413 run record."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected prior durable exact_next_action R276: remove loose probe-supplied translated semantic fixtures and derive target semantic identity from existing R271/R268/R273 exact provenance. Registered DX9Ex runtime regression risk paths did not directly intersect the changed DX11 native/probe/verifier paths."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R276 typed semantic translation-plan evidence and snapshot validator; refactored R275 to consume that plan; added positive/stale probe cases and source-graph guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37475790320 completed SUCCESS. validate 112310710125 and DX11 readiness smoke 112313312439 both SUCCESS; constant-buffer probe build/run passed. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit df1db98476b12a4af80ed4c290e18669f40c8e4a contains [AUTO:CONVERSION-DX11-00414] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R276 is dormant diagnostic translation-plan evidence only; it creates no native programmable shader payload and no user-test candidate."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Run record and branch-local conversion state persist exact material SHA, Gate receipts, UNTESTED runtime status and next independent R277 action."
+    }
+  },
+  "exact_next_action": "Under CONVERSION-DX11-00415, wire the source-derived R276 semantic translation plan and R275 typed receipt into the production DX11 runtime census for observed programmable shader pairs, expose deterministic receipt identity/readiness counters/log evidence, and keep shaderTranslationExact=false plus NativeDrawPath/Draw/DrawIndexed inactive.",
+  "status": "COMPLETE",
+  "implementation_commits": [
+    "df1db98476b12a4af80ed4c290e18669f40c8e4a"
+  ],
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "df1db98476b12a4af80ed4c290e18669f40c8e4a",
+    "backend_conversion_gate": {
+      "run_id": 37475790320,
+      "conclusion": "success",
+      "validate_job_id": 112310710125,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112313312439,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11418453935,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-df1db98476b12a4af80ed4c290e18669f40c8e4a",
+      "artifact_digest": "sha256:e45e0e597fb31f5119c7e704f65df7be78dc5553f5edb86cbad11b1601ed11d2"
+    }
+  }
+}

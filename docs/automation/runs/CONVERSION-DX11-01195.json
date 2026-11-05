@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01195",
+  "production_id": "CONVERSION-DX11-01195",
+  "event_id": "CONVERSION-DX11-01195-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SOURCE_RASTER_SWEEP_CAPTURE",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "0b853802d66bfe0fe8fb2baa573870246adf1cd8",
+  "implementation_source_sha": "7cc235370130c698da8ffec4850b0dbffcb85ebd",
+  "material_result_sha": "7cc235370130c698da8ffec4850b0dbffcb85ebd",
+  "validation_bearing_result_sha": "7cc235370130c698da8ffec4850b0dbffcb85ebd",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Replace legacy five-center/corner-only capture selection in the genuine native game Draw pre/post RGB path with an ordinal source raster tile sweep. Physical GPU sources are clipped to actual render-target sizes; paired captures must be disjoint. Add deterministic all-35-cell 3440x1440/512x288 raster coverage, scissored raster, small source, and pair separation regression. Retain DX11 immediate context event/fence, original D3D9 source-target identity, dirty-region admission and DX9Ex fallback.",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Expand authentic live game native GPU source raster sweep for paired RGB PRE/POST tiles while preserving source matching, disjoint capture and fallback without claiming playable full DX11.",
+    "acceptance_items": [
+      {
+        "id": "source_raster_sweep",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_GAME_GPU_TILE_SELECTION",
+        "expected_behavior": "Tile sweep covers original full source raster without restricting to the earlier fixed center and corner cells."
+      },
+      {
+        "id": "disjoint_source_integrity",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_OWNERSHIP_AND_PRESENT",
+        "expected_behavior": "Capture tiles remain clipped and independent; no forged source pixels, duplicated regions or DX9Ex fallback regression."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "WIN32_DX11_OPENXR_HUD_CI",
+        "expected_behavior": "All five mandatory workflows succeed on the documented original source-bearing exact SHA while Quest runtime remains UNTESTED."
+      }
+    ]
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41253020268,
+    "Backend Conversion Gate": 41253020398,
+    "Build": 41253024883,
+    "OpenXR VR architecture": 41253020288,
+    "OutRun EXE HUD Inspector CI": 41253024884
+  },
+  "validation_note": "Five required GitHub Actions finished SUCCESS on material SHA; no extra same-SHA Gate reruns or causal repair. This only extends opt-in partial native GPU RGB inspection; no complete menu/car/race frame or OpenXR HMD runtime proof.",
+  "actual_runtime_evidence": "NOT_RUN_NO_GAME_DESKTOP_NO_QUEST3_VDXR",
+  "native_gpu_pixels_observed": "UNTESTED",
+  "full_menu_vehicle_race": "INCOMPLETE",
+  "development_focus_time_ratio": "NOT_MEASURED",
+  "separate_documentation_commit": true,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_PRE_POST_SOURCE_CAPTURE",
+      "SOURCE_RASTER_SWEEP",
+      "SOURCE_RGB_DELTA",
+      "SOURCE_MATCHED_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "REAL_GAME_NATIVE_DRAW",
+      "SOURCE_ORDINAL_D3D11_GPU_TILE_SWEEP",
+      "SOURCE_RGB_PRE_POST_PAIR",
+      "D3D9_SOURCE_COINCIDENT_PRESENT"
+    ],
+    "batch_components": [
+      "NATIVE_GPU_SOURCE_TILE_SELECTION",
+      "DISJOINT_DUAL_CAPTURE_REGIONS",
+      "FULL_RASTER_COVERAGE_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Tests/native_raw_dual_tile_test.cpp sweeps 3440x1440 in 512x288 cells and requires all 35 source cells reachable; real device readback remains UNTESTED.",
+      "negative_regression": "Source scissor, small RT, clipping and disjoint pairs reject duplicated or out-of-source target tiles; D3D9 fallback remains intact.",
+      "component_integration": "Original live D3D9 callsite -> native game Draw GPU source -> paired PRE/POST staging -> RGB delta -> original D3D9 source-coincident Present path (opt-in; no verified full visible HMD frame)."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "OPT_IN_SOURCE_RASTER_SWEEP_BUILD_VERIFIED; PARTIAL_SOURCE_PIXEL_DIAGNOSTIC_ONLY; FULL_MENU_CAR_RACE_FRAME_AND_HMD_UNTESTED",
+    "activation_guard_and_fallback": "RAW default OFF; fail-closed source target/dirty-region gating, DX9Ex fallback and original input/FFB preserved."
+  },
+  "acceptance_results": {
+    "source_raster_sweep": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41253020268 SUCCESS at exact source commit 7cc235370130c698da8ffec4850b0dbffcb85ebd"
+    },
+    "disjoint_source_integrity": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate 41253020398 SUCCESS at exact source commit 7cc235370130c698da8ffec4850b0dbffcb85ebd"
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "GitHub Actions SUCCESS exact source commit 7cc235370130c698da8ffec4850b0dbffcb85ebd: Fast 41253020268; Backend 41253020398; Build 41253024883; OpenXR 41253020288; HUD 41253024884"
+    }
+  },
+  "record_repair_note": "CONVERSION-DX11-01196 causal CI repair: Backend Gate run 41293828814 failed in dx11_autodev_policy.py --check-latest because this 01195 C6 record omitted development_strategy. Restore record contract from actual 01195 source/test and previously successful exact-SHA Actions; no new native game GPU source implementation, no repeated credit, HMD still UNTESTED."
+}

@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01064",
+  "production_id": "CONVERSION-DX11-01064",
+  "event_id": "CONVERSION-DX11-01064-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01064",
+  "classification": "B",
+  "feature_id": "DX11:NATIVE_STEREO_SEQUENTIAL_TYPED_GAME_CAMERA_GPU_HANDOFF",
+  "work_key": "DX11:STEREO_NATIVE_GAME_CAMERA_GPU_RING:SEQUENTIAL_CAPTURE",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_COMMITTED",
+  "feature_stage": "C4_MATERIAL_COMMITTED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Real sequential native game camera L/R Draw sources retain each previously bound typed RTV and physical mip/array slice across OM changes, re-authenticate source identity, gamma and camera selection before GPU CopySubresourceRegion to OpenXR eye ring. Original D3D9Ex/game input/FFB fallback and GPU fence/ACK unaffected. CI pending; no HMD/gameplay proof.",
+  "material_result_sha": "6a1f2dfdf04999acc6e93cf7c59a4ab5d7c2b84f",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tests/vr/dx11_native_stereo_captured_views_01064.cpp",
+    "tools/test_dx11_native_stereo_captured_views_01064.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01063.json",
+    "docs/automation/runs/CONVERSION-DX11-01064.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_SEQUENTIAL_TYPED_GAME_CAMERA_GPU_HANDOFF",
+    "goal": "Carry two independently game-drawn sequential native camera eyes across real D3D11 OM RTV switches with exact typed physical source validation to GPU OpenXR eye ring, preserving original D3D9Ex rendering and game input/FFB fallback without HMD promotion.",
+    "acceptance_items": [
+      {
+        "id": "sequential_camera_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_D3D11_CAMERA_TO_GPU_EYE_RING",
+        "expected_behavior": "Capture two genuine game-authored Draw cameras with each selected local typed RTV during its own OM-bound pass; transfer physical L/R pixels through GPU shared OpenXR ring after the OM changes."
+      },
+      {
+        "id": "wrong_view_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "GPU_SOURCE_MIP_ARRAY_GAMMA_IDENTITY",
+        "expected_behavior": "Reject unbound, foreign, wrong mip/array, multi-slice and gamma-incompatible typed camera views, preserve original D3D9 fallback and exact producer fence/ACK."
+      },
+      {
+        "id": "two_eye_source_restore",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_STEREO_SEQUENTIAL_RT_LIFETIME",
+        "expected_behavior": "Retain L/R view COM references until exact GPU source submission completes; never substitute later right-eye output for left-eye source."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_EXACT_SHA_CI",
+        "expected_behavior": "Run portable positive and negative C++ source admissions and source-link destructive regressions plus all five GitHub Actions on one validated source SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "REAL_GAME_NATIVE_D3D11_EYE_DRAW",
+      "CAPTURE_SELECTED_BOUND_TYPED_CAMERA_VIEW",
+      "L_R_SEQUENTIAL_RTV_LIFETIME_ACROSS_OM_SWITCH",
+      "GPU_COPY_TO_OPENXR_STEREO_RING",
+      "EXACT_FENCE_AND_CONSUMER_ACK",
+      "D3D9EX_INPUT_FFB_RENDER_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_shared_eye_ring.hpp",
+      "tests/vr/dx11_native_stereo_captured_views_01064.cpp",
+      "tools/test_dx11_native_stereo_captured_views_01064.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01064 portable C++ asserts typed L/R sequential physical subresource admission; exact-SHA GitHub Fast outcome pending.",
+      "negative_regression": "01064 python source-link destructive mutations and C++ foreign/gamma/mip/slice/MSAA rejects; GitHub pending.",
+      "component_integration": "capture_eye retains OM-bound typed RTV per left/right -> source_is_live validates capture and submit lifetime -> native_shared_eye_ring rechecks typed source before same-generation two-eye GPU transfer/fence/ACK."
+    },
+    "conflict_keys": [
+      "DX11:STEREO_NATIVE_GAME_CAMERA_GPU_RING",
+      "DX11:SEQUENTIAL_CAMERA_TYPED_RTV_CAPTURE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED; CI PENDING, physical native game pixels/HMD untested",
+    "activation_guard_and_fallback": "Only opt-in actual game stereo camera RTV captured when OM-bound; original D3D9Ex Draw/Present/gamepad/FFB and prior host frame intact on mismatch. DXVK frozen."
+  },
+  "acceptance_results": {
+    "sequential_camera_capture": "PENDING_EXACT_SHA",
+    "wrong_view_fail_closed": "PENDING_EXACT_SHA",
+    "two_eye_source_restore": "PENDING_EXACT_SHA",
+    "exact_sha_gate": "PENDING_EXACT_SHA"
+  },
+  "validation_history": [
+    {
+      "exact_sha": "6a1f2dfdf04999acc6e93cf7c59a4ab5d7c2b84f",
+      "result": "FAIL",
+      "cause": "DX11 Fast run 40181871128 and Backend Gate run 40181871097 failed on inherited 01063 C6 task JSON schema acceptance before source compilation; causal record alignment required."
+    }
+  ],
+  "c6_validation_evidence": null,
+  "next_source_file": "src/vr/d3d11/native_game_stereo_submission.cpp",
+  "real_game_draw_blocker": "No independently observed OutRun native menu/car/race GPU Draw and Quest3/VDXR pixel parity. Runtime UNTESTED.",
+  "next_implementation_action": "Verify exact result SHA GitHub Actions; repair only measured CI failures in this same TASK_ID; keep D3D9Ex fallback.",
+  "runtime_note": "All game and HMD physical execution remains UNTESTED; no gameplay or backend promotion."
+}

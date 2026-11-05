@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01144",
+  "production_id": "CONVERSION-DX11-01144",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01144",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:DISJOINT_DIRTY_DUAL_RGB",
+  "classification": "A_SOURCE_MATERIAL_NATIVE_RAW_DUAL_GPU_DISPLAY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "source_base_sha": "ea6774a028fafc7234276df36dae4caa2ee8ddde",
+  "source_implementation_commit_sha": "9dc7c963768049cbc8cbb9e485a5db41d97d5dd3",
+  "material_result_sha": "89f10a248b9b99d8c7f382cd8a208266a4c938e1",
+  "validation_bearing_result_sha": "89f10a248b9b99d8c7f382cd8a208266a4c938e1",
+  "development_time_percentages": "UNMEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_DRAW",
+      "REAL_D3D11_GPU_BEFORE_AFTER_RGB",
+      "AUTHENTIC_DISJOINT_DIRTY_REGION",
+      "VISIBLE_OPT_IN_RAW_TILE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CXX_DIRTY_REGION_SECOND_SAME_SIZE_NONOVERLAPPING_TILE",
+      "NATIVE_RAW_VISUAL_PRESENT_DUAL_GPU_REGION_INTEGRATION",
+      "CXX17_DISJOINT_POSITIVE_NEGATIVE_SOURCE_REPAINT_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two source-authenticated disjoint 48x48 D3D9 dirty repaint islands carry two separately authenticated 32x32 GPU Draw RGB tiles.",
+      "negative_regression": "Missing second island, fake rcBound, invalid member, unknown header, source crop clipping, forged initial tile and unpainted neighbor reject.",
+      "component_integration": "Native Draw BEFORE/AFTER paired GPU RGB capture -> exact real D3D9 dirty union/secondary placement -> opt-in Present UpdateSurface, preserving first and second GPU source authenticity."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC:DISJOINT_DIRTY_DUAL_RGB"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Only experimental opted-in PARTIAL D3D11 RAW GPU diagnostic source-to-D3D9 output has BUILD/CI proof; no matched actual game pixels, full frame, or stereo runtime proof.",
+    "activation_guard_and_fallback": "Diagnostic OFF by default; incomplete RAW pixels segregated; preserve original D3D9 Draw/Present/input/FFB, DX9Ex and frozen DXVK, original full-frame fail-closed; no Quest3 promotion."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_present_coverage_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01143.json"
+  ],
+  "real_game_draw_blocker": "Native Draw, actual GPU desktop source pixel count, full publishedBackbufferFrames, real menu/car/race coverage and Quest3/VDXR not measured with 89f10a SHA; pinned 2026-10-28 older real game negative zero Draw does NOT prove this new SHA.",
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40773022141,
+        "head_sha": "89f10a248b9b99d8c7f382cd8a208266a4c938e1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40773022109,
+        "head_sha": "89f10a248b9b99d8c7f382cd8a208266a4c938e1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40773022234,
+        "head_sha": "89f10a248b9b99d8c7f382cd8a208266a4c938e1",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40773022218,
+        "head_sha": "89f10a248b9b99d8c7f382cd8a208266a4c938e1",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40773022154,
+        "head_sha": "89f10a248b9b99d8c7f382cd8a208266a4c938e1",
+        "conclusion": "success"
+      }
+    ],
+    "source_implementation": "Actual native D3D11 GPU before/after RGB pair -> two disjoint source-authentic partial D3D9 repaints, same pixel dimensions with exact dirty coverage; neither fabricated full frame nor OpenXR stereo.",
+    "source_causal_repair": "Prior 01143 C6 stage OPT_IN_RAW_VISIBLE_OUTPUT renamed to existing exact structural policy stage VISIBLE_FRAME_OUTPUT; first Fast failed at old record, without changing its material result or weakening validation.",
+    "build_artifacts": [
+      "Build:outrun2006tweaks-89f10a248b9b99d8c7f382cd8a208266a4c938e1 (id 12854790201)",
+      "OpenXR:feature-dx11-first-game-frame-89f10a248b9b99d8c7f382cd8a208266a4c938e1 (id 12853018179)"
+    ],
+    "runtime_evidence": "UNTESTED; exact SHA no source-matched real-game visual test or Quest3 stereo evidence",
+    "desktop_native_game": "UNTESTED",
+    "quest3_vdxr": "UNTESTED",
+    "full_native_game_frame_complete": false,
+    "related_issue14_comment_id": 6481470473,
+    "duplicate_task_score_change": 0,
+    "bookkeeping_only": false
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Show two genuine incomplete native GPU RGB diagnostic draw regions across independently authentic D3D9 partial Present repaint islands, keeping full-frame fail-closed.",
+    "acceptance_items": [
+      {
+        "id": "raw_disjoint_second_tile",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native Draw GPU RGB -> real D3D9 source dirty regions",
+        "expected_behavior": "A genuine second GPU source RGB region is not hidden by an unpainted adjacent area if a second real distant island exists."
+      },
+      {
+        "id": "original_source_bounds",
+        "category": "fallback_regression",
+        "behavior_area": "source union/crop & gamepad safety",
+        "expected_behavior": "Unpainted, forged, overlap, out-of-crop and invalid source claims fail closed and original renderer survives."
+      },
+      {
+        "id": "five_gates_exact_result_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub C++17 compile/regressions and exact-SHA Windows integration Gates",
+        "expected_behavior": "All five mandatory push Gates pass at exactly one final validation-bearing source+causal-repair SHA; runtime UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "raw_disjoint_second_tile": "PASS_BUILD",
+    "original_source_bounds": "PASS_BUILD",
+    "five_gates_exact_result_sha": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: inspected GitHub lease/HEAD, policies, 01143 result, 2026-10-28 native zero-Draw runtime blocker.",
+    "C1_REVIEW": "PASS: identified missing second actual D3D9 dirty-island display despite two independently genuine GPU samples.",
+    "C2_IMPLEMENT": "PASS: two production C++ source edits and one constexpr positive/negative regression file, material 9dc7c963.",
+    "C3_VALIDATE": "PASS: first Fast failure due prior 01143 C6 stage alias causally repaired at 89f10a; final five exact-SHA push Gates success.",
+    "C4_COMMIT": "PASS: source+tests 9dc7c963; record-limited causal repair 89f10a; no force-push, no result CI-skip.",
+    "C5_PACKAGE": "BUILD_ARTIFACT_CREATED: CI wheel and feature-dx11-first-game-frame artifact at exact material SHA; no game/HMD distribution promotion.",
+    "C6_STATE": "PASS: separate post-Gate C6 bookkeeping, immutable material result 89f10a, runtime UNTESTED."
+  },
+  "c6": {
+    "reason": "FIVE_GATES_SUCCESS_AT_VALIDATION_SHA",
+    "action": "CREATE_RESULT_RECORD_ONLY",
+    "bookkeeping_commit_separate_from_validation": true,
+    "validation_sha_immutable": "89f10a248b9b99d8c7f382cd8a208266a4c938e1",
+    "ci_rerun": false,
+    "source_changes": false,
+    "next_action": "Controller may start independent remaining live full-frame native Draw/swapchain stage; source-matched real game desktop native_draws/native_gpu_pixel_output/publishedBackbufferFrames and Quest3/VDXR HMD remain untested."
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00724",
+  "production_id": "CONVERSION-DX11-00724",
+  "event_id": "CONVERSION-DX11-00724-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_FRAME_FALLBACK_PROVENANCE",
+  "feature_id": "DX11-FULL-FRAME-READBACK-FAIL-CLOSED",
+  "status": "DONE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "d928661c2760b90e462e77157c5a199d7cc9cb2f",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "current game D3D9 Draw/DrawIndexed completion and owner captured before Present",
+      "native D3D11 asynchronous full-resolution readback provenance and output-generation fencing",
+      "safe backbuffer Upload/Present or original D3D9 gamepad rendering fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/dx11_full_frame_fallback_probe_00724.cpp",
+      "tools/test_dx11_full_frame_fallback_00724.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "full-scene consecutive game Draw and DrawIndexed continue to accept one-frame delayed full frame from the same valid output generation",
+      "negative_regression": "unsupported source Draw, aborted Clear/RT0 scene and unwriteable game backbuffer quarantine old native full-screen GPU copies including unfinished fences",
+      "component_integration": "real native frame composition completeness feeds frame-provenance generation before D3D11 GetData/Map; DX9Ex game renderer and gamepad remain untouched"
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_READBACK_PROVENANCE",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI proving current Draw completion fences stale full-screen readback; actual Quest3/VDXR game observation pending",
+    "activation_guard_and_fallback": "native opt-in only, retained game D3D9 Draw/Present/input, complete frame and writable backbuffer required before full-frame overlay"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-FRAME-READBACK-FAIL-CLOSED",
+    "goal": "Preserve correct menu-to-vehicle-to-race real full-size D3D11 frame publication across unsupported native draws, scene clears and asynchronous GPU fences without overwriting the current game's D3D9 fallback output.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_frame_composition",
+        "expected_behavior": "Supported current real D3D9 Draw/DrawIndexed game frames continue to publish eligible native output without forced GPU waits"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "game_present_input",
+        "expected_behavior": "Unsupported or aborted current native game frames quarantine all previous whole-frame readback results and preserve D3D9 game drawing and gamepad input"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "gpu_readback_transport",
+        "expected_behavior": "Portable C++ sequence and destructive source mutations verify output-generation fencing, followed by exact-SHA GitHub Fast, Backend, Windows Build, OpenXR and HUD Gates"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_readback_provenance.hpp",
+    "tools/dx11_full_frame_fallback_probe_00724.cpp",
+    "tools/test_dx11_full_frame_fallback_00724.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": "a2a9d0ad9a11b7521034ac3357894473d3824901",
+  "intermediate_repair_sha": "cf7cb3be75adb4684a33cc84fd9ac8990803008a",
+  "validation_bearing_result_sha": "cf7cb3be75adb4684a33cc84fd9ac8990803008a",
+  "acceptance_results": {
+    "A1": "PASS_EXACT_SHA",
+    "A2": "PASS_EXACT_SHA",
+    "A3": "PASS_EXACT_SHA"
+  },
+  "exact_sha_gates": {
+    "dx11_fast": {
+      "run_id": 38549743485,
+      "conclusion": "success"
+    },
+    "backend_conversion": {
+      "run_id": 38549743450,
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "windows_build": {
+      "run_id": 38549749925,
+      "conclusion": "success"
+    },
+    "openxr": {
+      "run_id": 38549749909,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38549750024,
+      "conclusion": "success"
+    }
+  },
+  "packaging_status": "NOT_REQUIRED",
+  "note": "C6: Full-resolution DX11 native async game Present source fallback provenance fix on a2a9d0ad; causal 00724 regression mutation test repair cf7cb3be; exact SHA five required GitHub Gate SUCCESS; Quest3/VDXR/game/menu-to-race/gamepad runtime not exercised. DXVK frozen. Original D3D9 fallback preserved. No further scoring for retry/C6."
+}

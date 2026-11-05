@@ -1,0 +1,105 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00774",
+  "production_id": "CONVERSION-DX11-00774",
+  "event_id": "CONVERSION-DX11-00774-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_GAME_DYNAMIC_STREAM_DISCARD",
+  "feature_id": "DX11-LIVE-GAME-DYNAMIC-VERTEX-INDEX-STREAM",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "64183e04d87305b15ed4cffc423940587ecacc7b",
+  "material_result_sha": "972203d60c3c8f0e9181f016fef27be4c28b7312",
+  "validation_bearing_result_sha": "972203d60c3c8f0e9181f016fef27be4c28b7312",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_dynamic_stream.hpp",
+    "tools/test_dx11_full_game_geometry_upload.py",
+    "tools/test_dx11_game_source_buffer_binding_00757.py",
+    "tools/dx11_dynamic_stream_probe_00774.cpp",
+    "tools/test_dx11_dynamic_stream_game_frame_00774.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00774.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-GAME-DYNAMIC-VERTEX-INDEX-STREAM",
+    "goal": "Preserve real menu/vehicle/race native Draw and DrawIndexed stream contents through successive GPU submissions using D3D11 dynamic WRITE_DISCARD renaming, without altering original D3D9/gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-menu-race-vb-and-ib",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_FVF_live_Draw_and_DrawIndexed_gpu_streams",
+        "expected_behavior": "Vertex and index uploads use Map WRITE_DISCARD and feed exact IA buffers on every native Draw."
+      },
+      {
+        "id": "failed-native-upload-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "map_copy_failure_and_d3d9_original_input",
+        "expected_behavior": "Invalid source, capacity or failed Map abort optional native publication while keeping immutable diagnostic and D3D9/gamepad paths."
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Windows_Backend_OpenXR_HUD",
+        "expected_behavior": "Portable C++ positive/negative stream checks plus five mandatory same-SHA Gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Real D3D9 game VB/Indexed VB/UP capture to NativeVertex and native index spans",
+      "Renamed D3D11 dynamic GPU stream upload to IA Draw/DrawIndexed in full-resolution frame",
+      "GPU native RTV readback to guarded Present while original DX9Ex/gamepad fallback remains"
+    ],
+    "batch_components": [
+      "D3D11 dynamic GPU VB and IB Map/Unmap upload in real frame bridge",
+      "Shared fail-closed CPU mapped byte transfer with portable compiled regression",
+      "Existing full game geometry and IA ownership contract test adaptation"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled stream bytes change between menu/race source and native VB/IB upload source bindings",
+      "negative_regression": "Failed Map, empty/null/overflow stream reject before Draw; diagnostic immutable and original D3D9 unaffected",
+      "component_integration": "D3D9 live source -> D3D11 dynamic VB/IB -> IA Draw/DrawIndexed -> original guarded game Present"
+    },
+    "conflict_keys": [
+      "DX11:FULL_GAME_DYNAMIC_STREAM_DISCARD"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source/CI only. Real Quest3 runtime and gamepad UNTESTED.",
+    "activation_guard_and_fallback": "Only existing explicit full-game opt-in; no production promotion; fail closed on Map/copy errors."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read current GitHub branch HEAD, AGENTS, DX11 policy, 00773 COMPLETE and 00774 independent source scope.",
+    "C1_REVIEW": "Repeated D3D11 DEFAULT UpdateSubresource live geometry uploads within a frame; replace with explicit WRITE_DISCARD-renamed source buffers for immediate context.",
+    "C2_IMPLEMENT": "Full-frame vertex + index GPU DYNAMIC buffers and transactional Map/Unmap, plus shared portable copy primitive and related regression tests.",
+    "C3_VALIDATE": "C++17 dynamic stream compiled probe and exact-SHA mandatory GitHub CI queued by source commit; no real Quest3 test.",
+    "C4_COMMIT": "Material source commit includes exact [AUTO:CONVERSION-DX11-00774] marker, no skip-ci.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA; CI SUCCESS for exact validation-bearing SHA 972203d60c3c8f0e9181f016fef27be4c28b7312; Quest3/VDXR/gamepad UNTESTED."
+  },
+  "acceptance_results": {
+    "live-menu-race-vb-and-ib": "PASS",
+    "failed-native-upload-fallback": "PASS",
+    "exact-sha-ci": "PASS_EXACT_SHA"
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00128",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T21:38:25+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "6de931e4fef13bacc57d75f30119c085ca6e94cf",
+  "result_sha": "d692c89cb308381cd80f8c23e09bffdfa1b7fbdc",
+  "validation_bearing_result_sha": "d692c89cb308381cd80f8c23e09bffdfa1b7fbdc",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R135_GUARDED_GF_HOOK_PROVENANCE_CENSUS",
+  "summary": "Added diagnostic-only exact-upstream-EXE provenance census support for the five guarded C2CSpeechBubbleGF/GF-heart spacing-only hook RVAs. The analyzer records 24 hook bytes plus closest known direct HUD/sprite CALL before/after each hook within 0x80 bytes in JSON, Markdown and stdout. The backend verifier requires this census contract. No runtime ownership or game/host draw behavior changed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "guarded_hooks": [
+    "0xFE8B1 C2CSpeechBubbleGF uncertain/no-effect spacing hook",
+    "0xFD60C C2CSpeechBubbleGFHeart spacing hook #1",
+    "0xFD591 C2CSpeechBubbleGFHeart spacing hook #2",
+    "0xFD5CD C2CSpeechBubbleGFHeart spacing hook #3",
+    "0xFD652 C2CSpeechBubbleGFHeart spacing hook #4"
+  ],
+  "review_lenses": {
+    "architecture": "Turns the missing immediate-draw provenance dependency into durable machine-readable CI evidence while preserving incremental F13 adoption.",
+    "ownership": "Census is diagnostic-only and does not arm ScreenHud ownership.",
+    "stereo_correctness": "All five guarded hooks remain spacing-only, avoiding unsupported flattening or world-stereo bypass.",
+    "performance": "Static analyzer/verifier only; no game/host hot-path code, waits, copies, draws or runtime logging added.",
+    "adversarial": "Only KNOWN_TARGETS direct rel32 calls within +/-0x80 are reported. Absence or proximity is evidence, not an automatic ownership verdict."
+  },
+  "provenance_census": {
+    "count": "5/5",
+    "window_bytes": 128,
+    "0xFD591": {"previous_known_call": null, "next_known_call": null},
+    "0xFD5CD": {"previous_known_call": null, "next_known_call": null},
+    "0xFD60C": {"previous_known_call": null, "next_known_call": null},
+    "0xFD652": {"previous_known_call": null, "next_known_call": null},
+    "0xFE8B1": {"previous_known_call": null, "next_known_call": null},
+    "interpretation": "No known HUD/sprite direct CALL was found within +/-0x80 of any guarded hook. This does not prove absence of indirect or unknown-target draw activity and does not justify ScreenHud promotion."
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "R134 intentionally kept the five hooks spacing-only because canonical range membership is insufficient to establish exact immediate-draw ownership. R135 gathers bounded exact-EXE adjacency evidence without modifying runtime semantics."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36715407693,
+      "conclusion": "success",
+      "validated_sha": "d692c89cb308381cd80f8c23e09bffdfa1b7fbdc",
+      "artifact_id": 11096251241,
+      "artifact_digest": "sha256:bdc8e89777e7928e7c9eb6aeb3a70da98c91ab480dafea19b75683d1815a8ece"
+    },
+    "build": {
+      "run_id": 36715414098,
+      "conclusion": "success",
+      "validated_sha": "d692c89cb308381cd80f8c23e09bffdfa1b7fbdc"
+    },
+    "hud_inspector": {
+      "run_id": 36715414133,
+      "conclusion": "success",
+      "validated_sha": "d692c89cb308381cd80f8c23e09bffdfa1b7fbdc",
+      "analysis_artifact_id": 11096290324,
+      "analysis_artifact_digest": "sha256:cd976728fa73510bff41c166ea9832c67f84efb24a0d640ec5a7abc58cf63590",
+      "game_artifact_id": 11095932720,
+      "game_artifact_digest": "sha256:439d27d66d438a899ffb79f80b3353a4d59c9e3faedf3703149723bce1113093",
+      "evidence": "static-exe-analysis and build-hud-inspector passed; exact job logs reported guarded_gf_provenance=5/5 with prev=none and next=none for all five guarded hook RVAs."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36715413971,
+      "conclusion": "success",
+      "validated_sha": "d692c89cb308381cd80f8c23e09bffdfa1b7fbdc",
+      "evidence": "All six jobs passed."
+    },
+    "pc_fast": {
+      "run_id": 36715407675,
+      "conclusion": "skipped",
+      "validated_sha": "d692c89cb308381cd80f8c23e09bffdfa1b7fbdc"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5911378542,
+    "validation_comment_id": 5911476225,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact marker [AUTO:CONVERSION-DX11-00128] and no CI-skip directive.",
+    "The analyzer census covers exactly five guarded GF speech/heart hook RVAs and emits exact-EXE bytes plus bounded known-call adjacency.",
+    "DX11 HUD Inspector logs report 5/5 rows and no known direct CALL before or after any guarded hook within +/-0x80.",
+    "No runtime source under src/ changed and R134 spacing-only negative guards remain intact.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs passed on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R135 guarded GF-hook provenance census is automation-validated on the DX11 branch. All five hooks remain deliberately spacing-only; bounded known-target direct-call adjacency returned none/none.",
+  "next_action": "Keep all five guarded hooks spacing-only. Further F13 ownership work must independently resolve unknown call targets/instruction effect or correlate exact runtime draw provenance before any ScreenHud handoff; otherwise move to the next evidence-driven DX11 priority such as selector payload identity or DX11 activation/census exactness."
+}

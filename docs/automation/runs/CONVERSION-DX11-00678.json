@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00678",
+  "production_id": "CONVERSION-DX11-00678",
+  "event_id": "CONVERSION-DX11-00678-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:MENU_RACE_SHADOW_FAILURE_DRAW_CONTINUITY",
+  "feature_id": "MENU_RACE_COMPLETE_SOURCE_CAPTURE_AND_SHADOW_FAILURE_FALLBACK",
+  "base_head_sha": "ed5807c3191ddd5bf32ebc1db6e56998f7c95dd3",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real R30 game VB/IB/IndexedUP callsites always report a source Draw, including shadow/index read failure and unsupported primitive captures",
+      "Native DX11 observer consumes the raw source index before topology/state admission; missing capture invalidates a multi-Draw batch without replacing any D3D9 Draw or gamepad input",
+      "Only a complete non-aborted native Draw/DrawIndexed batch may enter GPU async readback and visible game Present inset"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Existing actual game VB/IB/UP native Draw forwarding remains intact; additional source-level hook-to-native continuity checks cover all 3 shadow-capable hook families in both R30 variants",
+      "negative_regression": "Negative source mutation detects removal of any missing-shadow source report, forward-once marker, native primitive counting or missing-capture batch abort",
+      "component_integration": "R30 D3D9 game-authored Draw hook failure -> native source ordinal -> frame batch abort -> GPU Present publication guarded; original D3D9 gamepad and renderer unchanged"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SHADOW_FAILURE_DRAW_CONTINUITY",
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Real Draw/DrawIndexed game menu/car/race source gaps cannot be composited as if no intermediary existed. Exact-SHA CI evidence is not HMD/Quest3 display proof.",
+    "activation_guard_and_fallback": "Two exact diagnostic environment opt-ins required for multi-Draw batching; source failure aborts native inset only and leaves original D3D9 Draw/Present/gamepad untouched."
+  },
+  "feature_contract": {
+    "feature_id": "MENU_RACE_COMPLETE_SOURCE_CAPTURE_AND_SHADOW_FAILURE_FALLBACK",
+    "goal": "Make live D3D9 game VB/IB/IndexedUP source captures complete for the opt-in native D3D11 menu/car/race Draw scene, disallowing composited frames that silently skip failed CPU shadow captures and preserving DX9Ex gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "all-source-draws-counted",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_draw_to_native_bridge",
+        "expected_behavior": "Forwardable and unforwardable VB, indexed VB, indexed UP game Draw calls retain their raw source ordinal in the scene stream"
+      },
+      {
+        "id": "shadow-failure-inset-rollback",
+        "category": "fallback_regression",
+        "behavior_area": "game_present_input_fallback",
+        "expected_behavior": "Unsupported primitive and missing shadow/index captures abort any partial native batch while original game D3D9 rendering, Present and gamepad remain unchanged"
+      },
+      {
+        "id": "hook-bridge-exact-sha-gate",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_native_render_ci",
+        "expected_behavior": "Destructive Python hook-to-bridge mutation checks and required exact-SHA GitHub workflow Gates pass"
+      },
+      {
+        "id": "quest3-scene-controls",
+        "category": "end_to_end_behavior",
+        "behavior_area": "quest3_vdxr_runtime",
+        "expected_behavior": "Menu, vehicle selection, race, Quest3 VDXR stereo and gamepad verified on physical matching build"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "all-source-draws-counted": "PENDING_EXACT_SHA",
+    "shadow-failure-inset-rollback": "PENDING_EXACT_SHA",
+    "hook-bridge-exact-sha-gate": "PENDING_EXACT_SHA",
+    "quest3-scene-controls": "NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00678.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub HEAD ed5807c3; 00677 fully completed and no 00678 record",
+    "C1_REVIEW": "PASS: R30 VB/IB shadow early returns omit Draw from source continuity; primitive precheck also bypasses source ordinal",
+    "C2_IMPLEMENT": "GAME_SHADOW_SOURCE_COMPLETENESS_AND_ABORT",
+    "C3_VALIDATE": "PENDING_EXACT_SHA_FULL_GATES",
+    "C4_COMMIT": "PENDING_SHA",
+    "C5_PACKAGE": "NOT_REQUIRED: native diagnostic opt-in only, no runtime promotion",
+    "C6_STATE": "PENDING_GATES"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "next_action": "Check exact material commit CI five mandatory Gates; repair failures under same 00678; only exact Gate PASS closes build verification; real Quest3/VDXR/gamepad NEED_HMD_TEST"
+}

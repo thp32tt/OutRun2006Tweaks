@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01253",
+  "production_id": "CONVERSION-DX11-01253",
+  "event_id": "CONVERSION-DX11-01253-E002",
+  "event_type": "result",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "a912341b73931513ebdfb8640734c2ecf3b1107f",
+  "material_implementation_sha": "ea0f9d9df67724b1186379b143e256ccf0abeb0e",
+  "material_result_sha": "45e5c8fcca163106d237c3bd85782bf79b5a4009",
+  "validation_bearing_result_sha": "45e5c8fcca163106d237c3bd85782bf79b5a4009",
+  "result_sha": "45e5c8fcca163106d237c3bd85782bf79b5a4009",
+  "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_MULTI_GPU_DRAW_WINDOWS",
+  "feature_work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL",
+  "classification": "A_ORIGINAL_FVF_FULL_SOURCE_FAN_STRIP_POINT_FILL_INTEGRATION_B_CAUSAL_00600_01094_GATE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "record_type": "C6_RESULT_ONLY",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_stage": "FEATURE_READY",
+  "work_allocation_measured": false,
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "game_desktop_runtime_performed": false,
+  "quest3_vdxr_runtime_performed": false,
+  "score_change": 0,
+  "score_note": "01253 is the same FVF clipped POINTLIST multi-window GPU integration feature already scored under 01251; retries, CI repairs, and C6 bookkeeping are +0. No scoreboard edit.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+    "tests/vr/dx11_live_fvf_point_cull.cpp",
+    "tools/test_dx11_native_alpha_compare_00600.py",
+    "tools/test_dx11_live_fvf_polygon_windows_01094.py"
+  ],
+  "source_repair_shas": [
+    "ea0f9d9df67724b1186379b143e256ccf0abeb0e",
+    "d833f031a48a2aa33cba94d0ff5fdb4c72542dc1",
+    "45e5c8fcca163106d237c3bd85782bf79b5a4009"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FVF_CLIPPED_POINT_FILL_MULTI_GPU_DRAW_WINDOWS",
+    "goal": "Fully original-game FVF clipped point-fill triangles of any admitted triangle topology stream through native D3D11 point windows without arbitrary expansion truncation, extra GPU buffer allocation, or loss of source fallback.",
+    "acceptance_items": [
+      {
+        "id": "point_geometry_and_gpu_windows",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_geometry",
+        "expected_behavior": "Source FVF clip to complete point fan expansion, bounded reusable GPU IA windows and ordered D3D11 Draws."
+      },
+      {
+        "id": "transactional_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_input_and_source_safety",
+        "expected_behavior": "Any malformed IA, clipped source overrun or GPU write failure aborts partial native publication while original D3D9 Draw, input and FFB survive."
+      },
+      {
+        "id": "exact_source_gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_build_and_release_pipeline",
+        "expected_behavior": "Fast, Backend, Win32 Build, OpenXR, HUD pass on one exact validation-bearing commit; no claim of actual game/HMD runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "point_geometry_and_gpu_windows": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp"
+      ],
+      "validation_command": "Original source FVF fan/strip point-fill is preflighted as a single clipped source Draw and streamed across bounded D3D11 point windows. Targeted C++17 compile/execute succeeded; exact-SHA Fast 42032366666 and Win32 Build 42032366568 both SUCCESS."
+    },
+    "transactional_game_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp",
+        "tools/test_dx11_native_alpha_compare_00600.py",
+        "tools/test_dx11_live_fvf_polygon_windows_01094.py"
+      ],
+      "validation_command": "Whole-source point fan/strip retains original Draw ordinal and original D3D9 fallback on malformed indexed/clip/native GPU upload; 00600 and 01094 fail-closed mutation regressions PASS; exact-SHA Backend 42032366579 SUCCESS."
+    },
+    "exact_source_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+        "tests/vr/dx11_live_fvf_point_cull.cpp",
+        "tools/test_dx11_native_alpha_compare_00600.py",
+        "tools/test_dx11_live_fvf_polygon_windows_01094.py"
+      ],
+      "validation_command": "GitHub exact 45e5c8fcca163106d237c3bd85782bf79b5a4009: Fast 42032366666, Backend 42032366579, Win32 Build 42032366568, OpenXR 42032366733, HUD 42032366582 all SUCCESS. No game desktop or Quest3/VDXR HMD runtime performed."
+    }
+  },
+  "prior_feature_acceptance_results": {
+    "source_task_id": "CONVERSION-DX11-01252",
+    "validation_bearing_result_sha": "f25c32eedba89067e8bf2b375eb919db4691d6d5",
+    "acceptance_results": {
+      "point_geometry_and_gpu_windows": {
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+          "src/vr/d3d11/live_game_frame_bridge.cpp",
+          "tests/vr/dx11_live_fvf_point_cull.cpp"
+        ],
+        "validation_command": "Authentic FVF clipped source budget 42x/source triangle; bounded 6144+456 GPU upload regression; DX11 Fast Structural Checks 42021955044 SUCCESS and Windows Build 42021963248 SUCCESS on exact f25c32eedba89067e8bf2b375eb919db4691d6d5."
+      },
+      "transactional_game_fallback": {
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "src/vr/d3d11/live_game_frame_bridge.cpp",
+          "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+          "tests/vr/dx11_live_fvf_point_cull.cpp",
+          "tools/verify_dx11_first_game_frame_boundary.py",
+          "tools/test_dx11_first_game_frame_regressions.py"
+        ],
+        "validation_command": "Original D3D9 source IB/capacity checks and GPU fail-closed, preserved input/FFB and no DXVK changes; Backend Gate 42021955366 SUCCESS + Windows Build 42021963248 SUCCESS exact SHA f25c32eedba89067e8bf2b375eb919db4691d6d5."
+      },
+      "exact_source_gates": {
+        "status": "PASS_EXACT_SHA",
+        "evidence_paths": [
+          "src/vr/d3d11/live_game_frame_bridge.cpp",
+          "src/vr/d3d11/live_game_fvf_point_batches.hpp",
+          "tools/verify_dx11_first_game_frame_boundary.py",
+          "tools/test_dx11_first_game_frame_regressions.py"
+        ],
+        "validation_command": "GitHub exact f25c32eedba89067e8bf2b375eb919db4691d6d5: Fast 42021955044, Backend 42021955366, Windows Build 42021963248, OpenXR 42021963370, HUD 42021963232 all SUCCESS. No original game/HMD runtime performed."
+      }
+    }
+  },
+  "ci_exact_sha": {
+    "sha": "45e5c8fcca163106d237c3bd85782bf79b5a4009",
+    "fast": {
+      "id": 42032366666,
+      "conclusion": "success"
+    },
+    "backend": {
+      "id": 42032366579,
+      "conclusion": "success"
+    },
+    "build": {
+      "id": 42032366568,
+      "conclusion": "success"
+    },
+    "openxr": {
+      "id": 42032366733,
+      "conclusion": "success"
+    },
+    "hud": {
+      "id": 42032366582,
+      "conclusion": "success"
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME:FVF_POINT_FILL"
+    ],
+    "integration_path": [
+      "ORIGINAL_D3D9_FVF_POINT_FAN_STRIP_DRAW_DRAWINDEXED",
+      "WHOLE_SOURCE_CLIP_AND_BOUNDING_PREFLIGHT",
+      "MULTI_WINDOW_D3D11_POINT_DRAW",
+      "ONE_SOURCE_ORDINAL_AND_FAIL_CLOSED_D3D9_FALLBACK"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Long original fan/strip after invisible leading polygon windows retains later valid clipped source point vertices, original UVs, and complete GPU window plan.",
+      "negative_regression": "Late malformed index, invalid source geometry, lost original-point dispatch, missing GPU point window, and removed source-ordinal failure are rejected in regression.",
+      "component_integration": "Original game D3D9 Draw/DrawIndexed -> full source FVF point polygon clip -> D3D11 reusable GPU upload windows -> native Draw and original D3D9/FFB/input fallback."
+    }
+  },
+  "runtime_validation_notes": "No physical OutRun menu, vehicle-selection or racing desktop frame and no Quest3/VDXR headset session were executed. Exact-source CI only; full native renderer, visual parity and HMD promotion unverified.",
+  "bookkeeping_commit_separated": true,
+  "bookkeeping_reason": "RUN_RECORD_NOT_FOUND"
+}

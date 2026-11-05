@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00687",
+  "production_id": "CONVERSION-DX11-00687",
+  "event_id": "CONVERSION-DX11-00687-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_VIEWPORT_DEPTH_WORLD_SCREEN_NATIVE_FRAME",
+  "feature_id": "MENU_RACE_GAME_VIEWPORT_DEPTH_NATIVE_DRAW",
+  "status": "MATERIAL_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Capture actual game D3D9 GetViewport MinZ/MaxZ and FVF XYZRHW / world-space vertices at live Draw/DrawIndexed",
+      "Transform world WVP homogeneous clip Z into exact D3D9 viewport depth; retain already-window XYZRHW Z and signed near-camera W",
+      "Bind native D3D11 Draw/DrawIndexed and fenced game backbuffer diagnostic Present; reject invalid viewport/depth inputs without touching D3D9 Draw/input"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_viewport_depth.hpp",
+      "tools/dx11_game_viewport_depth_probe_00687.cpp",
+      "tools/test_dx11_live_viewport_depth_00687.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 finite world clip Z mapping including reversed/constant viewport, negative W; screen-space XYZRHW unchanged",
+      "negative_regression": "Invalid MinZ/MaxZ/NaN/infinity/zero-W/overflow must fail closed and destructive source disconnect detected",
+      "component_integration": "Live D3D9 GetViewport + FVF World/View/Projection or XYZRHW -> D3D11 native Draw/Indexed -> original game Present inset"
+    },
+    "conflict_keys": [
+      "DX11:GAME_VIEWPORT_DEPTH_WORLD_SCREEN_NATIVE_FRAME",
+      "src/vr/d3d11/live_game_viewport_depth.hpp",
+      "tools/dx11_game_viewport_depth_probe_00687.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Game viewport depth semantics implemented at native draw source; actual menu/race GPU frame and Quest3 HMD remain untested.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only; fail closed for unsupported viewport/depth; original D3D9 Draw/Present/gamepad stay primary."
+  },
+  "feature_contract": {
+    "feature_id": "MENU_RACE_GAME_VIEWPORT_DEPTH_NATIVE_DRAW",
+    "goal": "Preserve the game-authored D3D9 viewport Z mapping end-to-end on native menu, vehicle selection and race Draw/DrawIndexed without double-mapping XYZRHW sprites.",
+    "acceptance_items": [
+      {
+        "id": "race-world-depth",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_world_to_d3d11_clip",
+        "expected_behavior": "World WVP native vertices apply live MinZ/MaxZ mapping before D3D11 clip/DrawIndexed, including reversed and constant bounds."
+      },
+      {
+        "id": "menu-rhw-and-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_menu_fvf_and_input",
+        "expected_behavior": "Pretransformed XYZRHW window Z is not double remapped; invalid ranges and nonfinite output do not enter native, D3D9 input/Draw remain intact."
+      },
+      {
+        "id": "exact-sha-build",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_native_game",
+        "expected_behavior": "Portable C++ positive/negative, destructive bridge path regression and required exact-SHA GitHub Actions gates pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "race-world-depth": "PENDING_EXACT_SHA",
+    "menu-rhw-and-fallback": "PENDING_EXACT_SHA",
+    "exact-sha-build": "PENDING_EXACT_SHA"
+  },
+  "base_head_sha": "2640e62ffbddce0af8d309f7a430d1ad0dc3df90",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_viewport_depth.hpp",
+    "tools/dx11_game_viewport_depth_probe_00687.cpp",
+    "tools/test_dx11_live_viewport_depth_00687.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00687.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: branch HEAD + current 00686 gate owner checked",
+    "C1_REVIEW": "PASS: D3D9 viewport Z ignored in WVP native bridge, RHW postwindow already correct",
+    "C2_IMPLEMENT": "PASS: coupled world/screen viewport Z native integration",
+    "C3_VALIDATE": "PASS local portable C++17 positive/negative; exact-SHA CI pending",
+    "C4_COMMIT": "MATERIAL_RESULT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Await exact validation-bearing SHA GitHub gates; repair same TASK_ID if needed. Quest3/VDXR/gamepad runtime UNTESTED."
+}

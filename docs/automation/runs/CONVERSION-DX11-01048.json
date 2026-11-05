@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01048",
+  "production_id": "CONVERSION-DX11-01048",
+  "event_id": "CONVERSION-DX11-01048-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01048",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_COLORFILL_DEPTH_SCENE_RECOVERY",
+  "work_key": "DX11:MENU_CAR_RACE_AUTHORED_COLOR_Z_EPOCH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "bc6c2e51e394c3b5dc4de325490a46cab320d271",
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Retire game native D3D11 color+depth after a genuine whole ColorFill and resume same-Present full-sized Draw only after a real full canonical-main-Z D3D9 Clear on the same device/target; never publish stale depth or colors. Original D3D9 Present/input/FFB stays authoritative; actual game/HMD UNTESTED.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_native_depth_epoch_recovery_01048.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01048.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_COLORFILL_DEPTH_SCENE_RECOVERY",
+    "goal": "Continue authentic menu->vehicle->race native full-frame Draw/DrawIndexed after ColorFill overwrites a depth-writing scene AND the game fully clears its actual main Z in the same Present.",
+    "acceptance_items": [
+      {
+        "id": "retire_color_and_depth",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_SOURCE_DRAW_EPOCH",
+        "expected_behavior": "Whole D3D9 ColorFill retires previously submitted GPU Draw+Z, disallows every intervening Draw ordinal until a genuine full main Z Clear."
+      },
+      {
+        "id": "resume_game_frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_DEPTH_AND_NATIVE_D3D11",
+        "expected_behavior": "Verified game-owned full Z clear resumes original source ordinals with native RTV color reseed and precise new DSV depth."
+      },
+      {
+        "id": "fallback_integrity",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9EX_INPUT_FFB_PRESENT",
+        "expected_behavior": "Partial/foreign Z, unproved ownership, skipped source Draw and previously poisoned batches never publish native pixels or disable original D3D9/input/FFB."
+      },
+      {
+        "id": "full_ci",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "All five mandatory exact-SHA GitHub Actions gates pass on one validation-bearing material commit."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_COLORFILL_SOURCE_EPOCH",
+      "AUTHORED_GAME_Z_CLEAR",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_native_depth_epoch_recovery_01048.cpp",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Depth-writing game Draw -> authentic full ColorFill -> verified whole-Z -> native next Draw+Present chronological full frame source state.",
+      "negative_regression": "Missing or partial Z, invalid depth, source gap, aborted epoch and plain color-only transitions exercise fail-closed logic.",
+      "component_integration": "Original game ColorFill hook + game depth Clear observer + full-size D3D11 frame batch Draw and current game Present continuity."
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_AUTHORED_COLOR_Z_EPOCH"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY_GAME_HMD_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive opt-in, D3D9 authoritative with unchanged input/FFB/Present; no DXVK changes."
+  },
+  "acceptance_results": {
+    "retire_color_and_depth": {
+      "status": "SOURCE_IMPLEMENTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_frame_batch.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ]
+    },
+    "resume_game_frame": {
+      "status": "SOURCE_IMPLEMENTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_frame_batch.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ]
+    },
+    "fallback_integrity": {
+      "status": "SOURCE_IMPLEMENTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_frame_batch.hpp",
+        "tools/dx11_native_depth_epoch_recovery_01048.cpp"
+      ]
+    },
+    "full_ci": {
+      "status": "PENDING_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ]
+    }
+  },
+  "ci_failure_repair": "First exact-SHA Fast 40074875575 failed historical 00732 depth-only mutation because new recovery branch duplicated the original preDrawDepth.discard() operation; restructured source to route recovered whole-Z into the SAME verified existing clearZ discard+DSV seed (not weakening the existing 00732 mutation or any Gate). Second exact-SHA Fast 40075069256 passed 00732 but 00734 required the historical !beforeFirstGameDraw conditional unchanged; folded recovered main-Z eligibility into the existing beforeFirstGameDraw predicate, retaining both mutation checks and the same real owner/coverage validation.",
+  "c6_reconciliation_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_gate_results": {
+    "validation_sha": "bc6c2e51e394c3b5dc4de325490a46cab320d271",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40075237217,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40075237290,
+      "event": "push"
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40075237239,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40075237286,
+      "event": "push"
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40075237205,
+      "event": "push"
+    },
+    "note": "Five mandatory GitHub Actions SUCCESS at exact material validation SHA; gameplay and Quest3/VDXR runtime remain UNTESTED. C6 bookkeeping [skip ci], no duplicate CI or scoring."
+  }
+}

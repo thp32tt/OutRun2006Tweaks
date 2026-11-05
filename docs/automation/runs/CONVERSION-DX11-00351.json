@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00351",
+  "production_id": "CONVERSION-DXVK-00350",
+  "event_id": "CONVERSION-DXVK-00350-E009",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R240_PROGRAMMABLE_SHADER_PAIR_DEVICE_CACHE_OWNER_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "88b9e7afcbbb49f4e6ba739fce5d509e29bf48dd",
+  "result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+  "validation_bearing_result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+  "result_marker": "[AUTO:CONVERSION-DX11-00351]",
+  "selected_work_item": "DX11_R240_PROGRAMMABLE_SHADER_PAIR_DEVICE_CACHE_OWNER",
+  "summary": "R240 consumes the R239 stage-typed programmable VS/PS identity in a dormant per-D3D11-device cache owner. It deduplicates exact identities, fails closed on forged cache-key collisions and incomplete/translated-state claims, clears entries across device reinitialization, and binds readiness snapshots to owner/device generation. It does not translate D3D9 bytecode, create/bind programmable D3D11 shaders, or activate NativeDrawPath.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00351.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered DX11 lane at 88b9e7afcbbb49f4e6ba739fce5d509e29bf48dd; read current branch HEAD, VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_DX11_NATIVE_PLAN.md, VR automation/run/review state, Set05, regression knowledge/problem history. R239 is complete and its exact next action selects a dormant per-device programmable translation/object-cache owner."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R239 authenticates programmable shader-pair identity but no per-device owner exists to deduplicate identities, prevent forged cache-key aliasing, or invalidate cached readiness across D3D11 device generations. This is the smallest executable next step before actual bytecode translation/object creation.",
+      "review_lenses": {
+        "architecture": "Add a dormant metadata cache owner in native_backend; no game hook or draw routing.",
+        "ownership_lifetime": "Own only an ID3D11Device COM reference plus copied identity metadata; clear metadata on reinitialize/shutdown.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter semantics change.",
+        "performance": "No runtime caller is added; unordered-map work is exercised only by hosted probes.",
+        "adversarial": "Prove exact duplicate dedupe, forged same-key/different-metadata collision rejection, incomplete identity rejection, and old snapshot invalidation across device reinitialize."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderPairCache with per-device generation ownership, exact metadata collision checks, readiness/snapshot validation and fail-closed translated-state rejection; extended dx11_constant_buffer_probe with WARP-hosted positive, dedupe, collision, incomplete-identity and device-generation regressions; added source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R240_PROGRAMMABLE_SHADER_PAIR_DEVICE_CACHE_OWNER_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1933 run 37178853852 completed success for 3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2. validate job 111367100284 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, VR session regressions, DX11 native transport, dual-source, static-surface, source-graph including R240 cache-owner guards, dormant activation, census analyzer, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111367848305 passed every probe; specifically Build/Run DX11 constant buffer probe both succeeded with the R240 WARP device-cache dedupe/collision/device-generation regressions. Artifact 11294806139 digest sha256:dd788316fa8a5d1d22d23c8928bff6b280ff3890cf05fc25e085ce87dd524c9d. No Quest 3/VDXR runtime test was performed.",
+      "validation_run_id": 37178853852,
+      "validation_job_id": 111367100284,
+      "readiness_smoke_job_id": 111367848305,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11294806139,
+      "artifact_digest": "sha256:dd788316fa8a5d1d22d23c8928bff6b280ff3890cf05fc25e085ce87dd524c9d"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+      "validation_bearing_result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+      "source_implementation_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+      "result_marker": "[AUTO:CONVERSION-DX11-00351]",
+      "implementation_commits": [
+        "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R240 is dormant programmable shader identity-cache/readiness infrastructure only. It adds no runtime-distributable shader translation, no D3D11 programmable shader binding and no NativeDrawPath activation."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37178853852,
+      "validation_job_id": 111367100284,
+      "readiness_smoke_job_id": 111367848305,
+      "artifact_id": 11294806139,
+      "artifact_digest": "sha256:dd788316fa8a5d1d22d23c8928bff6b280ff3890cf05fc25e085ce87dd524c9d",
+      "implementation_comment_id": 5976793695,
+      "validation_comment_id": 5976847216,
+      "exact_next_action": "Release CONVERSION-DX11-00351 as complete. Preserve R239 stage-typed identity plus R240 per-device cache generation/collision semantics and keep NativeDrawPath dormant. The next independent programmable-shader unit should define a fail-closed translation/object-slot ownership boundary keyed by R240 readiness before input linkage and constant propagation are promoted."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "native_backend dormant cache/readiness infrastructure and hosted probe only; no D3D9 hook, stereo renderer, transport, OpenXR submission or production NativeDrawPath caller changes."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00351",
+    "production_id": "CONVERSION-DXVK-00350",
+    "event_id": "CONVERSION-DXVK-00350-E009",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Release CONVERSION-DX11-00351 as complete. Preserve R239 stage-typed identity plus R240 per-device cache generation/collision semantics and keep NativeDrawPath dormant. The next independent programmable-shader unit should define a fail-closed translation/object-slot ownership boundary keyed by R240 readiness before input linkage and constant propagation are promoted.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37178853852,
+      "run_number": 1933,
+      "result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+      "conclusion": "success",
+      "validate_job_id": 111367100284,
+      "readiness_smoke_job_id": 111367848305,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11294806139,
+      "artifact_digest": "sha256:dd788316fa8a5d1d22d23c8928bff6b280ff3890cf05fc25e085ce87dd524c9d"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5976793695,
+    "validation_comment_id": 5976847216
+  }
+}

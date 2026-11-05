@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01061",
+  "production_id": "CONVERSION-DX11-01061",
+  "event_id": "CONVERSION-DX11-01061-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01061",
+  "classification": "A",
+  "feature_id": "DX11:NATIVE_SHARED_BGRA_CAMERA_MIP0_GAME_FRAME",
+  "work_key": "DX11:GAME_MIP0_BGRA_SHARED_DESKTOP_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Material native D3D11 full-size game-camera GPU sharing now copies mip-zero even when authentic BGRA8 camera textures have multiple mips, and admits compatible typed sRGB and single-sampled typeless BGRA bytes via bounded D3D11 CopySubresourceRegion into the existing fenced D3D9Ex shared desktop. Unsupported array/eye slices, typeless MSAA, invalid layouts remain fail-closed; source-format resolve-cache changes are invalidated before use. No native gameplay/HMD claim.",
+  "material_result_sha": "12e329badf2982d8547b8a3e91ebfedea19eddd5",
+  "validation_bearing_result_sha": "75898b79367e818d389b003ead7f42b3f9df8015",
+  "changed_files": [
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "src/vr/d3d11/native_game_shared_desktop_source.hpp",
+    "tools/dx11_shared_desktop_source_layout_01061.cpp",
+    "tools/test_dx11_shared_desktop_source_layout_01061.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_SHARED_BGRA_CAMERA_MIP0_GAME_FRAME",
+    "goal": "Bridge native real game menu, car-selection and race GPU camera pixels to an opt-in D3D9Ex desktop texture when the native producer contains mip levels or a compatible BGRA8 color view while preserving exact D3D9 input/FFB and fail-closed fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_camera_mip0_gpu_transfer",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_NATIVE_D3D11_GPU_FRAME_TO_D3D9EX",
+        "expected_behavior": "Game-authored complete native color is copied from mip-zero through exact full or multi-region D3D11 GPU operations into existing fenced D3D9Ex shared desktop output"
+      },
+      {
+        "id": "bgra_formats_and_resolve_lifetime",
+        "category": "fallback_regression",
+        "behavior_area": "D3D11_SHADER_SOURCE_AND_SHARED_RESOURCE_LIFETIME",
+        "expected_behavior": "Compatible BGRA8 sRGB/typeless camera pixels use safe byte-compatible copy and a changed resolve source format invalidates cached GPU intermediates"
+      },
+      {
+        "id": "original_game_fallback_and_eye_guard",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_PRESENT_INPUT_FFB_AND_STEREO_FALLBACK",
+        "expected_behavior": "Unsupported array/ambiguous stereo slices, typed-MSAA failures or invalid source formats keep original D3D9 Present, game input and FFB intact"
+      },
+      {
+        "id": "integrated_five_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS_EXACT_SHA",
+        "expected_behavior": "Fast source-layout probe, Backend, Windows Build, OpenXR and HUD Inspector all pass at one validation-bearing implementation/repair SHA"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_NATIVE_D3D11_GAME_CAMERA",
+      "SAFE_BGRA_COLOR_AND_MIP0_GPU_COPY",
+      "CROPPED_AND_MULTI_DIRTY_D3D11_TEXTURE_COPY",
+      "FENCED_SHARED_D3D9EX_PRESENT",
+      "ORIGINAL_GAME_PRESENT_INPUT_FFB_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_shared_desktop.hpp",
+      "src/vr/d3d11/native_game_shared_desktop_source.hpp",
+      "tools/test_dx11_shared_desktop_source_layout_01061.py",
+      "tools/dx11_shared_desktop_source_layout_01061.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Fast 40169900853 compiled and executed 01061 C++17 layout test and 01061 source mutation regression PASS; five exact-SHA Actions SUCCESS",
+      "negative_regression": "Mutation checks reject disabled SRGB/typeless admission, absent mip-zero transfer, stale resolve cache and loss of CopySubresourceRegion; old D3D9 and XR fallback unchanged",
+      "component_integration": "Actual native full-size color target -> mip0 region GPU Copy/Resolve -> D3D9Ex shared GPU texture -> fenced original game desktop pixel update"
+    },
+    "conflict_keys": [
+      "DX11:GAME_MIP0_BGRA_SHARED_DESKTOP_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive and shared D3D9Ex presentation remain explicit opt-in; unsupported layouts fail closed, original D3D9 Draw/Present/input/FFB remain intact, DXVK frozen.",
+    "blocking_evidence": "D3D11 CopyResource requires matching complete subresource layout, but a real game render-target mip chain contains more than the target one-mip shared desktop allocation; explicit mip0 CopySubresourceRegion prevents a no-pixel GPU copy."
+  },
+  "acceptance_results": {
+    "native_camera_mip0_gpu_transfer": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01061 C++17 mip shape and source-layout regression passed in DX11 Fast 40169900853; real OutRun output untested",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_shared_desktop.hpp",
+        "tools/dx11_shared_desktop_source_layout_01061.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_shared_desktop_source_layout_01061.py"
+    },
+    "bgra_formats_and_resolve_lifetime": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01061 source-link negative mutations for typed BGRA input and exact cached resolve intermediate passed in Fast 40169900853",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_shared_desktop.hpp",
+        "tools/test_dx11_shared_desktop_source_layout_01061.py"
+      ],
+      "validation_command": "python tools/test_dx11_shared_desktop_source_layout_01061.py"
+    },
+    "original_game_fallback_and_eye_guard": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Source shape C++17 negative tests reject multi-array, unproved MSAA and false mip-count source; physical D3D9Ex and Quest3 remain UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_shared_desktop_source.hpp",
+        "tools/dx11_shared_desktop_source_layout_01061.cpp"
+      ],
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_shared_desktop_source_layout_01061.cpp -o /tmp/dx11_shared_layout_01061 && /tmp/dx11_shared_layout_01061"
+    },
+    "integrated_five_sha_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Identical SHA 75898b79367e818d389b003ead7f42b3f9df8015: Fast 40169900853, Backend 40169900809, Build 40169900803, OpenXR 40169900798, HUD 40169900857 all success; Quest3 UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "docs/automation/runs/CONVERSION-DX11-01061.json"
+      ],
+      "validation_command": "GitHub REST /actions/runs?head_sha=75898b79367e818d389b003ead7f42b3f9df8015"
+    }
+  },
+  "validation_history": [
+    {
+      "exact_sha": "12e329badf2982d8547b8a3e91ebfedea19eddd5",
+      "result": "FAIL",
+      "cause": "Inherited 01060 C6 record lacked required acceptance contract structure; source implementation separately material-committed"
+    },
+    {
+      "exact_sha": "75898b79367e818d389b003ead7f42b3f9df8015",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Repair of inherited 01060 feature acceptance record; five mandatory Actions passed at the same source-and-record SHA"
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "75898b79367e818d389b003ead7f42b3f9df8015",
+    "dx11_fast_run_id": 40169900853,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 40169900809,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 40169900803,
+    "windows_build_conclusion": "success",
+    "openxr_architecture_run_id": 40169900798,
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_run_id": 40169900857,
+    "hud_inspector_conclusion": "success",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "Actual OutRun menu/car/race source draw and native GPU published frame counts not yet measured on a physical game session; Quest3/VDXR not observed.",
+  "next_implementation_action": "Continue authentic programmable Draw/DrawIndexed to native game frame / stereo XR source integration; obtain separate Quest3 and desktop runtime evidence before gameplay promotion.",
+  "runtime_note": "Only GitHub Windows/OpenXR build and portable/source regressions verified. Physical game, controller input, FFB and HMD frame output remain UNTESTED.",
+  "resolved_hold_reason": "C6_EXACT_SHA_GATES_SUCCESS",
+  "ci_policy_repair_note": "Fixed inherited 01060 feature-acceptance schema under the same 01061 failure-repair SHA. Did not re-score or revalidate 01060's old successful result."
+}

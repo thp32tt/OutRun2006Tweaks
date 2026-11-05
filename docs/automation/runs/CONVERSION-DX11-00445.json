@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00445",
+  "production_id": "CONVERSION-DX11-00445",
+  "event_id": "CONVERSION-DX11-00445-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "33085e79d3be30ebc4d38e9e120dbd1867f9f538",
+  "result_sha": "319ed4dbc186bf9ca7d5a76a1640f41c1a562099",
+  "material_result_sha": "319ed4dbc186bf9ca7d5a76a1640f41c1a562099",
+  "validation_bearing_result_sha": "319ed4dbc186bf9ca7d5a76a1640f41c1a562099",
+  "selected_work_item": "DX11_R307_R297_PRODUCTION_SOURCE_REVALIDATION_ANALYZER_BRIDGE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R307 adds signature-scoped analyzer ingestion for existing R297 productionSourceRevalidation telemetry, correlating missing-evidence mask, R258 receipt state, source/join snapshot state and keeping the evidence diagnostic-only with ActivationProof=false.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "319ed4dbc186bf9ca7d5a76a1640f41c1a562099"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered from durable 00444 state and exact branch history.",
+    "C1_REVIEW": "PASS: selected unconsumed R297 production source-revalidation telemetry.",
+    "C2_IMPLEMENT": "PASS: parser, signature correlation, fail-closed/inconsistent fixtures and source-graph guard added.",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37673014580; validate 112969287051 SUCCESS; DX11 readiness smoke 112972091848 SUCCESS.",
+    "C4_COMMIT": "PASS: material result 319ed4dbc186bf9ca7d5a76a1640f41c1a562099 contains [AUTO:CONVERSION-DX11-00445] and no CI-skip directive.",
+    "C5_PACKAGE": "NOT_REQUIRED: analyzer/static evidence change; CI artifact retained as validation evidence only.",
+    "C6_STATE": "PASS_RECOVERED: durable record restored after a later material task had already started."
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37673014580,
+    "validation_job_id": 112969287051,
+    "readiness_smoke_job_id": 112972091848,
+    "artifact_id": 11505574570,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-319ed4dbc186bf9ca7d5a76a1640f41c1a562099",
+    "artifact_digest": "sha256:8a0ed7e3c51fe88db51b43791601cd71e19b5abcea15416da7a8d4262592bdeb",
+    "issue14_comment_id": 6045521806
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_test_required": false,
+  "next_action": "Consume the next unparsed production evidence record while retaining fail-closed draw activation."
+}

@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00307",
+  "production_id": "CONVERSION-DXVK-00306",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00306-E003",
+  "event_type": "retry",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "02e09811ca1db4c566fd32e4e69eb4d9cf17ad00",
+  "source_implementation_sha": "2fe7017b2566705d72eeea63de53d4602ec9d330",
+  "result_sha": "2fe7017b2566705d72eeea63de53d4602ec9d330",
+  "validation_bearing_result_sha": "2fe7017b2566705d72eeea63de53d4602ec9d330",
+  "result_marker": "[AUTO:CONVERSION-DX11-00307]",
+  "selected_work_item": "DX11_R217_RESOURCE_INTROSPECTION_CENSUS_IDENTITY_GUARD",
+  "summary": "R217 makes resourceIntrospectionComplete part of the sampled DX11 signature identity so failed descriptor/introspection observations cannot alias fully observed draws whose descriptor fields retain the same defaults. Existing fail-closed ExactSamples behavior is preserved and NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/test_dx11_census_log_contract_r131.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "2fe7017b2566705d72eeea63de53d4602ec9d330"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 state, prior R213-R216 durable results, the R217 material commit, validation evidence, regression knowledge/history, and the current queue dispatch. No completed material work was repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set-05 F17 resource-introspection failures were already excluded from ExactSamples, but resourceIntrospectionComplete was absent from hash_signature. A failed observation could therefore share diagnostic signature identity with a fully observed draw when descriptor fields matched retained defaults.",
+      "review_lenses": {
+        "architecture": "Diagnostic census identity only; backend selection and NativeDrawPath activation are unchanged.",
+        "ownership_lifetime": "No COM/resource ownership, device reset, synchronization or lifetime behavior changes.",
+        "stereo_correctness": "No draw routing, eye submission, pose, or shared-frame transport behavior changes.",
+        "performance": "One boolean hash_mix input per sampled signature; no allocation or GPU work added.",
+        "adversarial": "Incomplete resource observation remains fail-closed both for exactness and for sampled signature identity."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "2fe7017b2566705d72eeea63de53d4602ec9d330 hashes sig.resourceIntrospectionComplete and aligns the census log contract and source-graph verifier with the R217 identity invariant."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "evidence": "Exact-SHA Backend Conversion Gate 37141413169 passed on 2fe7017b2566705d72eeea63de53d4602ec9d330. Validate job 111256457288 passed queue/baseline/backend/static-surface/source-graph/dormant-activation/census checks, Win32 configure/build, binary verification, and artifact upload. DX11 readiness smoke job 111257416315 passed all fixed-function, input-layout/signature, shader, constant-buffer, native-transport, surface-mirror, triangle-fan and pipeline-handoff probes."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "2fe7017b2566705d72eeea63de53d4602ec9d330"
+      ],
+      "validation_bearing_result_sha": "2fe7017b2566705d72eeea63de53d4602ec9d330",
+      "issue14_material_comment_id": 5971765941,
+      "issue14_validation_comment_id": 5971834781
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R217 changes dormant diagnostic census/static verification only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_implementation_comment_id": 5971765941,
+      "issue14_validation_comment_id": 5971834781,
+      "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Quest 3/VDXR runtime parity remains a separate activation and visual-correctness gate.",
+      "authoritative_metadata_correction_comment_id": 5971852864,
+      "superseded_rollover_comment_ids": [
+        5971836339,
+        5971846531
+      ],
+      "lane_state_commit": "11d0f10485a5e9e6ada4b198814afb370cc59604"
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37141413169,
+    "head_sha": "2fe7017b2566705d72eeea63de53d4602ec9d330",
+    "validate_job_id": 111256457288,
+    "readiness_smoke_job_id": 111257416315,
+    "artifact_id": 11280771890,
+    "artifact_digest": "sha256:251ebf29b7a4522096ea433c5a1f310e03db460bfd1b898e63321ba163f7492b"
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "issue14_comment_ids": [
+    5971765941,
+    5971834781,
+    5971852864
+  ],
+  "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00306",
+    "event_id": "CONVERSION-DXVK-00306-E003",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH"
+  },
+  "dispatch_correction_note": "The current user queue task is authoritative: PRODUCTION_ID=CONVERSION-DXVK-00306, EVENT_ID=CONVERSION-DXVK-00306-E003, EVENT_TYPE=retry, ATTEMPT=1/3. Concurrent rollover-resume metadata is superseded for dispatch metadata only; material result and exact-SHA validation remain unchanged.",
+  "completed_at_kst": "2026-10-04T02:52:11+09:00",
+  "superseded_rollover_dispatch": {
+    "production_id": "CONVERSION-DX11-00307",
+    "event_id": "CONVERSION-DX11-00307-E001",
+    "event_type": "rollover",
+    "chat_rollover": 2,
+    "issue14_comment_ids": [
+      5971836339,
+      5971846531
+    ],
+    "run_record_commit": "280e1fac6fcd75af54c7d1fe02d4f8e94a019c5d"
+  },
+  "authoritative_metadata_correction_comment_id": 5971852864
+}

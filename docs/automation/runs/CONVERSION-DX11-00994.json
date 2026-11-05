@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00994",
+  "production_id": "CONVERSION-DX11-00994",
+  "event_id": "CONVERSION-DX11-00994-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00994",
+  "work_key": "DX11:LIVE_GAME_PARTIAL_TARGET_DEPTH_GPU_REPLAY",
+  "feature_id": "DX11_NATIVE_LIVE_PARTIAL_TARGET_DEPTH_REPLAY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "6e7b739cb1749168608e2263d6d9465fc1369b09",
+  "material_result_sha": "d907c1ff3c55ca0b4961d5040f7e8786dfd2c6d4",
+  "validation_bearing_result_sha": "66c08264c25e604a767b50277414e6f3e65638b7",
+  "result_sha": "66c08264c25e604a767b50277414e6f3e65638b7",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "score_change": 0,
+  "summary": "Source-integrated native D3D11.0 live game partial TARGET|Z color+D32 depth coupled raster replay, opt-in and fail-closed to unchanged D3D9Ex menu/race/input/FFB/SkyGlow. Material code/test commit d907c1ff; causal current in-progress run-record repair 66c08264 allowed Fast --check-latest without modifying/weakening prior 00993 or exact gate. Same SHA 66c08264 all mandatory DX11 Fast/Backend/Windows Build/OpenXR/HUD Actions SUCCESS. Real OutRun/Quest3/VDXR, frame count and gamepad remain UNTESTED. Full native game renderer not proven complete.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_partial_color_replay.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_partial_target_depth_gpu_00994.cpp",
+    "tools/test_dx11_partial_target_depth_gpu_00994.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_NATIVE_LIVE_PARTIAL_TARGET_DEPTH_REPLAY",
+    "goal": "Replay a successful real-game D3D9 cropped TARGET|Z Clear as color and depth native D3D11 GPU operations without breaking the live menu-to-race draw chronology or DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_game_depth_color_pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_clear_to_D3D11_color_and_depth_gpu",
+        "expected_behavior": "Native full-frame clipped game TARGET|Z writes both color and D32 depth on D3D11.0 after active game Draw."
+      },
+      {
+        "id": "atomic_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "native_partial_clear_rejection_and_original_d3d9",
+        "expected_behavior": "Unsupported native DSV or any GPU raster failure vetoes native output while the original successful D3D9 Clear and game input remain authoritative."
+      },
+      {
+        "id": "portable_and_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "source_gpu_replay_cross_component_ci",
+        "expected_behavior": "Portable branch regressions and static producer/linkage checks pass with five unmodified exact-SHA Github Actions gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_game_depth_color_pair": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/dx11_partial_target_depth_gpu_00994.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks + Windows Build exact SHA 66c08264; no runtime pixel validation"
+    },
+    "atomic_fail_closed": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_partial_color_replay.hpp",
+        "tools/dx11_partial_target_depth_gpu_00994.cpp",
+        "tools/test_dx11_partial_target_depth_gpu_00994.py"
+      ],
+      "validation_command": "DX11 Fast focused positive/negative paired-path checks exact SHA 66c08264"
+    },
+    "portable_and_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-00994.json"
+      ],
+      "validation_command": "GitHub Actions Fast/Backend/Build/OpenXR/HUD 5/5 success on 66c08264"
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "C++ coupled game partial TARGET+Z source mutation, native GPU color/depth replay",
+      "C++ portable route regression, cross-file static linkage, unchanged DX11 Fast check"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D11.0 paired color and depth GPU shader rectangles use exact clipped game-authored regions in original order.",
+      "negative_regression": "Missing D32, depth owner, typed RTV or failed shader leaves native scene unpublished; D3D9 HRESULT and input unchanged.",
+      "component_integration": "D3D9 Clear success -> native mono framebuffer mutation -> D3D11 color RTV and native D32 depth DSV -> native guarded frame output."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_PARTIAL_TARGET_DEPTH_GPU_REPLAY",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_NEED_EXACT_SHA_AND_REAL_GAME_EVIDENCE: no actual OutRun, Quest3, draw/published counters verified.",
+    "activation_guard_and_fallback": "Opt-in DX11 only; DX9Ex D3D9 game Draw/Present, input, FFB and SkyGlow remain authoritative."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "66c08264c25e604a767b50277414e6f3e65638b7",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39701728406,
+        "conclusion": "success",
+        "sha": "66c08264c25e604a767b50277414e6f3e65638b7"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39701728325,
+        "conclusion": "success",
+        "sha": "66c08264c25e604a767b50277414e6f3e65638b7"
+      },
+      {
+        "name": "Build",
+        "run_id": 39701728286,
+        "conclusion": "success",
+        "sha": "66c08264c25e604a767b50277414e6f3e65638b7"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39701728459,
+        "conclusion": "success",
+        "sha": "66c08264c25e604a767b50277414e6f3e65638b7"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39701728474,
+        "conclusion": "success",
+        "sha": "66c08264c25e604a767b50277414e6f3e65638b7"
+      }
+    ],
+    "material_source_commit": "d907c1ff3c55ca0b4961d5040f7e8786dfd2c6d4",
+    "causal_ci_repair": "66c08264c25e604a767b50277414e6f3e65638b7"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub initial 6e7b739c latest lease no conflict.",
+    "C1_REVIEW": "PASS actual D3D11.0 partial TARGET|Z paired GPU replay missing from live game callsite.",
+    "C2_IMPLEMENT": "PASS material C++ source + minimal regression commit d907c1ff.",
+    "C3_VALIDATE": "PASS_EXACT_SHA required 5 GitHub Actions SUCCESS at 66c08264; game/HMD UNTESTED.",
+    "C4_COMMIT": "PASS material implementation d907c1ff and causal --check-latest CI record repair 66c08264; neither carries skip ci.",
+    "C5_PACKAGE": "NOT_REQUIRED no user-validated runtime-ready package; user deploys.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST; docs-only C6 checkpoint after validation."
+  },
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST"
+}

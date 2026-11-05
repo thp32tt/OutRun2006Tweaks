@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00406",
+  "production_id": "CONVERSION-DX11-00406",
+  "event_id": "CONVERSION-DX11-00406-E003",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R268_PROGRAMMABLE_SHADER_STAGE_INTERFACE_LINKAGE",
+  "base_sha": "6278e9cddb6645239cceb2442e5df3be1403af4b",
+  "result_sha": "2800992d257e3df13c9837a424ab913c7fc13261",
+  "source_implementation_sha": "22b6cf0b82ff8c61479cfbb213dfe66547d20b49",
+  "material_result_sha": "2800992d257e3df13c9837a424ab913c7fc13261",
+  "validation_bearing_result_sha": "2800992d257e3df13c9837a424ab913c7fc13261",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "summary": "R268 consumes exact R267 SM3 VS-output and PS-input interface semantics to derive fail-closed usage/index/component-coverage stage-linkage evidence toward the dormant R263 F21 semantic-translation receipt. NativeDrawPath, Draw and DrawIndexed remain unauthorized.",
+  "evidence": [
+    "pipeline_translation.hpp defines ProgrammableShaderInterfaceLinkageEvidence with exact matched-input semantics.",
+    "pipeline_translation.cpp derives linkage only from exact correctly staged R267 receipts and rejects missing semantics or insufficient component coverage.",
+    "dx11_constant_buffer_probe covers positive linkage, semantic mismatch, component-mask mismatch and stage inversion.",
+    "verify_dx11_source_graph.py seals the R268 source/test contract."
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Current user authority is CONVERSION-DX11-00406-E003 rollover / CHAT_ROLLOVER=2. This rollover is not a retry; ATTEMPT remains 1/3. GitHub SSOT was reconstructed from the existing R268 material lineage and run record without repeating completed C1/C2/C4 work."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected 00405 exact_next_action: R268 stage-linkage compatibility evidence from R267 VS-output/PS-input semantics."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added pair-level R268 linkage evidence plus positive/fail-closed regressions and source-graph guard without enabling native draw dispatch."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37288302451 completed SUCCESS for 2800992d257e3df13c9837a424ab913c7fc13261. validate job 111692418194 and DX11 readiness smoke probes job 111694408833 both succeeded. The smoke built and ran the DX11 constant-buffer probe carrying the R268 linkage regressions. Artifact 11335596863 digest sha256:b97f884f0a0d2ae44869b57ec6a2a383177246c0e685d4a865bbd77a21368b03. No real HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "R268 type, derivation, regressions and source-graph guard are committed through 2800992d257e3df13c9837a424ab913c7fc13261; each material commit contains [AUTO:CONVERSION-DX11-00406]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static/source semantic-linkage evidence only; no runtime candidate or binary payload is authorized."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "E003 rollover authority, ATTEMPT=1/3, material/validation-bearing SHA and exact-SHA CI receipts are persisted. RUNTIME_VALIDATION remains UNTESTED; NativeDrawPath, Draw and DrawIndexed remain unauthorized."
+    }
+  },
+  "exact_next_action": "A later independent DX11 task may route exact R268 stage-linkage provenance into production census/R263 semantic-translation evidence. Keep programmable translation, NativeDrawPath, Draw and DrawIndexed fail-closed until that separate production proof is exact.",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "initial_dispatch_event": "CONVERSION-DX11-00406-E001",
+  "status": "COMPLETE",
+  "implementation_commits": [
+    "d258dc24d557c7cfcb26cff57cf6c89957379e1f",
+    "22b6cf0b82ff8c61479cfbb213dfe66547d20b49",
+    "aae6eea53f5cd8a027efa90c07df5ba0ae4de38f",
+    "2800992d257e3df13c9837a424ab913c7fc13261"
+  ],
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "2800992d257e3df13c9837a424ab913c7fc13261",
+    "backend_conversion_gate": {
+      "run_id": 37288302451,
+      "conclusion": "success",
+      "validate_job_id": 111692418194,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 111694408833,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11335596863,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-2800992d257e3df13c9837a424ab913c7fc13261",
+      "artifact_digest": "sha256:b97f884f0a0d2ae44869b57ec6a2a383177246c0e685d4a865bbd77a21368b03"
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01059",
+  "production_id": "CONVERSION-DX11-01059",
+  "event_id": "CONVERSION-DX11-01059-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01059",
+  "classification": "A",
+  "feature_id": "DX11:GAME_MAIN_BACKBUFFER_STAGING_CONTINUITY",
+  "work_key": "DX11:FULL_SOURCE_READBACK_REENTRANCY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Recover real D3D9 main-backbuffer full-source readback through a private GPU RT after direct GetRenderTargetData rejection; suppress nested R30 StretchRect observer reentrancy during GPU tile and full fallback copies, retaining original game and DX9Ex input/FFB.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_surface_full_readback.hpp",
+    "tools/test_dx11_cpu_tile_admission_01057.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:GAME_MAIN_BACKBUFFER_STAGING_CONTINUITY",
+    "goal": "Keep authentic main-backbuffer menu, vehicle-selection and race pixels connected to native DX11 frame composition across driver-dependent readback rejection without deadlocking R30 hooks or changing the original D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_game_full_readback_recovery",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_D3D9_SOURCE_TO_NATIVE_D3D11",
+        "expected_behavior": "After authentic menu-to-race D3D9 source copy and direct readback failure, full-size private GPU RT staging feeds original pixels to native D3D11 region copy"
+      },
+      {
+        "id": "reentrant_r30_hook_suppression",
+        "category": "fallback_regression",
+        "behavior_area": "R30_D3D9_REENTRANCY_AND_GAME_FALLBACK",
+        "expected_behavior": "Both GPU tile and full GPU-copy paths suppress nested R30 mutation observation while State mutex is held and preserve original D3D9/FFB fallback"
+      },
+      {
+        "id": "readback_extent_and_reset_lifetime",
+        "category": "fallback_regression",
+        "behavior_area": "NATIVE_FULL_FRAME_BUDGET_AND_RESET",
+        "expected_behavior": "Full-source budget admission and exact owner/extent/format/system staging checks gate fallback, with D3D9 DEFAULT scratch reset before device Reset"
+      },
+      {
+        "id": "mandatory_five_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS_EXACT_SHA",
+        "expected_behavior": "DX11 Fast, Backend, Windows Build, OpenXR and HUD Inspector all succeed at the same final validation-bearing source SHA"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_GAME_D3D9_UPDATE_SURFACE_OR_STRETCH_RECT",
+      "GAME_BACKBUFFER_DIRECT_READBACK_OR_GUARDED_PRIVATE_GPU_RT",
+      "SYSTEMMEM_FULL_READBACK_AND_BUDGET",
+      "NATIVE_D3D11_UPDATE_SUBRESOURCE_AND_GPU_REGION_COPY",
+      "ORIGINAL_GAME_D3D9_AND_FFB_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_surface_full_readback.hpp",
+      "tools/test_dx11_cpu_tile_admission_01057.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01059 structured mutation source-link regression and exact-SHA native Windows/OpenXR build success",
+      "negative_regression": "Removing either nested-hook scope, GPU RT fallback, owner/format/reset guard invalidates 01059 source regression; original D3D9 remains fail-closed",
+      "component_integration": "R30 real D3D9 StretchRect success -> full GPU private RT fallback -> system staging -> native D3D11 CopySubresourceRegion"
+    },
+    "conflict_keys": [
+      "DX11:FULL_SOURCE_READBACK_REENTRANCY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive opt-in; unchanged original game D3D9/FFB; no DXVK or game rendering promotion",
+    "blocking_evidence": "The pre-existing s.surfaceReplayTile.capture uses hooked D3D9 StretchRect under State::mutex with no NativeOutputUploadScope; direct backbuffer GetRenderTargetData failure previously stopped native full-frame copy even if private RT staging could succeed."
+  },
+  "acceptance_results": {
+    "native_game_full_readback_recovery": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01059 source-link mutation probe PASS in DX11 Fast 40162429648; real game/Quest3 UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_surface_full_readback.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    },
+    "reentrant_r30_hook_suppression": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01059 destructive scoped-guard tests PASS in DX11 Fast 40162429648; hooked real OutRun callsite remains UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    },
+    "readback_extent_and_reset_lifetime": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Source-link mutation checks for owner, format, staging and full-source copy PASS; OpenXR and Windows build compile PASS; no runtime parity assumed",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_surface_full_readback.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    },
+    "mandatory_five_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub Actions identical SHA 697c96ad... SUCCESS: Fast 40162429648, Backend 40162429562, Windows Build 40162429600, OpenXR 40162429610, HUD Inspector 40162429590",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "docs/automation/runs/CONVERSION-DX11-01059.json"
+      ],
+      "validation_command": "GitHub REST workflow-runs?head_sha=697c96ad6956fec38e95643bcafa509dfcdf8de7"
+    }
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "An authentic native Draw count and native output across menu, vehicle and race remain UNTESTED on actual game/HMD hardware.",
+  "next_implementation_action": "Continue native programmable D3D9 Draw to D3D11 full-frame source integration; obtain real OutRun and Quest3/VDXR evidence before promoting runtime.",
+  "runtime_note": "No game/HMD session was performed. CI compiles and source tests do not prove native gameplay or actual driver readback recovery.",
+  "material_result_sha": "697c96ad6956fec38e95643bcafa509dfcdf8de7",
+  "validation_bearing_result_sha": "697c96ad6956fec38e95643bcafa509dfcdf8de7",
+  "feature_stage": "C6_STATE",
+  "ci_policy_repair_note": "None; no additional SHA or Gate rerun was needed.",
+  "resolved_hold_reason": "C6_EXACT_SHA_GATES_SUCCESS",
+  "validation_history": [
+    {
+      "exact_sha": "697c96ad6956fec38e95643bcafa509dfcdf8de7",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Five mandatory GitHub Actions completed success on one implementation source commit"
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "697c96ad6956fec38e95643bcafa509dfcdf8de7",
+    "dx11_fast_run_id": 40162429648,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 40162429562,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 40162429600,
+    "windows_build_conclusion": "success",
+    "openxr_architecture_run_id": 40162429610,
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_run_id": 40162429590,
+    "hud_inspector_conclusion": "success"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00568",
+  "production_id": "CONVERSION-DX11-00568",
+  "event_id": "CONVERSION-DX11-00568-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00568",
+  "base_sha": "641bfa9168158670fce49d5c2872e19e23229814",
+  "work_key": "DX11:MENU_RACE_BLEND_RGB_SELECTED_ALPHA_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real D3D9 GetTextureStageState factor-blended RGB and independently selected alpha",
+      "TextureCapture -> four HLSL PS compile/recreate -> D3D11 Draw/DrawIndexed",
+      "GPU readback -> diagnostic VISIBLE_FRAME_OUTPUT inset; original DX9Ex game input/present remain"
+    ],
+    "batch_components": [
+      "D3D9 state capture and fail-closed RGB/alpha operand admission",
+      "Four native PS stages and device lifecycle/dispatch integration",
+      "Python destructive graph mutation and numerical alpha/opacity regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "4 native real-game BLENDTEXTUREALPHA/BLENDDIFFUSEALPHA RGB with independently SELECTARG1/2 alpha",
+      "negative_regression": "16 source links destructively removed, invalid operations and numerical RGBA reference",
+      "component_integration": "Live D3D9 -> TextureCapture -> D3D11 Draw/DrawIndexed -> VISIBLE_FRAME_OUTPUT"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BLEND_RGB_SELECTED_ALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BLEND_SELECTED_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "BLEND_RGB_SELECTED_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Opt-in visible diagnostic only, game/menu/race/Quest3/VDXR NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1; DX9Ex authoritative Draw/input/Present; no gameplay promotion"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00568.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Authenticated GitHub head 641bfa9168158670fce49d5c2872e19e23229814, distinct from 00567 SUBTRACT feature",
+    "C1_REVIEW": "Two blend factor RGB ops lack independently selected stage0 alpha variants",
+    "C2_IMPLEMENT": "4 live capture->shader->D3D11 Draw pipelines, 16 destructive tests",
+    "C3_VALIDATE": "PASS_EXACT_SHA 181e87806713b151bf1436a3ee9237c15a9d3c92: Backend #38175816279; DX11 Fast #38175816269; Build #38175820734; OpenXR #38175820716; HUD #38175820705 — all SUCCESS",
+    "C4_COMMIT": "Material 6f750d441d4b39a52135f79a598d9d7cb9221b19 with exact repair/validation-bearing 181e87806713b151bf1436a3ee9237c15a9d3c92, both [AUTO:CONVERSION-DX11-00568], no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic opt-in",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; full exact-SHA five mandatory Gate families PASS; Quest3/VDXR/menu/vehicle/race/gamepad untested; separate bookkeeping commit with [skip ci]"
+  },
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "New independent DX11 native menu/race render-input integration item; do not retry 00568. Quest3/VDXR/gamepad and gameplay parity NEED_HMD_TEST; DXVK frozen.",
+  "state_persisted": true,
+  "material_result_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+  "validation_bearing_result_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+  "result_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+  "initial_material_sha": "6f750d441d4b39a52135f79a598d9d7cb9221b19",
+  "repair_result_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+  "validation_evidence": {
+    "exact_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+    "github_actions": [
+      {
+        "name": "backend",
+        "run_id": 38175816279,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      },
+      {
+        "name": "fast",
+        "run_id": 38175816269,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      },
+      {
+        "name": "build",
+        "run_id": 38175820734,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      },
+      {
+        "name": "openxr",
+        "run_id": 38175820716,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      },
+      {
+        "name": "hud",
+        "run_id": 38175820705,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
+}

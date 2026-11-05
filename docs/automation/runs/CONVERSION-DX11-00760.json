@@ -1,0 +1,138 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00760",
+  "production_id": "CONVERSION-DX11-00760",
+  "event_id": "CONVERSION-DX11-00760-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_FRAME_RT0_TARGET_CONTINUITY",
+  "feature_id": "DX11-FULL_FRAME_RT0_TARGET_CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "a8523fca62432abdcbdf0a1ddfa87b375b57e1d4",
+  "source_implementation_sha": "8e566cb8d534b245e8d4afc4d64731fd5aace0df",
+  "material_result_sha": "4e93e80337ebf301378e1b978fadbb6ba2dc9784",
+  "validation_bearing_result_sha": "4e93e80337ebf301378e1b978fadbb6ba2dc9784",
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_full_frame_empty_draw_probe_00755.cpp",
+    "tools/test_dx11_full_frame_empty_draw_00755.py",
+    "tools/test_dx11_native_frame_batch_00671.py",
+    "tools/test_dx11_full_frame_color_seed_00735.py",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "change_summary": "Every live D3D9 full-frame Draw/DrawIndexed rechecks its original successful whole-TARGET Clear-owned RT0/backbuffer COM identity, not only the first native GPU Draw. Reject intervening menu/vehicle offscreen targets or invalidated source without replacing original D3D9 Draw/Present/gamepad; add compiled positive/negative source admission tests and integrated fail-closed regressions.",
+  "feature_contract": {
+    "feature_id": "DX11-FULL_FRAME_RT0_TARGET_CONTINUITY",
+    "goal": "A real menu/vehicle/race source Draw cannot contaminate the native full-backbuffer frame after RT0 switches, while same-target Draw/DrawIndexed and fallback remain available.",
+    "acceptance_items": [
+      {
+        "id": "real-game-rt0-draw-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_d3d9_rt0_live_draw_to_native_d3d11",
+        "expected_behavior": "Require Clear-owned backbuffer for every native-admitted Draw/DrawIndexed, not just the first; allow valid contiguous same-target stream."
+      },
+      {
+        "id": "offscreen-rt0-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "menu_vehicle_race_offscreen_and_gamepad",
+        "expected_behavior": "Mismatched/invalidated RT0 aborts native publishing, without modifying game Draw/Present/input."
+      },
+      {
+        "id": "exact-sha-five-workflow-gates",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_backend_windows_openxr_hud",
+        "expected_behavior": "All five mandatory checks PASS on one validation-bearing SHA while runtime/Quest3 remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real-game-rt0-draw-continuity": "PASS",
+    "offscreen-rt0-fallback": "PASS",
+    "exact-sha-five-workflow-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "CLEAR_OWNED_RT0_PROVENANCE",
+      "NATIVE_D3D11_DRAW_DRAWINDEXED",
+      "SAME_PRESENT_FULL_FRAME",
+      "DX9EX_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source/CI verified full target provenance; actual menu/car/race HMD pixel equality NOT TESTED.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME and OUTRUN_DX11_FULL_GAME_FRAME explicit opt-in; no production promotion; original D3D9 Draw/Present/gamepad unchanged.",
+    "integration_path": [
+      "D3D9 successful whole-backbuffer Clear and source RT0 COM identity",
+      "Per-real-game Draw/DrawIndexed recheck native batch target; fail closed before GPU submission for foreign RT0",
+      "same-Present readback/presentation and DX9Ex fallback"
+    ],
+    "batch_components": [
+      "native batch RT0 strict admission and D3D9 bridge source identity",
+      "compiled C++ positive/negative RT0 transition and destructive integration validation"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "First and following live game source Draws with matching Clear-owned backbuffer admit and publish full native frame.",
+      "negative_regression": "Later offscreen/foreign target rejected even after first native submitted Draw; original D3D9/input preserved.",
+      "component_integration": "Live D3D9 GetRenderTarget(0) -> Clear identity -> batch native Draw/DrawIndexed -> same-Present provenance."
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_RT0_TARGET_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub branch a8523fca, prior 00759 C6 SUCCESS; inspected AGENTS, DX11_AUTODEV_EXECUTION_POLICY and live game frame source.",
+    "C1_REVIEW": "Post-first-native Draw skipped full Clear-owned RT0 check even when D3D9 game switched menu/vehicle offscreen RT0; independent full-frame contamination.",
+    "C2_IMPLEMENT": "C++ native frame batch and real Draw/DrawIndexed observer RT0 per-call check; compiled source and destructive tests; inherited assertion repairs under one task.",
+    "C3_VALIDATE": "Source and stale test contract corrections 8e566 -> ea975 -> cb132 -> 4e93e; final exact-SHA DX11 Fast, Backend, Win32 Build, OpenXR, HUD all success.",
+    "C4_COMMIT": "Source implementation 8e566cb8d534; material and exact validation bearing 4e93e80337ebf301378e1b978fadbb6ba2dc9784; no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED; user hardware release separate.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED, PASS_EXACT_SHA, NEED_HMD_TEST, UNTESTED"
+  },
+  "evidence": {
+    "validation_bearing_sha": "4e93e80337ebf301378e1b978fadbb6ba2dc9784",
+    "exact_sha_gate_results": [
+      {
+        "workflow": "DX11 Fast Structural Checks",
+        "run_id": 38693618471,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "Backend Conversion Gate",
+        "run_id": 38693618483,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "Build",
+        "run_id": 38693625701,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "OpenXR VR architecture",
+        "run_id": 38693625652,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 38693625804,
+        "conclusion": "success"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "source_only_limit": "No actual OutRun menu/car/race, gamepad or Quest3/VDXR run. Not DX11 gameplay promotion."
+  }
+}

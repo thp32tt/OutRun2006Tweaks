@@ -1,0 +1,101 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00755",
+  "production_id": "CONVERSION-DX11-00755",
+  "event_id": "CONVERSION-DX11-00755-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLGAME_SUCCESSFUL_EMPTY_DRAW_CONTINUITY",
+  "feature_id": "DX11-MENU-RACE-EMPTY-DRAW-CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "dca697191d1401e48471ca655349106917e1e829",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "5c8dc04ba8fbb709978d874f93d1097bf921cc65",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_full_frame_empty_draw_probe_00755.cpp",
+    "tools/test_dx11_full_frame_empty_draw_00755.py",
+    "docs/automation/runs/CONVERSION-DX11-00755.json"
+  ],
+  "change_summary": "Live full-size native D3D9 menu/vehicle/race Draw -> D3D11 scene continuity preserves successful zero-primitive source ordinals after actual game Draw without changing GPU targets; invalid/failing Draws retain original D3D9 and gamepad fallback.",
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-EMPTY-DRAW-CONTINUITY",
+    "goal": "Carry complete game-authored menu/vehicle/race native D3D11 frames across successful empty D3D9 Draw calls while preventing failed, unseeded or discontinuous scenes from changing original game output or gamepad.",
+    "acceptance_items": [
+      {
+        "id": "native-game-empty-draw-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_observed_game_draw_to_native_full_frame",
+        "expected_behavior": "After a real native Draw, successful D3D9 zero-primitive Draws count toward a single contiguous full-frame native Present without changing the color or depth target."
+      },
+      {
+        "id": "invalid-and-failed-draw-original-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_failure_and_input_fallback",
+        "expected_behavior": "Leading empty calls, skipped ordinals, failed original game Draws and unsupported topologies cannot publish an incomplete native frame; original D3D9 rendering and gamepad remain untouched."
+      },
+      {
+        "id": "full-exact-sha-windows-openxr-hud",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_backend_win32_openxr_hud",
+        "expected_behavior": "Portable C++ positive/negative source-sequence probe, destructive live-source wiring checks and exact SHA mandatory GitHub Actions succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-game-empty-draw-continuity": "PENDING_EXACT_SHA",
+    "invalid-and-failed-draw-original-input-fallback": "PENDING_EXACT_SHA",
+    "full-exact-sha-windows-openxr-hud": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Fully observed native full-size game Draw/DrawIndexed, then benign successful zero-primitive source calls, then more Draws may keep one same-Present full-sized native output without a fabricated D3D11 Draw; hardware not claimed.",
+    "activation_guard_and_fallback": "Full native activation remains opt-in; no seeded game Draw, unknown or failed topology, noncontiguous source ordinal and original game failure abort native publication; D3D9 Present and gamepad untouched.",
+    "conflict_keys": [
+      "DX11:FULLGAME_SUCCESSFUL_EMPTY_DRAW_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "D3D9 successful game Draw/DrawIndexed observed native scene -> exact source ordinal",
+      "Zero-primitive successful D3D9 Draw consumes ordinal with no GPU draw or target mutation -> subsequent native Draw -> full-size original game Present"
+    ],
+    "batch_components": [
+      "native_game_frame_batch.hpp source ordinal accounting and live_game_frame_bridge.cpp integration",
+      "C++17 positive/negative portable executable + destructive static wiring test + DX11 Fast action"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled portable C++17 exact contiguous Draw, empty Draw, empty Draw, Draw sequence can publish at same Present with stable depth direction.",
+      "negative_regression": "Leading empty, duplicate/skipped ordinal, aborted scene, missing pending source and failed original game Draw preserve D3D9 input and never publish native output.",
+      "component_integration": "game-authored Draw callback -> accepted native Draw -> GameNativeFrameBatch::absorb_empty_source_draw -> follow-on native Draw -> publishable_full -> same-Present D3D9 output"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS fetched authenticated branch and owner-specific 00754/previous commits",
+    "C1_REVIEW": "PASS observed zero-primitive source is treated as unsupported and aborts native full scene even when game call writes no pixels",
+    "C2_IMPLEMENT": "PASS actual C++ native source continuity and regression tests",
+    "C3_VALIDATE": "PASS_EXACT_SHA: exact validation-bearing commit 5c8dc04ba8fbb709978d874f93d1097bf921cc65; DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector GitHub Actions all SUCCESS; runtime UNTESTED.",
+    "C4_COMMIT": "source and tests committed together without CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: verified exact-SHA CI SUCCESS for 5c8dc04ba8fbb709978d874f93d1097bf921cc65; this separate bookkeeping [skip ci] commit leaves original material source and HMD state unchanged."
+  },
+  "c6_trigger_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+}

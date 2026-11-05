@@ -1,0 +1,176 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01223",
+  "production_id": "CONVERSION-DX11-01223",
+  "event_id": "CONVERSION-DX11-01223-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_repo": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_FVF_LINE_POINT_GPU_CAPTURE",
+  "classification": "A_UNFINISHED_REAL_GAME_NATIVE_FVF_LINE_POINT_PIXEL_PATH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "fb5f0f5399f3ce61518d4d4487dfd60c62264c26",
+  "material_implementation_sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+  "material_result_sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+  "validation_bearing_result_sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_fvf_stroke_sampling.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_fvf_stroke_capture_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "implementation": "Actual game FVF D3D9 POINTLIST/LINELIST/LINESTRIP converted native D3D11 Draws now supply authentic live clip-space source IA to optional RAW PRE/POST GPU capture. Homogeneous XY/Z/W and user ClipDistance clipping, real viewport/scissor and depth-clip state, bounded point/segment sampling, dual physically disjoint source GPU tiles. Source/invalid state fallback and actual GPU RGB/epoch/RT/Present proof unchanged. This is not complete native menu-car-race frame nor observed runtime output.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "REAL_D3D9_FVF_LINE_POINT_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_D3D11_FVF_LINE_POINT_DRAW",
+      "AUTHENTIC_SOURCE_STROKE_HOMOGENEOUS_CLIP",
+      "NATIVE_GPU_RAW_PRE_POST_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT",
+      "ORIGINAL_GAME_D3D9_PRESENT_FALLBACK"
+    ],
+    "integration_path": [
+      "LIVE_D3D9_FVF_IA_AND_PASS_THROUGH_NATIVE_VS",
+      "ACTUAL_NATIVE_D3D11_STROKE_DRAW_AND_RS",
+      "AUTHENTIC_CLIPPED_STROKE_GPU_SOURCE_TILES",
+      "REAL_GPU_RGB_DELTA_WITH_D3D9_PRESENT_FALLBACK"
+    ],
+    "batch_components": [
+      "REAL_GAME_NATIVE_LINE_AND_POINT_SOURCE_CAPTURE_BINDING",
+      "HOMOGENEOUS_USER_CLIPPED_INDEXED_LINE_AND_POINT_TILE_PLANNER",
+      "GPU_PRE_POST_DIAGNOSTIC_INTEGRATION",
+      "POSITIVE_NEGATIVE_PORTABLE_CXX_REGRESSION",
+      "UNMODIFIED_FIVE_EXACT_SHA_CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two genuine separated native FVF menu/HUD lines, connected indexed strips and point primitives select corresponding physical GPU source tiles with different capture ordinals; Windows game/host source compiles.",
+      "negative_regression": "Invalid IA index, W=0, nonfinite enabled ClipDistance, unsupported raster, depth-clipped source, overlap and absent pixel proof fail closed to existing RAW viewport sampler; original D3D9 Draw, gamepad/FFB/SkyGlow and DX9Ex unaffected.",
+      "component_integration": "live_game_frame_bridge.cpp authentic native FVF line/point IA -> NativeRawVisualPreview -> native_game_raw_fvf_stroke_sampling.hpp actual GPU tile PRE/POST -> native GPU RGB/RT/epoch/Present checks -> D3D9 fallback; exact source SHA five Actions including the new Fast C++ test."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_ONLY. LIVE_D3D9_CALLSITE / D3D11_NATIVE_DRAW / VISIBLE_FRAME_OUTPUT are conditional source code path labels, NOT observed game-native runtime evidence. Actual visible source-aligned GPU pixels require native RGB delta, source identity, GPU fence and original D3D9 Present. No full-frame menu/car/race or HMD proof. RUNTIME_VALIDATION=UNTESTED.",
+    "activation_guard_and_fallback": "Existing explicit DX11_RAW_VISUAL_DIAGNOSTIC opt-in only; actual original D3D9 renderer and Present, FFB/input/SkyGlow, DX9Ex fallback preserved; DXVK frozen. Never enable production native fullframe based on CI."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Bring source-authentic point and line native D3D11 game draw GPU pixel capture into the ongoing complete native game-frame integration while protecting native GPU proof and original game rendering.",
+    "acceptance_items": [
+      {
+        "id": "fvf_stroke_authentic_gpu_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_NATIVE_D3D11_POINT_LINE_GPU_CAPTURE",
+        "expected_behavior": "Real point/list/strip native Draws pass authentic clip-space indices and typed clip distances into per-Draw paired GPU PRE/POST tiles instead of full-viewport only."
+      },
+      {
+        "id": "stroke_negative_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_CLIP_AND_ORIGINAL_D3D9_FALLBACK",
+        "expected_behavior": "Nonfinite clip, W=0, bad IA, clipped points/lines and overlapping GPU tiles never grant native pixel acceptance; original game Draw/input/FFB/fallback remain unchanged."
+      },
+      {
+        "id": "five_exact_source_gates",
+        "category": "integrated_validation",
+        "behavior_area": "SOURCE_SHA_WIN32_FAST_BACKEND_OPENXR_HUD",
+        "expected_behavior": "Exact implementation SHA passes all five unweakened required GitHub Actions workflows."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "fvf_stroke_authentic_gpu_capture": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_stroke_sampling.hpp",
+        "tests/native_raw_fvf_stroke_capture_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #41786927214 SUCCESS at exact f544ea5847568481a497b2e39496e78837c7ec63; native source Windows Build #41786927145 SUCCESS."
+    },
+    "stroke_negative_safe_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_stroke_sampling.hpp",
+        "tests/native_raw_fvf_stroke_capture_test.cpp"
+      ],
+      "validation_command": "DX11 Fast #41786927214 and Backend #41786927128 SUCCESS on f544ea5847568481a497b2e39496e78837c7ec63; original D3D9 game input/FFB/SkyGlow/DXVK untouched."
+    },
+    "five_exact_source_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_fvf_stroke_capture_test.cpp"
+      ],
+      "validation_command": "Fast 41786927214, Backend 41786927128, Build 41786927145, OpenXR 41786927148 (attempt 2 network-only failed-job retry), HUD 41786927094: 5 SUCCESS on f544ea5847568481a497b2e39496e78837c7ec63."
+    }
+  },
+  "validation_gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 41786927214,
+      "sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 41786927128,
+      "sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 41786927145,
+      "sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 41786927148,
+      "sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+      "conclusion": "SUCCESS",
+      "run_attempt": 2,
+      "network_only_failed_job_retry": true
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 41786927094,
+      "sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "runtime_evidence": null,
+  "runtime_note": "No OutRun2006 game-run native GPU capture, real-game Draw>0/published-fullframe>0, or Quest3/VDXR stereo/HMD evidence at this new SHA. CI/WARP is source/build validation only.",
+  "real_game_draw_blocker": "NEW_SHA_RUNTIME_UNTESTED: authentic real-game Draw/native GPU RGB/Present remains to be observed and full-size menu-car-race source coverage has not been proven; prior observed zero native Draws applies only to older pinned source SHA.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Continue coherent native D3D11 full-size real-game Draw/DrawIndexed -> complete game frame -> native stereo OpenXR GPU path under controller-owned follow-on task; preserve owner lease and DXVK freeze. Need exact-SHA desktop and Quest3 HMD validation before promotion.",
+  "record_type": "C6_RESULT_ONLY_CORRECTIVE_CONTRACT_LABELS",
+  "score_note": "NO ADDITIONAL SCORE: still incomplete DX11 full-resolution native game frame feature. One 01223 source commit, exact-SHA Gates and C6 record represent one unpromoted source stage; failed-job network retry and this report +0. AI1 unaffected.",
+  "source_and_repair_commits": [
+    {
+      "sha": "f544ea5847568481a497b2e39496e78837c7ec63",
+      "kind": "SOURCE_IMPLEMENTATION_AND_EXACT_SHA_VALIDATION_BEARING_RESULT",
+      "summary": "Actual game native point/list/strip source -> homogeneous stroke clipping -> paired GPU tile capture, unchanged runtime guards and C++ regression. No causal source repair; OpenXR one network-failed job rerun at same SHA."
+    }
+  ],
+  "checkpoint": "C6_STATE_POLICY_PATH_LABEL_REPAIR_01224; source result SHA and five prior exact SHA gates unchanged"
+}
