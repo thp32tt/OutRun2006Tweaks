@@ -182,6 +182,12 @@ int main(){
         guestPointers.size(),records.data(),records.size(),0,fetched));
     // Runtime now injects Quest XYZ at the original mode1 producer input,
     // so the game's own swing/blend/ground clamp consumes it before XR.
+    // Native camera override is state==0x10 only. START=0x0d and
+    // GOAL=0x13 must preserve the unpatched PC mode1 camera table.
+    assert(!OriginalQuestGameCameraState(0x0du));
+    assert(OriginalQuestGameCameraState(0x10u));
+    assert(!OriginalQuestGameCameraState(0x13u));
+    assert(!OriginalQuestGameCameraState(0x1bu));
     // ARM64 selected profile X/Y/Z is written to x19[64] buffer by
     // 2E1598/2E1650/2E16C4 before the native 2E17F4 YZ addition.
     // Both +.32Y and +.55Z must be present exactly once in the

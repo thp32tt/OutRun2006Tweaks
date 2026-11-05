@@ -1485,6 +1485,9 @@ namespace OutRunVRRenderer
                 Settings::VRQuestCockpitV2Enabled &&
                 Settings::VRQuestCockpitV2ApkNativeCamera &&
                 Settings::VRQuestCockpitV2NativeSeatProfile &&
+                Game::current_mode &&
+                OutRunVR::QuestCockpitV2::OriginalQuestGameCameraState(
+                    static_cast<std::uint32_t>(*Game::current_mode)) &&
                 GameRendererIsActive() && questCamera &&
                 questCamera->cam_mode_34A==1;
 			const bool hostChanged = !CenterValid || CenterHostPid != sample.hostPid;

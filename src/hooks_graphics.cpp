@@ -543,9 +543,17 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // the mode1 table must already contain the Quest anchors before the
         // next camera tick; a frame-enter/frame-end-only scope is too late.
         if(!CaptureNativeSeatTable())return false;
+        const bool apkRaceGameState=
+            !Settings::VRQuestCockpitV2ApkNativeCamera ||
+            (Game::current_mode &&
+             OutRunVR::QuestCockpitV2::OriginalQuestGameCameraState(
+                static_cast<std::uint32_t>(*Game::current_mode)));
+        // Native Quest's state==0x10 camera admission is OFF during
+        // menu, START and GOAL. Restore PC view1 anchors there.
+        // Original PadSnapshot toggle remains unknown, not fabricated.
         const bool requested=
             Settings::VREnabled && Settings::VRQuestCockpitV2Enabled &&
-            Settings::VRQuestCockpitV2NativeSeatProfile;
+            Settings::VRQuestCockpitV2NativeSeatProfile && apkRaceGameState;
         if(!requested) {
             RestoreNativeSeatProfile();
             return true;

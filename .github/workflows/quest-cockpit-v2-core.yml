@@ -171,6 +171,9 @@ jobs:
           assert 'QuestCockpitV2SeatDown = 0.0' in ini
           assert 'QuestCockpitV2ApkNativeCamera = true' in ini
           assert 'OriginalQuestModeOneInput(' in hook
+          assert 'OriginalQuestGameCameraState(' in hook
+          assert 'OriginalQuestGameCameraState(' in native_renderer
+          assert 'OriginalQuestGameCameraState(0x10u)' in Path('tools/tests/quest_cockpit_v2_seat_smoke.cpp').read_text(encoding='utf-8')
           assert 'guestProfile.y+0.319999993f' in Path('src/vr/game/quest_cockpit_v2_seat.hpp').read_text(encoding='utf-8')
           assert 'if(rotationOnly) {' in r7 and 'nativeView._41=0.f;' in r7
           native_pose=Path('src/vr/game/quest_cockpit_v2_apk_xr_pose.hpp').read_text(encoding='utf-8')

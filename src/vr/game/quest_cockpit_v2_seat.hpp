@@ -71,6 +71,13 @@ inline bool OriginalQuestVrProfileAnchor(
 //   an eye/hand view matrix; separate controller correction terms exist.
 // This is original per-car camera input data, NOT a generic world
 // HMD translation. Never add the pair again to OpenXR eye matrices.
+// Quest run_game::$_5 at 0x2E3690..0x2E36C8 enables
+// PcRaceCameraInputs only when guest state==0x10 (STATE_GAME)
+// and the captured PadSnapshot toggle is asserted. This
+// helper verifies the state prerequisite, not the still-missing toggle.
+inline bool OriginalQuestGameCameraState(std::uint32_t guestState) noexcept {
+    return guestState==0x10u;
+}
 inline bool OriginalQuestModeOneInput(Vec3 guestProfile,
                                       Vec3& destination) noexcept {
     if(!Finite(guestProfile) || std::fabs(guestProfile.x)>5.f ||
