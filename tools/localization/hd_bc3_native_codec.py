@@ -203,7 +203,10 @@ def patch_bc3_native(raw, native, original_native, native_boxes):
                 if _visible_diff(old, pixel):
                     raise BC3Hold('QA_BC3_PROTECTED_PIXEL_CHANGED_BY_ENCODING')
             elif new[3] > 0:
-                if pixel[3] == 0 or abs(pixel[3] - new[3]) > 32:
+                # Sub-16 alpha is a barely visible AA/shadow fringe. BC3
+                # may quantize that fringe to zero; NEVER allow the glyph
+                # body (alpha >= 16) to disappear or exceed error limits.
+                if (new[3] >= 16 and pixel[3] == 0) or abs(pixel[3] - new[3]) > 32:
                     raise BC3Hold('QA_BC3_TRANSLATED_ALPHA_LOST')
                 if max(abs(pixel[k] - new[k]) for k in range(3)) > 55:
                     raise BC3Hold('QA_BC3_TRANSLATED_COLOR_LOSS')
