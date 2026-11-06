@@ -759,37 +759,53 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         ticket.valid=true;
         return ticket;
     }
-    static void DrawPreparedDinoFitV6(DinoFitV6DrawTicket& ticket) noexcept
+    // Return true only after the full replacement draw was submitted and
+    // the device state restored successfully. A failed/missing external
+    // sidecar must NEVER suppress the original player car.
+    static bool DrawPreparedDinoFitV6(DinoFitV6DrawTicket& ticket) noexcept
     {
         using namespace OutRunVR::QuestCockpitV2;
-        if(!ticket.valid || !ticket.device)return;
-        // The original callback is allowed to advance the game state. If it
-        // crossed out of race gameplay, discard the prepared draw rather than
-        // drawing a stale car into the loading/menu frame.
-        if(!NativeFrameTrace().Active() || !Game::current_mode ||
-           *Game::current_mode != STATE_GAME) {
-            ticket.valid=false;
-            return;
-        }
+        if(!ticket.valid || !ticket.device)return false;
+        ticket.valid=false; // single-use; a reentrant callback cannot reuse it
+        if(!NativeFrameTrace().Active() ||
+           NativeFrameTrace().ActiveEpoch()!=ticket.nativeFrame ||
+           !Game::current_mode || *Game::current_mode != STATE_GAME)
+            return false;
+        const auto* currentEye=OutRunVRRenderer::GetLatchedStereoFrameView();
+        if(!currentEye || !currentEye->valid ||
+           currentEye->poseSequence!=ticket.xrPose)
+            return false;
         const HRESULT hr=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
             ticket.device,ticket.world,ticket.view,ticket.projection);
+        const bool replacementSubmitted=SUCCEEDED(hr);
         if(Settings::VRTelemetry) {
             static std::uint64_t attempts=0;
             const auto sample=++attempts;
             if(sample<=8u || (sample&(sample-1u))==0u)
                 spdlog::info(
-                    "VR QUEST DINO FITV6: sample={} nativeFrame={} xrPose={} mode=1 drawHr=0x{:08X} originalPMT=UNCHANGED",
+                    "VR QUEST DINO EXCLUSIVE: sample={} nativeFrame={} xrPose={} "
+                    "drawHr=0x{:08X} originalCar={} originalPMT=UNCHANGED",
                     sample,ticket.nativeFrame,ticket.xrPose,
-                    static_cast<unsigned int>(hr));
+                    static_cast<unsigned int>(hr),
+                    replacementSubmitted?"SUPPRESSED":"FALLBACK");
         }
-        ticket.valid=false;
+        return replacementSubmitted;
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
         auto dino=PrepareDinoFitV6(player);
+        // Original 49F3E0 queues native vehicle PMT draws which may flush
+        // AFTER this callback. Calling it before drawing the external sidecar
+        // leaves two bodies/wheels/steering wheels in the same stereo frame.
+        // Do not mutate original game car data or rely on hiding D3D9 draws:
+        // skip the original DISPLAY callback ONLY after the replacement has
+        // actually been submitted successfully with matching eye/frame.
+        if(DrawPreparedDinoFitV6(dino))
+            return;
+        // Fail closed to the entire unchanged native display path, including
+        // deferred queues, occupant scopes and original glass handling.
         QuestCockpitGlassLive::PlayerCallback scope(player);
         PlayerCallbackHook.ccall<void>(player);
-        DrawPreparedDinoFitV6(dino);
     }
     static void __cdecl OnPlayerCallback(EVWORK_CAR* player)
     {
