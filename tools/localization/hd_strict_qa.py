@@ -13,7 +13,8 @@ import struct
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageOps, UnidentifiedImageError
-from hd_bc3_index_patch import patch_mip1
+from hd_bc3_index_patch import BC3Hold as PaletteHold, patch_mip1
+from hd_bc3_native_codec import patch_bc3_native
 from hd_existing_candidate_salvage import (
     candidate_lines as salvage_candidate_lines,
     pad_candidate_edge,
@@ -314,7 +315,23 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
             for x0, y0, x1, y1 in used
         ]
         raw_source = ImageOps.flip(source) if orientation == "FLIPY" else source
-        data, bc3_receipt = patch_mip1(raw, native, native_boxes, raw_source)
+        bc3_method = "DXT5_BC3_ORIGINAL_ENDPOINTS_INDEX_ONLY"
+        try:
+            # Prefer bit-exact original BC3 endpoints and all original color
+            # palette values. This path cannot perturb untouched pixels.
+            data, bc3_receipt = patch_mip1(raw, native, native_boxes, raw_source)
+        except PaletteHold as exc:
+            if str(exc) not in (
+                "QA_BC3_EXISTING_RGB_PALETTE_INSUFFICIENT",
+                "QA_BC3_EXISTING_ALPHA_PALETTE_INSUFFICIENT",
+            ):
+                raise
+            # Fallback only when SOURCE block palettes cannot express the
+            # existing high-quality A/B lettering. Recompress changed blocks
+            # only, with individual source/pixel protection and error ceilings.
+            # A failed proof stays HOLD; no unilateral visual approval.
+            data, bc3_receipt = patch_bc3_native(raw, native, raw_source, native_boxes)
+            bc3_method = "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY"
         if data[:128] != raw[:128] or len(data) != len(raw) or data == raw:
             raise ValueError("QA_BC3_SOURCE_FORMAT_OR_NOOP")
         actual_native = decode(data)
@@ -325,9 +342,13 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
         if any(ImageChops.multiply(ch, outside).getbbox() for ch in difference.split()):
             raise ValueError("QA_BC3_SAVED_PROTECTED_ATLAS_PIXEL_CHANGED")
         for roi in painted:
-            roi["dds_format"] = "DXT5_BC3_ORIGINAL_ENDPOINTS_INDEX_ONLY"
+            roi["dds_format"] = bc3_method
             roi["bc3_saved_format_receipt"] = bc3_receipt
-            roi["auto_salvage"].append("DXT5_INDEX_ONLY_VISUAL_QA_REQUIRED")
+            roi["auto_salvage"].append(
+                "DXT5_INDEX_ONLY_VISUAL_QA_REQUIRED"
+                if bc3_method == "DXT5_BC3_ORIGINAL_ENDPOINTS_INDEX_ONLY"
+                else "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+            )
         return data, actual_readable, clean, painted, holds
     masks = struct.unpack_from("<IIII", raw, 92)
     fmt = "BGRA" if masks == (0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000) else "RGBA"
