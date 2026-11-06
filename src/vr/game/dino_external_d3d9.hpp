@@ -250,7 +250,16 @@ public:
     ~GpuOwner(){ReleaseGpu();}
     GpuOwner(const GpuOwner&)=delete;
     GpuOwner& operator=(const GpuOwner&)=delete;
-    void OnDeviceReset() noexcept {ReleaseGpu();gpuRetry_.OnReset();}
+    void OnDeviceReset() noexcept {
+        ReleaseGpu();
+        gpuRetry_.OnReset();
+        // A missing/corrupt sidecar is not retried on every eye draw.
+        // Re-arm only after a real device reset or race->menu boundary so a
+        // corrected OVC can be picked up next race without restarting the EXE.
+        // Preserve a successfully parsed CPU model across device-loss resets
+        // to avoid re-reading 100+ MiB of DDS from disk during gameplay.
+        if(!loaded_)loadAttempted_=false;
+    }
     bool Loaded() const noexcept {return loaded_;}
     bool EnsureResources(IDirect3DDevice9* device) noexcept {
         try{return EnsureGpu(device);}catch(...){return RejectGpu(device);}
