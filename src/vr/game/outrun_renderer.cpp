@@ -2533,7 +2533,18 @@ namespace OutRunVRRenderer
     bool GetQuestNativeEyeInverse(float outMatrix[16],
         int eye,std::uint32_t& poseSequence) noexcept
     {
+        // An F11 change, GAME->GOAL transition or failed guest profile
+        // rollback can happen after scene pose latching. Never hand a later
+        // Draw a native eye matrix once the seat producer was invalidated.
+        const auto* liveCamera=Game::camera();
         if(!outMatrix || eye<0 || eye>1 || !QuestNativeEyesValid ||
+           !OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Ready() ||
+           !OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.load(
+               std::memory_order_acquire) ||
+           !liveCamera || liveCamera->cam_mode_34A!=1 ||
+           !Game::current_mode ||
+           !OutRunVR::QuestCockpitV2::OriginalQuestGameCameraState(
+               static_cast<std::uint32_t>(*Game::current_mode)) ||
            QuestNativeEyePoseSequence==0 ||
            QuestNativeEyePoseSequence!=LatchedPoseSequence) return false;
         std::memcpy(outMatrix,&QuestNativeEyeInverse[eye],

@@ -173,6 +173,9 @@ jobs:
           native_renderer=Path('src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')
           assert 'NativeSeatCameraTick.Ready()' in native_renderer
           assert 'NativeQuestEyeEligible(' in native_renderer
+          native_eye_getter=native_renderer.split('bool GetQuestNativeEyeInverse(',1)[1].split('bool GetLatchedHeadInverse(',1)[0]
+          assert 'NativeSeatCameraTick.Ready()' in native_eye_getter
+          assert 'OriginalQuestGameCameraState(' in native_eye_getter
           assert 'SeatTablePatched=true;' in hook
           assert 'OriginalQuestVrProfileAnchor(' in hook
           assert 'QuestCockpitV2SeatBack = 0.0' in ini
