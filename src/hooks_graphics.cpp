@@ -15,6 +15,7 @@
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
 #include "vr/game/quest_cockpit_v2_glass_hook.hpp"
 #include "vr/game/dino_external_d3d9.hpp"
+#include "vr/game/dino_external_original_car_gate.hpp"
 #include "vr/state/state_block_tracker.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
@@ -697,6 +698,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         IDirect3DDevice9* device=nullptr;
         D3DMATRIX world{},view{},projection{};
+        std::uintptr_t originalPlayer=0;
         std::uint64_t nativeFrame=0,xrPose=0;
         bool valid=false;
         DinoFitV6DrawTicket()=default;
@@ -704,8 +706,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         DinoFitV6DrawTicket& operator=(const DinoFitV6DrawTicket&)=delete;
         DinoFitV6DrawTicket(DinoFitV6DrawTicket&& other) noexcept
             :device(other.device),world(other.world),view(other.view),
-             projection(other.projection),nativeFrame(other.nativeFrame),
-             xrPose(other.xrPose),valid(other.valid)
+             projection(other.projection),originalPlayer(other.originalPlayer),
+             nativeFrame(other.nativeFrame),xrPose(other.xrPose),valid(other.valid)
         {
             other.device=nullptr;other.valid=false;
         }
@@ -750,6 +752,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // callback. During race->menu teardown that callback may release or
         // recycle EVWORK_CAR; nothing after it may dereference 'player'.
         ticket.world=player->matrix_B0;
+        ticket.originalPlayer=reinterpret_cast<std::uintptr_t>(player);
         ticket.view=*nativeView;
         ticket.projection=*nativeProjection;
         ticket.nativeFrame=NativeFrameTrace().ActiveEpoch();
@@ -765,19 +768,33 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     static bool DrawPreparedDinoFitV6(DinoFitV6DrawTicket& ticket) noexcept
     {
         using namespace OutRunVR::QuestCockpitV2;
-        if(!ticket.valid || !ticket.device)return false;
-        ticket.valid=false; // single-use; a reentrant callback cannot reuse it
-        if(!NativeFrameTrace().Active() ||
-           NativeFrameTrace().ActiveEpoch()!=ticket.nativeFrame ||
-           !Game::current_mode || *Game::current_mode != STATE_GAME)
-            return false;
-        const auto* currentEye=OutRunVRRenderer::GetLatchedStereoFrameView();
-        if(!currentEye || !currentEye->valid ||
-           currentEye->poseSequence!=ticket.xrPose)
+        const bool liveRace=Game::current_mode &&
+            *Game::current_mode==STATE_GAME;
+        const auto* currentEye=liveRace ?
+            OutRunVRRenderer::GetLatchedStereoFrameView():nullptr;
+        const auto* camera=liveRace?Game::camera():nullptr;
+        const OutRunVR::DinoSidecar::OriginalCarGate gate{
+            Settings::VRDinoExternalCockpit && Settings::VREnabled &&
+                Settings::VRQuestCockpitV2Enabled && Settings::VRStereo,
+            ticket.originalPlayer!=0 && liveRace &&
+                reinterpret_cast<std::uintptr_t>(Game::pl_car())==
+                    ticket.originalPlayer,
+            liveRace,
+            camera && camera->cam_mode_34A==1,
+            currentEye && currentEye->valid,
+            NativeFrameTrace().Active(),
+            ticket.valid && ticket.device!=nullptr,
+            ticket.nativeFrame,NativeFrameTrace().ActiveEpoch(),
+            ticket.xrPose,currentEye?currentEye->poseSequence:0
+        };
+        ticket.valid=false; // single-use; prevent nested callback reuse
+        if(!OutRunVR::DinoSidecar::CanReplaceOriginalCar(gate))
             return false;
         const HRESULT hr=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
             ticket.device,ticket.world,ticket.view,ticket.projection);
-        const bool replacementSubmitted=SUCCEEDED(hr);
+        const bool replacementSubmitted=
+            OutRunVR::DinoSidecar::SuppressOriginalCarAfterExternalDraw(
+                gate,SUCCEEDED(hr));
         if(Settings::VRTelemetry) {
             static std::uint64_t attempts=0;
             const auto sample=++attempts;
