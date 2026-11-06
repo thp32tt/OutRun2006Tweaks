@@ -265,7 +265,10 @@ def patch_bc3_native(raw, native, original_native, native_boxes):
                 # Alpha>=16 text/glow still obeys the original strict 55
                 # channel error ceiling; no visible glyph may be color-lost.
                 if new[3] >= 16 and max(abs(pixel[k] - new[k]) for k in range(3)) > 55:
-                    raise BC3Hold('QA_BC3_TRANSLATED_COLOR_LOSS')
+                    failure = BC3Hold('QA_BC3_TRANSLATED_COLOR_LOSS')
+                    # Exact native pixel for safe ROI-specific fail-closed retry.
+                    failure.native_xy = (x0 + i % 4, y0 + i // 4)
+                    raise failure
             elif pixel[3] > 8:
                 raise BC3Hold('QA_BC3_ENGLISH_ALPHA_RESIDUE')
         offset = 128 + (by*blocks_x + bx)*16

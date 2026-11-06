@@ -1,5 +1,6 @@
 """Synthetic A/B ImageGen batch atlas regression gates; no font fallback."""
 import importlib.util, io, struct, tempfile, unittest
+from unittest.mock import patch
 from pathlib import Path
 from PIL import Image, ImageDraw
 
@@ -155,7 +156,40 @@ class MultiAtlasTest(unittest.TestCase):
   self.assertEqual(m.dominant_container_holds(rows),{"a"})
   self.assertEqual(m.conflicting_rois(rows[1:]),{"b","c"})
 
- def test_no_font_regeneration(self):
+  def test_bc3_exact_failure_quarantines_only_offending_roi(self):
+   rows=[{"roi_id":"Q052_1111111111111111","_bbox":[4,4,60,32]},
+         {"roi_id":"Q052_2222222222222222","_bbox":[80,4,120,32]}]
+   error=m.NativeBC3Hold("QA_BC3_TRANSLATED_COLOR_LOSS")
+   error.native_xy=(8,12)
+   receipt=(b"native-dds",None,None,[{"roi_id":rows[1]["roi_id"]}],
+            [{"roi_id":rows[0]["roi_id"],"reason":"QA_BC3_TRANSLATED_COLOR_LOSS"}])
+   with patch.object(m,"process_strict_atlas",side_effect=[error,receipt]) as fn:
+    result=m.process_strict_with_bc3_quarantine(fake_native(),rows,Path("."),"NORMAL")
+    self.assertEqual(result,receipt)
+    self.assertEqual(fn.call_count,2)
+    self.assertEqual(fn.call_args.kwargs["excluded_bc3"],{rows[0]["roi_id"]})
+
+  def test_bc3_ambiguous_failure_stays_held(self):
+   rows=[{"roi_id":"a","_bbox":[4,4,60,32]},
+         {"roi_id":"b","_bbox":[8,8,70,40]}]
+   error=m.NativeBC3Hold("QA_BC3_TRANSLATED_COLOR_LOSS")
+   error.native_xy=(8,12)
+   with patch.object(m,"process_strict_atlas",side_effect=error) as fn:
+    with self.assertRaisesRegex(m.NativeBC3Hold,"COLOR_LOSS"):
+     m.process_strict_with_bc3_quarantine(fake_native(),rows,Path("."),"NORMAL")
+    self.assertEqual(fn.call_count,1)
+
+  def test_bc3_flipy_failure_maps_native_y_to_source_row(self):
+   rows=[{"roi_id":"a","_bbox":[4,96,60,125]},
+         {"roi_id":"b","_bbox":[80,4,120,32]}]
+   error=m.NativeBC3Hold("QA_BC3_TRANSLATED_COLOR_LOSS")
+   error.native_xy=(8,15)
+   with patch.object(m,"process_strict_atlas",side_effect=[
+       error,(b"dd",None,None,[],[])]) as fn:
+    m.process_strict_with_bc3_quarantine(fake_native(),rows,Path("."),"FLIPY")
+    self.assertEqual(fn.call_args.kwargs["excluded_bc3"],{"a"})
+
+  def test_no_font_regeneration(self):
   s=src.read_text()
   for term in ("ImageFont","truetype(","draw.text(","font_path"):
    self.assertNotIn(term,s)

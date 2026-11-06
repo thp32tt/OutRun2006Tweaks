@@ -11,6 +11,7 @@ from pathlib import Path, PurePosixPath
 from PIL import Image, ImageChops, ImageDraw, ImageOps, UnidentifiedImageError
 from hd_strict_qa import process_strict_atlas
 from hd_bc3_index_patch import bc3_shape
+from hd_bc3_native_codec import BC3Hold as NativeBC3Hold
 
 CROSS="localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
 ORIGINAL="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
@@ -299,6 +300,32 @@ def zput(z,name,raw):
  i.compress_type=zipfile.ZIP_DEFLATED
  z.writestr(i,raw,compresslevel=4)
 
+def process_strict_with_bc3_quarantine(raw,rows,repo,orientation):
+ # Quarantine up to four exact, unambiguous failing ROIs per DDS.
+ # Every other original ROI and protected pixel is still independently gated.
+ excluded=set()
+ for _ in range(min(5,len(rows)+1)):
+  try:
+   return process_strict_atlas(raw,rows,repo,orientation,native_image,
+    imported_candidate,conflicting_rois,dominant_container_holds,
+    excluded_bc3=excluded)
+  except NativeBC3Hold as exc:
+   if str(exc)!="QA_BC3_TRANSLATED_COLOR_LOSS":raise
+   xy=getattr(exc,"native_xy",None)
+   if not(isinstance(xy,tuple) and len(xy)==2 and
+          all(isinstance(v,int) for v in xy)):raise
+   x,ny=xy
+   height=struct.unpack_from("<I",raw,12)[0]
+   y=height-1-ny if orientation=="FLIPY" else ny
+   matches=[r["roi_id"] for r in rows
+    if r["roi_id"] not in excluded and
+       r["_bbox"][0]<=x<r["_bbox"][2] and
+       r["_bbox"][1]<=y<r["_bbox"][3]]
+   if len(matches)!=1:raise
+   excluded.add(matches[0])
+ raise ValueError("QA_BC3_COLOR_ISOLATION_BUDGET_EXHAUSTED")
+
+
 def build(root,out):
  root=Path(root).resolve();out=Path(out).resolve()
  if out.is_relative_to(root):raise ValueError("OUTPUT_INSIDE_REPO_FORBIDDEN")
@@ -325,8 +352,8 @@ def build(root,out):
    holds.append({"target":target,"reason":"SOURCE_DDS_SHA_MISMATCH","rows":imported,"roi_ids":[r["roi_id"] for r in imported_rows]});continue
   orientation=orientations[target]
   try:
-   binary,readable,clean,painted,local_holds=process_strict_atlas(raw,rows,root,orientation,
-    native_image,imported_candidate,conflicting_rois,dominant_container_holds)
+   binary,readable,clean,painted,local_holds=process_strict_with_bc3_quarantine(
+    raw,rows,root,orientation)
    if painted:
     archive[target]=binary
     thumb=readable.copy()

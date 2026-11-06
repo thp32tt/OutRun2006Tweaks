@@ -280,7 +280,7 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
 
 
 def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
-                         conflict_fn, coarse_fn):
+                         conflict_fn, coarse_fn, excluded_bc3=frozenset()):
     source = decode(raw)
     if orientation == "FLIPY":
         source = ImageOps.flip(source)
@@ -298,6 +298,10 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
             continue
         if rid in conflicts:
             holds.append({"roi_id": rid, "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"})
+            continue
+        if rid in excluded_bc3:
+            # Preserve the full original ROI rather than leaving fragments.
+            holds.append({"roi_id": rid, "reason": "QA_BC3_TRANSLATED_COLOR_LOSS"})
             continue
         try:
             other_boxes = [r["_bbox"] for r in rows
