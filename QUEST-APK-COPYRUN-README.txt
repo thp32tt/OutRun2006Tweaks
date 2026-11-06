@@ -16,8 +16,10 @@ camera. It does NOT load Dino GLB, replacement meshes or external textures.
    files, activates DX9Ex and starts the VR cockpit.
 3. Use RUN-QUEST-APK-SKY-DIAG.cmd to capture bounded sky/vehicle evidence.
    Use RUN-QUEST-APK-INTERP-OFF.cmd for road-jitter interpolation A/B.
-4. RESTORE-QUEST-APK-COCKPIT.cmd restores the original files backed up
-   by the first launch. Close the game first.
+4. RESTORE-QUEST-APK-COCKPIT.cmd restores the files backed up by the
+   current test cycle. Close the game first. A successful restore archives
+   that baseline under QUEST_APK_COPYRUN_BACKUP_HISTORY, so a later test
+   creates a fresh backup instead of reusing an old pre-restore snapshot.
 
 The ZIP contains NO top-level dinput8.dll, d3d9.dll, VR host,
 OutRun2006Tweaks.ini, original game EXE or PMT/car/texture assets.

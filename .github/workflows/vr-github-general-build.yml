@@ -409,6 +409,41 @@ jobs:
               }
               Remove-Item -LiteralPath 'OR2006C2C.EXE' -Force
               $global:LASTEXITCODE=0
+
+              # Corrupted prior backup must make VERIFY fail before any launch.
+              $activeBackup=Join-Path $cmdProbe 'QUEST_APK_COPYRUN_ORIGINAL_BACKUP'
+              New-Item -ItemType Directory -Force -Path (Join-Path $activeBackup 'root') | Out-Null
+              $badManifest=[ordered]@{
+                SchemaVersion=1
+                SourceSha=$env:GITHUB_SHA
+                Entries=@([ordered]@{Scope='root';Name='dinput8.dll';Existed=$true;Sha256=('0'*64)})
+              }
+              $badManifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath (Join-Path $activeBackup 'original_files.json') -Encoding UTF8
+              & $env:ComSpec /d /v:on /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              $probeExit=$LASTEXITCODE
+              if($probeExit -eq 0){throw 'corrupted original backup was not rejected by VERIFY'}
+              Remove-Item -LiteralPath $activeBackup -Recurse -Force
+              $global:LASTEXITCODE=0
+
+              # A successful synthetic restore must archive the active baseline
+              # so the next test cycle cannot reuse a stale pre-restore snapshot.
+              New-Item -ItemType Directory -Force -Path $activeBackup | Out-Null
+              $restoreManifest=[ordered]@{
+                SchemaVersion=1
+                SourceSha=$env:GITHUB_SHA
+                Entries=@([ordered]@{Scope='root';Name='COPYRUN_SYNTHETIC_PROBE.tmp';Existed=$false;Sha256=''})
+              }
+              $restoreManifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath (Join-Path $activeBackup 'original_files.json') -Encoding UTF8
+              & $windowsPs -NoProfile -ExecutionPolicy Bypass -File '.\QuestCockpit-CopyRestore.ps1'
+              $probeExit=$LASTEXITCODE
+              if($probeExit -ne 0){throw "synthetic restore/archive probe failed exit=$probeExit"}
+              if(Test-Path -LiteralPath $activeBackup){throw 'successful restore left stale active backup directory'}
+              $history=Join-Path $cmdProbe 'QUEST_APK_COPYRUN_BACKUP_HISTORY'
+              if(!(Test-Path -LiteralPath $history -PathType Container) -or
+                 @(Get-ChildItem -LiteralPath $history -Directory).Count -ne 1){
+                throw 'successful restore did not archive exactly one completed baseline'
+              }
+              $global:LASTEXITCODE=0
             } finally {
               Pop-Location
               Remove-Item -LiteralPath $cmdProbe -Recurse -Force -ErrorAction SilentlyContinue

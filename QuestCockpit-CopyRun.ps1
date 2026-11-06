@@ -23,6 +23,9 @@ function Assert-BackupManifest([string]$manifestPath,[string]$backupRoot){
     if($m.SchemaVersion -ne 1 -or !$m.Entries){
         throw 'Existing original backup manifest is invalid; refusing to modify the game folder.'
     }
+    if($m.RestoredUtc){
+        throw 'Existing original backup was already restored but not archived; refusing stale baseline reuse.'
+    }
     $sourceId=[string]$m.SourceSha
     if($sourceId.Length -ne 40 -or $sourceId -match '[^0-9a-f]'){
         throw 'Existing original backup source identity is invalid.'
