@@ -1,4 +1,5 @@
 name: OutRun DXT5 HD 3-Atlas Real-Source Canary (GitHub CPU)
+# Recheck native exact-source texture after low-alpha Hangul fringe safety fix.
 # DXT5 depth-one regression retest: real source header dwDepth=1 is valid 2D.
 
 # Recheck exact-HD source pixel constraints after safe alpha-zero endpoint fallback.
