@@ -61,6 +61,9 @@ jobs:
           assert 'GlobalGpu().DrawNativeScene(' in hook
           assert 'OnDeviceReset()' in renderer
           assert 'OUTRUN_VR_DINO_PBR_TEST' in renderer
+          for sampler in (1, 2):
+              assert f'SetSamplerState({sampler},D3DSAMP_MAXMIPLEVEL,0u)' in renderer
+              assert f'SetSamplerState({sampler},D3DSAMP_MIPMAPLODBIAS,0u)' in renderer
           print('DINO_ORIGINAL_CAR_CALLBACK_EXCLUSIVE_TRANSACTION_CONTRACT_PASS')
           PY
   win32-script-compat:
