@@ -96,6 +96,19 @@ class DXT5OriginalProtection(unittest.TestCase):
         offset = 128 + 16*(6*8+6)
         self.assertEqual(raw[offset:offset+16], patched[offset:offset+16])
 
+    def test_thin_antialiased_hangul_alpha_never_quantizes_to_zero(self):
+        alphas = [0, 1, 3, 5, 12, 18, 25, 32,
+                  40, 60, 100, 130, 170, 200, 240, 255]
+        original = [(255, 250, 240, a) for a in alphas]
+        encoded = bc.encode_bc3_block(original)
+        decoded = bc.decode_bc3_block(encoded)
+        for src, dst in zip(original, decoded):
+            if src[3] > 0:
+                self.assertGreater(dst[3], 0, "A tiny alpha edge may not disappear")
+            self.assertLessEqual(abs(src[3] - dst[3]), 32)
+        self.assertTrue(encoded[0] <= encoded[1],
+                        "Low-alpha edge uses explicit 0/255 BC3 mode")
+
     def test_pillow_and_manual_dxt5_decoding_agree(self):
         raw, source = fake_dxt5()
         block = raw[128:144]
