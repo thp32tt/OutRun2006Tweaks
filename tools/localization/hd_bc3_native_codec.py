@@ -56,12 +56,47 @@ def encode_bc3_block(pixels):
     if len(pixels) != 16:
         raise BC3Hold('QA_BC3_BLOCK_NOT_16_PIXELS')
     alphas = [p[3] for p in pixels]
-    a0, a1 = max(alphas), min(alphas)
-    palette = _alpha_palette(a0, a1)
-    alpha_indexes = 0
-    for i, alpha in enumerate(alphas):
-        best = min(range(8), key=lambda k: (abs(alpha-palette[k]), k))
-        alpha_indexes |= best << (3*i)
+    hi_alpha, lo_alpha = max(alphas), min(alphas)
+    positive = [a for a in alphas if a > 0]
+    min_positive = min(positive) if positive else 0
+    # BC3 has two alpha interpolation modes: a0 > a1 yields 8
+    # interpolated values, while a0 <= a1 explicitly includes 0 and 255.
+    # In thin anti-aliased Hangul strokes, min alpha can be 1 while a
+    # nearby full-strength stroke is 255. The naive (255,0) palette then
+    # rounds alpha=1 to zero, making a native glyph edge disappear.
+    # Evaluate deterministic endpoint pairs, preferring a mode with explicit
+    # zero and a small positive endpoint if that preserves every stroke.
+    candidates = [
+        (hi_alpha, lo_alpha),
+        (min_positive, hi_alpha),
+        (min_positive, 255),
+        (0, hi_alpha),
+        (0, 255),
+    ]
+    best_encoding = None
+    for pair in dict.fromkeys(candidates):
+        palette = _alpha_palette(*pair)
+        indexes = []
+        errors = []
+        valid = True
+        for alpha in alphas:
+            # A positive source alpha can NEVER be mapped to visible zero.
+            choices = [k for k in range(8) if alpha == 0 or palette[k] > 0]
+            if not choices:
+                valid = False
+                break
+            idx = min(choices, key=lambda k: (abs(alpha - palette[k]), k))
+            indexes.append(idx)
+            errors.append(abs(alpha - palette[idx]))
+        if not valid:
+            continue
+        key = (max(errors), sum(errors), pair)
+        if best_encoding is None or key < best_encoding[0]:
+            best_encoding = (key, pair, indexes)
+    if best_encoding is None:
+        raise BC3Hold('QA_BC3_NO_ALPHA_PALETTE_WITH_POSITIVE_STROKES')
+    a0, a1 = best_encoding[1]
+    alpha_indexes = sum(idx << (3*i) for i, idx in enumerate(best_encoding[2]))
     visible = [p for p in pixels if p[3] > 0] or pixels
     lo = min(visible, key=lambda p: (sum(p[:3]), p[:3]))
     hi = max(visible, key=lambda p: (sum(p[:3]), p[:3]))
