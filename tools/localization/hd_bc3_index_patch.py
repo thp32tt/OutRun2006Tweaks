@@ -162,7 +162,7 @@ def patch_mip1(original, native_final, native_boxes, native_source=None):
                 ci = (ci & ~(3 << (2 * index))) | (c << (2 * index))
             ai = (ai & ~(7 << (3 * index))) | (a << (3 * index))
         if need_rebase:
-            output[offset:offset + 2] = b"\\xff\\x00"
+            output[offset:offset + 2] = bytes((255, 0))
         output[offset + 2:offset + 8] = ai.to_bytes(6, "little")
         output[offset + 12:offset + 16] = ci.to_bytes(4, "little")
         touched.append((bx, by, changed_in_block))
