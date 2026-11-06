@@ -1,0 +1,31 @@
+{
+  "coordinate_space": "Decoded PMT object-local coordinates in native units",
+  "physical_units_verified": false,
+  "anchors": [
+    {
+      "part": "instrument panel",
+      "source": "native object 0 group 1 material group 22 DDS slot 15",
+      "status": "extracted bounds center rounded to 0.01 native units; geometric candidate",
+      "position": [
+        -0.32,
+        0.71,
+        -0.5
+      ]
+    },
+    {
+      "part": "radio and sliders",
+      "source": "native object 0 group 1 material group 27 DDS slot 17",
+      "status": "extracted bounds center rounded to 0.01 native units; geometric candidate",
+      "position": [
+        0.04,
+        0.64,
+        -0.51
+      ]
+    },
+    {
+      "part": "wheel pivot, column attachments, stalk pivots and driver eye",
+      "status": "unresolved",
+      "position": null
+    }
+  ]
+}

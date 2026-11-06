@@ -232,7 +232,23 @@ class Glb:
         return len(self.accessors) - 1
 
 
-def build_glb(asset, parts, scale, output):
+def build_glb(asset, parts, scale, output, texture_override=None, ovc_preview=False):
+    override_slot, override_path = texture_override or (None, None)
+    if texture_override and not any(p["tex_index"] == override_slot for p in parts):
+        raise ValueError("override DDS slot is unused by selected object")
+    if ovc_preview:
+        selected = [p for p in parts if p["tex_index"] == override_slot]
+        if not texture_override or len(selected) != 1:
+            raise ValueError("OVC preview requires an override used by one native group")
+        part = selected[0]
+        if part["alpha"] or part["color"] != [1, 1, 1, 1]:
+            raise ValueError("OVC preview supports only opaque untinted groups")
+    replacement = None
+    if override_path is not None:
+        with Image.open(override_path) as edited:
+            if edited.format != "PNG" or not all(1 <= n <= 2048 for n in edited.size):
+                raise ValueError("override must be a PNG up to 2048 pixels per axis")
+            replacement = edited.convert("RGBA")
     buf = Glb()
     meshes, nodes, materials, imgs, texs = [], [], [], [], []
     tex_cache = {}
@@ -248,6 +264,13 @@ def build_glb(asset, parts, scale, output):
             if ti not in tex_cache:
                 try:
                     png, original, after = decode_dds(asset, ti, scale)
+                    if ti == override_slot:
+                        with Image.open(io.BytesIO(png)) as original_image:
+                            alpha = original_image.convert("RGBA").getchannel("A")
+                            replacement.putalpha(alpha.resize(replacement.size, Image.Resampling.NEAREST))
+                        encoded = io.BytesIO()
+                        replacement.save(encoded, format="PNG")
+                        png = encoded.getvalue()
                     v = buf.append(png)
                     img = len(imgs)
                     imgs.append({"name": "original_dds_%02d_%dx%d_to_%dx%d" %
@@ -256,6 +279,8 @@ def build_glb(asset, parts, scale, output):
                     tex_cache[ti] = len(texs)
                     texs.append({"source": img})
                 except Exception as exc:
+                    if ti == override_slot:
+                        raise
                     tex_cache[ti] = None
                     notes.append("DDS %s: %s" % (ti, exc))
             if tex_cache[ti] is not None:
@@ -295,6 +320,15 @@ def build_glb(asset, parts, scale, output):
     header = struct.pack("<4sII", b"glTF", 2, 12 + 8 + len(j) + 8 + len(b))
     output.write_bytes(header + struct.pack("<I4s", len(j), b"JSON") + j +
                        struct.pack("<I4s", len(b), b"BIN" + bytes((0,))) + b)
+    if ovc_preview:
+        from dino_cockpit_hdgeometry_v1 import Mesh, write_ovc
+
+        mesh = Mesh(part["name"], "native")
+        mesh.vertices = part["vertices"]
+        mesh.normals = part["normals"]
+        mesh.uvs = part["uvs"]
+        mesh.faces = part["indices"]
+        write_ovc([mesh], {"native": replacement}, output.with_suffix(".preview.ovc"))
     return {"sourceObjects": sorted(set(p["object"] for p in parts)),
             "meshes": len(meshes), "vertices": sum(len(p["vertices"]) for p in parts),
             "triangles": sum(len(p["indices"]) // 3 for p in parts),
@@ -311,6 +345,10 @@ def main():
                     help="PMT object number, not a cockpit semantic selector")
     pa.add_argument("--texture-scale", type=int, choices=(1, 2), default=2)
     pa.add_argument("--output-dir", type=Path, required=True)
+    pa.add_argument("--texture-override", nargs=2, metavar=("DDS_SLOT", "PNG"),
+                    help="Replace one embedded texture in a separate GLB, retaining original alpha")
+    pa.add_argument("--ovc-preview", action="store_true",
+                    help="Write an offline OVC for one opaque overridden native group")
     ar = pa.parse_args()
     p = ar.game_dir / "Cars" / ar.asset
     if not p.is_file():
@@ -322,12 +360,23 @@ def main():
     ar.output_dir.mkdir(parents=True, exist_ok=True)
     stem = "Dino246_%s_object%02d_TEX%dx" % (
         "PLCAR" if "plcar" in ar.asset else "RC", ar.object, ar.texture_scale)
+    override = None
+    if ar.texture_override:
+        try:
+            override = (int(ar.texture_override[0]), Path(ar.texture_override[1]))
+        except ValueError:
+            pa.error("DDS_SLOT must be an integer")
+        stem += "_slot%02d_override" % override[0]
     output = ar.output_dir / (stem + ".glb")
-    stats = build_glb(asset, parts, ar.texture_scale, output)
+    try:
+        stats = build_glb(asset, parts, ar.texture_scale, output, override, ar.ovc_preview)
+    except (OSError, ValueError) as error:
+        pa.error(str(error))
     report = {"source": p.name, "inputBytes": p.stat().st_size,
               "originalUnmodified": True, "objectCount": asset["obj_count"],
               "textureCount": asset["tex_count"], "object": ar.object,
               "textureScale": ar.texture_scale, "results": stats,
+              "overriddenDdsSlot": override[0] if override else None,
               "warnings": ["Not a VR-ready R26 .ovc file",
                            "Object identity and transform must be checked against real car",
                            "Upscale does not recover missing original texture detail"]}
