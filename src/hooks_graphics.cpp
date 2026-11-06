@@ -523,18 +523,25 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         return true;
     }
 
-    static void RestoreNativeSeatProfile() noexcept
+    static bool RestoreNativeSeatProfile() noexcept
     {
-        if(!SeatTableCaptured || !SeatTablePatched)return;
+        if(!SeatTableCaptured || !SeatTablePatched)return true;
         constexpr std::size_t kStride=36u;
         auto* table=Module::exe_ptr<std::uint8_t>(0x418BB0);
+        // A partial rollback must never be advertised as a clean original
+        // camera table. Preflight EVERY row before changing any of them.
+        // Keep SeatTablePatched armed when a row is unavailable so a later
+        // state transition can retry the original anchors.
         for(std::size_t i=0;i<SeatTableCount;++i) {
             auto* row=table+i*kStride;
             if(!QuestCockpitGlassLive::Memory(row,3u*sizeof(float),true))
-                continue;
-            std::memcpy(row,SeatTableOriginal[i].data(),3u*sizeof(float));
+                return false;
         }
+        for(std::size_t i=0;i<SeatTableCount;++i)
+            std::memcpy(table+i*kStride,SeatTableOriginal[i].data(),
+                        3u*sizeof(float));
         SeatTablePatched=false;
+        return true;
     }
 
     static bool SyncNativeSeatProfile() noexcept
@@ -554,10 +561,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const bool requested=
             Settings::VREnabled && Settings::VRQuestCockpitV2Enabled &&
             Settings::VRQuestCockpitV2NativeSeatProfile && apkRaceGameState;
-        if(!requested) {
-            RestoreNativeSeatProfile();
-            return true;
-        }
+        if(!requested)
+            return RestoreNativeSeatProfile();
 
         constexpr std::size_t kStride=36u,kProfileStride=0x128u;
         const auto* profiles=Module::exe_ptr<const std::uint8_t>(0x1B0CB8);
@@ -622,15 +627,19 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // Arm rollback BEFORE the first write. If any later row becomes
         // unwritable, RestoreNativeSeatProfile() must also restore rows
         // already replaced during this synchronization attempt.
-        SeatTablePatched=true;
+        // Verify all 30 rows before the first mutation. Otherwise one
+        // failing row leaves an interrupted camera-table replacement.
         for(std::size_t i=0;i<SeatTableCount;++i) {
-            auto* row=table+i*kStride;
-            if(!QuestCockpitGlassLive::Memory(row,3u*sizeof(float),true)) {
+            if(!QuestCockpitGlassLive::Memory(
+                   table+i*kStride,3u*sizeof(float),true)) {
                 RestoreNativeSeatProfile();
                 return false;
             }
+        }
+        SeatTablePatched=true;
+        for(std::size_t i=0;i<SeatTableCount;++i) {
             static_assert(sizeof(injected[i])==3u*sizeof(float));
-            std::memcpy(row,&injected[i],3u*sizeof(float));
+            std::memcpy(table+i*kStride,&injected[i],3u*sizeof(float));
         }
         return true;
     }
