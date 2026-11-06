@@ -122,6 +122,22 @@ class DXT5OriginalProtection(unittest.TestCase):
         self.assertTrue(encoded[0] <= encoded[1],
                         "Low-alpha edge uses explicit 0/255 BC3 mode")
 
+    def test_transparent_matte_outlier_does_not_recolor_readable_hangul(self):
+        # Sub-16 alpha matte RGB must not force an endpoint which makes
+        # the opaque native Korean glyph lose a color channel by >55.
+        ink = ([(245, 20, 15, 255)] * 7
+               + [(245, 120, 15, 255)] * 8)
+        pixels = ink + [(0, 255, 255, 1)]
+        encoded = bc.encode_bc3_block(pixels)
+        decoded = bc.decode_bc3_block(encoded)
+        for src, actual in zip(ink, decoded[:15]):
+            self.assertLessEqual(
+                max(abs(src[channel] - actual[channel]) for channel in range(3)),
+                55,
+                "Transparent matte pixels must not cause BC3 glyph core color loss")
+            self.assertGreaterEqual(actual[3], 223)
+        self.assertGreater(decoded[15][3], 0)
+
     def test_pillow_and_manual_dxt5_decoding_agree(self):
         raw, source = fake_dxt5()
         block = raw[128:144]
