@@ -39,6 +39,22 @@ jobs:
           c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_original_car_gate.cpp -o /tmp/test_dino_original_car_gate
           /tmp/test_dino_original_car_gate
           python3 -m unittest -v tools.tests.test_upgrade_dino_ovc_pbr tools.tests.test_package_dino_pbr_copyrun
+      - name: Validate actual GitHub checkout paths for flat test package
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from tools.package_dino_pbr_copyrun import ROOT_FILES, SCRIPT_FILES, DEFAULT_FILES
+          for name in ROOT_FILES:
+              assert Path(name).is_file(), name
+          for name in DEFAULT_FILES:
+              assert Path(name).is_file(), name
+          for name in SCRIPT_FILES:
+              path = Path(name) if name == 'Run-QuestCockpitV2-CrashDiag.ps1' else Path('tools') / name
+              assert path.is_file(), f"missing same-source helper: {path}"
+          for path in ('tools/package_dino_pbr_copyrun.py','BUILD-DINO-PBR-TEST-ZIP.cmd'):
+              assert Path(path).is_file(), path
+          print('DINO_PBR_COPYRUN_SAME_SOURCE_CHECKOUT_PATHS_PASS')
+          PY
       - name: Check original player callback is gated after replacement submission
         run: |
           python3 - <<'PY'
