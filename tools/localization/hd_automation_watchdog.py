@@ -22,8 +22,49 @@ QA_BRANCH = "korean-localization-qa-queue-20261104"
 WORKFLOW = "outrun-ab-multi-atlas.yml"
 ACTIVE = {"queued", "in_progress", "requested", "waiting", "pending"}
 
+# Mirror the actual heavy A/B workflow's push-path inputs. Docs, canary probes,
+# watchdog edits and preview packagers must NOT cause a 2-hour DDS rebuild.
+MATERIAL_FILES = frozenset({
+    ".github/workflows/outrun-ab-multi-atlas.yml",
+    "tools/localization/github_ab_imagegen_atlas_batch.py",
+    "tools/localization/hd_strict_qa.py",
+    "tools/localization/hd_bc3_index_patch.py",
+    "tools/localization/hd_bc3_native_codec.py",
+    "tools/localization/test_hd_bc3_index_patch.py",
+    "tools/localization/test_hd_bc3_native_codec.py",
+    "tools/localization/hd_existing_candidate_salvage.py",
+    "tools/localization/hd_rework_queue.py",
+    "tools/localization/publish_hd_rework_queue.py",
+    "tools/localization/test_hd_rework_queue.py",
+    "tools/localization/test_hd_strict_qa.py",
+    "tools/localization/test_github_ab_imagegen_atlas_batch.py",
+    "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv",
+    "localization/automation_inputs/hd_original_png_source_plan.json",
+})
+MATERIAL_PREFIXES = (
+    "localization/automation_inputs/candidate_outputs/",
+    "localization/automation_inputs/qa_rework/approved/",
+    "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/",
+)
 
-def decision(head_sha, runs, artifact_present, qa=None):
+
+def material_changed(compare):
+    """Never skip DDS if compare is incomplete, diverged or ambiguous."""
+    if compare.get("status") not in ("ahead", "identical"):
+        return True
+    files = compare.get("files")
+    if not isinstance(files, list) or len(files) >= 300 or compare.get("total_commits", 0) > 250:
+        return True
+    # Renames could move a source file away from the allow-list.
+    for file in files:
+        names = (file.get("filename", ""), file.get("previous_filename", ""))
+        if any(name in MATERIAL_FILES or name.startswith(MATERIAL_PREFIXES)
+               for name in names if isinstance(name, str)):
+            return True
+    return False
+
+
+def decision(head_sha, runs, artifact_present, qa=None, relevant_changes=None):
     """Return an auditable action, not an unbounded background worker."""
     if qa and qa.get("release_approved") is True and qa.get("runtime_validation") == "PASS":
         return {"action": "COMPLETE_NO_DISPATCH", "reason": "Game and visual QA still require independent evidence"}
@@ -34,7 +75,10 @@ def decision(head_sha, runs, artifact_present, qa=None):
                 "running_sha": chosen.get("head_sha"), "reason": "Avoid canceling a potentially expensive in-flight DDS build"}
     same = [r for r in runs if r.get("head_sha") == head_sha]
     if not same:
-        return {"action": "DISPATCH", "reason": "No DDS workflow run for newest exact asset SHA"}
+        if relevant_changes is False:
+            return {"action": "WAIT_NO_MATERIAL_CHANGE",
+                    "reason": "Exact previous-SHA DDS artifact exists; only docs/monitoring code changed"}
+        return {"action": "DISPATCH", "reason": "New material DDS source/code SHA or no verified prior build"}
     latest = same[0]
     if latest.get("conclusion") == "success":
         if artifact_present(latest["id"]):
@@ -113,7 +157,22 @@ def main():
                    and not a.get("expired", False)
                    and int(a.get("size_in_bytes", 0)) > 0
                    for a in result.get("artifacts", []))
-    result = decision(head, runs, artifact_present, qa)
+    relevant_changes = None
+    if not any(r.get("head_sha") == head for r in runs):
+        for previous in runs:
+            if previous.get("conclusion") != "success" or previous.get("head_sha") == head:
+                continue
+            if artifact_present(previous["id"]):
+                try:
+                    compared = api.call(
+                        f"/compare/{previous['head_sha']}...{head}?per_page=300")
+                    relevant_changes = material_changed(compared)
+                except (urllib.error.HTTPError, KeyError, ValueError) as exc:
+                    print(f"MATERIAL_COMPARE_UNVERIFIED: {type(exc).__name__}", file=sys.stderr)
+                    relevant_changes = None
+                break
+    result = decision(head, runs, artifact_present, qa, relevant_changes)
+    result["material_changes_since_last_verified_dds"] = relevant_changes
     result["asset_sha"] = head
     result["checked_utc"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     if qa:
