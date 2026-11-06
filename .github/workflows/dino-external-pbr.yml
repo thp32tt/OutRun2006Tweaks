@@ -5,6 +5,8 @@ on:
       - feature/dino-external-pbr-runtime-v1-20261106
     paths:
       - 'src/vr/game/dino_external_*.hpp'
+      - 'src/hooks_graphics.cpp'
+      - 'tests/test_dino_original_car_gate.cpp'
       - 'tests/test_dino_external_*.cpp'
       - 'tools/upgrade_dino_ovc_pbr.py'
       - 'tools/tests/test_upgrade_dino_ovc_pbr.py'
@@ -31,7 +33,29 @@ jobs:
             c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. "$test" -o "$exe"
             "$exe"
           done
+          c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_original_car_gate.cpp -o /tmp/test_dino_original_car_gate
+          /tmp/test_dino_original_car_gate
           python3 -m unittest -v tools.tests.test_upgrade_dino_ovc_pbr
+      - name: Check original player callback is gated after replacement submission
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          hook = Path('src/hooks_graphics.cpp').read_text()
+          renderer = Path('src/vr/game/dino_external_d3d9.hpp').read_text()
+          start = hook.index('static void CallOriginalPlayerWithGlassScope(')
+          end = hook.index('static void __cdecl OnPlayerCallback(', start)
+          scope = hook[start:end]
+          assert scope.count('PlayerCallbackHook.ccall<void>(player)') == 1
+          assert 'if(DrawPreparedDinoFitV6(dino))' in scope
+          assert scope.index('if(DrawPreparedDinoFitV6(dino))') < scope.index('PlayerCallbackHook.ccall<void>(player)')
+          assert 'OriginalCarGate gate{' in hook
+          assert 'SuppressOriginalCarAfterExternalDraw(' in hook
+          assert 'ticket.originalPlayer' in hook and 'ticket.xrPose' in hook
+          assert 'GlobalGpu().DrawNativeScene(' in hook
+          assert 'OnDeviceReset()' in renderer
+          assert 'OUTRUN_VR_DINO_PBR_TEST' in renderer
+          print('DINO_ORIGINAL_CAR_CALLBACK_EXCLUSIVE_TRANSACTION_CONTRACT_PASS')
+          PY
   win32-script-compat:
     runs-on: windows-2022
     steps:
