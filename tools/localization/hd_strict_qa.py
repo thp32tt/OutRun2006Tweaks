@@ -228,6 +228,21 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
         assert dest[2] <= x0 + s[2] and dest[3] <= y0 + s[3]
         positions.append(dest)
         render.append((fitted, left, top))
+    # A true image boundary has no external atlas pixels to damage, but
+    # newly translated text/effects MUST be fully inside that boundary.
+    native_edges = [side for side in ("LEFT", "TOP", "RIGHT", "BOTTOM")
+                    if "SOURCE_NATIVE_ATLAS_" + side + "_EDGE_INSET_REQUIRED" in source_salvage]
+    if native_edges:
+        for glyph, left, top in render:
+            ink = glyph.getchannel("A").getbbox()
+            if ink is None:
+                raise QualityHold("QA_NATIVE_ATLAS_EDGE_TRANSLATED_GLYPH_INVISIBLE")
+            l, t, r, b = left + ink[0], top + ink[1], left + ink[2], top + ink[3]
+            if (("LEFT" in native_edges and l < MARGIN) or
+                ("TOP" in native_edges and t < MARGIN) or
+                ("RIGHT" in native_edges and r > source.width - MARGIN) or
+                ("BOTTOM" in native_edges and b > source.height - MARGIN)):
+                raise QualityHold("QA_NATIVE_ATLAS_EDGE_TRANSLATED_GLYPH_TOUCH")
     # Even empty source padding belongs to another label's metadata ROI.
     # New translated ink must not enter it. Check every other ROI, including
     # candidates that will be held or have not been processed yet.
