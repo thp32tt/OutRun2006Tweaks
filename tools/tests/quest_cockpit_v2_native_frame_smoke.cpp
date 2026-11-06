@@ -2,6 +2,30 @@
 #include <cassert>
 using namespace OutRunVR::QuestCockpitV2;
 int main() {
+    // First frame's original camera cannot have consumed the freshly
+    // injected table. Confirm one unchanged camera/frame cycle and reject
+    // F11 reconfiguration, missing hooks, manual mode and failed restore.
+    NativeSeatCameraTickGate seatGate{};
+    assert(!seatGate.Ready());
+    assert(!NativeQuestEyeEligible(true,true,seatGate.Ready()));
+    seatGate.AfterSeatSync(false,false,true,true); // START -> GAME
+    assert(!seatGate.Ready());
+    seatGate.AfterSeatSync(true,true,true,false); // install-only
+    assert(!seatGate.Ready());
+    seatGate.AfterSeatSync(true,true,true,true); // next native camera tick
+    assert(seatGate.Ready());
+    assert(NativeQuestEyeEligible(true,true,seatGate.Ready()));
+    assert(!NativeQuestEyeEligible(true,false,seatGate.Ready()));
+    assert(!NativeQuestEyeEligible(false,true,seatGate.Ready()));
+    seatGate.AfterSeatSync(true,false,true,true); // live F11/profile change
+    assert(!seatGate.Ready());
+    seatGate.AfterSeatSync(true,true,true,true);
+    assert(seatGate.Ready());
+    seatGate.AfterSeatSync(true,true,false,true); // manual camera mode
+    assert(!seatGate.Ready());
+    seatGate.AfterSeatSync(true,true,true,true);
+    seatGate.Invalidate(); // GOAL, failure, or restore
+    assert(!seatGate.Ready());
     NativeFrameTracker t;
     t.OnPlayerCallback();
     t.OnFrameEnd();

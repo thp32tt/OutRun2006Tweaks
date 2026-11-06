@@ -1489,7 +1489,11 @@ namespace OutRunVRRenderer
                 OutRunVR::QuestCockpitV2::OriginalQuestGameCameraState(
                     static_cast<std::uint32_t>(*Game::current_mode)) &&
                 GameRendererIsActive() && questCamera &&
-                questCamera->cam_mode_34A==1;
+                OutRunVR::QuestCockpitV2::NativeQuestEyeEligible(
+                    questCamera->cam_mode_34A==1,
+                    OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.load(
+                        std::memory_order_acquire),
+                    OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Ready());
 			const bool hostChanged = !CenterValid || CenterHostPid != sample.hostPid;
 			const bool referenceSpaceChanged = CenterValid &&
 				CenterReferenceSpaceGeneration != sample.referenceSpaceGeneration;

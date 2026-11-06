@@ -93,6 +93,32 @@ public:
         return snapshot;
     }
 };
+// A newly installed Quest seat may not yet have been consumed by the
+// original 485FE0 camera tick (which precedes 449050 frame rendering).
+// Native eye transforms are admitted only on a later camera-to-frame cycle
+// that observes the same previously injected table; fallback is stock R26.
+class NativeSeatCameraTickGate final {
+    std::atomic<bool> ready_{false};
+public:
+    void Invalidate() noexcept {
+        ready_.store(false,std::memory_order_release);
+    }
+    void AfterSeatSync(bool previouslyPatched,bool sameInput,
+                       bool apkNativeCamera,bool afterCameraTick) noexcept {
+        ready_.store(previouslyPatched && sameInput &&
+                     apkNativeCamera && afterCameraTick,
+                     std::memory_order_release);
+    }
+    bool Ready() const noexcept {
+        return ready_.load(std::memory_order_acquire);
+    }
+};
+inline NativeSeatCameraTickGate NativeSeatCameraTick{};
+inline bool NativeQuestEyeEligible(bool gameModeOne,
+                                   bool originalHooksReady,
+                                   bool installedSeatReady) noexcept {
+    return gameModeOne && originalHooksReady && installedSeatReady;
+}
 // Ready ONLY when the exact retail EXE game-frame callback triad installed.
 inline std::atomic<bool> NativeOriginalHooksReady{false};
 inline std::atomic<std::uint64_t> NativeEpochCounter{0};

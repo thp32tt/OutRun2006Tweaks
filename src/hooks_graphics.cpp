@@ -525,6 +525,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
 
     static bool RestoreNativeSeatProfile() noexcept
     {
+        // Failed or partial rollback cannot authorize Quest-native eyes.
+        OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Invalidate();
         if(!SeatTableCaptured || !SeatTablePatched)return true;
         constexpr std::size_t kStride=36u;
         auto* table=Module::exe_ptr<std::uint8_t>(0x418BB0);
@@ -544,12 +546,15 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         return true;
     }
 
-    static bool SyncNativeSeatProfile() noexcept
+    static bool SyncNativeSeatProfile(bool afterOriginalCameraTick) noexcept
     {
         // 485FE0 CAMERA control runs before 449050 frame rendering. Therefore
         // the mode1 table must already contain the Quest anchors before the
         // next camera tick; a frame-enter/frame-end-only scope is too late.
-        if(!CaptureNativeSeatTable())return false;
+        if(!CaptureNativeSeatTable()) {
+            OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Invalidate();
+            return false;
+        }
         const bool apkRaceGameState=
             !Settings::VRQuestCockpitV2ApkNativeCamera ||
             (Game::current_mode &&
@@ -624,23 +629,31 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         }
 
         auto* table=Module::exe_ptr<std::uint8_t>(0x418BB0);
-        // Arm rollback BEFORE the first write. If any later row becomes
-        // unwritable, RestoreNativeSeatProfile() must also restore rows
-        // already replaced during this synchronization attempt.
-        // Verify all 30 rows before the first mutation. Otherwise one
-        // failing row leaves an interrupted camera-table replacement.
+        // Compare all 30 original seat inputs before changing anything.
+        // An initial game entry or live F11 adjustment cannot share an
+        // APK-native eye matrix with a camera that used the previous table.
+        bool sameInput=SeatTablePatched;
         for(std::size_t i=0;i<SeatTableCount;++i) {
-            if(!QuestCockpitGlassLive::Memory(
-                   table+i*kStride,3u*sizeof(float),true)) {
+            const auto* row=table+i*kStride;
+            if(!QuestCockpitGlassLive::Memory(row,3u*sizeof(float),true)) {
                 RestoreNativeSeatProfile();
                 return false;
             }
+            static_assert(sizeof(injected[i])==3u*sizeof(float));
+            if(std::memcmp(row,&injected[i],3u*sizeof(float))!=0)
+                sameInput=false;
         }
+        const bool previouslyPatched=SeatTablePatched;
+        OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Invalidate();
         SeatTablePatched=true;
         for(std::size_t i=0;i<SeatTableCount;++i) {
-            static_assert(sizeof(injected[i])==3u*sizeof(float));
-            std::memcpy(table+i*kStride,&injected[i],3u*sizeof(float));
+            auto* row=table+i*kStride;
+            // Unchanged input requires no guest-memory rewrite.
+            if(std::memcmp(row,&injected[i],3u*sizeof(float))!=0)
+                std::memcpy(row,&injected[i],3u*sizeof(float));
         }
+        OutRunVR::QuestCockpitV2::NativeSeatCameraTick.AfterSeatSync(
+            previouslyPatched,sameInput,apkNativeCamera,afterOriginalCameraTick);
         return true;
     }
     static void OnFrameEnter(SafetyHookContext&)
@@ -648,7 +661,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // Camera control for the next tick reads this persistent live table.
         // Re-sync here only for live F11/tuning changes; startup apply below
         // installs the profile before the first playable camera tick.
-        SyncNativeSeatProfile();
+        SyncNativeSeatProfile(true);
         OutRunVR::QuestCockpitV2::NativeFrameTrace().OnFrameEnter(
             OutRunVR::QuestCockpitV2::NextVerifiedNativeEpoch());
         QuestCockpitGlassLive::OnNewNativeFrame();
@@ -848,7 +861,7 @@ public:
         FrameEndHook=std::move(last);
         PlayerCallbackHook=std::move(actor);
         OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.store(true,std::memory_order_release);
-        if(!SyncNativeSeatProfile() &&
+        if(!SyncNativeSeatProfile(false) &&
            Settings::VRQuestCockpitV2NativeSeatProfile)
             spdlog::warn("VR COCKPIT: Quest mode1 profile table sync failed; "
                 "original camera anchors remain active");
