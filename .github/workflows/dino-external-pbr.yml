@@ -65,11 +65,27 @@ jobs:
           Copy-Item $dll.FullName out/dinput8.dll
           $env:GITHUB_SHA | Set-Content out/SOURCE_SHA.txt -Encoding ascii
           Get-FileHash out/dinput8.dll -Algorithm SHA256
+      - name: Build matching x64 OpenXR host from the same checkout SHA
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          if($LASTEXITCODE -ne 0){throw "OpenXR host configure failed"}
+          cmake --build build-host --config Release --target outrun-vr-host --parallel 4
+          if($LASTEXITCODE -ne 0){throw "OpenXR host build failed"}
+          $hostExe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Sort-Object Length -Descending | Select-Object -First 1
+          if(-not $hostExe){throw "Missing matching OpenXR host"}
+          Copy-Item $hostExe.FullName out/outrun-vr-host.exe
+          $env:GITHUB_SHA | Set-Content out/HOST_BUILD_SOURCE_SHA.txt -Encoding ascii
+          'ACTIVE_R26_R43_R44' | Set-Content out/VARIANT_ID.txt -Encoding ascii
+          Get-FileHash out/outrun-vr-host.exe -Algorithm SHA256
       - uses: actions/upload-artifact@v4
         with:
-          name: Dino-OVC3-PBR-R26-Win32
+          name: Dino-OVC3-PBR-R26-MatchedDLLHost
           path: |
             out/dinput8.dll
+            out/outrun-vr-host.exe
             out/SOURCE_SHA.txt
+            out/HOST_BUILD_SOURCE_SHA.txt
+            out/VARIANT_ID.txt
           retention-days: 14
           if-no-files-found: error
