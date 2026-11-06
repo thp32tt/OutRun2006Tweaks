@@ -1,6 +1,6 @@
 #pragma once
 // OutRun VR native-PMT-free cockpit sidecars.
-// V1 128px BC1 and V2 dynamically sized HQ DDS + 16/32-bit indices.
+// V1 128px BC1, V2 HQ DDS and V3 optional tangent-space normal/ORM PBR maps.
 // All offsets and counts are validated before GPU allocation.
 #include <algorithm>
 #include <array>
@@ -34,16 +34,29 @@ struct Texture {
     unsigned width=0,height=0,mips=0;
     TextureFormat format=TextureFormat::DXT1;
 };
+// V3 OVC material data; ORM = occlusion(R), roughness(G), metallic(B).
+// DDS maps are optional and are validated using the same bounded parser as albedo.
+struct PbrMaterial {
+    Texture normal,orm;
+    float roughness=0.75f,metallic=0.04f,normalScale=1.0f;
+};
 struct Model {
     std::vector<Mesh> meshes;
     std::vector<Texture> textures;
+    std::vector<PbrMaterial> pbrMaterials;
     unsigned vertices=0,triangles=0;
-    bool highQuality=false;
+    bool highQuality=false,pbrEnabled=false;
 };
 inline unsigned U32(const std::uint8_t* p) noexcept {
     return unsigned(p[0])|(unsigned(p[1])<<8)|(unsigned(p[2])<<16)|(unsigned(p[3])<<24);
 }
 inline unsigned U16(const std::uint8_t* p) noexcept {return unsigned(p[0])|(unsigned(p[1])<<8);}
+inline float F32(const std::uint8_t* p) noexcept {
+    const std::uint32_t bits=U32(p);
+    float value=0;
+    std::memcpy(&value,&bits,sizeof(value));
+    return value;
+}
 inline bool Bounds(std::size_t p,std::size_t n,std::size_t limit) noexcept {
     return p<=limit && n<=limit-p;
 }
@@ -102,10 +115,11 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
     if(!d || size<36 || size>MaxSidecarBytes)return fail("sidecar file size");
     const bool legacy=std::memcmp(d,"OVRCAB15",8)==0;
     const bool v2=std::memcmp(d,"OVRCABH2",8)==0;
-    if(!legacy && !v2)return fail("sidecar signature");
+    const bool v3=std::memcmp(d,"OVRCABH3",8)==0;
+    if(!legacy && !v2 && !v3)return fail("sidecar signature");
     const unsigned version=U32(d+8),groups=U32(d+12),materials=U32(d+16);
     const unsigned vertices=U32(d+20),triangles=U32(d+24);
-    if(version!=(legacy?1u:2u) || groups==0 || materials==0 ||
+    if(version!=(legacy?1u:(v2?2u:3u)) || groups==0 || materials==0 ||
        groups>MaxGroups || materials>MaxMaterials ||
        vertices>MaxVertices || triangles>MaxTriangles ||
        (legacy && (groups!=Groups || materials!=Materials ||
@@ -113,7 +127,8 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
        U32(d+28)!=size-36 || U32(d+32)!=Crc32(d+36,size-36))
         return fail("sidecar header/CRC");
     Model parsed;
-    parsed.highQuality=v2;
+    parsed.highQuality=!legacy;
+    parsed.pbrEnabled=v3;
     parsed.meshes.reserve(groups);
     std::size_t pos=36,bytesGpu=0;
     std::uint64_t nv=0,nt=0;
@@ -175,6 +190,39 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
         bytesGpu+=len;
         parsed.textures.push_back(std::move(texture));
         pos+=len;
+    }
+    if(v3) {
+        constexpr char pbrMagic[]="OVCPBR3!";
+        if(!Bounds(pos,8,size) || std::memcmp(d+pos,pbrMagic,8)!=0)
+            return fail("pbr extension");
+        pos+=8;
+        parsed.pbrMaterials.reserve(materials);
+        for(unsigned i=0;i<materials;++i) {
+            if(!Bounds(pos,12,size))return fail("pbr material factors");
+            PbrMaterial mat;
+            mat.roughness=F32(d+pos);
+            mat.metallic=F32(d+pos+4);
+            mat.normalScale=F32(d+pos+8);
+            pos+=12;
+            if(!std::isfinite(mat.roughness) || mat.roughness<0.04f ||
+               mat.roughness>1.0f || !std::isfinite(mat.metallic) ||
+               mat.metallic<0.f || mat.metallic>1.f ||
+               !std::isfinite(mat.normalScale) || mat.normalScale<0.f ||
+               mat.normalScale>2.f)return fail("pbr factor bounds");
+            for(Texture* map:{&mat.normal,&mat.orm}) {
+                if(!Bounds(pos,4,size))return fail("pbr map length");
+                const unsigned len=U32(d+pos);pos+=4;
+                if(!len)continue;
+                if(len<128 || !Bounds(pos,len,size) ||
+                   bytesGpu+len>MaxGpuPayloadBytes)
+                    return fail("pbr map bounds/budget");
+                if(!ParseDds(d+pos,len,*map,false))
+                    return fail("unsupported pbr dds texture");
+                bytesGpu+=len;
+                pos+=len;
+            }
+            parsed.pbrMaterials.push_back(std::move(mat));
+        }
     }
     if(pos!=size)return fail("trailing sidecar data");
     parsed.vertices=vertices;parsed.triangles=triangles;
