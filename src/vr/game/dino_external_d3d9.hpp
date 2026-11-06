@@ -330,6 +330,13 @@ public:
                FAILED(device->SetSamplerState(2,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
                FAILED(device->SetSamplerState(2,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
                FAILED(device->SetSamplerState(2,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
+               // Original sky/HUD shaders may have changed the inherited
+               // min-mip/LOD bias on samplers 1 and 2. Explicitly reset
+               // both normal and packed ORM samplers for crisp PBR details.
+               FAILED(device->SetSamplerState(1,D3DSAMP_MAXMIPLEVEL,0u)) ||
+               FAILED(device->SetSamplerState(2,D3DSAMP_MAXMIPLEVEL,0u)) ||
+               FAILED(device->SetSamplerState(1,D3DSAMP_MIPMAPLODBIAS,0u)) ||
+               FAILED(device->SetSamplerState(2,D3DSAMP_MIPMAPLODBIAS,0u)) ||
                FAILED(device->SetSamplerState(1,D3DSAMP_SRGBTEXTURE,FALSE)) ||
                FAILED(device->SetSamplerState(2,D3DSAMP_SRGBTEXTURE,FALSE)) ||
                FAILED(pbrShaders_.Bind(device,world,view,projection))) {
