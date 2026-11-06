@@ -2,7 +2,7 @@
   "active_roi_total": 954,
   "c1_preliminary_new_png_count": 0,
   "clean_plate_qa": "MECHANICAL_ALPHA_ONLY_C1_C3_VISUAL_REVIEW_REQUIRED",
-  "deterministic_salvaged_roi": 252,
+  "deterministic_salvaged_roi": 253,
   "generated": [
     {
       "dds_sha256": "cb9a33335e52129b6ef6e97c37e899243c9265054983ab89f4d73fe5e232c282",
@@ -4245,6 +4245,63 @@
       ],
       "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
       "target": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    },
+    {
+      "dds_sha256": "d220f9dd1e83d93ce3b8382eaa13ab2cd6107acc971f01b9d7c820f264ce9478",
+      "holds": [],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+      "painted": [
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_18_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 7745,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 18,
+          "candidate_sha256": "adb42264e5efca13af5ec9429eb9f1de5c5250e01f58a0398a6f224863c97898",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              392,
+              52,
+              1357,
+              201
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            348,
+            0,
+            1462,
+            256
+          ],
+          "roi_id": "Q104_01e25aa25a681d26",
+          "source_alpha_occupancy": 0.41411,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              392,
+              89,
+              1357,
+              164
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
       "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
     },
     {
@@ -12021,7 +12078,7 @@
   "hold_roi_reason_counts": {
     "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD": 36,
     "QA_BC3_MIP_CHAIN_REQUIRES_ORIGINAL_FORMAT_REBUILD": 13,
-    "QA_BC3_TRANSLATED_COLOR_LOSS": 34,
+    "QA_BC3_TRANSLATED_COLOR_LOSS": 33,
     "QA_DOWNSCALE_LOST_GLYPHS": 3,
     "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT": 23,
     "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE": 80,
@@ -13476,14 +13533,6 @@
       "target": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
     },
     {
-      "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
-      "roi_ids": [
-        "Q104_01e25aa25a681d26"
-      ],
-      "rows": 1,
-      "target": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds"
-    },
-    {
       "details": [
         {
           "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
@@ -14073,7 +14122,7 @@
   "imported_roi_total": 954,
   "layout_policy": "ORIGINAL_LINE_COUNT_AND_PER_LINE_BBOX_PRESERVED",
   "legacy_oversize_outputs_rejected": true,
-  "native_dds_generated": 49,
+  "native_dds_generated": 50,
   "pending_import": 0,
   "pending_import_holds": [],
   "release_approved": false,
@@ -14084,7 +14133,7 @@
   "source": "Existing A/B PNG reused exclusively; native HD bounded pad/reflow/downscale; no new ImageGen or fonts",
   "source_dds_missing_rows": 0,
   "source_sha_conflict_rows": 0,
-  "translated_roi_generated": 257,
+  "translated_roi_generated": 258,
   "visual_qa": "REVIEW_REQUIRED",
-  "zip_sha256": "a9cd3f88265f9af386563055fa5bcaaacdd90c0b6b7a0da03f28a818d775b520"
+  "zip_sha256": "afb877ac8fcc4dd94325d194f2894586a00dda6a6df8c0cce137990320b8f808"
 }
