@@ -21,6 +21,14 @@ Scope: only `feature/dino-external-pbr-runtime-v1-20261106`, originally based on
 - Windows: x86 R26 mod DLL build plus x64 OpenXR host build from the same SHA.
 - Windows: parse actual PowerShell copy-run/restore, synthetic 32-bit DLL and 64-bit host machine checks, `-Mode PBR -VerifyOnly`, negative host source marker and model hash, simulated full install using a fake game exe, preservation of an existing OVC2 sentinel file, pre-write conflict rejection, opt-in environment during simulated launch, environment restoration, removal of new PBR model on restore and recovery of original user DLL/host.
 
+## 2026-11-07: partial-submit protection and material correctness update
+
+- Original-car callback admission now consumes the actual GPU mesh-submission receipt. No external mesh -> original complete vehicle draws as before. Complete external mesh set with successful state restore -> original is skipped. If an error happens **after** at least one external mesh was already submitted, that eye/frame skips the original rather than drawing another complete car over partial sidecar geometry. The GPU sidecar resources/device are quarantined and later draws fail closed to the original until real Reset; a damaged frame cannot be un-rasterized. Source: `src/vr/game/dino_external_d3d9.hpp`, `src/hooks_graphics.cpp`, `src/vr/game/dino_external_original_car_gate.hpp`.
+- Original, menu, other-car and stereo/pose failure paths retain the unchanged PC player display. The partial-submission branch is explicitly exceptional and may temporarily show an incomplete sidecar image until next Reset.
+- If the file is absent/corrupt on the first attempt, it is not read every eye/frame. Failed file loads are re-armed on a real native race->menu or device Reset; successfully parsed CPU geometry is reused during D3D9 recovery.
+- OVC3 packed ORM defaults now use roughness=1.0 and metallic=1.0 multipliers **when ORM is supplied**, preserving the authored Blender R/G/B map. Material-factor-only fallback uses roughness=0.75 and metallic=0.0 (dielectric), with normal strength 1.0. Explicit material overrides still work. This corrects the former default metallic factor of 0.04 that erased metallic-map appearance.
+- **Still pending:** physical Quest3 stereoscopic PBR validation and renderer/shader-camera matrix comparison. The synthetic CI cannot prove the correct separate left/right world and normal-map transforms; no claim of parity is made.
+
 ## Real game compatibility **not yet established**
 
 - No original-game process/gameplay/HMD test executed in CI. Windows compilation is not native game runtime proof.
