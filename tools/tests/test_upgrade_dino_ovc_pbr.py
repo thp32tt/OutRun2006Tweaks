@@ -53,6 +53,27 @@ class Ovc3UpgradeTests(unittest.TestCase):
             self.assertEqual(zlib.crc32(new[36:]),struct.unpack_from("<I",new,32)[0])
             self.assertEqual(validate_base_ovc2(old)[0],1)
 
+    def test_packed_orm_defaults_preserve_metallic_and_roughness(self):
+        # A metallic 100%-white ORM pixel must remain metallic; the previous
+        # default 0.04 multiplier silently discarded ~96% of map metalness.
+        with tempfile.TemporaryDirectory() as t:
+            root=Path(t)
+            (root/"orm.dds").write_bytes(dds4())
+            base=ovc2()
+            metal=upgrade(base,{"materials":[{"index":0,"orm":"orm.dds"}]},root)
+            roughness, metallic, strength=struct.unpack_from("<3f",metal,len(base)+8)
+            self.assertEqual((roughness,metallic,strength),(1.0,1.0,1.0))
+            no_map=upgrade(base,{"materials":[]},root)
+            roughness, metallic, strength=struct.unpack_from("<3f",no_map,len(base)+8)
+            self.assertEqual((roughness,metallic,strength),(0.75,0.0,1.0))
+            with_factors=upgrade(base,{"materials":[
+                {"index":0,"orm":"orm.dds","roughness":0.6,"metallic":0.8}
+            ]},root)
+            self.assertAlmostEqual(
+                struct.unpack_from("<f",with_factors,len(base)+8)[0],0.6)
+            self.assertAlmostEqual(
+                struct.unpack_from("<f",with_factors,len(base)+12)[0],0.8)
+
     def test_reject_corrupt_input_and_unsafe_materials(self):
         with tempfile.TemporaryDirectory() as t:
             root=Path(t)
