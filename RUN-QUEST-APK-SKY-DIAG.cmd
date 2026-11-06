@@ -44,6 +44,11 @@ echo [FAILED] QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json is missing.
 echo Re-extract the ENTIRE COPY-RUN ZIP. Do not copy only the CMD files.
 if /I not "%~1"=="VERIFY" pause
 exit /b 93
+:missing_restore
+echo [FAILED] QuestCockpit-CopyRestore.ps1 is missing.
+echo Re-extract the ENTIRE QuestCockpitV2 COPY-RUN ZIP before running the test.
+if /I not "%~1"=="VERIFY" pause
+exit /b 96
 :missing_game
 echo [FAILED] OR2006C2C.EXE is not in this folder.
 echo Extract the ENTIRE COPY-RUN ZIP directly into the original OutRun 2006 game folder.

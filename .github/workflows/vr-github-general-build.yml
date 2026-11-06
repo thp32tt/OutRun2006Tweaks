@@ -120,6 +120,33 @@ jobs:
           }
           Write-Host 'Cockpit test script syntax PASS'
 
+      - name: Validate copy-run CMD control flow
+        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
+        shell: pwsh
+        run: |
+          $expected=[ordered]@{
+            'RUN-QUEST-APK-COCKPIT.cmd'='NORMAL'
+            'RUN-QUEST-APK-SKY-DIAG.cmd'='SKY'
+            'RUN-QUEST-APK-INTERP-OFF.cmd'='INTERP'
+          }
+          foreach($pair in $expected.GetEnumerator()){
+            $text=Get-Content -LiteralPath $pair.Key -Raw
+            if($text -notmatch 'setlocal EnableExtensions DisableDelayedExpansion'){throw "$($pair.Key): delayed expansion guard missing"}
+            $labels=@([regex]::Matches($text,'(?m)^:([A-Za-z0-9_]+)')|ForEach-Object{$_.Groups[1].Value.ToLowerInvariant()})
+            $targets=@([regex]::Matches($text,'(?i)\bgoto\s+:([A-Za-z0-9_]+)')|ForEach-Object{$_.Groups[1].Value.ToLowerInvariant()})
+            foreach($target in $targets){if($target -notin $labels){throw "$($pair.Key): goto target missing: $target"}}
+            foreach($required in @('verify','bad_root','no_powershell','missing_launcher','missing_payload','missing_restore','missing_game')){
+              if($required -notin $labels){throw "$($pair.Key): required label missing: $required"}
+            }
+            if($text -notmatch ('-Mode\s+'+[regex]::Escape($pair.Value))){throw "$($pair.Key): expected mode $($pair.Value) missing"}
+            if($text -notmatch 'exit /b 96'){throw "$($pair.Key): missing restore exit 96 guard"}
+          }
+          $restore=Get-Content -LiteralPath 'RESTORE-QUEST-APK-COCKPIT.cmd' -Raw
+          $restoreLabels=@([regex]::Matches($restore,'(?m)^:([A-Za-z0-9_]+)')|ForEach-Object{$_.Groups[1].Value.ToLowerInvariant()})
+          $restoreTargets=@([regex]::Matches($restore,'(?i)\bgoto\s+:([A-Za-z0-9_]+)')|ForEach-Object{$_.Groups[1].Value.ToLowerInvariant()})
+          foreach($target in $restoreTargets){if($target -notin $restoreLabels){throw "RESTORE CMD goto target missing: $target"}}
+          Write-Host 'COPY-RUN CMD control-flow static PASS'
+
       - name: Verify cockpit glass brightness regression
         if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
         shell: pwsh
