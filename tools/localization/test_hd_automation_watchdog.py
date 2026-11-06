@@ -56,6 +56,37 @@ class TestController(unittest.TestCase):
         self.assertEqual(self.pick([run(conclusion="neutral")])["action"],
                          "BLOCKED_UNKNOWN_STATE")
 
+    def test_docs_only_delta_skips_heavy_dds(self):
+        self.assertEqual(
+            c.decision(SHA, [run(OLD)], lambda rid: rid == 42,
+                       relevant_changes=False)["action"],
+            "WAIT_NO_MATERIAL_CHANGE")
+
+    def test_material_dds_source_delta_dispatches(self):
+        self.assertEqual(
+            c.decision(SHA, [run(OLD)], lambda rid: rid == 42,
+                       relevant_changes=True)["action"], "DISPATCH")
+
+    def test_failed_comparison_conservatively_dispatches(self):
+        self.assertEqual(
+            c.decision(SHA, [run(OLD)], lambda rid: rid == 42,
+                       relevant_changes=None)["action"], "DISPATCH")
+
+    def test_sha_compare_classifies_material_vs_docs_only(self):
+        self.assertFalse(c.material_changed({
+            "status":"ahead","total_commits":3,
+            "files":[{"filename":"docs/OUTRUN_HD_KOREAN_QA_RECOVERY_20261106.md"},
+                     {"filename":"tools/localization/hd_automation_watchdog.py"}]}))
+        self.assertTrue(c.material_changed({
+            "status":"ahead","total_commits":3,
+            "files":[{"filename":"tools/localization/hd_bc3_native_codec.py"}]}))
+        self.assertTrue(c.material_changed({
+            "status":"ahead","total_commits":2,
+            "files":[{"filename":"localization/automation_inputs/candidate_outputs/A/a.png"}]}))
+        self.assertTrue(c.material_changed({"status":"diverged","files":[]}))
+        self.assertTrue(c.material_changed({"status":"ahead","files":[{}]*300}))
+
+
     def test_new_sha_run_does_not_reuse_old_success(self):
         self.assertEqual(self.pick([run(OLD)], artifacts=[42])["action"], "DISPATCH")
 
