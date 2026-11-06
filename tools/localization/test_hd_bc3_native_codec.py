@@ -70,6 +70,15 @@ class DXT5OriginalProtection(unittest.TestCase):
         with self.assertRaisesRegex(bc.BC3Hold, 'MIP_CHAIN_REQUIRES'):
             bc.patch_bc3_native(bytes(multi), result, source, [(4, 4, 20, 20)])
 
+    def test_original_2d_dds_depth_one_is_not_a_volume_texture(self):
+        raw, _ = fake_dxt5()
+        source = bytearray(raw)
+        struct.pack_into('<I', source, 24, 1)
+        self.assertEqual(bc.bc3_header(source), (32, 32, 1))
+        struct.pack_into('<I', source, 24, 2)
+        with self.assertRaisesRegex(bc.BC3Hold, 'VOLUME_OR_CUBEMAP'):
+            bc.bc3_header(source)
+
     def test_reject_corrupt_payload_and_cube_texture(self):
         raw, _ = fake_dxt5()
         with self.assertRaisesRegex(bc.BC3Hold, 'BAD_MIP_PAYLOAD'):
