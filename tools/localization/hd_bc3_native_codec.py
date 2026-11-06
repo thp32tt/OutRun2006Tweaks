@@ -240,7 +240,11 @@ def patch_bc3_native(raw, native, original_native, native_boxes):
                 # body (alpha >= 16) to disappear or exceed error limits.
                 if (new[3] >= 16 and pixel[3] == 0) or abs(pixel[3] - new[3]) > 32:
                     raise BC3Hold('QA_BC3_TRANSLATED_ALPHA_LOST')
-                if max(abs(pixel[k] - new[k]) for k in range(3)) > 55:
+                # Invisible (<16 alpha) fringe RGB is not readable glyph
+                # color and can contain matte pixels after Lanczos resizing.
+                # Alpha>=16 text/glow still obeys the original strict 55
+                # channel error ceiling; no visible glyph may be color-lost.
+                if new[3] >= 16 and max(abs(pixel[k] - new[k]) for k in range(3)) > 55:
                     raise BC3Hold('QA_BC3_TRANSLATED_COLOR_LOSS')
             elif pixel[3] > 8:
                 raise BC3Hold('QA_BC3_ENGLISH_ALPHA_RESIDUE')
