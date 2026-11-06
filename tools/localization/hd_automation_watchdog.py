@@ -74,7 +74,8 @@ class API:
                      "Content-Type": "application/json",
                      "User-Agent": "OutRun-HD-Korean-GitHub-Controller"})
         with urllib.request.urlopen(request, timeout=20) as response:
-            return json.load(response) if response.status != 204 else {}
+            body = response.read()
+            return json.loads(body) if body else {}
 
 
 def fetch_qa(api):
