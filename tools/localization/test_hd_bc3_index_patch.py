@@ -54,8 +54,8 @@ class DXT5SafeIndexTests(unittest.TestCase):
         for by in range(32//4):
             for bx in range(64//4):
                 off=128+(by*16+bx)*16
-                original[off:off+2]=bytes((0,0))
-                original[off+2:off+8]=bytes(6)
+                original[off:off+2]=bytes((3,0))
+                # Original alpha indices already all point to endpoint1=0.
         original=bytes(original)
         source=bc3._decode_bc3(original)
         self.assertEqual(source.getpixel((10,10))[3],0)
@@ -81,7 +81,7 @@ class DXT5SafeIndexTests(unittest.TestCase):
         # One whole block contains protected alpha=50. We cannot change
         # original endpoints, because old alpha 50 must remain unchanged.
         off=128+(2*(64//4)+2)*16
-        original[off:off+2]=bytes((50,50))
+        original[off:off+2]=bytes((50,0))
         original[off+2:off+8]=bytes(6)
         original=bytes(original)
         desired=bc3._decode_bc3(original)
