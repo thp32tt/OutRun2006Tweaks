@@ -16,9 +16,14 @@
 #include <string>
 #include <vector>
 #include "dino_external_sidecar.hpp"
+#include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
 
 namespace OutRunVR::DinoSidecar {
+struct GpuDrawResult final {
+    HRESULT hr=E_FAIL;
+    MeshDrawReceipt receipt{};
+};
 class GpuOwner final {
     struct GpuMesh {
         IDirect3DVertexBuffer9* vb=nullptr;
@@ -124,6 +129,14 @@ class GpuOwner final {
         ReleaseGpu();
         gpuRetry_.NoteFailure(device);
         return false;
+    }
+    // A partial draw is not recoverable by issuing the original vehicle draw
+    // in the same eye: those external pixels are already on the target.
+    // Stop retries until the real D3D9 Reset, preventing another partial
+    // submission in subsequent frames.
+    void QuarantineFailedSubmission(IDirect3DDevice9* device) noexcept {
+        ReleaseGpu();
+        gpuRetry_.NoteFailure(device);
     }
     bool EnsureLoaded() {
         if(loadAttempted_)return loaded_;
@@ -245,13 +258,16 @@ public:
     // Call exactly once from the verified original player world-render scope.
     // The existing Quest/R26 D3D9 renderer remains the sole stereo owner and
     // duplicates these fixed-function DrawIndexedPrimitive calls per eye.
-    HRESULT DrawNativeScene(IDirect3DDevice9* device,const D3DMATRIX& world,
-                    const D3DMATRIX& view,const D3DMATRIX& projection) noexcept {
-        if(!EnsureResources(device))return E_FAIL;
+    GpuDrawResult DrawNativeScene(IDirect3DDevice9* device,
+                    const D3DMATRIX& world,const D3DMATRIX& view,
+                    const D3DMATRIX& projection) noexcept {
+        GpuDrawResult result{};
+        if(!EnsureResources(device))return result;
+        result.receipt.expectedMeshes=static_cast<std::uint32_t>(meshes_.size());
         IDirect3DStateBlock9* saved=nullptr;
         if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&saved))||!saved)
-            return E_FAIL;
-        if(FAILED(saved->Capture())){saved->Release();return E_FAIL;}
+            return result;
+        if(FAILED(saved->Capture())){saved->Release();return result;}
         HRESULT hr=S_OK;
         const DWORD fvf=D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1;
         if(FAILED(device->SetVertexShader(nullptr)) ||
@@ -338,10 +354,16 @@ public:
             hr=device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,0,0,m.vertexCount,
                                              0,m.indexCount/3);
             if(FAILED(hr))break;
+            ++result.receipt.submittedMeshes;
         }
         const HRESULT restore=saved->Apply();
         saved->Release();
-        return FAILED(hr)?hr:restore;
+        result.receipt.drawSucceeded=SUCCEEDED(hr);
+        result.receipt.stateRestored=SUCCEEDED(restore);
+        result.hr=FAILED(hr)?hr:restore;
+        if(FAILED(result.hr))
+            QuarantineFailedSubmission(device);
+        return result;
     }
 };
 inline GpuOwner& GlobalGpu() noexcept {static GpuOwner owner;return owner;}
