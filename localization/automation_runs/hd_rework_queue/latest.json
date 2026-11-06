@@ -6,11 +6,11 @@
   "hold_categories": {
     "AB_IMAGE_AND_CLEAN_REWORK": 28,
     "ENGINE_OR_COORDINATE_HOLD": 622,
-    "EVIDENCE_REVIEW_HOLD": 47
+    "EVIDENCE_REVIEW_HOLD": 46
   },
-  "hold_count": 697,
+  "hold_count": 696,
   "new_imagegen_disabled": true,
-  "old_painted_count_invalid_for_release": 257,
+  "old_painted_count_invalid_for_release": 258,
   "policy": "hd-existing-ab-salvage-first-v2-20261105",
   "previously_claimed_ticket_count": 8,
   "qa_report_schema": "outrun.ab-imagegen-hd-strict.v2",
@@ -20,7 +20,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-workqueue-v1",
   "selection_policy": "EXISTING_A_B_PNG_ONLY_NO_NEW_IMAGEGEN",
-  "source_asset_sha256": "a9cd3f88265f9af386563055fa5bcaaacdd90c0b6b7a0da03f28a818d775b520",
+  "source_asset_sha256": "afb877ac8fcc4dd94325d194f2894586a00dda6a6df8c0cce137990320b8f808",
   "source_reference_count_verified": 0,
   "source_roi_count": 954,
   "tasks": []
