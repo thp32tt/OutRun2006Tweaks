@@ -1,0 +1,44 @@
+name: OutRun HD Korean continuous auto controller (GitHub CPU)
+
+# This small watchdog does NOT re-render images, run Docker or install a game.
+# Default branch schedule invokes the original asset-branch DDS workflow ONLY
+# when the asset HEAD has changed, or retries the first failed run once.
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/outrun-hd-korean-auto-controller.yml"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: outrun-hd-korean-controller
+  cancel-in-progress: false
+
+jobs:
+  source-sha-watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout only current asset-branch controller and tests
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/hd_automation_watchdog.py
+            tools/localization/test_hd_automation_watchdog.py
+
+      - name: Prove dedup, active-run wait, bounded retry, and strict release safety
+        run: python3 -m unittest discover -s tools/localization -p test_hd_automation_watchdog.py -v
+
+      - name: Dispatch exact new SHA or retry one failed run only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/localization/hd_automation_watchdog.py --apply
