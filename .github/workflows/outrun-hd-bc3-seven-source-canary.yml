@@ -1,0 +1,96 @@
+name: OutRun HD DXT5 seven-source A/B canary (GitHub CPU)
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/outrun-hd-bc3-seven-source-canary.yml
+permissions:
+  contents: read
+jobs:
+  test-seven-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/github_ab_imagegen_atlas_batch.py
+            tools/localization/hd_strict_qa.py
+            tools/localization/hd_bc3_index_patch.py
+            tools/localization/hd_bc3_native_codec.py
+            tools/localization/hd_existing_candidate_salvage.py
+            tools/localization/probe_hd_bc3_real_sources.py
+            tools/localization/test_hd_bc3_index_patch.py
+            tools/localization/test_hd_bc3_native_codec.py
+            localization/automation_inputs/hd_original_png_source_plan.json
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+            localization/automation_inputs/candidate_outputs/B/Q104_01e25aa25a681d26_source_k.png
+            localization/automation_inputs/candidate_outputs/A/Q116_a9da32ccca1ed48a_source_k.png
+            localization/automation_inputs/candidate_outputs/B/Q102_b90c27565464daf9_source_k.png
+            localization/automation_inputs/candidate_outputs/A/Q059_0214d1bfb9538a64_source_k.png
+            localization/automation_inputs/candidate_outputs/A/Q059_d6b334ba2a964812_source_k.png
+            localization/automation_inputs/candidate_outputs/A/Q092_c3e26b50f325db99_source_k.png
+            localization/automation_inputs/candidate_outputs/A/Q059_c4006a90789c50b0_source_k.png
+            localization/automation_inputs/candidate_outputs/A/Q092_ec969d44bfedebe0_source_k.png
+            localization/automation_inputs/candidate_outputs/B/Q102_293bc908b7eb9ebe_source_k.png
+            localization/automation_inputs/candidate_outputs/A/Q119_e9d31b675f66d275_source_k.png
+            localization/automation_inputs/candidate_outputs/A/Q059_58da97467534c071_k.png
+            localization/automation_inputs/candidate_outputs/A/Q112_34d7b55a5e6b3ec8_k.png
+            localization/automation_inputs/candidate_outputs/A/Q119_470c1b806cd9eecb_k.png
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+      - name: Validate source-format and protected-ROI regression suite
+        run: |
+          python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
+          python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
+      - name: Exactly SHA-pinned seven original BC3 DXT5 atlases, no new art
+        run: |
+          python - <<'PY'
+          import sys,os,json,hashlib
+          sys.path.insert(0, 'tools/localization')
+          import probe_hd_bc3_real_sources as p
+          p.TARGETS=(
+            "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+            "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+            "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+            "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+            "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+            "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+            "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds"
+          )
+          one=p.run('.',os.path.join(os.environ['RUNNER_TEMP'],'bc3-first'))
+          two=p.run('.',os.path.join(os.environ['RUNNER_TEMP'],'bc3-second'))
+          for key in ('total_targets','total_rows','test_only_roi','hold_roi'):
+              assert one[key]==two[key],key
+          assert one['release_approved'] is False and one['runtime_validation']=='UNTESTED'
+          for r in one['results']:
+              assert r['release_approved'] is False
+          for name in ('bc3_real_source_report.json','BC3_CANARY_TEST_ONLY.zip'):
+              a=open(os.path.join(os.environ['RUNNER_TEMP'],'bc3-first',name),'rb').read()
+              b=open(os.path.join(os.environ['RUNNER_TEMP'],'bc3-second',name),'rb').read()
+              assert a==b,'NONDETERMINISTIC_'+name
+          print('BC3_SEVEN_SOURCE_RESULT',json.dumps({
+              'targets':one['total_targets'],'rows':one['total_rows'],
+              'test_only':one['test_only_roi'],'held':one['hold_roi'],
+              'release_approved':False},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: outrun-bc3-seven-source-test-only
+          path: ${{ runner.temp }}/bc3-first/
+          retention-days: 14
+          if-no-files-found: ignore
