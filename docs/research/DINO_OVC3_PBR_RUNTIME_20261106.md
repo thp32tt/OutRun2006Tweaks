@@ -23,8 +23,8 @@ Branch: `feature/dino-external-pbr-runtime-v1-20261106`. Never replace the origi
   "materials": [
     {
       "index": 0,
-      "roughness": 0.75,
-      "metallic": 0.05,
+      "roughness": 1.0,
+      "metallic": 1.0,
       "normalScale": 1.0,
       "normal": "material0_normal.png",
       "orm": "material0_orm.png"
@@ -47,6 +47,20 @@ py tools/upgrade_dino_ovc_pbr.py --input-ovc "D:\model\Dino246_Cockpit_LHD_v15.o
 ```
 
 4. Test only against a **matched PBR-enabled R26 Win32 DLL/OpenXR host** build and a copy of your original game folder. The original/installed stable OVC2 and DLL should be backed up first. The stable runtime path uses `Dino246_Cockpit_LHD_v15.ovc` by default. Only the explicit PBR copy-run mode sets the process-only `OUTRUN_VR_DINO_PBR_TEST=1` flag, selecting the *separate* `Dino246_Cockpit_LHD_v15_PBR.ovc` file. A missing/corrupt PBR sidecar does not replace the stable file. **Do not** deploy a new OVC3 file with an old DLL (old parser rejects the OVC3 signature). The PBR branch's CI packages a matching Win32 DLL and x64 OpenXR host with matching `SOURCE_SHA.txt` and `HOST_BUILD_SOURCE_SHA.txt`. Do not launch a PBR DLL alongside a host from another source SHA. This is a build artifact, **not** a complete ready-to-run model package. `RUN-QUEST-APK-DINO-PBR.cmd` and `QuestCockpit-CopyRun.ps1 -Mode PBR` additionally require a complete `QUEST_APK_COPYRUN_PAYLOAD` with a verified `IDENTITY.json` (including `DinoPbrModelSha256`) and the new OVC3 model. Do not use a former FitV6 payload/manifest as the PBR package.
+
+## Full matched-backend PBR ZIP for a copied game folder
+
+The `Dino-OVC3-PBR-R26-MatchedDLLHost` GitHub Actions artifact now includes the exact-SHA x86 DLL, x64 OpenXR host, original launch/restore PowerShell scripts, runner/config helpers, the `BUILD-DINO-PBR-TEST-ZIP.cmd` batch and the offline `CREATE-DINO-PBR-PACKAGE.py` packager. **The artifact contains no proprietary OVC3 model and no original game executable.**
+
+1. Download and extract **all** contents of the artifact from the exact passing PBR CI run into an empty folder.
+2. Export/convert your cockpit to a separate `Dino246_Cockpit_LHD_v15_PBR.ovc` using `tools/upgrade_dino_ovc_pbr.py`. Do not replace the existing stable OVC2.
+3. Drag that OVC3 onto `BUILD-DINO-PBR-TEST-ZIP.cmd`. This runs Python and creates `Dino-OVC3-PBR-COPYRUN.zip`. Alternatively run `python CREATE-DINO-PBR-PACKAGE.py --artifact-dir . --ovc3 path-to-model.ovc --out-zip Dino-OVC3-PBR-COPYRUN.zip`.
+4. Copy your game folder before testing. Extract the ZIP beside the copied `OR2006C2C.EXE`. No active game files are replaced by extraction because the build DLL and host are **only** in `QUEST_APK_COPYRUN_PAYLOAD/backend`.
+5. Precheck with `powershell -NoProfile -ExecutionPolicy Bypass -File QuestCockpit-CopyRun.ps1 -Mode PBR -VerifyOnly`; then launch `RUN-QUEST-APK-DINO-PBR.cmd`. Restore with `RESTORE-QUEST-APK-COCKPIT.cmd`.
+
+If a binary, OVC checksum, architecture, source marker or current model conflicts, the packager/launcher fails closed. The ZIP packer refuses to overwrite an existing output ZIP. This is for first-party user testing, not proof of Quest 3 runtime parity.
+
+**ORM semantics:** if `orm` is present and roughness/metallic factors are omitted, both default to **1.0**, preserving authored G/B map channels. If no ORM map is provided, the defaults are dielectric `metallic=0.0`, `roughness=0.75`. Optional explicit factors multiply the corresponding map channels.
 
 ## Validation
 
