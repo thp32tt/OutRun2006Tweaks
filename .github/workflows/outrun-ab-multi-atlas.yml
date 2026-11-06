@@ -1,19 +1,8 @@
 name: OutRun A/B High-Quality Multi-Atlas (GitHub CPU)
 
 on:
-  schedule:
-    # Daily 03:17 KST; GitHub default branch only
-    - cron: "17 18 * * *"
+  # Dispatched by the 30-minute SHA-gated GitHub controller only.
   workflow_dispatch:
-  push:
-    branches: [korean-localization-recovery-20260928]
-    paths:
-      - ".github/workflows/outrun-ab-multi-atlas.yml"
-      - "tools/localization/github_ab_imagegen_atlas_batch.py"
-      - "tools/localization/test_github_ab_imagegen_atlas_batch.py"
-      - "localization/automation_inputs/candidate_outputs/**"
-      - "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
-      - "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/**"
 
 permissions:
   contents: read
