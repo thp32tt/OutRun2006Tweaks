@@ -26,6 +26,9 @@ function Assert-BackupManifest([string]$manifestPath,[string]$backupRoot){
     if($m.RestoredUtc){
         throw 'Existing original backup was already restored but not archived; refusing stale baseline reuse.'
     }
+    if(Test-Path -LiteralPath (Join-Path $backupRoot 'RESTORE_IN_PROGRESS.txt') -PathType Leaf){
+        throw 'Interrupted restore detected. Run RESTORE-QUEST-APK-COCKPIT.cmd again before starting a new test.'
+    }
     $sourceId=[string]$m.SourceSha
     if($sourceId.Length -ne 40 -or $sourceId -match '[^0-9a-f]'){
         throw 'Existing original backup source identity is invalid.'

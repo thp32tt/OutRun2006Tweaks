@@ -104,6 +104,7 @@ jobs:
           foreach($file in @(
             'tools/Run-OutRunVRTest.ps1',
             'tools/Select-OutRunVRBackend.ps1',
+            'tools/OutRunVR-TestProfiles.ps1',
             'tools/Collect-OutRunVRLogs.ps1',
             'tools/Analyze-OutRunVRSession.ps1',
             'Run-QuestCockpitV2-CrashDiag.ps1',
@@ -119,6 +120,39 @@ jobs:
             }
           }
           Write-Host 'Cockpit test script syntax PASS'
+
+      - name: Validate packaged helpers with Windows PowerShell 5.1
+        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
+        shell: pwsh
+        run: |
+          $validator=Join-Path $env:RUNNER_TEMP 'validate-copyrun-ps51.ps1'
+          @'
+          param([Parameter(Mandatory=$true)][string]$Target)
+          $tokens=$null
+          $parseErrors=$null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            $Target,[ref]$tokens,[ref]$parseErrors)
+          if($parseErrors.Count -gt 0){
+            throw (([IO.Path]::GetFileName($Target))+': '+(($parseErrors|ForEach-Object Message)-join '; '))
+          }
+          '@ | Set-Content -LiteralPath $validator -Encoding ascii
+          $windowsPs=Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+          foreach($file in @(
+            'tools/Run-OutRunVRTest.ps1',
+            'tools/Select-OutRunVRBackend.ps1',
+            'tools/OutRunVR-TestProfiles.ps1',
+            'tools/Collect-OutRunVRLogs.ps1',
+            'tools/Analyze-OutRunVRSession.ps1',
+            'Run-QuestCockpitV2-CrashDiag.ps1',
+            'QuestCockpit-CopyRun.ps1',
+            'QuestCockpit-CopyRestore.ps1')){
+            $target=(Resolve-Path -LiteralPath $file).Path
+            & $windowsPs -NoProfile -ExecutionPolicy Bypass -File $validator -Target $target
+            if($LASTEXITCODE -ne 0){throw "Windows PowerShell 5.1 parse failed: $file"}
+          }
+          python -m py_compile tools/analyze_outrun_assets.py
+          if($LASTEXITCODE -ne 0){throw 'analyze_outrun_assets.py syntax failed'}
+          Write-Host 'Packaged helper Windows PowerShell 5.1/Python syntax PASS'
 
       - name: Validate copy-run CMD control flow
         if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
@@ -452,9 +486,24 @@ jobs:
               Remove-Item -LiteralPath $activeBackup -Recurse -Force
               $global:LASTEXITCODE=0
 
+              # A valid backup with an interrupted-restore marker must block
+              # a new COPY-RUN cycle until RESTORE is retried.
+              New-Item -ItemType Directory -Force -Path $activeBackup | Out-Null
+              $restoreManifest=[ordered]@{
+                SchemaVersion=1
+                SourceSha=$env:GITHUB_SHA
+                Entries=@([ordered]@{Scope='root';Name='COPYRUN_SYNTHETIC_PROBE.tmp';Existed=$false;Sha256=''})
+              }
+              $restoreManifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath (Join-Path $activeBackup 'original_files.json') -Encoding UTF8
+              'probe'|Set-Content -LiteralPath (Join-Path $activeBackup 'RESTORE_IN_PROGRESS.txt') -Encoding ascii
+              & $env:ComSpec /d /v:on /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              $probeExit=$LASTEXITCODE
+              if($probeExit -eq 0){throw 'interrupted restore marker did not block COPY-RUN VERIFY'}
+              Remove-Item -LiteralPath (Join-Path $activeBackup 'RESTORE_IN_PROGRESS.txt') -Force
+              $global:LASTEXITCODE=0
+
               # A successful synthetic restore must archive the active baseline
               # so the next test cycle cannot reuse a stale pre-restore snapshot.
-              New-Item -ItemType Directory -Force -Path $activeBackup | Out-Null
               $restoreManifest=[ordered]@{
                 SchemaVersion=1
                 SourceSha=$env:GITHUB_SHA

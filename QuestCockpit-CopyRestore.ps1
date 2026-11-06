@@ -61,8 +61,14 @@ $running=Get-Process -ErrorAction SilentlyContinue|Where-Object{
 }
 if($running){throw 'Close the game and VR host before restoring.'}
 $m=Read-ValidatedManifest
+$restoreTxn=Join-Path $backup 'RESTORE_IN_PROGRESS.txt'
+@(
+    "RESTORE_STARTED_UTC=$((Get-Date).ToUniversalTime().ToString('o'))"
+    "SOURCE_SHA=$($m.SourceSha)"
+)|Set-Content -LiteralPath $restoreTxn -Encoding ascii
 
 # Restore every tracked original only after the complete backup passed validation.
+# If any operation throws, RESTORE_IN_PROGRESS.txt remains and CopyRun fails closed.
 foreach($e in $m.Entries){
     $base=if($e.Scope -eq 'root'){$root}else{Join-Path $root 'backends/d3d9'}
     $dest=Join-Path $base ([string]$e.Name)
@@ -81,6 +87,7 @@ foreach($e in $m.Entries){
         }
     }
 }
+if(Test-Path -LiteralPath $restoreTxn){Remove-Item -LiteralPath $restoreTxn -Force}
 
 # Mark restore completion before archival. If archival itself fails, CopyRun
 # sees RestoredUtc and refuses to reuse this stale baseline.
