@@ -58,6 +58,19 @@ class DXT5OriginalProtection(unittest.TestCase):
         with self.assertRaisesRegex(bc.BC3Hold, 'SOURCE_NOOP'):
             bc.patch_bc3_native(raw, result, source, [(0, 0, 4, 4)])
 
+    def test_sub16_aa_fringe_may_quantize_but_glyph_core_survives(self):
+        raw, source = fake_dxt5()
+        result = source.copy()
+        result.putpixel((4, 4), (20, 210, 20, 255))
+        result.putpixel((5, 4), (20, 210, 20, 8))
+        patched, receipt = bc.patch_bc3_native(
+            raw, result, source, [(4, 4, 8, 8)])
+        native = Image.open(io.BytesIO(patched)).convert('RGBA')
+        self.assertGreater(native.getpixel((4, 4))[3], 200)
+        self.assertLessEqual(abs(native.getpixel((5, 4))[3] - 8), 32)
+        self.assertGreater(receipt['bc3_blocks_patched'], 0)
+        self.assertEqual(patched[128:144], raw[128:144])
+
     def test_mip_chain_fails_closed_without_reencoding_all_levels(self):
         raw, _ = fake_dxt5()
         multi = bytearray(raw)
