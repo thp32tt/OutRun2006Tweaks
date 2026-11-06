@@ -156,8 +156,15 @@ def upgrade(input_bytes: bytes, manifest: dict, root: Path) -> bytes:
     body.extend(b"OVCPBR3!")
     for i in range(materials):
         entry = per_material.get(i,{})
+        # glTF-style packed ORM masks store the actual per-pixel metal and
+        # roughness values. Their material factors must default to 1.0;
+        # otherwise the former 0.04 metallic default quietly turned even
+        # 100%-metal ORM pixels into dielectrics.
+        has_orm = bool(entry.get("orm"))
         factors = tuple(float(entry.get(k,d)) for k,d in (
-            ("roughness",0.75),("metallic",0.04),("normalScale",1.0)))
+            ("roughness",1.0 if has_orm else 0.75),
+            ("metallic",1.0 if has_orm else 0.0),
+            ("normalScale",1.0)))
         if not (math.isfinite(factors[0]) and 0.04 <= factors[0] <= 1 and
                 math.isfinite(factors[1]) and 0 <= factors[1] <= 1 and
                 math.isfinite(factors[2]) and 0 <= factors[2] <= 2):
