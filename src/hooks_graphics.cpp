@@ -790,23 +790,31 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         ticket.valid=false; // single-use; prevent nested callback reuse
         if(!OutRunVR::DinoSidecar::CanReplaceOriginalCar(gate))
             return false;
-        const HRESULT hr=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
+        const auto draw=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
             ticket.device,ticket.world,ticket.view,ticket.projection);
-        const bool replacementSubmitted=
-            OutRunVR::DinoSidecar::SuppressOriginalCarAfterExternalDraw(
-                gate,SUCCEEDED(hr));
+        const auto route=OutRunVR::DinoSidecar::ChooseOriginalCarRoute(
+            gate,draw.receipt);
+        const bool suppressOriginal=
+            route!=OutRunVR::DinoSidecar::OriginalCarRoute::OriginalFallback;
         if(Settings::VRTelemetry) {
             static std::uint64_t attempts=0;
             const auto sample=++attempts;
-            if(sample<=8u || (sample&(sample-1u))==0u)
+            if(sample<=8u || (sample&(sample-1u))==0u ||
+               route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial)
                 spdlog::info(
                     "VR QUEST DINO EXCLUSIVE: sample={} nativeFrame={} xrPose={} "
-                    "drawHr=0x{:08X} originalCar={} originalPMT=UNCHANGED",
+                    "drawHr=0x{:08X} submitted={}/{} stateRestored={} route={} "
+                    "originalPMT=UNCHANGED",
                     sample,ticket.nativeFrame,ticket.xrPose,
-                    static_cast<unsigned int>(hr),
-                    replacementSubmitted?"SUPPRESSED":"FALLBACK");
+                    static_cast<unsigned int>(draw.hr),
+                    draw.receipt.submittedMeshes,draw.receipt.expectedMeshes,
+                    draw.receipt.stateRestored,
+                    route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete ?
+                        "EXTERNAL_COMPLETE" :
+                    route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial ?
+                        "EXTERNAL_PARTIAL_QUARANTINED" : "ORIGINAL_FALLBACK");
         }
-        return replacementSubmitted;
+        return suppressOriginal;
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
