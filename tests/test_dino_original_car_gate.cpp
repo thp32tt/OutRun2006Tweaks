@@ -35,5 +35,25 @@ int main() {
     assert(!CanReplaceOriginalCar(bad)); // unowned stereo frame
     bad=g;bad.ticketEpoch=UINT64_MAX;bad.liveEpoch=UINT64_MAX;
     assert(CanReplaceOriginalCar(bad)); // no truncation of 64-bit owner
+    // Before any external mesh is drawn, failure falls through to the
+    // original car. After a partial GPU submission the original would double
+    // that mesh, so fail closed for this eye and retry original next frame.
+    const MeshDrawReceipt none{3,0,false,true};
+    const MeshDrawReceipt completed{3,3,true,true};
+    const MeshDrawReceipt partial{3,1,false,true};
+    const MeshDrawReceipt lostState{3,3,true,false};
+    const MeshDrawReceipt zero{0,0,true,true};
+    const MeshDrawReceipt invalid{3,4,true,true};
+    assert(ChooseOriginalCarRoute(g,none)==OriginalCarRoute::OriginalFallback);
+    assert(ChooseOriginalCarRoute(g,completed)==OriginalCarRoute::ExternalComplete);
+    assert(ChooseOriginalCarRoute(g,partial)==OriginalCarRoute::ExternalPartial);
+    assert(ChooseOriginalCarRoute(g,lostState)==OriginalCarRoute::ExternalPartial);
+    assert(ChooseOriginalCarRoute(g,zero)==OriginalCarRoute::OriginalFallback);
+    assert(ChooseOriginalCarRoute(g,invalid)==OriginalCarRoute::OriginalFallback);
+    bad=g;bad.livePose=457;
+    assert(ChooseOriginalCarRoute(bad,completed)==OriginalCarRoute::OriginalFallback);
+    bad=g;bad.ownedPlayer=false;
+    assert(ChooseOriginalCarRoute(bad,partial)==OriginalCarRoute::OriginalFallback);
+    std::puts("DINO_EXTERNAL_PARTIAL_SUBMISSION_NO_DOUBLE_CAR_PASS");
     std::puts("DINO_EXTERNAL_EXCLUSIVE_ORIGINAL_CAR_FAIL_CLOSED_GATE_PASS");
 }
