@@ -97,7 +97,13 @@ def encode_bc3_block(pixels):
         raise BC3Hold('QA_BC3_NO_ALPHA_PALETTE_WITH_POSITIVE_STROKES')
     a0, a1 = best_encoding[1]
     alpha_indexes = sum(idx << (3*i) for i, idx in enumerate(best_encoding[2]))
-    visible = [p[:3] for p in pixels if p[3] > 0] or [p[:3] for p in pixels]
+    # A/B PNGs may contain arbitrary matte RGB in nearly transparent (<16)
+    # AA fringe pixels. Such pixels are not readable ink and cannot veto the
+    # channel-55 quality gate on the actual glyph body. Prefer core colors;
+    # if a block has no core pixels, fall back to its positive-alpha colors.
+    visible = [p[:3] for p in pixels if p[3] >= 16]
+    if not visible:
+        visible = [p[:3] for p in pixels if p[3] > 0] or [p[:3] for p in pixels]
     unique = sorted(set(visible))
     def rgb_candidate(first, second):
         c0, c1 = _rgb565(first), _rgb565(second)
