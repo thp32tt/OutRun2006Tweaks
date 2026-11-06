@@ -24,7 +24,8 @@ Scope: only `feature/dino-external-pbr-runtime-v1-20261106`, originally based on
 ## Real game compatibility **not yet established**
 
 - No original-game process/gameplay/HMD test executed in CI. Windows compilation is not native game runtime proof.
-- The original `PlayerCallbackHook.ccall<void>(player)` still draws before the external sidecar overlay in `src/hooks_graphics.cpp`. Therefore the previously observed **duplicate steering wheel and overlapping interior** are **not fixed** by the PBR material extension.
+- The **new exclusive external-model draw** (2026-11-07) attempts the replacement sidecar first and only bypasses the original 0x49F3E0 player-car DISPLAY callback if the replacement draw and D3D9 state restoration return success with matching native epoch, player identity, camera=mode1 and XR pose. OVC1/OVC2 and OVC3 share this gate. This prevents native vehicle PMT queue creation on a successful external frame; missing/failed sidecar still runs the unchanged original player-car callback. Actual HMD image confirmation is still pending.
+- **Scope tradeoff:** Bypassing the original player-car display callback removes the *whole original player vehicle render*, not only the duplicated cockpit/steering. If an imported sidecar contains only the interior, exterior body/wheels/roof and native player-car-only render effects may be absent in the cockpit scene. Do not call this "full original game parity" until native race/menu, passenger, shadow and model-animation effects are checked.
 - No successful race-end -> loading -> main-menu -> exit/relaunch loop on the user's actual Quest 3 + PC has been established. Existing sky flicker, camera shake and menu crash are outside this PBR compatibility claim.
 - No frame-time or stereoscopic image validation. GGX shader uses approximate directional/ambient light, not original game's true dynamic lighting/environment reflections.
 - No turn-key ZIP with an actual proprietary Dino OVC3 model was produced. The standalone build artifact contains matching backend binaries; the copy-run script additionally requires a complete verified `QUEST_APK_COPYRUN_PAYLOAD` with an operator-created OVC3 sidecar and `DinoPbrModelSha256` in the package identity. Do **not** copy the new binary over an active old release and press the old launcher.
@@ -36,4 +37,4 @@ Scope: only `feature/dino-external-pbr-runtime-v1-20261106`, originally based on
 3. Before claiming parity, capture original OVC2 vs OVC3 race/menu flows, per-eye screenshots, driver wheel duplication, original sky/HUD, seat camera, GPU frame times and crash dump if any.
 4. Restore with `RESTORE-QUEST-APK-COCKPIT.cmd` if any compatibility fault is reproduced.
 
-Status: **SOURCE/CI COMPATIBILITY PARTIALLY VERIFIED; ORIGINAL GAME VR RUNTIME UNTESTED.**
+Status: **EXCLUSIVE ORIGINAL VEHICLE DISPLAY GATE IMPLEMENTED IN SOURCE; ORIGINAL GAME VR RUNTIME UNTESTED.**
