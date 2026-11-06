@@ -10,6 +10,7 @@ from collections import defaultdict
 from pathlib import Path, PurePosixPath
 from PIL import Image, ImageChops, ImageDraw, ImageOps, UnidentifiedImageError
 from hd_strict_qa import process_strict_atlas
+from hd_bc3_index_patch import bc3_shape
 
 CROSS="localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
 ORIGINAL="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
@@ -174,6 +175,17 @@ def native_image(b):
  if len(b)<128 or b[:4]!=b"DDS " or struct.unpack_from("<I",b,4)[0]!=124:raise ValueError("DDS_HEADER")
  height,width=struct.unpack_from("<II",b,12)
  if not 0<height<=4096 or not 0<width<=4096:raise ValueError("DDS_DIMENSIONS")
+ if (struct.unpack_from("<I",b,76)[0]==32 and
+     struct.unpack_from("<I",b,80)[0]==4 and
+     b[84:88]==b"DXT5"):
+  # The BC3 codec never changes source endpoints or any untouched pixel;
+  # mip chains fail closed until their complete format-preserving path exists.
+  bc3_shape(b)
+  with Image.open(io.BytesIO(b)) as im:
+   im.load()
+   image=im.convert("RGBA")
+  if image.size!=(width,height):raise ValueError("QA_BC3_DECODE_DIMENSIONS")
+  return image
  if (struct.unpack_from("<I",b,76)[0]!=32 or
      struct.unpack_from("<I",b,80)[0]!=65 or
      struct.unpack_from("<I",b,88)[0]!=32 or
