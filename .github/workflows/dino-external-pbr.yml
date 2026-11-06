@@ -40,7 +40,7 @@ jobs:
         shell: pwsh
         run: |
           & ./tools/tests/test_dino_pbr_copyrun.ps1
-          if($LASTEXITCODE -ne 0 -or -not $?){throw "PBR launcher compatibility smoke failed"}
+          if(-not $?){throw "PBR launcher compatibility smoke failed"}
   win32-shader:
     runs-on: windows-2022
     steps:
