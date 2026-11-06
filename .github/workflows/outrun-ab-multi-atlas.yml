@@ -1,30 +1,9 @@
 name: OutRun A/B High-Quality Multi-Atlas (GitHub CPU)
 
 on:
-  schedule:
-    # Daily 03:17 KST; GitHub default branch only
-    - cron: "17 18 * * *"
+  # The default-branch 30-minute SHA controller is now the only auto dispatcher.
+  # No push storm, no daily blind 2-hour rebuild for unchanged A/B assets.
   workflow_dispatch:
-  push:
-    branches: [korean-localization-recovery-20260928]
-    paths:
-      - ".github/workflows/outrun-ab-multi-atlas.yml"
-      - "tools/localization/github_ab_imagegen_atlas_batch.py"
-      - "tools/localization/hd_strict_qa.py"
-      - "tools/localization/hd_bc3_index_patch.py"
-      - "tools/localization/hd_bc3_native_codec.py"
-      - "tools/localization/test_hd_bc3_index_patch.py"
-      - "tools/localization/test_hd_bc3_native_codec.py"
-      - "tools/localization/hd_existing_candidate_salvage.py"
-      - "tools/localization/hd_rework_queue.py"
-      - "tools/localization/publish_hd_rework_queue.py"
-      - "tools/localization/test_hd_rework_queue.py"
-      - "tools/localization/test_hd_strict_qa.py"
-      - "tools/localization/test_github_ab_imagegen_atlas_batch.py"
-      - "localization/automation_inputs/candidate_outputs/**"
-      - "localization/automation_inputs/qa_rework/approved/**"
-      - "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
-      - "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/**"
 
 permissions:
   contents: write
@@ -32,7 +11,7 @@ permissions:
 concurrency:
   group: outrun-ab-multi-atlas
   # Only the newest asset/code SHA needs full DDS QA. Avoid wasting runners on obsolete commits.
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   merge-source-native:
