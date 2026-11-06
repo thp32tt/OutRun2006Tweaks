@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include "dino_external_sidecar.hpp"
+#include "dino_external_pbr_shader.hpp"
 
 namespace OutRunVR::DinoSidecar {
 class GpuOwner final {
@@ -28,6 +29,9 @@ class GpuOwner final {
     Model cpu_{};
     std::vector<GpuMesh> meshes_{};
     std::vector<IDirect3DTexture9*> textures_{};
+    std::vector<IDirect3DTexture9*> normals_{},orms_{};
+    PbrShaders pbrShaders_{};
+    bool pbrReady_=false;
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
     // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
@@ -109,6 +113,11 @@ class GpuOwner final {
         meshes_.clear();
         for(auto& texture:textures_) {if(texture)texture->Release();texture=nullptr;}
         textures_.clear();
+        for(auto& t:normals_)if(t)t->Release();
+        for(auto& t:orms_)if(t)t->Release();
+        normals_.clear();orms_.clear();
+        pbrShaders_.Release();
+        pbrReady_=false;
         owner_=nullptr;
     }
     bool RejectGpu(IDirect3DDevice9* device) noexcept {
@@ -151,6 +160,28 @@ class GpuOwner final {
         for(std::size_t material=0;material<cpu_.textures.size();++material) {
             if(!UploadDDS(dev,cpu_.textures[material],&textures_[material])) {
                 return RejectGpu(dev);
+            }
+        }
+        // Optional PBR allocations must never prevent a working legacy draw.
+        // On any map/shader failure fall back to textured fixed-function once
+        // per device generation, not once per eye/frame.
+        if(cpu_.pbrEnabled) {
+            normals_.resize(cpu_.pbrMaterials.size(),nullptr);
+            orms_.resize(cpu_.pbrMaterials.size(),nullptr);
+            bool mapsReady=true;
+            for(std::size_t i=0;i<cpu_.pbrMaterials.size();++i) {
+                const auto& p=cpu_.pbrMaterials[i];
+                if((!p.normal.dds.empty() &&
+                    !UploadDDS(dev,p.normal,&normals_[i])) ||
+                   (!p.orm.dds.empty() &&
+                    !UploadDDS(dev,p.orm,&orms_[i]))) {
+                    mapsReady=false;break;
+                }
+            }
+            if(mapsReady)pbrReady_=pbrShaders_.Ensure(dev);
+            if(!pbrReady_) {
+                for(auto& t:normals_){if(t)t->Release();t=nullptr;}
+                for(auto& t:orms_){if(t)t->Release();t=nullptr;}
             }
         }
         for(const auto& m:cpu_.meshes) {
@@ -254,10 +285,48 @@ public:
            FAILED(device->SetSamplerState(0,D3DSAMP_MIPMAPLODBIAS,0u)) ||
            FAILED(device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE)))
             hr=E_FAIL;
+        if(SUCCEEDED(hr) && pbrReady_) {
+            if(FAILED(device->SetRenderState(D3DRS_SRGBWRITEENABLE,FALSE)) ||
+               FAILED(device->SetSamplerState(1,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
+               FAILED(device->SetSamplerState(1,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
+               FAILED(device->SetSamplerState(2,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
+               FAILED(device->SetSamplerState(2,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
+               FAILED(device->SetSamplerState(1,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
+               FAILED(device->SetSamplerState(1,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
+               FAILED(device->SetSamplerState(1,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
+               FAILED(device->SetSamplerState(2,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
+               FAILED(device->SetSamplerState(2,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
+               FAILED(device->SetSamplerState(2,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
+               FAILED(device->SetSamplerState(1,D3DSAMP_SRGBTEXTURE,FALSE)) ||
+               FAILED(device->SetSamplerState(2,D3DSAMP_SRGBTEXTURE,FALSE)) ||
+               FAILED(pbrShaders_.Bind(device,world,view,projection))) {
+                // Preserve the color-texture path even on a shader bind error.
+                pbrReady_=false;
+                if(FAILED(device->SetVertexShader(nullptr)) ||
+                   FAILED(device->SetPixelShader(nullptr)))hr=E_FAIL;
+            }
+        }
+        const float eye[3]{
+            -(view._41*view._11+view._42*view._12+view._43*view._13),
+            -(view._41*view._21+view._42*view._22+view._43*view._23),
+            -(view._41*view._31+view._42*view._32+view._43*view._33)};
         if(SUCCEEDED(hr))for(const auto& m:meshes_) {
             if(FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||
                FAILED(device->SetIndices(m.ib)) ||
                FAILED(device->SetTexture(0,textures_[m.material]))) {hr=E_FAIL;break;}
+            if(pbrReady_) {
+                const auto& p=cpu_.pbrMaterials[m.material];
+                const float factors[4]{p.roughness,p.metallic,p.normalScale,
+                                       normals_[m.material]?1.f:0.f};
+                const float eyeOrm[4]{eye[0],eye[1],eye[2],
+                                      orms_[m.material]?1.f:0.f};
+                if(FAILED(device->SetTexture(1,normals_[m.material])) ||
+                   FAILED(device->SetTexture(2,orms_[m.material])) ||
+                   FAILED(device->SetPixelShaderConstantF(0,factors,1)) ||
+                   FAILED(device->SetPixelShaderConstantF(1,eyeOrm,1))) {
+                    hr=E_FAIL;break;
+                }
+            }
             hr=device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,0,0,m.vertexCount,
                                              0,m.indexCount/3);
             if(FAILED(hr))break;
