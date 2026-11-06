@@ -2,6 +2,11 @@
 import importlib.util
 from pathlib import Path
 import unittest
+from unittest.mock import patch
+import io
+import json
+import urllib.error
+from contextlib import redirect_stdout, redirect_stderr
 
 path = Path(__file__).resolve().parent / "hd_automation_watchdog.py"
 spec = importlib.util.spec_from_file_location("localization_watchdog", path)
@@ -89,6 +94,65 @@ class TestController(unittest.TestCase):
 
     def test_new_sha_run_does_not_reuse_old_success(self):
         self.assertEqual(self.pick([run(OLD)], artifacts=[42])["action"], "DISPATCH")
+
+    def test_end_to_end_controller_posts_only_exact_branch_dispatch(self):
+        seen = []
+        class FakeAPI:
+            def __init__(self, token):
+                self.token = token
+            def call(self, path, method="GET", payload=None):
+                seen.append((method, path, payload))
+                if path.startswith("/git/ref/heads/"):
+                    return {"object": {"sha": SHA}}
+                if "/actions/workflows/" in path and "/runs?" in path:
+                    return {"workflow_runs": []}
+                if path.startswith("/contents/"):
+                    raise urllib.error.HTTPError("https://api.github.com", 404, "not found", None, None)
+                if path.endswith("/dispatches") and method == "POST":
+                    return {}
+                raise AssertionError("Unexpected API call: " + path)
+        stdout = io.StringIO()
+        with patch.object(c, "API", FakeAPI), patch.object(c.sys, "argv", ["watchdog","--apply"]), \
+             patch.dict(c.os.environ, {"GH_TOKEN":"only-test", "GITHUB_REPOSITORY":c.REPO}, clear=True), \
+             redirect_stdout(stdout), redirect_stderr(io.StringIO()):
+            self.assertEqual(c.main(), 0)
+        result = json.loads(stdout.getvalue())
+        self.assertEqual(result["action"], "DISPATCH")
+        self.assertEqual(result["side_effect"], "DISPATCH_ACCEPTED_BY_GITHUB")
+        posts = [item for item in seen if item[0] == "POST"]
+        self.assertEqual(len(posts), 1)
+        self.assertEqual(posts[0][1], "/actions/workflows/outrun-ab-multi-atlas.yml/dispatches")
+        self.assertEqual(posts[0][2], {"ref":c.ASSET_BRANCH})
+
+    def test_end_to_end_document_only_change_does_not_post(self):
+        seen = []
+        class FakeAPI:
+            def __init__(self, token):
+                pass
+            def call(self, path, method="GET", payload=None):
+                seen.append((method, path))
+                if path.startswith("/git/ref/heads/"):
+                    return {"object": {"sha": SHA}}
+                if "/actions/workflows/" in path and "/runs?" in path:
+                    return {"workflow_runs": [run(OLD)]}
+                if path.startswith("/actions/runs/42/artifacts"):
+                    return {"artifacts": [{"name":"outrun-ab-multi-atlas-42",
+                                         "size_in_bytes":123, "expired":False}]}
+                if path.startswith("/compare/"):
+                    return {"status":"ahead","total_commits":1,
+                            "files":[{"filename":"docs/new-review.md"}]}
+                if path.startswith("/contents/"):
+                    raise urllib.error.HTTPError("https://api.github.com", 404, "not found", None, None)
+                raise AssertionError("Unexpected API call: " + path)
+        stdout=io.StringIO()
+        with patch.object(c, "API", FakeAPI), patch.object(c.sys, "argv", ["watchdog","--apply"]), \
+             patch.dict(c.os.environ, {"GH_TOKEN":"only-test", "GITHUB_REPOSITORY":c.REPO}, clear=True), \
+             redirect_stdout(stdout), redirect_stderr(io.StringIO()):
+            self.assertEqual(c.main(), 0)
+        result=json.loads(stdout.getvalue())
+        self.assertEqual(result["action"], "WAIT_NO_MATERIAL_CHANGE")
+        self.assertEqual(result["side_effect"], "NONE")
+        self.assertFalse(any(method=="POST" for method, _ in seen))
 
 
 if __name__ == "__main__":
