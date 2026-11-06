@@ -42,11 +42,27 @@ def prove_source_edge_clear(source, box, extent, margin=2):
         "BOTTOM": (x0,y1,x1,y1+margin) if y1+margin <= source.height else None,
     }
     alpha = source.getchannel("A")
+    edge_rules = {
+        "LEFT": x0 == 0,
+        "TOP": y0 == 0,
+        "RIGHT": x1 == source.width,
+        "BOTTOM": y1 == source.height,
+    }
+    actions = []
     for side in touched:
         strip = strips[side]
-        if strip is None or alpha.crop(strip).getbbox() is not None:
+        if strip is None:
+            # No source pixel exists beyond a PHYSICAL atlas boundary.
+            # This is NOT permission to clip translated ink: the caller
+            # must prove the new glyph/effect stays inset >= margin.
+            if not edge_rules[side]:
+                raise ValueError("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+            actions.append("SOURCE_NATIVE_ATLAS_" + side + "_EDGE_INSET_REQUIRED")
+        elif alpha.crop(strip).getbbox() is not None:
             raise ValueError("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
-    return ["SOURCE_EDGE_CLEAR_NEIGHBOR_PROOF"]
+        else:
+            actions.append("SOURCE_EDGE_CLEAR_NEIGHBOR_PROOF")
+    return actions
 
 
 def _column_components(line_image):
