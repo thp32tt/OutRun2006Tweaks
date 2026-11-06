@@ -24,7 +24,7 @@ def bc3_header(raw):
     mips = struct.unpack_from('<I', raw, 28)[0]
     if w < 4 or h < 4 or w > 4096 or h > 4096 or mips < 1 or mips > 13:
         raise BC3Hold('QA_BC3_UNSUPPORTED_DIMENSIONS_OR_MIPS')
-    if struct.unpack_from('<I', raw, 24)[0] or struct.unpack_from('<I', raw, 112)[0]:
+    if struct.unpack_from('<I', raw, 24)[0] not in (0, 1) or struct.unpack_from('<I', raw, 112)[0]:
         raise BC3Hold('QA_BC3_VOLUME_OR_CUBEMAP_HOLD')
     expected = 128 + sum(
         16 * max(1, (max(1, w >> i) + 3) // 4)
