@@ -1,0 +1,46 @@
+name: OutRun HD original compressed DDS format audit (GitHub CPU)
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: [".github/workflows/outrun-hd-dds-format-audit.yml"]
+permissions:
+  contents: read
+jobs:
+  inspect-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds
+      - name: Inspect original DDS headers, exact byte counts, format tags
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct, hashlib, json
+          root=Path('localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load')
+          files=[
+            root/'spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds',
+            root/'spr_sprani_fight_Exst/A8CE339F_512x256.dds',
+            root/'spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds']
+          for path in files:
+            with path.open('rb') as f: b=f.read()
+            height,width=struct.unpack_from('<II',b,12)
+            mip=struct.unpack_from('<I',b,28)[0]
+            flags=struct.unpack_from('<I',b,80)[0]
+            fourcc=b[84:88].decode('ascii','replace')
+            blocks=sum(max(1,(max(1,width>>i)+3)//4)*max(1,(max(1,height>>i)+3)//4)*16 for i in range(max(1,mip)))
+            output={"path":str(path),"sha256":hashlib.sha256(b).hexdigest(),
+              "dims":[width,height],"mips":mip,"pixel_flags":flags,"fourcc":fourcc,
+              "payload":len(b)-128,"bc3_expected":blocks,"bc3_size_exact":len(b)==128+blocks,
+              "reserved_caps":list(struct.unpack_from('<II',b,108))}
+            print('DDS_AUDIT '+json.dumps(output,sort_keys=True))
+          PY
