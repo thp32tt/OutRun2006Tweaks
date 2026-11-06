@@ -170,6 +170,7 @@ jobs:
           assert 'SyncNativeSeatProfile(true)' in hook
           assert 'SyncNativeSeatProfile(false)' in hook
           assert 'NativeSeatCameraTick.AfterSeatSync(' in hook
+          native_renderer=Path('src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')
           assert 'NativeSeatCameraTick.Ready()' in native_renderer
           assert 'NativeQuestEyeEligible(' in native_renderer
           assert 'SeatTablePatched=true;' in hook
@@ -179,7 +180,6 @@ jobs:
           assert 'QuestCockpitV2ApkNativeCamera = true' in ini
           assert 'OriginalQuestModeOneInput(' in hook
           assert 'OriginalQuestGameCameraState(' in hook
-          native_renderer=Path('src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')
           assert 'OriginalQuestGameCameraState(' in native_renderer
           assert 'OriginalQuestGameCameraState(0x10u)' in Path('tools/tests/quest_cockpit_v2_seat_smoke.cpp').read_text(encoding='utf-8')
           assert 'guestProfile.y+0.319999993f' in Path('src/vr/game/quest_cockpit_v2_seat.hpp').read_text(encoding='utf-8')
