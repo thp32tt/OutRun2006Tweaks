@@ -81,6 +81,72 @@ try {
     if(Test-Path (Join-Path $root 'QUEST_APK_COPYRUN_ORIGINAL_BACKUP')) {
         throw 'Failed verify must not write backup files.'
     }
+    # The real install path is tested against a completely synthetic game
+    # directory: no user's EXE, data, VR runtime or stable OVC2 is touched.
+    [IO.File]::WriteAllBytes($modelPath,$model)
+    $original='USER_STABLE_OVC2_SENTINEL'
+    $stableModel=Join-Path $root 'Dino246_Cockpit_LHD_v15.ovc'
+    Set-Content -LiteralPath $stableModel -Value $original -Encoding ascii
+    Set-Content -LiteralPath (Join-Path $root 'OR2006C2C.EXE') -Value 'GAME_EXE_SENTINEL' -Encoding ascii
+    Set-Content -LiteralPath (Join-Path $root 'dinput8.dll') -Value 'PREVIOUS_USER_DLL' -Encoding ascii
+    Set-Content -LiteralPath (Join-Path $root 'outrun-vr-host.exe') -Value 'PREVIOUS_USER_HOST' -Encoding ascii
+    $originalDll=(Get-FileHash -LiteralPath (Join-Path $root 'dinput8.dll') -Algorithm SHA256).Hash
+    $originalHost=(Get-FileHash -LiteralPath (Join-Path $root 'outrun-vr-host.exe') -Algorithm SHA256).Hash
+    $selector=@'
+param([string]$Backend,[string]$TestProfile,[string]$VariantId)
+$sourceDir=Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) 'backends/d3d9'
+$gameDir=Split-Path -Parent $MyInvocation.MyCommand.Path
+Copy-Item -LiteralPath (Join-Path $sourceDir 'dinput8.dll') -Destination (Join-Path $gameDir 'dinput8.dll') -Force
+Copy-Item -LiteralPath (Join-Path $sourceDir 'outrun-vr-host.exe') -Destination (Join-Path $gameDir 'outrun-vr-host.exe') -Force
+'@
+    $runner=@'
+param([string]$TestProfile,[string]$QuestCockpitV2ReleaseParity,
+      [string]$QuestCockpitV2,[string]$DinoFitV6)
+if($env:OUTRUN_VR_DINO_PBR_TEST -ne '1'){throw 'PBR launch env flag missing'}
+if($DinoFitV6 -ne 'ON'){throw 'Dino draw flag missing'}
+$gameDir=Split-Path -Parent $MyInvocation.MyCommand.Path
+if(!(Test-Path -LiteralPath (Join-Path $gameDir 'Dino246_Cockpit_LHD_v15_PBR.ovc'))){
+    throw 'OVC3 sidecar not staged before game launch'
+}
+Set-Content -LiteralPath (Join-Path $gameDir 'PBR_MODE_TEST_PASS.txt') -Value 'PBR_ONLY' -Encoding ascii
+'@
+    Set-Content -LiteralPath (Join-Path $payload 'scripts/Select-OutRunVRBackend.ps1') -Value $selector -Encoding UTF8
+    Set-Content -LiteralPath (Join-Path $payload 'scripts/Run-OutRunVRTest.ps1') -Value $runner -Encoding UTF8
+
+    # Existing user PBR file must be rejected before backend replacement.
+    $destPbr=Join-Path $root 'Dino246_Cockpit_LHD_v15_PBR.ovc'
+    Set-Content -LiteralPath $destPbr -Value 'USER_DIFFERENT_PBR' -Encoding ascii
+    $rejected=$false
+    try {& (Join-Path $root 'QuestCockpit-CopyRun.ps1') -Mode PBR}
+    catch {$rejected=($_.Exception.Message -match 'overwrite existing different')}
+    if(-not $rejected){throw 'Existing PBR conflict was not rejected before install.'}
+    if(Test-Path (Join-Path $root 'QUEST_APK_COPYRUN_ORIGINAL_BACKUP')){
+        throw 'Conflict case modified backup before rejecting.'
+    }
+    Remove-Item -LiteralPath $destPbr
+
+    Copy-Item -LiteralPath $restore -Destination (Join-Path $root 'QuestCockpit-CopyRestore.ps1')
+    & (Join-Path $root 'QuestCockpit-CopyRun.ps1') -Mode PBR
+    if(-not $? -or !(Test-Path (Join-Path $root 'PBR_MODE_TEST_PASS.txt'))){
+        throw 'PBR game launcher mock did not execute in opt-in mode.'
+    }
+    if($env:OUTRUN_VR_DINO_PBR_TEST){
+        throw 'PBR environment flag was not restored after launch.'
+    }
+    if((Get-Content -LiteralPath $stableModel -Raw).Trim() -ne $original){
+        throw 'Stable OVC2 file overwritten by PBR installer.'
+    }
+    & (Join-Path $root 'QuestCockpit-CopyRestore.ps1')
+    if(-not $?){throw 'Restore script failed.'}
+    if(Test-Path $destPbr){throw 'Restorer left a newly created PBR sidecar behind.'}
+    if((Get-Content -LiteralPath $stableModel -Raw).Trim() -ne $original){
+        throw 'Restorer changed stable OVC2 model.'
+    }
+    if((Get-FileHash -LiteralPath (Join-Path $root 'dinput8.dll') -Algorithm SHA256).Hash -ne $originalDll -or
+       (Get-FileHash -LiteralPath (Join-Path $root 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne $originalHost){
+        throw 'Restorer failed to restore original user DLL/host.'
+    }
+    Write-Host 'DINO_PBR_SYNTHETIC_INSTALL_OPTIN_STABLE_OVC2_AND_RESTORE_PASS'
     Write-Host 'DINO_PBR_POWERSHELL_PARSE_VERIFYONLY_SOURCE_AND_SIDECAR_GATES_PASS'
 } finally {
     if(Test-Path $root){Remove-Item -LiteralPath $root -Recurse -Force}
