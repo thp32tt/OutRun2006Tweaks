@@ -9,6 +9,10 @@ on:
       - 'tools/upgrade_dino_ovc_pbr.py'
       - 'tools/tests/test_upgrade_dino_ovc_pbr.py'
       - 'tools/tests/test_dino_pbr_hlsl_win.cpp'
+      - 'tools/tests/test_dino_pbr_copyrun.ps1'
+      - 'QuestCockpit-CopyRun.ps1'
+      - 'QuestCockpit-CopyRestore.ps1'
+      - 'RUN-QUEST-APK-DINO-PBR.cmd'
       - 'tools/tests/dino_pbr_hlsl_win/**'
       - '.github/workflows/dino-external-pbr.yml'
   workflow_dispatch:
@@ -28,6 +32,15 @@ jobs:
             "$exe"
           done
           python3 -m unittest -v tools.tests.test_upgrade_dino_ovc_pbr
+  win32-script-compat:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse actual copy-run/restore scripts and test OVC3 VerifyOnly
+        shell: pwsh
+        run: |
+          & ./tools/tests/test_dino_pbr_copyrun.ps1
+          if($LASTEXITCODE -ne 0 -or -not $?){throw "PBR launcher compatibility smoke failed"}
   win32-shader:
     runs-on: windows-2022
     steps:
