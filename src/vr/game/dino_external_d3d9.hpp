@@ -134,8 +134,16 @@ class GpuOwner final {
         wchar_t* last=wcsrchr(path,L'\\');
         if(!last)return false;
         *++last=L'\0';
-        constexpr wchar_t suffix[]=L"Dino246_Cockpit_LHD_v15.ovc";
-        if(std::wcslen(path)+(sizeof(suffix)/sizeof(suffix[0]))>MAX_PATH)return false;
+        // Never replace or auto-detect the stable OVC2 file. Only the
+        // separate PBR launcher may explicitly opt in to the V3 filename.
+        wchar_t pbrFlag[4]{};
+        const bool usePbr=GetEnvironmentVariableW(
+            L"OUTRUN_VR_DINO_PBR_TEST",pbrFlag,4)==1 &&
+            pbrFlag[0]==L'1' && pbrFlag[1]==L'\\0';
+        constexpr wchar_t stableSuffix[]=L"Dino246_Cockpit_LHD_v15.ovc";
+        constexpr wchar_t pbrSuffix[]=L"Dino246_Cockpit_LHD_v15_PBR.ovc";
+        const wchar_t* suffix=usePbr?pbrSuffix:stableSuffix;
+        if(std::wcslen(path)+std::wcslen(suffix)+1>MAX_PATH)return false;
         if(wcscat_s(path,MAX_PATH,suffix)!=0)return false;
         std::vector<std::uint8_t> bytes;
         if(!ReadFile(path,bytes))return false;
