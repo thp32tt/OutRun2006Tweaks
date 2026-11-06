@@ -67,13 +67,20 @@ def run(root, output):
     report["test_only_roi"] = sum(x["painted"] for x in report["results"])
     report["hold_roi"] = report["total_rows"] - report["test_only_roi"]
     assert report["test_only_roi"] + report["hold_roi"] == report["total_rows"]
+    def stable_write(z, name, data):
+        # zipfile.writestr(name, ...) uses wall-clock timestamps. Two runs
+        # with identical DDS bytes can otherwise produce different ZIPs.
+        info = zipfile.ZipInfo(name, (1980, 1, 1, 0, 0, 0))
+        info.external_attr = 0o100644 << 16
+        info.compress_type = zipfile.ZIP_DEFLATED
+        z.writestr(info, data, compresslevel=4)
     with zipfile.ZipFile(output / "BC3_CANARY_TEST_ONLY.zip", "w") as z:
         for name, raw in sorted(successes.items()):
-            z.writestr(name, raw, compress_type=zipfile.ZIP_DEFLATED)
-        z.writestr("NOT_GAME_APPROVED.json", json.dumps({
+            stable_write(z, name, raw)
+        stable_write(z, "NOT_GAME_APPROVED.json", json.dumps({
             "release_approved": False, "game_runtime": "UNTESTED",
             "dds_sha256": {name: digest(raw) for name, raw in sorted(successes.items())}
-        },sort_keys=True))
+        }, sort_keys=True).encode("utf-8"))
     (output / "bc3_real_source_report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8")
