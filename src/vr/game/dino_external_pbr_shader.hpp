@@ -109,6 +109,8 @@ float4 mainPS(PixelIn input) : COLOR0 {
 )HLSL";
     }
 public:
+    static constexpr const char* VertexHlsl() noexcept {return VertexSource();}
+    static constexpr const char* PixelHlsl() noexcept {return PixelSource();}
     PbrShaders()=default;
     ~PbrShaders(){Release();}
     PbrShaders(const PbrShaders&)=delete;
