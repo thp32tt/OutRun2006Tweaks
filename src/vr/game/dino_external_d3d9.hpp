@@ -139,7 +139,7 @@ class GpuOwner final {
         wchar_t pbrFlag[4]{};
         const bool usePbr=GetEnvironmentVariableW(
             L"OUTRUN_VR_DINO_PBR_TEST",pbrFlag,4)==1 &&
-            pbrFlag[0]==L'1' && pbrFlag[1]==L'\\0';
+            pbrFlag[0]==L'1' && pbrFlag[1]==L'\0';
         constexpr wchar_t stableSuffix[]=L"Dino246_Cockpit_LHD_v15.ovc";
         constexpr wchar_t pbrSuffix[]=L"Dino246_Cockpit_LHD_v15_PBR.ovc";
         const wchar_t* suffix=usePbr?pbrSuffix:stableSuffix;
