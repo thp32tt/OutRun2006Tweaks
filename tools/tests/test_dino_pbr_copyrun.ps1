@@ -3,11 +3,10 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $copyRun=Join-Path $repo 'QuestCockpit-CopyRun.ps1'
 $restore=Join-Path $repo 'QuestCockpit-CopyRestore.ps1'
-$parser=[System.Management.Automation.Language.Parser]
 foreach($file in @($copyRun,$restore)) {
     $tokens=$null
     $errors=$null
-    $null=$parser::ParseFile($file,[ref]$tokens,[ref]$errors)
+    $null=[System.Management.Automation.Language.Parser]::ParseFile($file,[ref]$tokens,[ref]$errors)
     if($errors.Count -gt 0){
         $info=($errors|ForEach-Object{$_.ToString()}) -join '; '
         throw "PowerShell syntax error in $file : $info"
