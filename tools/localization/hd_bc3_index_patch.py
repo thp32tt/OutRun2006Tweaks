@@ -1,7 +1,9 @@
 """Conservative DXT5/BC3 mip1 existing-palette pixel-index patcher.
 
-Keep original compressed endpoints and EVERY unchanged pixel index bit-exact.
-No block re-encode, palette replacement, inferred mips or generic-font redraw.
+Keep original RGB565 endpoints and EVERY unchanged decoded pixel bit-exact.
+Only all-alpha-zero original blocks may receive alpha 255/0 endpoints, and
+ONLY after verifying every untouched decoded pixel exactly equals its source.
+No full block re-encode, inferred mips or generic-font redraw.
 Changed pixels that cannot be represented closely by the source block palette
 remain HOLD. Caller must separately verify CLEAN, layout, ROI and game visuals.
 """
@@ -118,33 +120,53 @@ def patch_mip1(original, native_final, native_boxes, native_source=None):
     output = bytearray(original)
     touched = []
     changed_total = 0
+    transparent_rebased = 0
     for bx, by in sorted(candidate_blocks):
         offset = 128 + (by * blocks_per_row + bx) * 16
         old_block = bytes(output[offset:offset + 16])
         alpha_palette, color_palette = palettes(old_block)
         ai = int.from_bytes(old_block[2:8], "little")
         ci = int.from_bytes(old_block[12:16], "little")
-        changed_in_block = 0
+        pixel_rows = []
         for index in range(16):
             x, y = bx * 4 + index % 4, by * 4 + index // 4
             src_rgba, new_rgba = source_px[x, y], desired_px[x, y]
-            if src_rgba == new_rgba:
-                continue
-            if not allowed_px[x, y]:
+            changed = src_rgba != new_rgba
+            if changed and not allowed_px[x, y]:
                 raise BC3Hold("QA_BC3_PROTECTED_PIXEL_CHANGED")
-            a = select_alpha(alpha_palette, new_rgba[3])
-            # A zero-alpha pixel retains its ORIGINAL RGB index.
-            c = (select_color(color_palette, new_rgba)
-                 if new_rgba[3] >= 16
-                 else (ci >> (2 * index)) & 3)
+            pixel_rows.append((index, src_rgba, new_rgba, changed))
+        changed_in_block = sum(int(r[3]) for r in pixel_rows)
+        if not changed_in_block:
+            continue
+        need_rebase = any(
+            row[3] and min(abs(v - row[2][3]) for v in alpha_palette) > ALPHA_ERROR_LIMIT
+            for row in pixel_rows
+        )
+        if need_rebase:
+            # For a block with alpha-zero at ALL original pixels, replacing
+            # its ALPHA endpoints is safe only if the decoded saved bytes
+            # prove every old pixel unchanged. RGB endpoints never move.
+            if not all(row[1][3] == 0 for row in pixel_rows):
+                raise BC3Hold("QA_BC3_EXISTING_ALPHA_PALETTE_INSUFFICIENT")
+            rebased = bytes([255, 0]) + old_block[2:]
+            alpha_palette, _ = palettes(rebased)
+            ai = 0
+            transparent_rebased += 1
+        for index, src_rgba, new_rgba, changed in pixel_rows:
+            if not changed and not need_rebase:
+                continue
+            want = new_rgba if changed else src_rgba
+            a = select_alpha(alpha_palette, want[3])
+            if changed and want[3] >= 16:
+                c = select_color(color_palette, want)
+                ci = (ci & ~(3 << (2 * index))) | (c << (2 * index))
             ai = (ai & ~(7 << (3 * index))) | (a << (3 * index))
-            ci = (ci & ~(3 << (2 * index))) | (c << (2 * index))
-            changed_in_block += 1
-        if changed_in_block:
-            output[offset + 2:offset + 8] = ai.to_bytes(6, "little")
-            output[offset + 12:offset + 16] = ci.to_bytes(4, "little")
-            touched.append((bx, by, changed_in_block))
-            changed_total += changed_in_block
+        if need_rebase:
+            output[offset:offset + 2] = b"\\xff\\x00"
+        output[offset + 2:offset + 8] = ai.to_bytes(6, "little")
+        output[offset + 12:offset + 16] = ci.to_bytes(4, "little")
+        touched.append((bx, by, changed_in_block))
+        changed_total += changed_in_block
     if not changed_total:
         raise BC3Hold("QA_BC3_NO_GLYPH_CHANGE")
     data = bytes(output)
@@ -167,6 +189,7 @@ def patch_mip1(original, native_final, native_boxes, native_source=None):
     return data, {
         "bc3_blocks_modified": len(touched),
         "bc3_pixels_modified": changed_total,
-        "bc3_method": "SOURCE_ENDPOINTS_BIT_EXACT_INDEX_ONLY",
+        "bc3_method": "SOURCE_RGB_ENDPOINTS_FIXED_INDEX_ONLY_WITH_PROVEN_FULLY_TRANSPARENT_ALPHA_REBASE",
+        "bc3_alpha_rebased_from_zero_blocks": transparent_rebased,
         "bc3_still_requires": "C1_C3_NATIVE_50PCT_MIP_AND_GAME_QA"
     }
