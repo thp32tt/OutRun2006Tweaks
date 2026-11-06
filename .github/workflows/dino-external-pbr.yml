@@ -49,7 +49,11 @@ jobs:
           assert 'if(DrawPreparedDinoFitV6(dino))' in scope
           assert scope.index('if(DrawPreparedDinoFitV6(dino))') < scope.index('PlayerCallbackHook.ccall<void>(player)')
           assert 'OriginalCarGate gate{' in hook
-          assert 'SuppressOriginalCarAfterExternalDraw(' in hook
+          assert 'ChooseOriginalCarRoute(' in hook
+          assert 'EXTERNAL_PARTIAL_QUARANTINED' in hook
+          assert 'QuarantineFailedSubmission(' in renderer
+          assert '++result.receipt.submittedMeshes;' in renderer
+          assert 'result.receipt.stateRestored=SUCCEEDED(restore)' in renderer
           assert 'ticket.originalPlayer' in hook and 'ticket.xrPose' in hook
           assert 'GlobalGpu().DrawNativeScene(' in hook
           assert 'OnDeviceReset()' in renderer
