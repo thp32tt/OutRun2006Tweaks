@@ -1,5 +1,7 @@
 name: OutRun DXT5 HD 3-Atlas Real-Source Canary (GitHub CPU)
 
+# Recheck exact-HD source pixel constraints after safe alpha-zero endpoint fallback.
+
 on:
   workflow_dispatch:
   push:
