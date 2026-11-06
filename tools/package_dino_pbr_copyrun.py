@@ -72,7 +72,7 @@ def machine(path: Path, expected: int) -> None:
             raise ValueError(f"invalid PE offset: {path.name}")
         src.seek(offset)
         pe = src.read(6)
-        if len(pe) != 6 or pe[:4] != b"PE\\x00\\x00" or struct.unpack_from("<H",pe,4)[0] != expected:
+        if len(pe) != 6 or pe[:4] != b"PE\x00\x00" or struct.unpack_from("<H",pe,4)[0] != expected:
             raise ValueError(f"incorrect x86/x64 architecture: {path.name}")
 
 
