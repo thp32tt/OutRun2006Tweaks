@@ -46,14 +46,15 @@ py -m pip install Pillow
 py tools/upgrade_dino_ovc_pbr.py --input-ovc "D:\model\Dino246_Cockpit_LHD_v15.ovc" --materials-json "D:\model\dino-pbr-materials.json" --output-ovc "D:\pbr-test\Dino246_Cockpit_LHD_v15.ovc"
 ```
 
-4. Test only against a **matched PBR-enabled R26 Win32 DLL/OpenXR host** build and a copy of your original game folder. The original/installed stable OVC2 and DLL should be backed up first. The runtime searches the game executable directory for the fixed sidecar name `Dino246_Cockpit_LHD_v15.ovc`. **Do not** deploy a new OVC3 file with an old DLL (old parser rejects the OVC3 signature). The PBR branch's CI packages a matching Win32 DLL and x64 OpenXR host with matching `SOURCE_SHA.txt` and `HOST_BUILD_SOURCE_SHA.txt`. Do not launch a PBR DLL alongside a host from another source SHA. This is a build artifact, not a validated copy-and-run installer.
+4. Test only against a **matched PBR-enabled R26 Win32 DLL/OpenXR host** build and a copy of your original game folder. The original/installed stable OVC2 and DLL should be backed up first. The stable runtime path uses `Dino246_Cockpit_LHD_v15.ovc` by default. Only the explicit PBR copy-run mode sets the process-only `OUTRUN_VR_DINO_PBR_TEST=1` flag, selecting the *separate* `Dino246_Cockpit_LHD_v15_PBR.ovc` file. A missing/corrupt PBR sidecar does not replace the stable file. **Do not** deploy a new OVC3 file with an old DLL (old parser rejects the OVC3 signature). The PBR branch's CI packages a matching Win32 DLL and x64 OpenXR host with matching `SOURCE_SHA.txt` and `HOST_BUILD_SOURCE_SHA.txt`. Do not launch a PBR DLL alongside a host from another source SHA. This is a build artifact, **not** a complete ready-to-run model package. `RUN-QUEST-APK-DINO-PBR.cmd` and `QuestCockpit-CopyRun.ps1 -Mode PBR` additionally require a complete `QUEST_APK_COPYRUN_PAYLOAD` with a verified `IDENTITY.json` (including `DinoPbrModelSha256`) and the new OVC3 model. Do not use a former FitV6 payload/manifest as the PBR package.
 
 ## Validation
 
 - Linux C++ parser: `tests/test_dino_external_sidecar.cpp`, `tests/test_dino_external_hq.cpp`, `tests/test_dino_external_pbr.cpp`.
 - Python OVC2→OVC3 converter: `python3 -m unittest tools.tests.test_upgrade_dino_ovc_pbr`.
 - Windows real shader bytecode compilation: `tools/tests/test_dino_pbr_hlsl_win.cpp` with D3DCompiler_47 (`vs_3_0`, `ps_3_0`).
-- Windows R26/HUD 32-bit game DLL build: `.github/workflows/dino-external-pbr.yml`.
+- Windows R26/HUD 32-bit game DLL and same-checkout x64 OpenXR host: `.github/workflows/dino-external-pbr.yml`.
+- Windows PowerShell parse, exact-SHA preflight and synthetic install/conflict/restore: `tools/tests/test_dino_pbr_copyrun.ps1`.
 - Pending HMD checks: per-eye material shading and handedness, rotated/mirrored UVs, seat/column/dash normal response, frame pacing in beach/greenery areas, Reset/exit/menu crash reproduction and regression against OVC2.
 
 ## Format & safety notes
