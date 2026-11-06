@@ -2,7 +2,7 @@
   "active_roi_total": 954,
   "c1_preliminary_new_png_count": 0,
   "clean_plate_qa": "MECHANICAL_ALPHA_ONLY_C1_C3_VISUAL_REVIEW_REQUIRED",
-  "deterministic_salvaged_roi": 253,
+  "deterministic_salvaged_roi": 258,
   "generated": [
     {
       "dds_sha256": "cb9a33335e52129b6ef6e97c37e899243c9265054983ab89f4d73fe5e232c282",
@@ -3639,6 +3639,324 @@
       ],
       "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
       "target": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    },
+    {
+      "dds_sha256": "3ff32dba6d29d15525b4645b5d2c69ad7b61eba4a5c84b4cec0bf0809406d37a",
+      "holds": [
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q086_ba5582d4ea3b0947"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_9dc7cafdc29ca37c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_5b9e8ab56194f979"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_72f6f42102789a81"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_a5be7489aa680e44"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_045a31ea3bda92ad"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_c9bba6352022ab22"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_11895901f9313213"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_b992fc73b6a3bc92"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_09d5a2eb4ec75f6c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_0f8a5a5f621f6a9b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_96b50f42b3546c0a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_deaf9fd898e08025"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_8fc0625662b8725f"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_b666fbc45549afc4"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_22129be3f64aa24d"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_9eeb087d3de40205"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_63903035a9ba4fea"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q086_d244d33d9336c6bb"
+        },
+        {
+          "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
+          "roi_id": "Q086_efe5f21b303c5b48"
+        }
+      ],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "painted": [
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_14_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3749,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 14,
+          "candidate_sha256": "2d601214cd029d9d4e97a4212fff64ba206e3a6551adeec6a2b44c9356510162",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "Skyscrapers",
+          "korean": "스카이스크레이퍼스",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              3377,
+              704,
+              3629,
+              753
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            3363,
+            696,
+            3642,
+            761
+          ],
+          "roi_id": "Q086_bac66d798eb23b3d",
+          "source_alpha_occupancy": 0.45161,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              3377,
+              725,
+              3629,
+              732
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_7_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3749,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 7,
+          "candidate_sha256": "a118549bec26b61040742a64aa76ee82db2bd30008289a9d26742f77ea3a3618",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "Milky Way",
+          "korean": "밀키 웨이",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              3757,
+              705,
+              3968,
+              753
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            3744,
+            697,
+            3982,
+            761
+          ],
+          "roi_id": "Q086_cf5c6a0a497b6ce4",
+          "source_alpha_occupancy": 0.4761,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              3757,
+              714,
+              3968,
+              743
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_3_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3749,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 3,
+          "candidate_sha256": "bb48d7274c926a266d6fd6bb391ece69bee1ad3d5f3280772ae0f93246e00601",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "NORMAL",
+          "korean": "일반",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              616,
+              873,
+              924,
+              960
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            609,
+            866,
+            971,
+            975
+          ],
+          "roi_id": "Q086_af22aa50497e9e2b",
+          "source_alpha_occupancy": 0.29051,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              657,
+              873,
+              882,
+              960
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_9_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3749,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 9,
+          "candidate_sha256": "98e55c59ef6cfb88f37267890edc2c9bb6e4b013f44a4075c9b868a5765df529",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "TUNED",
+          "korean": "튜닝",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              1263,
+              899,
+              1469,
+              949
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            1245,
+            887,
+            1480,
+            955
+          ],
+          "roi_id": "Q086_6370e4e9a71aa2c9",
+          "source_alpha_occupancy": 0.51608,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              1263,
+              899,
+              1468,
+              949
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_6_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3749,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 6,
+          "candidate_sha256": "644d189114c6117e16ec9b5db432120cb243f521341c1b7ffd89497958306e8a",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "TUNED",
+          "korean": "튜닝",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              1863,
+              899,
+              2069,
+              949
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            1845,
+            887,
+            2080,
+            955
+          ],
+          "roi_id": "Q086_c764dcd00ec81a15",
+          "source_alpha_occupancy": 0.51608,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              1865,
+              899,
+              2066,
+              949
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
       "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
     },
     {
@@ -12078,12 +12396,12 @@
   "hold_roi_reason_counts": {
     "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD": 36,
     "QA_BC3_MIP_CHAIN_REQUIRES_ORIGINAL_FORMAT_REBUILD": 13,
-    "QA_BC3_TRANSLATED_COLOR_LOSS": 33,
+    "QA_BC3_TRANSLATED_COLOR_LOSS": 4,
     "QA_DOWNSCALE_LOST_GLYPHS": 3,
-    "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT": 23,
-    "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE": 80,
+    "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT": 26,
+    "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE": 83,
     "QA_TRANSLATION_TOO_SMALL_TO_READ": 2,
-    "ROI_OVERLAP_NEEDS_MANUAL_QA": 506
+    "ROI_OVERLAP_NEEDS_MANUAL_QA": 524
   },
   "holds": [
     {
@@ -12933,7 +13251,21 @@
       "target": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds"
     },
     {
-      "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
+      "details": [
+        {
+          "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
+          "roi_id": "Q052_a59a8c29fba84397"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q052_f24e7bf199654f00"
+        },
+        {
+          "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
+          "roi_id": "Q052_94ba15f4940e19ed"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
       "roi_ids": [
         "Q052_a59a8c29fba84397",
         "Q052_94ba15f4940e19ed",
@@ -13052,7 +13384,13 @@
       "target": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
     },
     {
-      "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
+      "details": [
+        {
+          "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
+          "roi_id": "Q055_dd5213d64f53d429"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
       "roi_ids": [
         "Q055_dd5213d64f53d429"
       ],
@@ -13149,7 +13487,25 @@
       "target": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds"
     },
     {
-      "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
+      "details": [
+        {
+          "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
+          "roi_id": "Q059_c4006a90789c50b0"
+        },
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q059_d6b334ba2a964812"
+        },
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q059_58da97467534c071"
+        },
+        {
+          "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+          "roi_id": "Q059_0214d1bfb9538a64"
+        }
+      ],
+      "reason": "IMPORTED_ROI_ALL_HELD",
       "roi_ids": [
         "Q059_0214d1bfb9538a64",
         "Q059_d6b334ba2a964812",
@@ -13310,38 +13666,6 @@
       ],
       "rows": 3,
       "target": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds"
-    },
-    {
-      "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
-      "roi_ids": [
-        "Q086_cf5c6a0a497b6ce4",
-        "Q086_72f6f42102789a81",
-        "Q086_bac66d798eb23b3d",
-        "Q086_c9bba6352022ab22",
-        "Q086_5b9e8ab56194f979",
-        "Q086_c764dcd00ec81a15",
-        "Q086_0f8a5a5f621f6a9b",
-        "Q086_6370e4e9a71aa2c9",
-        "Q086_09d5a2eb4ec75f6c",
-        "Q086_b992fc73b6a3bc92",
-        "Q086_11895901f9313213",
-        "Q086_8fc0625662b8725f",
-        "Q086_deaf9fd898e08025",
-        "Q086_a5be7489aa680e44",
-        "Q086_9dc7cafdc29ca37c",
-        "Q086_ba5582d4ea3b0947",
-        "Q086_af22aa50497e9e2b",
-        "Q086_045a31ea3bda92ad",
-        "Q086_63903035a9ba4fea",
-        "Q086_efe5f21b303c5b48",
-        "Q086_b666fbc45549afc4",
-        "Q086_9eeb087d3de40205",
-        "Q086_96b50f42b3546c0a",
-        "Q086_22129be3f64aa24d",
-        "Q086_d244d33d9336c6bb"
-      ],
-      "rows": 25,
-      "target": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
     },
     {
       "details": [
@@ -14122,7 +14446,7 @@
   "imported_roi_total": 954,
   "layout_policy": "ORIGINAL_LINE_COUNT_AND_PER_LINE_BBOX_PRESERVED",
   "legacy_oversize_outputs_rejected": true,
-  "native_dds_generated": 50,
+  "native_dds_generated": 51,
   "pending_import": 0,
   "pending_import_holds": [],
   "release_approved": false,
@@ -14133,7 +14457,7 @@
   "source": "Existing A/B PNG reused exclusively; native HD bounded pad/reflow/downscale; no new ImageGen or fonts",
   "source_dds_missing_rows": 0,
   "source_sha_conflict_rows": 0,
-  "translated_roi_generated": 258,
+  "translated_roi_generated": 263,
   "visual_qa": "REVIEW_REQUIRED",
-  "zip_sha256": "afb877ac8fcc4dd94325d194f2894586a00dda6a6df8c0cce137990320b8f808"
+  "zip_sha256": "7661bc5600a5b7a273bd711a29e1480a86d7d83dbd9430103efdb7e0d5e5081c"
 }
