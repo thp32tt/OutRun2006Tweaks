@@ -29,6 +29,8 @@ jobs:
             tools/localization/hd_strict_qa.py
             tools/localization/hd_existing_candidate_salvage.py
             tools/localization/hd_bc3_index_patch.py
+            tools/localization/hd_bc3_native_codec.py
+            tools/localization/test_hd_bc3_native_codec.py
             tools/localization/probe_hd_bc3_real_sources.py
             tools/localization/test_hd_bc3_index_patch.py
             localization/automation_inputs/hd_original_png_source_plan.json
@@ -43,8 +45,10 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
-      - name: Check DXT5 bit-exact endpoint safety
-        run: python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
+      - name: Check DXT5 bit-exact and fallback block pixel safety
+        run: |
+          python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
+          python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
       - name: Validate original DDS SHA and A/B image, attempt REAL BC3 canary (TEST_ONLY)
         run: |
           python tools/localization/probe_hd_bc3_real_sources.py --repo . --out "$RUNNER_TEMP/bc3-one"
