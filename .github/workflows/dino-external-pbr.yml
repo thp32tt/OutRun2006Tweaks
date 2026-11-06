@@ -137,7 +137,16 @@ jobs:
             'OutRunVR-TestProfiles.ps1','Collect-OutRunVRLogs.ps1',
             'Collect-OutRunVRLogs.cmd','Analyze-OutRunVRSession.ps1',
             'Run-QuestCockpitV2-CrashDiag.ps1','analyze_outrun_assets.py')) {
-              Copy-Item -LiteralPath $name -Destination (Join-Path out/scripts $name) -Force
+              # The runtime install layout is flat, but the repository stores
+              # most helper scripts under tools/. Only the crash diagnostic
+              # lives at repository root. Resolve explicit source ownership.
+              $src=if($name -eq 'Run-QuestCockpitV2-CrashDiag.ps1') {
+                $name
+              } else { Join-Path tools $name }
+              if(!(Test-Path -LiteralPath $src -PathType Leaf)) {
+                throw "Missing source helper for same-SHA package: $src"
+              }
+              Copy-Item -LiteralPath $src -Destination (Join-Path out/scripts $name) -Force
           }
           foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')) {
               Copy-Item -LiteralPath $name -Destination (Join-Path out/defaults $name) -Force
