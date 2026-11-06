@@ -29,9 +29,9 @@ try {
         [IO.File]::WriteAllBytes($dest,$bytes)
     }
     $gameDll=Join-Path $payload 'backend/dinput8.dll'
-    $host=Join-Path $payload 'backend/outrun-vr-host.exe'
+    $hostExe=Join-Path $payload 'backend/outrun-vr-host.exe'
     Make-StubPe $gameDll 0x14c
-    Make-StubPe $host 0x8664
+    Make-StubPe $hostExe 0x8664
     $sha='0123456789abcdef0123456789abcdef01234567'
     Set-Content -LiteralPath (Join-Path $payload 'backend/SOURCE_SHA.txt') -Value $sha -Encoding ascii
     Set-Content -LiteralPath (Join-Path $payload 'backend/HOST_BUILD_SOURCE_SHA.txt') -Value $sha -Encoding ascii
@@ -53,7 +53,7 @@ try {
     $identity=@{
         SourceSha=$sha;HostSourceSha=$sha;VariantId='ACTIVE_R26_R43_R44';
         GameDllSha256=(Get-FileHash -LiteralPath $gameDll -Algorithm SHA256).Hash.ToLowerInvariant();
-        HostExeSha256=(Get-FileHash -LiteralPath $host -Algorithm SHA256).Hash.ToLowerInvariant();
+        HostExeSha256=(Get-FileHash -LiteralPath $hostExe -Algorithm SHA256).Hash.ToLowerInvariant();
         DinoPbrModelSha256=(Get-FileHash -LiteralPath $modelPath -Algorithm SHA256).Hash.ToLowerInvariant()
     }
     $idFile=Join-Path $payload 'IDENTITY.json'
