@@ -23,7 +23,7 @@ function Assert-BackupManifest([string]$manifestPath,[string]$backupRoot){
     if($m.SchemaVersion -ne 1 -or !$m.Entries){
         throw 'Existing original backup manifest is invalid; refusing to modify the game folder.'
     }
-    if([string]$m.SourceSha -notmatch '^[0-9a-f]{40}
+    if(([string]$m.SourceSha) -notmatch '^[0-9a-f]{40}function Assert-Machine([string]$p,[int]$expected){
     $f=[IO.File]::OpenRead($p)
     try{
         if($f.Length -lt 256){throw "PE too small: $p"}
@@ -110,6 +110,9 @@ foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')){
     }
 }
 if($VerifyOnly){
+    if((Test-Path -LiteralPath $backup) -and !(Test-Path -LiteralPath $backupManifest -PathType Leaf)){
+        throw 'Partial original backup detected; VERIFY refuses unsafe state.'
+    }
     Assert-BackupManifest $backupManifest $backup
     Write-Host "PASS copy-run source=$($identity.SourceSha), payload verified, no game file modifications."
     return
@@ -230,7 +233,7 @@ if(-not $?){throw 'VR runner failed. See OUTRUNVR_LAUNCH_ERROR.txt or collected 
     $seen=[System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
     foreach($e in $m.Entries){
         if($e.Scope -notin @('root','backend') -or
-           [string]$e.Name -notmatch '^[A-Za-z0-9._-]+
+           ([string]$e.Name) -notmatch '^[A-Za-z0-9._-]+function Assert-Machine([string]$p,[int]$expected){
     $f=[IO.File]::OpenRead($p)
     try{
         if($f.Length -lt 256){throw "PE too small: $p"}
@@ -427,7 +430,7 @@ if(-not $?){throw 'VR runner failed. See OUTRUNVR_LAUNCH_ERROR.txt or collected 
         $key=([string]$e.Scope)+'/'+([string]$e.Name)
         if(!$seen.Add($key)){throw "Duplicate original backup entry: $key"}
         if($e.Existed){
-            if([string]$e.Sha256 -notmatch '^[0-9a-fA-F]{64}
+            if(([string]$e.Sha256) -notmatch '^[0-9a-fA-F]{64}function Assert-Machine([string]$p,[int]$expected){
     $f=[IO.File]::OpenRead($p)
     try{
         if($f.Length -lt 256){throw "PE too small: $p"}
