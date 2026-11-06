@@ -37,3 +37,15 @@
 - **신규 성과 판단:** exact branch/HEAD, Actions run ID, QA artifact SHA 및 \`translated_roi_generated + hold ROI = 954\` 확인; 전부 동일한 SHA라면 추가 성과로 재계산하지 않는다.
 - **사용자에게 수동 작업을 요청할 때:** 테스트 패키지 수령 및 게임 폴더에 카나리 설치가 가능한 시점에만 알린다. 기본적으로 N100 Docker/Portainer 재배포 불필요.
 - **최종 배포 승인:** 필수 현장 테스트와 버그 없음이 확인되면 별도 서명·버전별 출시 승인 단계를 만든다. 현 상태의 TEST_ONLY ZIP을 정식 릴리스에 재사용하거나 자동 승격하지 않는다.
+
+
+## 2026-11-06 10:04 KST — DXT5 네이티브 시험 결과 및 다음 병목
+
+- 포맷 미지원 111 ROI가 15개 DDS에 걸쳐 있음. 직접 읽은 원본 DDS 헤더는 `DXT5` (BC3). `568D3696_1024x1024.dds`는 4096x4096, 13 mips로 기존 서브밉 영문 잔상을 막을 수 없으므로 여전히 HOLD.
+- GitHub 자산 브랜치에 `hd_bc3_index_patch.py` / `test_hd_bc3_index_patch.py` 및 BC3 통합기를 구현. RGB565 엔드포인트 보존/변경 픽셀 인덱스만 수정하는 1차 경로와, 엄격한 저장 바이트·원문 주변 픽셀 검증을 전제로 DXT5 블록 재압축하는 대체 경로를 구별. 양쪽 모두 TEST_ONLY; 자동 RELEASE 금지.
+- **실제 원본 오류 수정:** DDS `dwDepth=1`은 정상 2D 텍스처일 수 있다. `hd_bc3_native_codec.py`에서 기존의 `dwDepth != 0` 일괄 거부를 `dwDepth not in (0,1)`만 거부하도록 변경; cubemap 및 depth2 이상은 여전히 HOLD. 별도 회귀 테스트 통과.
+- **DXT5 글자 AA:** 1~255의 약한 알파 획이 0으로 양자화되는 경우를 방지하려고 양 알파 보간 모드와 선택 팔레트를 검사. 원본 보호 알파 또는 색상 손상이 있으면 그대로 HOLD. 이후 16픽셀 컬러 팔레트가 실패할 때 RGB565 엔드포인트를 제한적으로 탐색하되 55/채널 저장 색오차 제한을 완화하지 않음.
+- 실제 3개 SHA 원본/기존 A/B PNG 가벼운 실증: `outrun-hd-bc3-canary.yml` GitHub run **42141243845 SUCCESS**. **QA RESULT = 0/3 TEST_ONLY, 3/3 HOLD**. Q098 `42E618FD`: `QA_BC3_TRANSLATED_COLOR_LOSS`; Q055 `2EA557B4`, Q099 `4F68708E`: `QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE`. 안전 제한을 내려 자동 합성하지 말 것.
+- synthetic GitHub regression **42141161995 SUCCESS** (서로 다른 아틀라스 픽셀, 글리프, DXT5 헤더 및 AA 검증). 3개 real-source canary는 두 번 실행해 동일한 JSON 및 ZIP 바이트를 검증. 원본 DDS/한글 PNG를 덮어쓰지 않았으며 실제 게임 테스트도 하지 않음.
+- 전체 954 ROI 재합성 GitHub Actions **42141161976** (커밋 `9c48e03b4c1ffc79512c4ba56d10bb4c2600d375`)은 이 기록 당시 실행 중. **새 합성 ROI 및 새 아틀라스 증가 없음으로 처리**하여 최신 성공 `last_report.json` 갱신 전 `250/46/704` 기준값을 유지.
+- 다음 작업은 겹침·CLEAN/원문 bbox를 원본 SHA로 재심사하고, 안전한 원본 UI 지움/PSD 마스크가 없으면 수동 QA로 넘김. DXT5 13mip은 저장 후 밉 레벨 1..13 전체 갱신·RAW/FLIP-Y/보호 아트 실증 없이는 배포하지 않음.
