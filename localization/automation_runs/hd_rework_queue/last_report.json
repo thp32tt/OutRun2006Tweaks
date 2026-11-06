@@ -2,7 +2,7 @@
   "active_roi_total": 954,
   "c1_preliminary_new_png_count": 0,
   "clean_plate_qa": "MECHANICAL_ALPHA_ONLY_C1_C3_VISUAL_REVIEW_REQUIRED",
-  "deterministic_salvaged_roi": 247,
+  "deterministic_salvaged_roi": 252,
   "generated": [
     {
       "dds_sha256": "cb9a33335e52129b6ef6e97c37e899243c9265054983ab89f4d73fe5e232c282",
@@ -4033,7 +4033,7 @@
       "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
     },
     {
-      "dds_sha256": "4010854313eed18474cfb3338139b328bbb3b9ed39425c0f10588e49b852f40e",
+      "dds_sha256": "e644c3142b9bb9fc9f103a758e508c3d734d29f75a24f34813246ab45716dccb",
       "holds": [],
       "orientation": "FLIPY",
       "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
@@ -6469,6 +6469,428 @@
       ],
       "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
       "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    },
+    {
+      "dds_sha256": "c1d65a5c70b8df0ede6ecf09d187ea0e5510f69bd6dd49125c05118b4792bb03",
+      "holds": [
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_72168a7e71342541"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_85450ed07d3da830"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_eea1bc2c7446635e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_c4bae570e6e8780a"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q161_2477321b0942c89b"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q161_29dfe698b1f2ee7c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_c8218cd6556c2d83"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_79406ebfad3d5500"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_6f783d525f704b09"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_a6f4d13b268bdb67"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_c06f8ed4980fa2ef"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_fa1031c933ff857b"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_163d8746137615d0_RB_B"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q161_7acd346f895eb1fe"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_72a382df95bd7d28"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_b6a048101dacac92"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_8b1637261d98ebb1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_835f21f8b3b20bd1"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_8429119f1960011e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_a354bf5e3a7b6177"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q161_269062c9f73b89e2"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_69ceaa6d71a93a6c"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_d413f217f1218b7a_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_8140a5326af839a7"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_296f622bed3245f4"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q161_a23756b65be7f8bc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_c0a1f3822a379fc0"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_533f9569493fb2fb"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_df71217914fbbe2a"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_3d3133e135f518b1_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_5d82b5fcd656adda"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_2ad4d17612e81c03"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_5edf693621dc45a1_RB_B"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_42f038b9fa20580e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_3935ff67daceaf17"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_59340de4d748c184"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_a0aa6db4d10210d3"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_53de9255d1000233"
+        },
+        {
+          "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
+          "roi_id": "Q161_6b26e2d669ced156"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_a0f1b3a49edfa829"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_623eedb28e9bece8"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_563039872fa7181e"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_9c1095bac503b8c5"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_1feedeb0bc9341cc"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_3b5295459e4be3d2"
+        },
+        {
+          "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
+          "roi_id": "Q161_73e0b73011bd08af"
+        }
+      ],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "painted": [
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_6_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3941,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 6,
+          "candidate_sha256": "f2a913ba5888326705e329bc7a5524c2d5e430d69f60a24b803c7ae41a7eae38",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "BRITAIN",
+          "korean": "영국",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              717,
+              968,
+              944,
+              1016
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            699,
+            956,
+            962,
+            1028
+          ],
+          "roi_id": "Q161_351fc9cdb163dae9_RB_B",
+          "source_alpha_occupancy": 0.36307,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              717,
+              968,
+              944,
+              1015
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_7_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3941,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 7,
+          "candidate_sha256": "0622a5316d10cbef30343578341e3bbb9c96bf803482c00d8e518fd296515c70",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "NETHERLANDS",
+          "korean": "네덜란드",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              717,
+              1095,
+              1137,
+              1146
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            699,
+            1083,
+            1154,
+            1157
+          ],
+          "roi_id": "Q161_54b6f457507d3066",
+          "source_alpha_occupancy": 0.35723,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              717,
+              1099,
+              1137,
+              1141
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_5_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3941,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 5,
+          "candidate_sha256": "e4950a8ba7a0e32ffe4f032491588c9f1c947d741129d500262b4a6b60610007",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "NORTH KOREA",
+          "korean": "북한",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              6,
+              1351,
+              404,
+              1402
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            0,
+            1345,
+            546,
+            1405
+          ],
+          "roi_id": "Q161_092816d9210fd402",
+          "source_alpha_occupancy": 0.34789,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              145,
+              1351,
+              264,
+              1402
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_9_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3941,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 9,
+          "candidate_sha256": "05ccad29ac4c456ffd84b82b5fe8a9b4de94ee12290f2943eb26eb2e300449cf",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "SINGAPORE",
+          "korean": "싱가포르",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              717,
+              1479,
+              1047,
+              1530
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            700,
+            1467,
+            1064,
+            1541
+          ],
+          "roi_id": "Q161_af7f7f05c566151f_RB_B",
+          "source_alpha_occupancy": 0.36138,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              717,
+              1494,
+              1047,
+              1515
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "REFLOW_EXISTING_CANDIDATE_9_TO_1_LINES_VISUAL_QA_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 3941,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 9,
+          "candidate_sha256": "ff43faad78b6f24d0e3c64ca1f50a1a0c0266291cacbdf8c74cb18e3b0d35e00",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "LIBRA",
+          "korean": "천칭자리",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              717,
+              1864,
+              888,
+              1912
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            699,
+            1852,
+            905,
+            1924
+          ],
+          "roi_id": "Q161_7f50a1d8ffbcd064_RB_B",
+          "source_alpha_occupancy": 0.33111,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              717,
+              1880,
+              888,
+              1896
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
       "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
     },
     {
@@ -11597,14 +12019,14 @@
     }
   ],
   "hold_roi_reason_counts": {
-    "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD": 30,
+    "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD": 36,
     "QA_BC3_MIP_CHAIN_REQUIRES_ORIGINAL_FORMAT_REBUILD": 13,
-    "QA_BC3_TRANSLATED_COLOR_LOSS": 85,
+    "QA_BC3_TRANSLATED_COLOR_LOSS": 34,
     "QA_DOWNSCALE_LOST_GLYPHS": 3,
     "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT": 23,
     "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE": 80,
     "QA_TRANSLATION_TOO_SMALL_TO_READ": 2,
-    "ROI_OVERLAP_NEEDS_MANUAL_QA": 466
+    "ROI_OVERLAP_NEEDS_MANUAL_QA": 506
   },
   "holds": [
     {
@@ -13343,64 +13765,6 @@
       "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
     },
     {
-      "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
-      "roi_ids": [
-        "Q161_53de9255d1000233",
-        "Q161_c4bae570e6e8780a",
-        "Q161_835f21f8b3b20bd1",
-        "Q161_8140a5326af839a7",
-        "Q161_54b6f457507d3066",
-        "Q161_9c1095bac503b8c5",
-        "Q161_af7f7f05c566151f_RB_B",
-        "Q161_3d3133e135f518b1_RB_B",
-        "Q161_351fc9cdb163dae9_RB_B",
-        "Q161_163d8746137615d0_RB_B",
-        "Q161_5edf693621dc45a1_RB_B",
-        "Q161_7f50a1d8ffbcd064_RB_B",
-        "Q161_d413f217f1218b7a_RB_B",
-        "Q161_85450ed07d3da830",
-        "Q161_a0aa6db4d10210d3",
-        "Q161_2ad4d17612e81c03",
-        "Q161_a354bf5e3a7b6177",
-        "Q161_6f783d525f704b09",
-        "Q161_533f9569493fb2fb",
-        "Q161_a0f1b3a49edfa829",
-        "Q161_b6a048101dacac92",
-        "Q161_69ceaa6d71a93a6c",
-        "Q161_092816d9210fd402",
-        "Q161_eea1bc2c7446635e",
-        "Q161_563039872fa7181e",
-        "Q161_73e0b73011bd08af",
-        "Q161_79406ebfad3d5500",
-        "Q161_fa1031c933ff857b",
-        "Q161_c06f8ed4980fa2ef",
-        "Q161_8b1637261d98ebb1",
-        "Q161_c0a1f3822a379fc0",
-        "Q161_c8218cd6556c2d83",
-        "Q161_6b26e2d669ced156",
-        "Q161_269062c9f73b89e2",
-        "Q161_72168a7e71342541",
-        "Q161_623eedb28e9bece8",
-        "Q161_29dfe698b1f2ee7c",
-        "Q161_a6f4d13b268bdb67",
-        "Q161_3935ff67daceaf17",
-        "Q161_7acd346f895eb1fe",
-        "Q161_42f038b9fa20580e",
-        "Q161_df71217914fbbe2a",
-        "Q161_2477321b0942c89b",
-        "Q161_59340de4d748c184",
-        "Q161_5d82b5fcd656adda",
-        "Q161_8429119f1960011e",
-        "Q161_1feedeb0bc9341cc",
-        "Q161_72a382df95bd7d28",
-        "Q161_296f622bed3245f4",
-        "Q161_a23756b65be7f8bc",
-        "Q161_3b5295459e4be3d2"
-      ],
-      "rows": 51,
-      "target": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds"
-    },
-    {
       "details": [
         {
           "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
@@ -13709,7 +14073,7 @@
   "imported_roi_total": 954,
   "layout_policy": "ORIGINAL_LINE_COUNT_AND_PER_LINE_BBOX_PRESERVED",
   "legacy_oversize_outputs_rejected": true,
-  "native_dds_generated": 48,
+  "native_dds_generated": 49,
   "pending_import": 0,
   "pending_import_holds": [],
   "release_approved": false,
@@ -13720,7 +14084,7 @@
   "source": "Existing A/B PNG reused exclusively; native HD bounded pad/reflow/downscale; no new ImageGen or fonts",
   "source_dds_missing_rows": 0,
   "source_sha_conflict_rows": 0,
-  "translated_roi_generated": 252,
+  "translated_roi_generated": 257,
   "visual_qa": "REVIEW_REQUIRED",
-  "zip_sha256": "9fad84c50aadeb7c5f5283bf330c8ca76a82fcd6bb4fa67cd2ab1c8965bffc3c"
+  "zip_sha256": "a9cd3f88265f9af386563055fa5bcaaacdd90c0b6b7a0da03f28a818d775b520"
 }
