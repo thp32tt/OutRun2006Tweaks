@@ -258,6 +258,52 @@ class StrictHDQualityTests(unittest.TestCase):
         self.assertTrue(any("PAD_EXISTING_CANDIDATE_EDGE" in x
                             for x in painted[0]["auto_salvage"]))
 
+    def test_physical_atlas_edge_requires_inset_but_allows_safe_narrow_hangul(self):
+        # At x=0 no outside pixel exists. A narrow replacement must be
+        # strictly inset; original edge alpha is removed from CLEAN.
+        image = native.native_image(source_dds())
+        image.paste((0, 0, 0, 0), (0, 0, image.width, image.height))
+        ImageDraw.Draw(image).rectangle((0, 18, 22, 37),
+                                        fill=(255, 255, 255, 255))
+        src = source_dds()[:128] + image.tobytes("raw", "BGRA")
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            candidate = Image.new("RGBA", (160, 160), (0, 0, 0, 0))
+            ImageDraw.Draw(candidate).rectangle((20, 20, 60, 125),
+                                                fill=(40, 80, 220, 255))
+            candidate.save(repo / "narrow.png")
+            entry = dict(row("narrow.png"), _bbox=[0, 6, 116, 100])
+            data, final, clean, painted, holds = strict.process_strict_atlas(
+                src, [entry], repo, "NORMAL", native.native_image,
+                native.imported_candidate, native.conflicting_rois,
+                native.dominant_container_holds)
+        self.assertIsNotNone(data)
+        self.assertEqual(len(painted), 1)
+        self.assertFalse(holds)
+        self.assertIn("SOURCE_NATIVE_ATLAS_LEFT_EDGE_INSET_REQUIRED",
+                      painted[0]["auto_salvage"])
+        self.assertIsNone(clean.crop((0, 18, 23, 38)).getchannel("A").getbbox())
+        self.assertGreaterEqual(final.getchannel("A").getbbox()[0], strict.MARGIN)
+
+    def test_physical_atlas_edge_wide_hangul_still_held_when_it_touches(self):
+        image = native.native_image(source_dds())
+        image.paste((0, 0, 0, 0), (0, 0, image.width, image.height))
+        ImageDraw.Draw(image).rectangle((0, 18, 22, 37),
+                                        fill=(255, 255, 255, 255))
+        src = source_dds()[:128] + image.tobytes("raw", "BGRA")
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            candidate_file(repo / "wide.png")
+            entry = dict(row("wide.png"), _bbox=[0, 6, 116, 100])
+            data, final, clean, painted, holds = strict.process_strict_atlas(
+                src, [entry], repo, "NORMAL", native.native_image,
+                native.imported_candidate, native.conflicting_rois,
+                native.dominant_container_holds)
+        self.assertIsNone(data)
+        self.assertFalse(painted)
+        self.assertEqual(holds[0]["reason"],
+                         "QA_NATIVE_ATLAS_EDGE_TRANSLATED_GLYPH_TOUCH")
+
     def test_source_border_touch_is_accepted_only_when_neighbor_pixels_are_clear(self):
         src = source_dds()
         b = bytearray(src)
