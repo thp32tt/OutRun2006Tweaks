@@ -38,7 +38,8 @@ struct Texture {
 // DDS maps are optional and are validated using the same bounded parser as albedo.
 struct PbrMaterial {
     Texture normal,orm;
-    float roughness=0.75f,metallic=0.04f,normalScale=1.0f;
+    // No ORM: opaque nonmetal by default. Packed ORM uses unity multipliers.
+    float roughness=0.75f,metallic=0.0f,normalScale=1.0f;
 };
 struct Model {
     std::vector<Mesh> meshes;
