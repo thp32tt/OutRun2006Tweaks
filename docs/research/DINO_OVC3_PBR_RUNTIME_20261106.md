@@ -46,7 +46,7 @@ py -m pip install Pillow
 py tools/upgrade_dino_ovc_pbr.py --input-ovc "D:\model\Dino246_Cockpit_LHD_v15.ovc" --materials-json "D:\model\dino-pbr-materials.json" --output-ovc "D:\pbr-test\Dino246_Cockpit_LHD_v15.ovc"
 ```
 
-4. Test only against a **matched PBR-enabled R26 Win32 DLL/OpenXR host** build and a copy of your original game folder. The original/installed stable OVC2 and DLL should be backed up first. The runtime searches the game executable directory for the fixed sidecar name `Dino246_Cockpit_LHD_v15.ovc`. **Do not** deploy a new OVC3 file with an old DLL (old parser rejects the OVC3 signature). The PBR branch's CI provides a Win32 DLL artifact; use a matching host (not a different source SHA) when testing in VR.
+4. Test only against a **matched PBR-enabled R26 Win32 DLL/OpenXR host** build and a copy of your original game folder. The original/installed stable OVC2 and DLL should be backed up first. The runtime searches the game executable directory for the fixed sidecar name `Dino246_Cockpit_LHD_v15.ovc`. **Do not** deploy a new OVC3 file with an old DLL (old parser rejects the OVC3 signature). The PBR branch's CI packages a matching Win32 DLL and x64 OpenXR host with matching `SOURCE_SHA.txt` and `HOST_BUILD_SOURCE_SHA.txt`. Do not launch a PBR DLL alongside a host from another source SHA. This is a build artifact, not a validated copy-and-run installer.
 
 ## Validation
 
