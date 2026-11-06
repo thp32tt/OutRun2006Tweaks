@@ -164,7 +164,14 @@ jobs:
           # sinks the eye toward the floor and amplifies view jitter.
           assert 'NativeVrProfilePose(' not in hook
           assert 'NativeVrProfileInputAnchor(' in hook
-          assert 'SyncNativeSeatProfile()' in hook
+          # Original camera runs before native frame_enter. Assert the
+          # changed source's real two call sites and live eye gate, rather
+          # than requiring the removed no-argument helper spelling.
+          assert 'SyncNativeSeatProfile(true)' in hook
+          assert 'SyncNativeSeatProfile(false)' in hook
+          assert 'NativeSeatCameraTick.AfterSeatSync(' in hook
+          assert 'NativeSeatCameraTick.Ready()' in native_renderer
+          assert 'NativeQuestEyeEligible(' in native_renderer
           assert 'SeatTablePatched=true;' in hook
           assert 'OriginalQuestVrProfileAnchor(' in hook
           assert 'QuestCockpitV2SeatBack = 0.0' in ini

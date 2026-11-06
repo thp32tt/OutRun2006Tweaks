@@ -644,7 +644,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 sameInput=false;
         }
         const bool previouslyPatched=SeatTablePatched;
-        OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Invalidate();
+        // Keep the existing admission stable when nothing changed; an
+        // unnecessary per-tick false/true would flicker a parallel Draw.
+        if(!sameInput)
+            OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Invalidate();
         SeatTablePatched=true;
         for(std::size_t i=0;i<SeatTableCount;++i) {
             auto* row=table+i*kStride;
