@@ -1,0 +1,75 @@
+name: Dino external OVC3 PBR (R26 VR)
+on:
+  push:
+    branches:
+      - feature/dino-external-pbr-runtime-v1-20261106
+    paths:
+      - 'src/vr/game/dino_external_*.hpp'
+      - 'tests/test_dino_external_*.cpp'
+      - 'tools/upgrade_dino_ovc_pbr.py'
+      - 'tools/tests/test_upgrade_dino_ovc_pbr.py'
+      - 'tools/tests/test_dino_pbr_hlsl_win.cpp'
+      - 'tools/tests/dino_pbr_hlsl_win/**'
+      - '.github/workflows/dino-external-pbr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  portable-parser:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate all OVC generations and PBR packer
+        run: |
+          set -eu
+          for test in tests/test_dino_external_sidecar.cpp tests/test_dino_external_hq.cpp tests/test_dino_external_pbr.cpp; do
+            exe="/tmp/$(basename "$test" .cpp)"
+            c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. "$test" -o "$exe"
+            "$exe"
+          done
+          python3 -m unittest -v tools.tests.test_upgrade_dino_ovc_pbr
+  win32-shader:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build actual D3D9 Shader Model 3 compiler test
+        shell: pwsh
+        run: |
+          cmake -S tools/tests/dino_pbr_hlsl_win -B build-pbr-hlsl -G "Visual Studio 17 2022" -A Win32
+          if($LASTEXITCODE -ne 0){throw "Shader gate configure failed"}
+          cmake --build build-pbr-hlsl --config Release --parallel 2
+          if($LASTEXITCODE -ne 0){throw "Shader gate build failed"}
+          & ./build-pbr-hlsl/Release/dino_pbr_shader_ci.exe
+          if($LASTEXITCODE -ne 0){throw "VS3/PS3 HLSL did not compile"}
+  win32-r26:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure stable R26/HUD external model path
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-r26 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=OFF
+          if($LASTEXITCODE -ne 0){throw "R26 configure failed"}
+      - name: Build Win32 mod DLL using PBR runtime
+        shell: pwsh
+        run: |
+          cmake --build build-r26 --config Release --target outrun2006tweaks --parallel 4
+          if($LASTEXITCODE -ne 0){throw "R26 Win32 build failed"}
+          $dll=Get-ChildItem build-r26 -Recurse -Filter dinput8.dll | Where-Object {$_.FullName -notmatch '_deps'} | Sort-Object Length -Descending | Select-Object -First 1
+          if(-not $dll){throw "Missing dinput8.dll"}
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item $dll.FullName out/dinput8.dll
+          $env:GITHUB_SHA | Set-Content out/SOURCE_SHA.txt -Encoding ascii
+          Get-FileHash out/dinput8.dll -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dino-OVC3-PBR-R26-Win32
+          path: |
+            out/dinput8.dll
+            out/SOURCE_SHA.txt
+          retention-days: 14
+          if-no-files-found: error
