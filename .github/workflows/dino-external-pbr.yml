@@ -9,6 +9,9 @@ on:
       - 'tests/test_dino_original_car_gate.cpp'
       - 'tests/test_dino_external_*.cpp'
       - 'tools/upgrade_dino_ovc_pbr.py'
+      - 'tools/package_dino_pbr_copyrun.py'
+      - 'tools/tests/test_package_dino_pbr_copyrun.py'
+      - 'BUILD-DINO-PBR-TEST-ZIP.cmd'
       - 'tools/tests/test_upgrade_dino_ovc_pbr.py'
       - 'tools/tests/test_dino_pbr_hlsl_win.cpp'
       - 'tools/tests/test_dino_pbr_copyrun.ps1'
@@ -35,7 +38,7 @@ jobs:
           done
           c++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. tests/test_dino_original_car_gate.cpp -o /tmp/test_dino_original_car_gate
           /tmp/test_dino_original_car_gate
-          python3 -m unittest -v tools.tests.test_upgrade_dino_ovc_pbr
+          python3 -m unittest -v tools.tests.test_upgrade_dino_ovc_pbr tools.tests.test_package_dino_pbr_copyrun
       - name: Check original player callback is gated after replacement submission
         run: |
           python3 - <<'PY'
@@ -119,14 +122,30 @@ jobs:
           $env:GITHUB_SHA | Set-Content out/HOST_BUILD_SOURCE_SHA.txt -Encoding ascii
           'ACTIVE_R26_R43_R44' | Set-Content out/VARIANT_ID.txt -Encoding ascii
           Get-FileHash out/outrun-vr-host.exe -Algorithm SHA256
+      - name: Stage complete same-source copy-run helpers without original game files
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory out/scripts,out/defaults -Force | Out-Null
+          foreach($name in @('QuestCockpit-CopyRun.ps1','QuestCockpit-CopyRestore.ps1',
+            'RUN-QUEST-APK-DINO-PBR.cmd','RESTORE-QUEST-APK-COCKPIT.cmd')) {
+              Copy-Item -LiteralPath $name -Destination (Join-Path out $name) -Force
+          }
+          foreach($name in @('Run-OutRunVRTest.ps1','Select-OutRunVRBackend.ps1',
+            'OutRunVR-TestProfiles.ps1','Collect-OutRunVRLogs.ps1',
+            'Collect-OutRunVRLogs.cmd','Analyze-OutRunVRSession.ps1',
+            'Run-QuestCockpitV2-CrashDiag.ps1','analyze_outrun_assets.py')) {
+              Copy-Item -LiteralPath $name -Destination (Join-Path out/scripts $name) -Force
+          }
+          foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')) {
+              Copy-Item -LiteralPath $name -Destination (Join-Path out/defaults $name) -Force
+          }
+          Copy-Item tools/package_dino_pbr_copyrun.py out/CREATE-DINO-PBR-PACKAGE.py -Force
+          Copy-Item BUILD-DINO-PBR-TEST-ZIP.cmd out/BUILD-DINO-PBR-TEST-ZIP.cmd -Force
+          if(Test-Path out/OR2006C2C.EXE){throw 'Unsafe original game executable in artifact'}
+          Write-Host "Matched Win32/x64 game backend, launchers, defaults and packager staged; no OVC or original EXE included"
       - uses: actions/upload-artifact@v4
         with:
           name: Dino-OVC3-PBR-R26-MatchedDLLHost
-          path: |
-            out/dinput8.dll
-            out/outrun-vr-host.exe
-            out/SOURCE_SHA.txt
-            out/HOST_BUILD_SOURCE_SHA.txt
-            out/VARIANT_ID.txt
+          path: out/
           retention-days: 14
           if-no-files-found: error
