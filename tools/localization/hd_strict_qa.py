@@ -13,6 +13,7 @@ import struct
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageOps, UnidentifiedImageError
+from hd_bc3_index_patch import patch_mip1
 from hd_existing_candidate_salvage import (
     candidate_lines as salvage_candidate_lines,
     pad_candidate_edge,
@@ -303,6 +304,31 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
         if any(ImageChops.multiply(ch, outside).getbbox() for ch in diff.split()):
             raise ValueError("QA_PROTECTED_ATLAS_PIXEL_CHANGED")
     native = ImageOps.flip(result) if orientation == "FLIPY" else result
+    if raw[84:88] == b"DXT5" and struct.unpack_from("<I", raw, 80)[0] == 4:
+        # DXT5 is lossy; preserve the original RGB565 + alpha endpoints
+        # bit-for-bit, touching only the indices of source-approved ROI pixels.
+        # Unsupported 13-mip originals fail closed in the codec.
+        native_boxes = [
+            (x0, source.height - y1, x1, source.height - y0)
+            if orientation == "FLIPY" else (x0, y0, x1, y1)
+            for x0, y0, x1, y1 in used
+        ]
+        raw_source = ImageOps.flip(source) if orientation == "FLIPY" else source
+        data, bc3_receipt = patch_mip1(raw, native, native_boxes, raw_source)
+        if data[:128] != raw[:128] or len(data) != len(raw) or data == raw:
+            raise ValueError("QA_BC3_SOURCE_FORMAT_OR_NOOP")
+        actual_native = decode(data)
+        actual_readable = ImageOps.flip(actual_native) if orientation == "FLIPY" else actual_native
+        # The preview must represent ACTUAL stored DXT5 bytes, not the
+        # ideal uncompressed composite. All non-ROI pixels stay unchanged.
+        difference = ImageChops.difference(source, actual_readable)
+        if any(ImageChops.multiply(ch, outside).getbbox() for ch in difference.split()):
+            raise ValueError("QA_BC3_SAVED_PROTECTED_ATLAS_PIXEL_CHANGED")
+        for roi in painted:
+            roi["dds_format"] = "DXT5_BC3_ORIGINAL_ENDPOINTS_INDEX_ONLY"
+            roi["bc3_saved_format_receipt"] = bc3_receipt
+            roi["auto_salvage"].append("DXT5_INDEX_ONLY_VISUAL_QA_REQUIRED")
+        return data, actual_readable, clean, painted, holds
     masks = struct.unpack_from("<IIII", raw, 92)
     fmt = "BGRA" if masks == (0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000) else "RGBA"
     data = raw[:128] + native.tobytes("raw", fmt)
