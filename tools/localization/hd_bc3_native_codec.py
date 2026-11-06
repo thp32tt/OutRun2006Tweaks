@@ -148,6 +148,20 @@ def encode_bc3_block(pixels):
                 trial = rgb_candidate(first, second)
                 if trial[0] < best[0]:
                     best = trial
+        if best[0][0] > 55 and len(unique) > len(anchors):
+            # Only on a failing block: try all distinct real visible ink
+            # endpoint pairs (at most 16 pixels). Color extremes can hide
+            # a feasible interior pair in multicolor AA/shadow glyphs.
+            # This is a search improvement, NOT a weaker QA threshold:
+            # saved BC3 bytes must still satisfy the original per-pixel
+            # protected-alpha and <=55/channel color guards.
+            for first in unique:
+                for second in unique:
+                    if first == second:
+                        continue
+                    trial = rgb_candidate(first, second)
+                    if trial[0] < best[0]:
+                        best = trial
     _, c0, c1, rgb_palette = best
     rgb_indexes = 0
     for i, pixel in enumerate(pixels):

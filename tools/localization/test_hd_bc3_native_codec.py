@@ -138,6 +138,29 @@ class DXT5OriginalProtection(unittest.TestCase):
             self.assertGreaterEqual(actual[3], 223)
         self.assertGreater(decoded[15][3], 0)
 
+    def test_all_visible_ink_endpoint_fallback_recovers_interior_pair(self):
+        # Real 4x4 BC3 has only two RGB565 endpoints. With >8 unique
+        # colors a min/max-channel-only search fails this fixture (>55),
+        # while a non-extreme visible pair fits all 16 pixels (<=55).
+        # No new font, visual approval or relaxed color budget.
+        rgb = [
+            (108, 169, 123), (105, 186, 150), (138, 175, 156),
+            (119, 164, 158), (121, 197, 137), (110, 174, 153),
+            (121, 178, 139), (101, 169, 129), (170, 61, 44),
+            (166, 75, 47), (171, 94, 68), (171, 75, 77),
+            (132, 99, 64), (164, 62, 46), (198, 219, 251),
+            (189, 210, 213),
+        ]
+        source = [color + (255,) for color in rgb]
+        encoded = bc.encode_bc3_block(source)
+        self.assertEqual(encoded, bc.encode_bc3_block(source))
+        decoded = bc.decode_bc3_block(encoded)
+        self.assertTrue(all(actual[3] == 255 for actual in decoded))
+        self.assertLessEqual(max(
+            abs(original[ch] - actual[ch])
+            for original, actual in zip(source, decoded) for ch in range(3)
+        ), 55)
+
     def test_pillow_and_manual_dxt5_decoding_agree(self):
         raw, source = fake_dxt5()
         block = raw[128:144]
