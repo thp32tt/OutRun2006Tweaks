@@ -101,6 +101,17 @@ $running=Get-Process -ErrorAction SilentlyContinue|Where-Object{
     $_.ProcessName -ieq 'OR2006C2C' -or $_.ProcessName -ieq 'outrun-vr-host'
 }
 if($running){throw 'Close game and OpenXR host before switching.'}
+# Reject destination conflicts before backups, backend writes or selector calls.
+# A user-modified sidecar must never cause a late half-installed failure.
+if($Mode -eq 'DINO' -or $Mode -eq 'PBR') {
+    $destName=if($Mode -eq 'PBR'){$pbrName}else{$dinoName}
+    $destHash=if($Mode -eq 'PBR'){$expectedPbr}else{$dinoExpected}
+    $destPath=Join-Path $root $destName
+    if((Test-Path -LiteralPath $destPath -PathType Leaf) -and
+       (HashFile $destPath) -ne $destHash) {
+        throw "Refusing to replace existing different model: $destName"
+    }
+}
 # One-time baseline snapshot: no root DLL, config, metadata or other helper
 # is touched until complete file-level backup/manifest is written.
 if(!(Test-Path $backupManifest)){
