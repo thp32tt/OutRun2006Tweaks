@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.20)
+project(dino_pbr_shader_ci LANGUAGES CXX)
+add_executable(dino_pbr_shader_ci ../test_dino_pbr_hlsl_win.cpp)
+target_compile_features(dino_pbr_shader_ci PRIVATE cxx_std_17)
+target_include_directories(dino_pbr_shader_ci PRIVATE ${CMAKE_CURRENT_LIST_DIR}/../../..)
