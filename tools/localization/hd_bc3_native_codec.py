@@ -97,26 +97,58 @@ def encode_bc3_block(pixels):
         raise BC3Hold('QA_BC3_NO_ALPHA_PALETTE_WITH_POSITIVE_STROKES')
     a0, a1 = best_encoding[1]
     alpha_indexes = sum(idx << (3*i) for i, idx in enumerate(best_encoding[2]))
-    visible = [p for p in pixels if p[3] > 0] or pixels
-    lo = min(visible, key=lambda p: (sum(p[:3]), p[:3]))
-    hi = max(visible, key=lambda p: (sum(p[:3]), p[:3]))
-    c0, c1 = _rgb565(hi), _rgb565(lo)
-    if c0 < c1:
-        c0, c1 = c1, c0
-    if c0 == c1:
-        if c0 < 65535:
-            c0 += 1
-        else:
-            c1 -= 1
-    p0, p1 = _unpack565(c0), _unpack565(c1)
-    rgb_palette = [p0, p1,
+    visible = [p[:3] for p in pixels if p[3] > 0] or [p[:3] for p in pixels]
+    unique = sorted(set(visible))
+    def rgb_candidate(first, second):
+        c0, c1 = _rgb565(first), _rgb565(second)
+        if c0 < c1:
+            c0, c1 = c1, c0
+        if c0 == c1:
+            if c0 < 65535:
+                c0 += 1
+            else:
+                c1 -= 1
+        p0, p1 = _unpack565(c0), _unpack565(c1)
+        palette = [p0, p1,
                    tuple((2*p0[k] + p1[k])//3 for k in range(3)),
                    tuple((p0[k] + 2*p1[k])//3 for k in range(3))]
+        selected = [min(range(4), key=lambda idx: (
+            max(abs(color[k]-palette[idx][k]) for k in range(3)),
+            sum((color[k]-palette[idx][k])**2 for k in range(3)), idx))
+            for color in visible]
+        max_error = max(max(abs(color[k]-palette[idx][k]) for k in range(3))
+                        for color, idx in zip(visible, selected))
+        sq_error = sum(sum((color[k]-palette[idx][k])**2 for k in range(3))
+                       for color, idx in zip(visible, selected))
+        return (max_error, sq_error, c0, c1), c0, c1, palette
+    initial_lo = min(unique, key=lambda p: (sum(p),p))
+    initial_hi = max(unique, key=lambda p: (sum(p),p))
+    best = rgb_candidate(initial_hi, initial_lo)
+    if best[0][0] > 55:
+        # A grayscale/luminance-only endpoint pair misrepresents some
+        # source-colored A/B Korean glyphs. Search a bounded set of actual
+        # visible candidate RGB colors; never relax the downstream 55/channel
+        # saved-pixel gate or change a protected native pixel.
+        if len(unique) <= 8:
+            anchors = unique
+        else:
+            anchors = sorted({min(unique,key=lambda p:p[k]) for k in range(3)}
+                             | {max(unique,key=lambda p:p[k]) for k in range(3)}
+                             | {initial_lo,initial_hi})
+        for first in anchors:
+            for second in anchors:
+                if first == second:
+                    continue
+                trial = rgb_candidate(first, second)
+                if trial[0] < best[0]:
+                    best = trial
+    _, c0, c1, rgb_palette = best
     rgb_indexes = 0
     for i, pixel in enumerate(pixels):
-        best = min(range(4), key=lambda k:
-                   (sum((pixel[ch]-rgb_palette[k][ch])**2 for ch in range(3)), k))
-        rgb_indexes |= best << (2*i)
+        best_index = min(range(4), key=lambda k: (
+            max(abs(pixel[ch]-rgb_palette[k][ch]) for ch in range(3)),
+            sum((pixel[ch]-rgb_palette[k][ch])**2 for ch in range(3)), k))
+        rgb_indexes |= best_index << (2*i)
     return bytes((a0, a1)) + alpha_indexes.to_bytes(6, 'little') + struct.pack('<HHI', c0, c1, rgb_indexes)
 
 
