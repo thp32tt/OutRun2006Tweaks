@@ -280,7 +280,7 @@ jobs:
                 'RUN-QUEST-APK-SKY-DIAG.cmd',
                 'RUN-QUEST-APK-INTERP-OFF.cmd',
                 'RESTORE-QUEST-APK-COCKPIT.cmd')) {
-                & $env:ComSpec /d /c ('"' + $cmd + '" VERIFY')
+                & $env:ComSpec /d /v:on /c ('"' + $cmd + '" VERIFY')
                 if($LASTEXITCODE -ne 0){
                   throw "copy-run CMD verification failed: $cmd exit=$LASTEXITCODE"
                 }
@@ -349,7 +349,7 @@ jobs:
             # publishes. Duplicate it into a path containing spaces so
             # %~dp0 and quoted -File paths match real user installs.
             $thinFull=(Resolve-Path $thin).Path
-            $cmdProbe=Join-Path (Resolve-Path 'build-general').Path 'copy run CMD probe with spaces'
+            $cmdProbe=Join-Path (Resolve-Path 'build-general').Path 'copy run CMD probe ! & (spaces)'
             if(Test-Path -LiteralPath $cmdProbe){Remove-Item -LiteralPath $cmdProbe -Recurse -Force}
             New-Item -ItemType Directory -Force -Path $cmdProbe | Out-Null
             Copy-Item -Path (Join-Path $thinFull '*') -Destination $cmdProbe -Recurse -Force
@@ -360,7 +360,7 @@ jobs:
                 'RUN-QUEST-APK-SKY-DIAG.cmd',
                 'RUN-QUEST-APK-INTERP-OFF.cmd',
                 'RESTORE-QUEST-APK-COCKPIT.cmd')) {
-                & $env:ComSpec /d /c ('"' + $cmd + '" VERIFY')
+                & $env:ComSpec /d /v:on /c ('"' + $cmd + '" VERIFY')
                 if($LASTEXITCODE -ne 0){throw "thin COPY-RUN CMD verification failed: $cmd exit=$LASTEXITCODE"}
               }
 
@@ -368,14 +368,14 @@ jobs:
               # fail with the explicit CMD guards, not an opaque PowerShell
               # '-File does not exist' error.
               Remove-Item -LiteralPath 'QuestCockpit-CopyRun.ps1' -Force
-              & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              & $env:ComSpec /d /v:on /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
               $probeExit=$LASTEXITCODE
               if($probeExit -ne 92){throw "missing-launcher guard returned $probeExit instead of 92"}
               $global:LASTEXITCODE=0
               Copy-Item -LiteralPath (Join-Path $thinFull 'QuestCockpit-CopyRun.ps1') -Destination . -Force
 
               Remove-Item -LiteralPath 'QUEST_APK_COPYRUN_PAYLOAD\IDENTITY.json' -Force
-              & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              & $env:ComSpec /d /v:on /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
               $probeExit=$LASTEXITCODE
               if($probeExit -ne 93){throw "missing-payload guard returned $probeExit instead of 93"}
               $global:LASTEXITCODE=0
@@ -384,9 +384,30 @@ jobs:
               # Missing nested runner must be rejected by the PowerShell
               # payload verifier before any game-folder mutation.
               Remove-Item -LiteralPath 'QUEST_APK_COPYRUN_PAYLOAD\scripts\Run-OutRunVRTest.ps1' -Force
-              & $env:ComSpec /d /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              & $env:ComSpec /d /v:on /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
               $probeExit=$LASTEXITCODE
               if($probeExit -eq 0){throw 'missing Run-OutRunVRTest.ps1 helper was not rejected'}
+              $global:LASTEXITCODE=0
+              Copy-Item -LiteralPath (Join-Path $thinFull 'QUEST_APK_COPYRUN_PAYLOAD\scripts\Run-OutRunVRTest.ps1') -Destination 'QUEST_APK_COPYRUN_PAYLOAD\scripts\Run-OutRunVRTest.ps1' -Force
+
+              Remove-Item -LiteralPath 'QuestCockpit-CopyRestore.ps1' -Force
+              & $env:ComSpec /d /v:on /c '"RUN-QUEST-APK-COCKPIT.cmd" VERIFY'
+              $probeExit=$LASTEXITCODE
+              if($probeExit -ne 96){throw "missing-restore guard returned $probeExit instead of 96"}
+              $global:LASTEXITCODE=0
+              Copy-Item -LiteralPath (Join-Path $thinFull 'QuestCockpit-CopyRestore.ps1') -Destination . -Force
+
+              # A wrong but valid x86 PE named OR2006C2C.EXE must be rejected
+              # before any original-backup directory or backend mutation exists.
+              Copy-Item -LiteralPath 'QUEST_APK_COPYRUN_PAYLOAD\backend\dinput8.dll' -Destination 'OR2006C2C.EXE' -Force
+              $windowsPs=Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+              & $windowsPs -NoProfile -ExecutionPolicy Bypass -File '.\QuestCockpit-CopyRun.ps1' -Mode NORMAL
+              $probeExit=$LASTEXITCODE
+              if($probeExit -eq 0){throw 'wrong-game-EXE preflight was not rejected'}
+              if(Test-Path -LiteralPath 'QUEST_APK_COPYRUN_ORIGINAL_BACKUP'){
+                throw 'wrong-game-EXE preflight modified backup state before rejection'
+              }
+              Remove-Item -LiteralPath 'OR2006C2C.EXE' -Force
               $global:LASTEXITCODE=0
             } finally {
               Pop-Location

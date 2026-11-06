@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableExtensions
+setlocal EnableExtensions DisableDelayedExpansion
 cd /d "%~dp0"
 if errorlevel 1 goto :bad_root
 
@@ -25,15 +25,19 @@ exit /b %EC%
 
 :bad_root
 echo [FAILED] Cannot enter the extracted game folder: %~dp0
+if /I not "%~1"=="VERIFY" pause
 exit /b 90
 :no_powershell
 echo [FAILED] Windows PowerShell not found: %PS%
+if /I not "%~1"=="VERIFY" pause
 exit /b 91
 :missing_restore
 echo [FAILED] QuestCockpit-CopyRestore.ps1 is missing.
 echo Re-extract the ENTIRE QuestCockpitV2 COPY-RUN ZIP.
+if /I not "%~1"=="VERIFY" pause
 exit /b 92
 :missing_backup
 echo [FAILED] No original backup manifest exists.
 echo Run RUN-QUEST-APK-COCKPIT.cmd once before using restore.
+if /I not "%~1"=="VERIFY" pause
 exit /b 94
