@@ -1,9 +1,12 @@
 name: OutRun HD Korean continuous auto controller (GitHub CPU)
 
 # This small watchdog does NOT re-render images, run Docker or install a game.
-# Default branch schedule invokes the original asset-branch DDS workflow ONLY
-# when the asset HEAD has changed, or retries the first failed run once.
+# Safety-test success now wakes the watchdog immediately; schedule remains a
+# fallback. The underlying SHA/artifact/retry dedup remains authoritative.
 on:
+  workflow_run:
+    workflows: ["OutRun A/B Multi-Atlas Fast Safety Unit Tests (GitHub CPU)"]
+    types: [completed]
   schedule:
     - cron: "7,37 * * * *"
   workflow_dispatch:
@@ -22,6 +25,12 @@ concurrency:
 
 jobs:
   source-sha-watchdog:
+    # Do not grant Actions write execution to unrelated/forked workflow runs.
+    if: >-
+      ${{ github.event_name != 'workflow_run' ||
+          (github.event.workflow_run.conclusion == 'success' &&
+           github.event.workflow_run.head_branch == 'korean-localization-recovery-20260928' &&
+           github.event.workflow_run.head_repository.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
