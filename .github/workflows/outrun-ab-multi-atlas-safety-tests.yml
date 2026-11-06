@@ -8,7 +8,9 @@ on:
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_strict_qa.py"
       - "tools/localization/hd_bc3_index_patch.py"
+      - "tools/localization/hd_bc3_native_codec.py"
       - "tools/localization/test_hd_bc3_index_patch.py"
+      - "tools/localization/test_hd_bc3_native_codec.py"
       - "tools/localization/hd_existing_candidate_salvage.py"
       - "tools/localization/hd_rework_queue.py"
       - "tools/localization/hd_qa_queue_refill.py"
@@ -38,7 +40,9 @@ jobs:
             tools/localization/github_ab_imagegen_atlas_batch.py
             tools/localization/hd_strict_qa.py
             tools/localization/hd_bc3_index_patch.py
+            tools/localization/hd_bc3_native_codec.py
             tools/localization/test_hd_bc3_index_patch.py
+            tools/localization/test_hd_bc3_native_codec.py
             tools/localization/hd_existing_candidate_salvage.py
             tools/localization/hd_rework_queue.py
             tools/localization/hd_qa_queue_refill.py
@@ -57,5 +61,6 @@ jobs:
           python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
           python -m unittest discover -s tools/localization -p test_hd_strict_qa.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
+          python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
           python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
           python -m unittest discover -s tools/localization -p test_hd_c1_overrides.py -v
