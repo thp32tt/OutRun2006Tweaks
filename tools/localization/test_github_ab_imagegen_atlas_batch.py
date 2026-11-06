@@ -156,7 +156,7 @@ class MultiAtlasTest(unittest.TestCase):
   self.assertEqual(m.dominant_container_holds(rows),{"a"})
   self.assertEqual(m.conflicting_rois(rows[1:]),{"b","c"})
 
-  def test_bc3_exact_failure_quarantines_only_offending_roi(self):
+ def test_bc3_exact_failure_quarantines_only_offending_roi(self):
    rows=[{"roi_id":"Q052_1111111111111111","_bbox":[4,4,60,32]},
          {"roi_id":"Q052_2222222222222222","_bbox":[80,4,120,32]}]
    error=m.NativeBC3Hold("QA_BC3_TRANSLATED_COLOR_LOSS")
@@ -169,7 +169,7 @@ class MultiAtlasTest(unittest.TestCase):
     self.assertEqual(fn.call_count,2)
     self.assertEqual(fn.call_args.kwargs["excluded_bc3"],{rows[0]["roi_id"]})
 
-  def test_bc3_ambiguous_failure_stays_held(self):
+ def test_bc3_ambiguous_failure_stays_held(self):
    rows=[{"roi_id":"a","_bbox":[4,4,60,32]},
          {"roi_id":"b","_bbox":[8,8,70,40]}]
    error=m.NativeBC3Hold("QA_BC3_TRANSLATED_COLOR_LOSS")
@@ -179,7 +179,7 @@ class MultiAtlasTest(unittest.TestCase):
      m.process_strict_with_bc3_quarantine(fake_native(),rows,Path("."),"NORMAL")
     self.assertEqual(fn.call_count,1)
 
-  def test_bc3_flipy_failure_maps_native_y_to_source_row(self):
+ def test_bc3_flipy_failure_maps_native_y_to_source_row(self):
    rows=[{"roi_id":"a","_bbox":[4,96,60,125]},
          {"roi_id":"b","_bbox":[80,4,120,32]}]
    error=m.NativeBC3Hold("QA_BC3_TRANSLATED_COLOR_LOSS")
@@ -189,7 +189,7 @@ class MultiAtlasTest(unittest.TestCase):
     m.process_strict_with_bc3_quarantine(fake_native(),rows,Path("."),"FLIPY")
     self.assertEqual(fn.call_args.kwargs["excluded_bc3"],{"a"})
 
-  def test_no_font_regeneration(self):
+ def test_no_font_regeneration(self):
   s=src.read_text()
   for term in ("ImageFont","truetype(","draw.text(","font_path"):
    self.assertNotIn(term,s)
