@@ -26,6 +26,14 @@ services:
       VR_FEATURE_C6_REMINDER_SECONDS: "300"
       CONVERSION_ACTIVE_LIMIT: "2"
       CONVERSION_DX11_ENABLED: "false"
+      # A now advances Daytona365 Blender work in the OutRun project, never DX11.
+      CAR_MODEL_AUTODEV_ENABLED: "true"
+      CAR_MODEL_GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
+      CAR_MODEL_TARGET_BRANCH: "feature/daytona365-blender-v8-20261108"
+      CAR_MODEL_SCHEDULE_MINUTES: "15"
+      CAR_MODEL_CONTINUE_MIN_SECONDS: "1800"
+      CAR_MODEL_RESPONSE_STABLE_SECONDS: "30"
+      CAR_MODEL_HARD_NEW_CHAT_SECONDS: "3600"
       DXVK_FROZEN: "true"
       CONVERSION_DXVK_ENABLED: "false"
       # C is no longer UW2 web porting or DX9Ex review.
@@ -76,11 +84,11 @@ services:
       PRODUCTION_COUNTER_MODE: "lane"
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      # Legacy DX11 dispatch minute retained for when A is explicitly re-enabled.
+      # Legacy DX11 dispatch minute retained only; Daytona A uses :15 each hour.
       SCHEDULE_MINUTES: "30"
       # Model2 C: >=30m normal followups; at 60m hard NEW ChatGPT project
       # conversation even if its previous answer is busy, frozen or missing.
-      # DX11 A is disabled; no automatic dispatch, continuation, or rollover.
+      # DX11 A remains disabled; Daytona Blender A runs a separate simple loop.
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
