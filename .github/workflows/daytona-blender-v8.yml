@@ -22,3 +22,5 @@ jobs:
         run: python tools/test_daytona365_v8_7_source_contract.py
       - name: V8.8 PMT console UV and source PBR shader contract (not a render)
         run: python tools/test_daytona365_v8_8_source_contract.py
+      - name: V8.9 genuine PMT silhouette headrest, seat pleat, charcoal PBR source contract (not a render)
+        run: python tools/test_daytona365_v8_9_source_contract.py
