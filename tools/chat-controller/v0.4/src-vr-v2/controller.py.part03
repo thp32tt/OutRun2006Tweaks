@@ -835,7 +835,7 @@ def queue_rollover_prompt(active: dict) -> str:
         f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
         f"CHAT_ROLLOVER={rollover}",
         "",
-        "VR 작업은 30분 주기로 새 대화로 전환한다. 이전 대화가 반드시 실패한 것은 아니다. GitHub 체크포인트와 게임 브랜치의 커밋으로 실제 진행 상태를 복원해.",
+        "VR 레거시 작업은 최대 60분 주기로 새 대화로 전환한다. 이전 대화가 반드시 실패한 것은 아니다. GitHub 체크포인트와 게임 브랜치의 커밋으로 실제 진행 상태를 복원해.",
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
         "FEATURE_ID=" + str(active.get("feature_id") or ""),
@@ -859,7 +859,7 @@ def queue_rollover_prompt(active: dict) -> str:
         "CHECKPOINT_MODE=" + str(active.get("vr_checkpoint_fallback") or "GITHUB_VERIFIED"),
         "CHECKPOINT_HTTP_STATUS=" + str(active.get("vr_checkpoint_http_status") or ""),
         "BASE_SHA=" + str(active.get("base_sha") or ""),
-        "GitHub 체크포인트가 검증됐다면 해당 기록을 읽어. CHECKPOINT_MODE=LOCAL_ONLY_AFTER_40M이면 원격 체크포인트 파일이 없을 수 있으니 해당 파일을 요구하거나 기다리지 말고 게임 브랜치 HEAD/커밋 및 docs/automation/runs 기록으로 즉시 복구해.",
+        "GitHub 체크포인트가 검증됐다면 해당 기록을 읽어. CHECKPOINT_MODE=LOCAL_ONLY_AFTER_60M이면 원격 체크포인트 파일이 없을 수 있으니 해당 파일을 요구하거나 기다리지 말고 게임 브랜치 HEAD/커밋 및 docs/automation/runs 기록으로 즉시 복구해.",
         "GitHub 기록과 대조하여 기존 작업의 미완료 범위만 수행하고, 이전 채팅의 미확정 실행과 소스 소유권이 충돌하지 않는지 확인해. 미커밋 내부 사고는 복구된 것으로 간주하지 마.",
         source_policy,
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
@@ -1275,7 +1275,7 @@ async def vr_checkpoint_and_rollover(context: BrowserContext, pages: dict, q: di
             save_queue_state(q)
             write_runtime(
                 status="vr_60m_local_fallback",
-                last_action=f"{active['task_id']} local queue saved; GitHub checkpoint failed, forcing fresh chat at 40m",
+                last_action=f"{active['task_id']} local queue saved; GitHub checkpoint failed, forcing fresh chat at 60m",
                 vr_rollover_data_loss_risk="Uncommitted model reasoning may be lost",
                 vr_checkpoint_status="FAILED_LOCAL_FALLBACK",
             )
