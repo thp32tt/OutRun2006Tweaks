@@ -1563,6 +1563,7 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
+            OutRunVR::DinoSidecar::GlobalDaytonaGpu().OnDeviceReset();
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;
             R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;
