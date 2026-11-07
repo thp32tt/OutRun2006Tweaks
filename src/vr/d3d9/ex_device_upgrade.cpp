@@ -502,6 +502,7 @@ namespace OutRunVRD3D9ExUpgrade
             // before the actual D3D9Ex reset; race->menu/loading transitions
             // must never carry those resources across ResetEx.
             OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
+            OutRunVR::DinoSidecar::GlobalDaytonaGpu().OnDeviceReset();
             const HRESULT hr =
                 deviceEx->ResetEx(&effective, fullscreenPtr);
             LARGE_INTEGER resetReturnQpc{};
