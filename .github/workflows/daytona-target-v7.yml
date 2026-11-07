@@ -1,0 +1,16 @@
+name: Daytona v7 target image PBR synthetic regression
+on:
+  push:
+    branches:
+      - feature/daytona365-blender-target-v7-20261108
+  workflow_dispatch:
+jobs:
+  source-free-photo-materials:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pillow
+      - run: python tools/test_daytona365_v7_materials.py
