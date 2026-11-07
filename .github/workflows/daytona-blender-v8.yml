@@ -32,3 +32,5 @@ jobs:
         run: python tools/test_daytona365_v8_12_source_contract.py
       - name: V8.13 real source cushion pleat geometry, packed tangent normal and UV contract (not a render)
         run: python tools/test_daytona365_v8_13_source_contract.py
+      - name: V8.14 genuine PMT-bounded physical H-gate underdeck, packed PBR and metric tangent UV source contract (not a render)
+        run: python tools/test_daytona365_v8_14_source_contract.py
