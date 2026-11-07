@@ -15,7 +15,10 @@ import math
 import struct
 import zlib
 from PIL import Image,ImageFilter,ImageEnhance,ImageChops
-from pmt_export_base import open_pmt, decode_object, decode_dds
+try:
+    from pmt_export_base import open_pmt, decode_object, decode_dds
+except ImportError:
+    from dino_original_pmt_to_glb import open_pmt, decode_object, decode_dds
 
 SOURCE=Path("/home/chatgpt-runner/rea-input/outrun/outrun2006/Cars/obj_plcar_dayts_pmt.sz")
 SHA="f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe"
