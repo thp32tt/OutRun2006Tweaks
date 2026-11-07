@@ -42,7 +42,7 @@ def fixture(ambiguous=False, connected=False):
     draw.rectangle((90, 54, 130, 68), fill=(255, 255, 255, 255))
     if ambiguous:
         # In both metadata ROIs, no unique source ROI anchor.
-        draw.rectangle((75, 17, 79, 21), fill=(255, 255, 255, 255))
+        draw.rectangle((75, 25, 79, 27), fill=(255, 255, 255, 255))
     if connected:
         draw.line((72, 42, 90, 54), fill=(255, 255, 255, 255), width=2)
     return original
