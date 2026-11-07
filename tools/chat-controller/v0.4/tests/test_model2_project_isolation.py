@@ -102,7 +102,7 @@ class Model2ProjectIsolation(unittest.TestCase):
         self.assertIn('MODEL2_GITHUB_REPO: "thp32tt/Model2VR-tools"', compose)
         self.assertIn('MODEL2_TARGET_BRANCH: "main"', compose)
         self.assertIn('MODEL2_PROJECT_URL: "${MODEL2_PROJECT_URL:-}"', compose)
-        self.assertIn('CONVERSION_DX11_ENABLED: "true"', compose)
+        self.assertIn('CONVERSION_DX11_ENABLED: "false"', compose)
         self.assertIn('DXVK_FROZEN: "true"', compose)
         self.assertIn("not MODEL2_AUTODEV_ENABLED", ast.unparse(NODES["vr_continuous_conversion_cycle"]))
         self.assertIn("await model2_simple_cycle", ast.unparse(NODES["conversion_parallel_cycle"]))
