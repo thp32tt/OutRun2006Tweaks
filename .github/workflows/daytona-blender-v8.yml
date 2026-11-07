@@ -36,3 +36,5 @@ jobs:
         run: python tools/test_daytona365_v8_14_source_contract.py
       - name: V8.15 PMT017 physical side bolster and rolled front apron, geodesic tangent UV and packed source PBR contract (not a render)
         run: python tools/test_daytona365_v8_15_source_contract.py
+      - name: V8.16 PMT017 backrest wing/lumbar physical contours, source PBR and packed tangent normal contract (not a render)
+        run: python tools/test_daytona365_v8_16_source_contract.py
