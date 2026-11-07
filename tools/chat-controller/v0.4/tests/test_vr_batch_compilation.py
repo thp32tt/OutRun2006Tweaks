@@ -29,6 +29,8 @@ def prefix(lane, continuous=False):
         "CONTROLLER_MODE": "conversion",
         "UW2_WEB_PORT_ENABLED": False,
         "MODEL2_AUTODEV_ENABLED": False,
+        "GITHUB_REPO": "thp32tt/OutRun2006Tweaks",
+        "UW2_GITHUB_REPO": "thp32tt/ai-dev-lab",
         "MAX_TASK_ATTEMPTS": 3,
         "DEVELOPMENT_TARGET_PERCENT": 70,
         "VR_CONTINUOUS_30M_ENABLED": continuous,
