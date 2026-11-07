@@ -332,6 +332,9 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         if CONTROLLER_MODE == "conversion" and (UW2_WEB_PORT_ENABLED or MODEL2_AUTODEV_ENABLED) and slot.name == "C":
             # Dedicated simple C loop owns Model2/UW2; legacy watchdog must never inject prompts.
             continue
+        if CONTROLLER_MODE == "conversion" and CAR_MODEL_AUTODEV_ENABLED and slot.name == "A":
+            # Daytona A simple loop owns prompts, including stuck-UI recovery.
+            continue
         if slot.watchdog_resumes_since_schedule >= WATCHDOG_MAX_RESUMES_PER_RUN:
             continue
 
