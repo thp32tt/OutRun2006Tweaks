@@ -544,7 +544,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('mem_limit: 4g', compose)
         self.assertIn('CONVERSION_PARALLEL: "true"', compose)
         self.assertIn('CONVERSION_ACTIVE_LIMIT: "2"', compose)
-        self.assertIn('CONVERSION_DX11_ENABLED: "true"', compose)
+        self.assertIn('CONVERSION_DX11_ENABLED: "false"', compose)
         self.assertIn('DXVK_FROZEN: "true"', compose)
         self.assertIn('CONVERSION_DXVK_ENABLED: "false"', compose)
         self.assertIn('CONVERSION_DX9EX_ENABLED: "true"', compose)
