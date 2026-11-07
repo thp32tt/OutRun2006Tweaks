@@ -24,3 +24,5 @@ jobs:
         run: python tools/test_daytona365_v8_8_source_contract.py
       - name: V8.9 genuine PMT silhouette headrest, seat pleat, charcoal PBR source contract (not a render)
         run: python tools/test_daytona365_v8_9_source_contract.py
+      - name: V8.10 source doors, wheel and packed normal/ORM contract (not a render)
+        run: python tools/test_daytona365_v8_10_source_contract.py
