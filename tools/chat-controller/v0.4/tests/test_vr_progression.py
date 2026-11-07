@@ -169,6 +169,7 @@ class Progression(unittest.TestCase):
         ns["write_runtime"] = Mock()
         ns["log"] = __import__("logging").getLogger("vr-continuous-test")
         ns["conversion_process_lane"] = AsyncMock()
+        ns["vr_unconditional_resume_due"] = lambda *_: False
         ns["vr_checkpoint_and_rollover"] = AsyncMock(return_value=False)
         calls = []
         async def sender(_context, _pages, q, lane, *, force_fresh_chat=False):
