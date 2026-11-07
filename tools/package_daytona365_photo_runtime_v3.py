@@ -152,6 +152,7 @@ files={
 # Include the exact privately-generated photo-derived materials and editable mesh,
 # but never include any downloaded source reference photo.
 for asset in sorted(RUNTIME.glob("Daytona365_PHOTO_*.png")):
+    if "tan_piping" in asset.name: continue  # Stale v2 intermediate, not a v3 material.
     files["DAYTONA365_EDITABLE_MATERIALS/"+asset.name]=asset.read_bytes()
 for filename in ("Daytona365_Cockpit_SOURCE_ALIGNED_v3.obj",
                  "Daytona365_v3.mtl",

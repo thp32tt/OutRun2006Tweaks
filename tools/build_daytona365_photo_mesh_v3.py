@@ -48,6 +48,27 @@ def photo_tile(image, box, size, kind):
         tile=ImageEnhance.Color(tile).enhance(.76)
         tile=ImageEnhance.Contrast(tile).enhance(.78)
         tile=ImageEnhance.Brightness(tile).enhance(.90)
+        # Reintroduce real fine-grain photographic relief from another
+        # authentic Daytona dashboard/vinyl close-up. This remains diffuse
+        # texture detail; it is not a fake bump map in the D3D9 path.
+        grainfile=REF/"REF5_mecum_interior_03_722bdd5e4.jpg"
+        if grainfile.is_file():
+            grain=Image.open(grainfile).convert("L").crop((680,50,850,225))
+            grain=grain.resize((half,half),Image.Resampling.LANCZOS)
+            detail=Image.new("L",(size,size))
+            detail.paste(grain,(0,0))
+            detail.paste(ImageOps.mirror(grain),(half,0))
+            detail.paste(ImageOps.flip(grain),(0,half))
+            detail.paste(ImageOps.flip(ImageOps.mirror(grain)),(half,half))
+            smooth=detail.filter(ImageFilter.GaussianBlur(radius=2.8))
+            dp=detail.load();sp=smooth.load()
+            result=tile.copy();pix=result.load()
+            for yy in range(size):
+                for xx in range(size):
+                    delta=max(-12,min(12,round((dp[xx,yy]-sp[xx,yy])*.75)))
+                    pixel=pix[xx,yy]
+                    pix[xx,yy]=tuple(max(0,min(255,q+delta)) for q in pixel)
+            tile=result
     elif kind=="black_dash":
         tile=ImageEnhance.Brightness(tile).enhance(.78)
         tile=ImageEnhance.Contrast(tile).enhance(.55)
