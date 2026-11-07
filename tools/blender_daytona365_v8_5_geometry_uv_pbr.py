@@ -246,7 +246,7 @@ def tapered_tube(name,stations,material):
         binormal=direction.cross(axis).normalized()
         for i in range(sections):
             angle=2*math.pi*i/sections
-            p=center+rad*(axis*math.cos(angle)+binormal*math.sin(angle))
+            p=Vector(center)+rad*(axis*math.cos(angle)+binormal*math.sin(angle))
             vertices.append(tuple(p))
     for j in range(len(stations)-1):
         for i in range(sections):
