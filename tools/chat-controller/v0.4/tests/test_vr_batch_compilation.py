@@ -26,6 +26,7 @@ def prefix(lane, continuous=False):
             "queue_qa_batch": [],
         },
         "json": json, "re": re,
+        "CONTROLLER_MODE": "conversion",
         "MAX_TASK_ATTEMPTS": 3,
         "DEVELOPMENT_TARGET_PERCENT": 70,
         "VR_CONTINUOUS_30M_ENABLED": continuous,
