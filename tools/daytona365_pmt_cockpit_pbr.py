@@ -190,8 +190,10 @@ def export(src_obj,context,filename):
     global CURRENT_CONTEXT
     CURRENT_CONTEXT=context
     p=[normalize(q) for q in base.decode_object(ASSET,src_obj)]
+    if context=="cockpit":
+        p=[q for q in p if q["tex_index"] in (8,14,15,16,18,19)]
     counts=(sum(len(q["indices"])//3 for q in p),sum(len(q["vertices"]) for q in p))
-    if context=="car":
+    if context in ("car","cockpit"):
         p,flags=zip(*(safe_subdivide(x) for x in p))
         p=list(p); upgraded=sum(flags)
     else:upgraded=0
@@ -214,6 +216,7 @@ if __name__=="__main__":
             "input_unmodified":True,"dino_unmodified":True,"warning":ENGINEERING_WARNING,
             "generated_grain":"AI-generated illustrated leather detail as a 32x32 grayscale high-pass seed; not full UV art",
             "car":export(0,"car","Daytona365_OriginalCar_CockpitPBR_v1.glb"),
+            "cockpit":export(0,"cockpit","Daytona365_InteriorSurfaces_ONLY_v1.glb"),
             "wheel_local":export(22,"wheel","Daytona365_Steering_LOCAL_PBR_v1.glb")}
     (OUT/"MANIFEST.json").write_text(json.dumps(result,indent=2),encoding="utf-8")
     print(json.dumps(result,indent=2))
