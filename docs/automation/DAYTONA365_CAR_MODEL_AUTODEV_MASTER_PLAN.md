@@ -1,6 +1,6 @@
 # Daytona 365 GTS/4 — Blender vehicle-model improvement (automation SSOT)
 
-Updated: 2026-11-08 KST (v8.7 real seat and underdash Cycles handoff). Owner: OutRun Chat Controller slot **A** (not legacy DX11).
+Updated: 2026-11-08 KST (v8.8 PMT console and packed PBR Cycles preview handoff). Owner: OutRun Chat Controller slot **A** (not legacy DX11).
 Repository: `thp32tt/OutRun2006Tweaks`.
 Production branch: `feature/daytona365-blender-v8-20261108`.
 Never edit `vr-dx11-native-r71`, `vr-d3d9ex-focus`, `Model2VR-tools`, localization, UW2 or the original game files.
@@ -13,7 +13,7 @@ Keep improving the **second Ferrari, 365 GTS/4 Daytona**, not Dino 246. Match th
 - Latest verified private Blender baseline: `blender_v8/Daytona365_Cockpit_Blender_PBR_v8_7.blend` (SHA-256 `e247abed67d15b5562daa5374163cc4c3a18de7dd059bfc42d94c9227e0e61a3`), `DAYTONA_V8_7_VERIFIED.json`, `Daytona365_v8_7_ACTUAL_CYCLES_PREVIEW.png`, and actual original PMT/v8.6/v8.7 three-way Cycles comparison.
 - GitHub contains v8.0–v8.6 history and new `tools/blender_daytona365_v8_7_seat_source_contours_underdash.py` plus fresh-open/render/compare/package/source-contract scripts; `.github/workflows/daytona-blender-v8.yml` tests source only.
 - `docs/images/daytona365-v8/` holds only actual rendered image evidence (now including v8.7 PMT/v8.6/v8.7 comparison); it is **not** a source model or an image-generation substitute.
-- v8.7 is now saved/reopened/render-previewed and actual PMT comparison verified. **Next material stage is v8.8**: upper backrest/headrest contour and cushion pleat segmentation against original material017 silhouette; do not retry/re-score completed v8.0–v8.7.
+- v8.7 is now saved/reopened/render-previewed and actual PMT comparison verified. **v8.8** additionally completed a distinct 13-station group018 console silhouette, metric UV and darker source-linked leather PBR pass with true preview. **Next material stage is v8.9**: upper backrest/headrest silhouette and cushion pleat segmentation against original material017 and the still-too-bright leather tone; do not retry/re-score completed v8.0–v8.8.
 
 ## Repeating real-work loop
 1. Read the **latest branch HEAD**, this plan, v8.7 manifests and the genuine PMT/v8.6/v8.7 render comparison. Read prior incomplete changes before selecting the next visible defect.
@@ -42,3 +42,9 @@ Keep improving the **second Ferrari, 365 GTS/4 Daytona**, not Dino 246. Match th
 - `RENDER_VALIDATION=PREVIEW_ONLY`; original matched full-res same-sample Cycles `UNTESTED`; OVC/game runtime/Quest3 `UNTESTED`. v8.7 original PMT private files never uploaded.
 - Private immutable `Daytona365_BLENDER_REWORK_v8_7_PRIVATE.zip` SHA-256 `c6292202dc340cf524049a899d888e92968e1d41d8c4be5f8919f829c9db3b94`, zip verification PASS.
 - Shared N100 orchestration runner may be overwritten by another active process using the same path. Trust actual Blender return code + immutable scene/render SHA/provenance, and use session-unique runner names in the future rather than rerendering already verified PNGs.
+
+## v8.8 verified additive handoff (2026-11-08 KST)
+- v8.7 input SHA256 e247abed67d15b5562daa5374163cc4c3a18de7dd059bfc42d94c9227e0e61a3; private v8.8 saved/reopened SHA256 6859ead3070525e9a55e7b6946ba10d0050ff85825ce1074f8e3a2255ef48c60. The model never overwrites v8.7.
+- 13 PMT018-bounded longitudinal console stations with measured tangent UV, updated original-compatible transition fascia; original H gate, gauges, steering, switchbank preserved. Existing v8.7 geodesic seat UV and contiguous side-return polygons remain, packed BaseColor/Normal/ORM/Height are connected and source tint/roughness/bump restrained.
+- Actual Blender 4.5.15 LTS Cycles 480x320/4 spp/2 threads v8.8 preview SHA256 64906b9627a9d80e05862df9c32aaa6e6be437cf1f65d8d623810a5be8320ef2. Original PMT/v8.6/v8.7/v8.8 four-way real-render comparison SHA256 7ad2acb353f8bd4187a38319599f85620904c97540b9cb8f9d2a8d6c22f7c71c; original 960x640/10 spp downsampled, so photometric sample equivalence NOT established.
+- Private editable .blend, source PMT/DDS/OVC/EXE stay off GitHub; source scripts/source-only CI and actual preview evidence are public. Full matched render, game and Quest3 remain UNTESTED.

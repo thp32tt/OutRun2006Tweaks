@@ -20,3 +20,5 @@ jobs:
         run: python tools/test_daytona365_v8_6_source_contract.py
       - name: V8.7 seat reach, geodesic UV, original source controls and footwell contract
         run: python tools/test_daytona365_v8_7_source_contract.py
+      - name: V8.8 PMT console UV and source PBR shader contract (not a render)
+        run: python tools/test_daytona365_v8_8_source_contract.py
