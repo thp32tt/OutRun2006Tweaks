@@ -15,6 +15,7 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageOps, UnidentifiedImageError
 from hd_bc3_index_patch import BC3Hold as PaletteHold, patch_mip1
 from hd_bc3_native_codec import patch_bc3_native
+from hd_overlap_ownership import prove_overlap_ownership
 from hd_existing_candidate_salvage import (
     candidate_lines as salvage_candidate_lines,
     pad_candidate_edge,
@@ -152,9 +153,11 @@ def strict_candidate(image_bytes):
     return img, salvage_actions
 
 
-def source_text_evidence(source: Image.Image, box):
+def source_text_evidence(source: Image.Image, box, owner_mask=None):
     area = source.crop(box)
     a = area.getchannel("A")
+    if owner_mask is not None:
+        a = ImageChops.multiply(a, owner_mask.crop(box))
     extent = a.getbbox()
     if not extent:
         raise QualityHold("QA_NO_SOURCE_TEXT_ALPHA")
@@ -195,7 +198,8 @@ def fit_line(glyph: Image.Image, source_box):
 
 
 def place_one_source_text(source, clean, result, row, repo, used, import_check,
-                          other_boxes=()):
+                          other_boxes=(), owner_mask=None, protected_alpha=None,
+                          placed_alpha=None):
     rid = row["roi_id"]
     x0, y0, x1, y1 = row["_bbox"]
     if x0 < 0 or y0 < 0 or x0 >= x1 or y0 >= y1 or x1 > source.width or y1 > source.height:
@@ -203,11 +207,11 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
     box = (x0, y0, x1, y1)
     overlap_used = [b for b in used if intersects(box, b)]
     alpha = source.getchannel("A")
-    if any(shared_native_alpha(alpha, box, b) for b in overlap_used):
+    if owner_mask is None and any(shared_native_alpha(alpha, box, b) for b in overlap_used):
         raise QualityHold("QA_OVERLAP_PROTECTED")
     if not import_check(repo, row):
         raise QualityHold("AB_PNG_NOT_YET_IMPORTED")
-    removal_mask, src_lines, occupancy, source_salvage = source_text_evidence(source, box)
+    removal_mask, src_lines, occupancy, source_salvage = source_text_evidence(source, box, owner_mask)
     candidate_path = repo / row["_candidate_rel"]
     candidate_bytes = candidate_path.read_bytes()
     candidate, candidate_salvage = strict_candidate(candidate_bytes)
@@ -249,11 +253,32 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
     if any(translated_alpha_touches_box(im, left, top, other)
            for im, left, top in render for other in other_boxes):
         raise QualityHold("QA_TRANSLATED_OVERLAPS_OTHER_ROI")
+    # For exclusively anchored shared-ROI source components, reject new
+    # glyph pixels touching original foreign art/text or earlier Korean ink.
+    # This is independent of bbox ownership and never marks visual QA PASS.
+    if owner_mask is not None:
+        if protected_alpha is None or placed_alpha is None:
+            raise QualityHold("QA_OVERLAP_MISSING_PROTECTION_EVIDENCE")
+        for im, left, top in render:
+            dst = (left, top, left + im.width, top + im.height)
+            ink = im.getchannel("A")
+            padded = protected_alpha.crop((left - 1, top - 1,
+                                            left + im.width + 1, top + im.height + 1))
+            from PIL import ImageFilter
+            nearby = padded.filter(ImageFilter.MaxFilter(3)).crop((1, 1, im.width + 1, im.height + 1))
+            if ImageChops.multiply(ink, nearby).getbbox():
+                raise QualityHold("QA_OVERLAP_FOREIGN_SOURCE_INK_PROTECTED")
+            if ImageChops.multiply(ink, placed_alpha.crop(dst)).getbbox():
+                raise QualityHold("QA_OVERLAP_ALREADY_PLACED_KOREAN_INK")
     # No modifications are made until every line and mask has passed.
     clean.paste((0, 0, 0, 0), box, removal_mask)
     result.paste((0, 0, 0, 0), box, removal_mask)
     for im, left, top in render:
         result.alpha_composite(im, (left, top))
+        if placed_alpha is not None:
+            box_new = (left, top, left + im.width, top + im.height)
+            previous = placed_alpha.crop(box_new)
+            placed_alpha.paste(ImageChops.lighter(previous, im.getchannel("A")), (left, top))
     # Verify every pixel of the original text/effect has been removed from CLEAN,
     # including semitransparent shadow edges: zero alpha at every original alpha pixel.
     clean_roi = clean.crop(box)
@@ -272,6 +297,8 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
         "candidate_sha256": hashlib.sha256(candidate_bytes).hexdigest(),
         "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
         "auto_salvage": source_salvage + candidate_salvage + line_salvage + (
+            ["SOURCE_ALPHA_CONNECTED_COMPONENT_EXCLUSIVE_OWNER_TEST_ONLY"]
+            if owner_mask is not None else []) + (
             ["OVERLAPPING_ROI_REUSED_ONLY_AFTER_DISJOINT_SOURCE_ALPHA_BBOX_PROOF"]
             if overlap_used else []),
         "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
@@ -288,9 +315,15 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
     result = source.copy()
     painted, holds, used = [], [], []
     coarse = coarse_fn(rows)
-    conflicts = source_ink_conflicts(
-        source, [r for r in rows if r["roi_id"] not in coarse], conflict_fn
-    )
+    noncoarse = [r for r in rows if r["roi_id"] not in coarse]
+    conflicts = source_ink_conflicts(source, noncoarse, conflict_fn)
+    # Preserve the existing fail-closed BC3 codec path: shared-block ROI
+    # ownership is not inferred from per-pixel uncompressed coordinates.
+    ownership_masks = {}
+    if conflicts and not (raw[84:88] == b"DXT5" and struct.unpack_from("<I", raw, 80)[0] == 4):
+        ownership_masks, _ = prove_overlap_ownership(source, noncoarse, conflicts)
+    conflicts = conflicts - set(ownership_masks)
+    placed_alpha = Image.new("L", source.size, 0)
     for row in sorted(rows, key=lambda r: (r["_bbox"][1], r["_bbox"][0], r["roi_id"])):
         rid = row["roi_id"]
         if rid in coarse:
@@ -304,10 +337,18 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
             holds.append({"roi_id": rid, "reason": "QA_BC3_TRANSLATED_COLOR_LOSS"})
             continue
         try:
-            other_boxes = [r["_bbox"] for r in rows
-                           if r["roi_id"] != rid and r["roi_id"] not in coarse]
+            owner_mask = ownership_masks.get(rid)
+            other_boxes = [r["_bbox"] for r in noncoarse
+                           if r["roi_id"] != rid and
+                           not (owner_mask is not None and
+                                shared_native_alpha(source.getchannel("A"),
+                                    row["_bbox"], r["_bbox"]))]
+            foreign_alpha = (ImageChops.subtract(source.getchannel("A"), owner_mask)
+                             if owner_mask is not None else None)
             evidence = place_one_source_text(
-                source, clean, result, row, repo, used, import_check, other_boxes
+                source, clean, result, row, repo, used, import_check, other_boxes,
+                owner_mask=owner_mask, protected_alpha=foreign_alpha,
+                placed_alpha=placed_alpha
             )
             painted.append(evidence)
         except (OSError, ValueError, UnidentifiedImageError, OverflowError) as exc:
