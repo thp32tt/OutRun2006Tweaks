@@ -8,7 +8,7 @@ O=R/"outputs"
 MAN=json.loads((O/"MANIFEST.json").read_text())
 assert hashlib.sha256(Path("/home/chatgpt-runner/rea-input/outrun/outrun2006/Cars/obj_plcar_dayts_pmt.sz").read_bytes()).hexdigest()==MAN["source_sha256"]
 reports={}
-for key in ("car","wheel_local"):
+for key in ("car","cockpit","wheel_local"):
  item=MAN[key];p=O/item["file"]
  raw=p.read_bytes()
  assert raw[:4]==b"glTF",p
@@ -39,7 +39,7 @@ for key in ("car","wheel_local"):
  assert tri==expected,(tri,expected)
  reports[key]={"triangles":tri,"meshes":len(j["meshes"]),"normal_mapped_materials":len(normal),
                "base_color_and_pbr_images":len(j["images"]),
-               "geometry_bounds_preserved":bool(key=="car")}
+               "geometry_bounds_preserved":bool(key in ("car","cockpit"))}
 # Confirm changed meaningful material pixels, not identical upscale.
 metrics={}
 for i in [8,14,15,16,18,19]:
