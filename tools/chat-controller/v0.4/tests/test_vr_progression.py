@@ -24,7 +24,8 @@ def functions():
         x for x in tree.body if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef)) and (x.name.startswith(('vr_', 'github_feature_', 'conversion_')) or x.name in {'refresh_wait_actions_task_binding', '_parse_iso', 'finalize_dx9ex_review_only_result'})]
     ns = dict(re=re, json=json, datetime=datetime, TZ=timezone.utc, base64=base64, urllib=urllib,
               DX9EX_REVIEW_ONLY=False, VR_SCHEDULED_DISPATCH_ENABLED=False,
-              UW2_WEB_PORT_ENABLED=False, MODEL2_AUTODEV_ENABLED=False)
+              UW2_WEB_PORT_ENABLED=False, MODEL2_AUTODEV_ENABLED=False,
+              CONTROLLER_MODE="conversion")
     exec(compile(ast.fix_missing_locations(tree), '<controller>', 'exec'), ns)
     return ns
 
