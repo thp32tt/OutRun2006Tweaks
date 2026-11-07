@@ -2858,6 +2858,214 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
     return True
 
 
+async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime) -> bool:
+    """Independent OutRun A: Daytona365 Blender modeling, no legacy DX11.
+
+    Uses a separate history/clock from Model2 C. The 60m chat lifetime
+    safely rotates A even when a previous UI response stays busy.
+    """
+    if not CAR_MODEL_AUTODEV_ENABLED or (CONVERSION_ONLY_SLOT and CONVERSION_ONLY_SLOT != "A"):
+        return False
+    if not CAR_MODEL_SCOPE_READY or not AUTO_SEND:
+        write_runtime(status="car_model_project_url_required",
+                      last_action="Daytona365 A disabled until the OutRun project URL is configured")
+        return False
+
+    state = q.setdefault("car_model_simple", {})
+    if now.minute in CAR_MODEL_SCHEDULE_MINUTES:
+        window = now.replace(second=0, microsecond=0).isoformat()
+        if state.get("last_sent_window") != window:
+            state["pending_window"] = window
+    pending = str(state.get("pending_window") or "")
+    if pending == state.get("last_sent_window"):
+        state.pop("pending_window", None)
+        pending = ""
+    if pending:
+        try:
+            scheduled_at = datetime.fromisoformat(pending)
+        except ValueError:
+            state.pop("pending_window", None)
+            pending = ""
+        else:
+            if (now - scheduled_at).total_seconds() >= 1800:
+                state.pop("pending_window", None)
+                pending = ""
+
+    last_sent = _parse_iso(state.get("last_sent_at"))
+    send_age = (now - last_sent).total_seconds() if last_sent else None
+    # The hard 60m clock belongs to the CHAT, not the last 30m follow-up.
+    # Do not reset it on normal successful continuations.
+    if last_sent and not state.get("chat_started_at"):
+        state["chat_started_at"] = state["last_sent_at"]  # v7 -> v8 migration
+        save_queue_state(q)
+    chat_started = _parse_iso(state.get("chat_started_at"))
+    chat_age = (now - chat_started).total_seconds() if chat_started else None
+    hard_due = bool(chat_age is not None and chat_age >= CAR_MODEL_HARD_NEW_CHAT_SECONDS)
+    if not hard_due and send_age is not None and send_age < CAR_MODEL_CONTINUE_MIN_SECONDS:
+        return False
+    if not pending and send_age is None:
+        return False
+
+    reg = load_registry(now)
+    slot = next((x for x in reg.slots if x.name == "A"), None)
+    if slot is None:
+        write_runtime(status="car_model_slot_missing", last_action="A slot missing")
+        return False
+    guard = send_guard_reason(reg, slot, now)
+    if guard:
+        write_runtime(status="car_model_send_guard", last_action=f"A send delayed: {guard}")
+        return False
+
+    if hard_due:
+        # A frozen reply may never expose 'idle'. At exactly 60m, persist
+        # the old owner's URL and abandon that renderer without waiting.
+        # Keep a pending rotation latch on send failure, not a new tab per tick.
+        if not state.get("hard_rotation_pending"):
+            old_url = slot.url or getattr(pages.get("A"), "url", None)
+            history = list(state.get("previous_chat_urls") or [])
+            if old_url and old_url not in history:
+                history.append(old_url)
+            state["previous_chat_urls"] = history[-20:]
+            state["hard_rotation_pending"] = True
+            state["hard_rotation_source_sent_at"] = state.get("last_sent_at")
+            state.pop("hard_rotation_page_ready_for", None)
+            save_queue_state(q)
+        if (state.get("hard_rotation_page_ready_for") != state.get("last_sent_at")
+                or slot.url):
+            page = await hard_replace_slot_page(context, pages, slot)
+            state["hard_rotation_page_ready_for"] = state.get("last_sent_at")
+            state["fresh_chat_required"] = False
+            state["bootstrap_complete"] = False
+            state.pop("response_sha", None)
+            state.pop("response_observed_at", None)
+            state.pop("response_before_send_sha", None)
+            save_registry(reg)
+            save_queue_state(q)
+        else:
+            page = await slot_page(context, pages, slot)
+    elif state.get("fresh_chat_required"):
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        state["fresh_chat_required"] = False
+        state["bootstrap_complete"] = False
+        state.pop("response_sha", None)
+        state.pop("response_observed_at", None)
+        state.pop("response_before_send_sha", None)
+        save_queue_state(q)
+        save_registry(reg)
+    else:
+        page = await slot_page(context, pages, slot)
+        if slot.url and (await detect_conversation_limit(page)
+                         or await first_visible(page, RETRY_SELECTORS, total_wait_ms=300) is not None):
+            page = await replace_with_fresh_slot_page(context, pages, slot)
+            state["bootstrap_complete"] = False
+            state.pop("response_sha", None)
+            state.pop("response_observed_at", None)
+            state.pop("response_before_send_sha", None)
+            save_queue_state(q)
+            save_registry(reg)
+
+    if not hard_due and await detect_busy(page):
+        write_runtime(status="car_model_busy", last_action="A still generating, do not interrupt until 60m")
+        return False
+    if not await ensure_logged_in(page):
+        write_runtime(status="car_model_login_required", last_action="A login required")
+        return False
+    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1300) is None:
+        page = await recover_slot_composer(context, pages, slot, page)
+        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=2500) is None:
+            write_runtime(status="car_model_composer_missing", last_action="A composer unavailable")
+            return False
+
+    # This mandatory guard is checked immediately before calling send_message.
+    if not is_slot_project_url(page.url, "A"):
+        write_runtime(status="car_model_wrong_project_blocked",
+                      last_action="A page is not in its dedicated Daytona365 project")
+        return False
+    if await detect_rate_limit(page) or await detect_limit(page):
+        mark_rate_limit(reg, datetime.now(TZ), "car-model-vr-c")
+        return False
+
+    # At the hard ceiling the OLD reply cannot affect new-chat readiness.
+    response = "" if hard_due else await last_assistant_text(page)
+    current_sha = stable_hash(response) if response else ""
+    if current_sha and current_sha != state.get("response_sha"):
+        state["response_sha"] = current_sha
+        state["response_observed_at"] = now.isoformat()
+        save_queue_state(q)
+    observed_at = _parse_iso(state.get("response_observed_at"))
+    stable = bool(current_sha and observed_at
+                  and (now - observed_at).total_seconds() >= CAR_MODEL_RESPONSE_STABLE_SECONDS)
+    if not hard_due and current_sha and not stable:
+        return False
+    response_ready = bool(
+        send_age is not None and current_sha and stable
+        and current_sha != state.get("response_before_send_sha")
+    )
+    if not pending and not response_ready and not hard_due:
+        return False
+
+    bootstrap = not state.get("bootstrap_complete")
+    # New chat has no prior memory; use one short, source-grounded assignment.
+    prompt = (
+        f"Ferrari 365 GTS/4 Daytona Blender 모델링 개선 새 세션. "
+        f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH} 최신 HEAD와 "
+        "docs/automation/DAYTONA365_CAR_MODEL_AUTODEV_MASTER_PLAN.md를 읽고 "
+        "v8.4 다음 미완료 형상·재질·노멀맵 개선부터 실제 Blender 스크립트와 렌더링 작업을 이어가. "
+        "원본 게임 또는 VR 런타임 브랜치와 Model2 VR은 수정하지 마. "
+        "기존 성공 결과 반복 검증·중복 점수 가산 금지."
+        if hard_due else
+        f"이 채팅은 Ferrari 365 GTS/4 Daytona Blender 실차 모델링 개선 전용입니다. "
+        f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH}의 "
+        "docs/automation/DAYTONA365_CAR_MODEL_AUTODEV_MASTER_PLAN.md를 읽고 "
+        "v8.4 실제 Blender 결과와 오리지널 게임 모델의 실제 렌더 비교를 기준으로 "
+        "기하·UV·PBR/노멀/ORM 개선을 실소스 수정과 실제 Blender 렌더로 이어가세요. "
+        "무거운 Cycles 작업은 N100 대신 적절한 GitHub Actions/Windows 작업 환경을 사용하고 "
+        "미실행이면 RENDER_VALIDATION=UNTESTED로 보고하세요. "
+        "검토만 반복하거나 계획만 작성하지 말고 한 명령에서 여러 연관된 개선을 완성하세요. "
+        "실제 개발을 20분 이상 목표로 하되 대기로 시간을 채우지 마세요."
+        if bootstrap else "Ferrari Daytona365 차량 Blender 모델링 개선 계속 진행해"
+    )
+    sent = await send_message(page, prompt, slot_name="A")
+    if sent != "sent":
+        write_runtime(status="car_model_send_retry", last_action=f"A send deferred: {sent}")
+        return False
+
+    sent_at = datetime.now(TZ)
+    if not slot.url:
+        new_url = await wait_for_chat_url(page, timeout_sec=8, slot_name="A")
+        if new_url:
+            slot.url = new_url
+    note_successful_request(reg, sent_at, "A")
+    slot.runs += 1
+    slot.last_sent_at = sent_at.isoformat()
+    slot.last_result = "car_model_60m_new_chat_sent" if hard_due else "car_model_bootstrap_sent" if bootstrap else "car_model_continue_sent"
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = sent_at.isoformat()
+    slot.watchdog_resumes_since_schedule = 0
+    save_registry(reg)
+    state["last_sent_at"] = sent_at.isoformat()
+    # Only an actual NEW conversation resets the hard 60m chat lifetime.
+    if bootstrap or hard_due or not state.get("chat_started_at"):
+        state["chat_started_at"] = sent_at.isoformat()
+    state["bootstrap_complete"] = True
+    if hard_due:
+        state["hard_rotation_sent_total"] = int(state.get("hard_rotation_sent_total") or 0) + 1
+        state["hard_rotation_last_at"] = sent_at.isoformat()
+        state.pop("hard_rotation_pending", None)
+        state.pop("hard_rotation_source_sent_at", None)
+        state.pop("hard_rotation_page_ready_for", None)
+    state["response_before_send_sha"] = current_sha or None
+    if pending:
+        state["last_sent_window"] = pending
+        state.pop("pending_window", None)
+    state["last_send_reason"] = "60m_hard_new_chat" if hard_due else "bootstrap" if bootstrap else ("response_complete" if response_ready else "schedule_fallback")
+    state["continuations_sent"] = int(state.get("continuations_sent") or 0) + 1
+    save_queue_state(q)
+    write_runtime(status="car_model_running", last_action=f"Daytona365 A: {state['last_send_reason']} sent in its own project",
+                  car_model_simple=state, queue=q)
+    return True
+
+
 async def conversion_send_lane_task(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -3860,7 +4068,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     save_queue_state(q)
     write_runtime(
         status="vr_continuous_running",
-        last_action=("A(DX11 implementation)" if CONVERSION_DX11_ENABLED else "A(DX11 disabled)")+ "+C("+(
+        last_action=("A(Daytona365 Blender)" if CAR_MODEL_AUTODEV_ENABLED else "A(DX11 implementation)" if CONVERSION_DX11_ENABLED else "A(DX11 disabled)")+ "+C("+(
             "Model2 VR last sent " + str((q.get("model2_simple") or {}).get("last_sent_at") or "not sent yet")
             if MODEL2_AUTODEV_ENABLED else
             "UW2 last sent " + str((q.get("uw2_simple") or {}).get("last_sent_at") or "not sent yet")
@@ -4012,6 +4220,23 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             save_registry(reg)
         save_queue_state(q)
 
+    # Convert the previously disabled DX11 A tab to Daytona modeling on first
+    # deployment, without reviving or overwriting a legacy DX11 TASK_ID.
+    if CAR_MODEL_AUTODEV_ENABLED and not q.get("car_model_simple_initialized"):
+        state = q.setdefault("car_model_simple", {})
+        state.clear()
+        state["fresh_chat_required"] = True
+        state["bootstrap_complete"] = False
+        q["car_model_simple_initialized"] = True
+        reg = load_registry(now)
+        a_slot = next((x for x in reg.slots if x.name == "A"), None)
+        if a_slot is not None:
+            a_slot.url = None
+            a_slot.last_result = "car_model_ready" if CAR_MODEL_SCOPE_READY else "car_model_project_required"
+            a_slot.completed_tasks_in_chat = 0
+            save_registry(reg)
+        save_queue_state(q)
+
     # Reconcile across the previous DX11-only deployment without losing C
     # task identity. Park B before per-lane processing, even if B was active.
     if reconcile_conversion_lane_freeze(
@@ -4044,6 +4269,14 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             log.warning("Model2 VR C continuation deferred: %s", type(exc).__name__)
             write_runtime(status="model2_simple_cycle_error",
                           last_action=f"Model2 C deferred: {type(exc).__name__}")
+
+    if CAR_MODEL_AUTODEV_ENABLED:
+        try:
+            await car_model_simple_cycle(context, pages, q, datetime.now(TZ))
+        except Exception as exc:
+            log.warning("Daytona Blender A continuation deferred: %s", type(exc).__name__)
+            write_runtime(status="car_model_simple_cycle_error",
+                          last_action=f"Daytona A deferred: {type(exc).__name__}")
 
     if UW2_WEB_PORT_ENABLED:
         # C has no TASK_ID and never enters the conversion production queue.
