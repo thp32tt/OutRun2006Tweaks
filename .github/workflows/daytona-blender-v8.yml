@@ -16,3 +16,5 @@ jobs:
         run: python tools/test_daytona365_v8_source_contract.py
       - name: V8.5 real-model source provenance and geometry contract
         run: python tools/test_daytona365_v8_5_source_contract.py
+      - name: V8.6 source geometry, UV and PBR contract (not a Blender render)
+        run: python tools/test_daytona365_v8_6_source_contract.py
