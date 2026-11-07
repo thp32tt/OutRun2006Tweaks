@@ -15,6 +15,31 @@ struct SeatPose {Vec3 eye{},look{};std::uint8_t model=0;};
 inline bool Finite(Vec3 v) noexcept {
     return std::isfinite(v.x)&&std::isfinite(v.y)&&std::isfinite(v.z);
 }
+// The original PC mode1 table is copied into mutable game RAM during
+// initialization. The native cockpit hook may install before that copy.
+// Accept an initial snapshot only when all 30 live XYZ anchors equal the
+// verified original PE source; otherwise restoring a premature zero table
+// can corrupt the camera after START/GOAL or an F11 toggle.
+// The remaining 24 bytes of each record are not VR-seat inputs and are
+// deliberately left to the original game.
+inline bool OriginalModeOneTableInitialized(
+    const std::uint8_t* live, std::size_t liveBytes,
+    const std::uint8_t* original, std::size_t originalBytes) noexcept {
+    constexpr std::size_t kStride=36u,kCount=30u,kXYZ=3u*sizeof(float);
+    if(!live || !original || liveBytes<kStride*kCount ||
+       originalBytes<kStride*kCount) return false;
+    for(std::size_t i=0;i<kCount;++i) {
+        Vec3 expected{},actual{};
+        std::memcpy(&expected,original+i*kStride,kXYZ);
+        std::memcpy(&actual,live+i*kStride,kXYZ);
+        if(!Finite(expected) || !Finite(actual) ||
+           std::fabs(expected.x)>5.f || std::fabs(expected.y)>5.f ||
+           std::fabs(expected.z)>5.f ||
+           std::memcmp(&actual,&expected,kXYZ)!=0) return false;
+    }
+    return true;
+}
+
 inline bool OriginalModeOneAnchor(
     const std::uint8_t* verifiedTable, std::size_t tableBytes,
     int carModel, Vec3& destination) noexcept {

@@ -164,6 +164,8 @@ jobs:
           # sinks the eye toward the floor and amplifies view jitter.
           assert 'NativeVrProfilePose(' not in hook
           assert 'NativeVrProfileInputAnchor(' in hook
+          assert 'OriginalModeOneTableInitialized(' in hook
+          assert '0x1BA4E0' in hook
           # Original camera runs before native frame_enter. Assert the
           # changed source's real two call sites and live eye gate, rather
           # than requiring the removed no-argument helper spelling.

@@ -7,6 +7,40 @@
 using namespace OutRunVR::QuestCockpitV2;
 static bool near(float a,float b) {return std::fabs(a-b)<1.e-4f;}
 int main(){
+    // Loading a cockpit hook before the original game has initialized its
+    // 30x36 live camera table must NOT snapshot zeroes as original seats.
+    constexpr std::size_t stride=36,modelCount=30;
+    std::array<std::uint8_t,stride*modelCount> originalSeats{};
+    std::array<std::uint8_t,stride*modelCount> liveSeats{};
+    for(std::size_t i=0;i<modelCount;++i) {
+        const float xyz[3]={-.35f,.6f+float(i)*.01f,-.4f};
+        std::memcpy(originalSeats.data()+i*stride,xyz,sizeof(xyz));
+    }
+    assert(!OriginalModeOneTableInitialized(
+        liveSeats.data(),liveSeats.size(),originalSeats.data(),originalSeats.size()));
+    liveSeats=originalSeats;
+    assert(OriginalModeOneTableInitialized(
+        liveSeats.data(),liveSeats.size(),originalSeats.data(),originalSeats.size()));
+    // Altering an unrelated original per-car record field leaves XYZ intact.
+    liveSeats[17*stride+15]=0x55;
+    assert(OriginalModeOneTableInitialized(
+        liveSeats.data(),liveSeats.size(),originalSeats.data(),originalSeats.size()));
+    // But one changed XYZ byte or one invalid original coordinate must veto
+    // the entire backup, not store the 29 plausible records.
+    liveSeats[29*stride+4]^=0x01;
+    assert(!OriginalModeOneTableInitialized(
+        liveSeats.data(),liveSeats.size(),originalSeats.data(),originalSeats.size()));
+    liveSeats=originalSeats;
+    originalSeats[3*stride+4]=0xff;
+    originalSeats[3*stride+5]=0xff;
+    originalSeats[3*stride+6]=0xff;
+    originalSeats[3*stride+7]=0x7f;
+    assert(!OriginalModeOneTableInitialized(
+        liveSeats.data(),liveSeats.size(),originalSeats.data(),originalSeats.size()));
+    assert(!OriginalModeOneTableInitialized(
+        liveSeats.data(),liveSeats.size()-1,originalSeats.data(),originalSeats.size()));
+    assert(!OriginalModeOneTableInitialized(
+        nullptr,liveSeats.size(),originalSeats.data(),originalSeats.size()));
     // Original 2D6A60 yaw-only XR origin and 2D6B98 dual-eye source math.
     // A live Quest HMD is not required to validate the quaternion/eye
     // algebra and its position recenter invariants.

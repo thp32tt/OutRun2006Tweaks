@@ -512,13 +512,22 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         if(SeatTableCaptured)return true;
         constexpr std::size_t kStride=36u;
+        constexpr std::size_t kBytes=SeatTableCount*kStride;
         auto* table=Module::exe_ptr<std::uint8_t>(0x418BB0);
+        // The original runtime copies PE 0x5BA4E0 to live VA 0x818BB0.
+        // Installing this hook before that copy used to capture 30 zeroed
+        // records as the "original" fallback, corrupting later restoration.
+        const auto* original=Module::exe_ptr<const std::uint8_t>(0x1BA4E0);
+        if(!QuestCockpitGlassLive::Memory(original,kBytes))return false;
         for(std::size_t i=0;i<SeatTableCount;++i) {
-            auto* row=table+i*kStride;
-            if(!QuestCockpitGlassLive::Memory(row,3u*sizeof(float),true))
-                return false;
-            std::memcpy(SeatTableOriginal[i].data(),row,3u*sizeof(float));
+            if(!QuestCockpitGlassLive::Memory(
+                   table+i*kStride,3u*sizeof(float),true))return false;
         }
+        if(!OutRunVR::QuestCockpitV2::OriginalModeOneTableInitialized(
+               table,kBytes,original,kBytes))return false;
+        for(std::size_t i=0;i<SeatTableCount;++i)
+            std::memcpy(SeatTableOriginal[i].data(),
+                        table+i*kStride,3u*sizeof(float));
         SeatTableCaptured=true;
         return true;
     }
