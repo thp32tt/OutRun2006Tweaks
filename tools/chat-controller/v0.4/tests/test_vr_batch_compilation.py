@@ -27,6 +27,8 @@ def prefix(lane, continuous=False):
         },
         "json": json, "re": re,
         "CONTROLLER_MODE": "conversion",
+        "UW2_WEB_PORT_ENABLED": False,
+        "MODEL2_AUTODEV_ENABLED": False,
         "MAX_TASK_ATTEMPTS": 3,
         "DEVELOPMENT_TARGET_PERCENT": 70,
         "VR_CONTINUOUS_30M_ENABLED": continuous,
