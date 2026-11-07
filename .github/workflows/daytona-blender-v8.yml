@@ -1,0 +1,15 @@
+name: Daytona v8 Blender source contract
+on:
+  push:
+    branches:
+      - feature/daytona365-blender-v8-20261108
+  workflow_dispatch:
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tools/test_daytona365_v8_source_contract.py
