@@ -30,3 +30,5 @@ jobs:
         run: python tools/test_daytona365_v8_11_source_contract.py
       - name: V8.12 original V5 back shell and PMT-bound PBR source contract (not a render)
         run: python tools/test_daytona365_v8_12_source_contract.py
+      - name: V8.13 real source cushion pleat geometry, packed tangent normal and UV contract (not a render)
+        run: python tools/test_daytona365_v8_13_source_contract.py
