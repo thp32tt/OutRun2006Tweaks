@@ -34,3 +34,5 @@ jobs:
         run: python tools/test_daytona365_v8_13_source_contract.py
       - name: V8.14 genuine PMT-bounded physical H-gate underdeck, packed PBR and metric tangent UV source contract (not a render)
         run: python tools/test_daytona365_v8_14_source_contract.py
+      - name: V8.15 PMT017 physical side bolster and rolled front apron, geodesic tangent UV and packed source PBR contract (not a render)
+        run: python tools/test_daytona365_v8_15_source_contract.py

@@ -1,0 +1,22 @@
+# Ferrari 365 GTS/4 Daytona Blender v8.15 — physical PMT017 seat bolsters and front apron
+
+2026-11-08 KST. Source scope: **feature/daytona365-blender-v8-20261108 only**. No original game files, OVC, DX11/DX9Ex/VR runtime, Model2 VR or UW2 changes.
+
+## Genuine PMT/Cycles comparison and geometric correction
+
+- Previously verified original PMT source was rendered by genuine Blender Cycles from the private original model, not generated imagery. Measured group017 seat aggregate: X within ±0.57464 m, Y [-0.72863,-0.01985] m, Z [.33179,.85149] m. These are aggregate envelope constraints only; original per-vertex PMT bolsters and exact fold count remain **unrecovered**.
+- The v8.14 Blender candidate had v8.13's seven central seat channels but understated outer shoulders and a flat, abrupt front apron. v8.15 physically sculpts **both existing** V8_L/R_CLASSIC_PADDED_CUSHION double-skinned meshes, each **7,738 vertices/7,736 faces**. Each has 1,766 existing top vertices modified by over 1mm and a max physical Z deformation of **8.062mm**, rather than applying shader-only appearance.
+- Near each outer shoulder, restrained 8.1mm localized lifts fade before the central seven-channel geometry and toward the nose; a physically rounded front lip uses 7.4mm pre-front relief with a 4.8mm final-edge drop. The connected 49mm underside now rolls 14mm forward at the apron, rather than retaining the previous constant 6mm return. The original exterior group017 seat bounds are enforced with assertions; old object IDs, mesh topology, all controls, headrests and the v8.14 gear-gate deck are preserved.
+- Entire source metric tangent UV is recomputed from true new surface arc length as V8_15_CROWN_BOLSTER_APRON_METRIC_UV. The **existing v8.13 aligned 512x512 packed tangent normal UV remains intact** on both objects. All 12 pre-existing seams/welts on each seat are reprojected to the deformed surface; no duplicate floating stitch geometry is introduced.
+- Only physically outer front polygons get the dedicated cloned, packed source-derived V8_15_Source_PMT017_Outer_Bolster_Packed_PBR material: **1,456 faces per seat**, with source TanLeather BaseColor, tangent Normal, ORM green-channel roughness and Height map connected and packed; edited HSV/roughness restrained. Inner seven-channel cushion remains the v8.13 packed source-plus-generated-normal material, and the rear 49mm return uses the previous source-linked side material.
+
+## Actual official Blender validation, provenance and limits
+
+- Source: immutable private v8.14 .blend SHA256 **6de017b7f62b60a8484eef1b5eb8c851db037bd2ab88b1d09a79259b91702c77**. Blender 4.5.15 LTS created a NEW private v8.15 .blend SHA256 **19728e96bb3b09ea92138cb4201218ac4479cdfaa7b624e375587fc0ef872006**, 6,557,458 bytes; separately fresh-reopened **PASS**, 106 mesh / 94 curve objects. The v8.14 source remains immutable.
+- New actual same-camera Cycles preview: docs/images/daytona365-v8/Daytona365_v8_15_ACTUAL_CYCLES_PREVIEW.png, SHA256 **1cca969d0a56f634912227bfc964b4a0fee9c66d7701796959cf01d6c7ca9486**, 480x320, 4 spp, 2 CPU threads, denoising/exposure -0.52, V7_Camera_Reference_ThreeQuarter. The actual render completed and PNG saved successfully; a post-render JSON path concatenation mistake was corrected after validating PNG decode/SHA and Blender log. No second render was performed for that metadata error.
+- Genuine PMT/v8.14/v8.15 actual Blender render comparison: docs/images/daytona365-v8/Daytona365_ORIGINAL_vs_V8_14_V8_15_ACTUAL_CYCLES_COMPARE.png, SHA256 **f3992e99a0f120f00954b9bd4f56f9c9e7230d4bdee2e12170739e62fbab5abf**. Real original source uses 960x640/10 spp downsampled; both candidates are 480x320/4 spp. Not matched-sample/photometric equivalence. Per-pixel diff is **NOT** a quality score.
+- Proprietary PMT/DDS/OVC/game, editable .blend and private manifests remain off public GitHub. The dedicated branch includes only reusable Blender code, source-only CI, written provenance, and **actual rendered PNG** image evidence. GitHub Actions never counts as genuine Blender/Quest3 validation.
+
+**RENDER_VALIDATION=PREVIEW_ONLY**, **FULL_RESOLUTION_MATCHED_CYCLES=UNTESTED**, **OVC/GAME/QUEST3=UNTESTED**.
+
+**Next independent candidate:** original material017 seat shell's back-of-bolster-to-headrest seam transition, compared with real original camera-side silhouette. Do not repeat v8.13 pleat, v8.14 gear deck or v8.15 apron work.
