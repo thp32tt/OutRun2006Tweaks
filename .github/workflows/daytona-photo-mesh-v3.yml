@@ -1,0 +1,16 @@
+name: Daytona photo-mesh v3 source-free regression
+on:
+  push:
+    branches:
+      - feature/daytona365-photo-mesh-pbr-v3-20261107
+  workflow_dispatch:
+jobs:
+  synthetic-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pillow
+      - run: python tools/test_daytona365_photo_mesh_v3.py
