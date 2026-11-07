@@ -28,3 +28,5 @@ jobs:
         run: python tools/test_daytona365_v8_10_source_contract.py
       - name: V8.11 PMT-bounded source headrest, conformal piping and packed PBR contract (not a render)
         run: python tools/test_daytona365_v8_11_source_contract.py
+      - name: V8.12 original V5 back shell and PMT-bound PBR source contract (not a render)
+        run: python tools/test_daytona365_v8_12_source_contract.py
