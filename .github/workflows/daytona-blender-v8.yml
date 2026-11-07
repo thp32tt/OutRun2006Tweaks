@@ -26,3 +26,5 @@ jobs:
         run: python tools/test_daytona365_v8_9_source_contract.py
       - name: V8.10 source doors, wheel and packed normal/ORM contract (not a render)
         run: python tools/test_daytona365_v8_10_source_contract.py
+      - name: V8.11 PMT-bounded source headrest, conformal piping and packed PBR contract (not a render)
+        run: python tools/test_daytona365_v8_11_source_contract.py

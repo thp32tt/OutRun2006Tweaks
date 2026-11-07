@@ -1,0 +1,21 @@
+# Ferrari 365 GTS/4 Daytona v8.11 — source-bounded headrest and original seat piping correction
+
+Date: 2026-11-08 KST. Only `feature/daytona365-blender-v8-20261108` was changed. Source PMT/DDS, original game executable/OVC, VR runtime, web port and Model2VR branches are untouched.
+
+## New physical Blender work
+- **Immutable v8.10 source** `Daytona365_Cockpit_Blender_PBR_v8_10.blend` SHA256 `ab60744f37c93f4db079a9be79b7df09f3d99006fc332e4a9f98e21b92acbb74`. No earlier verified .blend was overwritten.
+- `tools/blender_daytona365_v8_11_crown_dark_conformal_piping.py` re-lofts both **existing** `V8_9_L/R_INTEGRATED_PADDED_HEADREST` objects in place: each 11 height stations × 22 perimeter vertices = **242 vertices, 222 faces** (prior 28 vertices, 26 faces). A curved front face and closed return sheet form an editable padded crown. Source PMT material017 original paired-seat aggregate X ±0.57464, Y [-0.72863,-0.01985], Z [.33179,.85149] m used as geometric envelope numbers, never republished original vertices. Crown Z max 0.8508m, L X [-.548,-.136], R mirror.
+- Both existing **8,614-vertex / 8,612-face** original connected backrest meshes retain identity and two skin layers, but the upper 22% tapers and lowers the previous excessive ~0.860m top edge to **0.850m**, with updated normal calculation and `V8_11_CROWN_GEODESIC_UV` physical surface lengths. New crowned headrest material retains packed source image BaseColor, tangent Normal, ORM(G)→roughness and Height bump; separate face/return material treatment remains source-linked.
+- All four old `V8_3_L/R_BACK_OUTER_PIPING_±1` obsolete light-tan *Bezier* splines have been rebuilt as dark charcoal source-PBR *poly* splines following actual seat vertex rows. Both backrest-perimeter curves per side and inherited v8.5-v8.7 seam/welt curves now follow their updated mesh and are no longer left at older positions. No duplicate piping objects.
+- Preserved prior charcoal cushion, v8.10 door UV/normal and ebony wheel, original gauges, Ferrari emblem, switches, chrome H gate, dashboard and 13-station console.
+
+## Actual Blender and Cycles evidence
+- Official **Blender 4.5.15 LTS** saved a NEW immutable private `blender_v8/Daytona365_Cockpit_Blender_PBR_v8_11.blend`: **7,028,904 bytes**, SHA256 `f53ecaf68bea214831dd706baf79e12ab36d9c253febfe8b5bf367c1d13f9cb1`. Independent fresh Blender reopening verification PASS: **106 meshes, 92 curves**, new UV/normals, 2 crown meshes, 4 reprojected legacy curves, packed PBR, protected original controls.
+- Actual Cycles preview `docs/images/daytona365-v8/Daytona365_v8_11_ACTUAL_CYCLES_PREVIEW.png`, SHA256 `5eeb04599580bb8ed55b4dd55c4f9c913fd0addf35c5fcb735f92d090df1fba2`, 480×320, 4 spp, 2 CPU threads, denoise, exposure -0.52, reference camera `V7_Camera_Reference_ThreeQuarter`.
+- Actual original PMT / v8.9 / v8.10 / v8.11 contact sheet `docs/images/daytona365-v8/Daytona365_ORIGINAL_vs_V8_9_V8_10_V8_11_ACTUAL_CYCLES_COMPARE.png`, SHA256 `5b03e01658d1f5b7c081b254db10a95ee57e7d88aa721a907d57c167a4628aff`. Original rendered at 960×640/10 spp and downsampled; candidates 480×320/4 spp, so **matched camera but NOT photometrically matched**. v8.10→v8.11 RGB mean per-channel absolute difference **2.577** reflects pixels changing, NOT model quality score.
+- `tools/test_daytona365_v8_11_source_contract.py` AST/py_compile/20-source-guard PASS; GitHub Actions source-only gate is NOT an actual Blender render.
+
+## Remaining visible issue; mandatory next stage
+The near seat still exhibits a bright tan elongated stripe despite all four old v8.3 piping curves being darkened and conformed. **Independent private Blender scene inspection confirmed** `V5_L_SEAT_RECLINED_PADDED_BACK` and `V5_R_SEAT_RECLINED_PADDED_BACK` remain visible with original legacy `TanLeather` source material (1,617 verts each, visible Z extent [.446,.860]); they geometrically overlap darker v8 seat/backrest/crown. This is a strong remaining-cause candidate, **not a ray-traced material attribution proof**. Next **v8.12** should identify camera-visible legacy V5 faces/occlusion before modifying, then reconcile legacy materials or mesh without removing source assets. Avoid claiming v8.11 removed the entire stripe.
+
+`RENDER_VALIDATION=PREVIEW_ONLY`. `FULL_RESOLUTION_MATCHED_PMT=UNTESTED`. `GAME_RUNTIME/OVC/QUEST3=UNTESTED`.
