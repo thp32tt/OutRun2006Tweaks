@@ -302,10 +302,8 @@ def tune_material(m, rough_min, rough_max, normal_strength, bump_strength, bump_
              "ORM" in n.image.name.upper())
     assert orm.image.packed_file
     assert orm.image.colorspace_settings.name=="Non-Color"
-    sep=next((n for n in nt.nodes if n.type=="SEPARATE_COLOR" and
-              any(l.to_node.name==n.name and l.from_node.name==orm.name
-                  for l in nt.links)),None)
-    assert sep is not None,m.name
+    sep=next((n for n in nt.nodes if n.type=="SEPARATE_COLOR"),None)
+    assert sep is not None and sep.inputs["Color"].is_linked,m.name
     node=nt.nodes.get("V8_5_ORM_ROUGHNESS_RANGE")
     if node is None:
         node=nt.nodes.new("ShaderNodeMapRange")
