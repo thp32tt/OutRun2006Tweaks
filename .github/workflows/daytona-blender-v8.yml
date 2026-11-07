@@ -12,4 +12,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python tools/test_daytona365_v8_source_contract.py
+      - name: Legacy v8.4 source contract
+        run: python tools/test_daytona365_v8_source_contract.py
+      - name: V8.5 real-model source provenance and geometry contract
+        run: python tools/test_daytona365_v8_5_source_contract.py
