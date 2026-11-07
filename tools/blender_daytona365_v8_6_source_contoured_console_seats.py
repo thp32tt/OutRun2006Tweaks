@@ -36,8 +36,8 @@ assert bpy.data.objects.get("DAYTONA_GEAR_GATE_CHROME_OUTLINE_SOURCE_ALIGNED_V3"
 assert bpy.data.objects.get("V7_3_HIGH_RES_WALNUT_SINGLE_STEERING_RIM")
 
 # Private measurement provenance: original imported PMT object00
-# material016 (lower center stack) x=[-.14203,+.14203], y=[.16707,.22873],
-# z=[.58656,.84731]; original material018 (console) x=[-.10683,+.10683],
+# material016 (object00_group01_material016_a0 lower center stack) x=[-.14203,+.14203], y=[.16707,.22873],
+# z=[.58656,.84731]; original object00_group01_material018_a0 (console) x=[-.10683,+.10683],
 # y=[-.23555,+.20228], z=[.33638,.51887].
 # The bounds are used only to constrain newly authored topology, never to
 # copy/proxy/commit actual original PMT vertices or game texture bytes.
