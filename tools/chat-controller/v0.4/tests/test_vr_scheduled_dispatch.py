@@ -20,6 +20,8 @@ def due(enabled=True, mode="conversion"):
           "DX9EX_SCHEDULE_MINUTES": [0],
           "DX9EX_SCHEDULE_EVERY_HOURS": 1,
           "CONTROLLER_MODE": mode,
+          "UW2_WEB_PORT_ENABLED": False,
+          "MODEL2_AUTODEV_ENABLED": False,
           "datetime": datetime}
     exec(compile(ast.Module(body=funcs, type_ignores=[]), "<schedule>", "exec"), ns)
     return ns["vr_scheduled_dispatch_due"], ns["vr_lane_schedule_window_due"]
@@ -73,12 +75,12 @@ class ScheduledDispatchTests(unittest.TestCase):
         self.assertIn('CONTROLLER_MODE == "conversion" and slot_name == "C"', code)
         rollover = next(n for n in tree.body if isinstance(n, ast.AsyncFunctionDef)
                         and n.name == "vr_checkpoint_and_rollover")
-        self.assertIn("vr_lane_schedule_window_due", ast.get_source_segment(SOURCE, rollover))
+        self.assertIn("vr_unconditional_resume_due", ast.get_source_segment(SOURCE, rollover))
         yml = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
         for snippet in ('VR_SCHEDULED_DISPATCH_ENABLED: "true"',
                         'SCHEDULE_MINUTES: "30"',
-                        'DX9EX_SCHEDULE_MINUTES: "0"',
-                        'DX9EX_SCHEDULE_EVERY_HOURS: "1"',
+                        'CAR_MODEL_SCHEDULE_MINUTES: "15"',
+                        'MODEL2_SCHEDULE_MINUTES: "0,30"',
                         'DX9EX_REVIEW_ONLY: "true"'):
             self.assertIn(snippet, yml)
 
