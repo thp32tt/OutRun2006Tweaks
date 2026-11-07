@@ -250,7 +250,7 @@ class FeatureModeTests(unittest.TestCase):
             self.assertIn(marker, prompt)
         review = (ROOT / "conversion_dx9ex.md").read_text(encoding="utf-8")
         self.assertIn("MODE=DX9EX_REVIEW_ONLY", review)
-        self.assertIn("자동 patch/refactor/merge/update_ref/branch 생성", review)
+        self.assertIn("CODE_CHANGE=FORBIDDEN", review)
 
     def test_compose_and_legacy_dedup(self):
         compose = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
