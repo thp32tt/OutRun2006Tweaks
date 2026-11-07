@@ -23,7 +23,8 @@ def functions():
     tree.body = [ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0)] + [
         x for x in tree.body if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef)) and (x.name.startswith(('vr_', 'github_feature_', 'conversion_')) or x.name in {'refresh_wait_actions_task_binding', '_parse_iso', 'finalize_dx9ex_review_only_result'})]
     ns = dict(re=re, json=json, datetime=datetime, TZ=timezone.utc, base64=base64, urllib=urllib,
-              DX9EX_REVIEW_ONLY=False, VR_SCHEDULED_DISPATCH_ENABLED=False)
+              DX9EX_REVIEW_ONLY=False, VR_SCHEDULED_DISPATCH_ENABLED=False,
+              UW2_WEB_PORT_ENABLED=False, MODEL2_AUTODEV_ENABLED=False)
     exec(compile(ast.fix_missing_locations(tree), '<controller>', 'exec'), ns)
     return ns
 
@@ -41,7 +42,7 @@ class Progression(unittest.TestCase):
         self.assertFalse(verdict(True, True))   # 40m: force new chat
         self.assertFalse(verdict(False, False)) # idle: safe to rotate
         self.assertIn(
-            'if vr_rollover_must_wait_for_owner(owner_busy_or_missing, hard_40m):',
+            'if vr_rollover_must_wait_for_owner(owner_busy_or_missing, hard_ceiling):',
             SOURCE,
         )
 
