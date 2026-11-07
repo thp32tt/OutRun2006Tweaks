@@ -200,8 +200,13 @@ struct Gate {
     bool playerDraw=false,deviceReady=false,stateRecording=false;
     unsigned char carKind=255;
 };
-inline bool Eligible(const Gate& g) noexcept {
+inline bool EligibleForKind(const Gate& g,unsigned char kind) noexcept {
+    // A source-specific hook must supply the ACTUAL original game car kind.
+    // No fallback to a different vehicle sidecar on unverified identity.
     return g.optIn&&g.vr&&g.seat&&g.gameplay&&g.stereo&&g.playerDraw&&
-           g.deviceReady&&!g.stateRecording&&g.carKind==1;
+           g.deviceReady&&!g.stateRecording&&g.carKind==kind;
+}
+inline bool Eligible(const Gate& g) noexcept {
+    return EligibleForKind(g,1);
 }
 } // namespace OutRunVR::DinoSidecar
