@@ -25,6 +25,7 @@ class GpuOwner final {
         UINT vertexCount=0,indexCount=0;
         unsigned material=0;
     };
+    const wchar_t* sidecarName_=L"Dino246_Cockpit_LHD_v15.ovc";
     Model cpu_{};
     std::vector<GpuMesh> meshes_{};
     std::vector<IDirect3DTexture9*> textures_{};
@@ -125,8 +126,9 @@ class GpuOwner final {
         wchar_t* last=wcsrchr(path,L'\\');
         if(!last)return false;
         *++last=L'\0';
-        constexpr wchar_t suffix[]=L"Dino246_Cockpit_LHD_v15.ovc";
-        if(std::wcslen(path)+(sizeof(suffix)/sizeof(suffix[0]))>MAX_PATH)return false;
+        const wchar_t* suffix=sidecarName_;
+        if(!suffix || !*suffix || std::wcslen(path)+std::wcslen(suffix)+1u>MAX_PATH)
+            return false;
         if(wcscat_s(path,MAX_PATH,suffix)!=0)return false;
         std::vector<std::uint8_t> bytes;
         if(!ReadFile(path,bytes))return false;
@@ -194,7 +196,8 @@ class GpuOwner final {
         return meshes_.size()==cpu_.meshes.size();
     }
 public:
-    GpuOwner()=default;
+    explicit GpuOwner(const wchar_t* filename=L"Dino246_Cockpit_LHD_v15.ovc") noexcept
+        :sidecarName_(filename) {}
     ~GpuOwner(){ReleaseGpu();}
     GpuOwner(const GpuOwner&)=delete;
     GpuOwner& operator=(const GpuOwner&)=delete;
@@ -268,4 +271,8 @@ public:
     }
 };
 inline GpuOwner& GlobalGpu() noexcept {static GpuOwner owner;return owner;}
+// Separate CPU/GPU resource owner: never mutate the tested Dino loader state.
+inline GpuOwner& GlobalDaytonaGpu() noexcept {
+    static GpuOwner owner(L"Daytona365_Cockpit_R26_v2.ovc");return owner;
+}
 } // OutRunVR::DinoSidecar
