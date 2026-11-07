@@ -1,4 +1,5 @@
 """Regression tests for Daytona Blender A independent of Model2 VR C."""
+from __future__ import annotations
 import ast
 import asyncio
 from datetime import datetime
