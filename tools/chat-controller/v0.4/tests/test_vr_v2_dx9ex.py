@@ -19,7 +19,8 @@ def load_queue_target():
     tree = ast.parse(SOURCE)
     fn = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'queue_target_for_slot')
     module = ast.Module(body=[fn], type_ignores=[])
-    ns = {'CONTROLLER_MODE': 'conversion'}
+    ns = {'CONTROLLER_MODE': 'conversion', 'MODEL2_AUTODEV_ENABLED': False,
+          'UW2_WEB_PORT_ENABLED': False, 'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks'}
     exec(compile(module, '<queue-target>', 'exec'), ns)
     return ns['queue_target_for_slot']
 
@@ -355,20 +356,20 @@ class VRV2DX9ExTests(unittest.TestCase):
         body = ast.get_source_segment(SOURCE, node)
         self.assertIn('hard_due = vr_unconditional_resume_due', body)
         self.assertIn('if not remote_saved and not hard_due:', body)
-        self.assertIn('active["vr_checkpoint_fallback"] = "LOCAL_ONLY_AFTER_40M"', body)
+        self.assertIn('active["vr_checkpoint_fallback"] = "LOCAL_ONLY_AFTER_60M"', body)
         self.assertIn('save_queue_state(q)', body)
-        self.assertIn('VR_FORCED_40_MINUTE_RESUME', body)
+        self.assertIn('VR_FORCED_60_MINUTE_NEW_CHAT', body)
         rollover = next(n for n in tree.body if isinstance(n, ast.AsyncFunctionDef)
                         and n.name == 'queue_rollover_chat')
         rollout = ast.get_source_segment(SOURCE, rollover)
-        self.assertIn('hard_40m', rollout)
-        self.assertIn('if not thinking_verified and hard_40m:', rollout)
+        self.assertIn('hard_ceiling', rollout)
+        self.assertIn('if not thinking_verified and hard_ceiling:', rollout)
         self.assertIn('append_task_event(reg, active, "rollover")', rollout)
         self.assertNotIn('active["attempt"] += 1', rollout)
         prompt = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
                       and n.name == 'queue_rollover_prompt')
         self.assertIn('CHECKPOINT_MODE=', ast.get_source_segment(SOURCE, prompt))
-        self.assertIn('LOCAL_ONLY_AFTER_40M', ast.get_source_segment(SOURCE, prompt))
+        self.assertIn('LOCAL_ONLY_AFTER_60M', ast.get_source_segment(SOURCE, prompt))
 
     def test_forty_minute_fallback_dispatches_new_chat_when_remote_write_fails(self):
         import asyncio
@@ -404,8 +405,8 @@ class VRV2DX9ExTests(unittest.TestCase):
         queue = {'active_by_lane': {'A': a}}
         self.assertTrue(asyncio.run(env['vr_checkpoint_and_rollover'](None, {}, queue, a, now)))
         self.assertEqual(attempts, [('CONVERSION-DX11-00478', 'pre_rollover')])
-        self.assertEqual(changes, [('CONVERSION-DX11-00478', 1, 'VR_FORCED_40_MINUTE_RESUME')])
-        self.assertEqual(a['vr_checkpoint_fallback'], 'LOCAL_ONLY_AFTER_40M')
+        self.assertEqual(changes, [('CONVERSION-DX11-00478', 1, 'VR_FORCED_60_MINUTE_NEW_CHAT')])
+        self.assertEqual(a['vr_checkpoint_fallback'], 'LOCAL_ONLY_AFTER_60M')
         self.assertTrue(saved_states)
         self.assertEqual(a['task_id'], 'CONVERSION-DX11-00478')
         changes.clear()
@@ -547,7 +548,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('CONVERSION_DX11_ENABLED: "false"', compose)
         self.assertIn('DXVK_FROZEN: "true"', compose)
         self.assertIn('CONVERSION_DXVK_ENABLED: "false"', compose)
-        self.assertIn('CONVERSION_DX9EX_ENABLED: "true"', compose)
+        self.assertIn('CONVERSION_DX9EX_ENABLED: "false"', compose)
         self.assertIn('CONVERSION_ONLY_SLOT: ""', compose)
         self.assertIn("if DXVK_FROZEN and CONVERSION_ONLY_SLOT == \"B\"", SOURCE)
         self.assertIn("DXVK is frozen: cannot select conversion-only DXVK slot B", SOURCE)
@@ -560,9 +561,9 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn("실기 HMD/게임 화면 테스트가 없다는 이유로", SOURCE)
         self.assertIn("1000/5000회 반복", SOURCE)
         self.assertIn("실기 테스트가 필요한 항목은", (ROOT / "conversion_dx11.md").read_text())
-        self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS: "1800"', compose)
-        self.assertIn('VR_FORCE_ROLLOVER_SECONDS: "1800"', compose)
-        self.assertIn('VR_UNCONDITIONAL_RESUME_SECONDS: "2400"', compose)
+        self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS: "3600"', compose)
+        self.assertIn('VR_FORCE_ROLLOVER_SECONDS: "3600"', compose)
+        self.assertIn('VR_UNCONDITIONAL_RESUME_SECONDS: "3600"', compose)
         self.assertIn('VR_CHECKPOINT_ENABLED: "true"', compose)
         self.assertIn('MAX_CHAT_ROLLOVERS_PER_TASK: "0"', compose)
         self.assertIn('CHAT_ROTATE_COMPLETED_TASKS: "5"', compose)
