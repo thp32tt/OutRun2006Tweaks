@@ -18,7 +18,10 @@ import struct
 import zlib
 from pathlib import Path
 from PIL import Image, ImageFilter, ImageDraw
-from pmt_export_base import open_pmt, decode_object
+try:
+    from pmt_export_base import open_pmt, decode_object
+except ImportError:
+    from dino_original_pmt_to_glb import open_pmt, decode_object
 
 EXPECTED_SHA="f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe"
 NAME="Daytona365_Cockpit_R26_v2.ovc"
