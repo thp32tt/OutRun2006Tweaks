@@ -19,9 +19,9 @@ import zlib
 from pathlib import Path
 from PIL import Image, ImageFilter, ImageDraw
 try:
-    from pmt_export_base import open_pmt, decode_object
+    from pmt_export_base import open_pmt, decode_object, decode_dds
 except ImportError:
-    from dino_original_pmt_to_glb import open_pmt, decode_object
+    from dino_original_pmt_to_glb import open_pmt, decode_object, decode_dds
 
 EXPECTED_SHA="f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe"
 NAME="Daytona365_Cockpit_R26_v2.ovc"
@@ -51,6 +51,51 @@ def _texture_rgba(kind,size=256):
                 val=max(0,min(255,42+n))
                 pix[x,y]=(val,val-1 if val else 0,val+1,255)
     return img
+
+
+def painted_gauge_atlas(asset):
+    """Photo-style redraw on the EXACT source gauge texture #08 UV template.
+    The photo is reference only, not copied. The GLB/source UV stays unchanged.
+    """
+    from PIL import ImageFont, ImageEnhance
+    png,_,_=decode_dds(asset,8,1)
+    base=Image.open(io.BytesIO(png)).convert("RGBA")
+    S=8
+    im=ImageEnhance.Contrast(base.resize((1024,1024),Image.Resampling.LANCZOS)).enhance(1.20)
+    dr=ImageDraw.Draw(im,"RGBA")
+    # Instrument shapes were traced against the genuine UV sheet, not a scene render.
+    gauges=[
+        (32,64,17,48,"SPEED"),(95,64,17,47,"RPM"),
+        (8,65,7,24,"FUEL"),(54,34,8,23,"OIL"),
+        (73,34,8,23,"WATER"),(54,97,8,22,"BATTERY"),
+        (73,97,8,22,"CLOCK"),(120,66,7,24,"AUX")
+    ]
+    for ci,(cx,cy,rx,ry,label) in enumerate(gauges):
+        box=lambda r:((cx-r*rx)*S,(cy-r*ry)*S,(cx+r*rx)*S,(cy+r*ry)*S)
+        dr.ellipse(box(1.07),fill=(12,15,19,255),outline=(180,179,169,255),width=round(S*.25))
+        dr.ellipse(box(1.025),outline=(54,58,63,255),width=round(S*.21))
+        dr.ellipse(box(.965),fill=(8,14,18,255),outline=(108,113,116,255),width=round(S*.18))
+        dr.ellipse(box(.86),outline=(36,47,54,190),width=round(S*.06))
+        # Fine markings: numerals are deliberately not invented at tiny gauges.
+        for i in range(33 if ci<2 else 19):
+            count=33 if ci<2 else 19
+            angle=math.radians(215+i*290/(count-1))
+            c,s=math.cos(angle),math.sin(angle)
+            r0=.74 if i%4==0 else .78
+            r1=.91
+            a=(int((cx+rx*r0*c)*S),int((cy+ry*r0*s)*S))
+            b=(int((cx+rx*r1*c)*S),int((cy+ry*r1*s)*S))
+            dr.line((a,b),fill=(235,223,192,250) if i%4==0 else (154,168,165,195),
+                    width=round(S*.15 if i%4==0 else S*.085))
+        angle=math.radians((85 if ci%2 else -35)+ci*8)
+        needle=(int((cx+rx*.70*math.cos(angle))*S),
+                int((cy+ry*.70*math.sin(angle))*S))
+        dr.line(((cx*S,cy*S),needle),fill=(222,106,55,255),
+                width=round(S*.33))
+        dr.ellipse(((cx-.75)*S,(cy-.75)*S,(cx+.75)*S,(cy+.75)*S),
+                   fill=(231,223,198,255))
+    # Edge detail is real albedo for the existing UV plane, not a synthetic 3D model.
+    return im
 
 def _dds_argb32(img):
     img=img.convert("RGBA")
@@ -157,7 +202,13 @@ def build_geometry(asset):
     switch=_empty("DAYTONA_CONSOLE_SWITCH_METAL_BEZELS_ACTUAL_GEOMETRY",0)
     for x in (-.053,-.018,.018,.053):
         add_chrome_switch(switch,x,.773,-.155,w=.006,h=.013)
-    meshes=[bez,stitches,switch]
+    # Restore a genuinely textured replacement panel atop original tex08;
+    # no second full car. This is the original UV-mapped instrument geometry.
+    panel=_empty("DAYTONA_HIRES_GAUGES_NATIVE_UV_MESH",2)
+    for pos,nor,uv in zip(p["vertices"],p["normals"],p["uvs"]):
+        _v(panel,(pos[0],pos[1],pos[2]+.0065),nor,uv)
+    panel["i"]=list(p["indices"])
+    meshes=[bez,stitches,switch,panel]
     for m in meshes:
         if not m["v"] or not m["i"] or max(m["i"])>=len(m["v"]):
             raise ValueError("generated empty or corrupt mesh")
@@ -234,11 +285,11 @@ def main():
     args.output.mkdir(parents=True,exist_ok=True)
     asset=open_pmt(args.source)
     meshes,metadata=build_geometry(asset)
-    textures=[_texture_rgba("chrome"),_texture_rgba("stitch")]
+    textures=[_texture_rgba("chrome"),_texture_rgba("stitch"),painted_gauge_atlas(asset)]
     name=args.output/NAME
     res=write_ovc(meshes,textures,name)
     validate_ovc(name)
-    for im,kind in zip(textures,("chrome","stitch")):
+    for im,kind in zip(textures,("chrome","stitch","hires_gauges")):
         im.save(args.output/(f"Daytona365_{kind}_R26.png"))
     meta={**res,**metadata,"format":"OVRCABH2 v2 (D3D9Ex ARGB32, x86)",
         "runtime":"STATIC_FORMAT_PASS only; Quest 3/PC game not launched",
