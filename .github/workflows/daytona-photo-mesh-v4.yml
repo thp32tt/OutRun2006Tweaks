@@ -1,0 +1,17 @@
+name: Daytona v4 actual-geometry source-free regression
+on:
+  push:
+    branches:
+      - feature/daytona365-photo-geometry-v4-20261107
+  workflow_dispatch:
+jobs:
+  photo-geometry-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pillow
+      - run: python tools/test_daytona365_photo_mesh_v3.py
+      - run: python tools/test_daytona365_photo_mesh_v4.py
