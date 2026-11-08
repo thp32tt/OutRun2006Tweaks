@@ -27,6 +27,7 @@ from controller_png_attach import (
     ensure_image_tool, attach_png, attach_batch_pngs,
     verify_submission_receipt, clear_attachment_previews,
 )
+from chat_image_result_rescue import rescue_single_image_candidate
 
 REPO = "thp32tt/OutRun2006Tweaks"
 QUEUE_BRANCH = "korean-localization-qa-queue-20261104"
@@ -257,6 +258,39 @@ def recover_previous_sent_task(gh, task):
     return "HOLD_LEGACY_TASK_NO_RESEND"
 
 
+def result_poll_diagnostic(gh, state, reason):
+    """Record a sanitized WAIT code, max once per 30 min for unchanged reason."""
+    if state.get("status") != "AB_SENT":
+        return False
+    reason = re.sub(r"[^A-Za-z0-9_:-]", "_", str(reason))[:120]
+    if not reason:
+        reason = "WAIT_UNKNOWN"
+    now = dt.datetime.now(dt.timezone.utc)
+    stamp = state.get("last_result_poll_utc")
+    if state.get("last_result_poll_reason") == reason and isinstance(stamp, str):
+        try:
+            previous = dt.datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+            if previous.tzinfo and (now-previous).total_seconds() < 1800:
+                return False
+        except (ValueError, TypeError, OverflowError):
+            pass
+    stage_state(gh, state["task"], "AB_SENT", {
+        "last_result_poll_utc": now.isoformat(timespec="seconds"),
+        "last_result_poll_reason": reason,
+        "candidate_status": "RESULT_NOT_YET_EXPORTED_OR_QA_APPROVED",
+    })
+    return True
+
+
+def fair_task_files(files, after=None):
+    """Round-robin all persisted tasks instead of starving later task IDs."""
+    ordered = sorted(files, key=lambda file: file.name)
+    if not ordered or not after:
+        return ordered
+    index = next((i for i, file in enumerate(ordered) if file.stem > after), 0)
+    return ordered[index:] + ordered[:index]
+
+
 def stage_source_ref(gh,task):
     if not valid_task(task):
         raise ValueError("INVALID_GITHUB_WORK_TICKET")
@@ -386,6 +420,7 @@ class ChatBridge:
         self.context=None
         self.browser=None
         self.pages={}
+        self.last_inspected_task=None
 
     async def ensure_context(self):
         """Attach only to the already-visible VNC Chromium; never spawn a second profile."""
@@ -659,12 +694,18 @@ class ChatBridge:
         progressed=[]
         c1_sent_this_cycle=0
         tasks_root=ROOT/"tasks"
-        for file in sorted(tasks_root.glob("HDRW-*.json"))[:120] if tasks_root.is_dir() else []:
+        files=(fair_task_files(tasks_root.glob("HDRW-*.json"),
+                               self.last_inspected_task)
+               if tasks_root.is_dir() else [])
+        for file in files:
+            self.last_inspected_task=file.stem
             try:
                 entry=json.loads(file.read_text(encoding="utf-8"))
                 if not valid_task(entry.get("task",{})):
                     continue
                 task=entry["task"]
+                if entry.get("status") not in SEND_STATES:
+                    continue
                 updated,_=await asyncio.to_thread(self.gh.read_json,
                                   task_state_path(task["task_id"]),QUEUE_BRANCH)
                 if updated is None:
