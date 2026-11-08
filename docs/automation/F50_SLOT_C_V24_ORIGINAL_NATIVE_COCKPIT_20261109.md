@@ -21,6 +21,12 @@ No new car/cockpit mesh/object. Exactly **3 of 42** original imported source-ID 
 
 Photo-guided adjustments use existing source geometry only: low and continuous gauge eyebrow/cowl crest, top arc and symmetric F50 rim grip contour fairing, restrained front hub-plate relief away from six fasteners and badge island. Original wheel's **624 pre-existing non-manifold/open edges** have **not** been silently repaired. This is controlled contour editing, **not** a new instrument cluster, separate detail mesh or a fully photo-matched replacement.
 
+## Mesh hash before -> after (same original object IDs and faces)
+
+- Instrument cowl `object00_group01_material028_a0`: `c9ad46902db240eeefa667fe8f1beb5cb8377e862669ee445f30cceb327e1e64` -> `e07aaae7f2b8552328ea2384071dc1ca8e290b17715272ffccfcbc3a6f1138ea`.
+- Original three-spoke rim `object21_group01_material002_a0`: `a4e6388ebbed7da582c1f23f3ee860bc27d6b9ba7a2aa84d3563e192137ccd36` -> `798fad5bea06c7922992d8e37e5ea70a3c971f17a13de034eee5c431528672e3`.
+- Factory six-bolt hub `object21_group00_material000_a0`: `490dfb71323e1a72d53fa2af6ac75f7912eb8b1f1e06a2c314d8530f205cb896` -> `385dbcbfb715d4caddbdaec44ab5c4e7140e9b49a3e7d00ed987c65c46944d5a`.
+
 ## Verified Blender original-source QA
 
 - Public geometry script: `tools/car_modeling/slot_c/f50_p0_source_mesh_v24.py`, file SHA256 `571fbe05f5754c2955ce3b33b45720822b9ab88030486f5efef459b2a4e00caf`.
