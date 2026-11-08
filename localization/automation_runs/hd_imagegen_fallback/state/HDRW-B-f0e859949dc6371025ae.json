@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af0ffc5-d0cc-83ec-9c5e-f5cc7a817af3",
   "old_candidate_sha256": "727500659e1215e29c5f4a0e33574bdf709dc845bdb7e5df72fbcdded7597a4c",
   "release_approved": false,
   "roi_id": "Q048_311e1098a67b62ba",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Next Stage",
     "korean": "다음 스테이지",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-B-f0e859949dc6371025ae"
   },
   "task_id": "HDRW-B-f0e859949dc6371025ae",
-  "updated_utc": "2026-11-08T23:03:28+00:00"
+  "updated_utc": "2026-11-08T23:03:46+00:00"
 }
