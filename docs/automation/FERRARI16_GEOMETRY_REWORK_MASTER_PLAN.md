@@ -5,11 +5,27 @@ Queue: `docs/automation/FERRARI16_GEOMETRY_QUEUE.json` (schema v2); gate: `tools
 Controller: `thp32tt/OutRun2006Tweaks@chat-controller-downloads`.
 Owner: AI 2 ChatGPT2. This is modeling only; Model2VR, DX11, DX9Ex, DXVK, UW2, localization and game/VR runtime branches must not change.
 
+## 2026-11-08 12:25 KST operator override: ORIGINAL GAME RESOURCE IN-PLACE BLENDER REWORK ONLY
+
+**Every vehicle must begin from its actual OutRun 2006 game resource**—the original vehicle's PMT/native asset and a verified Blender import or a proven editable .blend derived from it. Work in a COPIED private baseline, never replace the read-only original game file. Do NOT create a new car from scratch, procedurally reconstruct an unrelated substitute car, import a third-party GLB as the new car, or count a Blender cube/test primitive as a vehicle.
+
+The requested work is **editing the existing original imported cockpit mesh in Blender**, retaining source object identities, vehicle coordinates, camera transforms, steering/animation pivots and source-to-output SHA256 provenance. Directly refine the existing dashboard, wheel and driver-visible parts by vertex/face/edge-loop editing, bevel/subdivision/mesh refinement and accurately photo-guided additions *attached to the existing original cockpit objects*. A small detail such as gauge bezels may have added geometry, but it must demonstrably refine the original source mesh, not replace it with an invented complete cockpit.
+
+**Deliverables are ONLY editable Blender modeling artifacts (.blend), non-proprietary Blender editing scripts and private before/after model renders.** Explicitly **do not export or convert to OVC3, OVC, PMT or game-playable formats; do not package/install into game; do not modify VR rendering code or perform integration/testing for this task**. The previous plan's "game-compatible export"/"original game runtime" language, if any, is superseded by this rule. Invariant: original game assets untouched; model edits saved separately.
+
+Required source evidence per car before genuine modeling credit:
+1. Exact original game car/resource filename, protected private source file SHA256 and exact model/variant identity.
+2. Hash of the initial imported original resource-backed .blend, plus names/IDs of imported **original mesh objects**.
+3. Edited original mesh object IDs and their before/after vertex/face metrics. Record independent Blender reopen and compare with the original model using matching driver-eye camera.
+4. If source resource or verified import is unavailable, report **BLOCKED_INPUT**. Do not solve that by building a new replica from photos or stock models.
+
+Verified local baseline available: N100 \`work_handoff/daytona365_v822_ai2_20261108/blender_v8/Daytona365_Cockpit_Blender_PBR_v8_22_r2.blend\` SHA256 \`30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437\`; this is an **existing editable derivative** with a recorded Blender build, NOT independent proof of which original game PMT resource imported into the very first version. Audit that lineage first, then continue editing this existing scene without redoing v8 geometry or textures. For F50 and future cars, verify the original native asset on N100/private storage and build a genuine import baseline before opening a modeling session. Never claim missing F50 original input was found.
+
 ## 2026-11-08 user directions — priority
 **Only model 3D structures actually visible from the original game's cockpit/driver-seat camera.**
 External wheels, tires, body/silhouette, bumper, spoiler, hood surface unrelated to windshield visibility, suspension, exhaust, and outside-camera cosmetics are all **excluded**. A-pillar, windshield surround, inner mirror, inside-visible hood edge and windshield base may be revised only if clearly visible from cockpit. Do not invent an entire exterior.
 **P0 = dashboard and steering wheel (both).** Specifically prioritize authentic instrument binnacle, dashboard upper/lower silhouette, gauge bezels and recesses, air vents, switch faces, steering rim sections, spoke count/shape, hub, column, stalks and spatial position. Next P1 = center console/shifter/handbrake/visible pedals. Then P2 = door tops/inner panels, seats, windscreen pillars and cockpit-visible mirrors. Maintain original game's camera mount, VR eye transform, steering animation pivot and vehicle local scale.
-**Only geometric mesh improvements**: topology, bevels, sculpted contours, real thickness, edge loops and shading/face normals. Existing UVs/textures are preserved as baseline but no new DDS, texture, normal map, PBR or ORM creation/baking. Material color changes and repeated renders are not a substitute for real geometric modifications.
+**Only geometric mesh improvements**: topology, bevels, sculpted contours, real thickness, edge loops and shading/face normals. Existing UVs/textures are preserved as baseline but no new DDS, texture, normal map, PBR or ORM creation/baking. Preserve read-only original game PMT; save modified imported mesh to a separate .blend. Material color changes and repeated renders are not a substitute for real geometric modifications.
 
 ## Two independent automatic slots, staggered exactly as requested
 | Slot | KST trigger minutes | First dedicated 24h vehicle | Next new work |
@@ -57,7 +73,7 @@ A vehicle can progress to `COMPLETE` only if all are evidenced:
 - Driver-eye, full dashboard, steering, instrument cluster, center console, inner door, windshield frame: seven authentic photo reference URLs and seven actual Blender comparison views, with camera orientation/provenance explicitly labeled.
 - Official Blender real-scene QA and independent save/reopen PASS. Mesh counts, normals, non-manifold findings, camera/position/original anchors and before/after SHA reported.
 - No exterior/body/wheel work, no new textures/PBR/normal maps and no original game/runtime source branch changes.
-- Game compatibility and Quest 3 runtime remain `UNTESTED` until actual original game / headset validation.
+- Game conversion/OVC3 packaging/runtime integration and Quest 3 validation are **NOT REQUESTED** for this modeling-only phase; do not spend time or CI on them. Historical runtime outcomes remain unchanged.
 
 ## Controller and deployment
 - Controller Compose: `tools/chat-controller/v0.4/docker-compose.portainer-vr.yml` in `chat-controller-downloads`.
