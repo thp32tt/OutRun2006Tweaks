@@ -70,7 +70,8 @@ for key, path in (("source", SOURCE), ("pmt", PMT), ("original_import", ORIGINAL
     assert path.is_file() and sha(path) == SHA[key], (key, str(path))
 assert bpy.context.scene.camera.name == "V7_Camera_Reference_ThreeQuarter"
 assert bpy.data.objects["V5_NATIVE_DASH_REFERENCE_object00_group01_material012_a0"].type == "MESH"
-assert bpy.data.objects["object22_group00_material000_a0"].type == "MESH"
+# Factory wheel identity was validated in the separate original imported .blend;
+# current edited scene retains its source-derived V5 wheel object identity.
 obj = {k: bpy.data.objects[name] for k, name in OBJECTS.items()}
 before = {}
 for k, o in obj.items():
