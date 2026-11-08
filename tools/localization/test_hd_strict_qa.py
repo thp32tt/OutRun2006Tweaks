@@ -362,6 +362,19 @@ class StrictHDQualityTests(unittest.TestCase):
         self.assertEqual(holds[0]["reason"],
                          "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
 
+    def test_diagonal_corner_external_alpha_is_not_missed_by_side_strips(self):
+        # (3,5) is outside BOTH legacy strips (left uses y>=6,
+        # top uses x>=4); it is nevertheless 8-connected to (4,6).
+        im = native.native_image(source_dds())
+        ImageDraw.Draw(im).point((4, 6), fill=(255, 255, 255, 1))
+        ImageDraw.Draw(im).point((3, 5), fill=(255, 255, 255, 1))
+        src = source_dds()[:128] + im.tobytes("raw", "BGRA")
+        data, final, clean, painted, holds = self.run_case(src)
+        self.assertIsNone(data)
+        self.assertFalse(painted)
+        self.assertEqual(holds[0]["reason"],
+                         "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+
     def test_new_korean_pixel_may_not_touch_protected_native_neighbor(self):
         from hd_existing_candidate_salvage import (
             translated_touches_external_native_ink,
