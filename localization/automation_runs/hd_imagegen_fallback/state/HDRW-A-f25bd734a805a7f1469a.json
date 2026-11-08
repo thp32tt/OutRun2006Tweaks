@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af0fb6a-a09c-83ee-beb6-a9cf8168d2bd",
   "old_candidate_sha256": "d5a9c89eb4a6641889863dea0c6d69506b3126af7651b2aad5507b6b7f3cc395",
   "release_approved": false,
   "roi_id": "Q046_b577bb70f171fb40",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Sunny Beach",
     "korean": "서니 비치",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-f25bd734a805a7f1469a"
   },
   "task_id": "HDRW-A-f25bd734a805a7f1469a",
-  "updated_utc": "2026-11-08T22:44:50+00:00"
+  "updated_utc": "2026-11-08T22:45:09+00:00"
 }
