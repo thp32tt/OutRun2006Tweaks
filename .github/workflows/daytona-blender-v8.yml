@@ -41,3 +41,5 @@ jobs:
 
       - name: V8.17 physical instrument cowl, packed source dark dash/tangent normals contract (not a render)
         run: python tools/test_daytona365_v8_17_source_contract.py
+      - name: V8.18 native source switchbank physically molded side and sill surround, packed PBR tangent normal contract (not a Blender render)
+        run: python tools/test_daytona365_v8_18_source_contract.py
