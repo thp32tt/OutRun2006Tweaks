@@ -189,7 +189,7 @@ def render(path,cam,visible):
    if o.type=="MESH":o.hide_render=hidden[o.name]
 def source_guard(a):
  assert bpy.app.version[:3]==(4,5,15),bpy.app.version_string
- for path,expected in ((a.native,PMT),(a.original_import,IMPORT),(a.before,V23)):
+ for path,expected in ((a.native,PMT),(a.original_import,IMPORT),(a.before,V22)):
   assert digest(path)==expected,("BLOCKED_INPUT SOURCE SHA",str(path),digest(path),expected)
  assert bpy.context.scene.get("outrun_original_game_resource_sha256")==PMT
 def report_guard(before,after):
@@ -241,7 +241,7 @@ def build(a):
   render(path,camera,visible);renders["after_"+label]={"path":str(path),"sha256":digest(path)}
  source_guard(a)
  j={"status":"LOCAL_F50_V23_SAVED_INDEPENDENT_REOPEN_PENDING","blender":bpy.app.version_string,
-    "native_pmt_sha256":PMT,"original_import_sha256":IMPORT,"input_v22_sha256":V23,
+    "native_pmt_sha256":PMT,"original_import_sha256":IMPORT,"input_v22_sha256":V22,
     "output_private_blend":str(a.after),"output_sha256":digest(a.after),
     "original_mesh_count":42,"changed_only_original_meshes":{
      name:{"before":b[name],"after":c[name],**stats[name]} for name in TARGETS},
