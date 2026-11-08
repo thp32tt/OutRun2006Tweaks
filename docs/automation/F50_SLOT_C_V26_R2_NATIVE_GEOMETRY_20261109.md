@@ -32,3 +32,8 @@ Original IDs, object transforms, indices, UVs, camera metadata, material slots, 
 - **GitHub hosted official Blender 4.5.15 genuine model QA = `BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED`**. Current hosted workflows install Blender and run queue/smoke tests but *have not received the private copyrighted original-derived .blend*. Do not equate smoke QA with this genuine private F50 result. No confidential assets in public repository.
 
 No OVC3/OVC/PMT export/conversion, GLB, game install/package or runtime/VR validation; no external body, wheels, tyres, texture, normals, PBR. This is continuation of F50 P0 feature; AI2 scoring **+0**, retries and rejection do not count.
+
+## Readback / private delivery
+
+- GitHub Actions official Blender 4.5.15 **hosted queue/smoke** for source SHA `75ce5ccbc30f702e6ffbf19e361af504730a12e0`: run `42502774419` **SUCCESS**. Its success is **not** a source-private original F50 render: genuine hosted scene audit remains `BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED`.
+- Three permitted deliverables uploaded **privately** to the existing personal Drive remote `gdrive_ezflash557:OutRun2006/F50_SlotC_OriginalPMT_v26_r2_20261109/`: edited `.blend` (1,539,547 bytes), public edit script (14,803 bytes) and genuine before/after diagnostic `.jpg` (95,679 bytes). Each remote size and remote MD5 verified against the exact private N100 SHA-pinned local file; no public sharing permission was created. Original PMT and copyrighted photo sources not uploaded.
