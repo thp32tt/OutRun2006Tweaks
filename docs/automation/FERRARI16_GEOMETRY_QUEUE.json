@@ -158,11 +158,11 @@
       "status": "ACTIVE",
       "started_at_utc": null,
       "completed_at_utc": null,
-      "geometry_gate": "UNTESTED",
+      "geometry_gate": "BLOCKED_INPUT",
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Next unfinished vehicle after user-excluded Dino. Photo set 03_F50, verify driver-view, LHD and authentic trim before edits. Original F50 native game resource/import file not verified in current N100 work_handoff; do not create surrogate mesh, mark BLOCKED_INPUT until verified original resource is obtained.",
+      "notes": "Next unfinished vehicle after user-excluded Dino. Photo set 03_F50, verify driver-view, LHD and authentic trim before edits. Original F50 native game resource/import file not verified in current N100 work_handoff; do not create surrogate mesh, mark BLOCKED_INPUT until verified original resource is obtained. [SLOT_C_INPUT_AUDIT_20261108] BLOCKED_INPUT: N100 F50 original PMT/native source and verified original-import .blend not found in inspected paths; no geometry created. Slot C remains assigned F50 pending exact source SHA and original mesh IDs.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -179,7 +179,28 @@
         "original_game_resource_sha256": null,
         "original_import_blend_sha256": null,
         "original_mesh_object_ids": [],
-        "verification": "UNTESTED"
+        "verification": "BLOCKED_INPUT",
+        "last_input_audit": {
+          "checked_at_kst": "2026-11-08 12:47 KST",
+          "result": "BLOCKED_INPUT",
+          "reason": "No directly verifiable original OutRun 2006 F50 PMT/native source nor original-imported editable F50 .blend in inspected N100 private locations; source object identities and original file SHA unavailable.",
+          "searched_roots": [
+            "work_handoff (PMT and F50 blend/name globs)",
+            "outrun-hd-rework (PMT glob)",
+            "outrun2_vr_refs (PMT and F50 blend globs)",
+            "work (F50 PMT/blend globs)"
+          ],
+          "reference_manifest": "outrun2_vr_refs/20261104_16car_cockpit/MANIFEST.json",
+          "reference_manifest_sha256": "a4645b3bcc98443026951f4aba845bd8561aad85b8cd58a8c289be02d194225e",
+          "photo_coverage_matrix_sha256": "1f16c1dddbd436954fdfc486807382ad75a97adc0fe3c70f902d9c3307cfaac3",
+          "f50_photo_records": 17,
+          "f50_downloaded_photos": 16,
+          "photo_quality_gate": "INCOMPLETE (only center shifter VISUALLY_VERIFIED in matrix; dashboard candidate UNTESTED, others insufficient)",
+          "source_edits_performed": 0,
+          "forbidden_outputs_created": 0,
+          "blender_real_scene_audit": "NOT_RUN_MISSING_ORIGINAL_SCENE",
+          "next_action": "Obtain read-only original OutRun 2006 F50 PMT/native resource and prove exact PMT SHA, verified import blend SHA, existing original cockpit mesh IDs and source camera/pivot before geometry editing."
+        }
       },
       "edit_from_original_required": true,
       "output_format": "blend",
