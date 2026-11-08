@@ -79,10 +79,27 @@ class ScheduledDispatchTests(unittest.TestCase):
         yml = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
         for snippet in ('VR_SCHEDULED_DISPATCH_ENABLED: "true"',
                         'SCHEDULE_MINUTES: "30"',
-                        'CAR_MODEL_SCHEDULE_MINUTES: "15"',
+                        'CAR_MODEL_SCHEDULE_MINUTES: "0,30"',
+                        'CAR_MODEL_C_AUTODEV_ENABLED: "true"',
+                        'CAR_MODEL_C_SCHEDULE_MINUTES: "15,45"',
                         'MODEL2_SCHEDULE_MINUTES: "0,30"',
                         'DX9EX_REVIEW_ONLY: "true"'):
             self.assertIn(snippet, yml)
+
+
+    def test_cockpit_two_slot_schedule_and_independent_state(self):
+        tree = ast.parse(SOURCE)
+        car = next(n for n in tree.body if isinstance(n, ast.AsyncFunctionDef)
+                   and n.name == "car_model_simple_cycle")
+        body = ast.get_source_segment(SOURCE, car)
+        self.assertIn("CAR_MODEL_SCHEDULE_MINUTES if slot_name == \"A\" else CAR_MODEL_C_SCHEDULE_MINUTES", body)
+        self.assertIn('state = q.setdefault("car_model_simple_" + slot_name, {})', body)
+        self.assertIn("active_by_slot[{slot_name!r}]", body)
+        self.assertIn("slot_name=slot_name", body)
+        yml = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
+        self.assertIn('MODEL2_AUTODEV_ENABLED: "false"', yml)
+        self.assertIn('CONVERSION_DX9EX_ENABLED: "false"', yml)
+        self.assertIn('CONVERSION_ONLY_SLOT: ""', yml)
 
 
 if __name__ == "__main__":
