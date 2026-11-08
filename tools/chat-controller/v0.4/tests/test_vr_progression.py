@@ -25,7 +25,8 @@ def functions():
     ns = dict(re=re, json=json, datetime=datetime, TZ=timezone.utc, base64=base64, urllib=urllib,
               DX9EX_REVIEW_ONLY=False, VR_SCHEDULED_DISPATCH_ENABLED=False,
               UW2_WEB_PORT_ENABLED=False, MODEL2_AUTODEV_ENABLED=False,
-              CONTROLLER_MODE="conversion", CAR_MODEL_AUTODEV_ENABLED=False)
+              CONTROLLER_MODE="conversion", CAR_MODEL_AUTODEV_ENABLED=False,
+              CAR_MODEL_C_AUTODEV_ENABLED=False)
     exec(compile(ast.fix_missing_locations(tree), '<controller>', 'exec'), ns)
     return ns
 
