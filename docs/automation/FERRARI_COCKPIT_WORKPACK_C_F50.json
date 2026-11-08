@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "strategy": "breadth_first_cockpit_v3",
+  "slot": "C",
+  "car_id": "f50",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "feature/ferrari16-geometry-rework-20261108",
+  "original_game_resource_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+  "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+  "migration_input_blend_sha256": "4f232ce124caab8afca8ddfcadb6b629267730d80a58ab50a1daddbfad591b3e",
+  "migration_info": "2026-11-09 user override; P0 repeatedly edited (Daytona R41, F50 v36), not certified PASS",
+  "component_order": [
+    "center_console",
+    "driver_controls",
+    "inner_door",
+    "windshield_frame",
+    "visible_seat",
+    "instrument_cluster",
+    "dashboard",
+    "steering_wheel",
+    "cross_cockpit_qa"
+  ],
+  "current_component": "center_console",
+  "dispatches_on_component": 0,
+  "max_dispatches_per_component": 2,
+  "components": {
+    "center_console": {
+      "status": "NOT_STARTED",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    },
+    "driver_controls": {
+      "status": "NOT_STARTED",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    },
+    "inner_door": {
+      "status": "NOT_STARTED",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    },
+    "windshield_frame": {
+      "status": "NOT_STARTED",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    },
+    "visible_seat": {
+      "status": "NOT_STARTED",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    },
+    "instrument_cluster": {
+      "status": "NOT_STARTED",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    },
+    "dashboard": {
+      "status": "P0_POLISH_HOLD",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    },
+    "steering_wheel": {
+      "status": "P0_POLISH_HOLD",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    },
+    "cross_cockpit_qa": {
+      "status": "NOT_STARTED",
+      "source_edits_this_phase": 0,
+      "evidence_refs": [],
+      "blocking_reason": null,
+      "last_saved_blend_sha256": null
+    }
+  },
+  "known_final_qa_blockers": [
+    "exact original game driver-eye camera uncalibrated",
+    "seven authenticated car-photo viewpoints incomplete",
+    "real proprietary source scene not available in GitHub-hosted Actions",
+    "existing source nonmanifold / connectivity findings unresolved"
+  ],
+  "cannot_promote_from_interim_coverage": true,
+  "last_material_commit": null,
+  "notes": "Do not repeat P0 geometry polishing until visible cockpit breadth sweep or specific user defect. Keep original private scene; NO OVC3, no new car."
+}
