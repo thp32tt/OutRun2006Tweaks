@@ -10,6 +10,8 @@ The R16 helper has the strict 107-other-object, camera/UV/material and 8-hole ga
 from pathlib import Path
 import bpy, bmesh, hashlib, json, math, os
 from mathutils import Vector
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 import slotA_daytona_r16_native_dashboard_steering as prior
 
 ROOT=Path("/home/chatgpt-runner/work_handoff/ferrari16_slotA_daytona_dashboard_steering_20261108")
