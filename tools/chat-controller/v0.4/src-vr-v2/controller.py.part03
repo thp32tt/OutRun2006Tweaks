@@ -2858,20 +2858,20 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
     return True
 
 
-async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime) -> bool:
+async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime, slot_name: str = "A") -> bool:
     """OutRun A: sequential Ferrari geometry-only modeling, never DX11/Model2.
 
     Uses an independent 60m chat lifetime; repo JSON queue selects active car.
     """
-    if not CAR_MODEL_AUTODEV_ENABLED or (CONVERSION_ONLY_SLOT and CONVERSION_ONLY_SLOT != "A"):
+    if not (CAR_MODEL_AUTODEV_ENABLED if slot_name == "A" else CAR_MODEL_C_AUTODEV_ENABLED) or (CONVERSION_ONLY_SLOT and CONVERSION_ONLY_SLOT != slot_name):
         return False
     if not CAR_MODEL_SCOPE_READY or not AUTO_SEND:
         write_runtime(status="car_model_project_url_required",
-                      last_action="Ferrari geometry A disabled until the OutRun project URL is configured")
+                      last_action=f"Ferrari cockpit {slot_name} disabled until the OutRun project URL is configured")
         return False
 
-    state = q.setdefault("car_model_simple", {})
-    if now.minute in CAR_MODEL_SCHEDULE_MINUTES:
+    state = q.setdefault("car_model_simple_" + slot_name, {})
+    if now.minute in (CAR_MODEL_SCHEDULE_MINUTES if slot_name == "A" else CAR_MODEL_C_SCHEDULE_MINUTES):
         window = now.replace(second=0, microsecond=0).isoformat()
         if state.get("last_sent_window") != window:
             state["pending_window"] = window
@@ -2906,13 +2906,13 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         return False
 
     reg = load_registry(now)
-    slot = next((x for x in reg.slots if x.name == "A"), None)
+    slot = next((x for x in reg.slots if x.name == slot_name), None)
     if slot is None:
-        write_runtime(status="car_model_slot_missing", last_action="A slot missing")
+        write_runtime(status="car_model_slot_missing", last_action=f"{slot_name} slot missing")
         return False
     guard = send_guard_reason(reg, slot, now)
     if guard:
-        write_runtime(status="car_model_send_guard", last_action=f"A send delayed: {guard}")
+        write_runtime(status="car_model_send_guard", last_action=f"{slot_name} send delayed: {guard}")
         return False
 
     if hard_due:
@@ -2920,7 +2920,7 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         # the old owner's URL and abandon that renderer without waiting.
         # Keep a pending rotation latch on send failure, not a new tab per tick.
         if not state.get("hard_rotation_pending"):
-            old_url = slot.url or getattr(pages.get("A"), "url", None)
+            old_url = slot.url or getattr(pages.get(slot_name), "url", None)
             history = list(state.get("previous_chat_urls") or [])
             if old_url and old_url not in history:
                 history.append(old_url)
@@ -2964,21 +2964,21 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
             save_registry(reg)
 
     if not hard_due and await detect_busy(page):
-        write_runtime(status="car_model_busy", last_action="A still generating, do not interrupt until 60m")
+        write_runtime(status="car_model_busy", last_action=f"{slot_name} still generating, do not interrupt until 60m")
         return False
     if not await ensure_logged_in(page):
-        write_runtime(status="car_model_login_required", last_action="A login required")
+        write_runtime(status="car_model_login_required", last_action=f"{slot_name} login required")
         return False
     if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1300) is None:
         page = await recover_slot_composer(context, pages, slot, page)
         if await first_visible(page, INPUT_SELECTORS, total_wait_ms=2500) is None:
-            write_runtime(status="car_model_composer_missing", last_action="A composer unavailable")
+            write_runtime(status="car_model_composer_missing", last_action=f"{slot_name} composer unavailable")
             return False
 
     # This mandatory guard is checked immediately before calling send_message.
-    if not is_slot_project_url(page.url, "A"):
+    if not is_slot_project_url(page.url, slot_name):
         write_runtime(status="car_model_wrong_project_blocked",
-                      last_action="A page is not in the dedicated OutRun Ferrari modeling project")
+                      last_action=f"{slot_name} page is not in the dedicated OutRun Ferrari modeling project")
         return False
     if await detect_rate_limit(page) or await detect_limit(page):
         mark_rate_limit(reg, datetime.now(TZ), "car-model-vr-c")
@@ -3008,29 +3008,31 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
     # Never select a car from stale chat state or a fixed Daytona-only prompt.
     # Enforce 24h + verified geometry/photo gates using the repository guard script.
     prompt = (
-        f"OutRun Ferrari 16종 실차 사진 기준 3D 형상 리워크 전용 작업. "
-        f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH} 최신 HEAD의 "
+        f"Ferrari 운전석 3D 형상 리워크 슬롯 {slot_name} 전용. "
+        f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH} 최신 HEAD, "
         "docs/automation/FERRARI16_GEOMETRY_REWORK_MASTER_PLAN.md 및 "
-        "docs/automation/FERRARI16_GEOMETRY_QUEUE.json을 먼저 읽어. "
-        "오직 ACTIVE 차량 한 대만 실제 Blender 형상 스크립트로 개선하라. "
-        "재질/텍스처/PBR/노멀맵 제작은 나중에 하므로 금지. "
-        "블렌더 4.5.15 GitHub Actions 가상머신은 "
-        ".github/workflows/ferrari-geometry-blender.yml을 사용하되 "
-        "source .blend가 없으면 실제 차량 렌더 완료를 주장하지 마. "
-        "각 차량 24시간 전담 작업, 시작 커밋 시간과 기하 변경 SHA를 기록하고 "
-        "24시간 경과 + 사진·Blender 원본 대비 검증 PASS 전에는 다음 차로 이동 금지. "
-        "모델2/DX11/DX9Ex/DXVK/웹포팅/원본게임 및 VR 런타임 브랜치는 수정하지 마. "
-        "완료 작업 재검증·중복 점수 가산 금지. "
-        "하나의 세션에서 계획 반복보다 실제 모델 형상 개선을 우선해."
-        if hard_due or bootstrap else
-        "Ferrari 16종 geometry-only 리워크 계속. GitHub 최신 Ferrari16 큐의 ACTIVE 차종만 "
-        "실제 형상 수정하고 Blender 검증/체크포인트를 기록해. "
-        "텍스처 작업·Model2·기존 완료 작업 재검증 금지. "
-        "24시간 및 PASS 조건 충족 전 다음 차량으로 넘어가지 마."
+        "docs/automation/FERRARI16_GEOMETRY_QUEUE.json을 즉시 읽어. "
+        f"오직 active_by_slot[{slot_name!r}] 소유 차량만 24시간 전담 개발. "
+        "0순위는 대시보드와 핸들: 실차 사진에 최대한 가까운 계기판, 대시 형상, "
+        "스티어링 림·스포크·허브·컬럼을 실제 Blender 형상으로 구현해. "
+        "운전석에서 보이는 센터콘솔, 도어 안쪽, A필러, 계기판 외에는 건드리지 마. "
+        "외부 차체/바퀴/타이어·텍스처/노멀/PBR 작업 금지. "
+        "N100 기존 개인 사진 라이브러리 "
+        "/home/chatgpt-runner/outrun2_vr_refs/20261104_16car_cockpit/"
+        "MANIFEST.json 및 COVERAGE_MATRIX_16x8.csv의 해당 차종 자료를 확인. "
+        "Dino 246은 이미 완료되어 재작업 금지. "
+        "GitHub Actions Blender 4.5.15에서 해당 차량 원본 모델/독립 렌더를 실제 검증하되 "
+        "원본 비공개 .blend 미전달 시 완료를 주장하지 마. "
+        "기존 Model2/VR 브랜치 변경 금지, 반복 CI·롤오버 점수 중복 금지. "
+        "새 세션이면 실제 소스 형상을 수정하고 진행 상태/변경 SHA를 기록해."
+        if bootstrap or hard_due else
+        f"Ferrari 운전석 리워크 슬롯 {slot_name} 계속. GitHub Ferrari16 큐 내 차종만 "
+        "기존 사진과 비교해 대시보드/핸들 실제 기하를 먼저 개선하고 커밋해. "
+        "24h/QA 통과 전 차량 변경 금지, 외부 차체·바퀴·텍스처·Model2·Dino 제외."
     )
-    sent = await send_message(page, prompt, slot_name="A")
+    sent = await send_message(page, prompt, slot_name=slot_name)
     if sent != "sent":
-        write_runtime(status="car_model_send_retry", last_action=f"A send deferred: {sent}")
+        write_runtime(status="car_model_send_retry", last_action=f"{slot_name} send deferred: {sent}")
         return False
 
     sent_at = datetime.now(TZ)
@@ -3038,7 +3040,7 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         new_url = await wait_for_chat_url(page, timeout_sec=8, slot_name="A")
         if new_url:
             slot.url = new_url
-    note_successful_request(reg, sent_at, "A")
+    note_successful_request(reg, sent_at, slot_name)
     slot.runs += 1
     slot.last_sent_at = sent_at.isoformat()
     slot.last_result = "car_model_60m_new_chat_sent" if hard_due else "car_model_bootstrap_sent" if bootstrap else "car_model_continue_sent"
@@ -3064,7 +3066,7 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
     state["last_send_reason"] = "60m_hard_new_chat" if hard_due else "bootstrap" if bootstrap else ("response_complete" if response_ready else "schedule_fallback")
     state["continuations_sent"] = int(state.get("continuations_sent") or 0) + 1
     save_queue_state(q)
-    write_runtime(status="car_model_running", last_action=f"Daytona365 A: {state['last_send_reason']} sent in its own project",
+    write_runtime(status="car_model_running", last_action=f"Ferrari cockpit {slot_name}: {state['last_send_reason']} sent in OutRun project",
                   car_model_simple=state, queue=q)
     return True
 
@@ -4223,6 +4225,39 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             save_registry(reg)
         save_queue_state(q)
 
+    # Preserve prior A car session state as its own slot after dual-slot migration.
+    if CAR_MODEL_AUTODEV_ENABLED and "car_model_simple_A" not in q and "car_model_simple" in q:
+        q["car_model_simple_A"] = dict(q.get("car_model_simple") or {})
+        save_queue_state(q)
+
+    # C changes from disabled Model2 to a separate cockpit owner in the OutRun project.
+    # Keep old Model2 state and URLs; never reuse the foreign-project ChatGPT tab.
+    if CAR_MODEL_C_AUTODEV_ENABLED and not q.get("car_model_simple_C_initialized"):
+        old_c = active_by_lane.pop("C", None)
+        if isinstance(old_c, dict):
+            q.setdefault("frozen_lane_tasks", []).append({
+                **old_c, "frozen_lane": "C", "frozen_at": now.isoformat(),
+                "frozen_reason": "C reassigned to Ferrari cockpit geometry",
+            })
+        state_c = q.setdefault("car_model_simple_C", {})
+        state_c.clear()
+        state_c["fresh_chat_required"] = True
+        state_c["bootstrap_complete"] = False
+        q["car_model_simple_C_initialized"] = True
+        reg = load_registry(now)
+        c_slot = next((item for item in reg.slots if item.name == "C"), None)
+        if c_slot is not None:
+            if c_slot.url:
+                prior_urls = q.setdefault("retired_model2_chat_urls", [])
+                if c_slot.url not in prior_urls:
+                    prior_urls.append(c_slot.url)
+                q["retired_model2_chat_urls"] = prior_urls[-30:]
+            c_slot.url = None
+            c_slot.last_result = "ferrari_cockpit_C_ready"
+            c_slot.completed_tasks_in_chat = 0
+            save_registry(reg)
+        save_queue_state(q)
+
     # Convert the previously disabled DX11 A tab to Daytona modeling on first
     # deployment, without reviving or overwriting a legacy DX11 TASK_ID.
     if CAR_MODEL_AUTODEV_ENABLED and not q.get("car_model_simple_initialized"):
@@ -4273,13 +4308,15 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             write_runtime(status="model2_simple_cycle_error",
                           last_action=f"Model2 C deferred: {type(exc).__name__}")
 
-    if CAR_MODEL_AUTODEV_ENABLED:
+    for car_slot, enabled in (("A", CAR_MODEL_AUTODEV_ENABLED), ("C", CAR_MODEL_C_AUTODEV_ENABLED)):
+        if not enabled:
+            continue
         try:
-            await car_model_simple_cycle(context, pages, q, datetime.now(TZ))
+            await car_model_simple_cycle(context, pages, q, datetime.now(TZ), slot_name=car_slot)
         except Exception as exc:
-            log.warning("Ferrari geometry A continuation deferred: %s", type(exc).__name__)
+            log.warning("Ferrari cockpit %s deferred: %s", car_slot, type(exc).__name__)
             write_runtime(status="car_model_simple_cycle_error",
-                          last_action=f"Ferrari geometry A deferred: {type(exc).__name__}")
+                          last_action=f"Ferrari cockpit {car_slot} deferred: {type(exc).__name__}")
 
     if UW2_WEB_PORT_ENABLED:
         # C has no TASK_ID and never enters the conversion production queue.
