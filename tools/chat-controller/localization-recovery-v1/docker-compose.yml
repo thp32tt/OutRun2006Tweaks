@@ -47,10 +47,12 @@ services:
     restart: unless-stopped
     init: true
     # Visible VNC Chromium needs headroom for ChatGPT rendering and image upload.
-    cpus: 1.50
-    mem_limit: 3072m
-    pids_limit: 512
-    shm_size: 1g
+    # A single visible Chromium/CDP context only. Override these in Portainer
+    # if the host has less free RAM; avoid a second Chrome profile/container.
+    cpus: 1.00
+    mem_limit: ${OUTRUN_REWORK_MEM_LIMIT:-2048m}
+    pids_limit: 384
+    shm_size: ${OUTRUN_REWORK_SHM_SIZE:-512m}
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -60,7 +62,11 @@ services:
       OUTRUN_REWORK_HOME: /data/hd-rework
       OUTRUN_REWORK_BROWSER_PROFILE_DIR: /browser-profile
       OUTRUN_REWORK_POLL_SECONDS: "${OUTRUN_REWORK_POLL_SECONDS:-600}"
-      OUTRUN_REWORK_REUSE_ONLY: "1"
+      # Reuse-only QA queue remains immutable. Connect the independent,
+      # SHA-proved ImageGen fallback queue (8 staged, 7 previously AB_SENT).
+      # New generation is permitted only if there is no previous send receipt.
+      OUTRUN_REWORK_QUEUE_NAME: hd_imagegen_fallback
+      OUTRUN_REWORK_REUSE_ONLY: "0"
       OUTRUN_GITHUB_CONTENTS_TOKEN: "${OUTRUN_GITHUB_CONTENTS_TOKEN:-}"
       OUTRUN_REWORK_VNC_PASSWORD: "${OUTRUN_REWORK_VNC_PASSWORD:-}"
       CHATGPT_PROJECT_URL: "${CHATGPT_PROJECT_URL:-https://chatgpt.com/}"
