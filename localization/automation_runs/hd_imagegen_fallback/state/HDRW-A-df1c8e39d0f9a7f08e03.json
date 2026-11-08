@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af0bda0-71fc-83e8-abe6-e5030d3163f0",
   "old_candidate_sha256": "841c8794bfdcab6a8b6d65a8d4e8e9a34193374f519f47944689b861a2eb87f0",
   "release_approved": false,
   "roi_id": "Q046_10ba6632e1f31585",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Palm Beach",
     "korean": "팜 비치",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-df1c8e39d0f9a7f08e03"
   },
   "task_id": "HDRW-A-df1c8e39d0f9a7f08e03",
-  "updated_utc": "2026-11-08T18:21:15+00:00"
+  "updated_utc": "2026-11-08T18:21:30+00:00"
 }
