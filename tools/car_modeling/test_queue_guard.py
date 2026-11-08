@@ -21,7 +21,22 @@ def ready(now, slot="A"):
         source_scene_sha256="a" * 64,
         output_scene_sha256="b" * 64,
     )
+    car["source_provenance"].update(
+        original_game_resource_file="private/original_game_obj_plcar.pmt",
+        original_game_resource_sha256="c" * 64,
+        original_import_blend_sha256="d" * 64,
+        original_mesh_object_ids=["ORIGINAL_GAUGE_BEZEL", "ORIGINAL_STEERING_RIM"],
+        verification="PASS",
+    )
     ev = dict(
+        source_provenance_verified=True,
+        edited_original_mesh_object_ids=["ORIGINAL_GAUGE_BEZEL", "ORIGINAL_STEERING_RIM"],
+        from_scratch_mesh_generation=False,
+        replacement_car_model=False,
+        ovc3_created=False,
+        ovc_exported=False,
+        game_integration_performed=False,
+        deliverable_format="blend",
         car_id=car["id"], slot=slot, material_commit_count=2,
         verified_blender_run_id="123456", blender_mode="audit",
         independent_reopen_verified=True,
@@ -85,6 +100,40 @@ class TwoLaneCockpitTests(unittest.TestCase):
         self.assertEqual(advance(q, ev_c, now, slot="C"), "f355spider")
         self.assertEqual(validate(q)["C"]["id"], "f355spider")
         self.assertEqual(q["cars"][1]["status"], "SKIPPED_DONE_BY_USER")
+
+    def test_missing_original_resource_blocks_new_car_completion(self):
+        now = dt.datetime(2026, 11, 10, tzinfo=UTC)
+        q, ev = ready(now, "C")
+        c = validate(q)["C"]
+        c["source_provenance"]["original_game_resource_file"] = None
+        with self.assertRaisesRegex(ValueError, "BLOCKED_INPUT"):
+            advance(q, ev, now, "C")
+
+    def test_procedural_replacement_or_ovc3_is_never_accepted(self):
+        now = dt.datetime(2026, 11, 10, tzinfo=UTC)
+        q, ev = ready(now)
+        ev["from_scratch_mesh_generation"] = True
+        with self.assertRaisesRegex(ValueError, "from-scratch"):
+            advance(q, ev, now)
+        ev["from_scratch_mesh_generation"] = False
+        ev["ovc3_created"] = True
+        with self.assertRaisesRegex(ValueError, "OVC3"):
+            advance(q, ev, now)
+        ev["ovc3_created"] = False
+        ev["deliverable_format"] = "ovc3"
+        with self.assertRaisesRegex(ValueError, "editable"):
+            advance(q, ev, now)
+
+    def test_edit_must_actually_touch_imported_original_mesh(self):
+        now = dt.datetime(2026, 11, 10, tzinfo=UTC)
+        q, ev = ready(now)
+        ev["edited_original_mesh_object_ids"] = ["brand_new_fake_dashboard"]
+        with self.assertRaisesRegex(ValueError, "originally imported"):
+            advance(q, ev, now)
+        ev["edited_original_mesh_object_ids"] = ["ORIGINAL_GAUGE_BEZEL"]
+        ev["source_provenance_verified"] = False
+        with self.assertRaisesRegex(ValueError, "independently verified"):
+            advance(q, ev, now)
 
     def test_no_double_assignment_and_no_implicit_skip(self):
         q = copy.deepcopy(SEED)
