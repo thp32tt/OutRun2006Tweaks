@@ -1,4 +1,13 @@
 # OutRun 2006 HD 한글화 — 기존 Docker ChatGPT 첨부로 HOLD 재생성/QA 수렴 계획
+
+## 2026-11-08 최신 구현 확인 — 우선 적용 (아래 초안의 중복 큐 구축 계획을 대체)
+- `korean-localization-recovery-20260928`의 `tools/localization/hd_imagegen_fallback_queue.py`와 `master`의 `.github/workflows/outrun-hd-imagegen-fallback.yml`이 **이미 구현됨**. 독립 GitHub Actions는 3시간마다 새 imagegen fallback 작업의 검증된 원본 참조를 최대 8개 준비한다. 동일 큐/원본 증빙 생성기를 새로 작성하지 말 것.
+- 실제 독립 작업 큐 `korean-localization-qa-queue-20261104:localization/automation_runs/hd_imagegen_fallback/latest.json` (blob `b49a267e868daf46a6168120337c99fec64cfed1`)는 `source_reference_count_verified=8`, `new_imagegen_disabled=false`, `tasks=8`, `release_approved=false`, `runtime_validation=UNTESTED`. 대상 영문은 `Sector1`, `Sector2`, `Diff`, `Result`, `PERFECT!`, `CONGRATULATIONS!`, `Shift up!!`, `Ancient Ruins`. 모두 실제 한글 PNG 미생성 대기열이지 작업 완료가 아니다.
+- 주 병목은 **연결**: 기존 Docker의 `github_chat_rework_controller.py`가 `QROOT=localization/automation_runs/hd_rework_queue`를 하드코딩하고, Compose도 `OUTRUN_REWORK_REUSE_ONLY=1`로 송신하지 않는다. 별도 `hd_imagegen_fallback`의 입력 refs/작업상태를 안전하게 읽을 수 있도록 검증된 `OUTRUN_REWORK_QUEUE_PREFIX` 또는 별도 fallback worker 모드를 추가한다. 허용 경로는 정해진 두 prefix만; 원본 `hd_rework_queue`의 재사용 우선 설정과 상태 기록은 그대로 보존한다. 브라우저 로그인 프로필은 한 인스턴스만 사용한다.
+- 첫 구현 PR은 **큐 재작성**이 아니라 fallback 큐 소비자 경로 선택·유일 TASK_ID lease·리트라이 게이트·원격 SHA 재확인·`REUSE_ONLY=0` 조건부 활성화다. 최초 1건 smoke 전까지 기본 OFF. 기존 8개 참조를 재사용하고 같은 SHA/태스크 중복 생성 금지.
+- 두 번째 PR은 출력 PNG 650KiB 제한 안전 처리, C1 독립 QA/원격 PNG 증빙, 세 번째 PR은 GitHub-hosted 정적 HD DDS/CLEAN QA다. 594 엔진/좌표 HOLD 및 17 증빙 HOLD는 ImageGen 대상이 아니다.
+- 기존 2026-11-05 reuse-only 큐의 `tasks=[]`, `source_reference_count_verified=0`는 **원본 reuse-only 큐에 한정된 상태**다. fallback 독립 큐의 검증 8개와 혼동하지 않는다.
+
 기준일: 2026-11-08 KST
 범위: UI 한글 이미지 / 검증된 원본 HD DDS. VR/FFB/DX11/DXVK 제외.
 상태: 실행 설계안. 이 파일의 GitHub 등록은 Portainer 배포 또는 ImageGen 실행 증거가 아님.
@@ -22,7 +31,7 @@
 ## 3. 구현 단계 (GitHub에서 코드·CI, N100은 가벼운 VNC/전송만)
 1. **인벤토리+재분류**: QA 최신 상태/원본/후보/좌표/번역을 SHA로 조인하는 GitHub Actions 스크립트. `REUSE_PASS | CLEAN_FIX | REGEN_REQUIRED | COORDINATE_FIX | EVIDENCE_BLOCKED`로 분류. 재검증한 결과만 큐에 반영; 654건을 모두 재생성하지 않는다.
 2. **자동 복구 우선**: `REUSE_PASS` 및 `CLEAN_FIX`에는 기존 A/B PNG를 검증된 HD 원문 bbox 안에 종횡비 유지로 조절한다. 필요 시 알파 가장자리와 불필요 픽셀 제거, 영문 제거 마스크와 CLEAN 플레이트 별도 생성, 테스트 오버레이. 기존 후보 원본은 불변.
-3. **재생성용 source reference 구축**: `REGEN_REQUIRED`에 한해 미분할 HD 원본에서 원문/효과 전체와 줄 관계가 확인된 ROI PNG(참조용)를 생성. 원본 DDS SHA·전체 HD PNG SHA·ROI XYXY·원문/번역·crop SHA·source PNG 파일을 증빙으로 묶는다. 대상별 GitHub refs 바이너리와 manifest를 업로드하여 다운로드 재조회 SHA가 통과할 때만 전송 가능한 `tasks` 작성. 현 큐의 `tasks=[]`/참조 0 상황을 해결하는 선행 조건.
+3. **재생성용 source reference 검증·증분 보충**: `REGEN_REQUIRED`에 한해 미분할 HD 원본에서 원문/효과 전체와 줄 관계가 확인된 ROI PNG(참조용)를 생성. 원본 DDS SHA·전체 HD PNG SHA·ROI XYXY·원문/번역·crop SHA·source PNG 파일을 증빙으로 묶는다. 대상별 GitHub refs 바이너리와 manifest를 업로드하여 다운로드 재조회 SHA가 통과할 때만 전송 가능한 `tasks` 작성. 독립 fallback 큐에는 이미 검증된 8건이 있으므로 이를 소비하고 추가 대상만 GitHub Actions로 증분 보충한다. 원래 reuse-only 큐의 `tasks=[]`/참조 0은 별도 상태다.
 4. **안전한 Docker 토글**: 현 `OUTRUN_REWORK_REUSE_ONLY=1` 기본 유지. 이미지 첨부 단건 smoke를 통과하고 미송신 REGEN_REQUIRED 태스크가 실제로 준비된 경우에만 선택적으로 `OUTRUN_REWORK_REUSE_ONLY=0`을 설정할 수 있게 한다. GitHub 작업 큐가 0이거나 SHA가 틀리거나 로그인/도구 선택 증거가 없으면 fail-closed. 수동 Portainer Pull+Rebuild+Redeploy 전에는 실제 설정 변경이 적용되지 않음.
 5. **A/B 자동 첨부·생성**: 기존 `set_input_files` 실 첨부, 프리뷰 수량 증가 확인, ImageGen 도구 선택 확인, 제출 `UPLOAD_TASK_ID`가 포함된 사용자 영속 메시지 + 원본 썸네일 확인. 최초 1건 smoke. 성공 시 회차당 최대 2건(현재 코드 속도 제한), 작업별 독립 대화/이미지 하나. 같은 SHA 무한 재시도 금지; 실패 원인별 최대 2회 검토 뒤 HOLD 및 사람이 확인.
 6. **이미지 회수/증빙**: 응답에 실제 이미지 1개가 있고 작업 식별/일치가 증명될 때만 PNG 저장. `candidate_sha256`, 투명도, 경계 침범, 픽셀 크기, 원본 SHA를 기록. 현재 GitHub Contents 경로에는 PNG당 650KiB 코드 제한이 있으므로 전송 전에 무손실 PNG 최적화와 대용량 저장 경로를 시험·마련해야 한다. 사이즈 초과를 성공 처리하지 않는다.
@@ -39,7 +48,7 @@
 - 작업 종결 조건: 재생성 대상/좌표·엔진/증빙 보류를 별도 집계하고, 원인 해결 후 GitHub QA·C3·사용자 실게임 판정까지 추적. 자동 수렴만으로 실게임 PASS 선언 금지.
 
 ## 5. 코드 수정 순서
-- PR-A: SHA 기반 QA 분류기 + existing PNG salvage + 검증된 HD ROI reference builder.
+- PR-A: 기존 fallback 8건을 Docker가 별도 namespace로 안전하게 읽도록 queue prefix 분리 + SHA/중복송신 가드. 이미 있는 HD ROI reference builder/스케줄러를 중복 구현하지 않는다.
 - PR-B: `github_chat_rework_controller.py`의 선택적 REGEN_REQUIRED 전송, 추가 감시/재시도 게이트; Compose 환경 토글, 메모리 사용 로그.
 - PR-C: 이미지 결과 저장 상한 안전 처리 + C1 결과 검증 + 원격 SHA readback.
 - PR-D: GitHub Actions 정적 DDS/CLEAN/보호 픽셀 QA 및 통합 1건 실증.
