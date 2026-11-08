@@ -1,10 +1,10 @@
 {
-  "schema_version": 1,
-  "policy": "geometry_only_no_texture",
-  "owner": "AI2_CAR_MODELING_A",
+  "schema_version": 2,
+  "policy": "cockpit_visible_geometry_only_no_texture",
+  "owner": "AI2_CAR_MODELING_A_AND_C",
   "repository": "thp32tt/OutRun2006Tweaks",
   "branch": "feature/ferrari16-geometry-rework-20261108",
-  "active_car_id": "daytona365",
+  "active_car_id": null,
   "budget": {
     "per_car_wall_clock_hours": 24,
     "planned_checkpoints_hours": [
@@ -16,11 +16,43 @@
       24
     ],
     "minimum_qa_gate": true,
-    "auto_advance_without_pass": false
+    "auto_advance_without_pass": false,
+    "priority_schedule_hours": {
+      "0-4": "reference and driver-eye camera plus baseline checkpoint",
+      "4-12": "dashboard / instrument cowl / gauges geometry",
+      "12-19": "steering rim, spokes, hub and column geometry",
+      "19-22": "center console, gear selector, door top, A-pillar and mirrors visible from driver",
+      "22-24": "Blender save-reopen, cockpit-aligned 7-view comparisons, QA"
+    },
+    "exclude": [
+      "car exterior body panels",
+      "exterior wheels",
+      "tires",
+      "suspension",
+      "external aerodynamic accessories",
+      "textures",
+      "PBR",
+      "ORM",
+      "DDS",
+      "normal maps"
+    ],
+    "required_views": [
+      "driver_eye",
+      "dashboard",
+      "steering_wheel",
+      "instrument_cluster",
+      "center_console",
+      "door_trim",
+      "windshield_frame"
+    ]
   },
   "source_artifacts": {
     "public_repo": "scripts, test, photo-reference URLs and no licensed originals",
-    "private_scene": "required for source-relative geometry/Blender save/reopen; location must be verified before use"
+    "private_scene": "required for source-relative geometry/Blender save/reopen; location must be verified before use",
+    "private_photo_root": "/home/chatgpt-runner/outrun2_vr_refs/20261104_16car_cockpit",
+    "private_photo_manifest": "MANIFEST.json",
+    "photo_coverage_matrix": "COVERAGE_MATRIX_16x8.csv",
+    "provenance_rule": "N100 photos as private measured reference only: verify exact variant, LHD/RHD, source rights; don't publish photos publicly."
   },
   "cars": [
     {
@@ -34,33 +66,63 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "v8.22-r2 cockpit geometry handoff; exterior baseline needs inventory"
+      "notes": "Existing genuine Daytona cockpit v8.22-r2 is immutable baseline; only NEW dashboard/steering driver-eye visible geometry; v8 texturing history out of scope.",
+      "private_photo_subdir": "02_365_GTS4_Daytona",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": "A"
     },
     {
       "order": 2,
       "id": "dino246gts",
       "name": "Dino 246 GTS",
-      "status": "PENDING",
+      "status": "SKIPPED_DONE_BY_USER",
       "started_at_utc": null,
       "completed_at_utc": null,
       "geometry_gate": "UNTESTED",
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "User confirms Dino already worked; excluded from new automation with +0 rework/score. Historical provenance retained; no new PASS claimed.",
+      "private_photo_subdir": "01_Dino_246_GTS",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 3,
       "id": "f50",
       "name": "Ferrari F50",
-      "status": "PENDING",
+      "status": "ACTIVE",
       "started_at_utc": null,
       "completed_at_utc": null,
       "geometry_gate": "UNTESTED",
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Next unfinished vehicle after user-excluded Dino. Photo set 03_F50, verify driver-view, LHD and authentic trim before edits.",
+      "private_photo_subdir": "03_F50",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": "C"
     },
     {
       "order": 4,
@@ -73,7 +135,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "04_360_Spider",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 5,
@@ -86,7 +158,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "05_F355_Spider",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 6,
@@ -99,7 +181,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "06_575M_Superamerica",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 7,
@@ -112,7 +204,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Verify game-specific convertible reference"
+      "notes": "Verify game-specific convertible reference",
+      "private_photo_subdir": "07_Testarossa_Spider",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 8,
@@ -125,7 +227,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "08_288_GTO",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 9,
@@ -138,7 +250,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "09_328_GTS",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 10,
@@ -151,7 +273,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "10_250_GTO",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 11,
@@ -164,7 +296,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "11_512_BB",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 12,
@@ -177,7 +319,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "12_F40",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 13,
@@ -190,7 +342,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "13_550_Barchetta",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 14,
@@ -203,7 +365,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Confirm distinct F430 body in source assets"
+      "notes": "Confirm distinct F430 body in source assets",
+      "private_photo_subdir": "14_F430",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 15,
@@ -216,7 +388,17 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Confirm distinct body/cockpit assets; if shared reuse common topology but still separate variant acceptance"
+      "notes": "Confirm distinct body/cockpit assets; if shared reuse common topology but still separate variant acceptance",
+      "private_photo_subdir": "15_F430_Spider",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     },
     {
       "order": 16,
@@ -229,7 +411,39 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Original asset baseline to identify"
+      "notes": "Original asset baseline to identify",
+      "private_photo_subdir": "16_Enzo",
+      "priority": [
+        "dashboard",
+        "steering_wheel",
+        "gauges_cluster",
+        "driver_eye_visible_secondary"
+      ],
+      "exterior_geometry_in_scope": false,
+      "photo_view_qa": "UNTESTED",
+      "slot": null
     }
-  ]
+  ],
+  "active_by_slot": {
+    "A": "daytona365",
+    "C": "f50"
+  },
+  "slots": {
+    "A": {
+      "schedule_minutes": [
+        0,
+        30
+      ],
+      "project": "OutRun2006",
+      "role": "driver-visible cockpit; dashboard and steering 0-priority"
+    },
+    "C": {
+      "schedule_minutes": [
+        15,
+        45
+      ],
+      "project": "OutRun2006",
+      "role": "driver-visible cockpit; dashboard and steering 0-priority"
+    }
+  }
 }
