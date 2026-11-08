@@ -241,10 +241,13 @@ if __name__ == "__main__":
     ap.add_argument("--qa-report",required=True)
     ap.add_argument("--out",required=True)
     ap.add_argument("--skip-state-root",default=None)
-    ap.add_argument("--reuse-only",action="store_true",default=True,
-                    help="Existing A/B PNG adjustment only; no new ImageGen tickets")
+    group = ap.add_mutually_exclusive_group()
+    group.add_argument("--reuse-only", action="store_true", default=True,
+                       help="Default: existing PNGs only; no ImageGen tasks")
+    group.add_argument("--allow-imagegen-fallback", action="store_true",
+                       help="Explicit staging of SHA-bound ImageGen tasks, not image generation")
     args=ap.parse_args()
     print(json.dumps({k:v for k,v in build_queue(
         args.repo_root,json.loads(Path(args.qa_report).read_text(encoding="utf-8")),
-        args.out,args.skip_state_root,reuse_only=args.reuse_only).items() if k in ("hold_count","hold_categories","ab_eligible_counts","reference_blockers")},
+        args.out,args.skip_state_root,reuse_only=not args.allow_imagegen_fallback).items() if k in ("hold_count","hold_categories","ab_eligible_counts","reference_blockers")},
         ensure_ascii=False))
