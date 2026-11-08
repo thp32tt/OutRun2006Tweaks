@@ -106,5 +106,109 @@ class BrowserBootstrapBeforeGithubTests(unittest.IsolatedAsyncioTestCase):
    await bridge.bootstrap_login_page()
   browser.close.assert_awaited_once()
 
+
+# Fallback task identity, recovered ChatGPT conversation links, and safe PNG
+# normalization are independent of the browser/network.
+import copy
+
+
+class FakeFallbackGithub:
+ def __init__(self, records=None):
+  self.records=copy.deepcopy(records or {})
+  self.writes=[]
+ def read_json(self,path,branch):
+  assert branch==c.QUEUE_BRANCH
+  value=copy.deepcopy(self.records.get(path))
+  return value, ("synthetic-sha" if value is not None else None)
+ def write_json(self,path,branch,data,expected=None,overwrite=False):
+  assert branch==c.QUEUE_BRANCH
+  if path in self.records:
+   assert expected=="synthetic-sha"
+  self.records[path]=copy.deepcopy(data)
+  self.writes.append((path,data["status"]))
+  return "synthetic-commit"
+
+
+class FallbackQueueResumeAndPixelTests(unittest.TestCase):
+ def setUp(self):
+  self.temp=tempfile.TemporaryDirectory()
+  self.old_root=c.ROOT
+  c.ROOT=Path(self.temp.name)
+  self.task={
+   "task_id":"HDRW-A-"+("7"*20),"role":"A","roi_id":"Q044_65bad63fe0353b2b",
+   "source_dds_sha256":"a"*64,"old_candidate_sha256":"b"*64,
+   "reference":{"name":"HDRW-A-"+("7"*20)+"_HD_SOURCE.png","sha256":"c"*64},
+  }
+  self.url="https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6aebd722-0f74-83e8-8126-f723dca3a685"
+  self.old_path=c.LEGACY_QROOT+"/state/"+self.task["task_id"]+".json"
+  self.new_path=c.task_state_path(self.task["task_id"])
+ def tearDown(self):
+  c.ROOT=self.old_root
+  self.temp.cleanup()
+ def state(self,**overrides):
+  result={"schema":"outrun-hd-qa-chat-status-v1",
+          "task":copy.deepcopy(self.task),"task_id":self.task["task_id"],
+          "role":"A","release_approved":False,"status":"AB_SENT",
+          "ab_chat_url":self.url}
+  result.update(overrides)
+  return result
+ def test_actual_project_chat_link_allowed(self):
+  self.assertTrue(c.is_saved_chat_url(self.url))
+  self.assertTrue(c.is_saved_chat_url("https://chatgpt.com/c/6aebd722-0f74-83e8-8126-f723dca3a685"))
+ def test_chat_links_reject_cross_origin_and_query(self):
+  for s in ["http://chatgpt.com/"+self.url.split("chatgpt.com/")[1],
+            self.url+"?token=abc","https://bad.example/c/6aebd722-0f74-83e8-8126-f723dca3a685","https://chatgpt.com/"]:
+   self.assertFalse(c.is_saved_chat_url(s))
+ def test_original_ab_sent_is_resumed_not_resent(self):
+  gh=FakeFallbackGithub({self.old_path:self.state()})
+  self.assertEqual(c.recover_previous_sent_task(gh,self.task),"RECOVERED_AB_SENT_NO_RESEND")
+  self.assertEqual(gh.records[self.new_path]["status"],"AB_SENT")
+  self.assertEqual(gh.records[self.new_path]["ab_chat_url"],self.url)
+  self.assertEqual(gh.records[self.old_path]["status"],"AB_SENT")
+  self.assertEqual(len(gh.writes),1)
+  self.assertEqual(json.loads(c.local_task_path(self.task["task_id"]).read_text())["status"],"AB_SENT")
+ def test_no_prior_task_may_proceed_as_new(self):
+  gh=FakeFallbackGithub()
+  self.assertEqual(c.recover_previous_sent_task(gh,self.task),"NEW")
+  self.assertEqual(gh.writes,[])
+ def test_conflicting_previous_reference_is_hold(self):
+  previous=self.state()
+  previous["task"]["reference"]["sha256"]="f"*64
+  gh=FakeFallbackGithub({self.old_path:previous})
+  self.assertEqual(c.recover_previous_sent_task(gh,self.task),"HOLD_LEGACY_TASK_CONFLICT")
+  self.assertEqual(gh.records[self.new_path]["status"],"HOLD")
+ def test_prior_claim_never_resent(self):
+  gh=FakeFallbackGithub({self.old_path:self.state(status="AB_CLAIMED")})
+  self.assertEqual(c.recover_previous_sent_task(gh,self.task),"HOLD_LEGACY_TASK_NO_RESEND")
+  self.assertEqual(gh.records[self.new_path]["status"],"HOLD")
+ def test_untrusted_old_chat_never_resent(self):
+  gh=FakeFallbackGithub({self.old_path:self.state(ab_chat_url="https://bad.example/")})
+  self.assertEqual(c.recover_previous_sent_task(gh,self.task),"HOLD_LEGACY_TASK_NO_RESEND")
+ def test_original_queue_write_immutable(self):
+  self.assertNotEqual(c.QROOT,c.LEGACY_QROOT)
+  gh=c.Github("unit-test-token")
+  with self.assertRaisesRegex(ValueError,"LEGACY_QUEUE_IS_READ_ONLY"):
+   gh.req(self.old_path,c.QUEUE_BRANCH,payload={"bad":True})
+ def test_cropping_preserves_every_alpha_pixel(self):
+  im=Image.new("RGBA",(1024,768),(0,0,0,0))
+  for x in range(310,330):
+   for y in range(210,224):
+    im.putpixel((x,y),(230,180,80,(x+y)%256))
+  data=io.BytesIO();im.save(data,format="PNG")
+  packed=c.compact_generated_png_lossless(data.getvalue())
+  self.assertEqual(packed[:8],b"\x89PNG\r\n\x1a\n")
+  with Image.open(io.BytesIO(packed)) as actual:
+   self.assertEqual(actual.size,(36,30))
+   self.assertEqual(actual.getpixel((8,8)),im.getpixel((310,210)))
+   self.assertEqual(actual.getpixel((27,21)),im.getpixel((329,223)))
+  self.assertEqual(c.valid_generated_image(packed),[36,30])
+ def test_alpha_touch_original_frame_still_fails(self):
+  im=Image.new("RGBA",(100,70),(0,0,0,0))
+  im.putpixel((0,10),(255,0,0,255))
+  data=io.BytesIO();im.save(data,format="PNG")
+  with self.assertRaisesRegex(ValueError,"ALPHA_TOUCHES_FRAME"):
+   c.compact_generated_png_lossless(data.getvalue())
+
+
 if __name__=="__main__":
  unittest.main()
