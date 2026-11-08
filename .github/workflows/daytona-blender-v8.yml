@@ -53,3 +53,6 @@ jobs:
 
       - name: V8.22-r2 physically manifold leather shifter boot with packed source PBR/analytical tangent normal (source-only, not Blender)
         run: python tools/test_daytona365_v8_22_r2_source_contract.py
+
+      - name: V8.23 three physical original-bounded wheel-spoke bridge tapers with stamped metal normals (source-only, not Blender render)
+        run: python tools/test_daytona365_v8_23_source_contract.py
