@@ -48,3 +48,5 @@ jobs:
         run: python tools/test_daytona365_v8_19_source_contract.py
       - name: V8.20 source-footwell formed mats, packed rubber PBR and tangent normal contract (source-only, not Blender render)
         run: python tools/test_daytona365_v8_20_source_contract.py
+      - name: V8.21-r2 original wheel hub-column physical shaft, dark source-packed gauge-under-shroud and tangent normal contract (source-only, not Blender render)
+        run: python tools/test_daytona365_v8_21_source_contract.py
