@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "policy": "cockpit_visible_geometry_only_no_texture",
+  "policy": "original_game_cockpit_mesh_rework_only",
   "owner": "AI2_CAR_MODELING_A_AND_C",
   "repository": "thp32tt/OutRun2006Tweaks",
   "branch": "feature/ferrari16-geometry-rework-20261108",
@@ -34,7 +34,13 @@
       "PBR",
       "ORM",
       "DDS",
-      "normal maps"
+      "normal maps",
+      "from-scratch car creation",
+      "concept-only or procedural replica",
+      "OVC3 conversion",
+      "OVC or PMT export",
+      "game installation or integration",
+      "game runtime validation"
     ],
     "required_views": [
       "driver_eye",
@@ -52,7 +58,25 @@
     "private_photo_root": "/home/chatgpt-runner/outrun2_vr_refs/20261104_16car_cockpit",
     "private_photo_manifest": "MANIFEST.json",
     "photo_coverage_matrix": "COVERAGE_MATRIX_16x8.csv",
-    "provenance_rule": "N100 photos as private measured reference only: verify exact variant, LHD/RHD, source rights; don't publish photos publicly."
+    "provenance_rule": "N100 photos as private measured reference only: verify exact variant, LHD/RHD, source rights; don't publish photos publicly.",
+    "asset_source_policy": "MANDATORY original OutRun 2006 car resource (native PMT or direct geometry import retaining original provenance); no from-scratch car or synthetic approximation",
+    "edit_mode": "import original geometry -> preserve source mesh and transforms -> edit mesh vertices/faces/topology in Blender -> save editable .blend",
+    "final_format": "BLEND_EDITABLE_ONLY",
+    "disallowed_deliverables": [
+      "OVC3",
+      "OVC",
+      "game conversion",
+      "game integration",
+      "export replacement",
+      "runtime patching",
+      "fresh full car mesh generation"
+    ],
+    "baseline_requirements": [
+      "verified native original resource file SHA256",
+      "original imported mesh baseline SHA256",
+      "source object identity and compatible coordinate transforms",
+      "editable checkpoint cloned from original import"
+    ]
   },
   "cars": [
     {
@@ -66,7 +90,7 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Existing genuine Daytona cockpit v8.22-r2 is immutable baseline; only NEW dashboard/steering driver-eye visible geometry; v8 texturing history out of scope.",
+      "notes": "Existing genuine Daytona cockpit v8.22-r2 is immutable baseline; only NEW dashboard/steering driver-eye visible geometry; v8 texturing history out of scope. Private v8.22-r2 editable .blend exists N100 work_handoff/daytona365_v822_ai2_20261108/blender_v8/Daytona365_Cockpit_Blender_PBR_v8_22_r2.blend (SHA256 30ddcbd0...), but independent source PMT linkage must be checked before new geometry approval; preserve old PBR materials without spending time on them.",
       "private_photo_subdir": "02_365_GTS4_Daytona",
       "priority": [
         "dashboard",
@@ -76,7 +100,21 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": "A"
+      "slot": "A",
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED",
+        "existing_editable_blend": "work_handoff/daytona365_v822_ai2_20261108/blender_v8/Daytona365_Cockpit_Blender_PBR_v8_22_r2.blend",
+        "existing_editable_blend_sha256": "30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 2,
@@ -99,7 +137,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 3,
@@ -112,7 +162,7 @@
       "reference_gate": "UNTESTED",
       "source_scene_sha256": null,
       "output_scene_sha256": null,
-      "notes": "Next unfinished vehicle after user-excluded Dino. Photo set 03_F50, verify driver-view, LHD and authentic trim before edits.",
+      "notes": "Next unfinished vehicle after user-excluded Dino. Photo set 03_F50, verify driver-view, LHD and authentic trim before edits. Original F50 native game resource/import file not verified in current N100 work_handoff; do not create surrogate mesh, mark BLOCKED_INPUT until verified original resource is obtained.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -122,7 +172,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": "C"
+      "slot": "C",
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 4,
@@ -145,7 +207,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 5,
@@ -168,7 +242,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 6,
@@ -191,7 +277,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 7,
@@ -214,7 +312,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 8,
@@ -237,7 +347,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 9,
@@ -260,7 +382,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 10,
@@ -283,7 +417,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 11,
@@ -306,7 +452,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 12,
@@ -329,7 +487,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 13,
@@ -352,7 +522,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 14,
@@ -375,7 +557,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 15,
@@ -398,7 +592,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     },
     {
       "order": 16,
@@ -421,7 +627,19 @@
       ],
       "exterior_geometry_in_scope": false,
       "photo_view_qa": "UNTESTED",
-      "slot": null
+      "slot": null,
+      "source_provenance": {
+        "required": true,
+        "original_game_resource_file": null,
+        "original_game_resource_sha256": null,
+        "original_import_blend_sha256": null,
+        "original_mesh_object_ids": [],
+        "verification": "UNTESTED"
+      },
+      "edit_from_original_required": true,
+      "output_format": "blend",
+      "ovc3_conversion_required": false,
+      "game_integration_required": false
     }
   ],
   "active_by_slot": {
