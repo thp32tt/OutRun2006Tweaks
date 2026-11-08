@@ -38,3 +38,6 @@ jobs:
         run: python tools/test_daytona365_v8_15_source_contract.py
       - name: V8.16 PMT017 backrest wing/lumbar physical contours, source PBR and packed tangent normal contract (not a render)
         run: python tools/test_daytona365_v8_16_source_contract.py
+
+      - name: V8.17 physical instrument cowl, packed source dark dash/tangent normals contract (not a render)
+        run: python tools/test_daytona365_v8_17_source_contract.py
