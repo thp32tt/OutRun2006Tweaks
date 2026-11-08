@@ -31,7 +31,14 @@ from controller_png_attach import (
 REPO = "thp32tt/OutRun2006Tweaks"
 QUEUE_BRANCH = "korean-localization-qa-queue-20261104"
 ASSETS_BRANCH = "korean-localization-recovery-20260928"
-QROOT = "localization/automation_runs/hd_rework_queue"
+# Only these two existing GitHub queue namespaces are permitted.
+# The fallback queue contains verified original HD reference PNGs, and is
+# intentionally separate from the immutable reuse-only QA queue.
+QUEUE_NAME = os.getenv("OUTRUN_REWORK_QUEUE_NAME", "hd_imagegen_fallback").strip()
+if QUEUE_NAME not in ("hd_rework_queue", "hd_imagegen_fallback"):
+    raise ValueError("OUTRUN_REWORK_QUEUE_NAME_NOT_ALLOWED")
+QROOT = "localization/automation_runs/" + QUEUE_NAME
+LEGACY_QROOT = "localization/automation_runs/hd_rework_queue"
 APPROVED = "localization/automation_inputs/qa_rework/approved"
 API = "https://api.github.com/repos/" + REPO
 ROOT = Path(os.getenv("OUTRUN_REWORK_HOME", "/data/hd-rework")).resolve()
@@ -56,6 +63,20 @@ def check_project_url(value):
         raise ValueError("CHATGPT_PROJECT_URL_MUST_BE_HTTPS_CHATGPT_COM")
     return value
 
+def is_saved_chat_url(value):
+    """Allow both native /c/... and ChatGPT Project /g/g-p-.../c/... links."""
+    if not isinstance(value, str) or len(value) > 350:
+        return False
+    parsed = urllib.parse.urlparse(value)
+    if (parsed.scheme != "https" or parsed.netloc != "chatgpt.com"
+            or parsed.params or parsed.query or parsed.fragment):
+        return False
+    return re.fullmatch(
+        r"/(?:g/g-p-[A-Za-z0-9_-]+/)?c/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}",
+        parsed.path,
+    ) is not None
+
+
 def safe_file_name(value):
     if not isinstance(value,str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,110}",value):
         raise ValueError("INVALID_FILE_NAME")
@@ -77,10 +98,13 @@ class Github:
         self.token=token
 
     def req(self, rel, branch, payload=None):
-        if not (rel.startswith(QROOT+"/") or rel.startswith(APPROVED+"/")):
+        if not (rel.startswith(QROOT+"/") or rel.startswith(LEGACY_QROOT+"/state/") or rel.startswith(APPROVED+"/")):
             raise ValueError("UNTRUSTED_PATH")
         if branch not in (QUEUE_BRANCH,ASSETS_BRANCH):
             raise ValueError("UNAPPROVED_BRANCH")
+        if (payload is not None and QROOT != LEGACY_QROOT
+                and rel.startswith(LEGACY_QROOT + "/")):
+            raise ValueError("LEGACY_QUEUE_IS_READ_ONLY")
         if ".." in rel or "\\" in rel or any(not re.fullmatch(r"[A-Za-z0-9_.-]+",x) for x in rel.split("/")):
             raise ValueError("UNSAFE_REPOSITORY_PATH")
         uri=API+"/contents/"+"/".join(urllib.parse.quote(p,safe="") for p in rel.split("/"))
@@ -190,6 +214,48 @@ def stage_state(gh,task,status,extras=None):
     gh.write_json(path,QUEUE_BRANCH,result,expected=sha,overwrite=True)
     local_save(task_id,result)
     return result
+
+def recover_previous_sent_task(gh, task):
+    """Resume an existing original-source ChatGPT send; NEVER send a duplicate.
+
+    Old reuse-only queue states from 2026-11-05 can refer to exactly the same
+    TASK_ID, source SHA, and PNG as the new fallback queue. A successful AB_SENT
+    is durable submission evidence, even though its output was not collected.
+    The old namespace is only read, never modified.
+    """
+    if QROOT == LEGACY_QROOT:
+        return "NEW"
+    old, _ = gh.read_json(
+        LEGACY_QROOT + "/state/" + task["task_id"] + ".json", QUEUE_BRANCH
+    )
+    if old is None:
+        return "NEW"
+    # Compare the whole task: source SHA alone is not sufficient evidence.
+    if (old.get("schema") != "outrun-hd-qa-chat-status-v1"
+            or old.get("task_id") != task["task_id"]
+            or old.get("task") != task or old.get("role") != task["role"]
+            or old.get("release_approved") is not False):
+        stage_state(gh, task, "HOLD", {
+            "hold_reason": "LEGACY_TASK_PROVENANCE_CONFLICT_NO_RESEND",
+            "recovered_from_legacy_queue": False,
+        })
+        return "HOLD_LEGACY_TASK_CONFLICT"
+    status = old.get("status")
+    if status == "AB_SENT" and is_saved_chat_url(old.get("ab_chat_url")):
+        stage_state(gh, task, "AB_SENT", {
+            "ab_chat_url": old["ab_chat_url"],
+            "recovered_from_legacy_queue": True,
+            "recovery_status": "ORIGINAL_CHAT_SENT_DO_NOT_RESEND",
+        })
+        return "RECOVERED_AB_SENT_NO_RESEND"
+    # AB_CLAIMED, HOLD, old approvals or an invalid old chat URL are not
+    # permission to create a second user message. Isolate for manual triage.
+    stage_state(gh, task, "HOLD", {
+        "hold_reason": "LEGACY_TASK_ALREADY_EXISTS_NO_RESEND:" + str(status)[:80],
+        "recovered_from_legacy_queue": False,
+    })
+    return "HOLD_LEGACY_TASK_NO_RESEND"
+
 
 def stage_source_ref(gh,task):
     if not valid_task(task):
@@ -335,7 +401,7 @@ class ChatBridge:
         if pg is None or pg.is_closed():
             pg=await self.context.new_page()
             self.pages[role]=pg
-        target=url if url and url.startswith("https://chatgpt.com/c/") else PROJECT_URL
+        target=url if is_saved_chat_url(url) else PROJECT_URL
         if pg.url.rstrip("/")!=target.rstrip("/"):
             await pg.goto(target,wait_until="domcontentloaded",timeout=60000)
         composer=pg.locator('[role="textbox"][contenteditable="true"]').first
@@ -527,6 +593,14 @@ class ChatBridge:
         tasks=queue.get("tasks",[])
         if not isinstance(tasks,list) or len(tasks)>8:
             return {"status":"HOLD_QUEUE_SIZE"}
+        if (queue.get("release_approved") is not False
+                or queue.get("runtime_validation") != "UNTESTED"
+                or queue.get("new_imagegen_disabled") is not REUSE_ONLY
+                or (QUEUE_NAME == "hd_imagegen_fallback"
+                    and (queue.get("source_reference_count_verified") != len(tasks)
+                         or any(t.get("qa_authority") != "NOT_C1_APPROVED_NOT_GAME_APPROVED"
+                                for t in tasks)))):
+            return {"status":"HOLD_QUEUE_AUTHORITY_OR_SOURCE_PROOF"}
         submitted=[]
         for task in ([] if REUSE_ONLY else tasks):
             if not valid_task(task):
@@ -536,7 +610,8 @@ class ChatBridge:
             if prior:
                 continue
             try:
-                result=await self.submit_producer(task)
+                recovery=await asyncio.to_thread(recover_previous_sent_task, self.gh, task)
+                result=(await self.submit_producer(task)) if recovery=="NEW" else recovery
             except Exception as exc:
                 result="HOLD_"+type(exc).__name__
             submitted.append({"task_id":task["task_id"],"result":result})
