@@ -56,3 +56,6 @@ jobs:
 
       - name: V8.23 three physical original-bounded wheel-spoke bridge tapers with stamped metal normals (source-only, not Blender render)
         run: python tools/test_daytona365_v8_23_source_contract.py
+
+      - name: V8.24-r2 physical 9 punched wheel-spoke holes, UV and packed source-metal normal contract (source-only, not Blender)
+        run: python tools/test_daytona365_v8_24_r2_source_contract.py
