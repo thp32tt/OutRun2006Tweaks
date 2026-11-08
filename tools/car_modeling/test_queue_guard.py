@@ -30,7 +30,7 @@ class GeometryQueueTests(unittest.TestCase):
             advance(q, {}, now)
         active["started_at_utc"] = (now - dt.timedelta(hours=25)).isoformat()
         with self.assertRaisesRegex(ValueError, "physical geometry"):
-            advance(q, {}, now)
+            advance(q, {"car_id": "daytona365"}, now)
 
     def test_advance_requires_genuine_audit_and_six_views(self):
         q = copy.deepcopy(SEED)
