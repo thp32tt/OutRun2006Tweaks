@@ -20,16 +20,37 @@
     "steering_wheel",
     "cross_cockpit_qa"
   ],
-  "current_component": "center_console",
+  "current_component": "driver_controls",
   "dispatches_on_component": 0,
   "max_dispatches_per_component": 2,
   "components": {
     "center_console": {
-      "status": "NOT_STARTED",
-      "source_edits_this_phase": 0,
-      "evidence_refs": [],
-      "blocking_reason": null,
-      "last_saved_blend_sha256": null
+      "status": "COVERED_PARTIAL_QA",
+      "source_edits_this_phase": 1,
+      "evidence_refs": [
+        "docs/automation/F50_SLOT_C_CENTER_CONSOLE_NATIVE_SHIFTER_V38_20261109.md",
+        "tools/car_modeling/slot_c/f50_center_console_original_shifter_v38.py",
+        "N100 private F50_CenterConsole_Shifter_v38_IndependentReopen.json"
+      ],
+      "blocking_reason": "PARTIAL ONLY: original object20 gear selector knob modified; original H-pattern gate/base/plinth/tunnel not positively identified; remaining geometry source-blocked, not synthesized",
+      "last_saved_blend_sha256": "8e9081c15a071e2b2edde4f44dc529470ac08d9f34a8e4516a93b8926e933ec2",
+      "dispatches_used": 1,
+      "partial_scope": {
+        "original_native_object": "object20_group00_material000_a0",
+        "original_knob_vf": [
+          16,
+          19
+        ],
+        "edited_knob_vf": [
+          103,
+          171
+        ],
+        "repositioned_verts": 91,
+        "other_41_native_meshes_unchanged": true,
+        "official_blender_fresh_reopen": "PASS",
+        "full_car_qa_pass": false,
+        "gate_and_tunnel": "BLOCKED_UNIDENTIFIED_SOURCE"
+      }
     },
     "driver_controls": {
       "status": "NOT_STARTED",
@@ -95,6 +116,8 @@
     "existing source nonmanifold / connectivity findings unresolved"
   ],
   "cannot_promote_from_interim_coverage": true,
-  "last_material_commit": null,
-  "notes": "Do not repeat P0 geometry polishing until visible cockpit breadth sweep or specific user defect. Keep original private scene; NO OVC3, no new car."
+  "last_material_commit": "4b53fc21a42608297f001bd85e9044cd3cfbdd82",
+  "notes": "2026-11-09: Original F50 PMT object20 gear selector knob source geometry v38 (16v19f ->103v171f); 41 other meshes preserved, official Blender 4.5.15 independent reopen PASS. center_console COVERED_PARTIAL_QA knob-only; gate/base/tunnel source unverified BLOCKED; next driver_controls. Dashboard/wheel remain P0_POLISH_HOLD; full 24h/7-view/game-eye QA not PASS.",
+  "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CenterConsole_Shifter_v38.blend",
+  "current_accepted_blend_sha256": "8e9081c15a071e2b2edde4f44dc529470ac08d9f34a8e4516a93b8926e933ec2"
 }
