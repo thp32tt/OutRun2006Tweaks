@@ -17,26 +17,28 @@ services:
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
       VR_FEATURE_DEVELOPMENT_ENABLED: "true"
-      # Operator 2026-11-08: car-geometry A ONLY. Model2 C and other VR lanes are disabled.
+      # Operator 2026-11-08: two Ferrari cockpit-only geometry lanes A and C; Model2 VR disabled.
       VR_CONTINUOUS_30M_ENABLED: "true"
       VR_SCHEDULED_DISPATCH_ENABLED: "true"
       VR_CONTINUOUS_INTERVAL_SECONDS: "3600"
       VR_FEATURE_PROMOTION_MODE: "ai"
       VR_FEATURE_POLL_SECONDS: "60"
       VR_FEATURE_C6_REMINDER_SECONDS: "300"
-      CONVERSION_ACTIVE_LIMIT: "1"
+      CONVERSION_ACTIVE_LIMIT: "2"
       CONVERSION_DX11_ENABLED: "false"
-      # A sequentially reworks Ferrari 3D geometry (no textures); latest state in Ferrari16 queue.
+      # Two independent cockpit-only vehicle owners (Daytona A, F50 C; Dino excluded).
       CAR_MODEL_AUTODEV_ENABLED: "true"
       CAR_MODEL_GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       CAR_MODEL_TARGET_BRANCH: "feature/ferrari16-geometry-rework-20261108"
-      CAR_MODEL_SCHEDULE_MINUTES: "15"
+      CAR_MODEL_SCHEDULE_MINUTES: "0,30"
+      CAR_MODEL_C_AUTODEV_ENABLED: "true"
+      CAR_MODEL_C_SCHEDULE_MINUTES: "15,45"
       CAR_MODEL_CONTINUE_MIN_SECONDS: "1800"
       CAR_MODEL_RESPONSE_STABLE_SECONDS: "30"
       CAR_MODEL_HARD_NEW_CHAT_SECONDS: "3600"
       DXVK_FROZEN: "true"
       CONVERSION_DXVK_ENABLED: "false"
-      # C is not dispatched. Preserve Model2 history, but no automatic Model2 prompts.
+      # C is reserved for Ferrari cockpit modeling, never legacy DX9Ex or Model2.
       CONVERSION_DX9EX_ENABLED: "false"
       DX9EX_REVIEW_ONLY: "true"
       UW2_WEB_PORT_ENABLED: "false"
@@ -53,7 +55,7 @@ services:
       MODEL2_RESPONSE_STABLE_SECONDS: "30"
       # Force brand-new Model2 chat/task session at 60m even when UI says busy.
       MODEL2_HARD_NEW_CHAT_SECONDS: "3600"
-      CONVERSION_ONLY_SLOT: "A"
+      CONVERSION_ONLY_SLOT: ""
       QUEUE_CHECK_SECONDS: "15"
       # GUI Chrome/noVNC stays enabled; only failed tabs are replaced.
       TAB_HEALTH_CHECK_SECONDS: "30"
@@ -84,10 +86,10 @@ services:
       PRODUCTION_COUNTER_MODE: "lane"
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      # Legacy DX11 dispatch remains disabled; geometry-only A uses :15 each hour.
+      # Legacy DX11 dispatch remains disabled; geometry A at :00/:30 and C at :15/:45.
       SCHEDULE_MINUTES: "30"
       # Model2 disabled. Keep historical Model2 settings for a future explicit opt-in only.
-      # DX11/DX9Ex/DXVK remain disabled; geometry-only A runs a separate simple loop.
+      # DX11/DX9Ex/DXVK remain disabled; geometry A/C use separate per-slot state and chats.
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
