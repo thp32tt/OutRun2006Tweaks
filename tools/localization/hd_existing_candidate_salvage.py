@@ -5,7 +5,7 @@ reflowed in reading order, or downscaled later into source-native HD boxes.
 Every salvage action remains TEST_ONLY and requires visual QA.
 """
 from itertools import combinations
-from PIL import Image, ImageOps
+from PIL import Image, ImageChops, ImageFilter, ImageOps
 
 ALPHA_THRESHOLD = 16
 MIN_COLUMN_GAP = 2
@@ -23,6 +23,67 @@ def pad_candidate_edge(image, margin=2):
     return ImageOps.expand(image, border=pad, fill=(0,0,0,0)), [
         "PAD_EXISTING_CANDIDATE_EDGE_VISUAL_QA_REQUIRED"
     ]
+
+
+def native_alpha_crosses_box_edge(alpha, box, side):
+    """Require a REAL 8-connected native ink crossing before an edge HOLD.
+
+    An unrelated neighbor farther along the rectangle is not a continuation
+    of the source text. Preserve even the faintest nonzero source alpha.
+    """
+    x0, y0, x1, y1 = box
+    width, height = alpha.size
+    if side in ("LEFT", "RIGHT"):
+        inside = x0 if side == "LEFT" else x1 - 1
+        outside = x0 - 1 if side == "LEFT" else x1
+        if not 0 <= outside < width:
+            return False
+        for y in range(y0, y1):
+            if alpha.getpixel((inside, y)) and any(
+                alpha.getpixel((outside, yy))
+                for yy in (y - 1, y, y + 1) if 0 <= yy < height
+            ):
+                return True
+    else:
+        inside = y0 if side == "TOP" else y1 - 1
+        outside = y0 - 1 if side == "TOP" else y1
+        if not 0 <= outside < height:
+            return False
+        for x in range(x0, x1):
+            if alpha.getpixel((x, inside)) and any(
+                alpha.getpixel((xx, outside))
+                for xx in (x - 1, x, x + 1) if 0 <= xx < width
+            ):
+                return True
+    return False
+
+
+def translated_touches_external_native_ink(source, box, rendered):
+    """Protect native ink just OUTSIDE a tight ROI from new Korean pixels.
+
+    Restrict the calculation to a 1px halo around the source ROI. The
+    caller must still prove source ownership and check every other ROI.
+    """
+    x0, y0, x1, y1 = box
+    region = (max(0, x0 - 1), max(0, y0 - 1),
+              min(source.width, x1 + 1), min(source.height, y1 + 1))
+    rx0, ry0, rx1, ry1 = region
+    protected = source.getchannel("A").crop(region)
+    protected.paste(0, (x0 - rx0, y0 - ry0, x1 - rx0, y1 - ry0))
+    halo = protected.filter(ImageFilter.MaxFilter(3))
+    for glyph, left, top in rendered:
+        dest = (left, top, left + glyph.width, top + glyph.height)
+        intersection = (max(rx0, dest[0]), max(ry0, dest[1]),
+                        min(rx1, dest[2]), min(ry1, dest[3]))
+        a, b, c, d = intersection
+        if a >= c or b >= d:
+            continue
+        visible = glyph.getchannel("A").crop(
+            (a - left, b - top, c - left, d - top))
+        neighbor = halo.crop((a - rx0, b - ry0, c - rx0, d - ry0))
+        if ImageChops.multiply(visible, neighbor).getbbox():
+            return True
+    return False
 
 
 def prove_source_edge_clear(source, box, extent, margin=2):
@@ -59,7 +120,12 @@ def prove_source_edge_clear(source, box, extent, margin=2):
                 raise ValueError("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
             actions.append("SOURCE_NATIVE_ATLAS_" + side + "_EDGE_INSET_REQUIRED")
         elif alpha.crop(strip).getbbox() is not None:
-            raise ValueError("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+            if native_alpha_crosses_box_edge(alpha, box, side):
+                raise ValueError("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+            # Other native glyphs may be in the nearby atlas strip but
+            # are provably 8-disconnected from this ROI's boundary ink.
+            # Caller must also block NEW Korean ink from touching them.
+            actions.append("SOURCE_EDGE_DISJOINT_EXTERNAL_ALPHA_PROOF")
         else:
             actions.append("SOURCE_EDGE_CLEAR_NEIGHBOR_PROOF")
     return actions
