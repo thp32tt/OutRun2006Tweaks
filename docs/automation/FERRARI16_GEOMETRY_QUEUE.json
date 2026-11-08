@@ -217,8 +217,8 @@
       "geometry_gate": "PARTIAL_NEEDS_QA",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
-      "output_scene_sha256": "8e9081c15a071e2b2edde4f44dc529470ac08d9f34a8e4516a93b8926e933ec2",
-      "notes": "[2026-11-09 SLOT_C_V38_SOURCE_SHIFTER_CENTER_CONSOLE] Original F50 PMT source v36 SHA 4f232ce1 -> v38 8e9081c1; native object20_group00_material000_a0 metal shifter knob geometry changed 16v/19f -> 103v/171f, stem+other 41 original meshes unchanged. Official Blender 4.5.15 separate-process save/reopen PASS. center_console COVERED_PARTIAL_QA only for knob; H-pattern gate/base/tunnel source UNIDENTIFIED BLOCKED. NEXT driver_controls; P0 dash/steering hold; full car QA/24h gate INCOMPLETE, no vehicle advance. Workpack FERRARI_COCKPIT_WORKPACK_C_F50.json and v38 report; v37 rejected review retained in prior docs.",
+      "output_scene_sha256": "724df8bcd079299e8781726b25888243dbdcab7368d7d758f81ba8236666072f",
+      "notes": "[2026-11-09 C F50 center_console 2/2 CLOSED] V38 genuine PMT shifter knob -> V39 genuine PMT lever shaft object20_group00_material001_a0 12v/6f ->108v/150f, 108 vertices moved max 2.188mm; N100 real F50 photo, official Blender 4.5.15 independent reopen PASS; 41 other meshes unchanged incl P0. V39 .blend SHA 724df8bc. Center console COVERED_PARTIAL_QA for source knob/shaft; gate/plate/tunnel BLOCKED original-mesh attribution, no fabrication. NEXT driver_controls; 24h original start & final car gates unchanged; no car advance; report F50_SLOT_C_CENTER_CONSOLE_NATIVE_SHAFT_V39_20261109.md.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -315,6 +315,35 @@
         "workpack_commit": "cdffed1960b81ecc8cb8a1b562d29ec764e04f34",
         "QA_doc": "docs/automation/F50_SLOT_C_CENTER_CONSOLE_NATIVE_SHIFTER_V38_20261109.md",
         "score_to_be_assessed": true
+      },
+      "last_slot_c_center_console_v39": {
+        "task_id": "FERRARI16-SLOTC-F50-CENTER-CONSOLE-NATIVE-SHAFT-V39-20261109-724DF8BC",
+        "native_original_PMTSHA256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+        "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+        "input_v38_sha256": "8e9081c15a071e2b2edde4f44dc529470ac08d9f34a8e4516a93b8926e933ec2",
+        "new_private_v39_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CenterConsole_Shaft_v39.blend",
+        "new_private_v39_sha256": "724df8bcd079299e8781726b25888243dbdcab7368d7d758f81ba8236666072f",
+        "modified_original_mesh": "object20_group00_material001_a0",
+        "before_vf": [
+          12,
+          6
+        ],
+        "after_vf": [
+          108,
+          150
+        ],
+        "moved_verts": 108,
+        "other_41_source_meshes_unchanged": true,
+        "fresh_blender_4_5_15_reopen": "PASS",
+        "center_console": "COVERED_PARTIAL_QA_KNOB_SHAFT_2_OF_2",
+        "H_gate_base_tunnel": "BLOCKED_SOURCE_UNIDENTIFIED",
+        "next": "driver_controls",
+        "vehicle_complete": false,
+        "slot_C_advance": false,
+        "source_commit": "f67d0f1bde0ac3b4a74d0777ea6d85278d8a6405",
+        "workpack_commit": "03511fe62238d7b06b294e4ca8b30951e1f4ab4d",
+        "qa_doc": "docs/automation/F50_SLOT_C_CENTER_CONSOLE_NATIVE_SHAFT_V39_20261109.md",
+        "score_review": "DISTINCT_SHAFT_SOURCE_VS_PRIOR_KNOB"
       }
     },
     {
