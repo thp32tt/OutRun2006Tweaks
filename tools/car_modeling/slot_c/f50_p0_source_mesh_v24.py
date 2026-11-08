@@ -278,7 +278,7 @@ def audit(a):
  j=json.loads(a.report.read_text(encoding="utf8"))
  assert Path(bpy.data.filepath).resolve()==a.after.resolve()
  assert digest(a.after)==j["output_sha256"]
- assert bpy.context.scene.get("geometry_edit_count")==69
+ assert bpy.context.scene.get("geometry_edit_count")==72
  c=snap();cam=cameras()
  assert len(c)==42
  bpy.ops.wm.open_mainfile(filepath=str(a.before))
