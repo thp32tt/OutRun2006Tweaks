@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Slot A Daytona R25: real original-PMT-derived existing cockpit mesh relief.
-Edits 13 existing dashboard/instrument/three-spoke/rim/hub/column objects in
+Edits 8 existing dashboard/instrument/three-spoke/rim/hub/column objects in
 an immutable R24 private Blender scene. No assets converted/exported, no
 new objects, external vehicle parts, materials, textures or game/VR changes.
 Private licensed scene and photos remain on authorized N100 storage.
@@ -182,7 +182,7 @@ def build():
   o.data.update()
   assert moved>=({"upper":100,"face":70,"cowl":100,"bezel":500,
    "spoke":100,"rim":2500,"hub":10,"column":15}[k]),("INSUFFICIENT_SOURCE_GEOMETRY",k,moved)
-  assert mx<(.020 if k=="trim" else .014),("DISPLACEMENT_TOO_LARGE",k,mx)
+  assert mx<.014,("DISPLACEMENT_TOO_LARGE",k,mx)
   after=state(o)
   for invariant in ("name","vertices","faces","world_matrix","uv_sha256","materials","hide_render"):
    assert before[invariant]==after[invariant],("CHANGED_SOURCE_ID_UV_MATERIAL_OR_TOPOLOGY",k,invariant)
