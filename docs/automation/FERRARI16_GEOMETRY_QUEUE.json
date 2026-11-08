@@ -213,13 +213,13 @@
       "id": "f50",
       "name": "Ferrari F50",
       "status": "ACTIVE",
-      "started_at_utc": null,
+      "started_at_utc": "2026-11-08T04:35:52Z",
       "completed_at_utc": null,
-      "geometry_gate": "BLOCKED_INPUT",
-      "reference_gate": "UNTESTED",
-      "source_scene_sha256": null,
-      "output_scene_sha256": null,
-      "notes": "Next unfinished vehicle after user-excluded Dino. Photo set 03_F50, verify driver-view, LHD and authentic trim before edits. Original F50 native game resource/import file not verified in current N100 work_handoff; do not create surrogate mesh, mark BLOCKED_INPUT until verified original resource is obtained. [SLOT_C_INPUT_AUDIT_20261108] BLOCKED_INPUT: N100 F50 original PMT/native source and verified original-import .blend not found in inspected paths; no geometry created. Slot C remains assigned F50 pending exact source SHA and original mesh IDs.",
+      "geometry_gate": "PARTIAL_NEEDS_QA",
+      "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
+      "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+      "output_scene_sha256": "b7289f9ec1d772f9beca1c785f63c3536e8c501aee8a9a5710b2b086b7152e6d",
+      "notes": "Slot C F50 original native PMT found under N100 rea-input (previous BLOCKED_INPUT RESOLVED). Official Blender 4.5.15 native direct import of 42 source-ID meshes; existing dashboard/gauge shell and original 3-spoke steering rim/hub edited in place, 39 other source meshes hash-identical. Original source SHA and editable baseline/candidate SHA independently verified; diagnostic 2-view compare only. Full 24h window, source game driver-eye camera, steering rig placement and seven view photo QA remain pending. Do NOT advance to another car. See docs/automation/F50_SLOT_C_ORIGINAL_SOURCE_P0_20261108.md.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -228,18 +228,61 @@
         "driver_eye_visible_secondary"
       ],
       "exterior_geometry_in_scope": false,
-      "photo_view_qa": "UNTESTED",
+      "photo_view_qa": "PARTIAL_NEEDS_7_VIEWS",
       "slot": "C",
       "source_provenance": {
         "required": true,
-        "original_game_resource_file": null,
-        "original_game_resource_sha256": null,
-        "original_import_blend_sha256": null,
-        "original_mesh_object_ids": [],
-        "verification": "BLOCKED_INPUT",
+        "original_game_resource_file": "rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz",
+        "original_game_resource_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+        "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+        "original_mesh_object_ids": [
+          "object00_group00_material000_a0",
+          "object00_group00_material001_a0",
+          "object00_group00_material002_a0",
+          "object00_group00_material003_a0",
+          "object00_group00_material004_a0",
+          "object00_group00_material005_a1",
+          "object00_group00_material006_a1",
+          "object00_group00_material007_a1",
+          "object00_group01_material008_a0",
+          "object00_group01_material009_a0",
+          "object00_group01_material010_a0",
+          "object00_group01_material011_a0",
+          "object00_group01_material012_a0",
+          "object00_group01_material013_a0",
+          "object00_group01_material014_a0",
+          "object00_group01_material015_a0",
+          "object00_group01_material016_a0",
+          "object00_group01_material017_a0",
+          "object00_group01_material018_a0",
+          "object00_group01_material019_a0",
+          "object00_group01_material020_a0",
+          "object00_group01_material021_a0",
+          "object00_group01_material022_a0",
+          "object00_group01_material023_a0",
+          "object00_group01_material024_a0",
+          "object00_group01_material025_a0",
+          "object00_group01_material026_a0",
+          "object00_group01_material027_a0",
+          "object00_group01_material028_a0",
+          "object00_group01_material029_a0",
+          "object00_group01_material030_a0",
+          "object00_group01_material031_a0",
+          "object00_group01_material032_a0",
+          "object00_group01_material033_a0",
+          "object00_group01_material034_a0",
+          "object00_group01_material035_a1",
+          "object00_group01_material036_a1",
+          "object20_group00_material000_a0",
+          "object20_group00_material001_a0",
+          "object21_group00_material000_a0",
+          "object21_group01_material001_a0",
+          "object21_group01_material002_a0"
+        ],
+        "verification": "NATIVE_RESOURCE_AND_ORIGINAL_IMPORT_VERIFIED_P0_PARTIAL",
         "last_input_audit": {
           "checked_at_kst": "2026-11-08 12:47 KST",
-          "result": "BLOCKED_INPUT",
+          "result": "RESOLVED_ORIGINAL_NATIVE_F50_PMT_FOUND",
           "reason": "No directly verifiable original OutRun 2006 F50 PMT/native source nor original-imported editable F50 .blend in inspected N100 private locations; source object identities and original file SHA unavailable.",
           "searched_roots": [
             "work_handoff (PMT and F50 blend/name globs)",
@@ -256,7 +299,69 @@
           "source_edits_performed": 0,
           "forbidden_outputs_created": 0,
           "blender_real_scene_audit": "NOT_RUN_MISSING_ORIGINAL_SCENE",
-          "next_action": "Obtain read-only original OutRun 2006 F50 PMT/native resource and prove exact PMT SHA, verified import blend SHA, existing original cockpit mesh IDs and source camera/pivot before geometry editing."
+          "next_action": "Obtain read-only original OutRun 2006 F50 PMT/native resource and prove exact PMT SHA, verified import blend SHA, existing original cockpit mesh IDs and source camera/pivot before geometry editing.",
+          "resolution": "Verified immutable source in N100 rea-input; original native game PMT compressed SHA and independent editable Blender import SHA recorded",
+          "source_path": "rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz",
+          "source_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab"
+        },
+        "last_geometry_checkpoint": {
+          "task_id": "FERRARI16-SLOTC-F50-ORIGINAL-PMT-DASH-WHEEL-20261108",
+          "material_source_commit": "6d8106026b9b9252469403ba80ab8dd58abbadc3",
+          "first_material_commit_time_utc": "2026-11-08T04:35:52Z",
+          "min_24h_window_end_utc": "2026-11-09T04:35:52Z",
+          "original_raw_pmt_sha256": "a080d3b5853063f9decdc92097b03148a1bee77c00340dd0d24f820ba17b07a7",
+          "private_workdir": "work_handoff/ferrari16_slotC_f50_source_audit_20261108",
+          "before_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+          "after_blend_sha256": "b7289f9ec1d772f9beca1c785f63c3536e8c501aee8a9a5710b2b086b7152e6d",
+          "edited_original_mesh_ids": [
+            "object00_group01_material028_a0",
+            "object21_group01_material002_a0",
+            "object21_group00_material000_a0"
+          ],
+          "before_after_vertex_face_counts": {
+            "object00_group01_material028_a0": [
+              [
+                10,
+                8
+              ],
+              [
+                346,
+                472
+              ]
+            ],
+            "object21_group01_material002_a0": [
+              [
+                110,
+                184
+              ],
+              [
+                898,
+                1656
+              ]
+            ],
+            "object21_group00_material000_a0": [
+              [
+                14,
+                12
+              ],
+              [
+                78,
+                124
+              ]
+            ]
+          },
+          "preserved_unmodified_native_mesh_parts": 39,
+          "original_transforms_unchanged": true,
+          "local_blender_4_5_15_independent_reopen": "PASS",
+          "private_compare_render_sha256": "efd580284a0f8b9340192159bac967c6484e7387834f15924c2f69a87ee320bd",
+          "game_driver_eye_camera": "UNVERIFIED",
+          "steering_rig_vehicle_transform": "UNVERIFIED",
+          "photo_7_view_gate": "UNTESTED",
+          "github_actions_real_scene": "NOT_ESTABLISHED_NO_PRIVATE_BLEND_UPLOAD",
+          "source_game_untouched": true,
+          "new_textures_pbr_normalmaps": false,
+          "forbidden_game_format_exports": false,
+          "complete_claim": false
         }
       },
       "edit_from_original_required": true,
