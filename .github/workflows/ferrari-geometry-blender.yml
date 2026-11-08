@@ -47,11 +47,13 @@ jobs:
               if not raw.endswith(".blend") or not path.is_relative_to(Path.cwd()) or not path.is_file():
                   raise SystemExit("BLOCKED_INPUT: provide permitted repository-local .blend")
           PY
-      - name: Enforce serialized 24h Ferrari queue and regression tests
+      - name: Enforce dual 24h Ferrari queue, breadth-first workpacks, and regression tests
         shell: bash
         run: |
           python3 tools/car_modeling/queue_guard.py --queue docs/automation/FERRARI16_GEOMETRY_QUEUE.json
-          python3 -m unittest discover -s tools/car_modeling -p 'test_queue_guard.py' -v
+          python3 -m unittest discover -s tools/car_modeling -p 'test_*.py' -v
+          python3 tools/car_modeling/coverage_strategy.py --queue docs/automation/FERRARI16_GEOMETRY_QUEUE.json --slot A --state docs/automation/FERRARI_COCKPIT_WORKPACK_A_DAYTONA365.json
+          python3 tools/car_modeling/coverage_strategy.py --queue docs/automation/FERRARI16_GEOMETRY_QUEUE.json --slot C --state docs/automation/FERRARI_COCKPIT_WORKPACK_C_F50.json
           python3 tools/car_modeling/test_slotA_daytona_p0_source_contract.py
       - name: Download verified official Blender archive
         shell: bash
