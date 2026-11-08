@@ -146,81 +146,105 @@
           "source_derived_original_meshes": {
             "dashboard": {
               "object": "V5_DASHBOARD_SOURCE_REFERENCED_PADDED_FACE",
-              "before": [
-                1885,
-                3584
-              ],
-              "after": [
-                1885,
-                3584
-              ],
+              "before": {
+                "vertices": 1885,
+                "faces": 3584,
+                "signature": "c1022eb24a78f66021e90598cffc4c6bada9e3dcdf3c075514a89daf6f91f32d"
+              },
+              "after": {
+                "vertices": 1885,
+                "faces": 3584,
+                "signature": "0f50ce3f22039dc6523ccb945a0eb4558cf51c8999509cb6175a178bd856bd3c"
+              },
               "moved": 374,
-              "nonmanifold": 184
+              "max_move_mm": 2.1954,
+              "mean_move_mm": 1.4787,
+              "nonmanifold_edges_after": 184
             },
             "cowl": {
               "object": "V8_17_ORIGINAL_GUIDED_GAUGE_COWL",
-              "before": [
-                2594,
-                2592
-              ],
-              "after": [
-                2594,
-                2592
-              ],
+              "before": {
+                "vertices": 2594,
+                "faces": 2592,
+                "signature": "1439f9c4d03bdd1054471e070c4f9cb2e7caff438e784102427e831cf6e04e45"
+              },
+              "after": {
+                "vertices": 2594,
+                "faces": 2592,
+                "signature": "f7d4614295f2d381a00dd67f53aeffb45f3ea6984588e49ab155eefc81c860d5"
+              },
               "moved": 1940,
-              "nonmanifold": 0
+              "max_move_mm": 3.0414,
+              "mean_move_mm": 1.5082,
+              "nonmanifold_edges_after": 0
             },
             "bezel": {
               "object": "DAYTONA_GAUGE_METAL_BEZEL_ACTUAL_GEOMETRY",
-              "before": [
-                3157,
-                5376
-              ],
-              "after": [
-                3157,
-                5376
-              ],
+              "before": {
+                "vertices": 3157,
+                "faces": 5376,
+                "signature": "6a64328f616299b77d8058be1c3587f6424f747d035c5f922264513cf70c4811"
+              },
+              "after": {
+                "vertices": 3157,
+                "faces": 5376,
+                "signature": "05830d1d70d13e0594174fb1020a6ec9172c3241fecca282d45247ae8278f6f0"
+              },
               "moved": 2771,
-              "nonmanifold": 932
+              "max_move_mm": 0.7432,
+              "mean_move_mm": 0.283,
+              "nonmanifold_edges_after": 932
             },
             "spoke": {
               "object": "V5_ORIGINAL_THREESPOKE_WHEEL_object22_group00_material000_a0",
-              "before": [
-                9720,
-                17285
-              ],
-              "after": [
-                9720,
-                17285
-              ],
+              "before": {
+                "vertices": 9720,
+                "faces": 17285,
+                "signature": "8ea5e583aad6d2e35ec42d72091e6580758a244305aa32339344dff3f7cc508f"
+              },
+              "after": {
+                "vertices": 9720,
+                "faces": 17285,
+                "signature": "4bc65921d0d54a3354f0fde4e0a2c1e3af1ec141520eb0ab6dd240704afecaab"
+              },
               "moved": 6587,
-              "nonmanifold": 1597
+              "max_move_mm": 2.7289,
+              "mean_move_mm": 0.6745,
+              "nonmanifold_edges_after": 1597
             },
             "rim": {
               "object": "V7_3_HIGH_RES_WALNUT_SINGLE_STEERING_RIM",
-              "before": [
-                6144,
-                6144
-              ],
-              "after": [
-                6144,
-                6144
-              ],
+              "before": {
+                "vertices": 6144,
+                "faces": 6144,
+                "signature": "e47ae534fd9346204ab23b48855dfb74b1c21d7eb1ae37c98565985aafef5b4a"
+              },
+              "after": {
+                "vertices": 6144,
+                "faces": 6144,
+                "signature": "11dacefbcd72feb2c148c3bdbd8d1f5bd58bf96920cb79c05e9cf47836e7f6c5"
+              },
               "moved": 6144,
-              "nonmanifold": 0
+              "max_move_mm": 3.078,
+              "mean_move_mm": 1.6664,
+              "nonmanifold_edges_after": 0
             },
             "hub": {
               "object": "V7_SHORT_SHAFT_AT_WHEEL_HUB",
-              "before": [
-                224,
-                210
-              ],
-              "after": [
-                224,
-                210
-              ],
+              "before": {
+                "vertices": 224,
+                "faces": 210,
+                "signature": "11f73aa3a94940dab0b72d23bf95297313066e0cb7b689c5bd9a0c882b48c99d"
+              },
+              "after": {
+                "vertices": 224,
+                "faces": 210,
+                "signature": "760750f0450acc2ac373fbdbecf2bf1a92a37ff9542490db3c6434429bb2adb1"
+              },
               "moved": 129,
-              "nonmanifold": 0
+              "max_move_mm": 1.1879,
+              "mean_move_mm": 0.5062,
+              "nonmanifold_edges_after": 0
             }
           },
           "source_scene_saved_independent_blender_reopen": "PASS",
@@ -240,7 +264,8 @@
           "slot_A_advance": false,
           "score_change": 0,
           "no_new_textures_PBR_normal_or_exterior": true,
-          "no_native_conversion_export_or_game": true
+          "no_native_conversion_export_or_game": true,
+          "source_derived_mesh_before_after_verified": "SHA_SIGNATURES_MATCH_PRIVATE_BLENDER_AUDIT"
         },
         "last_slot_a_audit_previous": {
           "material_source_commit": "79c80041888d348dfa07e495025aa7cb84360c03",
