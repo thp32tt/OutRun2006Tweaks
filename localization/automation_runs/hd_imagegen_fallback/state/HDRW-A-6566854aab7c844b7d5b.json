@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af0bd7c-5880-83ee-812d-387430cb2184",
   "old_candidate_sha256": "125db43164fef1b46794e3ec56a6c8b4c393058bf10d601f33f1aeea6bb23d93",
   "release_approved": false,
   "roi_id": "Q046_04f09090b3bc4003",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Castle Wall",
     "korean": "캐슬 월",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-6566854aab7c844b7d5b"
   },
   "task_id": "HDRW-A-6566854aab7c844b7d5b",
-  "updated_utc": "2026-11-08T18:20:38+00:00"
+  "updated_utc": "2026-11-08T18:20:59+00:00"
 }
