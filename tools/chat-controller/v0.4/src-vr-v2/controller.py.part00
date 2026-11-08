@@ -75,14 +75,19 @@ UW2_TARGET_BRANCH = os.getenv("UW2_TARGET_BRANCH", "uw2-web-port").strip()
 MODEL2_AUTODEV_ENABLED = os.getenv("MODEL2_AUTODEV_ENABLED", "false").lower() == "true"
 MODEL2_GITHUB_REPO = os.getenv("MODEL2_GITHUB_REPO", "thp32tt/Model2VR-tools").strip()
 MODEL2_TARGET_BRANCH = os.getenv("MODEL2_TARGET_BRANCH", "main").strip()
-# Independent OutRun A slot: Daytona 365 GTS/4 Blender asset rework.
-# Legacy DX11 must remain disabled while A owns the vehicle model.
+# Ferrari cockpit-only modeling: two separate ChatGPT slots and separate car owners.
+# Do not replace or reactivate previous Model2 C; that project remains disabled.
 CAR_MODEL_AUTODEV_ENABLED = os.getenv("CAR_MODEL_AUTODEV_ENABLED", "false").lower() == "true"
+CAR_MODEL_C_AUTODEV_ENABLED = os.getenv("CAR_MODEL_C_AUTODEV_ENABLED", "false").lower() == "true"
 CAR_MODEL_GITHUB_REPO = os.getenv("CAR_MODEL_GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
-CAR_MODEL_TARGET_BRANCH = os.getenv("CAR_MODEL_TARGET_BRANCH", "feature/daytona365-blender-v8-20261108").strip()
+CAR_MODEL_TARGET_BRANCH = os.getenv("CAR_MODEL_TARGET_BRANCH", "feature/ferrari16-geometry-rework-20261108").strip()
 CAR_MODEL_SCOPE_READY = bool(CONFIGURED_PROJECT_ID)
 if CAR_MODEL_AUTODEV_ENABLED and CONVERSION_DX11_ENABLED:
     raise ValueError("Car modeling A and legacy DX11 A cannot both be enabled")
+if CAR_MODEL_C_AUTODEV_ENABLED and (MODEL2_AUTODEV_ENABLED or UW2_WEB_PORT_ENABLED or CONVERSION_DX9EX_ENABLED):
+    raise ValueError("Car modeling C cannot coexist with Model2, UW2 or DX9Ex C")
+if CAR_MODEL_C_AUTODEV_ENABLED and not CAR_MODEL_AUTODEV_ENABLED:
+    raise ValueError("Car modeling C requires cockpit A production queue enabled")
 MODEL2_PROJECT_URL = os.getenv("MODEL2_PROJECT_URL", "").strip()
 MODEL2_PROJECT_ID = _project_id_from_url(MODEL2_PROJECT_URL)
 MODEL2_SCOPE_READY = bool(
@@ -152,9 +157,14 @@ MODEL2_CONTINUE_MIN_SECONDS = max(1800, int(os.getenv("MODEL2_CONTINUE_MIN_SECON
 MODEL2_RESPONSE_STABLE_SECONDS = max(15, int(os.getenv("MODEL2_RESPONSE_STABLE_SECONDS", "30")))
 # Independent C chat is never held forever by a frozen reply or busy button.
 MODEL2_HARD_NEW_CHAT_SECONDS = max(3600, int(os.getenv("MODEL2_HARD_NEW_CHAT_SECONDS", "3600")))
-CAR_MODEL_SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("CAR_MODEL_SCHEDULE_MINUTES", "15").split(",") if x.strip()})
-if not CAR_MODEL_SCHEDULE_MINUTES or any(x < 0 or x > 59 for x in CAR_MODEL_SCHEDULE_MINUTES):
-    raise ValueError("CAR_MODEL_SCHEDULE_MINUTES must contain minutes in 0..59")
+CAR_MODEL_SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("CAR_MODEL_SCHEDULE_MINUTES", "0,30").split(",") if x.strip()})
+CAR_MODEL_C_SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("CAR_MODEL_C_SCHEDULE_MINUTES", "15,45").split(",") if x.strip()})
+if CAR_MODEL_AUTODEV_ENABLED and CAR_MODEL_SCHEDULE_MINUTES != [0, 30]:
+    raise ValueError("Ferrari cockpit A requires exactly :00/:30 schedule")
+if CAR_MODEL_C_AUTODEV_ENABLED and CAR_MODEL_C_SCHEDULE_MINUTES != [15, 45]:
+    raise ValueError("Ferrari cockpit C requires exactly :15/:45 schedule")
+if CAR_MODEL_AUTODEV_ENABLED and CAR_MODEL_C_AUTODEV_ENABLED and set(CAR_MODEL_SCHEDULE_MINUTES) & set(CAR_MODEL_C_SCHEDULE_MINUTES):
+    raise ValueError("A/C Ferrari dispatch minutes must never overlap")
 CAR_MODEL_CONTINUE_MIN_SECONDS = max(1800, int(os.getenv("CAR_MODEL_CONTINUE_MIN_SECONDS", "1800")))
 CAR_MODEL_RESPONSE_STABLE_SECONDS = max(15, int(os.getenv("CAR_MODEL_RESPONSE_STABLE_SECONDS", "30")))
 CAR_MODEL_HARD_NEW_CHAT_SECONDS = max(3600, int(os.getenv("CAR_MODEL_HARD_NEW_CHAT_SECONDS", "3600")))
@@ -369,6 +379,8 @@ runtime = {
     "model2_project_separate": MODEL2_SCOPE_READY,
     "model2_auto_send_ready": bool(AUTO_SEND and MODEL2_SCOPE_READY),
     "car_model_autodev_enabled": CAR_MODEL_AUTODEV_ENABLED,
+    "car_model_c_autodev_enabled": CAR_MODEL_C_AUTODEV_ENABLED,
+    "car_model_c_schedule_minutes": CAR_MODEL_C_SCHEDULE_MINUTES if CAR_MODEL_C_AUTODEV_ENABLED else [],
     "car_model_github_repo": CAR_MODEL_GITHUB_REPO if CAR_MODEL_AUTODEV_ENABLED else None,
     "car_model_target_branch": CAR_MODEL_TARGET_BRANCH if CAR_MODEL_AUTODEV_ENABLED else None,
     "car_model_auto_send_ready": bool(AUTO_SEND and CAR_MODEL_SCOPE_READY and not CONVERSION_DX11_ENABLED),
