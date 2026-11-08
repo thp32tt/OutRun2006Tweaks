@@ -33,8 +33,17 @@ def validate(queue):
         raise ValueError("duplicate vehicle IDs")
     if queue.get("schema_version") != 2:
         raise ValueError("expected dual-slot schema v2")
-    if queue.get("policy") != "cockpit_visible_geometry_only_no_texture":
+    if queue.get("policy") != "original_game_cockpit_mesh_rework_only":
         raise ValueError("cockpit-only policy drift")
+    source = queue.get("source_artifacts", {})
+    if source.get("final_format") != "BLEND_EDITABLE_ONLY":
+        raise ValueError("only editable Blender scene output allowed")
+    if not source.get("asset_source_policy", "").startswith("MANDATORY original OutRun 2006 car resource"):
+        raise ValueError("original OutRun game mesh is mandatory")
+    if not {"OVC3", "OVC", "game conversion", "fresh full car mesh generation"}.issubset(
+        set(source.get("disallowed_deliverables", ()))
+    ):
+        raise ValueError("OVC3/export/from-scratch car policy drift")
     budget = queue.get("budget", {})
     if budget.get("per_car_wall_clock_hours") != 24:
         raise ValueError("24h policy drift")
@@ -68,6 +77,12 @@ def validate(queue):
     if cars[1]["id"] != "dino246gts" or cars[1]["status"] != "SKIPPED_DONE_BY_USER":
         raise ValueError("finished Dino246 is excluded, not recreated")
     for c in cars:
+        if c.get("edit_from_original_required") is not True:
+            raise ValueError("every car must be based on original game resource")
+        if c.get("output_format") != "blend" or c.get("ovc3_conversion_required") is not False:
+            raise ValueError("Blender-only output; OVC3 conversion is forbidden")
+        if c.get("game_integration_required") is not False:
+            raise ValueError("game integration is out of scope")
         if c["status"] not in {"ACTIVE", "PENDING", "COMPLETE", "SKIPPED_DONE_BY_USER"}:
             raise ValueError("unknown car status")
         if c["id"] != "dino246gts" and c["status"] == "SKIPPED_DONE_BY_USER":
@@ -86,6 +101,28 @@ def validate(queue):
 
 
 def check_evidence(car, evidence, now):
+    provenance = car.get("source_provenance") or {}
+    if not provenance.get("required"):
+        raise ValueError("original game source lineage must be enforced")
+    if not provenance.get("original_game_resource_file"):
+        raise ValueError("BLOCKED_INPUT: original game resource path has not been located")
+    for key in ("original_game_resource_sha256", "original_import_blend_sha256"):
+        if not HEX64.fullmatch(str(provenance.get(key, ""))):
+            raise ValueError("BLOCKED_INPUT: original PMT or native import hashes missing")
+    original_objects = set(provenance.get("original_mesh_object_ids") or ())
+    if not original_objects:
+        raise ValueError("BLOCKED_INPUT: no original mesh object identity")
+    if evidence.get("source_provenance_verified") is not True:
+        raise ValueError("original game resource provenance not independently verified")
+    edits = set(evidence.get("edited_original_mesh_object_ids") or ())
+    if not edits or not edits.issubset(original_objects):
+        raise ValueError("no proven edits to originally imported game mesh objects")
+    if evidence.get("from_scratch_mesh_generation") or evidence.get("replacement_car_model"):
+        raise ValueError("from-scratch or replacement car creation forbidden")
+    if evidence.get("ovc3_created") or evidence.get("ovc_exported") or evidence.get("game_integration_performed"):
+        raise ValueError("OVC3 conversion/OVC export/game integration forbidden")
+    if evidence.get("deliverable_format") != "blend":
+        raise ValueError("deliverable is editable .blend only")
     if not car.get("started_at_utc"):
         raise ValueError("NO_START: record first new source geometry commit timestamp")
     started = iso_utc(car["started_at_utc"])
