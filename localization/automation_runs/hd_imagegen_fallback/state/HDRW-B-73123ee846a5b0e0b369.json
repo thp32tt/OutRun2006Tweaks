@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "bb5baae80f20611dacada5639f517e24d70d5e597121157fd6bf16621f03ff0c",
+  "release_approved": false,
+  "roi_id": "Q046_4cb6257a5abe3410",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Deep Lake",
+    "korean": "딥 레이크",
+    "old_candidate_sha256": "bb5baae80f20611dacada5639f517e24d70d5e597121157fd6bf16621f03ff0c",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 97,
+      "name": "HDRW-B-73123ee846a5b0e0b369_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        336,
+        89
+      ],
+      "sha256": "7f290ec35e5802a0622ef120d4fc6a1eed6f5d37ff4ed075bfd7ebd84df3084c",
+      "source_box_xyxy": [
+        1649,
+        594,
+        1993,
+        691
+      ],
+      "source_native_size": [
+        2048,
+        2048
+      ],
+      "width": 344
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q046_4cb6257a5abe3410",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+    "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "source_native_bbox_xyxy": [
+      1657,
+      602,
+      1985,
+      683
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-73123ee846a5b0e0b369"
+  },
+  "task_id": "HDRW-B-73123ee846a5b0e0b369",
+  "updated_utc": "2026-11-08T18:33:05+00:00"
+}
