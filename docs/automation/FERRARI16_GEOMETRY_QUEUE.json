@@ -491,8 +491,8 @@
       "geometry_gate": "PARTIAL_NEEDS_QA",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
-      "output_scene_sha256": "f2cd5ac7b41f67b0c7278b52eff8edf444a4d2a4e62c324371a6711190642e43",
-      "notes": "Slot C F50 original native PMT found under N100 rea-input (previous BLOCKED_INPUT RESOLVED). Official Blender 4.5.15 native direct import of 42 source-ID meshes; existing dashboard/gauge shell and original 3-spoke steering rim/hub edited in place, 39 other source meshes hash-identical. Original source SHA and editable baseline/candidate SHA independently verified; diagnostic 2-view compare only. Full 24h window, source game driver-eye camera, steering rig placement and seven view photo QA remain pending. Do NOT advance to another car. See docs/automation/F50_SLOT_C_ORIGINAL_SOURCE_P0_20261108.md. [SLOTC_F50_P0_V2_20261108] Revised SAME original 3 cockpit source meshes in private Blender 4.5.15: cowl 346v/472f->1378v/1888f; wheel 898v/1656f->3460v/6624f; hub 78v/124f->306v/496f. Private v2 SHA 381326a1...; independent actual reopen and side-by-side before/after diagnostic render PASS. 39 other original meshes hash-identical; hosted GitHub Actions cannot validate unavailable private .blend. Still P0 PARTIAL, native game driver eye/7-photo view and 24h QA pending; no advance. [SLOT_C_V3R2] Same F50 native PMT-derived Blender .blend continued: dashboard cowl 1013 moved source verts, original 3-spoke wheel 1764 verts, source hub 306v/496f->2738v/4464f. Local official Blender 4.5.15 independent re-open PASS; original 39 other meshes SHA-identical, original source unchanged. First provisional v3 fastener distortions rejected; v3-r2 corrected. 24h/driver-eye/7-view and hosted private scene QA remain incomplete. No queue advancement. [SLOT_C_F50_V4_NATIVE_MESH] Official local Blender 4.5.15 actual source-derived 3 cockpit meshes modified; cowl 5506v7552f, wheel 13552v26496f, hub 2738v4464f; private v4 SHA 870ad166, 39 untouched original meshes; fresh-process reopen and independent render PASS. Seven-view/game camera/24h/hosted private scene incomplete; keep ACTIVE. No exports or score awarded. [SLOT_C_F50_V5R2_20261108] Actual PMT-derived .blend v4 SHA 870ad166 -> v5-r2 SHA f2cd5ac7; 3 original cockpit source meshes sculpted 3180+9112+2213 existing vertices, 39 unchanged, official private Blender 4.5.15 re-open and independent same-camera render PASS. First v5 hub artifact rejected. P0 quality 7-photo/game eye/24h/hosted real private scene incomplete, F50 remains ACTIVE, no other car or game exports.",
+      "output_scene_sha256": "bb0c0f5a98709194ec8a1cb15edc9b2f69dc6227515a6b0a96f208cf43cdd827",
+      "notes": "Slot C F50 original native PMT found under N100 rea-input (previous BLOCKED_INPUT RESOLVED). Official Blender 4.5.15 native direct import of 42 source-ID meshes; existing dashboard/gauge shell and original 3-spoke steering rim/hub edited in place, 39 other source meshes hash-identical. Original source SHA and editable baseline/candidate SHA independently verified; diagnostic 2-view compare only. Full 24h window, source game driver-eye camera, steering rig placement and seven view photo QA remain pending. Do NOT advance to another car. See docs/automation/F50_SLOT_C_ORIGINAL_SOURCE_P0_20261108.md. [SLOTC_F50_P0_V2_20261108] Revised SAME original 3 cockpit source meshes in private Blender 4.5.15: cowl 346v/472f->1378v/1888f; wheel 898v/1656f->3460v/6624f; hub 78v/124f->306v/496f. Private v2 SHA 381326a1...; independent actual reopen and side-by-side before/after diagnostic render PASS. 39 other original meshes hash-identical; hosted GitHub Actions cannot validate unavailable private .blend. Still P0 PARTIAL, native game driver eye/7-photo view and 24h QA pending; no advance. [SLOT_C_V3R2] Same F50 native PMT-derived Blender .blend continued: dashboard cowl 1013 moved source verts, original 3-spoke wheel 1764 verts, source hub 306v/496f->2738v/4464f. Local official Blender 4.5.15 independent re-open PASS; original 39 other meshes SHA-identical, original source unchanged. First provisional v3 fastener distortions rejected; v3-r2 corrected. 24h/driver-eye/7-view and hosted private scene QA remain incomplete. No queue advancement. [SLOT_C_F50_V4_NATIVE_MESH] Official local Blender 4.5.15 actual source-derived 3 cockpit meshes modified; cowl 5506v7552f, wheel 13552v26496f, hub 2738v4464f; private v4 SHA 870ad166, 39 untouched original meshes; fresh-process reopen and independent render PASS. Seven-view/game camera/24h/hosted private scene incomplete; keep ACTIVE. No exports or score awarded. [SLOT_C_F50_V5R2_20261108] Actual PMT-derived .blend v4 SHA 870ad166 -> v5-r2 SHA f2cd5ac7; 3 original cockpit source meshes sculpted 3180+9112+2213 existing vertices, 39 unchanged, official private Blender 4.5.15 re-open and independent same-camera render PASS. First v5 hub artifact rejected. P0 quality 7-photo/game eye/24h/hosted real private scene incomplete, F50 remains ACTIVE, no other car or game exports. [SLOT_C_F50_V6_SOURCE_20261108] Reopened original PMT SHA/first native-import SHA and previous v5-r2 immutable; sculpted existing F50 source visor/three-spoke wheel/hub 3863/7916/2124 positions, all source mesh IDs/transforms/UV/mats unchanged, 39 untouched geometry SHA. Official private Blender 4.5.15 save and separate new-process reopen/paired genuine renders PASS, v6 SHA bb0c0f5a. Still needs game-calibrated driver eye, 7 photo views, unresolved original wheel 624 boundary edges, first 24h checkpoint and private GitHub-hosted real-scene source transfer. No exports/textures/body/Dino/slot A/Model2 or duplicate score. Keep C=f50 ACTIVE.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -578,110 +578,97 @@
           "source_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab"
         },
         "last_geometry_checkpoint": {
-          "task_id": "FERRARI16-SLOTC-F50-P0-PHOTO-BROW-THREESPOKE-HUB-V5R2-20261108",
-          "source_prior_checkpoint": "FERRARI16-SLOTC-F50-P0-NATIVE-COWL-RIM-HUB-V4-20261108",
-          "input_private_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_P0_DashboardSteering_v4.blend",
-          "input_private_blend_sha256": "870ad1663837eabd391e6436c957b7f47b4c75868db9a4b448fc8d1d64bde8c8",
-          "output_private_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_P0_DashboardSteering_v5_r2.blend",
-          "output_private_blend_sha256": "f2cd5ac7b41f67b0c7278b52eff8edf444a4d2a4e62c324371a6711190642e43",
-          "output_bytes": 1539283,
-          "original_native_resource": "rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz",
-          "original_native_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+          "task_id": "FERRARI16-SLOTC-F50-P0-ORIGINAL-BROW-THREESPOKE-HUB-V6-20261108",
+          "original_game_pmt": "rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz",
+          "original_game_pmt_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
           "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
-          "edited_original_source_ids": [
+          "input_private_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_P0_DashboardSteering_v5_r2.blend",
+          "input_private_blend_sha256": "f2cd5ac7b41f67b0c7278b52eff8edf444a4d2a4e62c324371a6711190642e43",
+          "output_private_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_P0_DashboardSteering_v6.blend",
+          "output_private_blend_sha256": "bb0c0f5a98709194ec8a1cb15edc9b2f69dc6227515a6b0a96f208cf43cdd827",
+          "output_blend_bytes": 1538799,
+          "exact_original_mesh_ids": [
             "object00_group01_material028_a0",
             "object21_group01_material002_a0",
             "object21_group00_material000_a0"
           ],
-          "exact_before_after": {
-            "object00_group01_material028_a0": [
-              [
+          "real_source_derived_geometry": {
+            "object00_group01_material028_a0": {
+              "before": [
                 5506,
                 7552
               ],
-              [
+              "after": [
                 5506,
                 7552
+              ],
+              "moved_vertices": 3863,
+              "mesh_sha_before": "ba2dbe6871cf47750dd373926e1f9a661623b5d5e6f3217d8b51c7cd9be764f3",
+              "mesh_sha_after": "7710ab4cae5f59ab666fd1ed3c85fe2fb9644443d3ae99399ad160f2e6e03fdf",
+              "nonmanifold_before_after": [
+                0,
+                0
               ]
-            ],
-            "object21_group01_material002_a0": [
-              [
+            },
+            "object21_group01_material002_a0": {
+              "before": [
                 13552,
                 26496
               ],
-              [
+              "after": [
                 13552,
                 26496
+              ],
+              "moved_vertices": 7916,
+              "mesh_sha_before": "c51ddd8efca87030274a67f27d1f9518eb468151f0f953d56f65110c9c82d4c7",
+              "mesh_sha_after": "05233f8e315bd1fedc0b8dbfd9cefe8f7388a6f5559c740689f519b707b41c53",
+              "nonmanifold_before_after": [
+                624,
+                624
               ]
-            ],
-            "object21_group00_material000_a0": [
-              [
+            },
+            "object21_group00_material000_a0": {
+              "before": [
                 2738,
                 4464
               ],
-              [
+              "after": [
                 2738,
                 4464
+              ],
+              "moved_vertices": 2124,
+              "mesh_sha_before": "aa06aea5b9d56890fe6cc7fd0a8ee2cc225fb5a4e2124c9b6b8bad09fd06af01",
+              "mesh_sha_after": "94fde52385dea2af49ce86c8e9023405c6d7944ef8c9511207d105efeb686f2e",
+              "nonmanifold_before_after": [
+                0,
+                0
               ]
-            ]
+            }
           },
-          "altered_vertex_positions": {
-            "object00_group01_material028_a0": 3180,
-            "object21_group01_material002_a0": 9112,
-            "object21_group00_material000_a0": 2213
-          },
-          "geometry_sha_after": {
-            "object00_group01_material028_a0": "ba2dbe6871cf47750dd373926e1f9a661623b5d5e6f3217d8b51c7cd9be764f3",
-            "object21_group01_material002_a0": "c51ddd8efca87030274a67f27d1f9518eb468151f0f953d56f65110c9c82d4c7",
-            "object21_group00_material000_a0": "aa06aea5b9d56890fe6cc7fd0a8ee2cc225fb5a4e2124c9b6b8bad09fd06af01"
-          },
-          "source_mesh_count": 42,
-          "remaining_hash_identical_source_meshes": 39,
-          "world_matrices_and_cameras_unchanged": true,
-          "UV_and_materials_unchanged": true,
-          "nonmanifold_before_after": {
-            "object00_group01_material028_a0": [
-              0,
-              0
-            ],
-            "object21_group01_material002_a0": [
-              624,
-              624
-            ],
-            "object21_group00_material000_a0": [
-              0,
-              0
-            ]
-          },
-          "rejected_candidate_v5_blend_sha256": "2b792c2cbd4c6e4a7d7472b5b2af44f8e8222d8f28386a386241be98a94d8e89",
-          "rejected_candidate_reason": "Hub cup dents visually distorted: private artifact retained for failure reference, never accepted",
-          "official_Blender_local_4_5_15_source_save": "PASS",
-          "official_Blender_independent_fresh_process_reopen": "PASS",
-          "actual_matched_camera_render": "PASS_NON_GAME_DIAGNOSTIC",
-          "diagnostic_side_by_side": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_SlotC_P0_v5_r2_OriginalScene_BeforeAfter_2x2.jpg",
-          "diagnostic_side_by_side_sha256": "b60ed14167fc96ac68533b59538b9ffd08adbb128a4f180c994b93c2367fb8a9",
-          "private_photo_comparison": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_SlotC_P0_v5_r2_PRIVATE_PhotoBeforeAfter.jpg",
-          "private_photo_comparison_sha256": "195683e14bc189dcaf9e1c0b30e3c5968ecf5edef62eab074bc69bc3a187c1c3",
-          "private_photo_reference": "outrun2_vr_refs/20261104_16car_cockpit/03_F50/REF2_dashboard_closeup_dad64db8c0a5.jpg",
-          "private_photo_sha256": "6d2a66553b22fbf03f9bfdceed2a9bc5930cc0564da8b8bbe7a45bb01f6d8961",
-          "independent_reopen_render_sha256": "2489f9b33e527ce832841172f163d23d03b2d659c4fc4a3ef185ee18fd68cfeb",
-          "driver_eye_game_native_camera": "UNVERIFIED",
-          "photo_seven_view_QA": "INCOMPLETE",
-          "github_hosted_real_scene": "BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED",
+          "real_private_blender_4_5_15_save": "PASS",
+          "independent_fresh_process_blender_reopen": "PASS",
+          "private_real_before_after_render": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_SlotC_P0_v6_OriginalSource_BeforeAfter_2x2.jpg",
+          "private_real_before_after_render_sha256": "d8ff5f59d983c6e6c120e74e1bcfdbc931e2939e8a0e85bf7029a64f4f4a54c5",
+          "independent_reopen_steering_render_sha256": "47d24d8ebc0b411d51c1d0db84697753cbb91a40ca4c87d14c66a3bcbfbfdcfc",
+          "source_script_commit": "5bbe7e8e81638b532e26fc685571adf459509b1d",
+          "independent_verifier_commit": "18c0e60ff093b6ff16e628d95d1e4c1f24ab5bf5",
+          "documentation_commit": "d29b873062b7ffc828466f44010cffcfa0bd547e",
+          "preserved_other_original_mesh_count": 39,
+          "all_42_original_object_ids_matrices_cameras_uv_materials_preserved": true,
+          "native_game_driver_eye": "UNVERIFIED",
+          "seven_exact_photo_views": "INCOMPLETE",
+          "hosted_blender_4_5_15_real_source": "BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED",
+          "driver_eye_fidelity": "UNTESTED",
+          "p0_dashboard_and_steering": "PARTIAL_NEEDS_QA",
           "first_geometry_utc": "2026-11-08T04:35:52Z",
-          "minimum_24h_end_utc": "2026-11-09T04:35:52Z",
-          "forbidden_game_exports": false,
-          "new_GLB": false,
-          "exterior_or_textures_modified": false,
-          "other_slot_or_Dino_or_Model2_modified": false,
-          "source_original_PMTSHA_untouched": true,
-          "complete": false,
-          "do_not_advance": true,
-          "score_change": 0,
-          "hosted_exact_source_sha": "65e2cd3471cad34159dee55a9a926a686c560dd4",
-          "hosted_blender_4_5_15_smoke_run": 42454605507,
-          "hosted_blender_4_5_15_smoke_result": "SUCCESS_TOOLCHAIN_ONLY_NO_PRIVATE_BLEND",
-          "score_reason": "AI_SCOREBOARD.md main current confirmed F50 original native PMT first geometry event counted once (2780), later refinement of same dash/wheel geometry zero; no duplicate award"
+          "min_24h_window_end_utc": "2026-11-09T04:35:52Z",
+          "no_new_game_export_or_texture_or_material_or_exterior_changes": true,
+          "original_source_untouched": true,
+          "other_slot_Dino_Model2_untouched": true,
+          "vehicle_complete": false,
+          "keep_slot_c_active": true,
+          "new_score": 0,
+          "score_reason": "Same prior F50 original PMT dashboard/steering feature already uniquely awarded; v6 refinement +0. SSOT AI2 2780."
         },
         "last_geometry_checkpoint_previous": {
           "task_id": "FERRARI16-SLOTC-F50-SOURCE-P0-V2-20261108",
@@ -892,6 +879,112 @@
           "no_new_textures_PBR_normals_export_or_runtime": true,
           "slot_c_do_not_advance": true,
           "score_change": 0
+        },
+        "last_geometry_checkpoint_previous_v5r2": {
+          "task_id": "FERRARI16-SLOTC-F50-P0-PHOTO-BROW-THREESPOKE-HUB-V5R2-20261108",
+          "source_prior_checkpoint": "FERRARI16-SLOTC-F50-P0-NATIVE-COWL-RIM-HUB-V4-20261108",
+          "input_private_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_P0_DashboardSteering_v4.blend",
+          "input_private_blend_sha256": "870ad1663837eabd391e6436c957b7f47b4c75868db9a4b448fc8d1d64bde8c8",
+          "output_private_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_P0_DashboardSteering_v5_r2.blend",
+          "output_private_blend_sha256": "f2cd5ac7b41f67b0c7278b52eff8edf444a4d2a4e62c324371a6711190642e43",
+          "output_bytes": 1539283,
+          "original_native_resource": "rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz",
+          "original_native_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+          "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+          "edited_original_source_ids": [
+            "object00_group01_material028_a0",
+            "object21_group01_material002_a0",
+            "object21_group00_material000_a0"
+          ],
+          "exact_before_after": {
+            "object00_group01_material028_a0": [
+              [
+                5506,
+                7552
+              ],
+              [
+                5506,
+                7552
+              ]
+            ],
+            "object21_group01_material002_a0": [
+              [
+                13552,
+                26496
+              ],
+              [
+                13552,
+                26496
+              ]
+            ],
+            "object21_group00_material000_a0": [
+              [
+                2738,
+                4464
+              ],
+              [
+                2738,
+                4464
+              ]
+            ]
+          },
+          "altered_vertex_positions": {
+            "object00_group01_material028_a0": 3180,
+            "object21_group01_material002_a0": 9112,
+            "object21_group00_material000_a0": 2213
+          },
+          "geometry_sha_after": {
+            "object00_group01_material028_a0": "ba2dbe6871cf47750dd373926e1f9a661623b5d5e6f3217d8b51c7cd9be764f3",
+            "object21_group01_material002_a0": "c51ddd8efca87030274a67f27d1f9518eb468151f0f953d56f65110c9c82d4c7",
+            "object21_group00_material000_a0": "aa06aea5b9d56890fe6cc7fd0a8ee2cc225fb5a4e2124c9b6b8bad09fd06af01"
+          },
+          "source_mesh_count": 42,
+          "remaining_hash_identical_source_meshes": 39,
+          "world_matrices_and_cameras_unchanged": true,
+          "UV_and_materials_unchanged": true,
+          "nonmanifold_before_after": {
+            "object00_group01_material028_a0": [
+              0,
+              0
+            ],
+            "object21_group01_material002_a0": [
+              624,
+              624
+            ],
+            "object21_group00_material000_a0": [
+              0,
+              0
+            ]
+          },
+          "rejected_candidate_v5_blend_sha256": "2b792c2cbd4c6e4a7d7472b5b2af44f8e8222d8f28386a386241be98a94d8e89",
+          "rejected_candidate_reason": "Hub cup dents visually distorted: private artifact retained for failure reference, never accepted",
+          "official_Blender_local_4_5_15_source_save": "PASS",
+          "official_Blender_independent_fresh_process_reopen": "PASS",
+          "actual_matched_camera_render": "PASS_NON_GAME_DIAGNOSTIC",
+          "diagnostic_side_by_side": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_SlotC_P0_v5_r2_OriginalScene_BeforeAfter_2x2.jpg",
+          "diagnostic_side_by_side_sha256": "b60ed14167fc96ac68533b59538b9ffd08adbb128a4f180c994b93c2367fb8a9",
+          "private_photo_comparison": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_SlotC_P0_v5_r2_PRIVATE_PhotoBeforeAfter.jpg",
+          "private_photo_comparison_sha256": "195683e14bc189dcaf9e1c0b30e3c5968ecf5edef62eab074bc69bc3a187c1c3",
+          "private_photo_reference": "outrun2_vr_refs/20261104_16car_cockpit/03_F50/REF2_dashboard_closeup_dad64db8c0a5.jpg",
+          "private_photo_sha256": "6d2a66553b22fbf03f9bfdceed2a9bc5930cc0564da8b8bbe7a45bb01f6d8961",
+          "independent_reopen_render_sha256": "2489f9b33e527ce832841172f163d23d03b2d659c4fc4a3ef185ee18fd68cfeb",
+          "driver_eye_game_native_camera": "UNVERIFIED",
+          "photo_seven_view_QA": "INCOMPLETE",
+          "github_hosted_real_scene": "BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED",
+          "first_geometry_utc": "2026-11-08T04:35:52Z",
+          "minimum_24h_end_utc": "2026-11-09T04:35:52Z",
+          "forbidden_game_exports": false,
+          "new_GLB": false,
+          "exterior_or_textures_modified": false,
+          "other_slot_or_Dino_or_Model2_modified": false,
+          "source_original_PMTSHA_untouched": true,
+          "complete": false,
+          "do_not_advance": true,
+          "score_change": 0,
+          "hosted_exact_source_sha": "65e2cd3471cad34159dee55a9a926a686c560dd4",
+          "hosted_blender_4_5_15_smoke_run": 42454605507,
+          "hosted_blender_4_5_15_smoke_result": "SUCCESS_TOOLCHAIN_ONLY_NO_PRIVATE_BLEND",
+          "score_reason": "AI_SCOREBOARD.md main current confirmed F50 original native PMT first geometry event counted once (2780), later refinement of same dash/wheel geometry zero; no duplicate award"
         }
       },
       "edit_from_original_required": true,
