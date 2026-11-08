@@ -17,6 +17,21 @@ def load():
 
 
 class BreadthCoverageTests(unittest.TestCase):
+    def test_queue_is_compact_and_does_not_embed_old_wheel_audit_loops(self):
+        queue_file = ROOT / "docs/automation/FERRARI16_GEOMETRY_QUEUE.json"
+        self.assertLess(queue_file.stat().st_size, 60000)
+        q, pack = load()
+        self.assertEqual(q["strategy_v3"]["dispatch_turn_limit_per_component"], 2)
+        self.assertEqual(q["strategy_v3"]["component_sequence"][0], "center_console")
+        for car_id in ("daytona365", "f50"):
+            car = next(c for c in q["cars"] if c["id"] == car_id)
+            self.assertIn("source_audit_archive", car)
+            self.assertIn("progress_history_archive", car)
+            self.assertIn("workpack_path", car)
+            self.assertLess(len(car["notes"]), 6000)
+            self.assertFalse(any(k.startswith("last_geometry_checkpoint_previous")
+                                 for k in car))
+
     def test_existing_daytona_does_not_start_wheel_again(self):
         q, pack = load()
         validate(q, pack, "A")
