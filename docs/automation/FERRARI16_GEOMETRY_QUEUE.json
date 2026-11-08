@@ -217,8 +217,8 @@
       "geometry_gate": "PARTIAL_NEEDS_QA",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
-      "output_scene_sha256": "4f232ce124caab8afca8ddfcadb6b629267730d80a58ab50a1daddbfad591b3e",
-      "notes": "[2026-11-09 V3] Original PMT-derived f50 source; latest private .blend SHA 4f232ce124caab8afca8ddfcadb6b629267730d80a58ab50a1daddbfad591b3e. Previous detailed progress archived: docs/automation/FERRARI16_C_F50_PRE_V3_HISTORY_20261109.md. P0 dashboard/wheel have many prior geometry changes but QA remains incomplete. NEXT center_console, then driver_controls, inner_door, windshield_frame, visible_seat, instrument_cluster. Two successful scheduling turns max per component; no repeated P0 polishing; source/native Blender and no OVC3/game integration. [SLOT_C_F50_V37_R2_SOURCE_SURROUND_VISUAL_HOLD_20261109] User correctly identified v1-v36 mostly repetitive original PMT hood/steering/hub micro-smoothing with insufficient visible F50 cockpit progress. Newly source-identified untouched original F50 binnacle outer surround original object00_group01_material011_a0 (109v119f) actually opened from immutable v36 SHA 4f232ce1, verified native read-only game PMT SHA 10daa131 and original imported blend d82b3d. First physical v37 SHA 49ab8fde separate Blender 4.5.15 reopen PASS but visual DARK_GAP_REJECTED. Corrective v37-r2 directly from v36 source, native source mesh 109v119f->674v1071f, 50 repositioned after subdivision max 4.00001mm; 41 other original source objects unchanged, original wheel 624 open edges/cameras/UV/material intact, independent actual Blender save/reopen+render PASS; private N100 v37-r2 .blend SHA 711d4f5e897d55035cec9158a11499f46a564142a5209dc477c070b9d69b0fe8. Same diagnostic render only 2522/504000 (>3 RGB) changed pixels (0.50%), NOT meaningful visual improvement: VISUAL_QA_HOLD, DO NOT PROMOTE AS ACCEPTED. Keep accepted queue output SHA v36 4f232ce1, active_by_slot.C=f50, status ACTIVE/PARTIAL_NEEDS_QA. Source script commit ba6892a8, report F50_SLOT_C_V37_R2_SOURCE_SURROUND_VISUAL_HOLD_20261109.md. True game-eye, comprehensive P0/photo seven-view and hosted private-source audit BLOCKED/INCOMPLETE, no 24h quality-pass; same-feature retry +0 AI score, no new car, exports, texture, game/VR, other slot, Dino/Model2 changes.",
+      "output_scene_sha256": "8e9081c15a071e2b2edde4f44dc529470ac08d9f34a8e4516a93b8926e933ec2",
+      "notes": "[2026-11-09 SLOT_C_V38_SOURCE_SHIFTER_CENTER_CONSOLE] Original F50 PMT source v36 SHA 4f232ce1 -> v38 8e9081c1; native object20_group00_material000_a0 metal shifter knob geometry changed 16v/19f -> 103v/171f, stem+other 41 original meshes unchanged. Official Blender 4.5.15 separate-process save/reopen PASS. center_console COVERED_PARTIAL_QA only for knob; H-pattern gate/base/tunnel source UNIDENTIFIED BLOCKED. NEXT driver_controls; P0 dash/steering hold; full car QA/24h gate INCOMPLETE, no vehicle advance. Workpack FERRARI_COCKPIT_WORKPACK_C_F50.json and v38 report; v37 rejected review retained in prior docs.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -287,9 +287,35 @@
       "game_integration_required": false,
       "progress_history_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_HISTORY_20261109.md",
       "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_C_F50.json",
-      "strategy_v3_next_component": "center_console",
+      "strategy_v3_next_component": "driver_controls",
       "strategy_v3_p0_revisit_policy": "HOLD_BEFORE_BREADTH_PASS",
-      "source_audit_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_SOURCE_AUDITS_20261109.json"
+      "source_audit_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_SOURCE_AUDITS_20261109.json",
+      "last_slot_c_center_console_v38": {
+        "native_original_PMTSHA256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+        "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+        "input_v36_blend_sha256": "4f232ce124caab8afca8ddfcadb6b629267730d80a58ab50a1daddbfad591b3e",
+        "new_private_v38_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CenterConsole_Shifter_v38.blend",
+        "new_private_v38_sha256": "8e9081c15a071e2b2edde4f44dc529470ac08d9f34a8e4516a93b8926e933ec2",
+        "source_original_mesh_id": "object20_group00_material000_a0",
+        "original_vf": [
+          16,
+          19
+        ],
+        "edited_vf": [
+          103,
+          171
+        ],
+        "other_41_meshes_unchanged": true,
+        "fresh_blender_4_5_15_reopen": "PASS",
+        "center_console": "COVERED_PARTIAL_QA_SHIFTER_ONLY",
+        "gate_base_tunnel": "BLOCKED_SOURCE_NOT_POSITIVELY_IDENTIFIED",
+        "car_complete": false,
+        "slot_C_advance": false,
+        "source_commit": "4b53fc21a42608297f001bd85e9044cd3cfbdd82",
+        "workpack_commit": "cdffed1960b81ecc8cb8a1b562d29ec764e04f34",
+        "QA_doc": "docs/automation/F50_SLOT_C_CENTER_CONSOLE_NATIVE_SHIFTER_V38_20261109.md",
+        "score_to_be_assessed": true
+      }
     },
     {
       "order": 4,
