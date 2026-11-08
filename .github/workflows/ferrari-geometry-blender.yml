@@ -1,0 +1,82 @@
+name: Ferrari geometry Blender 4.5 LTS hosted QA
+on:
+  push:
+    branches:
+      - feature/ferrari16-geometry-rework-20261108
+    paths:
+      - tools/car_modeling/**
+      - .github/workflows/ferrari-geometry-blender.yml
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "smoke proves installed Blender only; audit requires a permitted checked-in scene"
+        type: choice
+        options: [smoke, audit]
+        default: smoke
+      scene_relpath:
+        description: "Repository-relative .blend path (only for audit; never upload licensed game assets)"
+        type: string
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: ferrari-geometry-qa-${{ github.ref }}-${{ github.event.inputs.mode || 'smoke' }}
+  cancel-in-progress: false
+jobs:
+  blender-geometry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      BLENDER_VERSION: 4.5.15
+      MODE: ${{ github.event.inputs.mode || 'smoke' }}
+      SCENE_RELPATH: ${{ github.event.inputs.scene_relpath || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check safe inputs
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          mode=os.environ["MODE"]
+          if mode not in ("smoke", "audit"):
+              raise SystemExit("INVALID_MODE")
+          if mode=="audit":
+              raw=os.environ.get("SCENE_RELPATH","")
+              path=(Path.cwd()/raw).resolve()
+              if not raw.endswith(".blend") or not path.is_relative_to(Path.cwd()) or not path.is_file():
+                  raise SystemExit("BLOCKED_INPUT: provide permitted repository-local .blend")
+          PY
+      - name: Download verified official Blender archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://download.blender.org/release/Blender4.5"
+          name="blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          curl -fsSL --retry 3 "${url}/blender-${BLENDER_VERSION}.sha256" -o official.sha256
+          curl -fsSL --retry 3 "${url}/${name}" -o "${name}"
+          grep -F "${name}" official.sha256 | head -n 1 | sha256sum --check -
+          mkdir -p blender
+          tar --extract --xz --file "${name}" -C blender --strip-components=1
+          ./blender/blender --version | head -n 2
+      - name: Real Blender headless geometry smoke or source-backed QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$MODE" == "audit" ]]; then
+            ./blender/blender --background "$SCENE_RELPATH" --threads 2 \
+              --python tools/car_modeling/blender_geometry_audit.py -- \
+              --mode audit --input "$SCENE_RELPATH" --out "$RUNNER_TEMP/ferrari-geometry"
+          else
+            ./blender/blender --background --factory-startup --threads 2 \
+              --python tools/car_modeling/blender_geometry_audit.py -- \
+              --mode smoke --out "$RUNNER_TEMP/ferrari-geometry"
+          fi
+      - name: Publish audit evidence (smoke is NOT model completion)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ferrari-geometry-${{ github.run_id }}
+          path: ${{ runner.temp }}/ferrari-geometry/
+          if-no-files-found: warn
+          retention-days: 14
