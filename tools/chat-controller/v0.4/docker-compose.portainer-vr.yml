@@ -17,31 +17,31 @@ services:
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
       VR_FEATURE_DEVELOPMENT_ENABLED: "true"
-      # DX11 A is disabled by operator request; Model2 C continues independently.
+      # Operator 2026-11-08: car-geometry A ONLY. Model2 C and other VR lanes are disabled.
       VR_CONTINUOUS_30M_ENABLED: "true"
       VR_SCHEDULED_DISPATCH_ENABLED: "true"
       VR_CONTINUOUS_INTERVAL_SECONDS: "3600"
       VR_FEATURE_PROMOTION_MODE: "ai"
       VR_FEATURE_POLL_SECONDS: "60"
       VR_FEATURE_C6_REMINDER_SECONDS: "300"
-      CONVERSION_ACTIVE_LIMIT: "2"
+      CONVERSION_ACTIVE_LIMIT: "1"
       CONVERSION_DX11_ENABLED: "false"
-      # A now advances Daytona365 Blender work in the OutRun project, never DX11.
+      # A sequentially reworks Ferrari 3D geometry (no textures); latest state in Ferrari16 queue.
       CAR_MODEL_AUTODEV_ENABLED: "true"
       CAR_MODEL_GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
-      CAR_MODEL_TARGET_BRANCH: "feature/daytona365-blender-v8-20261108"
+      CAR_MODEL_TARGET_BRANCH: "feature/ferrari16-geometry-rework-20261108"
       CAR_MODEL_SCHEDULE_MINUTES: "15"
       CAR_MODEL_CONTINUE_MIN_SECONDS: "1800"
       CAR_MODEL_RESPONSE_STABLE_SECONDS: "30"
       CAR_MODEL_HARD_NEW_CHAT_SECONDS: "3600"
       DXVK_FROZEN: "true"
       CONVERSION_DXVK_ENABLED: "false"
-      # C is no longer UW2 web porting or DX9Ex review.
+      # C is not dispatched. Preserve Model2 history, but no automatic Model2 prompts.
       CONVERSION_DX9EX_ENABLED: "false"
       DX9EX_REVIEW_ONLY: "true"
       UW2_WEB_PORT_ENABLED: "false"
       # Model2 VR C belongs to its OWN ChatGPT project, never OutRun's.
-      MODEL2_AUTODEV_ENABLED: "true"
+      MODEL2_AUTODEV_ENABLED: "false"
       MODEL2_GITHUB_REPO: "thp32tt/Model2VR-tools"
       MODEL2_TARGET_BRANCH: "main"
       # Create a dedicated ChatGPT Project; put its actual home in this stack
@@ -53,7 +53,7 @@ services:
       MODEL2_RESPONSE_STABLE_SECONDS: "30"
       # Force brand-new Model2 chat/task session at 60m even when UI says busy.
       MODEL2_HARD_NEW_CHAT_SECONDS: "3600"
-      CONVERSION_ONLY_SLOT: ""
+      CONVERSION_ONLY_SLOT: "A"
       QUEUE_CHECK_SECONDS: "15"
       # GUI Chrome/noVNC stays enabled; only failed tabs are replaced.
       TAB_HEALTH_CHECK_SECONDS: "30"
@@ -84,11 +84,10 @@ services:
       PRODUCTION_COUNTER_MODE: "lane"
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      # Legacy DX11 dispatch minute retained only; Daytona A uses :15 each hour.
+      # Legacy DX11 dispatch remains disabled; geometry-only A uses :15 each hour.
       SCHEDULE_MINUTES: "30"
-      # Model2 C: >=30m normal followups; at 60m hard NEW ChatGPT project
-      # conversation even if its previous answer is busy, frozen or missing.
-      # DX11 A remains disabled; Daytona Blender A runs a separate simple loop.
+      # Model2 disabled. Keep historical Model2 settings for a future explicit opt-in only.
+      # DX11/DX9Ex/DXVK remain disabled; geometry-only A runs a separate simple loop.
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
