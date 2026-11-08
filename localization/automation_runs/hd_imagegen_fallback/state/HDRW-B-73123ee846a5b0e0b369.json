@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af0c067-36a0-83ee-9f5d-595bc37c0946",
   "old_candidate_sha256": "bb5baae80f20611dacada5639f517e24d70d5e597121157fd6bf16621f03ff0c",
   "release_approved": false,
   "roi_id": "Q046_4cb6257a5abe3410",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Deep Lake",
     "korean": "딥 레이크",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-B-73123ee846a5b0e0b369"
   },
   "task_id": "HDRW-B-73123ee846a5b0e0b369",
-  "updated_utc": "2026-11-08T18:33:05+00:00"
+  "updated_utc": "2026-11-08T18:33:26+00:00"
 }
