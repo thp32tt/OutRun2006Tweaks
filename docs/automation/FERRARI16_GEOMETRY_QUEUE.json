@@ -91,8 +91,8 @@
       "geometry_gate": "NEEDS_REWORK",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437",
-      "output_scene_sha256": "55ffc5dd9c26448ffc3a076a3749319f6c1d082fd4d18ad165c6f3bcf22547f2",
-      "notes": "[2026-11-09 V3] Original PMT-derived daytona365 source; latest private .blend SHA 65320b1ac94990a1c187f9e92d06e290ef46e6c89e6f9b6843e777a10041a236. Previous detailed progress archived: docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_HISTORY_20261109.md. P0 dashboard/wheel have many prior geometry changes but QA remains incomplete. NEXT center_console, then driver_controls, inner_door, windshield_frame, visible_seat, instrument_cluster. Two successful scheduling turns max per component; no repeated P0 polishing; source/native Blender and no OVC3/game integration. [SLOTA_R42_SOURCE_NATIVE_SPOKE_LIP_DASH_20261109] Original read-only Daytona PMT f393ba5c/import .blend 92c82ee5 and source R41 65320b1a photo 6eae2faf verified. Official Blender 4.5.15 moved 16251 existing vertices in eight original PMT derived cockpit dashboard/pad/cowl/metal gauge bezel/3spoke/rim/3 original short bridges; 105 unrelated meshes UV/material/camera/pivots unchanged. New immutable private R42 .blend 55ffc5dd saved, fresh independent original scene reopened and real Cycles cd1184a9 PASS; R41-R42 true comparison 15674 RGB>3 pixels SHA d2f7b33a. Original source eight spoke holes remain OPEN (ugly bolt-like holes user issue NOT FIXED); rejected separate private trial generated six button-like caps and was not accepted. Original source nonmanifold and sheet bridge topological weld unresolved. Original game eye/7 authentic Spider matched views/hosted real proprietary scene BLOCKED_INPUT_NOT_TRANSFERRED, 24h incomplete. Still ACTIVE NEEDS_REWORK, no next car, score +0 same P0 feature. No prohibited game exports, textures, exterior, slot C/Dino/Model2/VR changes.",
+      "output_scene_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877",
+      "notes": "[2026-11-09 SLOT A R43] Original PMT018-guided center-console only: V8_LOW_CENTER_TUNNEL 20 existing vertices moved (max 34.75mm), 112 unrelated meshes SHA-invariant. Native game PMT f393ba5c/import 92c82ee5; R42 input 55ffc5dd; new private editable R43 SHA 27c477d saved/reopened official Blender 4.5.15 PASS. center_console COVERED_PARTIAL_QA only, not car PASS; exact driver-eye/seven authentic photo views outstanding. NEXT driver_controls; dashboard/wheel P0 hold, 24h ownership retained. Source/code d299eef; audit docs/automation/FERRARI16_SLOTA_DAYTONA_R43_CENTER_CONSOLE_20261109.md. No game exports, materials or other slots.",
       "private_photo_subdir": "02_365_GTS4_Daytona",
       "priority": [
         "dashboard",
@@ -128,7 +128,7 @@
       "game_integration_required": false,
       "progress_history_archive": "docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_HISTORY_20261109.md",
       "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_A_DAYTONA365.json",
-      "strategy_v3_next_component": "center_console",
+      "strategy_v3_next_component": "driver_controls",
       "strategy_v3_p0_revisit_policy": "HOLD_BEFORE_BREADTH_PASS",
       "source_audit_archive": "docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_SOURCE_AUDITS_20261109.json",
       "last_slot_a_audit_r42": {
@@ -170,6 +170,21 @@
         "score_change": 0,
         "PMT_OVC_OVC3_GLB_game_exports": 0,
         "other_slots_untouched": true
+      },
+      "last_slot_a_r43": {
+        "task_id": "FERRARI16-SLOTA-DAYTONA-PMT018-CENTER-CONSOLE-R43-20261109",
+        "component": "center_console",
+        "status": "COVERED_PARTIAL_QA",
+        "native_source_object": "object00_group01_material018_a0",
+        "existing_edited_object": "V8_LOW_CENTER_TUNNEL",
+        "modified_vertices": 20,
+        "protected_other_meshes": 112,
+        "input_blend_sha256": "55ffc5dd9c26448ffc3a076a3749319f6c1d082fd4d18ad165c6f3bcf22547f2",
+        "output_blend_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877",
+        "blender_save_reopen": "PASS",
+        "full_car_qa": "NOT_PASS",
+        "next": "driver_controls",
+        "source_commit": "d299eef3fbcfa2cd5faed78564fdf6f69f161018"
       }
     },
     {
