@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "125db43164fef1b46794e3ec56a6c8b4c393058bf10d601f33f1aeea6bb23d93",
+  "release_approved": false,
+  "roi_id": "Q046_04f09090b3bc4003",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Castle Wall",
+    "korean": "캐슬 월",
+    "old_candidate_sha256": "125db43164fef1b46794e3ec56a6c8b4c393058bf10d601f33f1aeea6bb23d93",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 144,
+      "name": "HDRW-A-6566854aab7c844b7d5b_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        234,
+        136
+      ],
+      "sha256": "927cff35cd60cec2d15632591a5967b3beec4f013a49b1d39f8619ab24e2d1cf",
+      "source_box_xyxy": [
+        638,
+        565,
+        880,
+        709
+      ],
+      "source_native_size": [
+        2048,
+        2048
+      ],
+      "width": 242
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q046_04f09090b3bc4003",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+    "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "source_native_bbox_xyxy": [
+      646,
+      573,
+      872,
+      701
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-A-6566854aab7c844b7d5b"
+  },
+  "task_id": "HDRW-A-6566854aab7c844b7d5b",
+  "updated_utc": "2026-11-08T18:20:38+00:00"
+}
