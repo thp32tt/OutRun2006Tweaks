@@ -46,3 +46,5 @@ jobs:
 
       - name: V8.19 physical dash-to-door endcap/taper rail, source packed PBR normal (static source, not Blender render)
         run: python tools/test_daytona365_v8_19_source_contract.py
+      - name: V8.20 source-footwell formed mats, packed rubber PBR and tangent normal contract (source-only, not Blender render)
+        run: python tools/test_daytona365_v8_20_source_contract.py
