@@ -144,7 +144,11 @@
           "github_hosted_private_blend_audit": "BLOCKED_INPUT_NOT_TRANSFERRED",
           "vehicle_complete": false,
           "slot_A_advance": false,
-          "score_change": 0
+          "score_change": 0,
+          "latest_source_commit": "f9a2bc52dadcf807f1baed6c5c41be2066d1ea40",
+          "source_script_sha256": "d6d0ce33b1a1ef71d69b2795cb887cbc1d3f0ec99486ccb27d95ed71eb11fdad",
+          "blender_smoke_workflow_run": 42483137107,
+          "blender_smoke_workflow_status": "SUCCESS_SMOKE_ONLY_NOT_PRIVATE_ORIGINAL_SCENE"
         },
         "last_slot_a_audit_previous": {
           "material_source_commit": "79c80041888d348dfa07e495025aa7cb84360c03",
