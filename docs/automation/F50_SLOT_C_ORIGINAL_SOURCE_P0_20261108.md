@@ -49,3 +49,29 @@ Reference photos from N100 03_F50 private gallery; exact F50 dashboard photograp
 - **Private evidence:** `F50_P0_DashboardSteering_MeshDelta_v8.json`, `F50_SlotC_P0_v8_Independent_Reopen_Audit.json`, `F50_SlotC_P0_v8_*_GAUGE.png`, `F50_SlotC_P0_v8_*_STEERING.png`, `F50_SlotC_P0_v8_INDEPENDENT_AFTER_STEERING.png`; private F50 photo + before/after diagnostic sheet `F50_SlotC_P0_v8_PRIVATE_photo_source_after_dashboard_steering.jpg` SHA256 `a34fce0be01eb7661c1b24a1e995032b9906329cc1c89753bbe1d3a57270db13`. Image/photo is **not** licensed for publication and model QA cameras are **NON_GAME**.
 - **GitHub Actions:** source-only workflow smoke cannot validate N100 private scene or true native model; hosted real-scene gate remains `BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED` until an authorized secure scene transfer is supplied. This does **not** qualify as vehicle COMPLETE.
 - **Scope respected:** no other vehicle, no Model2/Dino/slot A/VR branch, no original game modification, no OVC/OVC3/PMT output, no new car/third-party GLB, no exterior, no textures/normal/PBR. Same already-counted F50 P0 workflow continued; duplicate competition score **+0**.
+
+## Slot C F50 v9 — source-backed in-place cockpit sculpt (2026-11-08, follow-up session)
+
+**State:** `ACTIVE / PARTIAL_NEEDS_QA`. F50 remains in slot C; Daytona remains isolated in A; Dino 246 already complete, no changes. First 24h ownership started 2026-11-08T04:35:52Z and is not eligible for completion before 2026-11-09T04:35:52Z. Never auto-advance while P0/photo/camera QA unresolved.
+
+**Read-only provenance (SHA256 rechecked on N100):**
+- Original OutRun 2006 actual `rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz`: `10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab`.
+- True initial native imported `work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CockpitSource_v1.blend`: `d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31`.
+- v8 immutable starting editable `F50_OriginalPMT_P0_DashboardSteering_v8.blend`: `6895c0e155a823000303b8da4262d4539e131b07cf47e377a82c9316a97e4cea`.
+- **NEW v9 original derivative** `F50_OriginalPMT_P0_DashboardSteering_v9.blend`: `54a559ec42e9d119d2151f1c5798b6249cc1477736e21ec4276d9479bdd7a22e`, 1,539,653 bytes. Private path `/home/chatgpt-runner/work_handoff/ferrari16_slotC_f50_source_audit_20261108/`. This private proprietary scene is not in GitHub.
+
+**Precisely changed, existing PMT source-named meshes (no whole-car substitute, zero new objects):**
+
+| Original source ID | Before/after vertices/faces | Moved existing verts | max local mm | v8 mesh SHA256 → v9 mesh SHA256 |
+|---|---|---:|---:|---|
+| `object00_group01_material028_a0` — instrument visor and dashboard | 5,506 / 7,552 → 5,506 / 7,552 | 3,613 | 2.45965 | `074a723b0e2229f798f35e5c3c579f79461967d9e75312e8ba32f9508dbeaeb1` → `7cc160bd2679264180429eb644450704b3ab117ac9a0d9230b17e744db301db3` |
+| `object21_group01_material002_a0` — factory 3-spoke/steering rim | 13,552 / 26,496 → same | 8,354 | 2.88299 | `9315df69e58229abb81756b5746f3eca6500aaa86d8ab4f9805786b5fc25dcaa` → `9003b74d88700d7d27e6cf0d04ec321031d51411a13a6c587a789d063d2eddb7` |
+| `object21_group00_material000_a0` — native steering hub | 2,738 / 4,464 → same | 2,652 | 1.29173 | `ec15f701fcdf2c2756437c37416ce33d0507af07de08dd74bd1f41b45b28c05c` → `43eaf739dd457d30b8e257a9a96c0405beee4fbaae37d630db81c0b8bd7aca19` |
+
+**Actual Blender QA:** official private Blender 4.5.15 LTS reopened the verified v8 binary, sculpted only the three existing source meshes, saved v9, rendered matched `QA_*_NON_GAME` before/after gauge and steering images, and **separate Blender process** reopened v9 and v8, compared mesh/object/camera/UV/material/matrix signatures and saved `F50_SlotC_P0_v9_INDEPENDENT_AFTER_STEERING.png`: **PASS**. Exactly 39 other original imported source object geometry hashes remain identical. Original PMT and first imported blend original SHA unchanged. Factory 3-spoke wheel's **624 pre-existing boundary/nonmanifold edges remain 624**; topology was intentionally not closed without exact source-loop QA.
+
+**Private photo-to-geometry evidence:** `F50_SlotC_P0_v9_PRIVATE_F50_photos_source_after.jpg`, SHA256 `e0be3fa2677e027b7a58025bee94762a9e9f0d9ff21ef0119502a0ce8ab28a49`; includes private actual F50 interior `03_F50/01_interior.jpg` and exact-model PistonHeads dashboard `03_F50/REF2_dashboard_closeup_dad64db8c0a5.jpg` alongside two actual original-source before/after Blender views. Reference sources must remain private; exact driver-eye calibration and seven-view matching remain **NOT VERIFIED**.
+
+**Public source/verification commits:** `tools/car_modeling/slot_c/f50_p0_source_mesh_v9.py` @ `25be5c703ab23805ae7b25d0532960ae59e356e3`; `tools/car_modeling/slot_c/f50_v9_independent_reopen.py` @ `66cb13786c57e9091f575c413d925bf965f6b850`. No OVC3/OVC/PMT conversion/output, no game application, no extra exterior wheels/body, no textures/PBR/normal, no Dino/Model2/VR source, no slot A geometry.
+
+**Limitations:** GitHub Actions installs Blender 4.5.15 but hosted runner still lacks authorized private original .blend: `BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED`. Source-smoke workflow cannot be represented as real hosted original-scene audit. Native game driver-eye/steering animation pivot in actual runtime unknown. Full photo 7-view, 24h and P0 subjective quality gate remain outstanding; `vehicle_complete=false`. **Score +0**: continued same F50 P0 native geometry, no duplicate credit.
