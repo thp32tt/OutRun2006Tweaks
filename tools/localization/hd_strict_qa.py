@@ -20,6 +20,7 @@ from hd_existing_candidate_salvage import (
     candidate_lines as salvage_candidate_lines,
     pad_candidate_edge,
     prove_source_edge_clear,
+    translated_touches_external_native_ink,
 )
 
 MAX_LINES = 3
@@ -247,6 +248,12 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
                 ("RIGHT" in native_edges and r > source.width - MARGIN) or
                 ("BOTTOM" in native_edges and b > source.height - MARGIN)):
                 raise QualityHold("QA_NATIVE_ATLAS_EDGE_TRANSLATED_GLYPH_TOUCH")
+    # A distinct, unrelated English glyph may be just outside a tight ROI.
+    # Do not permit newly resized Hangul to touch that protected native ink.
+    if "SOURCE_EDGE_DISJOINT_EXTERNAL_ALPHA_PROOF" in source_salvage and (
+        translated_touches_external_native_ink(source, box, render)
+    ):
+        raise QualityHold("QA_TRANSLATED_TOUCHES_PROTECTED_EXTERNAL_SOURCE")
     # Even empty source padding belongs to another label's metadata ROI.
     # New translated ink must not enter it. Check every other ROI, including
     # candidates that will be held or have not been processed yet.
