@@ -27,20 +27,6 @@ def digest(path):
     return h.hexdigest()
 
 
-def make_smoke_scene():
-    bpy.ops.object.select_all(action="SELECT")
-    bpy.ops.object.delete(use_global=False)
-    # A test primitive only; deliberately NOT a vehicle-modeling deliverable.
-    bpy.ops.mesh.primitive_cube_add(size=2)
-    ob = bpy.context.object
-    ob.name = "TOOLCHAIN_TEST_CUBE_NOT_A_FERRARI"
-    ob.scale = (1.8, 0.8, 0.5)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    bevel = ob.modifiers.new("CI_BEVEL_PROBE", "BEVEL")
-    bevel.width = 0.06
-    bevel.segments = 2
-
-
 def audit_meshes():
     result = []
     for obj in bpy.context.scene.objects:
@@ -112,39 +98,48 @@ def save_views(out, low, high, mode):
             bpy.ops.render.render(write_still=True)
         return
 
-    # Synthetic-only smoke: never mark these images as cockpit proof.
-    center = (low + high) * 0.5
-    extent = max((high - low).length, 0.01)
-    cam_data = bpy.data.cameras.new("CI_TOOLCHAIN_ONLY_NOT_REAL_COCKPIT")
-    cam = bpy.data.objects.new("CI_TOOLCHAIN_ONLY_NOT_REAL_COCKPIT", cam_data)
-    scene.collection.objects.link(cam)
-    scene.camera = cam
-    cam_data.type = "ORTHO"
-    cam_data.ortho_scale = extent * 1.4
-    cam.location = center + Vector((1, -1, 1)).normalized() * extent * 2.5
-    cam.rotation_euler = (center - cam.location).to_track_quat("-Z", "Y").to_euler()
-    scene.render.filepath = str(out / "smoke_test_cube_not_a_car.png")
-    bpy.ops.render.render(write_still=True)
-    bpy.data.objects.remove(cam, do_unlink=True)
 
 def main():
     args = cli()
     out = Path(args.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     if args.mode == "smoke":
-        make_smoke_scene()
-    elif not args.input or not Path(args.input).is_file():
-        raise RuntimeError("BLOCKED_INPUT: audit requires real scene loaded by Blender")
+        # Only verify installed Blender process. Never manufacture test geometry.
+        (out / "toolchain_report.json").write_text(
+            json.dumps({
+                "mode": "smoke",
+                "blender": bpy.app.version_string,
+                "new_model_created": False,
+                "original_game_resource_used": False,
+                "ovc3_conversion_performed": False,
+                "modeling_result": "NOT_PRODUCED",
+                "status": "TOOLCHAIN_ONLY",
+            }, indent=2), encoding="utf-8",
+        )
+        return
+    if not args.input or not Path(args.input).is_file():
+        raise RuntimeError("BLOCKED_INPUT: audit requires source-backed original game .blend")
+    original_sha = bpy.context.scene.get("outrun_original_game_resource_sha256")
+    original_objects = [
+        obj for obj in bpy.context.scene.objects
+        if obj.type == "MESH" and obj.get("outrun_original_mesh_object_id")
+    ]
+    if not isinstance(original_sha, str) or len(original_sha) != 64 or not original_objects:
+        raise RuntimeError("BLOCKED_INPUT: source scene lacks verified original game import tags")
     meshes = audit_meshes()
     low, high = scene_bounds()
     if min((high - low)) < 0:
         raise RuntimeError("invalid bounding box")
-    save_views(out, low, high, args.mode)
+    save_views(out, low, high, "audit")
     scene_file = out / "geometry_audited.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(scene_file), compress=True)
     report = {
         "mode": args.mode,
-        "claim_scope": "TOOLCHAIN_ONLY_NOT_FERRARI" if args.mode == "smoke" else "SCENE_GEOMETRY_AUDIT_NOT_PHOTO_OR_RUNTIME_VALIDATION",
+        "claim_scope": "ORIGINAL_GAME_DERIVED_GEOMETRY_AUDIT_NOT_GAME_CONVERSION",
+        "original_game_source_sha256_tag": original_sha,
+        "imported_original_mesh_objects": [obj.name for obj in original_objects],
+        "ovc3_conversion_performed": False,
+        "output_format": "BLEND_EDITABLE",
         "blender": bpy.app.version_string,
         "source_blend": args.input if args.mode == "audit" else None,
         "source_sha256": digest(args.input) if args.mode == "audit" else None,
@@ -157,7 +152,7 @@ def main():
         "total_zero_area_faces": sum(x["zero_area_faces"] for x in meshes),
         "photos_compared": False,
         "camera_provenance": "requires explicit QA_COCKPIT_* scene cameras for audit, smoke not proof",
-        "rendered_views": list(COCKPIT_VIEWS) if args.mode == "audit" else ["smoke_test_cube_not_a_car"],
+        "rendered_views": list(COCKPIT_VIEWS),
         "original_game_runtime_tested": False,
     }
     (out / "geometry_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
