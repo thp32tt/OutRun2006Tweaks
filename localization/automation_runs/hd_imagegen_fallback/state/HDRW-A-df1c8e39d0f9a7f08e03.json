@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "841c8794bfdcab6a8b6d65a8d4e8e9a34193374f519f47944689b861a2eb87f0",
+  "release_approved": false,
+  "roi_id": "Q046_10ba6632e1f31585",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Palm Beach",
+    "korean": "팜 비치",
+    "old_candidate_sha256": "841c8794bfdcab6a8b6d65a8d4e8e9a34193374f519f47944689b861a2eb87f0",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 143,
+      "name": "HDRW-A-df1c8e39d0f9a7f08e03_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        223,
+        135
+      ],
+      "sha256": "5f103d11251464e5cae794028213d49347eb7129e3cd90d4af306d0571f2e7b7",
+      "source_box_xyxy": [
+        138,
+        414,
+        369,
+        557
+      ],
+      "source_native_size": [
+        2048,
+        2048
+      ],
+      "width": 231
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q046_10ba6632e1f31585",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+    "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "source_native_bbox_xyxy": [
+      146,
+      422,
+      361,
+      549
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-A-df1c8e39d0f9a7f08e03"
+  },
+  "task_id": "HDRW-A-df1c8e39d0f9a7f08e03",
+  "updated_utc": "2026-11-08T18:21:15+00:00"
+}
