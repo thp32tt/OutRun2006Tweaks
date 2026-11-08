@@ -4,6 +4,10 @@ name: OutRun HD ImageGen HOLD Rework Queue (source-bound, GitHub)
 # image generator. A/B browser production and independent C1 must process tasks.
 on:
   workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/outrun-hd-imagegen-fallback.yml"
   schedule:
     - cron: "23 */3 * * *"
 
