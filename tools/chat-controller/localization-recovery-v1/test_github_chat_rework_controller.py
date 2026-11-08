@@ -210,5 +210,122 @@ class FallbackQueueResumeAndPixelTests(unittest.TestCase):
    c.compact_generated_png_lossless(data.getvalue())
 
 
+
+# Tests below simulate browser-returned ImageGen evidence. They do not claim
+# to test a live authenticated ChatGPT session.
+import base64
+import hashlib
+import chat_image_result_rescue as rescue
+
+
+class GeneratedImageRescueTests(unittest.IsolatedAsyncioTestCase):
+ async def asyncSetUp(self):
+  self.temp=tempfile.TemporaryDirectory()
+  self.task="HDRW-A-"+"c"*20
+  self.out=Path(self.temp.name)/"text_roi_batches"/"candidate_outputs"/"A"/(self.task+".png")
+  self.evidence=Path(self.temp.name)/"text_roi_batches"/"export_evidence"/(self.task+".json")
+  im=Image.new("RGBA",(96,48),(0,0,0,0))
+  ImageDraw.Draw(im).rectangle((10,8,70,40),fill=(255,240,170,255))
+  data=io.BytesIO();im.save(data,format="PNG")
+  self.encoded="data:image/png;base64,"+base64.b64encode(data.getvalue()).decode()
+ async def asyncTearDown(self):
+  self.temp.cleanup()
+ async def test_one_verified_assistant_output_is_exported_and_reused(self):
+  class FakePage:
+   def __init__(self,outer):self.outer=outer
+   async def evaluate(self,js,arg):
+    if js==rescue.ASSISTANT_IMAGE_JS:
+     return {"status":"ASSISTANT_IMAGE_SOURCE_VERIFIED",
+             "url":"blob:https://chatgpt.com/valid","width":96,"height":48}
+    return self.outer.encoded
+  page=FakePage(self)
+  result,reason=await rescue.rescue_single_image_candidate(
+   page,self.task,"A",self.temp.name)
+  self.assertEqual(result,"LOCAL_CANDIDATES_EXPORTED_UNAPPROVED")
+  self.assertTrue(self.out.is_file())
+  self.assertTrue(self.evidence.is_file())
+  self.assertEqual(hashlib.sha256(self.out.read_bytes()).hexdigest(),
+                   json.loads(self.evidence.read_text())["files"][0]["sha256"])
+  again,_=await rescue.rescue_single_image_candidate(
+   page,self.task,"A",self.temp.name)
+  self.assertEqual(again,"EXISTING_CANDIDATES_VERIFIED")
+ async def test_generic_or_unrelated_image_never_exported(self):
+  class FakePage:
+   async def evaluate(self,js,arg):
+    return {"status":"ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING"}
+  status,why=await rescue.rescue_single_image_candidate(
+   FakePage(),self.task,"A",self.temp.name)
+  self.assertEqual(status,"WAIT_ASSISTANT_RESULT_UI")
+  self.assertEqual(why,"ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING")
+  self.assertFalse(self.out.exists())
+ async def test_ambiguous_assistant_image_never_exported(self):
+  class FakePage:
+   async def evaluate(self,js,arg):
+    return {"status":"ASSISTANT_IMAGE_AMBIGUOUS","count":2}
+  status,_=await rescue.rescue_single_image_candidate(
+   FakePage(),self.task,"A",self.temp.name)
+  self.assertEqual(status,"WAIT_ASSISTANT_RESULT_UI")
+  self.assertFalse(self.out.exists())
+ async def test_invalid_external_image_url_fails_without_export(self):
+  class FakePage:
+   async def evaluate(self,js,arg):
+    return {"status":"ASSISTANT_IMAGE_SOURCE_VERIFIED",
+            "url":"http://127.0.0.1/private","width":96,"height":48}
+  status,why=await rescue.rescue_single_image_candidate(
+   FakePage(),self.task,"A",self.temp.name)
+  self.assertEqual(status,"WAIT_ASSISTANT_RESULT_EXPORT")
+  self.assertIn("UNTRUSTED_GENERATED_IMAGE_URL",why)
+  self.assertFalse(self.out.exists())
+ def test_assistant_image_dom_selector_is_strict_and_user_excluded(self):
+  js=rescue.ASSISTANT_IMAGE_JS
+  self.assertIn("data-message-author-role",js)
+  self.assertIn("==='assistant'",js)
+  self.assertIn("UPLOAD_TASK_ID=",js)
+  self.assertNotIn("querySelectorAll('img')",js)
+  self.assertTrue(rescue.safe_image_url("blob:https://chatgpt.com/abc"))
+  self.assertTrue(rescue.safe_image_url("https://files.oaiusercontent.com/f.png"))
+  self.assertFalse(rescue.safe_image_url("http://localhost:8000/img.png"))
+  self.assertFalse(rescue.safe_image_url("https://openai.com.evil.example/png"))
+
+
+class RoundRobinAndDiagnosticsTests(unittest.TestCase):
+ def setUp(self):
+  self.temp=tempfile.TemporaryDirectory()
+  self.old_root=c.ROOT
+  c.ROOT=Path(self.temp.name)
+ def tearDown(self):
+  c.ROOT=self.old_root
+  self.temp.cleanup()
+ def test_round_robin_polls_all_16_jobs_instead_of_first_three(self):
+  names=[f"HDRW-A-{i:020x}" for i in range(16)]
+  files=[Path(name+".json") for name in names]
+  cursor=None
+  visited=[]
+  for _ in range(6):
+   ordered=c.fair_task_files(files,cursor)
+   batch=ordered[:3]
+   visited.extend(p.stem for p in batch)
+   cursor=batch[-1].stem
+  self.assertEqual(len(set(visited)),16)
+  self.assertEqual(visited[:3],names[:3])
+  self.assertEqual(visited[-2:],names[:2])
+ def test_unchanged_wait_reason_is_throttled_with_remote_readback(self):
+  task={"task_id":"HDRW-A-"+"1"*20,"role":"A",
+        "roi_id":"Q044_65bad63fe0353b2b",
+        "source_dds_sha256":"a"*64,
+        "old_candidate_sha256":"b"*64,
+        "reference":{"name":"HDRW-A-"+"1"*20+"_HD_SOURCE.png","sha256":"c"*64}}
+  path=c.task_state_path(task["task_id"])
+  state={"task":task,"status":"AB_SENT","task_id":task["task_id"],
+         "role":"A","source_dds_sha256":"a"*64}
+  gh=FakeFallbackGithub({path:state})
+  self.assertTrue(c.result_poll_diagnostic(gh,state,"ASSISTANT_TURN_NOT_READY"))
+  saved=gh.records[path]
+  self.assertEqual(saved["status"],"AB_SENT")
+  self.assertFalse(saved["release_approved"])
+  self.assertEqual(saved["last_result_poll_reason"],"ASSISTANT_TURN_NOT_READY")
+  self.assertFalse(c.result_poll_diagnostic(gh,saved,"ASSISTANT_TURN_NOT_READY"))
+  self.assertEqual(len(gh.writes),1)
+
 if __name__=="__main__":
  unittest.main()
