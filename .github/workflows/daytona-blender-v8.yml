@@ -50,3 +50,6 @@ jobs:
         run: python tools/test_daytona365_v8_20_source_contract.py
       - name: V8.21-r2 original wheel hub-column physical shaft, dark source-packed gauge-under-shroud and tangent normal contract (source-only, not Blender render)
         run: python tools/test_daytona365_v8_21_source_contract.py
+
+      - name: V8.22-r2 physically manifold leather shifter boot with packed source PBR/analytical tangent normal (source-only, not Blender)
+        run: python tools/test_daytona365_v8_22_r2_source_contract.py
