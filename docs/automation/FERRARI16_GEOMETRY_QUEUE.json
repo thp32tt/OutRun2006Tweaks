@@ -89,8 +89,8 @@
       "geometry_gate": "PARTIAL_NEEDS_QA",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437",
-      "output_scene_sha256": "9e280cba0bd3f90fbfb5a7a474452867302beca95c3eefc7a3a44aa6cca90117",
-      "notes": "Existing genuine Daytona cockpit v8.22-r2 is immutable baseline; only NEW dashboard/steering driver-eye visible geometry; v8 texturing history out of scope. Private v8.22-r2 editable .blend exists N100 work_handoff/daytona365_v822_ai2_20261108/blender_v8/Daytona365_Cockpit_Blender_PBR_v8_22_r2.blend (SHA256 30ddcbd0...), but independent source PMT linkage must be checked before new geometry approval; preserve old PBR materials without spending time on them. [SLOT_A_P0_20261108] Original obj_plcar_dayts_pmt.sz SHA verified; official original imported Blender SHA validated, source-derived dash 550 original-grid vertices formed and original-game wheel source spoke 61v/31f->246v/279f sculpted. Final private r2 blend independently reopened/Cycles-rendered; Ferrari badge visibility corrected. Still P0 partial, photos seven views/24h incomplete: NEVER advance car. [SLOT_A_P0_R3_20261108] Existing original-derived 6 cockpit meshes reshaped in Blender 4.5.15: 3640 vertex moves, source private .blend SHA 0d388f55 -> r3 SHA 1f6971bc; independent local fresh reopen and true Cycles before/after PASS with approximate camera only. No PMT/export/game/texture changes. 7-view exact Spider photo QA and official GitHub Actions real private scene blocked by missing authorized scene transfer; P0 remains PARTIAL, no advance. [SLOT_A_R5_ORIGINAL_GAME_HOLES] Active Daytona only: actual original-derived wheel 246v279f -> 9720v17285f, eight source-mesh-through-ray verified circular holes, source-derived original cowl 494v and dash 326v displaced; 4.5.15 independent private Blender reopen and Cycles 720x480 before/after PASS. Original PMT SHA unchanged; one exact 1971 genuine Daytona Spider LHD reference SHA checked, remaining 7-view/photo/game-camera QA incomplete, GitHub hosted private scene absent. No OVC/OVC3/PMT output, game, PBR, exterior, slot C, Dino, Model2 change. R4 prototype jagged holes rejected, R5 private blend SHA 163e48fe. Keep ACTIVE for original 24h window and P0 QA. [SLOT_A_R6_EXISTING_NATIVE_COCKPIT_CONTOURS] Source PMT/original-import/read-only r5 SHA reverified; existing 5 Daytona-only source-derived cockpit meshes moved 5756 vertices (perforated 3-spoke lip 4077, rim 456, hub 128, bezel 811, dash 284), no new mesh/texture/material/PMT export. Official Blender 4.5.15 real private r6 SHA cb220cd7, independent fresh reopen, 8 source-holes and 108 untouched meshes, 720x480 actual Cycles before/after and exact Spider private photo comparison; original game camera, 7-view/24h and hosted private scene BLOCKED/INCOMPLETE, source nonmanifold remains. Keep ACTIVE P0 partial; no duplicate AI score. [SLOT_A_R7_NATIVE_DASH_VISOR_STEERING] Original source/import/r6 hashes independently verified; official Blender 4.5.15 in-place existing source-derived dashboard 456 vertices up to 12.703mm, instrument cowl 463 up to 10.655mm, original perforated 3-spoke 1091, wheel rim 256 and hub 64 vertices moved, total 2330. Original camera/world transforms unchanged, 108 other existing mesh signatures identical, 8 through-holes re-ray-checked, real separate-process fresh reopen/Cycles 720x480 source/photo comparison SHA a66f156b; no game conversion, textures, exterior, other slots. P0 dashboard/steering, actual driver-eye, seven Spider photo views, 24h and hosted private Blender scene QA still INCOMPLETE/BLOCKED. Keep ACTIVE; duplicate score +0. [SLOT_A_R8_NATIVE_GAUGE_BROW_BEZEL_PUNCH] Reopened genuine original Daytona PMT-derived private r7 scene SHA a66f156b; actual 4.5.15 vertex editing of existing dashboard 259, cowl 408, metal-bezel 454, original 3-spoke 4210, rim 224 (5555 moved total), no new meshes/materials or outside body. Private r8 .blend SHA 39141806; independent separate Blender 4.5.15 fresh reopen + eight physical spoke through-hole BVH PASS, 108 unchanged meshes. Real Cycles 720x480 SHA 7572f06b compared against immutable r7 actual Cycles SHA 9a53e3f1 and genuine 1971 Daytona Spider LHD private photo; image diff 6872/345600 pixels >3 RGB. Existing dashboard/spoke/bezel nonmanifold topology preserved (184/1597/466). Game driver-eye, 7 complete real Spider views, 24h allocation, GitHub-hosted real private scene still incomplete/BLOCKED; P0 ACTIVE, no vehicle advance, score +0 while hosted source gate blocked. [SLOT_A_R9_NATIVE_COWL_ARCH_SOURCE_CONTINUATION] Follow-on geometry only for original Daytona Spider cockpit PMT: 4.5.15 opened immutable private r8 SHA 39141806, original PMT f393ba5c and original imported .blend 92c82ee5 verified. Existing native-derivative dash 198 vertices, gauge cowl 630, existing metal bezel 877, original factory 3-spoke pressing 4957, wheel rim 256, existing hub collar 96 moved = 7014. No new mesh/material/texture, no exterior/game conversion/Model2/Dino/slot C. Independent actual 4.5.15 fresh process opens r9 .blend SHA fd8ec518, all 107 other meshes unchanged, camera and source object matrix retained, 8 physical spoke holes BVH preserved. Real native private Cycles 720x480 r9 SHA 089a47d7 and original Spider photo 6eae2faf three-way comparison SHA d56c11f3; r8/r9 12372/345600 pixels changed >3 RGB, same APPROXIMATE non-game eye. Existing 184/466/1597 dashboard/bezel/spoke nonmanifold edges unresolved. Full 7-view, original eye calibration, 24h allocation, hosted original scene audit blocked. Keep ACTIVE, no transition or duplicate score. [SLOT_A_R10_ORIGINAL_SPIDER_DASH_AND_WHEEL_20261108] New original game resource-matched Daytona only, source PMT f393ba5c, imported original .blend 92c82ee5, r9 fd8ec518 -> r10 d18408d82e5de993f96ce882eff80e31eedf4b41468747785890e0942b2f6da9; Blender 4.5.15 saved and separate-process reopened real private .blend. Existing 6 P0 meshes moved 6921 original-derived vertices, 107 other meshes unchanged, 8 true spoke through-holes retained, genuine original Cycles photo/R9/R10 comparison >3 RGB 11062/345600 pixels. Source nonmanifold remains dashboard 184/bezel 466/spoke 1597. True original game driver eye and 7 photographed exact Spider views not validated; GitHub Actions hosted private .blend BLOCKED_INPUT_NOT_TRANSFERRED; no score +0, remains ACTIVE partial, no conversion/textures/exterior/runtime/other-slot edits. [SLOT_A_R11_ORIGINAL_SPIDER_COWL_STEERING_RELIEF_20261108] Genuine existing OutRun 2006 Daytona native PMT SHA f393ba5c + original import 92c82ee5 => private R10 d18408d8 to R11 2324f2e4; Blender 4.5.15 existing six meshes 8046 vertex positions edited, saved independent fresh reopen QA PASS, 107 other meshes hashes identical, original spoke 8 through-holes BVH PASS, same approximate-eye real Cycles R10/R11 12246/345600 RGB pixels >3; original private photo 6eae2faf present. Source meshes, UV, camera/pivots preserved. Existing dashboard 184, bezel 466, spoke 1597 nonmanifold unresolved; calibrated real game camera and 7 authentic Spider views incomplete; hosted real confidential scene BLOCKED_INPUT_NOT_TRANSFERRED. Keep ACTIVE no advance, no export/texture/exterior/other slot, score +0 duplicate/partial. [SLOT_A_R12_NATIVE_ORIGINAL_SPOKE_ROLL_DASH] Immutable OutRun Daytona PMT f393ba5c + original imported Blender 92c82ee5 + r11 2324f2e4 verified; six existing source-derived meshes 8222 vertices physically sculpted, 8 actual spoke through-holes + 107 other native meshes retained; private Blender 4.5.15 saved/reopened r12 SHA 2995c8b2, actual independent Cycles R12 9154e6d1, same approx-eye R11/R12 comparison 12884 RGB>3 pixels. Seven exact Spider views, real game eye, source nonmanifold and hosted private-scene QA incomplete/BLOCKED. Remains slot A ACTIVE, P0 PARTIAL, score +0 follow-up; no exports, other slot or Dino. [SLOTA_R13_NATIVE_VISOR_RIM_SOURCE_TOPOLOGY] Original game PMT f393ba5c + imported PMT .blend 92c82ee5 + R12 2995c8b2 hash PASS; original-derived existing cowl 650/648 ->2594/2592 v/f, existing rim 1536/1536->6144/6144, source existing six P0 objects 13120 vertex moves. Real private R13 .blend e8c63f9a 7,792,013 bytes official Blender 4.5.15 independent reopen/Cycles PASS, 8 native spoke holes/107 other meshes unchanged. Actual R12/R13 Cycles diff >3 RGB 13747/345600, approx eye only; full Spider 7 view, game-camera, nonmanifold, hosted private scene, 24h incomplete. ACTIVE, no new score, no advance. [SLOT_A_R14_ORIGINAL_DASH_COWL_STEERING_GRIP] PMT f393ba5c/import 92c82ee5/R13 e8c63f9a exact SHA verified; existing six source-derived cockpit meshes moved 448/1588/908/9339/6144/137 vertices, no new geometry objects/textures/exterior; Blender 4.5.15 saved R14 ce021c82, independent fresh reopen/Cycles a559966a, 8 source spoke through-holes/107 unchanged meshes; R13-vs-R14 24,742 RGB>3 pixels, approx-eye only. GitHub Actions smoke PASS but real hosted private .blend BLOCKED_INPUT_NOT_TRANSFERRED; original game camera/7 exact Spider views/nonmanifold/24h still incomplete. ACTIVE, +0 score, no advance. [SLOT_A_R15_ORIGINAL_NATIVE_BEZEL_COWL_STEERING] Actual OutRun Daytona PMT f393ba5c/import 92c82ee5/R14 ce021c82 authenticated; in-place source-derived six original cockpit meshes refined, bezel actual source subdivision 908/1344 ->3157/5376; original source steering 8 holes/107 other meshes unchanged. Private R15 .blend 5da12b72 saved, separate official Blender 4.5.15 reopen/Cycles 03c41e58 PASS; R14/R15 34266 pixels >3 RGB. Existing bezel nonmanifold boundary doubled to 932 by subdivision, not healed; 7-view Spider QA, original game camera calibration, hosted PRIVATE scene and 24h gate INCOMPLETE/BLOCKED. Still ACTIVE; no next car, new score +0; no exterior/textures/PMT/OVC/GLB/game/runtime/slotC/Dino change. [SLOTA_R16_AUTHENTIC_PMT_DASH_STEERING] Existing verified original Daytona native .sz f393ba5c and import .blend 92c82ee5, immutable R15 5da12b72 reopened; official Blender 4.5.15 in-place existing six source-derived cockpit meshes 19,855 vertex moves, source steering 8 holes open, 107 unrelated meshes unchanged. Immutable private R16 .blend SHA 1af18e11 saved/fresh reopened actual Cycles SHA b9035dd6, R15/R16 20,944 >3 RGB pixels changed; original import raw IDs (object00 13v12f, object22 61v31f) independently confirmed. Exact game driver-eye, seven authentic Spider views, remaining nonmanifold and GitHub-hosted private scene QA incomplete/BLOCKED_INPUT_NOT_TRANSFERRED. ACTIVE, no advance; source script b8ac9b12; +0 score, no outside scope. [SLOT_A_R17_AUTHENTIC_GAME_DASH_WHEEL_SCULPT] Original Daytona PMT f393ba5c/import 92c82ee5/R16 1af18e11 checked on N100; Blender 4.5.15 source-native existing six cockpit objects physically moved 17945 vertices (dash 374, cowl 1940, bezel 2771, spoke 6587, rim 6144, hub 129) from photo; R17 private blend 93b3d1ee fresh-open + real Cycles bbf8e014 PASS; original 8 spoke holes and other 107 meshes unchanged; R16/R17 21603 pixels >3 RGB. Full calibrated original game eye, seven genuine Spider photo views, manifold repair and GitHub-hosted confidential-scene QA INCOMPLETE/BLOCKED. Stay ACTIVE, no advance, no score +0, no game conversion, PMT, material, textures, exterior, other-slot. [SLOTA_R18_NATIVE_PMT_DASH_STEERING_20261108] Protected original Daytona PMT f393ba5c/import 92c82ee5/R17 93b3d1ee validated. Official Blender 4.5.15 genuine private source R17 opened; 19122 existing P0 mesh vertex moves (dash 365, cowl 1865, bezel 3157, spoke 7473, rim 6144, hub 118). R18 native-derived .blend 9e280cba saved and separately reopened, real Cycles 3d9b779b at approximate eye, RGB>3 delta 19099/345600; eight native steering holes and 107 other meshes unchanged, matrices, UV and materials untouched. Prior nonmanifold dashboard 184, bezel 932, spoke 1597 unresolved; game camera calibration, 7 exact Spider photo angles, and official GitHub-hosted real source scene QA blocked/incomplete. Slot A remains Daytona ACTIVE partial and +0 score; no next car, no conversion or exterior/texture/runtime/other slot changes.",
+      "output_scene_sha256": "0e0d403e512d4f4612817fb71b9796fc84f2f58cc52b9b3625497727fbab8fcd",
+      "notes": "Existing genuine Daytona cockpit v8.22-r2 is immutable baseline; only NEW dashboard/steering driver-eye visible geometry; v8 texturing history out of scope. Private v8.22-r2 editable .blend exists N100 work_handoff/daytona365_v822_ai2_20261108/blender_v8/Daytona365_Cockpit_Blender_PBR_v8_22_r2.blend (SHA256 30ddcbd0...), but independent source PMT linkage must be checked before new geometry approval; preserve old PBR materials without spending time on them. [SLOT_A_P0_20261108] Original obj_plcar_dayts_pmt.sz SHA verified; official original imported Blender SHA validated, source-derived dash 550 original-grid vertices formed and original-game wheel source spoke 61v/31f->246v/279f sculpted. Final private r2 blend independently reopened/Cycles-rendered; Ferrari badge visibility corrected. Still P0 partial, photos seven views/24h incomplete: NEVER advance car. [SLOT_A_P0_R3_20261108] Existing original-derived 6 cockpit meshes reshaped in Blender 4.5.15: 3640 vertex moves, source private .blend SHA 0d388f55 -> r3 SHA 1f6971bc; independent local fresh reopen and true Cycles before/after PASS with approximate camera only. No PMT/export/game/texture changes. 7-view exact Spider photo QA and official GitHub Actions real private scene blocked by missing authorized scene transfer; P0 remains PARTIAL, no advance. [SLOT_A_R5_ORIGINAL_GAME_HOLES] Active Daytona only: actual original-derived wheel 246v279f -> 9720v17285f, eight source-mesh-through-ray verified circular holes, source-derived original cowl 494v and dash 326v displaced; 4.5.15 independent private Blender reopen and Cycles 720x480 before/after PASS. Original PMT SHA unchanged; one exact 1971 genuine Daytona Spider LHD reference SHA checked, remaining 7-view/photo/game-camera QA incomplete, GitHub hosted private scene absent. No OVC/OVC3/PMT output, game, PBR, exterior, slot C, Dino, Model2 change. R4 prototype jagged holes rejected, R5 private blend SHA 163e48fe. Keep ACTIVE for original 24h window and P0 QA. [SLOT_A_R6_EXISTING_NATIVE_COCKPIT_CONTOURS] Source PMT/original-import/read-only r5 SHA reverified; existing 5 Daytona-only source-derived cockpit meshes moved 5756 vertices (perforated 3-spoke lip 4077, rim 456, hub 128, bezel 811, dash 284), no new mesh/texture/material/PMT export. Official Blender 4.5.15 real private r6 SHA cb220cd7, independent fresh reopen, 8 source-holes and 108 untouched meshes, 720x480 actual Cycles before/after and exact Spider private photo comparison; original game camera, 7-view/24h and hosted private scene BLOCKED/INCOMPLETE, source nonmanifold remains. Keep ACTIVE P0 partial; no duplicate AI score. [SLOT_A_R7_NATIVE_DASH_VISOR_STEERING] Original source/import/r6 hashes independently verified; official Blender 4.5.15 in-place existing source-derived dashboard 456 vertices up to 12.703mm, instrument cowl 463 up to 10.655mm, original perforated 3-spoke 1091, wheel rim 256 and hub 64 vertices moved, total 2330. Original camera/world transforms unchanged, 108 other existing mesh signatures identical, 8 through-holes re-ray-checked, real separate-process fresh reopen/Cycles 720x480 source/photo comparison SHA a66f156b; no game conversion, textures, exterior, other slots. P0 dashboard/steering, actual driver-eye, seven Spider photo views, 24h and hosted private Blender scene QA still INCOMPLETE/BLOCKED. Keep ACTIVE; duplicate score +0. [SLOT_A_R8_NATIVE_GAUGE_BROW_BEZEL_PUNCH] Reopened genuine original Daytona PMT-derived private r7 scene SHA a66f156b; actual 4.5.15 vertex editing of existing dashboard 259, cowl 408, metal-bezel 454, original 3-spoke 4210, rim 224 (5555 moved total), no new meshes/materials or outside body. Private r8 .blend SHA 39141806; independent separate Blender 4.5.15 fresh reopen + eight physical spoke through-hole BVH PASS, 108 unchanged meshes. Real Cycles 720x480 SHA 7572f06b compared against immutable r7 actual Cycles SHA 9a53e3f1 and genuine 1971 Daytona Spider LHD private photo; image diff 6872/345600 pixels >3 RGB. Existing dashboard/spoke/bezel nonmanifold topology preserved (184/1597/466). Game driver-eye, 7 complete real Spider views, 24h allocation, GitHub-hosted real private scene still incomplete/BLOCKED; P0 ACTIVE, no vehicle advance, score +0 while hosted source gate blocked. [SLOT_A_R9_NATIVE_COWL_ARCH_SOURCE_CONTINUATION] Follow-on geometry only for original Daytona Spider cockpit PMT: 4.5.15 opened immutable private r8 SHA 39141806, original PMT f393ba5c and original imported .blend 92c82ee5 verified. Existing native-derivative dash 198 vertices, gauge cowl 630, existing metal bezel 877, original factory 3-spoke pressing 4957, wheel rim 256, existing hub collar 96 moved = 7014. No new mesh/material/texture, no exterior/game conversion/Model2/Dino/slot C. Independent actual 4.5.15 fresh process opens r9 .blend SHA fd8ec518, all 107 other meshes unchanged, camera and source object matrix retained, 8 physical spoke holes BVH preserved. Real native private Cycles 720x480 r9 SHA 089a47d7 and original Spider photo 6eae2faf three-way comparison SHA d56c11f3; r8/r9 12372/345600 pixels changed >3 RGB, same APPROXIMATE non-game eye. Existing 184/466/1597 dashboard/bezel/spoke nonmanifold edges unresolved. Full 7-view, original eye calibration, 24h allocation, hosted original scene audit blocked. Keep ACTIVE, no transition or duplicate score. [SLOT_A_R10_ORIGINAL_SPIDER_DASH_AND_WHEEL_20261108] New original game resource-matched Daytona only, source PMT f393ba5c, imported original .blend 92c82ee5, r9 fd8ec518 -> r10 d18408d82e5de993f96ce882eff80e31eedf4b41468747785890e0942b2f6da9; Blender 4.5.15 saved and separate-process reopened real private .blend. Existing 6 P0 meshes moved 6921 original-derived vertices, 107 other meshes unchanged, 8 true spoke through-holes retained, genuine original Cycles photo/R9/R10 comparison >3 RGB 11062/345600 pixels. Source nonmanifold remains dashboard 184/bezel 466/spoke 1597. True original game driver eye and 7 photographed exact Spider views not validated; GitHub Actions hosted private .blend BLOCKED_INPUT_NOT_TRANSFERRED; no score +0, remains ACTIVE partial, no conversion/textures/exterior/runtime/other-slot edits. [SLOT_A_R11_ORIGINAL_SPIDER_COWL_STEERING_RELIEF_20261108] Genuine existing OutRun 2006 Daytona native PMT SHA f393ba5c + original import 92c82ee5 => private R10 d18408d8 to R11 2324f2e4; Blender 4.5.15 existing six meshes 8046 vertex positions edited, saved independent fresh reopen QA PASS, 107 other meshes hashes identical, original spoke 8 through-holes BVH PASS, same approximate-eye real Cycles R10/R11 12246/345600 RGB pixels >3; original private photo 6eae2faf present. Source meshes, UV, camera/pivots preserved. Existing dashboard 184, bezel 466, spoke 1597 nonmanifold unresolved; calibrated real game camera and 7 authentic Spider views incomplete; hosted real confidential scene BLOCKED_INPUT_NOT_TRANSFERRED. Keep ACTIVE no advance, no export/texture/exterior/other slot, score +0 duplicate/partial. [SLOT_A_R12_NATIVE_ORIGINAL_SPOKE_ROLL_DASH] Immutable OutRun Daytona PMT f393ba5c + original imported Blender 92c82ee5 + r11 2324f2e4 verified; six existing source-derived meshes 8222 vertices physically sculpted, 8 actual spoke through-holes + 107 other native meshes retained; private Blender 4.5.15 saved/reopened r12 SHA 2995c8b2, actual independent Cycles R12 9154e6d1, same approx-eye R11/R12 comparison 12884 RGB>3 pixels. Seven exact Spider views, real game eye, source nonmanifold and hosted private-scene QA incomplete/BLOCKED. Remains slot A ACTIVE, P0 PARTIAL, score +0 follow-up; no exports, other slot or Dino. [SLOTA_R13_NATIVE_VISOR_RIM_SOURCE_TOPOLOGY] Original game PMT f393ba5c + imported PMT .blend 92c82ee5 + R12 2995c8b2 hash PASS; original-derived existing cowl 650/648 ->2594/2592 v/f, existing rim 1536/1536->6144/6144, source existing six P0 objects 13120 vertex moves. Real private R13 .blend e8c63f9a 7,792,013 bytes official Blender 4.5.15 independent reopen/Cycles PASS, 8 native spoke holes/107 other meshes unchanged. Actual R12/R13 Cycles diff >3 RGB 13747/345600, approx eye only; full Spider 7 view, game-camera, nonmanifold, hosted private scene, 24h incomplete. ACTIVE, no new score, no advance. [SLOT_A_R14_ORIGINAL_DASH_COWL_STEERING_GRIP] PMT f393ba5c/import 92c82ee5/R13 e8c63f9a exact SHA verified; existing six source-derived cockpit meshes moved 448/1588/908/9339/6144/137 vertices, no new geometry objects/textures/exterior; Blender 4.5.15 saved R14 ce021c82, independent fresh reopen/Cycles a559966a, 8 source spoke through-holes/107 unchanged meshes; R13-vs-R14 24,742 RGB>3 pixels, approx-eye only. GitHub Actions smoke PASS but real hosted private .blend BLOCKED_INPUT_NOT_TRANSFERRED; original game camera/7 exact Spider views/nonmanifold/24h still incomplete. ACTIVE, +0 score, no advance. [SLOT_A_R15_ORIGINAL_NATIVE_BEZEL_COWL_STEERING] Actual OutRun Daytona PMT f393ba5c/import 92c82ee5/R14 ce021c82 authenticated; in-place source-derived six original cockpit meshes refined, bezel actual source subdivision 908/1344 ->3157/5376; original source steering 8 holes/107 other meshes unchanged. Private R15 .blend 5da12b72 saved, separate official Blender 4.5.15 reopen/Cycles 03c41e58 PASS; R14/R15 34266 pixels >3 RGB. Existing bezel nonmanifold boundary doubled to 932 by subdivision, not healed; 7-view Spider QA, original game camera calibration, hosted PRIVATE scene and 24h gate INCOMPLETE/BLOCKED. Still ACTIVE; no next car, new score +0; no exterior/textures/PMT/OVC/GLB/game/runtime/slotC/Dino change. [SLOTA_R16_AUTHENTIC_PMT_DASH_STEERING] Existing verified original Daytona native .sz f393ba5c and import .blend 92c82ee5, immutable R15 5da12b72 reopened; official Blender 4.5.15 in-place existing six source-derived cockpit meshes 19,855 vertex moves, source steering 8 holes open, 107 unrelated meshes unchanged. Immutable private R16 .blend SHA 1af18e11 saved/fresh reopened actual Cycles SHA b9035dd6, R15/R16 20,944 >3 RGB pixels changed; original import raw IDs (object00 13v12f, object22 61v31f) independently confirmed. Exact game driver-eye, seven authentic Spider views, remaining nonmanifold and GitHub-hosted private scene QA incomplete/BLOCKED_INPUT_NOT_TRANSFERRED. ACTIVE, no advance; source script b8ac9b12; +0 score, no outside scope. [SLOT_A_R17_AUTHENTIC_GAME_DASH_WHEEL_SCULPT] Original Daytona PMT f393ba5c/import 92c82ee5/R16 1af18e11 checked on N100; Blender 4.5.15 source-native existing six cockpit objects physically moved 17945 vertices (dash 374, cowl 1940, bezel 2771, spoke 6587, rim 6144, hub 129) from photo; R17 private blend 93b3d1ee fresh-open + real Cycles bbf8e014 PASS; original 8 spoke holes and other 107 meshes unchanged; R16/R17 21603 pixels >3 RGB. Full calibrated original game eye, seven genuine Spider photo views, manifold repair and GitHub-hosted confidential-scene QA INCOMPLETE/BLOCKED. Stay ACTIVE, no advance, no score +0, no game conversion, PMT, material, textures, exterior, other-slot. [SLOTA_R18_NATIVE_PMT_DASH_STEERING_20261108] Protected original Daytona PMT f393ba5c/import 92c82ee5/R17 93b3d1ee validated. Official Blender 4.5.15 genuine private source R17 opened; 19122 existing P0 mesh vertex moves (dash 365, cowl 1865, bezel 3157, spoke 7473, rim 6144, hub 118). R18 native-derived .blend 9e280cba saved and separately reopened, real Cycles 3d9b779b at approximate eye, RGB>3 delta 19099/345600; eight native steering holes and 107 other meshes unchanged, matrices, UV and materials untouched. Prior nonmanifold dashboard 184, bezel 932, spoke 1597 unresolved; game camera calibration, 7 exact Spider photo angles, and official GitHub-hosted real source scene QA blocked/incomplete. Slot A remains Daytona ACTIVE partial and +0 score; no next car, no conversion or exterior/texture/runtime/other slot changes. [SLOTA_USER_FEEDBACK_R19_R20_FALSE_BAR_WHEEL_CORRECTION_20261108] Reopened verified original-game Daytona PMT f393ba5c/import 92c82ee5 and immutable R18 9e280cba. User identified falsely raised cockpit brow and blocklike steering rim bridges; independently inspected photograph and actual render/raycast. R19 existing seven source-derived objects physically corrected, original eight wheel holes + 106 other mesh signatures preserved, private R19 237f0add new Blender 4.5.15 independent reopen + Cycles 2ad9280f. Root cause remaining straight 11mm-thick false bar: non-PMT-added V6_BLENDER_INSTRUMENT_COWL_ROUNDED_LEATHER_EDGE CURVE; R20 moved all 65 spline points inside original dashboard and set geometry bevel 0.011->0.0, retaining object and original PMT meshes, 113/113 existing mesh signatures unchanged R19->R20. Official Blender 4.5.15 independent fresh reopen/Cycles R20 private SHA 0e0d403e, render SHA 1dec8531; actual R18/R20 render >3 RGB diff 56434 pixels; N100 private screenshot comparisons delivered separately. Original game eye, 7 calibrated Spider photos, original topology nonmanifold repairs, hosted private real-scene QA and 24h gate INCOMPLETE/BLOCKED. ACTIVE, no car advance, +0 score same ongoing corrective achievement. No textures/PBR/exterior/PMT/OVC/game/VR/other slot.",
       "private_photo_subdir": "02_365_GTS4_Daytona",
       "priority": [
         "dashboard",
@@ -119,146 +119,60 @@
         "original_import_blend_file": "work_handoff/daytona365_rework_20261107/original_game_blender/Daytona365_ORIGINAL_GAME_COCKPIT_COMPARE.blend",
         "imported_original_mesh_identity_note": "object00_group01_material012_a0 13v/12f source signature matches V5_NATIVE_DASH_REFERENCE...; factory object22_group00_material000_a0 61v/31f corresponds to existing v5 original wheel. V5_DASHBOARD_SOURCE_REFERENCED_PADDED_FACE is a v5 geometry derivative, not byte-identical original source triangles.",
         "last_slot_a_audit": {
-          "revision": "r18",
-          "task_id": "FERRARI16-SLOTA-DAYTONA-R18-NATIVE-DASH-SPOKE-RELIEF-20261108",
+          "revision": "r20",
+          "task_id": "FERRARI16-SLOTA-DAYTONA-R20-FALSE-COWL-BAR-STEERING-BRIDGE-CORRECTION-20261108",
           "date_kst": "2026-11-08",
-          "source_script_commit": "55e8995344a28fe4cabe282b019ebabb7aedd1a0",
-          "source_script_path": "tools/car_modeling/slotA_daytona_r18_native_dashboard_steering.py",
+          "prior_confirmed_revision": "r18",
+          "source_script_r19": "tools/car_modeling/slotA_daytona_r19_correct_cowl_and_spoke_bridges.py",
+          "source_script_r19_commit": "582d36c8565d557b2d3f8938507f1d515b4b5741",
+          "source_script_r20": "tools/car_modeling/slotA_daytona_r20_remove_false_cowl_curve.py",
+          "source_script_r20_commit": "dd30fec33d7e82e470155e09d77d822355d062bc",
           "original_native_pmt": "/home/chatgpt-runner/rea-input/outrun/outrun2006/Cars/obj_plcar_dayts_pmt.sz",
           "original_native_pmt_sha256": "f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe",
-          "original_import_blend": "/home/chatgpt-runner/work_handoff/daytona365_rework_20261107/original_game_blender/Daytona365_ORIGINAL_GAME_COCKPIT_COMPARE.blend",
+          "original_import_blend": "work_handoff/daytona365_rework_20261107/original_game_blender/Daytona365_ORIGINAL_GAME_COCKPIT_COMPARE.blend",
           "original_import_blend_sha256": "92c82ee5c4e0631195cb314e0d8e2f56a78a6a58da3c809c46b1da0f9d2c71a3",
-          "original_import_mesh_ids_and_counts": {
-            "object00_group01_material012_a0": [
-              13,
-              12
-            ],
-            "object22_group00_material000_a0": [
-              61,
-              31
-            ]
+          "original_native_object_ids": {
+            "dashboard": "object00_group01_material012_a0",
+            "three_spoke": "object22_group00_material000_a0"
           },
-          "private_source_blend": "work_handoff/ferrari16_slotA_daytona_dashboard_steering_20261108/Daytona365_SlotA_SourceCockpit_P0_DashWheel_v15_r17.blend",
-          "private_source_sha256": "93b3d1ee0a6c6e0828a2b9103cae52009cd0984893cbe81314684f61a9e4726a",
-          "private_output_blend": "work_handoff/ferrari16_slotA_daytona_dashboard_steering_20261108/Daytona365_SlotA_SourceCockpit_P0_DashWheel_v16_r18.blend",
-          "private_output_sha256": "9e280cba0bd3f90fbfb5a7a474452867302beca95c3eefc7a3a44aa6cca90117",
+          "last_verified_r18_sha256": "9e280cba0bd3f90fbfb5a7a474452867302beca95c3eefc7a3a44aa6cca90117",
+          "r19_private_blend": "work_handoff/ferrari16_slotA_daytona_dashboard_steering_20261108/Daytona365_SlotA_SourceCockpit_P0_DashWheel_v17_r19.blend",
+          "r19_sha256": "237f0add4f0a6e931bfcb86c24e0ac5aede13f05147c2be18116f1096b36c779",
+          "r19_existing_original_derived_mesh_vertex_changes": {
+            "instrument_visor": 2594,
+            "stitch_arc": 168,
+            "left_spoke_bridge": 8,
+            "right_spoke_bridge": 8,
+            "lower_spoke_bridge": 8,
+            "wheel_rim": 6144,
+            "factory_three_spoke": 698
+          },
+          "r19_unmodified_other_meshes": 106,
+          "r19_source_8_spoke_holes": "PASS",
+          "r19_real_cycles_sha256": "2ad9280f6805317a60122f5e6998473be08cd490cfd7dba66523bdb0b8965a96",
+          "r20_private_blend": "work_handoff/ferrari16_slotA_daytona_dashboard_steering_20261108/Daytona365_SlotA_SourceCockpit_P0_DashWheel_v18_r20.blend",
+          "r20_blend_sha256": "0e0d403e512d4f4612817fb71b9796fc84f2f58cc52b9b3625497727fbab8fcd",
+          "fixed_non_original_overlaid_curve": "V6_BLENDER_INSTRUMENT_COWL_ROUNDED_LEATHER_EDGE",
+          "curve_bevel_before_m": 0.011,
+          "curve_bevel_after_m": 0,
+          "curve_points_moved": 65,
+          "r20_113_existing_source_and_derived_mesh_signatures_preserved": true,
+          "r20_8_original_spoke_holes": "PASS",
           "blender_version": "4.5.15 LTS",
-          "source_derived_original_meshes": {
-            "dashboard": {
-              "object": "V5_DASHBOARD_SOURCE_REFERENCED_PADDED_FACE",
-              "before": {
-                "vertices": 1885,
-                "faces": 3584,
-                "signature": "0f50ce3f22039dc6523ccb945a0eb4558cf51c8999509cb6175a178bd856bd3c"
-              },
-              "after": {
-                "vertices": 1885,
-                "faces": 3584,
-                "signature": "42d6463460b463fd15702917cd1026141f7c53901751d76a74fae9e719d1c936"
-              },
-              "moved": 365,
-              "max_move_mm": 2.97405,
-              "nonmanifold_edges_after": 184
-            },
-            "cowl": {
-              "object": "V8_17_ORIGINAL_GUIDED_GAUGE_COWL",
-              "before": {
-                "vertices": 2594,
-                "faces": 2592,
-                "signature": "f7d4614295f2d381a00dd67f53aeffb45f3ea6984588e49ab155eefc81c860d5"
-              },
-              "after": {
-                "vertices": 2594,
-                "faces": 2592,
-                "signature": "67fa64fe7bffb1a32a2b990ce02068411a2f7641e4028e129adc398f53eae2f3"
-              },
-              "moved": 1865,
-              "max_move_mm": 4.3909,
-              "nonmanifold_edges_after": 0
-            },
-            "bezel": {
-              "object": "DAYTONA_GAUGE_METAL_BEZEL_ACTUAL_GEOMETRY",
-              "before": {
-                "vertices": 3157,
-                "faces": 5376,
-                "signature": "05830d1d70d13e0594174fb1020a6ec9172c3241fecca282d45247ae8278f6f0"
-              },
-              "after": {
-                "vertices": 3157,
-                "faces": 5376,
-                "signature": "4fb16e408ce53fa638719b1fa51d86dcd00287a03bb374ab195e7de884ee7296"
-              },
-              "moved": 3157,
-              "max_move_mm": 0.80943,
-              "nonmanifold_edges_after": 932
-            },
-            "spoke": {
-              "object": "V5_ORIGINAL_THREESPOKE_WHEEL_object22_group00_material000_a0",
-              "before": {
-                "vertices": 9720,
-                "faces": 17285,
-                "signature": "4bc65921d0d54a3354f0fde4e0a2c1e3af1ec141520eb0ab6dd240704afecaab"
-              },
-              "after": {
-                "vertices": 9720,
-                "faces": 17285,
-                "signature": "4d52da8474bc960f6c6b858ce7239c196fdec476641996696644114bff616387"
-              },
-              "moved": 7473,
-              "max_move_mm": 2.01648,
-              "nonmanifold_edges_after": 1597
-            },
-            "rim": {
-              "object": "V7_3_HIGH_RES_WALNUT_SINGLE_STEERING_RIM",
-              "before": {
-                "vertices": 6144,
-                "faces": 6144,
-                "signature": "11dacefbcd72feb2c148c3bdbd8d1f5bd58bf96920cb79c05e9cf47836e7f6c5"
-              },
-              "after": {
-                "vertices": 6144,
-                "faces": 6144,
-                "signature": "89ccb952f1c24979868a77260c3058d5e023626c7572d991d62b1a6e01945f99"
-              },
-              "moved": 6144,
-              "max_move_mm": 1.85903,
-              "nonmanifold_edges_after": 0
-            },
-            "hub": {
-              "object": "V7_SHORT_SHAFT_AT_WHEEL_HUB",
-              "before": {
-                "vertices": 224,
-                "faces": 210,
-                "signature": "760750f0450acc2ac373fbdbecf2bf1a92a37ff9542490db3c6434429bb2adb1"
-              },
-              "after": {
-                "vertices": 224,
-                "faces": 210,
-                "signature": "739ac3da2e42a561b7640afb9dbdb0c9b6180c18c88866c32f6ed93d818f8b60"
-              },
-              "moved": 118,
-              "max_move_mm": 1.31485,
-              "nonmanifold_edges_after": 0
-            }
-          },
-          "source_scene_saved_independent_blender_reopen": "PASS",
-          "actual_private_cycles_render": "SLOTA_DAYTONA_R18_AFTER_REAL_CYCLES_APPROX_EYE.png",
-          "actual_private_cycles_sha256": "3d9b779b08033a1939e13b261bf9773869ba526da91f90039d8cd9f5064145d8",
-          "private_comparison_sha256": "e67ad72a25618f1c75d5e58c5271541c183d39c6f33509817c6723ae5fa6e805",
-          "r17_vs_r18_rgb_gt3": 19099,
-          "r17_vs_r18_rgb_gt10": 7888,
-          "native_spoke_8_through_holes": "PASS",
-          "other_107_meshes_untouched": true,
-          "original_camera_matrices_pivots_uv_materials_images_preserved": true,
-          "game_driver_eye_calibration": "NOT_DONE",
-          "seven_authentic_spider_photo_views": "INCOMPLETE",
-          "github_actions_original_private_scene": "BLOCKED_INPUT_NOT_TRANSFERRED",
-          "photo_spider_lhd_sha256": "6eae2fafd6369c1dbd4b82df8e24834d2d284bc3415cace15a9ea830cadd26eb",
+          "independent_fresh_reopen_and_cycles": "PASS",
+          "r20_real_cycles_sha256": "1dec8531ebb368ccf4c96a5493c6c48b08733258ef62db1ae86cf82b882be646",
+          "r18_vs_r20_rgb_gt3": 56434,
+          "before_after_private_compare_sha256": "cb56eba6c37af13dd0567517de05ec237a39a4691ca15b5c23bfa07844820984",
+          "detail_private_compare_sha256": "b87e70f2667c2d6bf8b5ce5c288d56e942deacad5a320ab89f6fe5ae09d369ba",
+          "photo_Spider_LHD_sha256": "6eae2fafd6369c1dbd4b82df8e24834d2d284bc3415cace15a9ea830cadd26eb",
+          "original_camera_game_calibration": "NOT_DONE",
+          "seven_Spider_photo_angles": "INCOMPLETE",
+          "GitHub_hosted_original_private_scene": "BLOCKED_INPUT_NOT_TRANSFERRED",
+          "protected_original_game_resource_unchanged": true,
+          "outside_exterior_textures_normal_PBR_game_and_slot_C_untouched": true,
           "vehicle_complete": false,
           "slot_A_advance": false,
-          "score_change": 0,
-          "no_new_textures_PBR_normal_or_exterior": true,
-          "no_native_conversion_export_or_game": true
+          "score_change": 0
         },
         "last_slot_a_audit_previous": {
           "material_source_commit": "79c80041888d348dfa07e495025aa7cb84360c03",
