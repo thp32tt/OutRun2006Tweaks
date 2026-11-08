@@ -326,6 +326,55 @@ class StrictHDQualityTests(unittest.TestCase):
         self.assertFalse(painted)
         self.assertEqual(holds[0]["reason"], "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
 
+    def test_source_edge_unrelated_neighbor_is_not_false_hold(self):
+        # The source text ends at x=4. Another word's native alpha lies
+        # just outside the same bounding ROI but far away on the y axis.
+        # The original neighbor stays bit-identical after resizing and CLEAN.
+        im = native.native_image(source_dds())
+        draw = ImageDraw.Draw(im)
+        draw.rectangle((4, 18, 14, 37), fill=(255, 255, 255, 255))
+        draw.rectangle((3, 76, 3, 81), fill=(127, 100, 255, 80))
+        src = source_dds()[:128] + im.tobytes("raw", "BGRA")
+        data, final, clean, painted, holds = self.run_case(src)
+        self.assertIsNotNone(data)
+        self.assertFalse(holds)
+        self.assertEqual(len(painted), 1)
+        self.assertIn("SOURCE_EDGE_DISJOINT_EXTERNAL_ALPHA_PROOF",
+                      painted[0]["auto_salvage"])
+        self.assertEqual(final.getpixel((3, 78)), im.getpixel((3, 78)))
+        self.assertEqual(clean.getpixel((3, 78)), im.getpixel((3, 78)))
+        self.assertIsNone(clean.crop((4, 18, 99, 38)).getchannel("A").getbbox())
+        self.assertEqual(data[:128], src[:128])
+        self.assertEqual(len(data), len(src))
+
+    def test_source_edge_diagonal_native_continuation_is_still_hold(self):
+        # Native AA can cross diagonally. Even one nonzero alpha pixel
+        # connecting to the outside must preserve source and stay HOLD.
+        im = native.native_image(source_dds())
+        draw = ImageDraw.Draw(im)
+        draw.rectangle((4, 18, 14, 37), fill=(255, 255, 255, 255))
+        draw.point((3, 38), fill=(127, 100, 255, 1))
+        draw.point((4, 37), fill=(255, 255, 255, 1))
+        src = source_dds()[:128] + im.tobytes("raw", "BGRA")
+        data, final, clean, painted, holds = self.run_case(src)
+        self.assertIsNone(data)
+        self.assertFalse(painted)
+        self.assertEqual(holds[0]["reason"],
+                         "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+
+    def test_new_korean_pixel_may_not_touch_protected_native_neighbor(self):
+        from hd_existing_candidate_salvage import (
+            translated_touches_external_native_ink,
+        )
+        im = Image.new("RGBA", (128, 112), (0, 0, 0, 0))
+        ImageDraw.Draw(im).point((3, 40), fill=(255, 255, 255, 20))
+        glyph = Image.new("RGBA", (4, 5), (255, 90, 90, 255))
+        box = (4, 6, 116, 100)
+        self.assertTrue(translated_touches_external_native_ink(
+            im, box, [(glyph, 4, 40)]))
+        self.assertFalse(translated_touches_external_native_ink(
+            im, box, [(glyph, 15, 40)]))
+
     def test_flip_y_native_roundtrip_preserves_orientation(self):
         src = source_dds()
         # Native upside-down input contains the original text near the bottom.
