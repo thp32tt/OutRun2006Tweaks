@@ -275,6 +275,36 @@ def stage_source_ref(gh,task):
     target.write_bytes(raw)
     return target
 
+def compact_generated_png_lossless(raw):
+    """Normalize sparse lettering PNG before the 650 KiB GitHub Contents gate.
+
+    Only transparent empty margins may be removed; no glyph pixels, alpha,
+    dimensions of the original source HD atlas, or text effects are resampled.
+    A source whose alpha already touches the frame is rejected before padding.
+    """
+    if not isinstance(raw, bytes) or len(raw) < 100 or not raw.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+        raise ValueError("CANDIDATE_NOT_PNG")
+    with Image.open(io.BytesIO(raw)) as source:
+        if source.format != "PNG" or not (24 <= source.width <= 4096
+                                           and 12 <= source.height <= 4096):
+            raise ValueError("CANDIDATE_IMAGE_DIMENSIONS")
+        rgba=source.convert("RGBA")
+    alpha=rgba.getchannel("A")
+    bbox=alpha.getbbox()
+    if not bbox or min(bbox[0],bbox[1],rgba.width-bbox[2],rgba.height-bbox[3]) < 2:
+        raise ValueError("CANDIDATE_ALPHA_TOUCHES_FRAME")
+    # Crop only actual all-zero-alpha borders, preserving every visible pixel.
+    cropped=rgba.crop(bbox)
+    packed=Image.new("RGBA",(cropped.width+16,cropped.height+16),(0,0,0,0))
+    packed.paste(cropped,(8,8))
+    buffer=io.BytesIO()
+    packed.save(buffer,format="PNG",optimize=True,compress_level=9)
+    compact=buffer.getvalue()
+    if len(compact)>MAX_CONTENTS_PNG:
+        raise ValueError("CANDIDATE_LOSSLESS_PNG_EXCEEDS_GITHUB_LIMIT")
+    return compact
+
+
 def valid_generated_image(raw):
     if len(raw)>MAX_CONTENTS_PNG or len(raw)<100 or not raw.startswith(b"\x89PNG\r\n\x1a\n"):
         raise ValueError("CANDIDATE_NOT_SAFE_GITHUB_PNG")
@@ -490,14 +520,17 @@ class ChatBridge:
                            "EXISTING_CANDIDATES_VERIFIED"):
             return "WAIT_IMAGEGEN_EXPORT_"+outcome
         file=ROOT/old.STATE_DIR/"candidate_outputs"/task["role"]/(task["task_id"]+".png")
-        png=file.read_bytes()
+        original_png=file.read_bytes()
+        png=compact_generated_png_lossless(original_png)
         dimensions=valid_generated_image(png)
         digest=hashlib.sha256(png).hexdigest()
         rel=QROOT+"/candidates/"+task["task_id"]+".png"
         await asyncio.to_thread(self.gh.write,rel,QUEUE_BRANCH,png)
         await asyncio.to_thread(stage_state,self.gh,task,"C1_READY",{
             "ab_chat_url":pg.url,"candidate_sha256":digest,
-            "candidate_dimensions":dimensions,"candidate_gh_path":rel,
+            "candidate_dimensions":dimensions,
+            "candidate_generated_raw_sha256":hashlib.sha256(original_png).hexdigest(),
+            "candidate_gh_path":rel,
             "candidate_status":"IMAGEGEN_BLOB_SAVED_PENDING_C1"})
         return "C1_READY"
 
@@ -595,7 +628,7 @@ class ChatBridge:
             return {"status":"HOLD_QUEUE_SIZE"}
         if (queue.get("release_approved") is not False
                 or queue.get("runtime_validation") != "UNTESTED"
-                or queue.get("new_imagegen_disabled") is not REUSE_ONLY
+                or (not REUSE_ONLY and queue.get("new_imagegen_disabled") is not False)
                 or (QUEUE_NAME == "hd_imagegen_fallback"
                     and (queue.get("source_reference_count_verified") != len(tasks)
                          or any(t.get("qa_authority") != "NOT_C1_APPROVED_NOT_GAME_APPROVED"
@@ -608,6 +641,11 @@ class ChatBridge:
             prior,_=await asyncio.to_thread(self.gh.read_json,
                            task_state_path(task["task_id"]),QUEUE_BRANCH)
             if prior:
+                # A restart or lost local checkpoint must not cause either
+                # duplicate sending or permanent loss of C1 processing.
+                if (prior.get("task") == task and
+                        prior.get("status") in SEND_STATES):
+                    await asyncio.to_thread(local_save, task["task_id"], prior)
                 continue
             try:
                 recovery=await asyncio.to_thread(recover_previous_sent_task, self.gh, task)
