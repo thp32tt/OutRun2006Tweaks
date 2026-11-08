@@ -282,7 +282,7 @@ def compact_generated_png_lossless(raw):
     dimensions of the original source HD atlas, or text effects are resampled.
     A source whose alpha already touches the frame is rejected before padding.
     """
-    if not isinstance(raw, bytes) or len(raw) < 100 or not raw.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+    if not isinstance(raw, bytes) or len(raw) < 100 or not raw.startswith(b"\x89PNG\r\n\x1a\n"):
         raise ValueError("CANDIDATE_NOT_PNG")
     with Image.open(io.BytesIO(raw)) as source:
         if source.format != "PNG" or not (24 <= source.width <= 4096
