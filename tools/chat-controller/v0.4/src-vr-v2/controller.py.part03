@@ -3013,10 +3013,16 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         "docs/automation/FERRARI16_GEOMETRY_REWORK_MASTER_PLAN.md 및 "
         "docs/automation/FERRARI16_GEOMETRY_QUEUE.json을 즉시 읽어. "
         f"오직 active_by_slot[{slot_name!r}] 소유 차량만 24시간 전담 개발. "
-        "0순위는 대시보드와 핸들: 실차 사진에 최대한 가까운 계기판, 대시 형상, "
-        "스티어링 림·스포크·허브·컬럼을 실제 Blender 형상으로 구현해. "
-        "운전석에서 보이는 센터콘솔, 도어 안쪽, A필러, 계기판 외에는 건드리지 마. "
+        "무조건 원본 OutRun 2006 게임 차량 PMT/native 리소스를 직접 가져와 "
+        "검증된 원본 유래 .blend 속 기존 운전석 메시부터 수정해. "
+        "원본 게임 파일은 읽기 전용으로 두고, SHA/원본 오브젝트 이름과 변경 전후 메시를 기록. "
+        "원본 리소스/변환된 진짜 원본 장면이 없으면 BLOCKED_INPUT 처리하고 "
+        "새 차량/운전석을 만들거나 다른 GLB로 대체하지 마. "
+        "0순위 대시보드/핸들: 실차 사진 기준 계기판, 대시보드, 림·스포크·허브·컬럼 "
+        "기존 메시를 정교하게 리워크해. 차에서 보이는 센터콘솔·도어 안쪽·A필러만 부가 개선. "
         "외부 차체/바퀴/타이어·텍스처/노멀/PBR 작업 금지. "
+        "최종 산출물은 원본 기반 수정 .blend와 기하 수정 스크립트 및 비교 렌더만. "
+        "OVC3/OVC/PMT 변환 및 출력, 게임 적용, 모드 패키징, VR 소스 변경은 전부 금지. "
         "N100 기존 개인 사진 라이브러리 "
         "/home/chatgpt-runner/outrun2_vr_refs/20261104_16car_cockpit/"
         "MANIFEST.json 및 COVERAGE_MATRIX_16x8.csv의 해당 차종 자료를 확인. "
@@ -3027,7 +3033,10 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         "새 세션이면 실제 소스 형상을 수정하고 진행 상태/변경 SHA를 기록해."
         if bootstrap or hard_due else
         f"Ferrari 운전석 리워크 슬롯 {slot_name} 계속. GitHub Ferrari16 큐 내 차종만 "
-        "기존 사진과 비교해 대시보드/핸들 실제 기하를 먼저 개선하고 커밋해. "
+        "기존 사진과 비교해 원본 게임 메시에서 파생된 .blend를 직접 열고 "
+        "원본 대시보드/핸들 형상을 이어서 수정해. 새 차량 생성 및 GLB 대체 금지. "
+        "OVC3/OVC/PMT 변환이나 게임 적용 금지, .blend만 저장. "
+        "원본 파일 출처/SHA가 없으면 BLOCKED_INPUT. "
         "24h/QA 통과 전 차량 변경 금지, 외부 차체·바퀴·텍스처·Model2·Dino 제외."
     )
     sent = await send_message(page, prompt, slot_name=slot_name)
@@ -3037,7 +3046,7 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
 
     sent_at = datetime.now(TZ)
     if not slot.url:
-        new_url = await wait_for_chat_url(page, timeout_sec=8, slot_name="A")
+        new_url = await wait_for_chat_url(page, timeout_sec=8, slot_name=slot_name)
         if new_url:
             slot.url = new_url
     note_successful_request(reg, sent_at, slot_name)
