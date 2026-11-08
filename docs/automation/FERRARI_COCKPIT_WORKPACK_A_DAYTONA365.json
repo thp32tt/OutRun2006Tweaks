@@ -25,14 +25,24 @@
   "max_dispatches_per_component": 2,
   "components": {
     "center_console": {
-      "status": "BLOCKED",
-      "source_edits_this_phase": 0,
+      "status": "COVERED_PARTIAL_QA",
+      "source_edits_this_phase": 1,
       "evidence_refs": [
-        "docs/automation/FERRARI16_SLOTA_DAYTONA_CENTER_CONSOLE_BLOCKED_20261109.md"
+        "docs/automation/FERRARI16_SLOTA_DAYTONA_CENTER_CONSOLE_BLOCKED_20261109.md",
+        "docs/automation/FERRARI16_SLOTA_DAYTONA_R43_CENTER_CONSOLE_20261109.md"
       ],
-      "blocking_reason": "Native original PMT018 located (24v/12f) and real LHD photos reviewed, but N100 overloaded (loadavg 56.88/4 cores, <600MB free): Blender timed out then was canceled; no verified R43 .blend save/reopen, so no coverage PASS.",
-      "last_saved_blend_sha256": null,
-      "original_native_mesh_object": "object00_group01_material018_a0"
+      "blocking_reason": null,
+      "last_saved_blend_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877",
+      "original_native_mesh_object": "object00_group01_material018_a0",
+      "dispatches_consumed_this_phase": 2,
+      "existing_original_derived_mesh_modified": "V8_LOW_CENTER_TUNNEL",
+      "edited_existing_vertices": 20,
+      "max_vertex_offset_m": 0.03474878682372335,
+      "pending_qa": [
+        "calibrated_original_game_eye",
+        "matched_before_after_driver_view",
+        "seven_authenticated_photo_views"
+      ]
     },
     "driver_controls": {
       "status": "NOT_STARTED",
@@ -98,6 +108,7 @@
     "existing source nonmanifold / connectivity findings unresolved"
   ],
   "cannot_promote_from_interim_coverage": true,
-  "last_material_commit": null,
-  "notes": "Slot A Daytona R42 remains immutable baseline. center_console BLOCKED N100 host overload, native PMT018 proven; next driver_controls; dashboard/steering P0 hold, no car QA PASS."
+  "last_material_commit": "d299eef3fbcfa2cd5faed78564fdf6f69f161018",
+  "notes": "R43 native PMT018-guided center_console COVERED_PARTIAL_QA: 20 existing vertices changed and independent Blender 4.5.15 save/reopen PASS. Protected 112 meshes unchanged. Not car QA PASS; exact game-eye/seven photo views pending. Next driver_controls; P0 wheel/dash HOLD; 24h owner unchanged.",
+  "latest_accepted_editable_blend_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877"
 }
