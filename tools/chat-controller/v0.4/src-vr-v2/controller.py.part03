@@ -4077,7 +4077,9 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
             "Model2 VR last sent " + str((q.get("model2_simple") or {}).get("last_sent_at") or "not sent yet")
             if MODEL2_AUTODEV_ENABLED else
             "UW2 last sent " + str((q.get("uw2_simple") or {}).get("last_sent_at") or "not sent yet")
-            if UW2_WEB_PORT_ENABLED else "DX9Ex REVIEW_ONLY"
+            if UW2_WEB_PORT_ENABLED else
+            ("Ferrari cockpit C last sent " + str((q.get("car_model_simple_C") or {}).get("last_sent_at") or "not sent yet"))
+            if CAR_MODEL_C_AUTODEV_ENABLED else "DX9Ex REVIEW_ONLY"
         )+"), B(DXVK) frozen; active: " +
             ", ".join(f"{key}={x.get('task_id')}:{x.get('phase')}"
                       for key, x in sorted(active_by_lane.items())),
@@ -4258,10 +4260,10 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             save_registry(reg)
         save_queue_state(q)
 
-    # Convert the previously disabled DX11 A tab to Daytona modeling on first
+    # Convert disabled legacy DX11 A to cockpit modeling without reviving it.
     # deployment, without reviving or overwriting a legacy DX11 TASK_ID.
     if CAR_MODEL_AUTODEV_ENABLED and not q.get("car_model_simple_initialized"):
-        state = q.setdefault("car_model_simple", {})
+        state = q.setdefault("car_model_simple_A", {})
         state.clear()
         state["fresh_chat_required"] = True
         state["bootstrap_complete"] = False
