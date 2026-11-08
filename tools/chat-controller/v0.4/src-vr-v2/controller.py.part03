@@ -2859,16 +2859,15 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
 
 
 async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime) -> bool:
-    """Independent OutRun A: Daytona365 Blender modeling, no legacy DX11.
+    """OutRun A: sequential Ferrari geometry-only modeling, never DX11/Model2.
 
-    Uses a separate history/clock from Model2 C. The 60m chat lifetime
-    safely rotates A even when a previous UI response stays busy.
+    Uses an independent 60m chat lifetime; repo JSON queue selects active car.
     """
     if not CAR_MODEL_AUTODEV_ENABLED or (CONVERSION_ONLY_SLOT and CONVERSION_ONLY_SLOT != "A"):
         return False
     if not CAR_MODEL_SCOPE_READY or not AUTO_SEND:
         write_runtime(status="car_model_project_url_required",
-                      last_action="Daytona365 A disabled until the OutRun project URL is configured")
+                      last_action="Ferrari geometry A disabled until the OutRun project URL is configured")
         return False
 
     state = q.setdefault("car_model_simple", {})
@@ -2979,7 +2978,7 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
     # This mandatory guard is checked immediately before calling send_message.
     if not is_slot_project_url(page.url, "A"):
         write_runtime(status="car_model_wrong_project_blocked",
-                      last_action="A page is not in its dedicated Daytona365 project")
+                      last_action="A page is not in the dedicated OutRun Ferrari modeling project")
         return False
     if await detect_rate_limit(page) or await detect_limit(page):
         mark_rate_limit(reg, datetime.now(TZ), "car-model-vr-c")
@@ -3005,25 +3004,29 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         return False
 
     bootstrap = not state.get("bootstrap_complete")
-    # New chat has no prior memory; use one short, source-grounded assignment.
+    # One production owner per day: the durable Ferrari16 queue selects the active car.
+    # Never select a car from stale chat state or a fixed Daytona-only prompt.
+    # Enforce 24h + verified geometry/photo gates using the repository guard script.
     prompt = (
-        f"Ferrari 365 GTS/4 Daytona Blender 모델링 개선 새 세션. "
-        f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH} 최신 HEAD와 "
-        "docs/automation/DAYTONA365_CAR_MODEL_AUTODEV_MASTER_PLAN.md를 읽고 "
-        "v8.4 다음 미완료 형상·재질·노멀맵 개선부터 실제 Blender 스크립트와 렌더링 작업을 이어가. "
-        "원본 게임 또는 VR 런타임 브랜치와 Model2 VR은 수정하지 마. "
-        "기존 성공 결과 반복 검증·중복 점수 가산 금지."
-        if hard_due else
-        f"이 채팅은 Ferrari 365 GTS/4 Daytona Blender 실차 모델링 개선 전용입니다. "
-        f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH}의 "
-        "docs/automation/DAYTONA365_CAR_MODEL_AUTODEV_MASTER_PLAN.md를 읽고 "
-        "v8.4 실제 Blender 결과와 오리지널 게임 모델의 실제 렌더 비교를 기준으로 "
-        "기하·UV·PBR/노멀/ORM 개선을 실소스 수정과 실제 Blender 렌더로 이어가세요. "
-        "무거운 Cycles 작업은 N100 대신 적절한 GitHub Actions/Windows 작업 환경을 사용하고 "
-        "미실행이면 RENDER_VALIDATION=UNTESTED로 보고하세요. "
-        "검토만 반복하거나 계획만 작성하지 말고 한 명령에서 여러 연관된 개선을 완성하세요. "
-        "실제 개발을 20분 이상 목표로 하되 대기로 시간을 채우지 마세요."
-        if bootstrap else "Ferrari Daytona365 차량 Blender 모델링 개선 계속 진행해"
+        f"OutRun Ferrari 16종 실차 사진 기준 3D 형상 리워크 전용 작업. "
+        f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH} 최신 HEAD의 "
+        "docs/automation/FERRARI16_GEOMETRY_REWORK_MASTER_PLAN.md 및 "
+        "docs/automation/FERRARI16_GEOMETRY_QUEUE.json을 먼저 읽어. "
+        "오직 ACTIVE 차량 한 대만 실제 Blender 형상 스크립트로 개선하라. "
+        "재질/텍스처/PBR/노멀맵 제작은 나중에 하므로 금지. "
+        "블렌더 4.5.15 GitHub Actions 가상머신은 "
+        ".github/workflows/ferrari-geometry-blender.yml을 사용하되 "
+        "source .blend가 없으면 실제 차량 렌더 완료를 주장하지 마. "
+        "각 차량 24시간 전담 작업, 시작 커밋 시간과 기하 변경 SHA를 기록하고 "
+        "24시간 경과 + 사진·Blender 원본 대비 검증 PASS 전에는 다음 차로 이동 금지. "
+        "모델2/DX11/DX9Ex/DXVK/웹포팅/원본게임 및 VR 런타임 브랜치는 수정하지 마. "
+        "완료 작업 재검증·중복 점수 가산 금지. "
+        "하나의 세션에서 계획 반복보다 실제 모델 형상 개선을 우선해."
+        if hard_due or bootstrap else
+        "Ferrari 16종 geometry-only 리워크 계속. GitHub 최신 Ferrari16 큐의 ACTIVE 차종만 "
+        "실제 형상 수정하고 Blender 검증/체크포인트를 기록해. "
+        "텍스처 작업·Model2·기존 완료 작업 재검증 금지. "
+        "24시간 및 PASS 조건 충족 전 다음 차량으로 넘어가지 마."
     )
     sent = await send_message(page, prompt, slot_name="A")
     if sent != "sent":
@@ -4068,7 +4071,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     save_queue_state(q)
     write_runtime(
         status="vr_continuous_running",
-        last_action=("A(Daytona365 Blender)" if CAR_MODEL_AUTODEV_ENABLED else "A(DX11 implementation)" if CONVERSION_DX11_ENABLED else "A(DX11 disabled)")+ "+C("+(
+        last_action=("A(Ferrari16 geometry-only)" if CAR_MODEL_AUTODEV_ENABLED else "A(DX11 implementation)" if CONVERSION_DX11_ENABLED else "A(DX11 disabled)")+ "+C("+(
             "Model2 VR last sent " + str((q.get("model2_simple") or {}).get("last_sent_at") or "not sent yet")
             if MODEL2_AUTODEV_ENABLED else
             "UW2 last sent " + str((q.get("uw2_simple") or {}).get("last_sent_at") or "not sent yet")
@@ -4274,9 +4277,9 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         try:
             await car_model_simple_cycle(context, pages, q, datetime.now(TZ))
         except Exception as exc:
-            log.warning("Daytona Blender A continuation deferred: %s", type(exc).__name__)
+            log.warning("Ferrari geometry A continuation deferred: %s", type(exc).__name__)
             write_runtime(status="car_model_simple_cycle_error",
-                          last_action=f"Daytona A deferred: {type(exc).__name__}")
+                          last_action=f"Ferrari geometry A deferred: {type(exc).__name__}")
 
     if UW2_WEB_PORT_ENABLED:
         # C has no TASK_ID and never enters the conversion production queue.
