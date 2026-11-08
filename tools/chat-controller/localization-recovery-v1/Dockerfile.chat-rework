@@ -8,9 +8,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python -m pip install --no-cache-dir Pillow==11.3.0 playwright==1.63.0 && \
     python -c "from playwright.async_api import async_playwright; from PIL import Image; print('CHAT_REWORK_PYTHON_IMPORTS_OK')"
 WORKDIR /opt/outrun
-COPY github_chat_rework_controller.py controller_png_attach.py /opt/outrun/
+COPY github_chat_rework_controller.py controller_png_attach.py test_github_chat_rework_controller.py /opt/outrun/
 COPY text_roi_queue.py tile_batch_queue.py tile_orientation_policy.py /opt/outrun/
 COPY entrypoint.chat-rework.sh /opt/outrun/
-RUN python -m py_compile /opt/outrun/github_chat_rework_controller.py /opt/outrun/controller_png_attach.py /opt/outrun/text_roi_queue.py /opt/outrun/tile_orientation_policy.py && \
+RUN python -m py_compile /opt/outrun/github_chat_rework_controller.py /opt/outrun/controller_png_attach.py /opt/outrun/text_roi_queue.py /opt/outrun/tile_orientation_policy.py /opt/outrun/test_github_chat_rework_controller.py && \
+    python -m unittest -v test_github_chat_rework_controller && \
     chmod 0755 /opt/outrun/entrypoint.chat-rework.sh
 ENTRYPOINT ["/opt/outrun/entrypoint.chat-rework.sh"]
