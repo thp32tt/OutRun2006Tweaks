@@ -47,6 +47,11 @@ jobs:
               if not raw.endswith(".blend") or not path.is_relative_to(Path.cwd()) or not path.is_file():
                   raise SystemExit("BLOCKED_INPUT: provide permitted repository-local .blend")
           PY
+      - name: Enforce serialized 24h Ferrari queue and regression tests
+        shell: bash
+        run: |
+          python3 tools/car_modeling/queue_guard.py --queue docs/automation/FERRARI16_GEOMETRY_QUEUE.json
+          python3 -m unittest discover -s tools/car_modeling -p 'test_queue_guard.py' -v
       - name: Download verified official Blender archive
         shell: bash
         run: |
