@@ -87,6 +87,26 @@ class ScheduledDispatchTests(unittest.TestCase):
             self.assertIn(snippet, yml)
 
 
+    def test_breadth_first_cockpit_never_revisits_wheel_after_chat_rollover(self):
+        tree = ast.parse(SOURCE)
+        fn = next(x for x in tree.body if isinstance(x, ast.AsyncFunctionDef)
+                  and x.name == "car_model_simple_cycle")
+        body = ast.get_source_segment(SOURCE, fn)
+        self.assertIn("breadth_strategy_version", body)
+        self.assertIn("breadth_dispatch_count", body)
+        self.assertIn('state["breadth_dispatch_count"] = count + 1', body)
+        self.assertIn("center_console", body)
+        self.assertIn("inner_door", body)
+        self.assertIn("windshield_frame", body)
+        self.assertIn("visible_seat", body)
+        self.assertIn("cross_cockpit_qa", body)
+        self.assertIn("repair_components", body)
+        repair_section = body.split("repair_components = (", 1)[1].split(")", 1)[0]
+        self.assertNotIn("steering_wheel", repair_section)
+        self.assertIn("TARGET={component}", body)
+        self.assertLess(body.index('sent = await send_message('),
+                        body.index('state["breadth_dispatch_count"] = count + 1'))
+
     def test_cockpit_two_slot_schedule_and_independent_state(self):
         tree = ast.parse(SOURCE)
         car = next(n for n in tree.body if isinstance(n, ast.AsyncFunctionDef)
