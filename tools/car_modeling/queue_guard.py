@@ -154,6 +154,24 @@ def check_evidence(car, evidence, now):
         raise ValueError("missing seven source-proven real-car cockpit photo views")
     if evidence.get("correct_car_variant") is not True or evidence.get("photo_handedness_checked") is not True:
         raise ValueError("real vehicle trim and LHD/RHD photos must be verified")
+    # V3: a whole-car pass must prove multiple driver-visible original cockpit
+    # regions, not 30+ micro-iterations on the original dashboard or wheel.
+    coverage = evidence.get("cockpit_coverage") or {}
+    required_parts = (
+        "center_console", "driver_controls", "inner_door", "windshield_frame",
+        "visible_seat", "instrument_cluster", "dashboard", "steering_wheel",
+    )
+    for region in required_parts:
+        entry = coverage.get(region) or {}
+        status = entry.get("status")
+        if status == "OUT_OF_VIEW":
+            if not entry.get("camera_visibility_proof_ref"):
+                raise ValueError("NO_COVERAGE: out-of-view claim needs actual camera evidence")
+            continue
+        if status != "COVERED_PARTIAL_QA" or not entry.get("edited_original_mesh_object_ids"):
+            raise ValueError("NO_COVERAGE: complete driver-visible cockpit regions before whole-car gate")
+    if evidence.get("repeated_cosmetic_only_p0_cycles", 0):
+        raise ValueError("NO_COVERAGE: repeated P0-only polish is not whole-car completion")
     if evidence.get("dashboard_review") != "PASS" or evidence.get("steering_wheel_review") != "PASS":
         raise ValueError("P0 dashboard and wheel must both PASS first")
     if evidence.get("manual_geometry_review") != "PASS":
