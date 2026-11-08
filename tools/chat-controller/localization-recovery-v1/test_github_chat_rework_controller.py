@@ -327,5 +327,70 @@ class RoundRobinAndDiagnosticsTests(unittest.TestCase):
   self.assertFalse(c.result_poll_diagnostic(gh,saved,"ASSISTANT_TURN_NOT_READY"))
   self.assertEqual(len(gh.writes),1)
 
+
+class CollectorIntegrationTests(unittest.IsolatedAsyncioTestCase):
+ async def asyncSetUp(self):
+  self.temp=tempfile.TemporaryDirectory()
+  self.old_root=c.ROOT
+  c.ROOT=Path(self.temp.name)
+  self.task={
+   "task_id":"HDRW-A-"+("9"*20),"role":"A","roi_id":"Q044_65bad63fe0353b2b",
+   "source_dds_sha256":"a"*64,"old_candidate_sha256":"b"*64,
+   "reference":{"name":"HDRW-A-"+("9"*20)+"_HD_SOURCE.png",
+                "sha256":"c"*64,"width":180,"height":75},
+  }
+  self.state={"status":"AB_SENT","task":self.task,"task_id":self.task["task_id"],
+              "role":"A","source_dds_sha256":"a"*64}
+  self.gh=FakeFallbackGithub()
+  self.gh.pngs={}
+  def put_png(path,branch,png,**kwargs):
+   self.gh.pngs[path]=png
+   return "commit-sha"
+  self.gh.write=put_png
+  self.bridge=c.ChatBridge(self.gh,MagicMock())
+  self.bridge.page=AsyncMock(return_value=MagicMock(
+   url="https://chatgpt.com/c/6aebd722-0f74-83e8-8126-f723dca3a685"))
+ async def asyncTearDown(self):
+  c.ROOT=self.old_root
+  self.temp.cleanup()
+ async def test_legacy_probe_miss_uses_assistant_rescue_without_resend(self):
+  im=Image.new("RGBA",(200,110),(0,0,0,0))
+  ImageDraw.Draw(im).rectangle((10,10,160,82),fill=(245,230,180,255))
+  buffer=io.BytesIO();im.save(buffer,format="PNG")
+  raw=buffer.getvalue()
+  async def fake_rescue(page,task_id,role,root):
+   p=Path(root)/"text_roi_batches"/"candidate_outputs"/role/(task_id+".png")
+   p.parent.mkdir(parents=True,exist_ok=True)
+   p.write_bytes(raw)
+   return "LOCAL_CANDIDATES_EXPORTED_UNAPPROVED","ASSISTANT_ONLY_ONE_IMAGE_SHA_VERIFIED"
+  with patch("text_roi_queue._probe_imagegen_result",
+             new=AsyncMock(return_value={"error":"USER_TURN_MISSING"})), \
+       patch("text_roi_queue._recover_task_turn",new=AsyncMock(return_value=False)), \
+       patch.object(c,"rescue_single_image_candidate",new=AsyncMock(side_effect=fake_rescue)) as method:
+   status=await self.bridge.collect_producer(self.state)
+   self.assertEqual(status,"C1_READY")
+   method.assert_awaited_once()
+  self.assertEqual(len(self.gh.pngs),1)
+  saved=self.gh.records[c.task_state_path(self.task["task_id"])]
+  self.assertEqual(saved["status"],"C1_READY")
+  self.assertEqual(saved["candidate_sha256"],
+                   hashlib.sha256(next(iter(self.gh.pngs.values()))).hexdigest())
+  self.assertFalse(saved["release_approved"])
+ async def test_no_image_keeps_ab_sent_and_emits_remote_diagnostic(self):
+  with patch("text_roi_queue._probe_imagegen_result",
+             new=AsyncMock(return_value={"error":"USER_TURN_MISSING"})), \
+       patch("text_roi_queue._recover_task_turn",new=AsyncMock(return_value=False)), \
+       patch.object(c,"rescue_single_image_candidate",new=AsyncMock(
+          return_value=("WAIT_ASSISTANT_RESULT_UI",
+                        "ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING"))):
+   status=await self.bridge.collect_producer(self.state)
+  self.assertIn("WAIT_IMAGEGEN_",status)
+  saved=self.gh.records[c.task_state_path(self.task["task_id"])]
+  self.assertEqual(saved["status"],"AB_SENT")
+  self.assertEqual(saved["last_result_poll_reason"],
+                   "ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING")
+  self.assertEqual(len(self.gh.pngs),0)
+
+
 if __name__=="__main__":
  unittest.main()
