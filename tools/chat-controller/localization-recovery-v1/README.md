@@ -1,3 +1,17 @@
+## 2026-11-09 ImageGen result collector repair (manual redeploy required)
+
+**Why:** 16 observed A/B tasks reached `AB_SENT` but no candidate PNG reached GitHub/C1. Code inspection identified that only the alphabetically first three saved task files were checked each cycle, and the existing lazy ChatGPT conversation recovery helper was never invoked in `collect_producer`. The legacy result detector also depended on one older ChatGPT generated-preview DOM shape. The live failed selector cannot be confirmed without authenticated container browser logs.
+
+**Changed:** 
+- `github_chat_rework_controller.py` round-robins all persisted A/B tasks, including older batches when the GitHub staging queue rotates. It invokes `text_roi_queue._recover_task_turn()` when `USER_TURN_MISSING` occurs and keeps prior `AB_SENT` receipt evidence without sending duplicate prompts.
+- New `chat_image_result_rescue.py` uses only the assistant reply immediately after an exact `UPLOAD_TASK_ID` user turn to locate a single generated image. It rejects uploaded user English reference images, unrelated generic images, multiple ambiguous images, untrusted download URLs and screenshots; image bytes are SHA-verified and stored as unapproved local PNG before publication and C1 QA.
+- A/B `AB_SENT` states now expose `last_result_poll_reason` and `last_result_poll_utc` on the GitHub queue branch, throttled to once per 30 minutes per identical reason. Missing evidence stays `AB_SENT`, not `PASS`; opaque/cropped generated output becomes `HOLD` for rework. C1/DDS/game approval is unchanged.
+- `Dockerfile.chat-rework` includes the module and gates build on all **27 offline tests PASS** on 2026-11-09, including modern-image simulation, 16-ticket fairness, collector integration, SHA receipt and fail-closed cases. Live browser image capture is **not yet verified**.
+
+**Operator deployment:** Pull latest controller branch `localization-controller-recovery-20260928` and **Rebuild + Redeploy existing** Portainer stack only. Do not delete data/browser volumes or change secrets. Compose is unchanged (default fallback workqueue, 2GiB memory, noVNC 6084). After deployment inspect `localization/automation_runs/hd_imagegen_fallback/state/<TASK_ID>.json` on `korean-localization-qa-queue-20261104` and check that `last_result_poll_reason` is populated or state moves to `C1_READY`. If stalled, inspect container logs for `processed` outcomes, then use `last_result_poll_reason` to distinguish missing original user turn, missing assistant output, inaccessible image URL, and invalid alpha candidate. No auto-redeploy or image-generation success was claimed in the code-only repair.
+
+---
+
 ## 2026-11-08 Docker ImageGen fallback deployment — operator-managed Portainer
 
 Implementation: `github_chat_rework_controller.py`, `docker-compose.yml`, `test_github_chat_rework_controller.py`, `Dockerfile.chat-rework` on this branch. GitHub work queue: `korean-localization-qa-queue-20261104:localization/automation_runs/hd_imagegen_fallback/latest.json` (8 SHA-proved original HD PNG tasks, of which 7 exactly match preexisting `hd_rework_queue/state` `AB_SENT` receipts dated 2026-11-05; only PERFECT! has no prior send). Fallback work order is **not** proof of ImageGen output.
