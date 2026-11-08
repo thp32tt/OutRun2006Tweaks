@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Slot A Daytona R23: real original-PMT-derived existing cockpit mesh relief.
-Edits 12 existing dashboard/instrument/three-spoke/rim/hub/column objects in
+Edits 11 existing dashboard/instrument/three-spoke/rim/hub/column objects in
 an immutable R22 private Blender scene. No assets converted/exported, no
 new objects, external vehicle parts, materials, textures or game/VR changes.
 Private licensed scene and photos remain on authorized N100 storage.
