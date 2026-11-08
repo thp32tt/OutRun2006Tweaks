@@ -20,16 +20,19 @@
     "steering_wheel",
     "cross_cockpit_qa"
   ],
-  "current_component": "center_console",
+  "current_component": "driver_controls",
   "dispatches_on_component": 0,
   "max_dispatches_per_component": 2,
   "components": {
     "center_console": {
-      "status": "NOT_STARTED",
+      "status": "BLOCKED",
       "source_edits_this_phase": 0,
-      "evidence_refs": [],
-      "blocking_reason": null,
-      "last_saved_blend_sha256": null
+      "evidence_refs": [
+        "docs/automation/FERRARI16_SLOTA_DAYTONA_CENTER_CONSOLE_BLOCKED_20261109.md"
+      ],
+      "blocking_reason": "Native original PMT018 located (24v/12f) and real LHD photos reviewed, but N100 overloaded (loadavg 56.88/4 cores, <600MB free): Blender timed out then was canceled; no verified R43 .blend save/reopen, so no coverage PASS.",
+      "last_saved_blend_sha256": null,
+      "original_native_mesh_object": "object00_group01_material018_a0"
     },
     "driver_controls": {
       "status": "NOT_STARTED",
@@ -96,5 +99,5 @@
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": null,
-  "notes": "Do not repeat P0 geometry polishing until visible cockpit breadth sweep or specific user defect. Keep original private scene; NO OVC3, no new car."
+  "notes": "Slot A Daytona R42 remains immutable baseline. center_console BLOCKED N100 host overload, native PMT018 proven; next driver_controls; dashboard/steering P0 hold, no car QA PASS."
 }
