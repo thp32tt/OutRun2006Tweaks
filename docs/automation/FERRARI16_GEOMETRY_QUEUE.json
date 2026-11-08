@@ -672,7 +672,11 @@
           "source_original_PMTSHA_untouched": true,
           "complete": false,
           "do_not_advance": true,
-          "score_change": "PENDING_ADJUDICATION_NO_REPEAT"
+          "score_change": 0,
+          "hosted_exact_source_sha": "65e2cd3471cad34159dee55a9a926a686c560dd4",
+          "hosted_blender_4_5_15_smoke_run": 42454605507,
+          "hosted_blender_4_5_15_smoke_result": "SUCCESS_TOOLCHAIN_ONLY_NO_PRIVATE_BLEND",
+          "score_reason": "AI_SCOREBOARD.md main current confirmed F50 original native PMT first geometry event counted once (2780), later refinement of same dash/wheel geometry zero; no duplicate award"
         },
         "last_geometry_checkpoint_previous": {
           "task_id": "FERRARI16-SLOTC-F50-SOURCE-P0-V2-20261108",
