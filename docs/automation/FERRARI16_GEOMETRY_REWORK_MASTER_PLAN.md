@@ -5,6 +5,16 @@ Queue: `docs/automation/FERRARI16_GEOMETRY_QUEUE.json` (schema v2); gate: `tools
 Controller: `thp32tt/OutRun2006Tweaks@chat-controller-downloads`.
 Owner: AI 2 ChatGPT2. This is modeling only; Model2VR, DX11, DX9Ex, DXVK, UW2, localization and game/VR runtime branches must not change.
 
+## 2026-11-09 V3 operator correction — no all-day steering-wheel loop
+
+NEW authoritative strategy: [FERRARI16_BREADTH_FIRST_STRATEGY.md](FERRARI16_BREADTH_FIRST_STRATEGY.md). It supersedes old hour 4–12 dashboard and 12–19 wheel time allocations. Previous repeated exact-original-PMT/source-backed Daytona R41 and F50 v36 P0 edits are preserved; they are no longer the automatic next task.
+
+**Coverage-first rule:** Each 30-minute slot dispatch must target the next unfinished driver-visible region, with no more than two sent messages per part. New sequence: center console -> driver controls -> inner door -> windshield/A-pillar -> visible seat -> instrument cluster -> whole dashboard review -> explicit steering defect only -> whole cockpit QA. Both A and C start at center console as of this policy (not from an invented new model). P0 dashboard/wheel are withheld from new cosmetic iterations until other visible cockpit areas receive actual original mesh edits or evidence-backed blockers.
+
+The **same car still owns 24 hours**, but 24h is a scheduling budget, NOT a demand to iterate a single part for 24h. Checkpoint each part once; commit authentic shape changes and record its evidence independently in its own workpack. Missing final 7-photo views or confidential hosted-Blender transfer does not justify an endless spoke/rim/hood modification cycle. No photos/mesh original => BLOCKED_INPUT, no invented substitute. No OVC3, game, textures, exterior.
+
+Original source SHA, private .blend SHA and past reports must remain auditable; the large pre-V3 historical notes have been archived separately from the short queue. Material QA remains required before car advance, but **interim COVERED_PARTIAL_QA allows progressing to the NEXT COMPONENT on the SAME CAR**. Do not conflate a part-level progress mark with final whole-car acceptance.
+
 ## 2026-11-08 12:25 KST operator override: ORIGINAL GAME RESOURCE IN-PLACE BLENDER REWORK ONLY
 
 **Every vehicle must begin from its actual OutRun 2006 game resource**—the original vehicle's PMT/native asset and a verified Blender import or a proven editable .blend derived from it. Work in a COPIED private baseline, never replace the read-only original game file. Do NOT create a new car from scratch, procedurally reconstruct an unrelated substitute car, import a third-party GLB as the new car, or count a Blender cube/test primitive as a vehicle.
@@ -50,14 +60,18 @@ Reference library: `/home/chatgpt-runner/outrun2_vr_refs/20261104_16car_cockpit`
 - Existing reference library records **221 photographs** but not every photo/angle is verified. Validate photo car/year/roadster vs coupe and LHD vs RHD, and do not map wrong car/trim to target geometry. Photographs of 365 GTB/4 coupe must not be treated uncritically as actual 365 GTS/4 spider. Same for Ferrari 512 BB vs BBi and F430 vs Spider.
 - Missing essential reference -> keep `UNTESTED` and select a valid existing reference or authorized new research; never fabricate viewpoint details, image provenance, dimensions or triangulation.
 
-## Vehicle phase budget (24h dedicated target, not 24h CPU guarantee)
-| Target hours | Scope and expected actual evidence |
+## Vehicle phase budget V3 (24h dedicated target, not 24h CPU guarantee)
+| Target hours | Work |
 |---|---|
-| 0–4 | Choose exact original vehicle mesh + authenticated interior references; measure camera FOV/eye origin, view masks, wheel axis & dashboard original bounds. Save version/hash. |
-| 4–12 | **P0 dashboard**: real 3D gauge/shroud, dashboard frame, vents, instrument geometry and game-compatible pivot/scale. |
-| 12–19 | **P0 steering**: original-spoke profile, realistic rim cross section, hub, steering column, stalks, retained original wheel animation axis. |
-| 19–22 | Interior-visible console, gear selector, door trim, inner mirrors, A pillars and seat surfaces only if visible. |
-| 22–24 | Reopen saved .blend in a fresh Blender process; original mesh vs result and photo comparisons from driver-eye, dashboard, steering, gauges, console, door trim, windscreen. Fix measured issues and document residual deviations. |
+| 0–2 | Original game resource/photo/driver-eye baseline; immutable private import SHA |
+| 2–4 | Dashboard meaningful geometry pass, no excessive tiny resculpting |
+| 4–6 | Steering meaningful geometry pass, no repeated micro-polish |
+| 6–14 | **Broad cockpit coverage** — console, controls, door, windshield, visible seats, gauges; each max two 30m dispatch turns |
+| 14–18 | Reconcile silhouette/photo differences from driver seat, fix largest distinct missing area |
+| 18–21 | Private actual Blender save/reopen, source derived before/after and coverage reports |
+| 21–24 | Final targeted visible-defect corrections and QA, unresolved blocking evidence recorded |
+
+For cars already deep into dashboard/steering (Daytona R41 and F50 v36), skip the old first-pass timeblocks; **start console immediately**. Report \`COVERED_PARTIAL_QA\` only after real source-mesh checkpoint and independent Blender reopen. Never use insufficient full QA as excuse to repeat wheel work, and never claim that interim coverage completes the car.
 
 ## Blender and validation environment
 The existing `.github/workflows/ferrari-geometry-blender.yml` installs official Blender 4.5.15 LTS in a fresh GitHub-hosted VM; verified smoke run 42441624991 only proves the toolchain. Hosted VM does not contain N100 private photos or original game meshes automatically.
