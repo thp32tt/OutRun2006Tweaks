@@ -267,7 +267,7 @@ def build(a):
   render(path,camera,visible);renders["after_"+label]={"path":str(path),"sha256":digest(path)}
  source_guard(a)
  j={"status":"LOCAL_F50_V26_SAVED_INDEPENDENT_REOPEN_PENDING","blender":bpy.app.version_string,
-    "native_pmt_sha256":PMT,"original_import_sha256":IMPORT,"input_v24_sha256":V25,
+    "native_pmt_sha256":PMT,"original_import_sha256":IMPORT,"input_v25_r2_sha256":V25,
     "output_private_blend":str(a.after),"output_sha256":digest(a.after),
     "original_mesh_count":42,"changed_only_original_meshes":{
      name:{"before":b[name],"after":c[name],**stats[name]} for name in TARGETS},
@@ -284,7 +284,7 @@ def audit(a):
  j=json.loads(a.report.read_text(encoding="utf8"))
  assert Path(bpy.data.filepath).resolve()==a.after.resolve()
  assert digest(a.after)==j["output_sha256"]
- assert bpy.context.scene.get("geometry_edit_count")==75
+ assert bpy.context.scene.get("geometry_edit_count")==78
  c=snap();cam=cameras()
  assert len(c)==42
  bpy.ops.wm.open_mainfile(filepath=str(a.before))
@@ -300,7 +300,7 @@ def audit(a):
  path=a.render_root.with_name(a.render_root.name+"_INDEPENDENT_STEERING.png")
  x={"status":"PASS_F50_V26_NATIVE_ORIGINAL_BLENDER_4_5_15_FRESH_REOPEN_AND_RENDER",
     "original_pmt_sha256":digest(a.native),"original_import_sha256":digest(a.original_import),
-    "input_v24_sha256":digest(a.before),"candidate_sha256":digest(a.after),
+    "input_v25_r2_sha256":digest(a.before),"candidate_sha256":digest(a.after),
     "original_mesh_count":42,"modified_original_mesh_count":3,"untouched_source_mesh_count":39,
     "cameras_original_ids_transforms_uv_materials_unchanged":True,
     "original_wheel_nonmanifold_edges":624,"independent_steering_render_sha256":digest(path),
