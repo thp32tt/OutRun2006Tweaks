@@ -536,28 +536,65 @@ class ChatBridge:
         return "AB_SENT"
 
     async def collect_producer(self,state):
+        """Recover a previously sent single generated image, never resend."""
         import text_roi_queue as old
         task=state["task"]
         pg=await self.page(task["role"],state.get("ab_chat_url"))
         if pg is None:
-            return "HOLD_CHATGPT_LOGIN_REQUIRED"
+            reason="WAIT_CHATGPT_COMPOSER_OR_LOGIN"
+            await asyncio.to_thread(result_poll_diagnostic,self.gh,state,reason)
+            return reason
         probe=await old._probe_imagegen_result(pg,task["task_id"],1)
-        if probe.get("error") or probe.get("count")!=1 or probe.get("busy"):
-            return "WAIT_IMAGEGEN_"+str(probe.get("error") or "IN_PROGRESS")
-        source_name=task["reference"]["name"]
-        active={"task_id":task["task_id"],"role":task["role"],"count":1,
-                "items":[{"output_filename":task["task_id"]+".png",
-                          "ordinal":1,"filename":source_name,
-                          "width":task["reference"]["width"],
-                          "height":task["reference"]["height"]}]}
-        outcome=await old.export_unapproved_k_candidates(pg,active,str(ROOT))
-        if outcome not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
-                           "EXISTING_CANDIDATES_VERIFIED"):
-            return "WAIT_IMAGEGEN_EXPORT_"+outcome
+        if probe.get("error")=="USER_TURN_MISSING":
+            # Previously unused helper recovers lazily rendered old chats.
+            recovered=await old._recover_task_turn(pg,task["task_id"])
+            if recovered:
+                probe=await old._probe_imagegen_result(pg,task["task_id"],1)
+        legacy_status="WAIT_IMAGEGEN_"+str(
+            probe.get("error") or (
+                "BUSY" if probe.get("busy")
+                else "COUNT_"+str(probe.get("count","UNKNOWN"))
+            )
+        )
+        saved=None
+        if (probe.get("error") is None and probe.get("count")==1
+                and not probe.get("busy")):
+            source_name=task["reference"]["name"]
+            active={"task_id":task["task_id"],"role":task["role"],"count":1,
+                    "items":[{"output_filename":task["task_id"]+".png",
+                              "ordinal":1,"filename":source_name,
+                              "width":task["reference"]["width"],
+                              "height":task["reference"]["height"]}]}
+            try:
+                saved=await old.export_unapproved_k_candidates(pg,active,str(ROOT))
+            except (ValueError,OSError) as exc:
+                legacy_status="WAIT_IMAGEGEN_LEGACY_EXPORT_"+type(exc).__name__
+        if saved not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                         "EXISTING_CANDIDATES_VERIFIED"):
+            # Strict assistant-turn detector excludes the user's English
+            # attachment, unrelated cards, CSS screenshots and generic images.
+            rescued,why=await rescue_single_image_candidate(
+                pg,task["task_id"],task["role"],str(ROOT)
+            )
+            if rescued not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                               "EXISTING_CANDIDATES_VERIFIED"):
+                reason=(str(why) if rescued.startswith("WAIT_") else legacy_status)
+                reason=re.sub(r"[^A-Za-z0-9_:-]","_",reason)[:120]
+                await asyncio.to_thread(result_poll_diagnostic,self.gh,state,reason)
+                return "WAIT_IMAGEGEN_"+reason
         file=ROOT/old.STATE_DIR/"candidate_outputs"/task["role"]/(task["task_id"]+".png")
-        original_png=file.read_bytes()
-        png=compact_generated_png_lossless(original_png)
-        dimensions=valid_generated_image(png)
+        try:
+            original_png=file.read_bytes()
+            png=compact_generated_png_lossless(original_png)
+            dimensions=valid_generated_image(png)
+        except (ValueError,OSError) as exc:
+            # An opaque or clipped generated image must not be approved.
+            reason="CANDIDATE_ALPHA_OR_PNG_"+type(exc).__name__
+            await asyncio.to_thread(stage_state,self.gh,task,"HOLD",{
+                "hold_reason":reason,
+                "candidate_status":"REWORK_REQUIRED_BEFORE_C1",
+            })
+            return "HOLD_"+reason
         digest=hashlib.sha256(png).hexdigest()
         rel=QROOT+"/candidates/"+task["task_id"]+".png"
         await asyncio.to_thread(self.gh.write,rel,QUEUE_BRANCH,png)
@@ -566,9 +603,9 @@ class ChatBridge:
             "candidate_dimensions":dimensions,
             "candidate_generated_raw_sha256":hashlib.sha256(original_png).hexdigest(),
             "candidate_gh_path":rel,
-            "candidate_status":"IMAGEGEN_BLOB_SAVED_PENDING_C1"})
+            "candidate_status":"IMAGEGEN_BLOB_SAVED_PENDING_C1",
+        })
         return "C1_READY"
-
 
     async def submit_c1(self,state):
         task=state["task"]
