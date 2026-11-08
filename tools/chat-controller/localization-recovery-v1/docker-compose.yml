@@ -65,8 +65,8 @@ services:
       # Reuse-only QA queue remains immutable. Connect the independent,
       # SHA-proved ImageGen fallback queue (8 staged, 7 previously AB_SENT).
       # New generation is permitted only if there is no previous send receipt.
-      OUTRUN_REWORK_QUEUE_NAME: hd_imagegen_fallback
-      OUTRUN_REWORK_REUSE_ONLY: "0"
+      OUTRUN_REWORK_QUEUE_NAME: "${OUTRUN_REWORK_QUEUE_NAME:-hd_imagegen_fallback}"
+      OUTRUN_REWORK_REUSE_ONLY: "${OUTRUN_REWORK_REUSE_ONLY:-0}"
       OUTRUN_GITHUB_CONTENTS_TOKEN: "${OUTRUN_GITHUB_CONTENTS_TOKEN:-}"
       OUTRUN_REWORK_VNC_PASSWORD: "${OUTRUN_REWORK_VNC_PASSWORD:-}"
       CHATGPT_PROJECT_URL: "${CHATGPT_PROJECT_URL:-https://chatgpt.com/}"
