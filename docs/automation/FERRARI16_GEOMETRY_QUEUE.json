@@ -274,8 +274,8 @@
       "geometry_gate": "PARTIAL_NEEDS_QA",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
-      "output_scene_sha256": "381326a1b3bfbe598bd744abc19c53aeb6140895fe9e9a095f677ecf49defb53",
-      "notes": "Slot C F50 original native PMT found under N100 rea-input (previous BLOCKED_INPUT RESOLVED). Official Blender 4.5.15 native direct import of 42 source-ID meshes; existing dashboard/gauge shell and original 3-spoke steering rim/hub edited in place, 39 other source meshes hash-identical. Original source SHA and editable baseline/candidate SHA independently verified; diagnostic 2-view compare only. Full 24h window, source game driver-eye camera, steering rig placement and seven view photo QA remain pending. Do NOT advance to another car. See docs/automation/F50_SLOT_C_ORIGINAL_SOURCE_P0_20261108.md. [SLOTC_F50_P0_V2_20261108] Revised SAME original 3 cockpit source meshes in private Blender 4.5.15: cowl 346v/472f->1378v/1888f; wheel 898v/1656f->3460v/6624f; hub 78v/124f->306v/496f. Private v2 SHA 381326a1...; independent actual reopen and side-by-side before/after diagnostic render PASS. 39 other original meshes hash-identical; hosted GitHub Actions cannot validate unavailable private .blend. Still P0 PARTIAL, native game driver eye/7-photo view and 24h QA pending; no advance.",
+      "output_scene_sha256": "46f7e420e10701d410137114a15bd86598c05db01fbe51e83ced719803447438",
+      "notes": "Slot C F50 original native PMT found under N100 rea-input (previous BLOCKED_INPUT RESOLVED). Official Blender 4.5.15 native direct import of 42 source-ID meshes; existing dashboard/gauge shell and original 3-spoke steering rim/hub edited in place, 39 other source meshes hash-identical. Original source SHA and editable baseline/candidate SHA independently verified; diagnostic 2-view compare only. Full 24h window, source game driver-eye camera, steering rig placement and seven view photo QA remain pending. Do NOT advance to another car. See docs/automation/F50_SLOT_C_ORIGINAL_SOURCE_P0_20261108.md. [SLOTC_F50_P0_V2_20261108] Revised SAME original 3 cockpit source meshes in private Blender 4.5.15: cowl 346v/472f->1378v/1888f; wheel 898v/1656f->3460v/6624f; hub 78v/124f->306v/496f. Private v2 SHA 381326a1...; independent actual reopen and side-by-side before/after diagnostic render PASS. 39 other original meshes hash-identical; hosted GitHub Actions cannot validate unavailable private .blend. Still P0 PARTIAL, native game driver eye/7-photo view and 24h QA pending; no advance. [SLOT_C_V3R2] Same F50 native PMT-derived Blender .blend continued: dashboard cowl 1013 moved source verts, original 3-spoke wheel 1764 verts, source hub 306v/496f->2738v/4464f. Local official Blender 4.5.15 independent re-open PASS; original 39 other meshes SHA-identical, original source unchanged. First provisional v3 fastener distortions rejected; v3-r2 corrected. 24h/driver-eye/7-view and hosted private scene QA remain incomplete. No queue advancement.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -361,6 +361,71 @@
           "source_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab"
         },
         "last_geometry_checkpoint": {
+          "task_id": "FERRARI16-SLOTC-F50-P0-SOURCE-DASH-GRIP-HUB-V3R2-20261108",
+          "source_parent_sha": "7e70b956ba27087a5814df2a8eea99928ca187a3",
+          "source_edit_script_blob_sha": "444b907d80336bef833d1dfb18a182186ab3bb46",
+          "independent_reopen_script_blob_sha": "4f9c90bfbb5c086eeeb95024ee412ca080f850c8",
+          "original_game_resource_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+          "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+          "previous_v2_blend_sha256": "381326a1b3bfbe598bd744abc19c53aeb6140895fe9e9a095f677ecf49defb53",
+          "private_v3r2_blend_path": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_P0_DashboardSteering_v3_r2.blend",
+          "private_v3r2_blend_sha256": "46f7e420e10701d410137114a15bd86598c05db01fbe51e83ced719803447438",
+          "edited_original_mesh_ids": [
+            "object00_group01_material028_a0",
+            "object21_group01_material002_a0",
+            "object21_group00_material000_a0"
+          ],
+          "mesh_before_after": {
+            "object00_group01_material028_a0": [
+              [
+                1378,
+                1888
+              ],
+              [
+                1378,
+                1888
+              ]
+            ],
+            "object21_group01_material002_a0": [
+              [
+                3460,
+                6624
+              ],
+              [
+                3460,
+                6624
+              ]
+            ],
+            "object21_group00_material000_a0": [
+              [
+                306,
+                496
+              ],
+              [
+                2738,
+                4464
+              ]
+            ]
+          },
+          "untouched_original_meshes": 39,
+          "original_transforms_unchanged": true,
+          "original_game_input_untouched": true,
+          "original_first_material_commit_utc": "2026-11-08T04:35:52Z",
+          "earliest_24h_end_utc": "2026-11-09T04:35:52Z",
+          "blender_version": "4.5.15 LTS",
+          "private_real_blender_save": "PASS",
+          "private_independent_reopen": "PASS",
+          "comparison_render_path": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_SlotC_P0_v2_vs_v3_r2_RealBlender.png",
+          "comparison_render_sha256": "058bf51e1378bd20d179ee495bb0d050e45c16fcdfde9ba246e9e9cac9918851",
+          "original_game_driver_eye": "UNVERIFIED",
+          "photo_7_view_QA": "UNTESTED",
+          "github_hosted_real_scene": "BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED",
+          "geometry_gate": "PARTIAL_NEEDS_QA",
+          "prohibited_exports": 0,
+          "complete_claim": false,
+          "do_not_advance": true
+        },
+        "last_geometry_checkpoint_previous": {
           "task_id": "FERRARI16-SLOTC-F50-SOURCE-P0-V2-20261108",
           "source_script_blob_sha": "c255ac523aadffd98b989d97b73257c9efe51d6c",
           "independent_qa_script_blob_sha": "a501f2675bc9d27a515ce89db3d74e0d1e8b5e19",
@@ -424,65 +489,6 @@
           "prohibited_pmt_ovc_game_exports": 0,
           "complete_claim": false,
           "do_not_advance": true
-        },
-        "last_geometry_checkpoint_previous": {
-          "task_id": "FERRARI16-SLOTC-F50-ORIGINAL-PMT-DASH-WHEEL-20261108",
-          "material_source_commit": "6d8106026b9b9252469403ba80ab8dd58abbadc3",
-          "first_material_commit_time_utc": "2026-11-08T04:35:52Z",
-          "min_24h_window_end_utc": "2026-11-09T04:35:52Z",
-          "original_raw_pmt_sha256": "a080d3b5853063f9decdc92097b03148a1bee77c00340dd0d24f820ba17b07a7",
-          "private_workdir": "work_handoff/ferrari16_slotC_f50_source_audit_20261108",
-          "before_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
-          "after_blend_sha256": "b7289f9ec1d772f9beca1c785f63c3536e8c501aee8a9a5710b2b086b7152e6d",
-          "edited_original_mesh_ids": [
-            "object00_group01_material028_a0",
-            "object21_group01_material002_a0",
-            "object21_group00_material000_a0"
-          ],
-          "before_after_vertex_face_counts": {
-            "object00_group01_material028_a0": [
-              [
-                10,
-                8
-              ],
-              [
-                346,
-                472
-              ]
-            ],
-            "object21_group01_material002_a0": [
-              [
-                110,
-                184
-              ],
-              [
-                898,
-                1656
-              ]
-            ],
-            "object21_group00_material000_a0": [
-              [
-                14,
-                12
-              ],
-              [
-                78,
-                124
-              ]
-            ]
-          },
-          "preserved_unmodified_native_mesh_parts": 39,
-          "original_transforms_unchanged": true,
-          "local_blender_4_5_15_independent_reopen": "PASS",
-          "private_compare_render_sha256": "efd580284a0f8b9340192159bac967c6484e7387834f15924c2f69a87ee320bd",
-          "game_driver_eye_camera": "UNVERIFIED",
-          "steering_rig_vehicle_transform": "UNVERIFIED",
-          "photo_7_view_gate": "UNTESTED",
-          "github_actions_real_scene": "NOT_ESTABLISHED_NO_PRIVATE_BLEND_UPLOAD",
-          "source_game_untouched": true,
-          "new_textures_pbr_normalmaps": false,
-          "forbidden_game_format_exports": false,
-          "complete_claim": false
         }
       },
       "edit_from_original_required": true,
