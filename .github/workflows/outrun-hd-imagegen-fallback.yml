@@ -1,0 +1,87 @@
+name: OutRun HD ImageGen HOLD Rework Queue (source-bound, GitHub)
+
+# Queue prep + evidence only. GitHub Actions cannot invoke the free ChatGPT
+# image generator. A/B browser production and independent C1 must process tasks.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 */3 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: outrun-hd-imagegen-fallback-workqueue
+  cancel-in-progress: false
+
+jobs:
+  stage-pinned-imagegen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact asset-branch originals and work-order engine
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/github_ab_imagegen_atlas_batch.py
+            tools/localization/hd_strict_qa.py
+            tools/localization/hd_overlap_ownership.py
+            tools/localization/hd_bc3_index_patch.py
+            tools/localization/hd_bc3_native_codec.py
+            tools/localization/hd_existing_candidate_salvage.py
+            tools/localization/hd_rework_queue.py
+            tools/localization/hd_imagegen_fallback_queue.py
+            tools/localization/publish_hd_rework_queue.py
+            tools/localization/test_hd_rework_queue.py
+            tools/localization/test_hd_imagegen_fallback_queue.py
+            localization/automation_inputs/candidate_outputs
+            localization/automation_inputs/hd_original_png_source_plan.json
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+
+      - name: Read actual latest strict DDS report and fallback task state
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-qa-queue-20261104
+          path: queue-state
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            localization/automation_runs/hd_rework_queue/last_report.json
+            localization/automation_runs/hd_imagegen_fallback/latest.json
+            localization/automation_runs/hd_imagegen_fallback/state
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install image inspection only
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+
+      - name: Test SHA-gated source proof and queue safeguards
+        run: |
+          python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
+          python -m unittest discover -s tools/localization -p test_hd_imagegen_fallback_queue.py -v
+
+      - name: Prepare at most eight verified HD ROI tasks and publish separate queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_imagegen_fallback_queue.py \
+            --repo-root . \
+            --queue-root queue-state \
+            --out "$RUNNER_TEMP/hd-imagegen-fallback" \
+            --publish
+
+      - name: Archive only available source crops, work orders and unapproved QA status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hd-imagegen-fallback-${{ github.run_id }}
+          path: ${{ runner.temp }}/hd-imagegen-fallback/
+          retention-days: 14
+          if-no-files-found: ignore
