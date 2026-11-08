@@ -84,8 +84,8 @@ CAR_MODEL_TARGET_BRANCH = os.getenv("CAR_MODEL_TARGET_BRANCH", "feature/ferrari1
 CAR_MODEL_SCOPE_READY = bool(CONFIGURED_PROJECT_ID)
 if CAR_MODEL_AUTODEV_ENABLED and CONVERSION_DX11_ENABLED:
     raise ValueError("Car modeling A and legacy DX11 A cannot both be enabled")
-if CAR_MODEL_C_AUTODEV_ENABLED and (MODEL2_AUTODEV_ENABLED or UW2_WEB_PORT_ENABLED or CONVERSION_DX9EX_ENABLED):
-    raise ValueError("Car modeling C cannot coexist with Model2, UW2 or DX9Ex C")
+if CAR_MODEL_C_AUTODEV_ENABLED and (MODEL2_AUTODEV_ENABLED or UW2_WEB_PORT_ENABLED):
+    raise ValueError("Car modeling C cannot coexist with Model2 or UW2 C")
 if CAR_MODEL_C_AUTODEV_ENABLED and not CAR_MODEL_AUTODEV_ENABLED:
     raise ValueError("Car modeling C requires cockpit A production queue enabled")
 MODEL2_PROJECT_URL = os.getenv("MODEL2_PROJECT_URL", "").strip()
@@ -99,6 +99,8 @@ if MODEL2_AUTODEV_ENABLED and UW2_WEB_PORT_ENABLED:
     raise ValueError("MODEL2_AUTODEV_ENABLED and UW2_WEB_PORT_ENABLED are mutually exclusive")
 # DXVK remains frozen independently of the C lane.
 CONVERSION_DX9EX_ENABLED = os.getenv("CONVERSION_DX9EX_ENABLED", "true").lower() == "true"
+if CAR_MODEL_C_AUTODEV_ENABLED and CONVERSION_DX9EX_ENABLED:
+    raise ValueError("Car modeling C cannot coexist with legacy DX9Ex C")
 DX9EX_REVIEW_ONLY = os.getenv("DX9EX_REVIEW_ONLY", "true").lower() == "true"
 CONVERSION_ONLY_SLOT = os.getenv("CONVERSION_ONLY_SLOT", "").strip().upper()
 if CONVERSION_ONLY_SLOT not in {"", "A", "B", "C"}:
