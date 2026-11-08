@@ -74,7 +74,13 @@ def scene_bounds():
     return low, high
 
 
-def save_views(out, low, high):
+COCKPIT_VIEWS = (
+    "driver_eye", "dashboard", "steering_wheel", "instrument_cluster",
+    "center_console", "door_trim", "windshield_frame",
+)
+
+
+def save_views(out, low, high, mode):
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.samples = 2
@@ -90,31 +96,36 @@ def save_views(out, low, high):
     if background:
         background.inputs["Color"].default_value = (0.7, 0.7, 0.7, 1)
         background.inputs["Strength"].default_value = 1
+
+    # Real vehicle model requires 7 explicitly calibrated cockpit camera objects.
+    # A generic bounding-box render must NEVER be passed as driver's-eye evidence.
+    if mode == "audit":
+        cameras = {}
+        for view in COCKPIT_VIEWS:
+            marker = bpy.data.objects.get("QA_COCKPIT_" + view.upper())
+            if marker is None or marker.type != "CAMERA":
+                raise RuntimeError("BLOCKED_INPUT: missing calibrated cockpit camera QA_COCKPIT_" + view.upper())
+            cameras[view] = marker
+        for label, cam in cameras.items():
+            scene.camera = cam
+            scene.render.filepath = str(out / (label + ".png"))
+            bpy.ops.render.render(write_still=True)
+        return
+
+    # Synthetic-only smoke: never mark these images as cockpit proof.
     center = (low + high) * 0.5
     extent = max((high - low).length, 0.01)
-    cam_data = bpy.data.cameras.new("GEOMETRY_QA_ORTHO")
-    cam = bpy.data.objects.new("GEOMETRY_QA_ORTHO", cam_data)
+    cam_data = bpy.data.cameras.new("CI_TOOLCHAIN_ONLY_NOT_REAL_COCKPIT")
+    cam = bpy.data.objects.new("CI_TOOLCHAIN_ONLY_NOT_REAL_COCKPIT", cam_data)
     scene.collection.objects.link(cam)
     scene.camera = cam
     cam_data.type = "ORTHO"
     cam_data.ortho_scale = extent * 1.4
-    # Axis assumptions are labeled: actual car orientation must be recorded separately.
-    directions = [
-        ("front_assumed_minus_y", (0, -1, 0)),
-        ("rear_assumed_plus_y", (0, 1, 0)),
-        ("left_assumed_minus_x", (-1, 0, 0)),
-        ("right_assumed_plus_x", (1, 0, 0)),
-        ("top_plus_z", (0, 0, 1)),
-        ("cockpit_diagonal", (1, -1, 1)),
-    ]
-    for label, xyz in directions:
-        direction = Vector(xyz).normalized()
-        cam.location = center + direction * extent * 2.5
-        cam.rotation_euler = (center - cam.location).to_track_quat("-Z", "Y").to_euler()
-        scene.render.filepath = str(out / (label + ".png"))
-        bpy.ops.render.render(write_still=True)
+    cam.location = center + Vector((1, -1, 1)).normalized() * extent * 2.5
+    cam.rotation_euler = (center - cam.location).to_track_quat("-Z", "Y").to_euler()
+    scene.render.filepath = str(out / "smoke_test_cube_not_a_car.png")
+    bpy.ops.render.render(write_still=True)
     bpy.data.objects.remove(cam, do_unlink=True)
-
 
 def main():
     args = cli()
@@ -128,7 +139,7 @@ def main():
     low, high = scene_bounds()
     if min((high - low)) < 0:
         raise RuntimeError("invalid bounding box")
-    save_views(out, low, high)
+    save_views(out, low, high, args.mode)
     scene_file = out / "geometry_audited.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(scene_file), compress=True)
     report = {
@@ -145,6 +156,8 @@ def main():
         "total_faces": sum(x["faces"] for x in meshes),
         "total_zero_area_faces": sum(x["zero_area_faces"] for x in meshes),
         "photos_compared": False,
+        "camera_provenance": "requires explicit QA_COCKPIT_* scene cameras for audit, smoke not proof",
+        "rendered_views": list(COCKPIT_VIEWS) if args.mode == "audit" else ["smoke_test_cube_not_a_car"],
         "original_game_runtime_tested": False,
     }
     (out / "geometry_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
