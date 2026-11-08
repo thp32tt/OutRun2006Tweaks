@@ -33,3 +33,8 @@ Only three of 42 original source mesh objects changed. All **other 39 source mes
 - Remaining: authentic driver-eye/FOV/animation pivot proof; seven photo-view comparisons and QA; original steering boundary defects; human P0 dashboard/steering approval; first dedicated 24h start `2026-11-08T04:35:52Z`, earliest elapsed 24h `2026-11-09T04:35:52Z` (=13:35:52 KST). **No complete gate, car advancement or point credit.**
 
 **Output restriction:** only updated source-derived editable .blend delivered; validation scripts/renders retained as private evidence. No OVC3/OVC/PMT conversion or game package/runtime source changes, no new car or GLB, no exterior/tire/wheel or texture/normal/PBR work. Slot C stays `f50`; AI2 scoring +0 (continuation of existing feature).
+
+## Exact public smoke / private handoff readback
+
+- GitHub Actions on the **exact v27-r2 public script commit** `77c8ad43389293748aba77cf3b1cddf93e66ff1a`, Ferrari geometry Blender 4.5.15 hosted workflow run `42505025424`: **SUCCESS**, source/queue and Blender smoke only. This does **not** verify the confidential native F50 scene on hosted GitHub; hosted real model state remains `BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED`.
+- Separately, protected N100 source scene `F50_OriginalPMT_P0_DashboardSteering_v27_r2.blend` was delivered to the operator's preexisting **private Google Drive remote**, folder `OutRun2006/F50_SlotC_OriginalPMT_v27_r2_20261109/`. Remote 1,539,966-byte size, SHA256 `45393c348358214c4332d449fcdb1c5a47d38b1958e4e1a043efd59eebe92faf` and MD5 each matched the private output. **Only one editable .blend uploaded**; no source PMT, game export, third-party reference photo, scripts, or comparison PNG delivered in this handoff. No public sharing permission was created.
