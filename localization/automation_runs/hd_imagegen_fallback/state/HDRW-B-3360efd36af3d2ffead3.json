@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "b0887df34da37aba0ac3e804bd58ae7ff06bd23112e36cd8c155f86b34027d93",
+  "release_approved": false,
+  "roi_id": "Q046_bafb49b53be97b5b",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Coniferous Forest",
+    "korean": "코니퍼러스 포레스트",
+    "old_candidate_sha256": "b0887df34da37aba0ac3e804bd58ae7ff06bd23112e36cd8c155f86b34027d93",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 144,
+      "name": "HDRW-B-3360efd36af3d2ffead3_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        332,
+        136
+      ],
+      "sha256": "363d9dd14248301d3a5ad08bf1d68df61b4a9159c7a66f6bf945605066b288b5",
+      "source_box_xyxy": [
+        135,
+        565,
+        475,
+        709
+      ],
+      "source_native_size": [
+        2048,
+        2048
+      ],
+      "width": 340
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q046_bafb49b53be97b5b",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+    "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "source_native_bbox_xyxy": [
+      143,
+      573,
+      467,
+      701
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-3360efd36af3d2ffead3"
+  },
+  "task_id": "HDRW-B-3360efd36af3d2ffead3",
+  "updated_utc": "2026-11-08T18:45:06+00:00"
+}
