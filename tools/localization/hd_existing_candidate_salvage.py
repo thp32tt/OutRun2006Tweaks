@@ -119,12 +119,13 @@ def prove_source_edge_clear(source, box, extent, margin=2):
             if not edge_rules[side]:
                 raise ValueError("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
             actions.append("SOURCE_NATIVE_ATLAS_" + side + "_EDGE_INSET_REQUIRED")
+        elif native_alpha_crosses_box_edge(alpha, box, side):
+            # This also checks diagonal 8-connected pixels at ROI CORNERS:
+            # the rectangular strips alone exclude those outside corners.
+            raise ValueError("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
         elif alpha.crop(strip).getbbox() is not None:
-            if native_alpha_crosses_box_edge(alpha, box, side):
-                raise ValueError("QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
-            # Other native glyphs may be in the nearby atlas strip but
-            # are provably 8-disconnected from this ROI's boundary ink.
-            # Caller must also block NEW Korean ink from touching them.
+            # Nearby native alpha without a real connection is some other
+            # label or art. A subsequent translated-ink halo guard protects it.
             actions.append("SOURCE_EDGE_DISJOINT_EXTERNAL_ALPHA_PROOF")
         else:
             actions.append("SOURCE_EDGE_CLEAR_NEIGHBOR_PROOF")
