@@ -43,6 +43,12 @@ def ready(now, slot="A"):
         real_render_views={v: "blender-run-1234/" + v for v in REQUIRED_COCKPIT_VIEWS},
         reference_photo_urls={v: "https://example.org/photos/" + v for v in REQUIRED_COCKPIT_VIEWS},
         correct_car_variant=True, photo_handedness_checked=True,
+        cockpit_coverage={part: {"status": "COVERED_PARTIAL_QA",
+                                 "edited_original_mesh_object_ids": ["SOURCE_" + part.upper()]}
+                          for part in ("center_console", "driver_controls", "inner_door",
+                                       "windshield_frame", "visible_seat", "instrument_cluster",
+                                       "dashboard", "steering_wheel")},
+        repeated_cosmetic_only_p0_cycles=0,
         dashboard_review="PASS", steering_wheel_review="PASS",
         manual_geometry_review="PASS", outside_cockpit_geometry_edit_count=0,
         texture_work_count=0,
@@ -141,6 +147,18 @@ class TwoLaneCockpitTests(unittest.TestCase):
         ev["source_provenance_verified"] = False
         with self.assertRaisesRegex(ValueError, "independently verified"):
             advance(q, ev, now)
+
+    def test_whole_car_cannot_promote_if_only_steering_and_dashboard_worked(self):
+        now = dt.datetime(2026, 11, 10, tzinfo=UTC)
+        q, ev = ready(now)
+        ev["cockpit_coverage"]["center_console"]["status"] = "NOT_STARTED"
+        with self.assertRaisesRegex(ValueError, "NO_COVERAGE"):
+            advance(q, ev, now, slot="A")
+        ev["cockpit_coverage"]["center_console"]["status"] = "OUT_OF_VIEW"
+        with self.assertRaisesRegex(ValueError, "camera evidence"):
+            advance(q, ev, now, slot="A")
+        ev["cockpit_coverage"]["center_console"]["camera_visibility_proof_ref"] = "private-real-camera-png"
+        self.assertEqual(advance(q, ev, now, slot="A"), "360spider")
 
     def test_no_double_assignment_and_no_implicit_skip(self):
         q = copy.deepcopy(SEED)
