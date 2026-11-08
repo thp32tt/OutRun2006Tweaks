@@ -99,3 +99,31 @@ Actual modeling: sculpted original instrument visor upper continuous brow, lip, 
 **Outstanding:** actual in-game driver-eye alignment and steering rig pivot provenance `UNVERIFIED`; seven photo view QA `INCOMPLETE`; source wheel 624 open/nonmanifold edges not arbitrarily filled; visual matching remains `PARTIAL` (small geometric changes are not subjective completion). Github-hosted 4.5.15 real proprietary .blend audit `BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED`, not misreported as passed by CI smoke. Minimum 24h not elapsed, **vehicle_complete=false** and **slot_C_advance=false**. **AI score change +0**, continuation of same F50 P0 achievement / no duplicate scoring.
 
 **v10 paired comparison output:** private (no proprietary assets published) `work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_SlotC_P0_v10_BEFORE_AFTER_COMPARISON.jpg`, 1436x1064, SHA256 `932b299c07c3fb236a1a72474344b0b1dc576f522f2e35c339ead955e26a4cc0`. Original non-game diagnostic Workbench camera only; not a 7-view or game-driver-eye completion claim.
+
+
+## Slot C F50 v11 — photo-guided true original PMT geometry, 2026-11-08 KST
+
+**Task ID:** \`FERRARI16-SLOTC-F50-P0-NATIVE-COWL-THREESPOKE-HUB-V11-20261108\` (continuation of existing P0, no duplicate AI point).
+**Status:** \`ACTIVE / PARTIAL_NEEDS_QA\`. Slot C exclusively \`f50\`; A remains Daytona. Do not advance before 2026-11-09 04:35:52 UTC and never without all original-driver-eye / 7-view / QA checks.
+
+**Immutable provenance rehashed on private N100:**
+- Original OutRun 2006 Ferrari F50 native \`/home/chatgpt-runner/rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz\`, SHA256 \`10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab\`.
+- First verified PMT-derived Blender import \`F50_OriginalPMT_CockpitSource_v1.blend\`, SHA256 \`d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31\`.
+- Input \`F50_OriginalPMT_P0_DashboardSteering_v10.blend\`, SHA256 \`602f5628e658e29658378c4ae42e5010633fffd366deea7370f7764049e67bac\`, unchanged.
+- Output **true source-derived editable v11** private \`work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_P0_DashboardSteering_v11.blend\` 1,539,223 bytes, SHA256 **\`33edb2a2b3673847569c9bc321f8442148478e6a996d606fbd3f1bca27a69b9f\`**. Proprietary binary **not publicly committed**.
+
+**Only existing factory source-named cockpit meshes were edited**:
+
+| Native source ID | Before and after vertices/faces | Existing vertices moved | Maximum local position delta | Mesh SHA256 before -> after | Nonmanifold |
+|---|---|---:|---:|---|---|
+| \`object00_group01_material028_a0\` instrument visor / original dashboard | 5506/7552 -> unchanged | 3412 | 3.13288 mm | \`53e6fe791a97d71f32abd125a699a3531274b20172b443ff8fe1460b0ba348ce\` -> \`9ac1da17b864f5777cd58f1e712993bcb4dbb6aa9d5008b25a174bec5b420783\` | 0 -> 0 |
+| \`object21_group01_material002_a0\` original three-spoke steering rim | 13552/26496 -> unchanged | 9815 | 2.58490 mm | \`099543381308ee8eb155347b2b794e7fa820102e5b9deed137a2fe7f73682377\` -> \`394253546d833cdf7eec608cc9d471913c9e82fce54c6c935658bb8152c2fee1\` | 624 -> 624 |
+| \`object21_group00_material000_a0\` original hub/collar | 2738/4464 -> unchanged | 2542 | 1.20273 mm | \`5d892685de7586d773009bed67aef8b09cd600ec42070650b0e0406cc194de23\` -> \`ee41fbb2cb9f5d64b68a9537932d508133de32e2251458578230b011c90c4486\` | 0 -> 0 |
+
+**Physical geometry changes (no recreated model)**: continuous instrument cowl shadow brow with physically lowered double-instrument pockets / center bridge, curved 10/2-o'clock steering grip and existing spoke pressing / fold relief, original six-fastener hub seat profile. This is a real **original mesh vertex-position sculpt** with identical topology counts; it does not yet demonstrate true driver-eye photographic fidelity.
+
+**Real official Blender 4.5.15 LTS verification:** v10 copied original-verified scene opened and saved as v11; two paired gauge/steering Workbench before/after renders. Independently launched another fresh Blender process to load v11, re-open v10, compare all 42 original source mesh IDs/geometry/UV/materials/object matrices/cameras, then load v11 again and render. **PASS**: 3 source mesh geometry hashes changed; 39 source objects unchanged; all original IDs, cameras, matrices, UV counts, material slot counts unchanged; native and imported base hashes stable; source wheel's 624 pre-existing nonmanifold edges not silently repaired. Independent rendered steering SHA256 \`dbab050f39fca82ff20425bb4ed3e73e28a78887933a56d40beb9e6cba6bbab3\`. Source \`tools/car_modeling/slot_c/f50_p0_source_mesh_v11.py\` commit \`bee95f955120fd6d44eadb89dc40f89d571acfe4\`, QA \`tools/car_modeling/slot_c/f50_v11_independent_reopen.py\` commit \`99414e21bf9f90e2a0421f3f32461981360a91cf\`.
+
+**Private photo comparison** at \`03_F50/REF2_dashboard_closeup_dad64db8c0a5.jpg\` and \`03_F50/REF5_mecum_interior_01_f8afa7e2a.jpg\` with actual v10/v11 non-game-camera gauge/steering renders. All six private images grouped in \`F50_SlotC_P0_v11_PRIVATE_F50_PHOTOS_BEFORE_AFTER.jpg\` SHA256 \`7020f365872d3c69a6f299d805442b8f74ac42dd401fc6dff9007a55939c7a5d\` (private, no copyrighted photo commit). Before/after render SHA256: gauge \`33420ebd50a77316c0c2b0d01b8f3a8feb7a10e50be12a486ecdbe4e0c0167d0\` -> \`83dc7dbdd7dbfd338ab01bff3d0003a471904c12ed8b856cd035074c3fe44fa2\`; steering \`af7668d0d41277668e11316e9ae300688cd2fe6dbf9b4891161a47f34b6fd5ff\` -> \`da7fb8fb2da61799c29b9b687032b6855aa71f910203e26cbb4d4d46e75633c9\`.
+
+**Still blocked/unfinished:** original game **driver-eye calibration, steering animation rig/pivot provenance, seven matched true F50 photo views**, and visually strong authentic geometry gate remain \`NEEDS_QA\`; actual hosted GitHub Actions does not have private input .blend: \`BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED\` for **hosted real-source audit only** (does not mean original local input is missing). This is not a completed vehicle, not a game executable. \`vehicle_complete=false\`, \`advance_slot_c=false\`, \`score_change=0\`. No OVC/OVC3/PMT export, game integration, outside body/wheels, texture/PBR/normal, Dino, slot A, Model2, or VR runtime changes.
