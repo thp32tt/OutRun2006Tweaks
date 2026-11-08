@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "d5a9c89eb4a6641889863dea0c6d69506b3126af7651b2aad5507b6b7f3cc395",
+  "release_approved": false,
+  "roi_id": "Q046_b577bb70f171fb40",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Sunny Beach",
+    "korean": "서니 비치",
+    "old_candidate_sha256": "d5a9c89eb4a6641889863dea0c6d69506b3126af7651b2aad5507b6b7f3cc395",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 144,
+      "name": "HDRW-A-f25bd734a805a7f1469a_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        232,
+        136
+      ],
+      "sha256": "447e565bd5ccad7551164fc6adec779b820328a971aa7acedf10701c676446bc",
+      "source_box_xyxy": [
+        639,
+        1021,
+        879,
+        1165
+      ],
+      "source_native_size": [
+        2048,
+        2048
+      ],
+      "width": 240
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q046_b577bb70f171fb40",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+    "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "source_native_bbox_xyxy": [
+      647,
+      1029,
+      871,
+      1157
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-A-f25bd734a805a7f1469a"
+  },
+  "task_id": "HDRW-A-f25bd734a805a7f1469a",
+  "updated_utc": "2026-11-08T22:44:50+00:00"
+}
