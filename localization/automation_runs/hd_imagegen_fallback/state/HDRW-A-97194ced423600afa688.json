@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af0f606-c240-83ee-a621-21c769688810",
   "old_candidate_sha256": "ef66c98cd2e25bd1decd59397a4fa9c9c0fa8819a70f2c6acfd509a983992c19",
   "release_approved": false,
   "roi_id": "Q046_34bab43a7a71606f",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Snow Mountain",
     "korean": "스노 마운틴",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-97194ced423600afa688"
   },
   "task_id": "HDRW-A-97194ced423600afa688",
-  "updated_utc": "2026-11-08T22:21:53+00:00"
+  "updated_utc": "2026-11-08T22:22:11+00:00"
 }
