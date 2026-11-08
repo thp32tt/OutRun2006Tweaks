@@ -52,6 +52,7 @@ jobs:
         run: |
           python3 tools/car_modeling/queue_guard.py --queue docs/automation/FERRARI16_GEOMETRY_QUEUE.json
           python3 -m unittest discover -s tools/car_modeling -p 'test_queue_guard.py' -v
+          python3 tools/car_modeling/test_slotA_daytona_p0_source_contract.py
       - name: Download verified official Blender archive
         shell: bash
         run: |
