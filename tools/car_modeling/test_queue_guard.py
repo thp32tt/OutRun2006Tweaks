@@ -96,6 +96,13 @@ class TwoLaneCockpitTests(unittest.TestCase):
         new_c.update(started_at_utc=(now - dt.timedelta(hours=25)).isoformat(),
                      geometry_gate="PASS", reference_gate="PASS",
                      source_scene_sha256="a" * 64, output_scene_sha256="b" * 64)
+        new_c["source_provenance"].update(
+            original_game_resource_file="private/native_f50.pmt",
+            original_game_resource_sha256="c" * 64,
+            original_import_blend_sha256="d" * 64,
+            original_mesh_object_ids=["ORIGINAL_GAUGE_BEZEL", "ORIGINAL_STEERING_RIM"],
+            verification="PASS",
+        )
         ev_c = dict(ev, car_id="f50", slot="C")
         self.assertEqual(advance(q, ev_c, now, slot="C"), "f355spider")
         self.assertEqual(validate(q)["C"]["id"], "f355spider")
