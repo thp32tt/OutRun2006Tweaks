@@ -1,0 +1,18 @@
+# Ferrari F50 slot C — v37-r2 genuine source gauge surround, visual QA hold
+
+Date 2026-11-09 KST. **Outcome: VISUAL_QA_HOLD, not P0 PASS.** Active_by_slot.C is F50. Accepted production/private source is still v36.
+
+## Root cause of slow progress
+Versions v1-v36 repeatedly adjusted original instrument hood, 3-spoke wheel and hub while leaving another distinct authentic original instrument-binnacle outer surround untouched: PMT_F50_object00_group01_material011_a0. This 109v/119f object was individually identified from the authenticated original 42-mesh .blend and visualized on the existing original scene. Real F50 photos inspected from private N100 library: REF5_mecum_interior_01_f8afa7e2a.jpg (full interior LHD side needs confirmation) and REF2_dashboard_closeup_dad64db8c0a5.jpg (RHD; not game viewpoint). The v36 rear/upper source surround remained blocky and unrefined.
+
+## SHA and geometry
+Original OutRun2006 F50 read-only PMT rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz SHA256 10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab. Verified first native Blender import SHA256 d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31. Exact existing accepted editable v36 SHA256 4f232ce124caab8afca8ddfcadb6b629267730d80a58ab50a1daddbfad591b3e.
+
+Actual F50 native mesh object original ID object00_group01_material011_a0. Before mesh SHA 1189babe5d7d2f956065deb0ab444fa597ff50e6a6e991c8e1c4aa670803dd3c; candidate after mesh SHA 3b28f0b458262e3bf6e9ccb8d543876e42db0c07c08995fd360b1fac00c04ef3. Source object topology 109 vertices / 119 faces -> 674 vertices / 1071 faces by source-edge subdivision plus profile-guided rolled contour (50 repositioned subdivisions, max 4.00001mm). Existing other 41 native meshes are exactly unchanged, as are cameras, original source identity, UV/materials, and steering eight boundary openings/624 open edges. No new geometry object or outside cockpit change.
+
+First v37 scene SHA256 49ab8fde576cc0d43221ecdf4853415160913bee4ce9eb339aecf51c5a079860 was **REJECTED** on actual render: unacceptable dark gap above hood even though independent Blender reopen passed. Rebuilt from immutable v36 only; new v37-r2 local private editable F50_OriginalPMT_P0_GaugeSurround_v37_r2.blend SHA256 711d4f5e897d55035cec9158a11499f46a564142a5209dc477c070b9d69b0fe8 (1,567,637 bytes), actual independent official Blender 4.5.15 fresh-process re-open source/candidate/render passed. Before/after compare JPG SHA256 28b1c4f10acbaff3674e516bbd4118d734077645954e0c09e830f2663d64e18c: 2522 of 504000 pixels change >3 RGB = only 0.50 percent.
+
+## Decision
+Although real source topology changed and the dark gap was fixed, **visible improvement still insufficient**, so v37-r2 is not promoted to accepted source. Queue accepted output SHA remains v36 4f232ce1..., status ACTIVE / PARTIAL_NEEDS_QA; no car advance. Source editing script committed at tools/car_modeling/slot_c/f50_p0_original_gauge_surround_v37_r2.py, script commit ba6892a8ba4538648d762a016ec1ffcde57dfb26, private script SHA256 a4b0ef609600ab5df49c7890205be9f0780aba3facf5ba80e48d4c708e57eb6d. Seven authentic photo views, native game driver-eye calibration and credible full-dashboard P0 quality QA remain incomplete. GitHub-hosted real private original Blender scene remains BLOCKED_INPUT_PRIVATE_BLEND_NOT_TRANSFERRED; a smoke run is not proof. User-reported lack of progress acknowledged as substantive QA failure.
+
+No public proprietary blend commit, PMT/OVC/OVC3 conversion or output, GLB substitution, game/VR changes, outside car/wheels/tires, texture/PBR/normal creation, Dino/Model2/DX11/slot A modifications. AI2 score delta +0, same already-scored F50 task and rejected/continuation work.
