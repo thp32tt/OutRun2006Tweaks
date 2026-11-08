@@ -64,10 +64,13 @@ def source_gate():
  for tag,p,h in (("PMT",PMT,EXPECTED["pmt"]),("original imported scene",IMP,EXPECTED["import"]),
  ("R15 existing editable scene",OLD,EXPECTED["r15"]),("Spider LHD photo",PHOTO,EXPECTED["photo"])):
   assert p.is_file() and sha(p)==h,("BLOCKED_INPUT_SHA",tag)
- assert "object00_group01_material012_a0" in bpy.data.objects
- assert "object22_group00_material000_a0" in bpy.data.objects
- assert len(bpy.data.objects["object00_group01_material012_a0"].data.vertices)==13
- assert len(bpy.data.objects["object22_group00_material000_a0"].data.vertices)==61
+ # The immutable original IMPORT scene contains raw object00/object22.
+ # The R15 working scene retains linked DERIVATIVE object identities instead.
+ # Never mislabel these 6 edited meshes as byte-identical native triangles.
+ assert "V5_NATIVE_DASH_REFERENCE_object00_group01_material012_a0" in bpy.data.objects
+ assert "V5_ORIGINAL_THREESPOKE_WHEEL_object22_group00_material000_a0" in bpy.data.objects
+ assert len(bpy.data.objects["V5_NATIVE_DASH_REFERENCE_object00_group01_material012_a0"].data.vertices)==13
+ assert len(bpy.data.objects["V5_ORIGINAL_THREESPOKE_WHEEL_object22_group00_material000_a0"].data.vertices)==9720
  assert bpy.context.scene.camera and bpy.context.scene.camera.name=="V7_Camera_Reference_ThreeQuarter"
 def snapshot():
  objs={key:bpy.data.objects[name] for key,name in PARTS.items()}
