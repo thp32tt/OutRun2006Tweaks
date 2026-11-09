@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "1182991fd8bc1bb96535bf9e2d18cba7b73225be25c832ea9c074b96e91fe019",
+  "release_approved": false,
+  "roi_id": "Q095_13497d0995cb4553",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Manual",
+    "korean": "수동",
+    "old_candidate_sha256": "1182991fd8bc1bb96535bf9e2d18cba7b73225be25c832ea9c074b96e91fe019",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 131,
+      "name": "HDRW-B-322d801e17d4261db4fa_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        445,
+        123
+      ],
+      "sha256": "e70eac44a5a823034131e2af3ce772be27bed46788e178f2e112927142d8987c",
+      "source_box_xyxy": [
+        2849,
+        209,
+        3302,
+        340
+      ],
+      "source_native_size": [
+        4096,
+        4096
+      ],
+      "width": 453
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q095_13497d0995cb4553",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "source_dds_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+    "source_native_bbox_xyxy": [
+      2857,
+      217,
+      3294,
+      332
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-322d801e17d4261db4fa"
+  },
+  "task_id": "HDRW-B-322d801e17d4261db4fa",
+  "updated_utc": "2026-11-09T02:07:28+00:00"
+}
