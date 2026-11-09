@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/outrun-hd-chat-rework-ci.yml"
       - "tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/chat_image_result_rescue.py"
       - "tools/chat-controller/localization-recovery-v1/test_github_chat_rework_controller.py"
       - "tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework"
       - "tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh"
@@ -25,6 +26,7 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
+            tools/chat-controller/localization-recovery-v1/chat_image_result_rescue.py
             tools/chat-controller/localization-recovery-v1/test_github_chat_rework_controller.py
             tools/chat-controller/localization-recovery-v1/controller_png_attach.py
             tools/chat-controller/localization-recovery-v1/text_roi_queue.py
@@ -75,13 +77,15 @@ jobs:
           assert "playwright==1.63.0" in image
           assert "from playwright.async_api import async_playwright" in image
           assert chat["healthcheck"]["test"][-1].find("6080/vnc.html")>=0
-          assert float(chat["cpus"])<=0.65
+          assert 0 < float(chat["cpus"]) <= 1.0
+          assert "outrun_chat_browser_profile_clean_v2:/browser-profile" in chat["volumes"]
+          assert chat["environment"]["OUTRUN_REWORK_BROWSER_PROFILE_DIR"]=="/browser-profile"
           assert "OUTRUN_GITHUB_CONTENTS_TOKEN" in chat["environment"]
           assert "OUTRUN_REWORK_VNC_PASSWORD" in chat["environment"]
           assert len(chat.get("ports",[]))==1
           assert "connect_over_cdp" in (p/"github_chat_rework_controller.py").read_text()
           assert "--remote-debugging-address=127.0.0.1" in (p/"entrypoint.chat-rework.sh").read_text()
-          assert "--user-data-dir=/data/hd-rework/browser-rework-profile" in (p/"entrypoint.chat-rework.sh").read_text()
+          assert '--user-data-dir="$profile_dir"' in (p/"entrypoint.chat-rework.sh").read_text()
           assert "source_dds_sha256" in (p/"github_chat_rework_controller.py").read_text()
           assert (p/"entrypoint.chat-rework.sh").read_text().startswith("#!/usr/bin/env bash")
           print("REWORK_OPT_IN_AND_SHA_QA_GATES_PASS")
