@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "7bab91515763b617f3c0795ec21e66bcf9463806184adcb4531aa463478a1311",
+  "release_approved": false,
+  "roi_id": "Q101_ce6fc95e42c9cdff",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Steering Wheel :",
+    "korean": "스티어링 휠:",
+    "old_candidate_sha256": "7bab91515763b617f3c0795ec21e66bcf9463806184adcb4531aa463478a1311",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_DOWNSCALE_LOST_GLYPHS",
+    "reference": {
+      "height": 145,
+      "name": "HDRW-B-72b313b78a43c6d5249b_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        479,
+        137
+      ],
+      "sha256": "4158a57b9106ffa7290c9d162fc7b4a415f74fd811439cc52e90557ee30b63ba",
+      "source_box_xyxy": [
+        3377,
+        827,
+        3864,
+        972
+      ],
+      "source_native_size": [
+        4096,
+        4096
+      ],
+      "width": 487
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q101_ce6fc95e42c9cdff",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+    "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "source_native_bbox_xyxy": [
+      3385,
+      835,
+      3856,
+      964
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-72b313b78a43c6d5249b"
+  },
+  "task_id": "HDRW-B-72b313b78a43c6d5249b",
+  "updated_utc": "2026-11-09T07:50:59+00:00"
+}
