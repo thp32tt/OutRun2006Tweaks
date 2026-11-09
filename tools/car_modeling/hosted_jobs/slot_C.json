@@ -2,20 +2,18 @@
   "schema_version": 1,
   "slot": "C",
   "car_id": "f50",
-  "mode": "edit",
-  "component": "inner_door",
+  "mode": "probe",
+  "component": "visible_seat",
   "original_native_rel": "rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz",
   "original_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
   "original_import_blend_rel": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CockpitSource_v1.blend",
   "original_import_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
   "source_blend_rel": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_Windshield_Header_Apillar_v41.blend",
   "source_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
-  "output_blend_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_NativeInnerDoor_v42.blend",
-  "receipt_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_NativeInnerDoor_v42_receipt.json",
-  "allowed_existing_meshes": [
-    "PMT_F50_object00_group01_material031_a0"
-  ],
-  "edit_script": "tools/car_modeling/hosted_edits/f50_slot_c_inner_door_v42.py",
+  "output_blend_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_NativeVisibleSeat_v43.blend",
+  "receipt_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_NativeVisibleSeat_v43_source_inventory.json",
+  "allowed_existing_meshes": [],
+  "edit_script": null,
   "disallowed_actions": [
     "OVC3 export",
     "PMT export",
@@ -23,13 +21,6 @@
     "game integration",
     "out-of-target cockpit editing"
   ],
-  "evidence_png_rels": [
-    "work_handoff/ferrari_hosted_results/slot_C/F50_NativeInnerDoor_v42_BEFORE.png",
-    "work_handoff/ferrari_hosted_results/slot_C/F50_NativeInnerDoor_v42_AFTER.png"
-  ],
-  "request_gate": "HOSTED_SOURCE_SHA_AND_ORIGINAL_ID_FAIL_CLOSED; NO_NEW_DISPATCH_20261109",
-  "source_photo_rel": "outrun2_vr_refs/20261104_16car_cockpit/03_F50/REF5_mecum_interior_01_f8afa7e2a.jpg",
-  "source_photo_sha256": "cd31303113763596eebada76ea964386522f4a03c9684c9132226963e8663ca2",
-  "retry_of_failed_hosted_run": 42543904654,
-  "retry_limit": "single user-requested retry of one blocked hosted attempt; not additional dispatch; keep next component visible_seat"
+  "evidence_png_rels": [],
+  "request_gate": "SOURCE_IDENTIFICATION_PROBE_ONLY: no verified original F50 visible_seat PMT object yet, so no edit script, no geometry, no QA promotion"
 }

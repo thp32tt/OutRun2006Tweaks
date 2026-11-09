@@ -278,7 +278,7 @@
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
       "output_scene_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
-      "notes": "[2026-11-09 SLOT C F50 v41] driver_controls BLOCKED original native PMT pedal/stalk not positively identified; moved to windshield_frame original PMT000 header/A-pillar outer border. 13 existing vertices moved max 21mm, glass PMT005 and other 41 native meshes untouched. Private .blend v41 SHA 016645f5, official Blender 4.5.15 independent reopen PASS. windshield_frame COVERED_PARTIAL_QA only; NEXT visible_seat, no full car QA PASS; original 24h ownership unchanged.",
+      "notes": "[2026-11-09 SLOT C] F50 original PMT031 inner_door v42 public GitHub VM success: 1 genuine existing source mesh edited, Blender saved/reopened, before/after render, encrypted artifact run 42546429232. Region COVERED_PARTIAL_QA 2/2; private ciphertext result unpromoted, v41 SHA 016645f5 remains active. Next visible_seat; car QA NOT PASS.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
