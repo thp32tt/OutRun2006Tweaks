@@ -194,6 +194,8 @@ jobs:
           assert 'OriginalQuestGameCameraState(0x10u)' in Path('tools/tests/quest_cockpit_v2_seat_smoke.cpp').read_text(encoding='utf-8')
           assert 'guestProfile.y+0.319999993f' in Path('src/vr/game/quest_cockpit_v2_seat.hpp').read_text(encoding='utf-8')
           assert 'if(rotationOnly) {' in r7 and 'nativeView._41=0.f;' in r7
+          assert 'shaderSkyMixedEyes={}' in r7
+          assert 'ProgrammableSkyViewModeSwitches-windowSwitches' in r7
           native_pose=Path('src/vr/game/quest_cockpit_v2_apk_xr_pose.hpp').read_text(encoding='utf-8')
           assert 'NativeYawOrigin(' in native_pose
           assert 'NativeInverseOriginCompose(' in native_renderer

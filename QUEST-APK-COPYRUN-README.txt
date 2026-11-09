@@ -47,6 +47,10 @@ TEST AND APK COMPARISON (2026-11-05):
 - The original camera table may not be ready at hook installation.
   New logs distinguish deferred startup from successful native-game
   admission and 90-frame permanent failure.
+- SKY diagnostic output now distinguishes shaderSkyNative,
+  shaderSkyFallback, shaderSkyMixedEyes and shaderSkyModeSwitches per 90
+  Presents. shaderExactSkyDraws is now windowed, not lifetime cumulative.
+  This is a root-cause probe, not a claimed fix for faint double sky.
 - If road bounce/sky flicker persists, use the two included A/B scripts
   without changing the original game files. These remain unresolved
   visual comparisons until captured on a Quest 3 headset.

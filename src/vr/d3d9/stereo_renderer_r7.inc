@@ -243,6 +243,13 @@ namespace OutRunVRStereo
         // This is NOT exact sky source ownership.
         std::uint64_t ProgrammableDepthOffWorldDraws = 0;
         std::uint64_t ProgrammableExactWorldSkyDraws = 0;
+        // Per-sky-draw mode coherence, not a generic depth-off heuristic.
+        std::uint64_t ProgrammableSkyNativeViewDraws = 0;
+        std::uint64_t ProgrammableSkyFallbackViewDraws = 0;
+        std::uint64_t ProgrammableSkyMixedEyeDraws = 0;
+        std::uint64_t ProgrammableSkyViewModeSwitches = 0;
+        bool ProgrammableSkyLastModeKnown = false;
+        bool ProgrammableSkyLastNative = false;
 		bool FirstFixedFunctionWorldLogged = false;
 		bool FirstFixedFunctionSkyRotationLogged = false;
 		std::uint64_t OcclusionQueriesCreated = 0;
@@ -1000,6 +1007,7 @@ namespace OutRunVRStereo
 			const bool exactWorldSky =
 				OutRunVR::GameSemantic::CapturePhysicalDrawCommand().scope ==
 				OutRunVR::GameSemantic::RenderScope::WorldSky;
+            bool exactSkyNativeEye[2]{false,false};
 			for (int eye = 0; eye < 2; ++eye)
 			{
 				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale * Settings::VRStereoDepth);
@@ -1009,6 +1017,7 @@ namespace OutRunVRStereo
                 if(OutRunVRRenderer::GetQuestNativeEyeInverse(
                        nativeViewBytes,eye,nativePoseSequence) &&
                    nativePoseSequence==stereo.poseSequence) {
+                    if(exactWorldSky)exactSkyNativeEye[eye]=true;
                     float headBytes[16]{};
                     std::uint32_t headPoseSequence=0;
                     if(!OutRunVRRenderer::GetLatchedHeadInverse(
@@ -1065,12 +1074,26 @@ namespace OutRunVRStereo
 				if (!MatrixFinite(eyeWvp)) return EyeBuildResult::FatalError;
 				const D3DMATRIX eyeWvpT = TransposeMatrix(eyeWvp); std::memcpy(state.eyeConstants[eye], &eyeWvpT, sizeof(eyeWvpT));
 			}
-			if (Settings::VRQuestCockpitV2SkyProbe) {
-                if(exactWorldSky)
+
+            if (Settings::VRQuestCockpitV2SkyProbe) {
+                if(exactWorldSky) {
                     ++ProgrammableExactWorldSkyDraws;
+                    if(exactSkyNativeEye[0]!=exactSkyNativeEye[1]) {
+                        ++ProgrammableSkyMixedEyeDraws;
+                    } else {
+                        const bool native=exactSkyNativeEye[0];
+                        if(native)++ProgrammableSkyNativeViewDraws;
+                        else ++ProgrammableSkyFallbackViewDraws;
+                        if(ProgrammableSkyLastModeKnown &&
+                           ProgrammableSkyLastNative!=native)
+                            ++ProgrammableSkyViewModeSwitches;
+                        ProgrammableSkyLastModeKnown=true;
+                        ProgrammableSkyLastNative=native;
+                    }
+                }
                 DWORD depth=D3DZB_TRUE;
-                if (ReadTrackedRenderState(device,D3DRS_ZENABLE,depth) &&
-                    depth==D3DZB_FALSE)
+                if(ReadTrackedRenderState(device,D3DRS_ZENABLE,depth) &&
+                   depth==D3DZB_FALSE)
                     ++ProgrammableDepthOffWorldDraws;
             }
             state.worldStereo = true; state.poseSequence = stereo.poseSequence; return EyeBuildResult::WorldStereo;
@@ -2178,6 +2201,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
             static std::uint32_t frames=0,skyFrames=0,badFrames=0;
             static std::uint32_t rightFailures=0,poisoned=0,depthMissing=0;
             static std::uint64_t lastSky=0,windowSky=0,windowWorld=0,windowShaderDepthOff=0;
+            static std::uint64_t windowExact=0,windowNative=0,
+                windowFallback=0,windowMixed=0,windowSwitches=0;
             static std::uint64_t totalPresent=0;
             static bool sawRequested=false,sawComposed=false,sawDirect=false;
             ++frames;
@@ -2194,14 +2219,21 @@ if(WaitForEventQuery(slot.fence,1,0u))
             if(frames>=90) {
                 spdlog::info(
                     "VR SKY PROBE: present={} samples={} skyLikeFrames={} "
-                    "skyLikeDraws={} otherFixedWorldDraws={} shaderDepthOffWorldDraws={} shaderExactSkyDraws={} incomplete={} "
+                    "skyLikeDraws={} otherFixedWorldDraws={} shaderDepthOffWorldDraws={} "
+                    "shaderExactSkyDraws={} shaderSkyNative={} "
+                    "shaderSkyFallback={} shaderSkyMixedEyes={} "
+                    "shaderSkyModeSwitches={} incomplete={} "
                     "rightFailed={} poisoned={} depthUnsynced={} "
                     "requested={} composed={} direct={} lastFailure={} presentHr={}",
                     totalPresent,frames,skyFrames,
                     FixedFunctionSkyRotationOnlyDraws-windowSky,
                     FixedFunctionWorldStereoDraws-windowWorld,
                     ProgrammableDepthOffWorldDraws-windowShaderDepthOff,
-                    ProgrammableExactWorldSkyDraws,
+                    ProgrammableExactWorldSkyDraws-windowExact,
+                    ProgrammableSkyNativeViewDraws-windowNative,
+                    ProgrammableSkyFallbackViewDraws-windowFallback,
+                    ProgrammableSkyMixedEyeDraws-windowMixed,
+                    ProgrammableSkyViewModeSwitches-windowSwitches,
                     badFrames,rightFailures,poisoned,depthMissing,
                     sawRequested,sawComposed,sawDirect,
                     static_cast<unsigned>(FrameFailureReason),
@@ -2212,6 +2244,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 windowSky=FixedFunctionSkyRotationOnlyDraws;
                 windowWorld=FixedFunctionWorldStereoDraws;
                 windowShaderDepthOff=ProgrammableDepthOffWorldDraws;
+                windowExact=ProgrammableExactWorldSkyDraws;
+                windowNative=ProgrammableSkyNativeViewDraws;
+                windowFallback=ProgrammableSkyFallbackViewDraws;
+                windowMixed=ProgrammableSkyMixedEyeDraws;
+                windowSwitches=ProgrammableSkyViewModeSwitches;
             }
         }
 
