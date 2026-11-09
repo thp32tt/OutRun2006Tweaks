@@ -37,6 +37,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Verify ciphertext bytes and full SHA256 (no key required)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/car_modeling/restore_encrypted_chunks.py --slot "${{ matrix.slot }}" \
+            --manifest-dir "tools/car_modeling/encrypted_inputs/20261109/slot_${{ matrix.slot }}" \
+            --output "$RUNNER_TEMP/slot_${{ matrix.slot }}_input.enc"
       - id: gate
         name: Check private AES key and selected slot
         shell: bash
@@ -65,9 +72,6 @@ jobs:
         run: |
           set -euo pipefail
           sudo install -d -m 0700 -o "$(id -un)" -g "$(id -gn)" /home/chatgpt-runner
-          python3 tools/car_modeling/restore_encrypted_chunks.py --slot "${{ matrix.slot }}" \
-            --manifest-dir "tools/car_modeling/encrypted_inputs/20261109/slot_${{ matrix.slot }}" \
-            --output "$RUNNER_TEMP/slot_${{ matrix.slot }}_input.enc"
           "$RUNNER_TEMP/ferrari-venv/bin/python" tools/car_modeling/secure_bundle.py unpack \
             --slot "${{ matrix.slot }}" --root /home/chatgpt-runner \
             --bundle "$RUNNER_TEMP/slot_${{ matrix.slot }}_input.enc"
