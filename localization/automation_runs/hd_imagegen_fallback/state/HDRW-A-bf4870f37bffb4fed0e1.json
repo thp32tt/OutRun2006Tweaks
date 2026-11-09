@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "d72c1078ae1ab6e667bfd222f41592ad0ee33614293ead634dfd57dc455e4d5c",
+  "release_approved": false,
+  "roi_id": "Q059_d6b334ba2a964812",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Race The Rivals!",
+    "korean": "라이벌과 레이스!",
+    "old_candidate_sha256": "d72c1078ae1ab6e667bfd222f41592ad0ee33614293ead634dfd57dc455e4d5c",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 120,
+      "name": "HDRW-A-bf4870f37bffb4fed0e1_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        597,
+        112
+      ],
+      "sha256": "89a783f84969d4f49e5d61fa335925c16064db4f33830e4f6da63ca00b744785",
+      "source_box_xyxy": [
+        45,
+        207,
+        650,
+        327
+      ],
+      "source_native_size": [
+        2048,
+        512
+      ],
+      "width": 605
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q059_d6b334ba2a964812",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+    "source_dds_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+    "source_native_bbox_xyxy": [
+      53,
+      215,
+      642,
+      319
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-A-bf4870f37bffb4fed0e1"
+  },
+  "task_id": "HDRW-A-bf4870f37bffb4fed0e1",
+  "updated_utc": "2026-11-09T07:08:29+00:00"
+}
