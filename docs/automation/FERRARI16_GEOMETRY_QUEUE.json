@@ -92,7 +92,7 @@
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437",
       "output_scene_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
-      "notes": "[2026-11-09 SLOT A hosted] inner_door R45 already COVERED_PARTIAL_QA (41 original-derived vertices; no re-edit). windshield_frame BLOCKED_HOSTED_KEY/INPUT: public Actions 42540030991 key missing, decrypted Blender stages skipped; encrypted input commit predates R45 SHA 224131c7. No new source geometry or QA PASS. Next visible_seat; preserve start/24h and C/F50. Report FERRARI16_SLOTA_DAYTONA_HOSTED_BLOCKED_20261109.md.",
+      "notes": "[2026-11-09 SLOT A hosted corrected] inner_door R45 COVERED_PARTIAL_QA; do not repeat. Public run 42543904654: AES key present, decrypted 6 inputs, but hosted edit BLOCKED_SOURCE_SHA because ciphertext input predates private R45 .blend SHA 224131c7. Newer run 42546429232 selected slot C; A model steps skipped. No hosted A geometry/reopen/render or QA PASS. Next visible_seat remains NOT_STARTED until fresh encrypted R45 source is provided. Existing 24h vehicle ownership retained; C/F50 untouched.",
       "private_photo_subdir": "02_365_GTS4_Daytona",
       "priority": [
         "dashboard",

@@ -93,7 +93,7 @@
       "evidence_refs": [
         "docs/automation/FERRARI16_SLOTA_DAYTONA_HOSTED_BLOCKED_20261109.md"
       ],
-      "blocking_reason": "BLOCKED_HOSTED_KEY/INPUT: GitHub Actions 42540030991 SLOT A KEY empty, decrypt/Blender steps skipped; encrypted slot_A bundle 502cf59b (committed 00:10:44Z) predates R45 (00:39:56Z), so current 224131c7 source cannot be authenticated. Native windshield mesh not inspected; no synthetic edit.",
+      "blocking_reason": "BLOCKED_HOSTED_INPUT_STALE (NOT KEY): hosted run 42543904654 slot A had nonempty FERRARI_BUNDLE_KEY_B64, decrypt verified 6 private inputs, then runner rejected stale source .blend (BLOCKED_SOURCE_SHA); ciphertext SHA 502cf59b predates R45 source SHA 224131c7. Native windshield not inspected; do not fabricate.",
       "last_saved_blend_sha256": null,
       "dispatches_consumed_this_phase": 0,
       "native_source_mesh": "UNVERIFIED_HOSTED_INPUT_BLOCKED"
@@ -139,10 +139,22 @@
     "seven authenticated car-photo viewpoints incomplete",
     "real proprietary source scene not available in GitHub-hosted Actions",
     "existing source nonmanifold / connectivity findings unresolved",
-    "GitHub-hosted AES-GCM key missing and encrypted slot A inputs predate latest R45 scene"
+    "Host key is present (run 42543904654); slot A encrypted input is stale against latest R45 source SHA, so hosted source geometry is blocked"
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": "4ebbeb8342d0fe8ebca18d7c830a6be2ac6cee02",
-  "notes": "inner_door R45 COVERED_PARTIAL_QA only, no repeat; windshield_frame BLOCKED_HOSTED_KEY/INPUT (run 42540030991 key empty, ciphertext predates R45). No hosted Blender save/reopen/render or new geometry this call. Next visible_seat pending original PMT source attribution and fresh encrypted inputs; car QA NOT PASS, wheel/dash and C untouched.",
-  "latest_accepted_editable_blend_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722"
+  "notes": "SLOT A inner_door R45 previously COVERED_PARTIAL_QA; repeated user command is not a new geometry pass. Run 42543904654 proved key/decrypt available but BLOCKED_SOURCE_SHA on stale slot A ciphertext. Run 42546429232 selected slot C; slot A Blender skipped. Current region visible_seat NOT_STARTED, pending fresh encrypted R45 exact input and positive original seat mesh attribution. No new script, render or vehicle QA PASS, no new score.",
+  "latest_accepted_editable_blend_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
+  "hosted_a_latest_evidence": {
+    "updated_at_kst": "2026-11-09 10:36",
+    "latest_confirmed_usable_key_run": 42543904654,
+    "decrypt": "PASS_SIX_INPUTS",
+    "blender": "INSTALLED",
+    "source_admission": "BLOCKED_SOURCE_SHA_STALE_CIPHERTEXT",
+    "current_expected_source_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
+    "encrypted_bundle_sha256": "502cf59b193ad45345ca50e6dd093eb88c92248ae044a99d9860991d6fffd520",
+    "new_geometry": false,
+    "whole_car_qa_pass": false,
+    "score_delta": 0
+  }
 }

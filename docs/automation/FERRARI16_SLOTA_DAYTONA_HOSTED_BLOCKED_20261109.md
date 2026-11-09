@@ -8,3 +8,11 @@
 - Windshield-frame work is `BLOCKED` by hosted key/current encrypted input, **not** proven absent in original PMT; no windshield mesh fabricated or edited. Per breadth-first skip policy the next candidate is `visible_seat`. Underlying hosted prerequisites must be resolved before any real geometry edit.
 - No Blender executed on N100, no PMT/OVC/OVC3/game conversion/export, no exterior/wheel, new model, textures/PBR, Model2, Dino, or other slots.
 - This checkpoint has **no material modeling achievement**; `vehicle QA PASS=false`, score delta `+0`. No geometry script committed as an unverified edit.
+
+## Correction after newer public VM runs — 2026-11-09 10:36 KST
+
+- The earlier key-missing observation applied to run 42540030991 only, **not the later status**. In [run 42543904654](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/42543904654), SLOT A had a configured AES Secret (masked in logs), decrypted **six private inputs**, installed Blender 4.5.15, but stopped with `RuntimeError: BLOCKED_SOURCE_SHA: changed source .blend` before any model edit. Never reveal the Secret.
+- [Run 42546429232](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/42546429232) selected SLOT C; A's decrypt, Blender and edit steps were skipped. Its success/green A job is **not** Daytona geometry proof.
+- Correct A blocker: `BLOCKED_HOSTED_INPUT_STALE`, **not missing key**. Bundle SHA256 `502cf59b193ad45345ca50e6dd093eb88c92248ae044a99d9860991d6fffd520` predates current accepted R45 .blend SHA256 `224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722`.
+- Keep `inner_door=COVERED_PARTIAL_QA` from R45; no repeat dashboard/wheel/door edit. `visible_seat=NOT_STARTED` until current authenticated encrypted R45 scene and native seat identity are available. The entire car input is blocked, so do not mislabel each unexplored component as absent. No N100 Blender/render, new script, plaintext upload or synthetic source.
+- Documentation-only correction; no hosted modeling/QA PASS, no duplicated competition points. `tools/car_modeling/hosted_jobs/slot_A.json` is **not** rewritten merely to trigger another stale public Actions run.
