@@ -392,5 +392,48 @@ class CollectorIntegrationTests(unittest.IsolatedAsyncioTestCase):
   self.assertEqual(len(self.gh.pngs),0)
 
 
+class ExistingChatReadOnlyTests(unittest.IsolatedAsyncioTestCase):
+ async def asyncSetUp(self):
+  self.url="https://chatgpt.com/c/6aebd722-0f74-83e8-8126-f723dca3a685"
+  self.bridge=c.ChatBridge(MagicMock(),MagicMock())
+  self.bridge.ensure_context=AsyncMock()
+  self.page=MagicMock()
+  self.page.is_closed.return_value=False
+  self.page.url=self.url
+  self.page.goto=AsyncMock()
+  self.bridge.pages["A"]=self.page
+ async def test_collector_reads_same_persisted_chat_without_composer(self):
+  self.page.locator.side_effect=AssertionError("COMPOSER_MUST_NOT_BLOCK_RESULT_READ")
+  got=await self.bridge.page("A",self.url,read_only=True)
+  self.assertIs(got,self.page)
+  self.page.locator.assert_not_called()
+  self.page.goto.assert_not_awaited()
+ async def test_missing_source_chat_url_fails_closed(self):
+  got=await self.bridge.page("A",None,read_only=True)
+  self.assertIsNone(got)
+  self.bridge.ensure_context.assert_not_awaited()
+ async def test_redirected_chat_fails_closed_without_composer(self):
+  self.page.url="https://chatgpt.com/auth/login"
+  self.page.goto=AsyncMock()
+  # A login redirect stays at /auth/login, never a verified source chat.
+  got=await self.bridge.page("A",self.url,read_only=True)
+  self.assertIsNone(got)
+  self.page.goto.assert_awaited_once()
+ async def test_producer_send_still_requires_visible_composer(self):
+  textbox=MagicMock()
+  textbox.wait_for=AsyncMock(side_effect=TimeoutError("composer not visible"))
+  self.page.locator.return_value=MagicMock(first=textbox)
+  got=await self.bridge.page("A",self.url)
+  self.assertIsNone(got)
+  self.page.locator.assert_called_once()
+  textbox.wait_for.assert_awaited_once()
+ async def test_c1_and_a_b_read_only_call_sites_explicit(self):
+  import inspect
+  source=inspect.getsource(c.ChatBridge.collect_producer)
+  self.assertIn("read_only=True",source)
+  source_c1=inspect.getsource(c.ChatBridge.inspect_c1)
+  self.assertIn("read_only=True",source_c1)
+
+
 if __name__=="__main__":
  unittest.main()
