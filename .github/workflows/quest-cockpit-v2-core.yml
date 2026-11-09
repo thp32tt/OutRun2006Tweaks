@@ -170,6 +170,11 @@ jobs:
           # changed source's real two call sites and live eye gate, rather
           # than requiring the removed no-argument helper spelling.
           assert 'SyncNativeSeatProfile(true)' in hook
+          assert 'original 30-car table' in hook
+          copy_launcher=Path('QuestCockpit-CopyRun.ps1').read_text(encoding='utf-8')
+          assert "QuestCockpitV2F0='ON'" in copy_launcher
+          assert "'-VR.QuestCockpitV2SeatBack=-0.08'" in launcher
+          assert "'-VR.QuestCockpitV2SeatDown=-0.05'" in launcher
           assert 'SyncNativeSeatProfile(false)' in hook
           assert 'NativeSeatCameraTick.AfterSeatSync(' in hook
           native_renderer=Path('src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')

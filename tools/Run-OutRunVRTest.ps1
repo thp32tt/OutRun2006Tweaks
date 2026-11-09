@@ -349,10 +349,8 @@ if($QuestCockpitV2 -eq 'ON'){
         '-VR.QuestCockpitV2RawB0Camera=false',
         '-VR.QuestCockpitV2NativeSeatProfile=true',
         '-VR.QuestCockpitV2ApkNativeCamera=true',
-        # APK parity owns its native seat source. Saved F11 manual
-        # SeatBack/SeatDown/SeatRight values may remain in user.ini for A/B,
-        # but the runtime intentionally ignores them while ApkNativeCamera=true.
-        # They are consumed only by the explicit non-APK comparison path.
+        # Existing signed F11 offsets now act at the original Quest-profile
+        # INPUT, not on the already-composited XR eyes.
         '-VR.QuestCockpitV2GlassReflectionOff=true',
         '-VR.QuestCockpitV2OccupantCorrection=true',
         ('-VR.QuestCockpitV2OccupantLod0=' + $(if($QuestCockpitV2Lod0 -eq 'ON'){'true'}else{'false'})),
@@ -364,6 +362,15 @@ if($QuestCockpitV2 -eq 'ON'){
         ('-VR.Telemetry=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'})),
         ('-FileLogging=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'}))
     )
+    if($QuestCockpitV2ReleaseParity -eq 'ON') {
+        # Physical Quest3 feedback: negative Back is forward, negative Down
+        # is upward; override saved user.ini offsets only for COPY-RUN.
+        $gameArgs += @(
+            '-VR.QuestCockpitV2SeatBack=-0.08',
+            '-VR.QuestCockpitV2SeatDown=-0.05',
+            '-VR.QuestCockpitV2SeatRight=0.0'
+        )
+    }
     if($QuestCockpitV2Diagnostics -eq 'ON') { $env:OUTRUN_VR_FILE_LOG='1' }
     else { $env:OUTRUN_VR_FILE_LOG='0' }
     Write-Host "QuestCockpitV2 mode1 active; detailed diagnostics=$QuestCockpitV2Diagnostics."

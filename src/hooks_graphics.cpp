@@ -591,30 +591,24 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
 
         const bool apkNativeCamera=
             Settings::VRQuestCockpitV2ApkNativeCamera.get();
-        // Exact APK parity must not inherit an old F11/manual seat offset from
-        // OutRun2006Tweaks.user.ini. The Quest source selects the per-car
-        // guest profile and then applies its own +0.32Y/+0.55Z step. Manual
-        // SeatBack/Down/Right remains available only for the explicit
-        // ApkNativeCamera=false comparison path.
-        const float manualBack=apkNativeCamera
-            ? 0.f : Settings::VRQuestCockpitV2SeatBack.get();
-        const float manualDown=apkNativeCamera
-            ? 0.f : Settings::VRQuestCockpitV2SeatDown.get();
-        const float manualRight=apkNativeCamera
-            ? 0.f : Settings::VRQuestCockpitV2SeatRight.get();
-        if(apkNativeCamera &&
-           (Settings::VRQuestCockpitV2SeatBack.get()!=0.f ||
-            Settings::VRQuestCockpitV2SeatDown.get()!=0.f ||
-            Settings::VRQuestCockpitV2SeatRight.get()!=0.f)) {
-            static bool manualIgnoredLogged=false;
-            if(!manualIgnoredLogged) {
-                manualIgnoredLogged=true;
+        // Quest 3 physical feedback 2026-11-10: signed F11 offsets
+        // CALIBRATE the selected native Quest profile BEFORE stock camera
+        // swing, ground clamp and the single +0.32Y/+0.55Z composition.
+        // Zero means uncalibrated APK-derived pose. No XR eye offset.
+        const float manualBack=Settings::VRQuestCockpitV2SeatBack.get();
+        const float manualDown=Settings::VRQuestCockpitV2SeatDown.get();
+        const float manualRight=Settings::VRQuestCockpitV2SeatRight.get();
+        if(apkNativeCamera) {
+            static bool logged=false;
+            static float priorBack=0.f,priorDown=0.f,priorRight=0.f;
+            if(!logged || manualBack!=priorBack ||
+               manualDown!=priorDown || manualRight!=priorRight) {
+                logged=true;
+                priorBack=manualBack;priorDown=manualDown;priorRight=manualRight;
                 spdlog::info(
-                    "VR COCKPIT APK PARITY: saved manual seat offsets ignored "
-                    "(back={:.3f}, down={:.3f}, right={:.3f})",
-                    Settings::VRQuestCockpitV2SeatBack.get(),
-                    Settings::VRQuestCockpitV2SeatDown.get(),
-                    Settings::VRQuestCockpitV2SeatRight.get());
+                    "VR COCKPIT APK SEAT: calibrated back={:.3f} "
+                    "down={:.3f} right={:.3f}; native Y/Z exactly once",
+                    manualBack,manualDown,manualRight);
             }
         }
 
@@ -673,7 +667,26 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // Camera control for the next tick reads this persistent live table.
         // Re-sync here only for live F11/tuning changes; startup apply below
         // installs the profile before the first playable camera tick.
-        SyncNativeSeatProfile(true);
+        const bool synced=SyncNativeSeatProfile(true);
+        if(Settings::VRQuestCockpitV2Enabled &&
+           Settings::VRQuestCockpitV2NativeSeatProfile &&
+           Game::current_mode &&
+           OutRunVR::QuestCockpitV2::OriginalQuestGameCameraState(
+               static_cast<std::uint32_t>(*Game::current_mode))) {
+            static bool loggedReady=false;
+            static unsigned missingCount=0;
+            if(synced &&
+               OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Ready() &&
+               !loggedReady) {
+                loggedReady=true;
+                spdlog::info("VR COCKPIT SEAT: original 30-car table "
+                    "synchronized before native camera tick; "
+                    "Quest-native eye admission enabled");
+            } else if(!synced && ++missingCount==90u) {
+                spdlog::warn("VR COCKPIT SEAT: GAME 90 frames without "
+                    "native seat-table sync; original PC camera retained");
+            }
+        }
         OutRunVR::QuestCockpitV2::NativeFrameTrace().OnFrameEnter(
             OutRunVR::QuestCockpitV2::NextVerifiedNativeEpoch());
         QuestCockpitGlassLive::OnNewNativeFrame();
@@ -875,8 +888,8 @@ public:
         OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.store(true,std::memory_order_release);
         if(!SyncNativeSeatProfile(false) &&
            Settings::VRQuestCockpitV2NativeSeatProfile)
-            spdlog::warn("VR COCKPIT: Quest mode1 profile table sync failed; "
-                "original camera anchors remain active");
+            spdlog::info("VR COCKPIT: initial seat table sync deferred; "
+                "will retry after original 30-car table initialization");
         return true;
     }
     static QuestCockpitV2NativeFrameProbe instance;

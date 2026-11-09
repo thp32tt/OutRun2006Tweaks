@@ -245,6 +245,7 @@ $launchArgs=@{
     TestProfile='CORRECTNESS'
     QuestCockpitV2ReleaseParity='ON'
     QuestCockpitV2='ON'
+    QuestCockpitV2F0='ON'
 }
 if($Mode -eq 'SKY'){$launchArgs.QuestCockpitV2SkyProbe='ON'}
 if($Mode -eq 'INTERP'){

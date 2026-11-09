@@ -27,17 +27,26 @@ This avoids changing existing binaries or INI just by unzipping.
 Existing OutRun2006Tweaks.user.ini is preserved. The launcher may
 temporarily switch away from DXVK to DX9Ex, with a backup available.
 
-This remains a WIP test. Original Quest angle-dependent native view
-matrix and player-car F0 render-time vibration are NOT yet HMD-verified.
+This remains a WIP test. Quest 3 field feedback 2026-11-10: enabling
+the F11 F0 Render Scope removed body vibration. COPY-RUN now launches
+with QuestCockpitV2F0RenderScope=true in NORMAL, SKY and INTERP modes.
+This affects only the original car render callback, not simulation.
+The default seat is calibrated 0.08 game units forward and 0.05 upward.
+This is an experimental local adjustment; sky flicker is unresolved.
 
 TEST AND APK COMPARISON (2026-11-05):
 - Keep original view1 (in-car) selected. The native Quest 30-car profile
   and verified game-state guard remain in use; no EXE or APK asset patch.
-- QuestCockpitV2ApkNativeCamera=true is the APK-parity path. Saved F11
-  QuestCockpitV2SeatBack/SeatDown/SeatRight values are intentionally ignored
-  there so an old manual SeatDown cannot raise/lower the native Quest seat.
-  The original 30-car profile and exactly one source Y/Z composition remain.
-  Manual seat tuning is only for the explicit ApkNativeCamera=false comparison.
+- QuestCockpitV2ApkNativeCamera=true still derives the camera from
+  the original 30-car Quest APK profile and the single +0.32Y/+0.55Z
+  composition. Signed F11 SeatBack/Down/Right now calibrates the INPUT.
+  COPY-RUN overrides stale user.ini calibration with SeatBack=-0.08,
+  SeatDown=-0.05, SeatRight=0.0. All zero returns APK-derived input.
+- Normal, SKY and INTERP copy-run entrypoints now all force F0 scope ON;
+  the interpolation comparison changes ONLY interpolation.
+- The original camera table may not be ready at hook installation.
+  New logs distinguish deferred startup from successful native-game
+  admission and 90-frame permanent failure.
 - If road bounce/sky flicker persists, use the two included A/B scripts
   without changing the original game files. These remain unresolved
   visual comparisons until captured on a Quest 3 headset.

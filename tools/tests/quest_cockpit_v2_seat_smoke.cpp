@@ -281,6 +281,13 @@ int main(){
     assert(near(nativeComposed.x,-.403f));
     assert(near(nativeComposed.y,1.327f));
     assert(near(nativeComposed.z,.410f));
+    // Physical Quest3 requested modest forward/up movement.
+    assert(NativeVrProfileInputAnchor(
+        questXYZ[0],-.08f,-.05f,0.f,nativeTuned));
+    assert(OriginalQuestModeOneInput(nativeTuned,nativeComposed));
+    assert(near(nativeComposed.x,-.353f));
+    assert(near(nativeComposed.y,.997f));
+    assert(near(nativeComposed.z,.080f));
     const Vec3 priorComposed=nativeComposed;
     assert(!NativeVrProfileInputAnchor(questXYZ[0],-1.3f,0.f,0.f,nativeTuned));
     assert(near(nativeComposed.y,priorComposed.y));
