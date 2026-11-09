@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "slot": "C",
+  "car_id": "f50",
+  "mode": "probe",
+  "component": "driver_controls",
+  "original_native_rel": "rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz",
+  "original_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+  "original_import_blend_rel": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CockpitSource_v1.blend",
+  "original_import_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+  "source_blend_rel": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CenterConsole_Shaft_v39.blend",
+  "source_sha256": "724df8bcd079299e8781726b25888243dbdcab7368d7d758f81ba8236666072f",
+  "output_blend_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_OriginalPMT_DriverControls_Hosted_V40.blend",
+  "receipt_rel": "work_handoff/ferrari_hosted_results/slot_C/driver_controls_source_probe.json",
+  "allowed_existing_meshes": [],
+  "edit_script": null,
+  "disallowed_actions": [
+    "OVC3 export",
+    "PMT export",
+    "new synthetic car",
+    "game integration",
+    "out-of-target cockpit editing"
+  ]
+}
