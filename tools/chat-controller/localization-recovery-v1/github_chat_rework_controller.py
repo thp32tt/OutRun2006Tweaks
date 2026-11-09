@@ -568,9 +568,11 @@ class ChatBridge:
         if saved not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
                          "EXISTING_CANDIDATES_VERIFIED"):
             saved=None
-            # domcontentloaded may precede ChatGPT's user-turn hydration.
+            # domcontentloaded may precede ChatGPT's user/assistant hydration.
+            # One 1.2s retry; no full reload or duplicate ImageGen request.
             if (why.startswith("CHAT_USER_TURNS_NOT_RENDERED") or
-                    why.startswith("SOURCE_BOUND_USER_TURN_MISSING")):
+                    why.startswith("SOURCE_BOUND_USER_TURN_MISSING") or
+                    why.startswith("ASSISTANT_GENERATED_IMAGE_NOT_RENDERED")):
                 await pg.wait_for_timeout(1200)
                 again,detail=await rescue_single_image_candidate(
                     pg,task["task_id"],task["role"],str(ROOT),binding=task
