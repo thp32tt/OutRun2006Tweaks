@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af16e3e-e058-83e8-810c-5a1a1611bc82",
   "old_candidate_sha256": "8c9436e74f58cf05161a913666c66f05084ce6190877724b0cf58d9a2fb85a60",
   "release_approved": false,
   "roi_id": "Q046_c28a311899c25247",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Big Forest",
     "korean": "빅 포레스트",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-3c1068b039fc6476c14e"
   },
   "task_id": "HDRW-A-3c1068b039fc6476c14e",
-  "updated_utc": "2026-11-09T06:54:50+00:00"
+  "updated_utc": "2026-11-09T06:55:12+00:00"
 }
