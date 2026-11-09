@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af2273c-3794-83ee-a1f2-d7ffde318bfc",
   "old_candidate_sha256": "cbee80855aafd02422df916827d6988f861dd238c08487bb421a1da5360605d7",
   "release_approved": false,
   "roi_id": "Q193_53d6085638ec9c80",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "OUTRUN SHOWROOM",
     "korean": "아웃런 쇼룸",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-6da1f7cc40dee42b8dca"
   },
   "task_id": "HDRW-A-6da1f7cc40dee42b8dca",
-  "updated_utc": "2026-11-09T20:04:05+00:00"
+  "updated_utc": "2026-11-09T20:04:28+00:00"
 }
