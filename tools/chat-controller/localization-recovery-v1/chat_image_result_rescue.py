@@ -148,11 +148,33 @@ ASSISTANT_IMAGE_JS = r"""({task,english,korean,sha})=>{
     }
     images=candidates;
   }
-  if(!images.length)return {
-    status:replies.length?
-      'ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING':
-      'ASSISTANT_GENERATED_IMAGE_NOT_RENDERED'
-  };
+  if(!images.length){
+    // A confirmed failure message is not an in-progress image and must not
+    // be silently reported as "assistant not ready". The text is inspected
+    // only AFTER the SHA-bound user message, BEFORE the next user message,
+    // and never saved/copied out to GitHub.
+    const errorMessages=[
+      'something went wrong while generating your image',
+      'there was a problem generating your image',
+      'we couldn\u2019t generate your image',
+      'we could not generate your image',
+      'image generation failed',
+      '이미지를 생성하는 동안 문제가 발생',
+      '이미지 생성 중 오류가 발생'
+    ];
+    const errors=[...document.querySelectorAll(
+      'p,[role="alert"],[data-testid*="error"],[data-testid*="imagegen"]'
+    )].filter(isWithinBoundedReply);
+    if(errors.some(n=>{
+      const t=(n.innerText||n.textContent||'').toLowerCase();
+      return t.length<800&&errorMessages.some(e=>t.includes(e));
+    }))return {status:'IMAGEGEN_FAILED_UI'};
+    return {
+      status:replies.length?
+        'ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING':
+        'ASSISTANT_GENERATED_IMAGE_NOT_RENDERED'
+    };
+  }
   const ready=images.filter(n=>n.complete&&n.naturalWidth>0&&n.naturalHeight>0);
   if(!ready.length)return {status:'ASSISTANT_IMAGE_LOADING'};
   const urls=[...new Set(ready.map(n=>n.currentSrc||n.src).filter(Boolean))];
@@ -316,6 +338,7 @@ async def rescue_single_image_candidate(page, task_id, role, root, binding=None)
             "ASSISTANT_TURN_NOT_READY", "ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING",
             "ASSISTANT_IMAGE_LOADING", "ASSISTANT_IMAGE_AMBIGUOUS",
             "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED",
+            "IMAGEGEN_FAILED_UI",
         ):
             status = "ASSISTANT_RESULT_NOT_VERIFIED"
         return "WAIT_ASSISTANT_RESULT_UI", status
