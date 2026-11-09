@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "63e34fd3506dc7b613661bb65b4c88942e7a44f758c2e1e19591605df2cf1d26",
+  "release_approved": false,
+  "roi_id": "Q059_0214d1bfb9538a64",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "NEXT MISSION",
+    "korean": "다음 미션",
+    "old_candidate_sha256": "63e34fd3506dc7b613661bb65b4c88942e7a44f758c2e1e19591605df2cf1d26",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 188,
+      "name": "HDRW-A-6ba69865c6024503a2df_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        8,
+        1336,
+        188
+      ],
+      "sha256": "48aafee355b476c0d6ce569cea92330b4bb5f8c195388780a5ac0dee66f2cb3a",
+      "source_box_xyxy": [
+        0,
+        324,
+        1344,
+        512
+      ],
+      "source_native_size": [
+        2048,
+        512
+      ],
+      "width": 1344
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q059_0214d1bfb9538a64",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+    "source_dds_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+    "source_native_bbox_xyxy": [
+      0,
+      332,
+      1336,
+      512
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-A-6ba69865c6024503a2df"
+  },
+  "task_id": "HDRW-A-6ba69865c6024503a2df",
+  "updated_utc": "2026-11-09T06:55:26+00:00"
+}
