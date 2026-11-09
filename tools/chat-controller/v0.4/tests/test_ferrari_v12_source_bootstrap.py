@@ -24,12 +24,13 @@ class TestNextCarImport(unittest.TestCase):
         self.packs={}
         for slot,car,sha in (("A","360spider","a"*64),("C","f355spider","b"*64)):
             self.packs[slot]={"car_id":car,"slot":slot,"component_order":self.seq,
-                        "current_component":"center_console","dispatches_on_component":0,
+                        "current_component":"source_bootstrap","dispatches_on_component":0,
                         "input_stage":"SOURCE_IMPORT_PENDING",
                         "original_game_resource_file":f"/home/chatgpt-runner/rea-input/outrun/outrun2006/Cars/obj_plcar_{'360sp' if slot=='A' else 'f355sp'}_pmt.sz",
                         "original_game_resource_sha256":sha,"original_import_blend_sha256":None,
                         "migration_input_blend_sha256":None,
-                        "components":{x:{"status":"NOT_STARTED","source_edits_this_phase":0} for x in self.seq}}
+                        "components":{**{x:{"status":"NOT_STARTED","source_edits_this_phase":0} for x in self.seq},
+                                      "source_bootstrap":{"status":"NOT_STARTED","source_edits_this_phase":0}}}
         def api(url):
             if url.endswith("FERRARI16_GEOMETRY_QUEUE.json?ref=main"): payload=self.queue
             elif url.endswith("FERRARI_COCKPIT_WORKPACK_A_360SPIDER.json?ref=main"):payload=self.packs["A"]
@@ -51,7 +52,7 @@ class TestNextCarImport(unittest.TestCase):
         r=self.dec()
         self.assertTrue(r["allow"])
         self.assertTrue(r["bootstrap_only"])
-        self.assertEqual(r["component"],"center_console")
+        self.assertEqual(r["component"],"source_bootstrap")
         self.assertFalse(self.dec(state={"last_workpack_fingerprint_sent":r["fingerprint"]})["allow"])
     def test_c_slot_independent(self):
         self.assertEqual(self.dec("C")["vehicle"],"f355spider")
@@ -61,13 +62,15 @@ class TestNextCarImport(unittest.TestCase):
         p["input_stage"]="SOURCE_VERIFIED"
         p["original_import_blend_sha256"]="c"*64
         p["migration_input_blend_sha256"]="c"*64
+        p["current_component"]="center_console"
+        p["components"]["source_bootstrap"]["status"]="SOURCE_VERIFIED"
         s=self.dec(state={"last_workpack_fingerprint_sent":r["fingerprint"]})
         self.assertTrue(s["allow"])
         self.assertFalse(s.get("bootstrap_only",False))
         self.assertNotEqual(r["fingerprint"],s["fingerprint"])
     def test_import_error_fails_closed(self):
         self.packs["A"]["input_stage"]="SOURCE_IMPORT_BLOCKED"
-        self.assertFalse(self.dec()["allow"])
+        with self.assertRaises(ValueError): self.dec()
     def test_wrong_original_path_fails_closed(self):
         self.packs["A"]["original_game_resource_file"]="/tmp/random_fake_car_pmt.sz"
         self.assertFalse(self.dec()["allow"])
