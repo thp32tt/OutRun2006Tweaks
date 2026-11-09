@@ -367,11 +367,12 @@ class CollectorIntegrationTests(unittest.IsolatedAsyncioTestCase):
    return "LOCAL_CANDIDATES_EXPORTED_UNAPPROVED","ASSISTANT_ONLY_ONE_IMAGE_SHA_VERIFIED"
   with patch("text_roi_queue._probe_imagegen_result",
              new=AsyncMock(return_value={"error":"USER_TURN_MISSING"})), \
-       patch("text_roi_queue._recover_task_turn",new=AsyncMock(return_value=False)), \
+       patch("text_roi_queue._recover_task_turn",new=AsyncMock(return_value=False)) as reload_chat, \
        patch.object(c,"rescue_single_image_candidate",new=AsyncMock(side_effect=fake_rescue)) as method:
    status=await self.bridge.collect_producer(self.state)
    self.assertEqual(status,"C1_READY")
    method.assert_awaited_once()
+   reload_chat.assert_not_awaited()
   self.assertEqual(len(self.gh.pngs),1)
   saved=self.gh.records[c.task_state_path(self.task["task_id"])]
   self.assertEqual(saved["status"],"C1_READY")
