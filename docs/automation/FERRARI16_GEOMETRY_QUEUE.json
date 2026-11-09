@@ -91,8 +91,8 @@
       "geometry_gate": "NEEDS_REWORK",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437",
-      "output_scene_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877",
-      "notes": "[2026-11-09 SLOT A R43] Original PMT018-guided center-console only: V8_LOW_CENTER_TUNNEL 20 existing vertices moved (max 34.75mm), 112 unrelated meshes SHA-invariant. Native game PMT f393ba5c/import 92c82ee5; R42 input 55ffc5dd; new private editable R43 SHA 27c477d saved/reopened official Blender 4.5.15 PASS. center_console COVERED_PARTIAL_QA only, not car PASS; exact driver-eye/seven authentic photo views outstanding. NEXT driver_controls; dashboard/wheel P0 hold, 24h ownership retained. Source/code d299eef; audit docs/automation/FERRARI16_SLOTA_DAYTONA_R43_CENTER_CONSOLE_20261109.md. No game exports, materials or other slots.",
+      "output_scene_sha256": "638f69369f9ff9d074221320f38f4e137675a911d05939470f6cd24bec73040d",
+      "notes": "[2026-11-09 SLOT A R44] Genuine PMT016-guided slider/toggle control panel: 70 existing vertices moved max 14mm; original 10 anchors matched; 112 others unchanged incl dash/wheel. New private R44 .blend SHA 638f6936, Blender 4.5.15 independent reopen PASS. driver_controls COVERED_PARTIAL_QA only; pedals/stalks BLOCKED original attribution, no fabrication. NEXT inner_door; 24h start and vehicle final QA unchanged; slot C untouched. Source b43347f; report FERRARI16_SLOTA_DAYTONA_R44_DRIVER_CONTROLS_20261109.md.",
       "private_photo_subdir": "02_365_GTS4_Daytona",
       "priority": [
         "dashboard",
@@ -128,7 +128,7 @@
       "game_integration_required": false,
       "progress_history_archive": "docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_HISTORY_20261109.md",
       "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_A_DAYTONA365.json",
-      "strategy_v3_next_component": "driver_controls",
+      "strategy_v3_next_component": "inner_door",
       "strategy_v3_p0_revisit_policy": "HOLD_BEFORE_BREADTH_PASS",
       "source_audit_archive": "docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_SOURCE_AUDITS_20261109.json",
       "last_slot_a_audit_r42": {
@@ -185,6 +185,30 @@
         "full_car_qa": "NOT_PASS",
         "next": "driver_controls",
         "source_commit": "d299eef3fbcfa2cd5faed78564fdf6f69f161018"
+      },
+      "last_slot_a_r44": {
+        "task_id": "FERRARI16-SLOTA-DAYTONA-DRIVER-CONTROLS-SWITCHBANK-PMT016-R44-20261109",
+        "component": "driver_controls",
+        "status": "COVERED_PARTIAL_QA",
+        "blocked_subparts": [
+          "pedals native original attribution",
+          "column stalks native original attribution"
+        ],
+        "source_native_object": "object00_group01_material016_a0",
+        "edited_existing_mesh": "DAYTONA_PHOTO_NATIVE_SWITCHBANK_REFINED_V4",
+        "changed_vertices": 70,
+        "protected_other_meshes": 112,
+        "max_displacement_m": 0.014,
+        "input_blend_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877",
+        "output_blend_sha256": "638f69369f9ff9d074221320f38f4e137675a911d05939470f6cd24bec73040d",
+        "original_game_PMT_sha256": "f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe",
+        "original_import_SHA256": "92c82ee5c4e0631195cb314e0d8e2f56a78a6a58da3c809c46b1da0f9d2c71a3",
+        "blender_independent_reopen": "PASS",
+        "full_car_qa": "NOT_PASS",
+        "next": "inner_door",
+        "source_commit": "b43347f41e617aa05b3c44df8c559b993ebd46fa",
+        "workpack_commit": "e7924558fe1a9aebf8ecc6de9c4f79af4ce1350c",
+        "qa_doc": "docs/automation/FERRARI16_SLOTA_DAYTONA_R44_DRIVER_CONTROLS_20261109.md"
       }
     },
     {
