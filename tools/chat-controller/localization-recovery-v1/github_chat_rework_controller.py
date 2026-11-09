@@ -453,7 +453,8 @@ class ChatBridge:
             await pg.bring_to_front()
             if pg.url.rstrip("/")!=PROJECT_URL.rstrip("/"):
                 await pg.goto(PROJECT_URL,wait_until="domcontentloaded",timeout=30000)
-            return "CHATGPT_LOGIN_BROWSER_VISIBLE_NOT_AUTHENTICATED"
+            # Showing the browser window does not prove a logged-out session.
+            return "CHATGPT_BROWSER_TAB_VISIBLE_AUTH_UNVERIFIED"
         except Exception as exc:
             # Chromium window is still visible for manual navigation.
             return "HOLD_CHATGPT_PAGE_NAVIGATION_"+type(exc).__name__
@@ -559,21 +560,32 @@ class ChatBridge:
             reason="WAIT_CHATGPT_COMPOSER_OR_LOGIN"
             await asyncio.to_thread(result_poll_diagnostic,self.gh,state,reason)
             return reason
-        probe=await old._probe_imagegen_result(pg,task["task_id"],1)
-        saved=None
-        if probe.get("error")=="USER_TURN_MISSING":
-            # The legacy probe requires a marker that the current Project UI
-            # can hide in reopened conversation turns. First try our strict
-            # SHA-bound assistant detector WITHOUT another costly page reload.
-            fast,_=await rescue_single_image_candidate(
-                pg,task["task_id"],task["role"],str(ROOT),binding=task
-            )
-            if fast in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
-                        "EXISTING_CANDIDATES_VERIFIED"):
-                saved=fast
-            else:
-                # Only when no assistant candidate is verified do we attempt
-                # the expensive lazy-chat recovery and a fresh final probe.
+        # Prefer the verified assistant-only probe; the legacy inspector
+        # cannot recognize many newly rendered ChatGPT Project message turns.
+        saved,why=await rescue_single_image_candidate(
+            pg,task["task_id"],task["role"],str(ROOT),binding=task
+        )
+        if saved not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                         "EXISTING_CANDIDATES_VERIFIED"):
+            saved=None
+            # domcontentloaded may precede ChatGPT's user-turn hydration.
+            if (why.startswith("CHAT_USER_TURNS_NOT_RENDERED") or
+                    why.startswith("SOURCE_BOUND_USER_TURN_MISSING")):
+                await pg.wait_for_timeout(1200)
+                again,detail=await rescue_single_image_candidate(
+                    pg,task["task_id"],task["role"],str(ROOT),binding=task
+                )
+                why=detail
+                if again in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                             "EXISTING_CANDIDATES_VERIFIED"):
+                    saved=again
+        probe=({"error":"RESCUED_ASSISTANT_IMAGE"} if saved else
+               await old._probe_imagegen_result(pg,task["task_id"],1))
+        if saved is None and probe.get("error")=="USER_TURN_MISSING":
+            # Once the correct user turn is found but assistant media is not
+            # rendered, avoid 24s legacy waits and repeated page reloads.
+            if (why.startswith("CHAT_USER_TURNS_NOT_RENDERED") or
+                    why.startswith("SOURCE_BOUND_USER_TURN_MISSING")):
                 recovered=await old._recover_task_turn(pg,task["task_id"])
                 if recovered:
                     probe=await old._probe_imagegen_result(pg,task["task_id"],1)
@@ -599,13 +611,20 @@ class ChatBridge:
                          "EXISTING_CANDIDATES_VERIFIED"):
             # Strict assistant-turn detector excludes the user's English
             # attachment, unrelated cards, CSS screenshots and generic images.
-            rescued,why=await rescue_single_image_candidate(
-                pg,task["task_id"],task["role"],str(ROOT),binding=task
-            )
-            if rescued not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+            # Recheck after the legacy path only; never mistake a reference
+            # image, loading placeholder or unrelated turn for generated PNG.
+            if probe.get("error")!="RESCUED_ASSISTANT_IMAGE":
+                rescued,detail=await rescue_single_image_candidate(
+                    pg,task["task_id"],task["role"],str(ROOT),binding=task
+                )
+                if rescued in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
                                "EXISTING_CANDIDATES_VERIFIED"):
-                reason=(str(why) if rescued.startswith("WAIT_") else legacy_status)
-                reason=re.sub(r"[^A-Za-z0-9_:-]","_",reason)[:120]
+                    saved=rescued
+                else:
+                    why=detail
+            if saved not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                             "EXISTING_CANDIDATES_VERIFIED"):
+                reason=re.sub(r"[^A-Za-z0-9_:-]","_",str(why or legacy_status))[:120]
                 await asyncio.to_thread(result_poll_diagnostic,self.gh,state,reason)
                 return "WAIT_IMAGEGEN_"+reason
         file=ROOT/old.STATE_DIR/"candidate_outputs"/task["role"]/(task["task_id"]+".png")
