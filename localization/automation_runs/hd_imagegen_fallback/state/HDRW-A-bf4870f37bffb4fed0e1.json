@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af17175-f1e4-83e8-8494-e0373c949cfd",
   "old_candidate_sha256": "d72c1078ae1ab6e667bfd222f41592ad0ee33614293ead634dfd57dc455e4d5c",
   "release_approved": false,
   "roi_id": "Q059_d6b334ba2a964812",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Race The Rivals!",
     "korean": "라이벌과 레이스!",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-bf4870f37bffb4fed0e1"
   },
   "task_id": "HDRW-A-bf4870f37bffb4fed0e1",
-  "updated_utc": "2026-11-09T07:08:29+00:00"
+  "updated_utc": "2026-11-09T07:08:51+00:00"
 }
