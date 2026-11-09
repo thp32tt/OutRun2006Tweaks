@@ -195,6 +195,61 @@ def local_save(task_id,data):
         if os.path.exists(tmp):
             os.unlink(tmp)
 
+def restore_remote_active_states(gh):
+    """Rehydrate A/B and C1 receipts after a missing/replaced Docker volume.
+
+    Previously sent image requests must NEVER be sent again. The GitHub queue
+    branch is the authority; only exact safe active receipts are copied into
+    the local processing list. No ImageGen, browser or DDS work is performed.
+    """
+    listed = gh.req(QROOT + "/state", QUEUE_BRANCH)
+    if listed is None:
+        return 0
+    if not isinstance(listed, list) or len(listed) > 128:
+        raise ValueError("REMOTE_QA_STATE_LIST_UNBOUNDED")
+    recovered = 0
+    seen = set()
+    for item in listed:
+        if not isinstance(item, dict) or item.get("type") != "file":
+            continue
+        name = item.get("name", "")
+        if not isinstance(name, str) or not name.endswith(".json"):
+            continue
+        task_id = name[:-5]
+        if not CHAT_TASK.fullmatch(task_id) or task_id in seen:
+            raise ValueError("REMOTE_QA_STATE_ID_INVALID_OR_DUPLICATE")
+        seen.add(task_id)
+        local = local_task_path(task_id)
+        if local.exists():
+            # Never overwrite a retained volume's existing local checkpoint.
+            continue
+        state, _ = gh.read_json(task_state_path(task_id), QUEUE_BRANCH)
+        if not isinstance(state, dict) or state.get("status") not in SEND_STATES:
+            continue
+        task = state.get("task")
+        if (state.get("schema") != "outrun-hd-qa-chat-status-v1"
+                or state.get("task_id") != task_id
+                or state.get("release_approved") is not False
+                or not valid_task(task)
+                or state.get("role") != task["role"]
+                or state.get("roi_id") != task.get("roi_id")
+                or state.get("source_dds_sha256") != task["source_dds_sha256"]
+                or state.get("old_candidate_sha256") != task["old_candidate_sha256"]):
+            continue
+        if state["status"] == "AB_SENT" and not is_saved_chat_url(state.get("ab_chat_url")):
+            continue
+        if state["status"] == "C1_SENT" and not is_saved_chat_url(state.get("c1_chat_url")):
+            continue
+        if state["status"] == "C1_READY" and (
+                state.get("candidate_gh_path") !=
+                QROOT + "/candidates/" + task_id + ".png"
+                or not HASH.fullmatch(state.get("candidate_sha256", ""))):
+            continue
+        local_save(task_id, state)
+        recovered += 1
+    return recovered
+
+
 def stage_state(gh,task,status,extras=None):
     task_id=task["task_id"]
     path=task_state_path(task_id)
@@ -421,6 +476,7 @@ class ChatBridge:
         self.browser=None
         self.pages={}
         self.last_inspected_task=None
+        self.remote_state_recovered=False
 
     async def ensure_context(self):
         """Attach only to the already-visible VNC Chromium; never spawn a second profile."""
@@ -742,6 +798,12 @@ class ChatBridge:
         return "C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY"
 
     async def cycle(self):
+        if not self.remote_state_recovered:
+            # Exactly once per worker lifetime, restore every SHA-bound
+            # submitted/C1-pending receipt, including older rotated batches.
+            # This never calls submit_producer or sends a duplicate request.
+            await asyncio.to_thread(restore_remote_active_states, self.gh)
+            self.remote_state_recovered=True
         queue,_=await asyncio.to_thread(self.gh.read_json,
                                 QROOT+"/latest.json",QUEUE_BRANCH)
         if not isinstance(queue,dict) or queue.get("schema")!="outrun-hd-qa-chat-workqueue-v1":
