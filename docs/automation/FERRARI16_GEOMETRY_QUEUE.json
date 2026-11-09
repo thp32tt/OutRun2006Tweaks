@@ -277,8 +277,8 @@
       "geometry_gate": "PARTIAL_NEEDS_QA",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
-      "output_scene_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a",
-      "notes": "[2026-11-09 C F50 v40] driver_controls BLOCKED_UNIDENTIFIED_NATIVE_STALK_PEDAL, no fabricated geometry. Advanced to inner_door: original PMT object00_group01_material031_a0 driver upper rail 10 existing vertices moved (max 26.495mm), 41 other source meshes unchanged; official Blender 4.5.15 saved/fresh reopened PASS, private v40 .blend SHA 03b96b1e. inner_door COVERED_PARTIAL_QA only; handle unverified. NEXT windshield_frame. P0 hold; 24h ownership and full QA gate unchanged.",
+      "output_scene_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
+      "notes": "[2026-11-09 SLOT C F50 v41] driver_controls BLOCKED original native PMT pedal/stalk not positively identified; moved to windshield_frame original PMT000 header/A-pillar outer border. 13 existing vertices moved max 21mm, glass PMT005 and other 41 native meshes untouched. Private .blend v41 SHA 016645f5, official Blender 4.5.15 independent reopen PASS. windshield_frame COVERED_PARTIAL_QA only; NEXT visible_seat, no full car QA PASS; original 24h ownership unchanged.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -347,7 +347,7 @@
       "game_integration_required": false,
       "progress_history_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_HISTORY_20261109.md",
       "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_C_F50.json",
-      "strategy_v3_next_component": "windshield_frame",
+      "strategy_v3_next_component": "visible_seat",
       "strategy_v3_p0_revisit_policy": "HOLD_BEFORE_BREADTH_PASS",
       "source_audit_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_SOURCE_AUDITS_20261109.json",
       "last_slot_c_center_console_v38": {
@@ -422,6 +422,25 @@
         "next": "windshield_frame",
         "source_commit": "7b7e9b514206b888a9728f54ab32ad5fba371fe5",
         "report": "docs/automation/F50_SLOT_C_DRIVER_CONTROLS_BLOCKED_INNER_DOOR_V40_20261109.md"
+      },
+      "last_slot_c_v41": {
+        "task_id": "FERRARI16-SLOTC-F50-DRIVER-CONTROLS-BLOCKED-WINDSHIELD-FRAME-V41-20261109",
+        "original_game_pmt_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+        "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+        "input_blend_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a",
+        "output_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
+        "driver_controls": "BLOCKED_UNIDENTIFIED_NATIVE_STALK_PEDAL",
+        "windshield_frame": "COVERED_PARTIAL_QA",
+        "modified_native_object": "object00_group00_material000_a0",
+        "existing_vertices_moved": 13,
+        "max_displacement_mm": 21,
+        "other_41_original_meshes_unchanged": true,
+        "original_glass_unchanged": true,
+        "official_blender_independent_reopen": "PASS",
+        "full_car_qa": "NOT_PASS",
+        "next": "visible_seat",
+        "source_commit": "3693c9fc68b570b5e41e7a06156bebc19475efb8",
+        "report": "docs/automation/F50_SLOT_C_WINDSHIELD_FRAME_NATIVE_HEADER_V41_20261109.md"
       }
     },
     {
