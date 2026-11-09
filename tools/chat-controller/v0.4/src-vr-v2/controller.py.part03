@@ -2923,13 +2923,52 @@ def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetim
         "allow": False, "vehicle": active_car, "component": component,
         "status": status, "turns": turns, "age_exceeded_24h": expired,
     }
+    # V12: new cars start with a SOURCE-ONLY bootstrap. A verified original PMT
+    # is not yet an imported editable Blender scene; never pretend otherwise.
+    input_stage = workpack.get("input_stage")
+    if input_stage == "SOURCE_IMPORT_PENDING":
+        source_path = workpack.get("original_game_resource_file", "")
+        source_sha = workpack.get("original_game_resource_sha256", "")
+        if (component != "center_console" or status != "NOT_STARTED" or turns != 0
+                or expired or not isinstance(source_sha, str)
+                or not re.fullmatch(r"[0-9a-f]{64}", source_sha)
+                or not isinstance(source_path, str)
+                or not source_path.startswith(
+                    "/home/chatgpt-runner/rea-input/outrun/outrun2006/Cars/obj_plcar_")
+                or not source_path.endswith("_pmt.sz")
+                or workpack.get("original_import_blend_sha256")
+                or workpack.get("migration_input_blend_sha256")):
+            admission["reason"] = "unsafe or expired original-source bootstrap"
+            return admission
+        admission["bootstrap_only"] = True
+    elif input_stage is not None:
+        if input_stage != "SOURCE_VERIFIED":
+            admission["reason"] = "source import blocked; await verified native Blender baseline"
+            return admission
+        if any(not isinstance(workpack.get(k), str) or
+               not re.fullmatch(r"[0-9a-f]{64}", workpack[k]) for k in (
+                   "original_game_resource_sha256",
+                   "original_import_blend_sha256",
+                   "migration_input_blend_sha256")):
+            admission["reason"] = "native Blender baseline missing verified SHA"
+            return admission
     if status in {"BLOCKED", "OUT_OF_VIEW", "COVERED_PARTIAL_QA", "PROTECTED_DO_NOT_EDIT",
                   "P0_POLISH_HOLD", "WAITING_QA_INPUT", "QA_OBSERVED_PARTIAL_NOT_PASS"}:
         admission["reason"] = "component already blocked, completed or on hold"
         return admission
-    if component in {"windshield_frame", "dashboard", "steering_wheel"}:
-        admission["reason"] = "protected windshield or prohibited P0 polish"
+    if component == "windshield_frame":
+        admission["reason"] = "windshield and adjacent glazing permanently protected"
         return admission
+    if component in {"dashboard", "steering_wheel"}:
+        prior = sequence[:sequence.index(component)]
+        fresh_p0 = (status == "NOT_STARTED"
+                    and part.get("source_edits_this_phase", 0) == 0
+                    and all((workpack.get("components") or {}).get(name, {}).get("status")
+                            in {"COVERED_PARTIAL_QA", "OUT_OF_VIEW", "BLOCKED"}
+                            for name in prior))
+        if not fresh_p0:
+            admission["reason"] = "historic P0 polish held; only initial untouched P0 pass eligible"
+            return admission
     if component == "cross_cockpit_qa":
         if status not in {"NOT_STARTED", "IN_PROGRESS"}:
             admission["reason"] = "QA has no actionable new acceptance evidence"
@@ -2950,6 +2989,8 @@ def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetim
 
     fingerprint_payload = {
         "car": active_car, "component": component, "status": status,
+        "input_stage": input_stage, "original_game_resource_sha256": workpack.get("original_game_resource_sha256"),
+        "original_import_blend_sha256": workpack.get("original_import_blend_sha256"),
         "turn": turns, "used": used,
         "source_edits": part.get("source_edits_this_phase", 0),
         "accepted_blend": workpack.get("latest_accepted_editable_blend_sha256"),
@@ -2962,7 +3003,8 @@ def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetim
         admission["reason"] = "same workpack checkpoint already dispatched; await SSOT progress"
         return admission
     admission["allow"] = True
-    admission["reason"] = "fresh authoritative workpack checkpoint"
+    admission["reason"] = ("verified original PMT source bootstrap" if admission.get("bootstrap_only")
+                           else "fresh authoritative workpack checkpoint")
     return admission
 
 
@@ -3159,32 +3201,50 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
     # One production owner per day: the durable Ferrari16 queue selects the active car.
     # Never select a car from stale chat state or a fixed Daytona-only prompt.
     # Enforce 24h + verified geometry/photo gates using the repository guard script.
-    prompt = (
-        f"Ferrari 원본게임 운전석 메시 리워크 SLOT={slot_name}, TARGET={component}. "
-        f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH} 최신 HEAD에서 "
-        "docs/automation/FERRARI16_GEOMETRY_QUEUE.json 및 "
-        "docs/automation/FERRARI16_BREADTH_FIRST_STRATEGY.md 확인. "
-        f"오직 active_by_slot[{slot_name!r}] 차량만 수정. "
-        f"GitHub SSOT 진입 확인: active_car={admission['vehicle']}, current_component={component}, "
-        f"dispatch={admission['turns'] + 1}/2. "
-        + stage_instruction +
-        "이전 대시보드/핸들 40회가량 반복됨: 이번 명령에서 타깃 부위 외 핸들/대시 미세조정 절대 금지. "
-        "타깃의 진짜 원본 PMT 유래 기존 운전석 메시만 기하 변경, N100 수집 실차 사진과 비교. "
-        "독립 .blend 저장·재열기·원본 SHA 기록, 부품별 2회 지시 상한이면 무조건 다음 부위로 이동. "
-        "없거나 막히면 근거와 BLOCKED를 짧게 기록하고 다음 부위로 이동, 새 모델 합성 금지. "
-        "기존 차종별 workpack에 범위별 COVERED_PARTIAL_QA/BLOCKED 기록; 이것은 차량 QA PASS가 아님. "
-        "OVC/OVC3/PMT 변환·게임 적용·바퀴/외관·새 텍스처/PBR/Model2/Dino 금지. "
-        "앞유리 보호영역은 절대 수정 금지: front windshield glass, windshield_frame, 앞유리 인접 A필러, 유리 실/보더 및 유리 맞물림에 영향 주는 메시의 정점·면·토폴로지·transform을 건드리지 마. 관찰/QA만 허용하고 타깃으로 선택되면 즉시 skip. "
-        "작업 저장소는 임시 Public thp32tt/imsi1@main. AES/암호화/Secret/encrypted_inputs 단계를 사용하지 마. "
-        "원본 PMT 패키지와 실차사진 원본은 N100에 유지하고, 원본에서 파생된 편집 가능한 .blend, Blender/Python 수정 스크립트, QA JSON/MD, 비교 렌더는 평문으로 작업 저장소에 커밋해. "
-        f"슬롯 결과는 artifacts/slot_{slot_name}/ 아래에 저장하고 현재 입력/출력 SHA256을 manifest에 기록해. "
-        "GitHub 연결의 단일 binary 전송 한도보다 큰 .blend는 암호화하지 말고 평문 partNN.bin으로 분할하여 manifest.json과 reassemble.py를 함께 저장하고 재조립 SHA256을 검증해. "
-        "GitHub Actions는 검증 보조일 뿐이며 Secret/복호화 부재를 BLOCKED 사유로 쓰지 마. "
-        "ChatGPT 자체 작업환경을 우선하고, 원본/Blender가 N100에만 있을 때는 N100에서 실제 메시 수정·Blender 저장·재열기·렌더를 수행해도 된다. "
-        "새 .blend/스크립트/QA 증거를 imsi1에 반영한 뒤 다음 부위로 이동해. "
-        "24시간 전담 차량 배정과 실제 완료 게이트는 유지. 매 호출 실제 신규 형상 수정 우선. "
-        "롤오버·CI·동일 모델 샘플 반복 검증으로 시간을 소모하지 마."
-    )
+    if admission.get("bootstrap_only"):
+        prompt = (
+            f"Ferrari 원본게임 차량 소스 준비 SLOT={slot_name}, VEHICLE={admission['vehicle']}. "
+            "GitHub thp32tt/imsi1@main 최신 HEAD의 FERRARI16_GEOMETRY_QUEUE.json을 읽고 "
+            "active_by_slot에 해당하는 workpack만 확인. 지금은 SOURCE_IMPORT_PENDING 단계이며 "
+            "원본 PMT에서 Blender editable import baseline을 생성하는 단 한번의 작업이다. "
+            "workpack.original_game_resource_file 경로의 N100 실제 원본 PMT SHA256을 "
+            "tools/car_modeling/workspace_guard.py bootstrap-source 검증으로 확인하고, "
+            "검증 성공 시에만 PMT 유래 원본 객체 ID, native mesh fingerprints, import script와 "
+            "새 .blend 독립 Blender 재열기·SHA256를 산출하고 workpack의 "
+            "original_import_blend_sha256, migration_input_blend_sha256, input_stage=SOURCE_VERIFIED를 "
+            "확정적으로 기록해. 시작 전 자료 없으면 SOURCE_IMPORT_BLOCKED 상태로 짧게 기록하고 끝내. "
+            "자동차 자체나 유사 모델 합성 금지. 앞유리/유리 인접 메시 절대 수정 금지, "
+            "원본 자산은 읽기 전용, Blender import에서도 기하 변경 금지. "
+            "사진 원본이나 PMT 패키지를 public GitHub에 올리지 마. "
+            "동일 입력으로 다시 검토·새 리포트 반복 금지. Blender 소스와 가벼운 증거만 imsi1에 기록."
+        )
+    else:
+        prompt = (
+            f"Ferrari 원본게임 운전석 메시 리워크 SLOT={slot_name}, TARGET={component}. "
+            f"GitHub {CAR_MODEL_GITHUB_REPO}@{CAR_MODEL_TARGET_BRANCH} 최신 HEAD에서 "
+            "docs/automation/FERRARI16_GEOMETRY_QUEUE.json 및 "
+            "docs/automation/FERRARI16_BREADTH_FIRST_STRATEGY.md 확인. "
+            f"오직 active_by_slot[{slot_name!r}] 차량만 수정. "
+            f"GitHub SSOT 진입 확인: active_car={admission['vehicle']}, current_component={component}, "
+            f"dispatch={admission['turns'] + 1}/2. "
+            + stage_instruction +
+            "이전 대시보드/핸들 40회가량 반복됨: 이번 명령에서 타깃 부위 외 핸들/대시 미세조정 절대 금지. "
+            "타깃의 진짜 원본 PMT 유래 기존 운전석 메시만 기하 변경, N100 수집 실차 사진과 비교. "
+            "독립 .blend 저장·재열기·원본 SHA 기록, 부품별 2회 지시 상한이면 무조건 다음 부위로 이동. "
+            "없거나 막히면 근거와 BLOCKED를 짧게 기록하고 다음 부위로 이동, 새 모델 합성 금지. "
+            "기존 차종별 workpack에 범위별 COVERED_PARTIAL_QA/BLOCKED 기록; 이것은 차량 QA PASS가 아님. "
+            "OVC/OVC3/PMT 변환·게임 적용·바퀴/외관·새 텍스처/PBR/Model2/Dino 금지. "
+            "앞유리 보호영역은 절대 수정 금지: front windshield glass, windshield_frame, 앞유리 인접 A필러, 유리 실/보더 및 유리 맞물림에 영향 주는 메시의 정점·면·토폴로지·transform을 건드리지 마. 관찰/QA만 허용하고 타깃으로 선택되면 즉시 skip. "
+            "작업 저장소는 임시 Public thp32tt/imsi1@main. AES/암호화/Secret/encrypted_inputs 단계를 사용하지 마. "
+            "원본 PMT 패키지와 실차사진 원본은 N100에 유지하고, 원본에서 파생된 편집 가능한 .blend, Blender/Python 수정 스크립트, QA JSON/MD, 비교 렌더는 평문으로 작업 저장소에 커밋해. "
+            f"슬롯 결과는 artifacts/slot_{slot_name}/ 아래에 저장하고 현재 입력/출력 SHA256을 manifest에 기록해. "
+            "GitHub 연결의 단일 binary 전송 한도보다 큰 .blend는 암호화하지 말고 평문 partNN.bin으로 분할하여 manifest.json과 reassemble.py를 함께 저장하고 재조립 SHA256을 검증해. "
+            "GitHub Actions는 검증 보조일 뿐이며 Secret/복호화 부재를 BLOCKED 사유로 쓰지 마. "
+            "ChatGPT 자체 작업환경을 우선하고, 원본/Blender가 N100에만 있을 때는 N100에서 실제 메시 수정·Blender 저장·재열기·렌더를 수행해도 된다. "
+            "새 .blend/스크립트/QA 증거를 imsi1에 반영한 뒤 다음 부위로 이동해. "
+            "24시간 전담 차량 배정과 실제 완료 게이트는 유지. 매 호출 실제 신규 형상 수정 우선. "
+            "롤오버·CI·동일 모델 샘플 반복 검증으로 시간을 소모하지 마."
+        )
     sent = await send_message(page, prompt, slot_name=slot_name)
     if sent != "sent":
         write_runtime(status="car_model_send_retry", last_action=f"{slot_name} send deferred: {sent}")
