@@ -154,11 +154,13 @@
         "docs/automation/F50_SLOT_C_WINDSHIELD_FRAME_NATIVE_HEADER_V41_20261109.md",
         "tools/car_modeling/slot_c/f50_windshield_native_header_v41.py",
         "N100 private F50_Windshield_Header_Apillar_v41_Receipt.json",
-        "N100 private F50_Windshield_Header_Apillar_v41_IndependentReopen.json"
+        "N100 private F50_Windshield_Header_Apillar_v41_IndependentReopen.json",
+        "tools/car_modeling/encrypted_inputs/20261109/slot_C/manifest.json (verified staged v41 ciphertext)",
+        "GitHub Actions encrypted artifact 13642534956 from run 42546429232 (v42, not yet source-promoted)"
       ],
-      "blocking_reason": "Original PMT windshield header/A-pillar outer-border 13 verts edited; transparent PMT005 untouched. Other 41 native meshes unchanged; cockpit seven views and calibrated game driver-eye not verified.",
+      "blocking_reason": "v41 header/A-pillar 13 native vertices COVERED_PARTIAL_QA; second dispatch BLOCKED_HOSTED_INPUT because v42 inner_door output is encrypted-artifact-only, not in staged slot_C input. Cap 2/2; no second windshield edit; next visible_seat; final QA NOT_PASS.",
       "last_saved_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
-      "dispatches_used": 1,
+      "dispatches_used": 2,
       "partial_scope": {
         "original_native_object": "object00_group00_material000_a0",
         "original_mesh_verts": 68,
@@ -171,6 +173,28 @@
         "official_blender_4_5_15_fresh_reopen": "PASS",
         "full_car_qa_pass": false,
         "private_photo": "REF16_interior_1_b0df0e6809.jpg"
+      },
+      "hosted_followup": {
+        "task_id": "FERRARI16-SLOTC-F50-WINDSHIELD-HOSTED-BLOCKED-20261109-SECOND-DISPATCH",
+        "status": "BLOCKED_HOSTED_INPUT",
+        "target": "windshield_frame",
+        "native_mesh": "PMT_F50_object00_group00_material000_a0",
+        "original_resource_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+        "original_import_blend_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+        "verified_available_ciphertext_source_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
+        "encrypted_input_manifest": "tools/car_modeling/encrypted_inputs/20261109/slot_C/manifest.json",
+        "blocker": "Allowed GitHub encrypted input contains v41; subsequently validated v42 inner_door exists only as encrypted Actions artifact, its output .blend SHA is sealed in private receipt and v42 is not yet source-promoted. Editing v41 again would omit v42 door geometry. No safe hosted current source for a second windshield edit.",
+        "prior_hosted_artifact_id": 13642534956,
+        "prior_hosted_run_id": 42546429232,
+        "prior_hosted_ciphertext_sha256": "0fd3e4d95f883d798764ea8d341953349b09f75c0d629246f514849fd3e7f0c3",
+        "geometry_modified_this_dispatch": false,
+        "hosted_blender_started_this_dispatch": false,
+        "input_pmt_sha_verified": true,
+        "input_v41_scene_sha_verified": true,
+        "photo_ref_sha256": "9a52450918bfa4a0cb22cf56c0bf373175b212dcb20fe1e6ee7c512114546dad",
+        "dispatches_used_for_windshield_frame": 2,
+        "disposition": "retain v41 COVERED_PARTIAL_QA; second dispatch BLOCKED; advance visible_seat; never assert QA_PASS",
+        "next_component": "visible_seat"
       }
     },
     "visible_seat": {
@@ -219,7 +243,7 @@
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": "3693c9fc68b570b5e41e7a06156bebc19475efb8",
-  "notes": "2026-11-09 hosted SLOT C F50 v42 original PMT031 inner door: existing 10 vertices modified, 41 other native meshes unchanged, Blender 4.5.15 save+reopen and 2 renders PASS. Encrypted artifact 13642534956 SHA256 0fd3e4d9; no plain public files or N100 Blender. Region COVERED_PARTIAL_QA, 2/2; next visible_seat; whole car QA NOT_PASS. v41 remains staged input until v42 encrypted carry-forward.",
+  "notes": "2026-11-09 SLOT C windshield_frame hosted second dispatch BLOCKED_HOSTED_INPUT: staged encrypted source v41 SHA 016645f5 while inner_door v42 newer validated source is encrypted-artifact-only (13642534956), output SHA sealed. No Blender/model edit/reopen/render claimed. Preserve v41 windshield COVERED_PARTIAL_QA 1 source edit, 2/2 dispatches; next visible_seat, vehicle NOT_PASS. Slot A untouched.",
   "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_Windshield_Header_Apillar_v41.blend",
   "current_accepted_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d"
 }
