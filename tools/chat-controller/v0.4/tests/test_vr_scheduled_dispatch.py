@@ -91,21 +91,26 @@ class ScheduledDispatchTests(unittest.TestCase):
         tree = ast.parse(SOURCE)
         fn = next(x for x in tree.body if isinstance(x, ast.AsyncFunctionDef)
                   and x.name == "car_model_simple_cycle")
+        guard = next(x for x in tree.body if isinstance(x, ast.FunctionDef)
+                     and x.name == "ferrari_workpack_dispatch_decision")
         body = ast.get_source_segment(SOURCE, fn)
+        admitted = ast.get_source_segment(SOURCE, guard)
         self.assertIn("breadth_strategy_version", body)
-        self.assertIn("breadth_dispatch_count", body)
+        self.assertIn("breadth_dispatch_count", body)  # telemetry only
         self.assertIn('state["breadth_dispatch_count"] = count + 1', body)
-        self.assertIn("center_console", body)
-        self.assertIn("inner_door", body)
-        self.assertIn("windshield_frame", body)
-        self.assertIn("visible_seat", body)
-        self.assertIn("cross_cockpit_qa", body)
-        self.assertIn("repair_components", body)
-        repair_section = body.split("repair_components = (", 1)[1].split(")", 1)[0]
-        self.assertNotIn("steering_wheel", repair_section)
+        self.assertIn('state["last_workpack_fingerprint_sent"] = admission["fingerprint"]', body)
+        self.assertIn("ferrari_workpack_dispatch_decision(", body)
+        self.assertIn("current_component", admitted)
+        self.assertIn("P0_POLISH_HOLD", admitted)
+        self.assertIn("steering_wheel", admitted)
+        self.assertIn("cross_cockpit_qa", admitted)
+        self.assertNotIn("repair_components =", body)
+        self.assertNotIn("coverage_components =", body)
         self.assertIn("TARGET={component}", body)
+        self.assertLess(body.index("ferrari_workpack_dispatch_decision("),
+                        body.index("reg = load_registry(now)"))
         self.assertLess(body.index('sent = await send_message('),
-                        body.index('state["breadth_dispatch_count"] = count + 1'))
+                        body.index('state["last_workpack_fingerprint_sent"] = admission["fingerprint"]'))
 
     def test_cockpit_two_slot_schedule_and_independent_state(self):
         tree = ast.parse(SOURCE)
