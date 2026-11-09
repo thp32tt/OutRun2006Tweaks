@@ -589,7 +589,7 @@ class ChatBridge:
             # Strict assistant-turn detector excludes the user's English
             # attachment, unrelated cards, CSS screenshots and generic images.
             rescued,why=await rescue_single_image_candidate(
-                pg,task["task_id"],task["role"],str(ROOT)
+                pg,task["task_id"],task["role"],str(ROOT),binding=task
             )
             if rescued not in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
                                "EXISTING_CANDIDATES_VERIFIED"):
