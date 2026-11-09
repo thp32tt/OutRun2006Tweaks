@@ -54,6 +54,7 @@ function check(label,messages,want,method=null){
  const context={
   document:{querySelectorAll:selector=>
      selector.includes('data-markdown-text-tone')?messages:
+     selector.startsWith('p,')?messages.filter(m=>m.kind!=='user'):
      messages.flatMap(m=>m.parent.images)},
   location:{hostname:'chatgpt.com',pathname:'/g/some-project/c/a-verified-id'}
  };
@@ -124,4 +125,16 @@ check('two roleless ImageGen images remain ambiguous',
       roleless(english+'\n'+korean+'\n'+sha,
                [img(src),img('blob:https://chatgpt.com/second')]),
       'ASSISTANT_IMAGE_AMBIGUOUS');
-console.log('ALL 14 PROJECT DOM FIXTURES PASSED');
+const failedText='Something went wrong while generating your image. Sorry about that.';
+check('failed ImageGen response is not a silent assistant wait',
+      [message('user',english+'\n'+korean+'\n'+sha,turn([])),
+       message('media',failedText,turn([]))],
+      'IMAGEGEN_FAILED_UI');
+check('do not treat the English user quotation as assistant failure',
+      [message('user',english+'\n'+korean+'\n'+sha+'\n'+failedText,turn([]))],
+      'ASSISTANT_GENERATED_IMAGE_NOT_RENDERED');
+check('failure text in a later user turn is ignored',
+      [message('user',english+'\n'+korean+'\n'+sha,turn([])),
+       message('user',failedText,turn([]))],
+      'ASSISTANT_GENERATED_IMAGE_NOT_RENDERED');
+console.log('ALL 17 PROJECT DOM FIXTURES PASSED');
