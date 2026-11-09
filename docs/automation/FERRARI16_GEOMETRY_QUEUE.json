@@ -278,7 +278,7 @@
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
       "output_scene_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
-      "notes": "[2026-11-09 SLOT C] F50 original PMT031 inner_door v42 public GitHub VM success: 1 genuine existing source mesh edited, Blender saved/reopened, before/after render, encrypted artifact run 42546429232. Region COVERED_PARTIAL_QA 2/2; private ciphertext result unpromoted, v41 SHA 016645f5 remains active. Next visible_seat; car QA NOT PASS.",
+      "notes": "[2026-11-09 SLOT C F50 hosted inner_door v42] Actual PMT031 native mesh edit 10 original vertices, source save+independent Blender reopen and Workbench before-after PASS on public Ubuntu Actions 42546429232; 41 other native meshes unchanged. Encrypted artifact 13642534956, SHA256 0fd3e4d9; output .blend SHA in private encrypted receipt; v41 staged source unchanged pending carry-forward. inner_door COVERED_PARTIAL_QA, cap 2/2, NEXT visible_seat, vehicle QA NOT_PASS.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -441,6 +441,26 @@
         "next": "visible_seat",
         "source_commit": "3693c9fc68b570b5e41e7a06156bebc19475efb8",
         "report": "docs/automation/F50_SLOT_C_WINDSHIELD_FRAME_NATIVE_HEADER_V41_20261109.md"
+      },
+      "last_slot_c_hosted_inner_door_v42": {
+        "component": "inner_door",
+        "status": "COVERED_PARTIAL_QA",
+        "original_PMTSHA256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+        "original_import_SHA256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+        "input_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
+        "output_blend_sha256": "IN_PRIVATE_ENCRYPTED_RECEIPT",
+        "native_object": "object00_group01_material031_a0",
+        "moved_existing_vertices": 10,
+        "protected_other_meshes_unchanged": 41,
+        "blender_save_reopen": "PASS",
+        "before_after_renders": "PASS_ENCRYPTED",
+        "run_id": 42546429232,
+        "source_commit": "760218d81f9d0101569ea8db0d43a7637f549d2e",
+        "artifact_id": 13642534956,
+        "encrypted_output_sha256": "0fd3e4d95f883d798764ea8d341953349b09f75c0d629246f514849fd3e7f0c3",
+        "staged_source_still_v41": true,
+        "next": "visible_seat",
+        "full_vehicle_QA_pass": false
       }
     },
     {

@@ -88,9 +88,10 @@
         "tools/car_modeling/hosted_edits/f50_slot_c_inner_door_v42.py",
         "hosted run 42540030991 gate ready=false; Blender/decrypt/edit skipped",
         "GitHub Actions 42543904654: decryption + Blender install PASS, model step BLOCKED_PART, no ciphertext artifact",
-        "GitHub Actions 42546429232: AES decrypt, Blender 4.5.15 original-native edit, before/after workbench, independent reopen PASS; AES-GCM artifact 13642534956"
+        "GitHub Actions 42546429232: AES decrypt, Blender 4.5.15 original-native edit, before/after workbench, independent reopen PASS; AES-GCM artifact 13642534956",
+        "Actions 42546429232: source-native 1 mesh changed; Blender save+independent fresh reopen PASS; BEFORE/AFTER render; AES ciphertext artifact 13642534956"
       ],
-      "blocking_reason": "Native driver-side door shoulder has v40 + hosted v42 geometry checkpoints; missing original door handle attribution, calibrated driver-eye and seven-view comparison remain. Public hosted result ciphertext-only, output SHA held in encrypted receipt; cannot claim car QA or promote v42 as accepted source before private verification.",
+      "blocking_reason": "Original PMT031 upper rail modified twice (v40 and v42), 41 protected source meshes unchanged. Unidentified handle remains BLOCKED; whole-car QA pending. Latest v42 only in encrypted Actions artifact; carry into next private input before visible_seat edits.",
       "last_saved_blend_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a",
       "dispatches_used": 2,
       "partial_scope": {
@@ -106,7 +107,7 @@
         "handle": "BLOCKED_UNIDENTIFIED_NATIVE_SOURCE"
       },
       "hosted_v42_request": {
-        "status": "SOURCE_NATIVE_EDIT_FRESH_BLENDER_REOPEN_PASS_ENCRYPTED_UNPROMOTED",
+        "status": "COVERED_PARTIAL_QA_HOSTED_VERIFIED",
         "original_native_object": "object00_group01_material031_a0",
         "source_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
         "original_native_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
@@ -116,8 +117,8 @@
         "source_edit_count_remains": 2,
         "next": "visible_seat",
         "latest_run_id": 42546429232,
-        "runner_decryption": "PASS",
-        "blender_install": "PASS",
+        "runner_decryption": "PASS_4_INPUTS",
+        "blender_install": "PASS_4_5_15",
         "stopped_at": null,
         "hosted_blend_saved": true,
         "hosted_artifact_uploaded": true,
@@ -130,11 +131,20 @@
         "encrypted_artifact_name": "ferrari-ciphertext-slot-C-42546429232",
         "encrypted_artifact_id": 13642534956,
         "encrypted_payload_sha256": "0fd3e4d95f883d798764ea8d341953349b09f75c0d629246f514849fd3e7f0c3",
-        "output_blend_sha256": null,
+        "output_blend_sha256": "RECORDED_IN_ENCRYPTED_RECEIPT_NOT_PUBLIC",
         "output_sha_location": "Encrypted receipt only; public log cannot prove standalone file digest",
         "source_promotion": "PENDING_PRIVATE_DECRYPTED_RECEIPT_AND_SOURCE_ACCEPTANCE",
         "whole_car_qa_pass": false,
-        "retry_allowed": false
+        "retry_allowed": false,
+        "independent_reopen": "PASS",
+        "before_after_render": "PASS_ENCRYPTED",
+        "changed_existing_native_mesh": "PMT_F50_object00_group01_material031_a0",
+        "changed_existing_vertices": 10,
+        "other_41_native_meshes_unchanged": true,
+        "artifact_id": 13642534956,
+        "artifact_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/42546429232/artifacts/13642534956",
+        "ciphertext_sha256": "0fd3e4d95f883d798764ea8d341953349b09f75c0d629246f514849fd3e7f0c3",
+        "full_car_qa_pass": false
       }
     },
     "windshield_frame": {
@@ -204,11 +214,12 @@
     "seven authenticated car-photo viewpoints incomplete",
     "real proprietary source scene not available in GitHub-hosted Actions",
     "existing source nonmanifold / connectivity findings unresolved",
-    "hosted v42 output scene SHA and photo match contained only in encrypted artifact, not yet privately reviewed/promoted"
+    "hosted v42 output scene SHA and photo match contained only in encrypted artifact, not yet privately reviewed/promoted",
+    "v42 encrypted output must be securely carried forward into next source bundle before visible_seat editing"
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": "3693c9fc68b570b5e41e7a06156bebc19475efb8",
-  "notes": "SLOT C F50: hosted v42 inner_door second (2/2) source-native checkpoint GitHub Actions 42546429232 PASS: one original PMT031 mesh changed, .blend saved/fresh reopened, Workbench before/after PASS, encrypted artifact 13642534956. Prior v40 door remains COVERED_PARTIAL_QA only; v42 output SHA inside encrypted receipt, NOT promoted as accepted v41 successor. NEXT visible_seat original source attribution; no wheel/dash, vehicle QA NOT PASS.",
+  "notes": "2026-11-09 hosted SLOT C F50 v42 original PMT031 inner door: existing 10 vertices modified, 41 other native meshes unchanged, Blender 4.5.15 save+reopen and 2 renders PASS. Encrypted artifact 13642534956 SHA256 0fd3e4d9; no plain public files or N100 Blender. Region COVERED_PARTIAL_QA, 2/2; next visible_seat; whole car QA NOT_PASS. v41 remains staged input until v42 encrypted carry-forward.",
   "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_Windshield_Header_Apillar_v41.blend",
   "current_accepted_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d"
 }
