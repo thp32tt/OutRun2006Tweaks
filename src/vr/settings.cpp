@@ -175,7 +175,7 @@ namespace Settings
     Setting<bool> VRQuestCockpitV2PassengerVisible{ "VR", "QuestCockpitV2PassengerVisible", true,
         "Keep exact event 363 passenger original PC robot matrix; force visible LOD0 inside only its synchronous draw to avoid missing near-seat model. Default ON." };
 	Setting<bool> VRQuestCockpitV2SkyProbe{ "VR", "QuestCockpitV2SkyProbe", false,
-        "Experimental bounded sky/R9 Present stereo and B0/F0 player-body motion diagnostics, one aggregate per 90 frames/draws. Full VR.Telemetry is not required." };
+        "Bounded sky/R9 Present, B0/F0 car motion and Quest/PC original view1 yaw-source comparison (body +0x2E vs auxiliary +0x1FE vs native camera look). One aggregate per 90 calls." };
     Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
 		"Isolated QuestCockpitV2 diagnostic: collects original player B0/F0 and bounded Present correlation. The native game-frame owner is unverified; this does not activate cockpit. Requires restart." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,

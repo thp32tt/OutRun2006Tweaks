@@ -10,6 +10,7 @@
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/quest_cockpit_v2_runtime.hpp"
 #include "vr/game/quest_cockpit_v2_seat.hpp"
+#include "vr/game/quest_cockpit_v2_turn_yaw.hpp"
 #include "vr/game/quest_cockpit_v2_occupant.hpp"
 #include "vr/game/quest_cockpit_v2_visibility.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
@@ -709,20 +710,52 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const float b0Y=player->matrix_B0._42;
         const float f0Y=player->matrix_F0._42;
         const float cameraY=camera->cam_pos_F8.y;
+        // Stock PC/Quest mode1 camera yaw uses auxiliary car+0x1FE;
+        // the body itself points along car+0x2E. Diagnose this
+        // separate original producer without mutating game/VR state.
+        const auto bodyWord=static_cast<std::uint16_t>(player->field_2C[1]);
+        const auto auxWord=player->field_1FE;
+        const auto steerWord=static_cast<std::uint16_t>(player->field_162);
+        const float auxBodyDeg=
+            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(auxWord,bodyWord);
+        const float cameraLookYaw=camera->cam_ang_128.y;
+        const float speed=player->field_1C4;
         if(!std::isfinite(b0Y)||!std::isfinite(f0Y)||
-           !std::isfinite(cameraY))return;
+           !std::isfinite(cameraY)||!std::isfinite(cameraLookYaw)||
+           !std::isfinite(speed))return;
         static const EVWORK_CAR* lastPlayer=nullptr;
         static float lastB0Y=0.f,lastF0Y=0.f,lastCameraY=0.f;
         static float lastRelativeY=0.f;
         static float maxB0Delta=0.f,maxF0Delta=0.f,maxCameraDelta=0.f;
         static float maxRelativeDelta=0.f;
+        static std::uint16_t prevBody=0,prevAux=0;
+        static float prevCameraLookYaw=0.f;
+        static float maxBodyYawStep=0.f,maxAuxYawStep=0.f;
+        static float maxCameraYawStep=0.f,maxAuxBodyGap=0.f;
+        static float maxSteering=0.f;
         static unsigned observations=0;
         if(lastPlayer!=player) {
             lastPlayer=player;observations=0;
             maxB0Delta=maxF0Delta=maxCameraDelta=maxRelativeDelta=0.f;
             lastB0Y=b0Y;lastF0Y=f0Y;lastCameraY=cameraY;
             lastRelativeY=b0Y-cameraY;
+            prevBody=bodyWord;prevAux=auxWord;
+            prevCameraLookYaw=cameraLookYaw;
+            maxBodyYawStep=maxAuxYawStep=maxCameraYawStep=0.f;
+            maxAuxBodyGap=maxSteering=0.f;
         }
+        maxBodyYawStep=std::max(maxBodyYawStep,std::fabs(
+            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(bodyWord,prevBody)));
+        maxAuxYawStep=std::max(maxAuxYawStep,std::fabs(
+            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(auxWord,prevAux)));
+        maxCameraYawStep=std::max(maxCameraYawStep,std::fabs(
+            OutRunVR::QuestCockpitV2::YawRadiansStepDegrees(
+                cameraLookYaw,prevCameraLookYaw)));
+        maxAuxBodyGap=std::max(maxAuxBodyGap,std::fabs(auxBodyDeg));
+        maxSteering=std::max(maxSteering,std::fabs(
+            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(steerWord,0)));
+        prevBody=bodyWord;prevAux=auxWord;
+        prevCameraLookYaw=cameraLookYaw;
         const float b0Delta=std::fabs(b0Y-lastB0Y);
         const float f0Delta=std::fabs(f0Y-lastF0Y);
         const float cameraDelta=std::fabs(cameraY-lastCameraY);
@@ -744,8 +777,19 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 maxB0Delta,maxF0Delta,maxCameraDelta,maxRelativeDelta,
                 b0Y,f0Y,cameraY,
                 Settings::VRQuestCockpitV2F0RenderScope.get());
+            spdlog::info(
+                "VR CAMERA YAW PROBE: samples=90 "
+                "maxBodyYawStepDeg={:.3f} maxAuxYawStepDeg={:.3f} "
+                "maxCameraYawStepDeg={:.3f} "
+                "maxAuxBodyGapDeg={:.3f} auxMinusBodyDeg={:.3f} "
+                "maxSteerDeg={:.3f} speed={:.6f} f0RenderScope={}",
+                maxBodyYawStep,maxAuxYawStep,maxCameraYawStep,
+                maxAuxBodyGap,auxBodyDeg,maxSteering,speed,
+                Settings::VRQuestCockpitV2F0RenderScope.get());
             observations=0;
             maxB0Delta=maxF0Delta=maxCameraDelta=maxRelativeDelta=0.f;
+            maxBodyYawStep=maxAuxYawStep=maxCameraYawStep=0.f;
+            maxAuxBodyGap=maxSteering=0.f;
         }
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)

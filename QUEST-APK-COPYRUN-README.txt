@@ -51,6 +51,11 @@ TEST AND APK COMPARISON (2026-11-05):
   shaderSkyFallback, shaderSkyMixedEyes and shaderSkyModeSwitches per 90
   Presents. shaderExactSkyDraws is now windowed, not lifetime cumulative.
   This is a root-cause probe, not a claimed fix for faint double sky.
+- On a left and right bend, SKY DIAG also logs VR CAMERA YAW PROBE
+  every 90 car callbacks. Compare maxBodyYawStepDeg (body +0x2E),
+  maxAuxYawStepDeg (camera source +0x1FE), maxCameraYawStepDeg
+  (native eye/look direction), maxAuxBodyGapDeg and speed.
+  These are magnitudes only, not proof of camera lead phase.
 - If road bounce/sky flicker persists, use the two included A/B scripts
   without changing the original game files. These remain unresolved
   visual comparisons until captured on a Quest 3 headset.

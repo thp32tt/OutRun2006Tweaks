@@ -29,6 +29,8 @@ on:
       - 'QuestCockpitV2-GlassControl.ps1'
       - 'RUN-QUEST-COCKPIT-V2-GLASS.cmd'
       - 'src/hooks_graphics.cpp'
+      - 'src/vr/game/quest_cockpit_v2_turn_yaw.hpp'
+      - 'tools/tests/quest_cockpit_v2_turn_yaw_smoke.cpp'
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
   workflow_dispatch:
@@ -76,6 +78,12 @@ jobs:
             tools/tests/quest_cockpit_v2_native_frame_smoke.cpp \
             -o /tmp/quest-cockpit-v2-native
           /tmp/quest-cockpit-v2-native
+      - name: Original Quest/PC mode1 yaw-source angle-wrap regression
+        run: |
+          c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            tools/tests/quest_cockpit_v2_turn_yaw_smoke.cpp \
+            -o /tmp/quest-v2-yaw
+          /tmp/quest-v2-yaw
       - name: Original 30-record model-1 seat anchors and frame trial
         run: |
           c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
@@ -112,6 +120,9 @@ jobs:
                             'ApplyDriverSeatCameraOffset','DriverSeatCameraActive']:
               assert forbidden not in hook, forbidden
           assert 'QuestCockpitV2PlayerCandidateProbe' in hook
+          assert 'VR CAMERA YAW PROBE:' in hook
+          assert 'player->field_1FE' in hook
+          assert 'player->field_2C[1]' in hook
           assert 'QuestCockpitV2NativeFrameProbe' in hook
           assert 'MatchOriginalRva(FrameEnterRva,begin)' in hook
           assert 'ComputeBodyCorrection(b0,f0,correction)' in hook
