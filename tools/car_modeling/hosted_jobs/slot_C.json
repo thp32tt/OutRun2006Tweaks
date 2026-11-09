@@ -3,15 +3,15 @@
   "slot": "C",
   "car_id": "f50",
   "mode": "probe",
-  "component": "windshield_frame",
+  "component": "visible_seat",
   "original_native_rel": "rea-input/outrun/outrun2006/Cars/obj_plcar_f50_pmt.sz",
   "original_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
   "original_import_blend_rel": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CockpitSource_v1.blend",
   "original_import_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
   "source_blend_rel": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_Windshield_Header_Apillar_v41.blend",
   "source_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
-  "output_blend_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_NativeWindshieldFrame_v43.blend",
-  "receipt_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_NativeWindshieldFrame_v43_source_inventory.json",
+  "output_blend_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_NativeVisibleSeat_v43.blend",
+  "receipt_rel": "work_handoff/ferrari_hosted_results/slot_C/F50_NativeVisibleSeat_v43_source_inventory.json",
   "allowed_existing_meshes": [],
   "edit_script": null,
   "disallowed_actions": [
@@ -22,13 +22,10 @@
     "out-of-target cockpit editing"
   ],
   "evidence_png_rels": [],
-  "request_gate": "BLOCKED_HOSTED_INPUT: v41 is current permitted ciphertext, v42 inner_door geometry exists only in encrypted artifact and is not safely carried forward; do not run Blender or re-edit old v41. windshield_frame v41 COVERED_PARTIAL_QA; 2/2 dispatch cap; next visible_seat; QA NOT_PASS.",
-  "target_native_mesh_id": "PMT_F50_object00_group00_material000_a0",
-  "target_original_mesh_object_id": "object00_group00_material000_a0",
-  "target_original_topology": {
-    "vertices": 68,
-    "faces": 56
-  },
+  "request_gate": "SOURCE_IDENTIFICATION_PROBE_ONLY: follow-up windshield_frame 2/2 BLOCKED_HOSTED_INPUT (v42 encrypted artifact not carried into staged v41 source); preserve prior windshield COVERED_PARTIAL_QA. Next visible_seat original PMT mesh not identified, so no geometry edit without positive source provenance and refreshed accepted ciphertext. Vehicle QA NOT_PASS.",
+  "target_native_mesh_id": null,
+  "target_original_mesh_object_id": null,
+  "target_original_topology": null,
   "latest_staged_encrypted_source_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
   "unpromoted_newer_source": {
     "source": "GitHub Actions encrypted artifact",
@@ -37,5 +34,8 @@
     "ciphertext_sha256": "0fd3e4d95f883d798764ea8d341953349b09f75c0d629246f514849fd3e7f0c3",
     "private_output_blend_sha256": "NOT_PUBLICLY_KNOWN_IN_ENCRYPTED_RECEIPT"
   },
-  "next_component": "visible_seat"
+  "next_component": "visible_seat",
+  "last_requested_component": "windshield_frame",
+  "last_requested_native_mesh_id": "PMT_F50_object00_group00_material000_a0",
+  "last_requested_attempt_status": "BLOCKED_HOSTED_INPUT_DISPATCH_2_OF_2_NO_GEOMETRY"
 }
