@@ -395,6 +395,30 @@ class CollectorIntegrationTests(unittest.IsolatedAsyncioTestCase):
   self.assertEqual(len(self.gh.pngs),0)
 
 
+class ImagegenPollEfficiencyTests(CollectorIntegrationTests):
+ async def test_no_assistant_media_never_reloads_verified_chat(self):
+  page=self.bridge.page.return_value
+  with patch("text_roi_queue._probe_imagegen_result",
+             new=AsyncMock(return_value={"error":"USER_TURN_MISSING"})) as legacy, \
+       patch("text_roi_queue._recover_task_turn",
+             new=AsyncMock(return_value=False)) as reload_chat, \
+       patch.object(c,"rescue_single_image_candidate",new=AsyncMock(
+           return_value=("WAIT_ASSISTANT_RESULT_UI",
+                         "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0"))) as rescue_probe:
+   status=await self.bridge.collect_producer(self.state)
+  self.assertEqual(status,
+      "WAIT_IMAGEGEN_ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0")
+  self.assertEqual(rescue_probe.await_count,2)
+  legacy.assert_awaited_once()
+  reload_chat.assert_not_awaited()
+  page.wait_for_timeout.assert_not_called()
+  self.assertEqual(len(self.gh.pngs),0)
+  saved=self.gh.records[c.task_state_path(self.task["task_id"])]
+  self.assertEqual(saved["status"],"AB_SENT")
+  self.assertEqual(saved["last_result_poll_reason"],
+      "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0")
+
+
 class ImageGenFailureRecoveryTests(unittest.IsolatedAsyncioTestCase):
  async def asyncSetUp(self):
   self.temp=tempfile.TemporaryDirectory()
@@ -496,6 +520,27 @@ class CurrentProjectDOMContractTests(unittest.IsolatedAsyncioTestCase):
   self.assertIn("영문 원문: ",js)
   self.assertIn("한국어 번역: ",js)
   self.assertIn("원본 DDS SHA: ",js)
+ async def test_ui_diagnostic_exposes_only_bounded_node_counts(self):
+  class FakePage:
+   async def evaluate(self,js,arg):
+    return {"status":"ASSISTANT_GENERATED_IMAGE_NOT_RENDERED",
+            "ui":{"assistant":0,"generated":0,"user":1,"auth":1}}
+  status,reason=await rescue.rescue_single_image_candidate(
+    FakePage(),self.task,"A",self.temp.name,binding=self.source)
+  self.assertEqual(status,"WAIT_ASSISTANT_RESULT_UI")
+  self.assertEqual(reason,
+     "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L1")
+  self.assertFalse((Path(self.temp.name)/"text_roi_batches").exists())
+ async def test_out_of_range_ui_counts_are_never_exported(self):
+  class FakePage:
+   async def evaluate(self,js,arg):
+    return {"status":"ASSISTANT_GENERATED_IMAGE_NOT_RENDERED",
+            "ui":{"assistant":-1,"generated":999,"user":1,"auth":1}}
+  status,reason=await rescue.rescue_single_image_candidate(
+    FakePage(),self.task,"A",self.temp.name,binding=self.source)
+  self.assertEqual(reason,"ASSISTANT_GENERATED_IMAGE_NOT_RENDERED")
+  self.assertEqual(status,"WAIT_ASSISTANT_RESULT_UI")
+
  async def test_unbound_or_ambiguous_chat_cannot_advance(self):
   class FakePage:
    async def evaluate(self,js,arg):
