@@ -1,12 +1,13 @@
 {
   "ab_eligible_counts": {
-    "A": 23,
-    "B": 20
+    "A": 2,
+    "B": 4
   },
   "hold_categories": {
-    "AB_IMAGE_AND_CLEAN_REWORK": 43,
+    "AB_IMAGE_AND_CLEAN_REWORK": 6,
     "ENGINE_OR_COORDINATE_HOLD": 594,
-    "EVIDENCE_REVIEW_HOLD": 17
+    "EVIDENCE_REVIEW_HOLD": 17,
+    "SOURCE_CLEAN_MASK_OR_SEGMENTATION_HOLD": 37
   },
   "hold_count": 654,
   "new_imagegen_disabled": true,
