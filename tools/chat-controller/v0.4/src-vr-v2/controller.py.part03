@@ -2883,8 +2883,15 @@ def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetim
             return json.loads(base64.b64decode(response["content"]).decode("utf-8"))
 
         queue = fetch_json_file("docs/automation/FERRARI16_GEOMETRY_QUEUE.json")
-        suffix = {"A": "A_DAYTONA365", "C": "C_F50"}[slot_name]
-        workpack = fetch_json_file("docs/automation/FERRARI_COCKPIT_WORKPACK_" + suffix + ".json")
+        car_id = (queue.get("active_by_slot") or {}).get(slot_name)
+        car_record = next((c for c in queue.get("cars", [])
+                           if c.get("id") == car_id and c.get("slot") == slot_name), None)
+        path = car_record.get("workpack_path") if car_record else None
+        if (not isinstance(path, str)
+                or not path.startswith("docs/automation/FERRARI_COCKPIT_WORKPACK_")
+                or not path.endswith(".json") or ".." in path):
+            raise ValueError("active car has no safe authoritative workpack path")
+        workpack = fetch_json_file(path)
         _ferrari_workpack_ssot_cache[slot_name] = (now, queue, workpack)
 
     active_car = (queue.get("active_by_slot") or {}).get(slot_name)
