@@ -1,3 +1,20 @@
+## 2026-11-09 19:52 KST — QA rework container log analysis and bounded collection retry
+
+**Evidence:** user-supplied Portainer export `_outrun-chat-qa-rework_logs.txt` (16:37–19:40 KST; timestamps in file are UTC). 17 `CYCLE_OK` logs, repeated `WAIT_IMAGEGEN_ASSISTANT_GENERATED_IMAGE_NOT_RENDERED`, no exported candidate and no C1-ready status in the supplied segment. The initial `CHROMIUM_LOCAL_RENDER_PROBE: FAIL dom=False pixel=(255,255,255)` and an early `HOLD_CHATGPT_LOGIN_REQUIRED` were followed by a verified `AB_SENT` event, so the browser could subsequently send. This alone does not establish that ImageGen actually produced a response. Hundreds of repeated Portainer timestamps in single exported lines are exporter formatting, not the Python worker printing hundreds of separate cycles (the worker prints one JSON per cycle).
+
+**Fixes in this branch:**
+- Browser bootstrap now says `CHATGPT_BROWSER_TAB_VISIBLE_AUTH_UNVERIFIED`. Merely opening a page cannot prove logout.
+- On every persisted `AB_SENT` task, try the SHA-bound assistant-image collector first. Wait *once*, for up to 1.2s, for delayed user or assistant hydration. Never resend an `AB_SENT` task.
+- Do not launch the old 24-second twice-wait-and-reload path when the exact source-bound user turn has already rendered but there is no Assistant image. Run the legacy exporter only if its exact candidate selector verifies one result.
+- Missing ImageGen output now emits **only bounded DOM counts**, for example `ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0`. `A`=assistant text turns immediately after the user; `G`=generated-image selector nodes anywhere in this page; `U`=rendered user turns; `L`=visible password login input (0/1). These are diagnostic signals, not confirmation of image generation/authentication. No user text, private chat URL, cookies, image bytes or tokens are logged.
+- C1 QA, source-SHA linkage, PNG alpha/frame checks, and native DDS/game release gates remain unchanged.
+
+**Verification:** **44 Python tests PASS** on N100; **17 JS mocked DOM tests PASS**. Browser runtime recovery **not yet verified**, so do not mark any PNG complete based only on these tests.
+
+**Operator action:** Portainer, existing image-rework stack only (not the separate Actions light controller): Pull latest branch `localization-controller-recovery-20260928`, **Rebuild and Redeploy**, retaining login profile/volumes. Then check the first `processed` reason / GitHub `hd_imagegen_fallback/state` for `_A#_G#_U#_L#` and check `candidates` for a real new PNG. If `A0_G0` persists, inspect one matching saved ChatGPT conversation in noVNC for a generated image or generation error; do not blindly resend.
+
+---
+
 ## 2026-11-09 15:15 KST — distinguish delivered image prompt from failed ImageGen response
 
 **Known sent-work anchor:** `HDRW-B-322d801e17d4261db4fa`, English `Manual`, Korean `수동`, original DDS SHA-256 `7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5`. GitHub `AB_SENT` is evidence of an attached **user message**, never evidence that the assistant image was generated or collected. The user's reference chat showed a generation-error response for this prompt in this project, but the running Docker's actual response/log still requires confirmation.
