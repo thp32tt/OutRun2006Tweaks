@@ -2,7 +2,7 @@
   "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af17761-9c1c-83e8-a802-47b4faf77fbd",
   "candidate_status": "RESULT_NOT_YET_EXPORTED_OR_QA_APPROVED",
   "last_result_poll_reason": "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0",
-  "last_result_poll_utc": "2026-11-09T19:41:59+00:00",
+  "last_result_poll_utc": "2026-11-09T22:04:59+00:00",
   "old_candidate_sha256": "27dbf9b8c2d48d1b18a5d63f295b45f52f7619ba10a9a980e7e0023119dbaed7",
   "release_approved": false,
   "roi_id": "Q111_9684be626751292c",
@@ -61,5 +61,5 @@
     "task_id": "HDRW-B-6536adde77f082596e8e"
   },
   "task_id": "HDRW-B-6536adde77f082596e8e",
-  "updated_utc": "2026-11-09T19:42:00+00:00"
+  "updated_utc": "2026-11-09T22:04:59+00:00"
 }
