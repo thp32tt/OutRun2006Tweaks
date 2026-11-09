@@ -1,3 +1,23 @@
+## 2026-11-09 15:15 KST — distinguish delivered image prompt from failed ImageGen response
+
+**Known sent-work anchor:** `HDRW-B-322d801e17d4261db4fa`, English `Manual`, Korean `수동`, original DDS SHA-256 `7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5`. GitHub `AB_SENT` is evidence of an attached **user message**, never evidence that the assistant image was generated or collected. The user's reference chat showed a generation-error response for this prompt in this project, but the running Docker's actual response/log still requires confirmation.
+
+**Fix:** `chat_image_result_rescue.py` now classifies explicit ImageGen failure text (e.g. `Something went wrong while generating your image`) as `IMAGEGEN_FAILED_UI` in a reply *bounded after the verified task's user message and before the next user message*. It keeps failed output in `AB_SENT` with `last_result_poll_reason=IMAGEGEN_FAILED_UI`, never writes an English uploaded reference as a Korean image, never falsely advances to `C1_READY`, and **does not automatically resend** the existing `UPLOAD_TASK_ID`. A missing media result without an explicit failure is `ASSISTANT_GENERATED_IMAGE_NOT_RENDERED`, not automatically treated as generation failure. This permits precise operator recovery without violating the duplicate-send policy.
+
+**Offline regressions:** 39 Python tests PASS and 17 mock browser-DOM tests PASS, including roleless ImageGen media, explicit failure, quoted failure in a user prompt, failure after the next user turn, original-reference exclusion and SHA-bound proof. These are not live image-success evidence.
+
+**Operator log evidence request:** In Portainer → Containers → `outrun-chat-qa-rework` → Logs, copy **the latest 100–200 lines** including JSON keys `checked_utc`, `processed`, `status` and `error_type`. Or, on a privileged host shell, run:
+
+```bash
+docker logs --since 45m --tail 200 outrun-chat-qa-rework 2>&1
+```
+
+Remove tokens, cookies, personal chat text and authentication URLs before sharing. The connected non-root host session cannot read the Docker socket or worker's `/proc/.../fd/1`, so the user-provided logs are required to conclusively distinguish a generation failure from absent DOM/media. Avoid repeated manual resend under the same task ID. If the actual ChatGPT conversation shows a failed image, retry in the **existing conversation** only once the UI action and exact task binding are verified; do not claim an output was produced.
+
+**Deploy:** Once logs are captured, pull latest `localization-controller-recovery-20260928`, **rebuild and redeploy** existing Portainer stack, preserving browser/data volumes. The running controller at 15:16 KST predates this source change; a simple restart would not apply it. No new host resources or paid API added.
+
+---
+
 ## 2026-11-09 15:04 KST — ImageGen media-only assistant turn handling
 
 **Live evidence:** browser and the existing Docker controller remain running at 15:05 KST; `Ghost Forest` and `Manual` persisted A/B tasks are still `AB_SENT` with `ASSISTANT_TURN_NOT_READY`. This status is not proof that the AI image was never generated. The running worker's Docker logs and process stdout could not be read by the authorized non-root host connection (Docker socket and `/proc/<pid>/fd/1` denied). No new PNG/C1 success claimed.
