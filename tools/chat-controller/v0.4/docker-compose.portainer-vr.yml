@@ -17,7 +17,7 @@ services:
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
       VR_FEATURE_DEVELOPMENT_ENABLED: "true"
-      # Operator 2026-11-08: two Ferrari cockpit-only geometry lanes A and C; Model2 VR disabled.
+      # Operator 2026-11-09: Ferrari A/C use temporary PUBLIC plaintext workspace thp32tt/imsi1; Model2 VR disabled.
       VR_CONTINUOUS_30M_ENABLED: "true"
       VR_SCHEDULED_DISPATCH_ENABLED: "true"
       VR_CONTINUOUS_INTERVAL_SECONDS: "3600"
@@ -28,8 +28,8 @@ services:
       CONVERSION_DX11_ENABLED: "false"
       # Two independent cockpit-only vehicle owners (Daytona A, F50 C; Dino excluded).
       CAR_MODEL_AUTODEV_ENABLED: "true"
-      CAR_MODEL_GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
-      CAR_MODEL_TARGET_BRANCH: "feature/ferrari16-geometry-rework-20261108"
+      CAR_MODEL_GITHUB_REPO: "thp32tt/imsi1"
+      CAR_MODEL_TARGET_BRANCH: "main"
       CAR_MODEL_SCHEDULE_MINUTES: "0,30"
       CAR_MODEL_C_AUTODEV_ENABLED: "true"
       CAR_MODEL_C_SCHEDULE_MINUTES: "15,45"
