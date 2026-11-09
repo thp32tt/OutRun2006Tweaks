@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af22fe6-7e48-83ee-9ae5-2cf64449f05e",
   "old_candidate_sha256": "6606ec9448b74fc00cbe4ad3c24dbcff2db53d16970f7c1700c8461353b9cb2c",
   "release_approved": false,
   "roi_id": "Q205_0e672581cf837a7d",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "SORRY! You need more miles!",
     "korean": "죄송합니다! 마일이 더 필요합니다!",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-B-a115e545a33da2f8e890"
   },
   "task_id": "HDRW-B-a115e545a33da2f8e890",
-  "updated_utc": "2026-11-09T20:41:03+00:00"
+  "updated_utc": "2026-11-09T20:41:23+00:00"
 }
