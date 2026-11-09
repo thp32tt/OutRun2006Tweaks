@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "slot": "A",
+  "car_id": "daytona365",
+  "mode": "probe",
+  "component": "driver_controls",
+  "original_native_rel": "rea-input/outrun/outrun2006/Cars/obj_plcar_dayts_pmt.sz",
+  "original_sha256": "f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe",
+  "original_import_blend_rel": "work_handoff/daytona365_rework_20261107/original_game_blender/Daytona365_ORIGINAL_GAME_COCKPIT_COMPARE.blend",
+  "original_import_sha256": "92c82ee5c4e0631195cb314e0d8e2f56a78a6a58da3c809c46b1da0f9d2c71a3",
+  "source_blend_rel": "work_handoff/ferrari16_slotA_daytona_dashboard_steering_20261108/Daytona365_SlotA_OriginalPMT018_CenterConsole_R43.blend",
+  "source_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877",
+  "output_blend_rel": "work_handoff/ferrari_hosted_results/slot_A/Daytona365_OriginalPMT_DriverControls_Hosted_V44.blend",
+  "receipt_rel": "work_handoff/ferrari_hosted_results/slot_A/driver_controls_source_probe.json",
+  "allowed_existing_meshes": [],
+  "edit_script": null,
+  "disallowed_actions": [
+    "OVC3 export",
+    "PMT export",
+    "new synthetic car",
+    "game integration",
+    "out-of-target cockpit editing"
+  ]
+}
