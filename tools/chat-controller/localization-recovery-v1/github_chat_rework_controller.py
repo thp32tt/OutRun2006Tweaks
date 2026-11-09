@@ -560,20 +560,31 @@ class ChatBridge:
             await asyncio.to_thread(result_poll_diagnostic,self.gh,state,reason)
             return reason
         probe=await old._probe_imagegen_result(pg,task["task_id"],1)
+        saved=None
         if probe.get("error")=="USER_TURN_MISSING":
-            # Previously unused helper recovers lazily rendered old chats.
-            recovered=await old._recover_task_turn(pg,task["task_id"])
-            if recovered:
-                probe=await old._probe_imagegen_result(pg,task["task_id"],1)
+            # The legacy probe requires a marker that the current Project UI
+            # can hide in reopened conversation turns. First try our strict
+            # SHA-bound assistant detector WITHOUT another costly page reload.
+            fast,_=await rescue_single_image_candidate(
+                pg,task["task_id"],task["role"],str(ROOT),binding=task
+            )
+            if fast in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                        "EXISTING_CANDIDATES_VERIFIED"):
+                saved=fast
+            else:
+                # Only when no assistant candidate is verified do we attempt
+                # the expensive lazy-chat recovery and a fresh final probe.
+                recovered=await old._recover_task_turn(pg,task["task_id"])
+                if recovered:
+                    probe=await old._probe_imagegen_result(pg,task["task_id"],1)
         legacy_status="WAIT_IMAGEGEN_"+str(
             probe.get("error") or (
                 "BUSY" if probe.get("busy")
                 else "COUNT_"+str(probe.get("count","UNKNOWN"))
             )
         )
-        saved=None
-        if (probe.get("error") is None and probe.get("count")==1
-                and not probe.get("busy")):
+        if (saved is None and probe.get("error") is None
+                and probe.get("count")==1 and not probe.get("busy")):
             source_name=task["reference"]["name"]
             active={"task_id":task["task_id"],"role":task["role"],"count":1,
                     "items":[{"output_filename":task["task_id"]+".png",
