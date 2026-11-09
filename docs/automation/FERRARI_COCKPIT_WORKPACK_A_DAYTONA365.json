@@ -20,7 +20,7 @@
     "steering_wheel",
     "cross_cockpit_qa"
   ],
-  "current_component": "driver_controls",
+  "current_component": "inner_door",
   "dispatches_on_component": 0,
   "max_dispatches_per_component": 2,
   "components": {
@@ -45,11 +45,27 @@
       ]
     },
     "driver_controls": {
-      "status": "NOT_STARTED",
-      "source_edits_this_phase": 0,
-      "evidence_refs": [],
+      "status": "COVERED_PARTIAL_QA",
+      "source_edits_this_phase": 1,
+      "evidence_refs": [
+        "docs/automation/FERRARI16_SLOTA_DAYTONA_R44_DRIVER_CONTROLS_20261109.md"
+      ],
       "blocking_reason": null,
-      "last_saved_blend_sha256": null
+      "last_saved_blend_sha256": "638f69369f9ff9d074221320f38f4e137675a911d05939470f6cd24bec73040d",
+      "dispatches_consumed_this_phase": 1,
+      "blocked_subparts": [
+        "pedal original native mesh attribution unproven",
+        "column stalk original native mesh attribution unproven"
+      ],
+      "original_native_mesh_object": "object00_group01_material016_a0",
+      "existing_original_derived_mesh_modified": "DAYTONA_PHOTO_NATIVE_SWITCHBANK_REFINED_V4",
+      "edited_existing_vertices": 70,
+      "max_vertex_offset_m": 0.014,
+      "pending_qa": [
+        "calibrated_original_game_eye",
+        "matched_same_camera_before_after",
+        "seven_authenticated_photo_views"
+      ]
     },
     "inner_door": {
       "status": "NOT_STARTED",
@@ -108,7 +124,7 @@
     "existing source nonmanifold / connectivity findings unresolved"
   ],
   "cannot_promote_from_interim_coverage": true,
-  "last_material_commit": "d299eef3fbcfa2cd5faed78564fdf6f69f161018",
-  "notes": "R43 native PMT018-guided center_console COVERED_PARTIAL_QA: 20 existing vertices changed and independent Blender 4.5.15 save/reopen PASS. Protected 112 meshes unchanged. Not car QA PASS; exact game-eye/seven photo views pending. Next driver_controls; P0 wheel/dash HOLD; 24h owner unchanged.",
-  "latest_accepted_editable_blend_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877"
+  "last_material_commit": "b43347f41e617aa05b3c44df8c559b993ebd46fa",
+  "notes": "R44 PMT016 native 10-anchor control switch housing source-backed geometry: 70 existing vertices moved <=14mm. Independent Blender 4.5.15 save/reopen PASS; 112 other meshes unchanged incl P0 dash/wheel. driver_controls COVERED_PARTIAL_QA only; pedal/stalk original native attribution BLOCKED, no fabrication; next inner_door. Vehicle QA NOT PASS; same 24h car clock, slot C untouched.",
+  "latest_accepted_editable_blend_sha256": "638f69369f9ff9d074221320f38f4e137675a911d05939470f6cd24bec73040d"
 }
