@@ -15,6 +15,8 @@ on:
       - "tools/localization/test_hd_bc3_native_codec.py"
       - "tools/localization/hd_existing_candidate_salvage.py"
       - "tools/localization/hd_rework_queue.py"
+      - "tools/localization/hd_hold_triage.py"
+      - "tools/localization/test_hd_hold_triage.py"
       - "tools/localization/hd_qa_queue_refill.py"
       - "tools/localization/publish_hd_rework_queue.py"
       - "tools/localization/test_hd_rework_queue.py"
@@ -49,6 +51,8 @@ jobs:
             tools/localization/test_hd_bc3_native_codec.py
             tools/localization/hd_existing_candidate_salvage.py
             tools/localization/hd_rework_queue.py
+            tools/localization/hd_hold_triage.py
+            tools/localization/test_hd_hold_triage.py
             tools/localization/hd_qa_queue_refill.py
             tools/localization/publish_hd_rework_queue.py
             tools/localization/test_hd_rework_queue.py
@@ -68,4 +72,5 @@ jobs:
           python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
           python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
+          python -m unittest discover -s tools/localization -p test_hd_hold_triage.py -v
           python -m unittest discover -s tools/localization -p test_hd_c1_overrides.py -v
