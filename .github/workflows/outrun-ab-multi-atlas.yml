@@ -35,6 +35,8 @@ jobs:
             tools/localization/test_hd_bc3_native_codec.py
             tools/localization/hd_existing_candidate_salvage.py
             tools/localization/hd_rework_queue.py
+            tools/localization/hd_hold_triage.py
+            tools/localization/test_hd_hold_triage.py
             tools/localization/publish_hd_rework_queue.py
             tools/localization/test_hd_rework_queue.py
             tools/localization/test_hd_strict_qa.py
@@ -70,6 +72,7 @@ jobs:
           python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
           python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
+          python -m unittest discover -s tools/localization -p test_hd_hold_triage.py -v
 
       - name: Reuse and deterministically salvage existing A/B artwork into native HD DDS
         shell: bash
@@ -100,6 +103,15 @@ jobs:
           print("HD_STRICT_NATIVE_SIZE_AND_CLEAN_QA_GATES_PASS")
           PY
           sha256sum "$RUNNER_TEMP/ab-multi-one/OUTRUN_AB_HD_STRICT_CLEAN_TEST_ONLY.zip"
+
+      - name: Generate source-bound HOLD triage tickets without unsafe auto-PASS
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_hold_triage.py --repo-root . \
+            --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
+            --out "$RUNNER_TEMP/ab-multi-one/hold_triage"
 
       - name: Preserve existing-art-only HOLD accountability without new ImageGen requests
         if: success()
