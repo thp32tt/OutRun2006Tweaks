@@ -1,3 +1,15 @@
+## 2026-11-09 read-only chat result collector fix (manual rebuild/redeploy)
+
+**Verified live symptoms:** after the browser and worker were restarted around 10:55 KST, Ghost Forest continued recording `WAIT_CHATGPT_COMPOSER_OR_LOGIN` at 10:56 KST. This is a collected-page check failure, **not proof that ChatGPT logout occurred**. N100 load and memory were normal; current queue still had 0 saved PNG candidates.
+
+**Fix:** `ChatBridge.page(..., read_only=True)` retrieves a **specific, previously saved and validated ChatGPT conversation URL** without requiring a composer. The A/B `collect_producer` and C1 `inspect_c1` paths use read-only mode. Invalid or redirected conversation URLs fail closed; `submit_producer` and `submit_c1` still require the visible composer and existing attachment/send validation. No output SHA, PNG evidence, independent C1 QA, or native DDS acceptance gate was relaxed.
+
+**Independent checks:** 32 offline regression tests PASS on 2026-11-09, including composer-free authenticated-chat URL read, missing URL fail closed, redirect rejection, send-path composer enforcement, and previous assistant-only image result cases. Real UI collection remains unverified until the next container deployment.
+
+**Operator action:** Portainer Git Stack (controller branch `localization-controller-recovery-20260928`): Pull latest, Rebuild image, Redeploy the **existing** stack. Preserve browser login and data volumes. A simple browser refresh/container restart without rebuilding the image does not include this code change. Confirm on GitHub `hd_imagegen_fallback/state`: `last_result_poll_reason` changes from `WAIT_CHATGPT_COMPOSER_OR_LOGIN` to a more precise image result reason, or a task advances to `C1_READY`. Do not resend an already `AB_SENT` task.
+
+---
+
 ## 2026-11-09 ImageGen result collector repair (manual redeploy required)
 
 **Why:** 16 observed A/B tasks reached `AB_SENT` but no candidate PNG reached GitHub/C1. Code inspection identified that only the alphabetically first three saved task files were checked each cycle, and the existing lazy ChatGPT conversation recovery helper was never invoked in `collect_producer`. The legacy result detector also depended on one older ChatGPT generated-preview DOM shape. The live failed selector cannot be confirmed without authenticated container browser logs.
