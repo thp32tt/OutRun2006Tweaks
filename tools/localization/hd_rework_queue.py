@@ -25,7 +25,14 @@ REGEN_REASONS = (
     "QA_CANDIDATE", "QA_CANDIDATE_UNREADABLE", "QA_CANDIDATE_INVISIBLE",
     "QA_CANDIDATE_PNG_GEOMETRY", "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
     "QA_DOWNSCALE_LOST_GLYPHS", "QA_TRANSLATION_TOO_SMALL_TO_READ",
-    "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT", "QA_SOURCE_LINE_LAYOUT_UNVERIFIED",
+)
+# An ImageGen text-only replacement cannot erase source English when the DDS
+# source alpha also contains opaque background, artwork, or mixed line shapes.
+# These need a separately source-pinned CLEAN/segmentation mask; never spend
+# another A/B generation request on them without that missing evidence.
+CLEAN_SOURCE_REASONS = (
+    "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "QA_SOURCE_LINE_LAYOUT_UNVERIFIED",
     "OPAQUE_PROTECTED_ART_HOLD",
 )
 NOT_GENERATION = (
@@ -78,6 +85,8 @@ def flatten_holds(report):
 
 
 def category(reason):
+    if reason.startswith(CLEAN_SOURCE_REASONS):
+        return "SOURCE_CLEAN_MASK_OR_SEGMENTATION_HOLD"
     if reason.startswith(NOT_GENERATION):
         return "ENGINE_OR_COORDINATE_HOLD"
     if reason.startswith(REGEN_REASONS):
