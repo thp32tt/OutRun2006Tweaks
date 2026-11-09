@@ -20,7 +20,7 @@
     "steering_wheel",
     "cross_cockpit_qa"
   ],
-  "current_component": "windshield_frame",
+  "current_component": "visible_seat",
   "dispatches_on_component": 0,
   "max_dispatches_per_component": 2,
   "components": {
@@ -102,11 +102,30 @@
       }
     },
     "windshield_frame": {
-      "status": "NOT_STARTED",
-      "source_edits_this_phase": 0,
-      "evidence_refs": [],
-      "blocking_reason": null,
-      "last_saved_blend_sha256": null
+      "status": "COVERED_PARTIAL_QA",
+      "source_edits_this_phase": 1,
+      "evidence_refs": [
+        "docs/automation/F50_SLOT_C_WINDSHIELD_FRAME_NATIVE_HEADER_V41_20261109.md",
+        "tools/car_modeling/slot_c/f50_windshield_native_header_v41.py",
+        "N100 private F50_Windshield_Header_Apillar_v41_Receipt.json",
+        "N100 private F50_Windshield_Header_Apillar_v41_IndependentReopen.json"
+      ],
+      "blocking_reason": "Original PMT windshield header/A-pillar outer-border 13 verts edited; transparent PMT005 untouched. Other 41 native meshes unchanged; cockpit seven views and calibrated game driver-eye not verified.",
+      "last_saved_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
+      "dispatches_used": 1,
+      "partial_scope": {
+        "original_native_object": "object00_group00_material000_a0",
+        "original_mesh_verts": 68,
+        "original_mesh_faces": 56,
+        "moved_existing_vertices": 13,
+        "max_displacement_mm": 21,
+        "original_windshield_glass_object": "object00_group00_material005_a1",
+        "original_glass_unchanged": true,
+        "other_41_original_meshes_unchanged": true,
+        "official_blender_4_5_15_fresh_reopen": "PASS",
+        "full_car_qa_pass": false,
+        "private_photo": "REF16_interior_1_b0df0e6809.jpg"
+      }
     },
     "visible_seat": {
       "status": "NOT_STARTED",
@@ -151,8 +170,8 @@
     "existing source nonmanifold / connectivity findings unresolved"
   ],
   "cannot_promote_from_interim_coverage": true,
-  "last_material_commit": "7b7e9b514206b888a9728f54ab32ad5fba371fe5",
-  "notes": "2026-11-09 C F50: driver_controls BLOCKED (no identified native PMT stalk/pedal, no synthesis); moved to inner_door. Native PMT material031 driver upper rail 10 existing verts physically reshaped max 26.495mm; 41 others invariant; official Blender 4.5.15 saved/fresh-reopened PASS. Inner_door COVERED_PARTIAL_QA only; handle blocked. Next windshield_frame. No P0/dash, wheel, other slot or full-car QA pass. Retain 24h gate.",
-  "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_InnerDoor_UpperRail_v40.blend",
-  "current_accepted_blend_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a"
+  "last_material_commit": "3693c9fc68b570b5e41e7a06156bebc19475efb8",
+  "notes": "2026-11-09 C F50 v41: driver_controls BLOCKED (original PMT stalk/pedals not identified); moved to authentic PMT000 windshield header/A-pillar frame: 13 existing verts moved max 21mm, 41 other source meshes identical incl PMT005 glass, dash/wheel; Blender 4.5.15 saved/reopened PASS. windshield_frame COVERED_PARTIAL_QA only; NEXT visible_seat. No vehicle QA PASS; original 24h assignment and all slots unchanged.",
+  "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_Windshield_Header_Apillar_v41.blend",
+  "current_accepted_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d"
 }
