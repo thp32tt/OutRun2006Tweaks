@@ -1,3 +1,15 @@
+## 2026-11-09 15:04 KST — ImageGen media-only assistant turn handling
+
+**Live evidence:** browser and the existing Docker controller remain running at 15:05 KST; `Ghost Forest` and `Manual` persisted A/B tasks are still `AB_SENT` with `ASSISTANT_TURN_NOT_READY`. This status is not proof that the AI image was never generated. The running worker's Docker logs and process stdout could not be read by the authorized non-root host connection (Docker socket and `/proc/<pid>/fd/1` denied). No new PNG/C1 success claimed.
+
+**Code fix:** `chat_image_result_rescue.py` now searches specifically generated-image UI elements in DOM order **after the exact SHA-bound user task and before the next user turn**, even when the generated image is wrapped in a media/tool-only turn without an assistant text-role element. Never capture source-upload previews, a later user's response, or multiple ambiguous generated images. Existing source-triple/provenance and independent C1/DDS gates are unchanged. Missing output is labeled `ASSISTANT_GENERATED_IMAGE_NOT_RENDERED` instead of implying that an assistant text-role was mandatory.
+
+**Offline verification:** 37 Python regression tests PASS and 14 ImageGen DOM JS mock fixtures PASS, including media-only image output, next-user rejection, ambiguous image rejection, and upload-vs-output separation. No actual authenticated browser image retrieval has yet been demonstrated.
+
+**For operator diagnosis (no secrets):** In Portainer, open container `outrun-chat-qa-rework` → Logs → most recent 200 lines, and share lines with `status`, `processed`, `checked_utc`, or `error_type`. Alternatively run `docker logs --since 30m --tail 200 outrun-chat-qa-rework` on a privileged host terminal. Redact secrets, cookies, tokens and private chat URLs. The worker logs one cycle JSON record every `OUTRUN_REWORK_POLL_SECONDS` (default 600). This is required to separate page DOM failures from browser reload/navigation exceptions and unexpected worker errors. After logs are examined, **Rebuild + Redeploy** this latest controller branch; ordinary container restart does not incorporate the fix.
+
+---
+
 ## 2026-11-09 12:10 KST — current ChatGPT Project DOM recovery repair
 
 **Issue confirmed from source:** the persisted send receipt validator uses current ChatGPT Project selectors `[data-markdown-text-tone="user-message"]` and `[data-chatgpt-search-unit-key]`, but the fallback ImageGen result collector previously only searched `[data-message-author-role]`. Its `USER_TURN_MISSING` result could therefore be misleading even if the source user message was saved. The legacy detector also depends on visible `UPLOAD_TASK_ID`, which can be absent in an older/re-rendered turn. No user-facing screenshot, log, or image success is assumed.
