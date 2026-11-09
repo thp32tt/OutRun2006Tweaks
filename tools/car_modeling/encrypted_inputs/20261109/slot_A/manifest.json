@@ -1,0 +1,29 @@
+{
+  "format": "ferrari_public_action_aesgcm_v1",
+  "slot": "A",
+  "chunk_unit_bytes": 1048575,
+  "expected_ciphertext_size": 16832441,
+  "ciphertext_sha256": "502cf59b193ad45345ca50e6dd093eb88c92248ae044a99d9860991d6fffd520",
+  "parts": [
+    "part_000.encbin",
+    "part_001.encbin",
+    "part_002.encbin",
+    "part_003.encbin",
+    "part_004.encbin",
+    "part_005.encbin",
+    "part_006.encbin",
+    "part_007.encbin",
+    "part_008.encbin",
+    "part_009.encbin",
+    "part_010.encbin",
+    "part_011.encbin",
+    "part_012.encbin",
+    "part_013.encbin",
+    "part_014.encbin",
+    "part_015.encbin",
+    "part_016.encbin"
+  ],
+  "encrypted": true,
+  "contains_plaintext_assets": false,
+  "description": "Encrypted native OutRun 2006 cockpit inputs; key is NOT in the repository; do not publish decrypted artifacts."
+}
