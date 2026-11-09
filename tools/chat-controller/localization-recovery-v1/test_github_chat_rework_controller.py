@@ -200,6 +200,36 @@ class FallbackQueueResumeAndPixelTests(unittest.TestCase):
   original["status"]="C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY"
   self.assertEqual(c.restore_remote_active_states(FakeFallbackGithub({self.new_path:original})),0)
 
+ def test_previous_mixed_alpha_imagegen_receipt_is_preserved_but_not_repolled(self):
+  # These are source CLEAN / segmentation tasks, not more glyph generation.
+  for reason in c.SOURCE_CLEAN_ONLY_REASONS:
+   task=copy.deepcopy(self.task)
+   task["reason"]=reason
+   state=self.state(task=task,
+       source_dds_sha256=task["source_dds_sha256"],
+       old_candidate_sha256=task["old_candidate_sha256"],
+       roi_id=task["roi_id"])
+   gh=FakeFallbackGithub({self.new_path:state})
+   self.assertFalse(c.image_result_actionable(task))
+   self.assertEqual(c.restore_remote_active_states(gh),0)
+   self.assertFalse(c.local_task_path(task["task_id"]).exists())
+   self.assertEqual(gh.records[self.new_path]["status"],"AB_SENT")
+   self.assertEqual(gh.writes,[])
+
+ def test_actual_glyph_scale_holds_remain_recoverable(self):
+  for reason in ("QA_DOWNSCALE_LOST_GLYPHS", "QA_TRANSLATION_TOO_SMALL_TO_READ"):
+   task=copy.deepcopy(self.task)
+   task["reason"]=reason
+   state=self.state(task=task,
+       source_dds_sha256=task["source_dds_sha256"],
+       old_candidate_sha256=task["old_candidate_sha256"],
+       roi_id=task["roi_id"])
+   gh=FakeFallbackGithub({self.new_path:state})
+   self.assertTrue(c.image_result_actionable(task))
+   self.assertEqual(c.restore_remote_active_states(gh),1)
+   c.local_task_path(task["task_id"]).unlink()
+   self.assertEqual(gh.writes,[])
+
  def test_no_prior_task_may_proceed_as_new(self):
   gh=FakeFallbackGithub()
   self.assertEqual(c.recover_previous_sent_task(gh,self.task),"NEW")
