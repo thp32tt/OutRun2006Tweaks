@@ -3014,7 +3014,7 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         save_queue_state(q)
     coverage_components = (
         "center_console", "driver_controls", "inner_door",
-        "windshield_frame", "visible_seat", "instrument_cluster",
+        "visible_seat", "instrument_cluster",
         "dashboard", "steering_wheel", "cross_cockpit_qa",
     )
     count = max(0, int(state.get("breadth_dispatch_count") or 0))
@@ -3025,7 +3025,7 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         # areas, but never return to generic infinite steering-wheel refinement.
         repair_components = (
             "center_console", "inner_door", "driver_controls",
-            "instrument_cluster", "windshield_frame", "visible_seat",
+            "instrument_cluster", "visible_seat",
             "cross_cockpit_qa",
         )
         component = repair_components[((count - len(coverage_components) * 2) // 2) % len(repair_components)]
@@ -3044,6 +3044,7 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         "없거나 막히면 근거와 BLOCKED를 짧게 기록하고 다음 부위로 이동, 새 모델 합성 금지. "
         "기존 차종별 workpack에 범위별 COVERED_PARTIAL_QA/BLOCKED 기록; 이것은 차량 QA PASS가 아님. "
         "OVC/OVC3/PMT 변환·게임 적용·바퀴/외관·새 텍스처/PBR/Model2/Dino 금지. "
+        "앞유리 보호영역은 절대 수정 금지: front windshield glass, windshield_frame, 앞유리 인접 A필러, 유리 실/보더 및 유리 맞물림에 영향 주는 메시의 정점·면·토폴로지·transform을 건드리지 마. 관찰/QA만 허용하고 타깃으로 선택되면 즉시 skip. "
         "작업 저장소는 임시 Public thp32tt/imsi1@main. AES/암호화/Secret/encrypted_inputs 단계를 사용하지 마. "
         "원본 PMT 패키지와 실차사진 원본은 N100에 유지하고, 원본에서 파생된 편집 가능한 .blend, Blender/Python 수정 스크립트, QA JSON/MD, 비교 렌더는 평문으로 작업 저장소에 커밋해. "
         f"슬롯 결과는 artifacts/slot_{slot_name}/ 아래에 저장하고 현재 입력/출력 SHA256을 manifest에 기록해. "
