@@ -358,7 +358,9 @@ class CollectorIntegrationTests(unittest.IsolatedAsyncioTestCase):
   ImageDraw.Draw(im).rectangle((10,10,160,82),fill=(245,230,180,255))
   buffer=io.BytesIO();im.save(buffer,format="PNG")
   raw=buffer.getvalue()
-  async def fake_rescue(page,task_id,role,root):
+  async def fake_rescue(page,task_id,role,root,binding=None):
+   self.assertEqual(binding["source_dds_sha256"],"a"*64)
+   self.assertEqual(binding["task_id"],task_id)
    p=Path(root)/"text_roi_batches"/"candidate_outputs"/role/(task_id+".png")
    p.parent.mkdir(parents=True,exist_ok=True)
    p.write_bytes(raw)
@@ -433,6 +435,71 @@ class ExistingChatReadOnlyTests(unittest.IsolatedAsyncioTestCase):
   self.assertIn("read_only=True",source)
   source_c1=inspect.getsource(c.ChatBridge.inspect_c1)
   self.assertIn("read_only=True",source_c1)
+
+
+class CurrentProjectDOMContractTests(unittest.IsolatedAsyncioTestCase):
+ async def asyncSetUp(self):
+  self.temp=tempfile.TemporaryDirectory()
+  self.task="HDRW-A-"+("d"*20)
+  self.source={"task_id":self.task,
+               "english":"Ghost Forest",
+               "korean":"고스트 포레스트",
+               "source_dds_sha256":"a"*64}
+ async def asyncTearDown(self):
+  self.temp.cleanup()
+ async def test_bound_fields_sent_to_modern_browser_dom_probe(self):
+  args=[]
+  class FakePage:
+   async def evaluate(self,js,arg):
+    args.append(arg)
+    return {"status":"SOURCE_BOUND_USER_TURN_MISSING"}
+  outcome,detail=await rescue.rescue_single_image_candidate(
+    FakePage(),self.task,"A",self.temp.name,binding=self.source)
+  self.assertEqual(outcome,"WAIT_ASSISTANT_RESULT_UI")
+  self.assertEqual(detail,"SOURCE_BOUND_USER_TURN_MISSING")
+  self.assertEqual(args[0],{
+    "task":self.task,"english":"Ghost Forest",
+    "korean":"고스트 포레스트","sha":"a"*64})
+ async def test_current_ui_is_selected_as_well_as_legacy(self):
+  js=rescue.ASSISTANT_IMAGE_JS
+  self.assertIn('[data-markdown-text-tone="user-message"]',js)
+  self.assertIn('[data-markdown-text-tone="assistant"]',js)
+  self.assertIn("data-chatgpt-search-unit-key",js)
+  self.assertIn("data-message-author-role",js)
+  self.assertIn("UPLOAD_TASK_ID=",js)
+  self.assertIn("영문 원문: ",js)
+  self.assertIn("한국어 번역: ",js)
+  self.assertIn("원본 DDS SHA: ",js)
+ async def test_unbound_or_ambiguous_chat_cannot_advance(self):
+  class FakePage:
+   async def evaluate(self,js,arg):
+    return {"status":"SOURCE_BOUND_USER_TURN_AMBIGUOUS"}
+  state,detail=await rescue.rescue_single_image_candidate(
+    FakePage(),self.task,"A",self.temp.name,binding=self.source)
+  self.assertEqual(state,"WAIT_ASSISTANT_RESULT_UI")
+  self.assertEqual(detail,"SOURCE_BOUND_USER_TURN_AMBIGUOUS")
+  self.assertFalse((Path(self.temp.name)/"text_roi_batches").exists())
+ def test_source_triple_evidence_never_lies_about_marker(self):
+  png,dimensions=rescue.checked_image_bytes(self.make_png())
+  status=rescue.save_candidate_evidence(
+    self.temp.name,"A",self.task,png,dimensions,
+    hashlib.sha256(png).hexdigest(),match_method="SOURCE_TRIPLE")
+  self.assertEqual(status,"LOCAL_CANDIDATES_EXPORTED_UNAPPROVED")
+  proof=json.loads((Path(self.temp.name)/"text_roi_batches"/"export_evidence"/
+                    (self.task+".json")).read_text())
+  self.assertIn("SOURCE_TRIPLE",proof["files"][0]["pairing"])
+  self.assertNotIn("EXACT_USER_MARKER",proof["files"][0]["pairing"])
+ def make_png(self):
+  image=Image.new("RGBA",(128,64),(0,0,0,0))
+  ImageDraw.Draw(image).rectangle((11,10,100,50),fill=(255,255,255,255))
+  buf=io.BytesIO(); image.save(buf,format="PNG")
+  return buf.getvalue()
+ def test_unknown_proof_kind_is_rejected_before_writing(self):
+  png,dimensions=rescue.checked_image_bytes(self.make_png())
+  with self.assertRaisesRegex(ValueError,"UNSUPPORTED_ASSISTANT_TURN_PROOF"):
+   rescue.save_candidate_evidence(self.temp.name,"A",self.task,png,dimensions,
+        hashlib.sha256(png).hexdigest(),match_method="FAKE")
+  self.assertFalse((Path(self.temp.name)/"text_roi_batches").exists())
 
 
 if __name__=="__main__":
