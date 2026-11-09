@@ -2858,6 +2858,110 @@ async def model2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q
     return True
 
 
+
+# Ferrari V4: authoritative GitHub queue/workpack admission. Never consume a chat
+# dispatch on a finished, held, out-of-order, or already-sent input fingerprint.
+_ferrari_workpack_ssot_cache = {}
+
+
+def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetime) -> dict:
+    if slot_name not in ("A", "C"):
+        raise ValueError("unknown Ferrari modeling slot")
+    if CAR_MODEL_GITHUB_REPO != "thp32tt/imsi1" or CAR_MODEL_TARGET_BRANCH != "main":
+        raise ValueError("Ferrari SSOT must be thp32tt/imsi1@main")
+    cache = _ferrari_workpack_ssot_cache.get(slot_name)
+    if cache and (now - cache[0]).total_seconds() < 45:
+        queue, workpack = cache[1], cache[2]
+    else:
+        def fetch_json_file(path):
+            uri = ("/repos/thp32tt/imsi1/contents/"
+                   + urllib.parse.quote(path, safe="/")
+                   + "?ref=main")
+            response = github_api_json(uri)
+            if not isinstance(response, dict) or response.get("encoding") != "base64":
+                raise ValueError("GitHub SSOT content is not a base64-encoded file")
+            return json.loads(base64.b64decode(response["content"]).decode("utf-8"))
+
+        queue = fetch_json_file("docs/automation/FERRARI16_GEOMETRY_QUEUE.json")
+        suffix = {"A": "A_DAYTONA365", "C": "C_F50"}[slot_name]
+        workpack = fetch_json_file("docs/automation/FERRARI_COCKPIT_WORKPACK_" + suffix + ".json")
+        _ferrari_workpack_ssot_cache[slot_name] = (now, queue, workpack)
+
+    active_car = (queue.get("active_by_slot") or {}).get(slot_name)
+    if (queue.get("repository") != "thp32tt/imsi1"
+            or queue.get("branch") != "main"
+            or active_car != workpack.get("car_id")
+            or workpack.get("slot") != slot_name):
+        raise ValueError("Ferrari slot/vehicle identity mismatch")
+    sequence = (queue.get("strategy_v3") or {}).get("component_sequence")
+    if not isinstance(sequence, list) or sequence != workpack.get("component_order"):
+        raise ValueError("Ferrari queue/workpack component order mismatch")
+    component = workpack.get("current_component")
+    if component not in sequence:
+        raise ValueError("workpack has no valid active component")
+    part = (workpack.get("components") or {}).get(component, {})
+    status = part.get("status")
+    turns = workpack.get("dispatches_on_component", 0)
+    if type(turns) is not int or not 0 <= turns <= 2:
+        raise ValueError("invalid Ferrari component dispatch counter")
+
+    started = next((c.get("started_at_utc") for c in queue.get("cars", [])
+                    if c.get("id") == active_car), None)
+    if not started:
+        raise ValueError("active Ferrari vehicle lacks a start time")
+    start_time = datetime.fromisoformat(started.replace("Z", "+00:00"))
+    expired = (now.astimezone(start_time.tzinfo) - start_time).total_seconds() >= 24 * 3600
+
+    admission = {
+        "allow": False, "vehicle": active_car, "component": component,
+        "status": status, "turns": turns, "age_exceeded_24h": expired,
+    }
+    if status in {"BLOCKED", "OUT_OF_VIEW", "COVERED_PARTIAL_QA", "PROTECTED_DO_NOT_EDIT",
+                  "P0_POLISH_HOLD", "WAITING_QA_INPUT", "QA_OBSERVED_PARTIAL_NOT_PASS"}:
+        admission["reason"] = "component already blocked, completed or on hold"
+        return admission
+    if component in {"windshield_frame", "dashboard", "steering_wheel"}:
+        admission["reason"] = "protected windshield or prohibited P0 polish"
+        return admission
+    if component == "cross_cockpit_qa":
+        if status not in {"NOT_STARTED", "IN_PROGRESS"}:
+            admission["reason"] = "QA has no actionable new acceptance evidence"
+            return admission
+    else:
+        if expired:
+            admission["reason"] = "24h per-car geometry window elapsed; QA only"
+            return admission
+        if status not in {"NOT_STARTED", "IN_PROGRESS"}:
+            admission["reason"] = "component not eligible for source-backed edit"
+            return admission
+
+    used = part.get("dispatches_consumed_this_phase",
+                    part.get("dispatches_used", 0))
+    if turns >= 2 or (type(used) is int and used >= 2):
+        admission["reason"] = "two-dispatch component budget exhausted"
+        return admission
+
+    fingerprint_payload = {
+        "car": active_car, "component": component, "status": status,
+        "turn": turns, "used": used,
+        "source_edits": part.get("source_edits_this_phase", 0),
+        "accepted_blend": workpack.get("latest_accepted_editable_blend_sha256"),
+        "part_blend": part.get("last_saved_blend_sha256"),
+        "material_commit": workpack.get("last_material_commit"),
+    }
+    fingerprint = hashlib.sha256(
+        json.dumps(fingerprint_payload, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    admission["fingerprint"] = fingerprint
+    if state.get("last_workpack_fingerprint_sent") == fingerprint:
+        admission["reason"] = "same workpack checkpoint already dispatched; await SSOT progress"
+        return admission
+    admission["allow"] = True
+    admission["reason"] = "fresh authoritative workpack checkpoint"
+    return admission
+
+
+
 async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime, slot_name: str = "A") -> bool:
     """OutRun A: sequential Ferrari geometry-only modeling, never DX11/Model2.
 
@@ -2904,6 +3008,23 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         return False
     if not pending and send_age is None:
         return False
+
+    # Do not open/rotate a ChatGPT tab until GitHub SSOT authorizes a new
+    # actual component checkpoint. An unavailable GitHub API fails closed.
+    try:
+        admission = ferrari_workpack_dispatch_decision(slot_name, state, now)
+    except Exception as exc:
+        admission = {"allow": False, "reason": "GitHub SSOT unavailable: " + type(exc).__name__}
+    if not admission["allow"]:
+        reason = admission["reason"]
+        if state.get("workpack_wait_reason") != reason:
+            state["workpack_wait_reason"] = reason
+            save_queue_state(q)
+        write_runtime(status="car_model_waiting_for_ssot",
+                      last_action=f"Ferrari {slot_name} no dispatch: {reason}",
+                      **{"car_model_" + slot_name + "_gate": admission})
+        return False
+    component = admission["component"]
 
     reg = load_registry(now)
     slot = next((x for x in reg.slots if x.name == slot_name), None)
@@ -3004,31 +3125,32 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         return False
 
     bootstrap = not state.get("bootstrap_complete")
-    # V3: bounded cockpit breadth schedule, persisted separately per A/C and
-    # incremented ONLY after an actual successful message send.
-    # Old wheel-only sessions resume at center console, never re-enter P0 loop.
-    if state.get("breadth_strategy_version") != 3:
-        state["breadth_strategy_version"] = 3
-        state["breadth_dispatch_count"] = 0
-        state["last_breadth_component_sent"] = None
+    # V4: GitHub's current_component and each part's persisted progress are
+    # authoritative; the old cyclic dispatch index is telemetry only.
+    if state.get("breadth_strategy_version") != 4:
+        state["breadth_strategy_version"] = 4
+        state.setdefault("breadth_dispatch_count", 0)
+        state["dispatch_source"] = "imsi1_workpack_main"
         save_queue_state(q)
-    coverage_components = (
-        "center_console", "driver_controls", "inner_door",
-        "visible_seat", "instrument_cluster",
-        "dashboard", "steering_wheel", "cross_cockpit_qa",
-    )
     count = max(0, int(state.get("breadth_dispatch_count") or 0))
-    if count < len(coverage_components) * 2:
-        component = coverage_components[count // 2]
-    else:
-        # After the first sweep, repairs can revisit still-incomplete interior
-        # areas, but never return to generic infinite steering-wheel refinement.
-        repair_components = (
-            "center_console", "inner_door", "driver_controls",
-            "instrument_cluster", "visible_seat",
-            "cross_cockpit_qa",
+    if component == "cross_cockpit_qa":
+        stage_instruction = (
+            "현재 단계는 전체 운전석 검증이며 새 부위 조각 모델링/핸들 미세조정 반복이 아니다. "
+            "SLOT A Daytona는 R45 통합 원본 .blend에 아직 병합되지 않은 R46 좌석과 R47 계기판을 "
+            "원본 PMT object ID/정점 fingerprint 보존 조건으로 안전하게 통합하는 것이 우선이다. "
+            "기존 .blend를 덮어쓰지 말고 새 통합 checkpoint를 저장·독립 재열기·각 소스 SHA 검증·"
+            "앞유리/기존 비대상 메시 불변을 입증한 경우에만 새 통합 성과로 기록. "
+            "SLOT C F50은 v40→v43→v44의 통합 연속성과 정면 운전자 시점 사진 비교를 우선 확인. "
+            "기본 실차 운전자 시점 미보정/7뷰 사진 부재 등으로 판정 불가하면 QA_WAITING_INPUT "
+            "근거를 단 1회 기록하고 같은 입력의 QA/커밋/회전 반복은 중지. "
+            "COVERED_PARTIAL_QA를 차량 PASS로 포장하지 마. "
         )
-        component = repair_components[((count - len(coverage_components) * 2) // 2) % len(repair_components)]
+    else:
+        stage_instruction = (
+            "반드시 workpack.current_component와 TARGET이 일치하는지 재확인하고 "
+            "실제 원본 메시 수정이 없는 상태조회/재검증/동일 SHA 문서 커밋만으로 "
+            "슬롯을 소비하지 마. 부품은 한 번 실질 변경에 성공하면 다음으로 넘어가. "
+        )
     # One production owner per day: the durable Ferrari16 queue selects the active car.
     # Never select a car from stale chat state or a fixed Daytona-only prompt.
     # Enforce 24h + verified geometry/photo gates using the repository guard script.
@@ -3038,6 +3160,9 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
         "docs/automation/FERRARI16_GEOMETRY_QUEUE.json 및 "
         "docs/automation/FERRARI16_BREADTH_FIRST_STRATEGY.md 확인. "
         f"오직 active_by_slot[{slot_name!r}] 차량만 수정. "
+        f"GitHub SSOT 진입 확인: active_car={admission['vehicle']}, current_component={component}, "
+        f"dispatch={admission['turns'] + 1}/2. "
+        + stage_instruction +
         "이전 대시보드/핸들 40회가량 반복됨: 이번 명령에서 타깃 부위 외 핸들/대시 미세조정 절대 금지. "
         "타깃의 진짜 원본 PMT 유래 기존 운전석 메시만 기하 변경, N100 수집 실차 사진과 비교. "
         "독립 .blend 저장·재열기·원본 SHA 기록, 부품별 2회 지시 상한이면 무조건 다음 부위로 이동. "
@@ -3092,6 +3217,10 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
     state["continuations_sent"] = int(state.get("continuations_sent") or 0) + 1
     state["breadth_dispatch_count"] = count + 1
     state["last_breadth_component_sent"] = component
+    state["last_workpack_fingerprint_sent"] = admission["fingerprint"]
+    state["last_workpack_component_sent"] = component
+    state["last_workpack_vehicle_sent"] = admission["vehicle"]
+    state.pop("workpack_wait_reason", None)
     save_queue_state(q)
     write_runtime(status="car_model_running", last_action=f"Ferrari cockpit {slot_name}: {state['last_send_reason']} sent in OutRun project",
                   car_model_simple=state, queue=q)
@@ -5299,4 +5428,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
