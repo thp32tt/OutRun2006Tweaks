@@ -581,6 +581,8 @@ class ChatBridge:
                 if again in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
                              "EXISTING_CANDIDATES_VERIFIED"):
                     saved=again
+        page_reloaded=False
+        legacy_export_attempted=False
         probe=({"error":"RESCUED_ASSISTANT_IMAGE"} if saved else
                await old._probe_imagegen_result(pg,task["task_id"],1))
         if saved is None and probe.get("error")=="USER_TURN_MISSING":
@@ -590,6 +592,7 @@ class ChatBridge:
                     why.startswith("SOURCE_BOUND_USER_TURN_MISSING")):
                 recovered=await old._recover_task_turn(pg,task["task_id"])
                 if recovered:
+                    page_reloaded=True
                     probe=await old._probe_imagegen_result(pg,task["task_id"],1)
         legacy_status="WAIT_IMAGEGEN_"+str(
             probe.get("error") or (
@@ -605,6 +608,7 @@ class ChatBridge:
                               "ordinal":1,"filename":source_name,
                               "width":task["reference"]["width"],
                               "height":task["reference"]["height"]}]}
+            legacy_export_attempted=True
             try:
                 saved=await old.export_unapproved_k_candidates(pg,active,str(ROOT))
             except (ValueError,OSError) as exc:
@@ -615,7 +619,7 @@ class ChatBridge:
             # attachment, unrelated cards, CSS screenshots and generic images.
             # Recheck after the legacy path only; never mistake a reference
             # image, loading placeholder or unrelated turn for generated PNG.
-            if probe.get("error")!="RESCUED_ASSISTANT_IMAGE":
+            if page_reloaded or legacy_export_attempted:
                 rescued,detail=await rescue_single_image_candidate(
                     pg,task["task_id"],task["role"],str(ROOT),binding=task
                 )
