@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af17450-ffa0-83ee-ba7b-da41eec8738f",
   "old_candidate_sha256": "ea0136ae202f364456914c30075de823ea6ffeef5c8cf0e498f06b05cd23e900",
   "release_approved": false,
   "roi_id": "Q100_84c26a1be776761c",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "TimeAttack Mode OutRun2",
     "korean": "타임 어택 모드 아웃런2",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-B-955146ecb34065c9da22"
   },
   "task_id": "HDRW-B-955146ecb34065c9da22",
-  "updated_utc": "2026-11-09T07:20:40+00:00"
+  "updated_utc": "2026-11-09T07:21:04+00:00"
 }
