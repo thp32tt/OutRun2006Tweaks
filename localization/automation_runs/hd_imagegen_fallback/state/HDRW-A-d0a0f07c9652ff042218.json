@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af1714f-aabc-83ee-8d55-02845cf90f3e",
   "old_candidate_sha256": "98b0ce042a22fdce55278b59e3fea6ba173a346d987404021d12852f7817a71c",
   "release_approved": false,
   "roi_id": "Q059_58da97467534c071",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Slipstream To Score!",
     "korean": "슬립스트림 점수 도전!",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-A-d0a0f07c9652ff042218"
   },
   "task_id": "HDRW-A-d0a0f07c9652ff042218",
-  "updated_utc": "2026-11-09T07:07:54+00:00"
+  "updated_utc": "2026-11-09T07:08:14+00:00"
 }
