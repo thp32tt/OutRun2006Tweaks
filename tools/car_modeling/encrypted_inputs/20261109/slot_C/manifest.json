@@ -2,15 +2,16 @@
   "format": "ferrari_public_action_aesgcm_v1",
   "slot": "C",
   "chunk_unit_bytes": 1048575,
-  "expected_ciphertext_size": 3859159,
-  "ciphertext_sha256": "4ae9dc9e70436a52d99847dcf3da977ae8a08fb423c01011b3c0840c7de29449",
+  "expected_ciphertext_size": 2339069,
+  "ciphertext_sha256": "27e3ccb58a05da5c72332713049a696250411edf6e2e325c453d1915d3e01c64",
   "parts": [
     "part_000.encbin",
     "part_001.encbin",
-    "part_002.encbin",
-    "part_003.encbin"
+    "part_002.encbin"
   ],
   "encrypted": true,
   "contains_plaintext_assets": false,
-  "description": "Encrypted native OutRun 2006 cockpit inputs; key is NOT in the repository; do not publish decrypted artifacts."
+  "description": "Encrypted genuine F50 PMT + original import + v41 original-derived cockpit + authenticated private photo; no plaintext uploaded.",
+  "source_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
+  "original_native_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab"
 }

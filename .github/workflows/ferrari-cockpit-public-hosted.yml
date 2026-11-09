@@ -49,7 +49,7 @@ jobs:
         shell: bash
         env:
           KEY: ${{ secrets.FERRARI_BUNDLE_KEY_B64 }}
-          SELECT_SLOT: ${{ inputs.slot || 'both' }}
+          SELECT_SLOT: ${{ inputs.slot || (contains(github.event.head_commit.message, '[slot-c-only]') && 'C' || 'both') }}
         run: |
           set -euo pipefail
           if [[ "$SELECT_SLOT" != both && "$SELECT_SLOT" != "${{ matrix.slot }}" ]] || [[ -z "$KEY" ]]; then

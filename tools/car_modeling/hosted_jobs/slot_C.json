@@ -27,7 +27,9 @@
     "work_handoff/ferrari_hosted_results/slot_C/F50_NativeInnerDoor_v42_BEFORE.png",
     "work_handoff/ferrari_hosted_results/slot_C/F50_NativeInnerDoor_v42_AFTER.png"
   ],
-  "request_gate": "BLOCKED_HOSTED_KEY_INPUT_20261109; two-dispatch cap consumed; do not auto-modify while workpack.next=visible_seat",
+  "request_gate": "HOSTED_SOURCE_SHA_AND_ORIGINAL_ID_FAIL_CLOSED; NO_NEW_DISPATCH_20261109",
   "source_photo_rel": "outrun2_vr_refs/20261104_16car_cockpit/03_F50/REF5_mecum_interior_01_f8afa7e2a.jpg",
-  "source_photo_sha256": "cd31303113763596eebada76ea964386522f4a03c9684c9132226963e8663ca2"
+  "source_photo_sha256": "cd31303113763596eebada76ea964386522f4a03c9684c9132226963e8663ca2",
+  "retry_of_failed_hosted_run": 42543904654,
+  "retry_limit": "single user-requested retry of one blocked hosted attempt; not additional dispatch; keep next component visible_seat"
 }

@@ -47,8 +47,32 @@ def main():
     target=queue.get("active_by_slot",{}).get(a.slot)
     if spec.get("schema_version")!=1 or target!=spec.get("car_id") or workpack.get("car_id")!=target:
         raise RuntimeError("BLOCKED_SLOT: inconsistent car assignment")
-    if spec.get("component")!=workpack.get("current_component"):
-        raise RuntimeError("BLOCKED_PART: stale component; no infinite wheel redo")
+    if spec.get("component") != workpack.get("current_component"):
+        # A retry of a previously BLOCKED hosted job is NOT a new dispatch.
+        # Make the one explicit F50 inner-door retry fail closed for every
+        # other part, car, source SHA, and workpack state.
+        previous = (workpack.get("components", {})
+                    .get(spec.get("component"), {})
+                    .get("hosted_v42_request", {}))
+        retry_allowed = (
+            a.slot == "C"
+            and target == "f50"
+            and spec.get("component") == "inner_door"
+            and workpack.get("current_component") == "visible_seat"
+            and spec.get("retry_of_failed_hosted_run") == 42543904654
+            and spec.get("mode") == "edit"
+            and previous.get("status") == "BLOCKED_HOSTED_PART_INPUT_UNVERIFIED"
+            and previous.get("dispatches_used") == 2
+            and previous.get("script") == spec.get("edit_script")
+            and previous.get("source_blend_sha256") == spec.get("source_sha256")
+            and previous.get("original_native_sha256") == spec.get("original_sha256")
+            and spec.get("allowed_existing_meshes") == [
+                "PMT_F50_object00_group01_material031_a0"
+            ]
+        )
+        if not retry_allowed:
+            raise RuntimeError("BLOCKED_PART: stale component; no repeat dispatch")
+        print("RETRY_PREVIOUS_BLOCKED_HOSTED_PART_ONLY; workpack next remains visible_seat")
     car=next(c for c in queue["cars"] if c["id"]==target)
     if car.get("output_scene_sha256")!=spec.get("source_sha256"):
         raise RuntimeError("BLOCKED_INPUT: latest private .blend SHA changed; refresh encrypted input before model edit")
