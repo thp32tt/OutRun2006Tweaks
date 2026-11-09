@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "ea0136ae202f364456914c30075de823ea6ffeef5c8cf0e498f06b05cd23e900",
+  "release_approved": false,
+  "roi_id": "Q100_84c26a1be776761c",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "TimeAttack Mode OutRun2",
+    "korean": "타임 어택 모드 아웃런2",
+    "old_candidate_sha256": "ea0136ae202f364456914c30075de823ea6ffeef5c8cf0e498f06b05cd23e900",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 216,
+      "name": "HDRW-B-955146ecb34065c9da22_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        358,
+        208
+      ],
+      "sha256": "18748a68a69cd6d438cec563bb841e926db1e23a8029798be61e110c4b24f417",
+      "source_box_xyxy": [
+        2,
+        1632,
+        368,
+        1848
+      ],
+      "source_native_size": [
+        2048,
+        2048
+      ],
+      "width": 366
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q100_84c26a1be776761c",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+    "source_dds_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+    "source_native_bbox_xyxy": [
+      10,
+      1640,
+      360,
+      1840
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-955146ecb34065c9da22"
+  },
+  "task_id": "HDRW-B-955146ecb34065c9da22",
+  "updated_utc": "2026-11-09T07:20:40+00:00"
+}
