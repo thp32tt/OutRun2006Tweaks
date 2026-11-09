@@ -6,3 +6,8 @@
 - **BLOCKED_HOSTED_KEY**: [run 42540030991](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/42540030991) showed empty AES secret, `ready=false`. Decrypt, Blender, edit, independent reopen and render were skipped despite workflow success.
 - **BLOCKED_HOSTED_INPUT**: existing ciphertext is integrity-checked, but its membership cannot confirm v41 source and REF5 photo until decrypted; prior job spec still pointed at v39. No raw PMT, .blend or photos uploaded. No N100 modeling/render.
 - `inner_door` retains prior `COVERED_PARTIAL_QA`, second dispatch BLOCKED, 2/2 limit exhausted. No new geometry, output SHA or QA PASS. `workpack.current_component=visible_seat` maintained; vehicle retains 24-hour ownership and final QA gate.
+
+## Latest hosted run correction — 2026-11-09 10:08 KST
+- Latest [run 42543904654](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/42543904654), same-source commit `8c660149649dfbb3725e44149a3a08005e7b8970`, **AES-GCM decryption PASS** and **Blender 4.5.15 install PASS** in SLOT=C. Hence the earlier missing-key blocker is **historical** and must not be represented as still current.
+- SLOT=C model step failed `RuntimeError: BLOCKED_PART: stale component; no infinite wheel redo`: the next authoritative workpack component is already `visible_seat`, while this timeboxed requested job is `inner_door`. That is correct fail-closed behavior under 2/2 cap. Job did **not** reach v41 source SHA check, geometry, save/reopen, render or artifact upload. `BLOCKED_HOSTED_PART_INPUT_UNVERIFIED` is current; no new source mesh completed.
+- No attempt to rerun the same part, no N100 workarounds. Preserve existing door coverage and progress next `visible_seat` as directed.

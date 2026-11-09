@@ -86,9 +86,10 @@
         "N100 private F50_InnerDoor_UpperRail_v40_IndependentReopen.json",
         "docs/automation/FERRARI16_SLOTC_F50_HOSTED_INNER_DOOR_BLOCKED_20261109.md",
         "tools/car_modeling/hosted_edits/f50_slot_c_inner_door_v42.py",
-        "hosted run 42540030991 gate ready=false; Blender/decrypt/edit skipped"
+        "hosted run 42540030991 gate ready=false; Blender/decrypt/edit skipped",
+        "GitHub Actions 42543904654: decryption + Blender install PASS, model step BLOCKED_PART, no ciphertext artifact"
       ],
-      "blocking_reason": "Prior v40 source-native upper rail remains COVERED_PARTIAL_QA; handle native ID unconfirmed. Second dispatched inner_door instruction BLOCKED_HOSTED_KEY_INPUT: no Actions secret; v41+private photo ciphertext contents unverified. No new .blend/save/reopen/render; no whole-car QA PASS.",
+      "blocking_reason": "Prior v40 upper rail original edit COVERED_PARTIAL_QA only; unidentified handle blocked. Second inner_door instruction reached hosted runner, but latest Actions 42543904654 BLOCKED_PART (workpack advanced to visible_seat) before edit. AES key/decrypt and Blender installation NOW PASS; v41 membership still not validated by runner. No v42 geometry/save/reopen/render.",
       "last_saved_blend_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a",
       "dispatches_used": 2,
       "partial_scope": {
@@ -104,7 +105,7 @@
         "handle": "BLOCKED_UNIDENTIFIED_NATIVE_SOURCE"
       },
       "hosted_v42_request": {
-        "status": "BLOCKED_HOSTED_KEY_INPUT",
+        "status": "BLOCKED_HOSTED_PART_INPUT_UNVERIFIED",
         "original_native_object": "object00_group01_material031_a0",
         "source_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
         "original_native_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
@@ -112,7 +113,13 @@
         "geometry_modified": false,
         "dispatches_used": 2,
         "source_edit_count_remains": 1,
-        "next": "visible_seat"
+        "next": "visible_seat",
+        "latest_run_id": 42543904654,
+        "runner_decryption": "PASS",
+        "blender_install": "PASS",
+        "stopped_at": "BLOCKED_PART: workpack current_component=visible_seat, v42 part=inner_door",
+        "hosted_blend_saved": false,
+        "hosted_artifact_uploaded": false
       }
     },
     "windshield_frame": {
@@ -182,11 +189,11 @@
     "seven authenticated car-photo viewpoints incomplete",
     "real proprietary source scene not available in GitHub-hosted Actions",
     "existing source nonmanifold / connectivity findings unresolved",
-    "FERRARI_BUNDLE_KEY_B64 missing on hosted run 42540030991; encrypted source v41 not independently decrypted"
+    "hosted v42 inner_door BLOCKED_PART after source decryption; current part moved visible_seat; current v41 bundle file membership unverified by edit stage"
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": "3693c9fc68b570b5e41e7a06156bebc19475efb8",
-  "notes": "SLOT C F50 2026-11-09 inner_door second instruction: BLOCKED_HOSTED_KEY_INPUT (run 42540030991). Hosted-only candidate script/spec for native PMT031 v41 prepared, no Blender execution or geometry accomplishment. v40 upper rail COVERED_PARTIAL_QA retained, dispatch cap 2/2. NEXT visible_seat, no vehicle QA PASS; A/Dino/P0 hold unchanged.",
+  "notes": "SLOT C F50 2026-11-09 inner_door second dispatch: code/target v41 SHA committed; public runner 42543904654 AES decrypt + Blender install PASS then BLOCKED_PART (workpack points visible_seat). No v42 .blend/reopen/render/artifact, geometry +0. Prior v40 door COVERED_PARTIAL_QA remains; 2/2 dispatches, NEXT visible_seat, car QA NOT PASS. Other slots unchanged.",
   "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_Windshield_Header_Apillar_v41.blend",
   "current_accepted_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d"
 }
