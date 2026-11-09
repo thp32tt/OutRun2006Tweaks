@@ -2904,7 +2904,11 @@ def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetim
     if not isinstance(sequence, list) or sequence != workpack.get("component_order"):
         raise ValueError("Ferrari queue/workpack component order mismatch")
     component = workpack.get("current_component")
-    if component not in sequence:
+    # A separate bootstrap sentinel is intentionally invalid in V11, so the
+    # still-running old controller fails closed until V12 is deployed.
+    bootstrap_stage = (component == "source_bootstrap" and
+                       workpack.get("input_stage") == "SOURCE_IMPORT_PENDING")
+    if component not in sequence and not bootstrap_stage:
         raise ValueError("workpack has no valid active component")
     part = (workpack.get("components") or {}).get(component, {})
     status = part.get("status")
@@ -2929,7 +2933,7 @@ def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetim
     if input_stage == "SOURCE_IMPORT_PENDING":
         source_path = workpack.get("original_game_resource_file", "")
         source_sha = workpack.get("original_game_resource_sha256", "")
-        if (component != "center_console" or status != "NOT_STARTED" or turns != 0
+        if (component != "source_bootstrap" or status != "NOT_STARTED" or turns != 0
                 or expired or not isinstance(source_sha, str)
                 or not re.fullmatch(r"[0-9a-f]{64}", source_sha)
                 or not isinstance(source_path, str)
@@ -3212,7 +3216,9 @@ async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page]
             "검증 성공 시에만 PMT 유래 원본 객체 ID, native mesh fingerprints, import script와 "
             "새 .blend 독립 Blender 재열기·SHA256를 산출하고 workpack의 "
             "original_import_blend_sha256, migration_input_blend_sha256, input_stage=SOURCE_VERIFIED를 "
-            "확정적으로 기록해. 시작 전 자료 없으면 SOURCE_IMPORT_BLOCKED 상태로 짧게 기록하고 끝내. "
+            "확정적으로 기록하고 현재 source_bootstrap 단계는 SOURCE_VERIFIED로 닫은 뒤 "
+            "workpack.current_component를 center_console으로 이동해. "
+            "시작 전 자료 없으면 input_stage=SOURCE_IMPORT_BLOCKED 상태로 짧게 기록하고 끝내. "
             "자동차 자체나 유사 모델 합성 금지. 앞유리/유리 인접 메시 절대 수정 금지, "
             "원본 자산은 읽기 전용, Blender import에서도 기하 변경 금지. "
             "사진 원본이나 PMT 패키지를 public GitHub에 올리지 마. "
