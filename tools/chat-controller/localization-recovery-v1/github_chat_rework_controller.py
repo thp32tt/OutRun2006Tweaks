@@ -458,9 +458,18 @@ class ChatBridge:
             # Chromium window is still visible for manual navigation.
             return "HOLD_CHATGPT_PAGE_NAVIGATION_"+type(exc).__name__
 
-    async def page(self,role,url=None):
+    async def page(self,role,url=None,*,read_only=False):
+        """Read-only result retrieval never depends on a visible chat composer.
+
+        A submitted message has an independently verified persisted chat URL.
+        A missing/redirected URL is not proof of authentication and cannot be
+        used to fetch an unrelated or user-uploaded image. New A/B/C1 sends
+        still require the visible composer and attachment checks.
+        """
         if role not in ("A","B","C1"):
             raise ValueError("INVALID_ROLE")
+        if read_only and not is_saved_chat_url(url):
+            return None
         await self.ensure_context()
         pg=self.pages.get(role)
         if pg is None or pg.is_closed():
@@ -469,6 +478,12 @@ class ChatBridge:
         target=url if is_saved_chat_url(url) else PROJECT_URL
         if pg.url.rstrip("/")!=target.rstrip("/"):
             await pg.goto(target,wait_until="domcontentloaded",timeout=60000)
+        if read_only:
+            # A login redirect or an unexpected conversation must not be
+            # mistaken for the original source-bound assistant response.
+            if not is_saved_chat_url(pg.url) or pg.url.rstrip("/") != target.rstrip("/"):
+                return None
+            return pg
         composer=pg.locator('[role="textbox"][contenteditable="true"]').first
         try:
             await composer.wait_for(state="visible",timeout=11000)
@@ -539,7 +554,7 @@ class ChatBridge:
         """Recover a previously sent single generated image, never resend."""
         import text_roi_queue as old
         task=state["task"]
-        pg=await self.page(task["role"],state.get("ab_chat_url"))
+        pg=await self.page(task["role"],state.get("ab_chat_url"),read_only=True)
         if pg is None:
             reason="WAIT_CHATGPT_COMPOSER_OR_LOGIN"
             await asyncio.to_thread(result_poll_diagnostic,self.gh,state,reason)
@@ -656,7 +671,7 @@ class ChatBridge:
 
     async def inspect_c1(self,state):
         task=state["task"]
-        pg=await self.page("C1",state.get("c1_chat_url"))
+        pg=await self.page("C1",state.get("c1_chat_url"),read_only=True)
         if pg is None:
             return "HOLD_C1_LOGIN_REQUIRED"
         responses=await pg.locator(
