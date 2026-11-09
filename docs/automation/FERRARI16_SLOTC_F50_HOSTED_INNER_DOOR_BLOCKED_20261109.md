@@ -1,0 +1,8 @@
+# SLOT C F50 inner_door — public-hosted second instruction (2026-11-09)
+
+- `active_by_slot.C=f50`. Original `obj_plcar_f50_pmt.sz` SHA256 `10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab`; immutable import .blend SHA256 `d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31`; latest N100 SHA-only-verified v41 .blend SHA256 `016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d`.
+- Existing `inner_door=COVERED_PARTIAL_QA`: v40 genuinely modified 10 original PMT `object00_group01_material031_a0` vertices (66v/40f); missing handle attribution stays BLOCKED. This is second permitted instruction; no dashboard/wheel repetition.
+- GitHub-hosted-only source-edit candidate `tools/car_modeling/hosted_edits/f50_slot_c_inner_door_v42.py` restricts edits to same PMT031 existing driver-side rail and requires the authenticated private F50 photo. Workbench before/after images and a fresh saved .blend would be kept encrypted in Actions artifact; not yet executed.
+- **BLOCKED_HOSTED_KEY**: [run 42540030991](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/42540030991) showed empty AES secret, `ready=false`. Decrypt, Blender, edit, independent reopen and render were skipped despite workflow success.
+- **BLOCKED_HOSTED_INPUT**: existing ciphertext is integrity-checked, but its membership cannot confirm v41 source and REF5 photo until decrypted; prior job spec still pointed at v39. No raw PMT, .blend or photos uploaded. No N100 modeling/render.
+- `inner_door` retains prior `COVERED_PARTIAL_QA`, second dispatch BLOCKED, 2/2 limit exhausted. No new geometry, output SHA or QA PASS. `workpack.current_component=visible_seat` maintained; vehicle retains 24-hour ownership and final QA gate.

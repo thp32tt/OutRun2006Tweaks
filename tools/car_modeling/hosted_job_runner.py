@@ -77,7 +77,14 @@ def main():
     if not receipt.is_file():
         raise RuntimeError("BLOCKED_PROBE: missing private scene inventory")
     secure=repo/"tools/car_modeling/secure_bundle.py"
-    paths=[spec["receipt_rel"]]+([spec["output_blend_rel"]] if mode=="edit" else [])
+    evidence = spec.get("evidence_png_rels", []) if mode == "edit" else []
+    if not isinstance(evidence, list) or len(evidence) > 4 or any(not isinstance(p, str) for p in evidence):
+        raise RuntimeError("BLOCKED_EVIDENCE: untrusted private render list")
+    for rel in evidence:
+        path = inside(root, rel)
+        if path.suffix.lower() != ".png" or not path.is_file() or path.stat().st_size < 200:
+            raise RuntimeError("BLOCKED_RENDER: missing hosted before/after")
+    paths = [spec["receipt_rel"]] + ([spec["output_blend_rel"]] if mode=="edit" else []) + evidence
     encrypted=Path(a.encrypted_output).resolve()
     pack=[sys.executable,str(secure),"pack","--slot",a.slot,
           "--root",str(root),"--out",str(encrypted)]

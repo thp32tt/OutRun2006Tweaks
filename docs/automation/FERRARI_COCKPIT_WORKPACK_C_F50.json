@@ -83,11 +83,14 @@
       "evidence_refs": [
         "docs/automation/F50_SLOT_C_DRIVER_CONTROLS_BLOCKED_INNER_DOOR_V40_20261109.md",
         "tools/car_modeling/slot_c/f50_inner_door_native_v40.py",
-        "N100 private F50_InnerDoor_UpperRail_v40_IndependentReopen.json"
+        "N100 private F50_InnerDoor_UpperRail_v40_IndependentReopen.json",
+        "docs/automation/FERRARI16_SLOTC_F50_HOSTED_INNER_DOOR_BLOCKED_20261109.md",
+        "tools/car_modeling/hosted_edits/f50_slot_c_inner_door_v42.py",
+        "hosted run 42540030991 gate ready=false; Blender/decrypt/edit skipped"
       ],
-      "blocking_reason": "Only authentic PMT driver-side upper door rail source region covered; door handle BLOCKED_UNIDENTIFIED_NATIVE_SOURCE. 7-view and game-eye pending.",
+      "blocking_reason": "Prior v40 source-native upper rail remains COVERED_PARTIAL_QA; handle native ID unconfirmed. Second dispatched inner_door instruction BLOCKED_HOSTED_KEY_INPUT: no Actions secret; v41+private photo ciphertext contents unverified. No new .blend/save/reopen/render; no whole-car QA PASS.",
       "last_saved_blend_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a",
-      "dispatches_used": 1,
+      "dispatches_used": 2,
       "partial_scope": {
         "original_native_object": "object00_group01_material031_a0",
         "original_mesh_verts": 66,
@@ -99,6 +102,17 @@
         "full_vehicle_qa_pass": false,
         "original_photo": "REF5_mecum_interior_01_f8afa7e2a.jpg",
         "handle": "BLOCKED_UNIDENTIFIED_NATIVE_SOURCE"
+      },
+      "hosted_v42_request": {
+        "status": "BLOCKED_HOSTED_KEY_INPUT",
+        "original_native_object": "object00_group01_material031_a0",
+        "source_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
+        "original_native_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+        "script": "tools/car_modeling/hosted_edits/f50_slot_c_inner_door_v42.py",
+        "geometry_modified": false,
+        "dispatches_used": 2,
+        "source_edit_count_remains": 1,
+        "next": "visible_seat"
       }
     },
     "windshield_frame": {
@@ -167,11 +181,12 @@
     "exact original game driver-eye camera uncalibrated",
     "seven authenticated car-photo viewpoints incomplete",
     "real proprietary source scene not available in GitHub-hosted Actions",
-    "existing source nonmanifold / connectivity findings unresolved"
+    "existing source nonmanifold / connectivity findings unresolved",
+    "FERRARI_BUNDLE_KEY_B64 missing on hosted run 42540030991; encrypted source v41 not independently decrypted"
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": "3693c9fc68b570b5e41e7a06156bebc19475efb8",
-  "notes": "2026-11-09 C F50 v41: driver_controls BLOCKED (original PMT stalk/pedals not identified); moved to authentic PMT000 windshield header/A-pillar frame: 13 existing verts moved max 21mm, 41 other source meshes identical incl PMT005 glass, dash/wheel; Blender 4.5.15 saved/reopened PASS. windshield_frame COVERED_PARTIAL_QA only; NEXT visible_seat. No vehicle QA PASS; original 24h assignment and all slots unchanged.",
+  "notes": "SLOT C F50 2026-11-09 inner_door second instruction: BLOCKED_HOSTED_KEY_INPUT (run 42540030991). Hosted-only candidate script/spec for native PMT031 v41 prepared, no Blender execution or geometry accomplishment. v40 upper rail COVERED_PARTIAL_QA retained, dispatch cap 2/2. NEXT visible_seat, no vehicle QA PASS; A/Dino/P0 hold unchanged.",
   "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_Windshield_Header_Apillar_v41.blend",
   "current_accepted_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d"
 }
