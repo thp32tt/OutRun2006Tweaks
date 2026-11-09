@@ -395,6 +395,31 @@ class CollectorIntegrationTests(unittest.IsolatedAsyncioTestCase):
   self.assertEqual(len(self.gh.pngs),0)
 
 
+class ImageGenFailureRecoveryTests(unittest.IsolatedAsyncioTestCase):
+ async def asyncSetUp(self):
+  self.temp=tempfile.TemporaryDirectory()
+  self.task="HDRW-B-"+"2"*20
+ async def asyncTearDown(self):
+  self.temp.cleanup()
+ async def test_explicit_generation_failure_does_not_write_candidate(self):
+  class FakePage:
+   async def evaluate(self,js,arg):
+    return {"status":"IMAGEGEN_FAILED_UI"}
+  outcome,reason=await rescue.rescue_single_image_candidate(
+   FakePage(),self.task,"B",self.temp.name)
+  self.assertEqual(outcome,"WAIT_ASSISTANT_RESULT_UI")
+  self.assertEqual(reason,"IMAGEGEN_FAILED_UI")
+  self.assertFalse((Path(self.temp.name)/"text_roi_batches").exists())
+ async def test_explicit_error_detection_does_not_resend(self):
+  import inspect
+  js=rescue.ASSISTANT_IMAGE_JS
+  self.assertIn("something went wrong while generating your image",js)
+  self.assertIn("isWithinBoundedReply",js)
+  source=inspect.getsource(c.ChatBridge.collect_producer)
+  self.assertIn("result_poll_diagnostic",source)
+  self.assertNotIn("submit_producer(",source)
+
+
 class ExistingChatReadOnlyTests(unittest.IsolatedAsyncioTestCase):
  async def asyncSetUp(self):
   self.url="https://chatgpt.com/c/6aebd722-0f74-83e8-8126-f723dca3a685"
