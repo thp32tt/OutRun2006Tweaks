@@ -341,7 +341,7 @@ class Registry:
     last_global_send_slot: Optional[str] = None
 
 runtime = {
-    "controller_build": "2026-11-09-ferrari-ssot-v11",
+    "controller_build": "2026-11-09-ferrari-slot-reuse-v12",
     "vr_continuous_30m_enabled": VR_CONTINUOUS_30M_ENABLED,
     "vr_continuous_interval_seconds": VR_CONTINUOUS_INTERVAL_SECONDS,
     "vr_scheduled_dispatch_enabled": VR_SCHEDULED_DISPATCH_ENABLED,
