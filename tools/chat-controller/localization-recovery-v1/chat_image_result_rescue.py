@@ -149,6 +149,15 @@ ASSISTANT_IMAGE_JS = r"""({task,english,korean,sha})=>{
     images=candidates;
   }
   if(!images.length){
+    // Non-sensitive numeric UI evidence differentiates missing assistant
+    // responses from image-selector mismatch and visible login gates.
+    // Never export user/assistant text, cookies, URLs or image contents here.
+    const ui={
+      assistant:Math.min(replies.length,9),
+      generated:Math.min(document.querySelectorAll(generationSelector).length,9),
+      user:Math.min(users.length,9),
+      auth:document.querySelectorAll('input[type="password"]').length?1:0
+    };
     // A confirmed failure message is not an in-progress image and must not
     // be silently reported as "assistant not ready". The text is inspected
     // only AFTER the SHA-bound user message, BEFORE the next user message,
@@ -168,11 +177,12 @@ ASSISTANT_IMAGE_JS = r"""({task,english,korean,sha})=>{
     if(errors.some(n=>{
       const t=(n.innerText||n.textContent||'').toLowerCase();
       return t.length<800&&errorMessages.some(e=>t.includes(e));
-    }))return {status:'IMAGEGEN_FAILED_UI'};
+    }))return {status:'IMAGEGEN_FAILED_UI',ui};
     return {
       status:replies.length?
         'ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING':
-        'ASSISTANT_GENERATED_IMAGE_NOT_RENDERED'
+        'ASSISTANT_GENERATED_IMAGE_NOT_RENDERED',
+      ui
     };
   }
   const ready=images.filter(n=>n.complete&&n.naturalWidth>0&&n.naturalHeight>0);
@@ -341,6 +351,21 @@ async def rescue_single_image_candidate(page, task_id, role, root, binding=None)
             "IMAGEGEN_FAILED_UI",
         ):
             status = "ASSISTANT_RESULT_NOT_VERIFIED"
+        # Only append bounded, non-sensitive node counts when the real UI
+        # supplied them; tests/older clients without a probe remain compatible.
+        ui = result.get("ui") if isinstance(result, dict) else None
+        if isinstance(ui, dict) and status in (
+            "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED",
+            "ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING",
+            "IMAGEGEN_FAILED_UI",
+        ):
+            try:
+                nums = [int(ui.get(key)) for key in
+                        ("assistant", "generated", "user", "auth")]
+                if (all(0 <= n <= 9 for n in nums) and nums[-1] <= 1):
+                    status += "_A%d_G%d_U%d_L%d" % tuple(nums)
+            except (ValueError, TypeError, OverflowError):
+                pass
         return "WAIT_ASSISTANT_RESULT_UI", status
     try:
         png, dims = await read_assistant_image(page, result.get("url"))
