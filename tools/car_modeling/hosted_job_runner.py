@@ -92,6 +92,13 @@ def main():
         cmd=[str(blender),"--background",str(scene),"--threads","2",
              "--python",str(stage),"--","--stage",stage_name,"--slot",a.slot,
              "--spec",str(spec_path),"--root",str(root)]
+        # Hosted Ubuntu Blender Workbench requires a display + software OpenGL.
+        # Never fall back to N100 rendering if these dependencies are missing.
+        if sys.platform.startswith("linux"):
+            import shutil
+            if not shutil.which("xvfb-run"):
+                raise RuntimeError("BLOCKED_HOSTED_EGL: missing xvfb-run on GitHub VM")
+            cmd = ["xvfb-run", "-a", "-s", "-screen 0 1280x1024x24"] + cmd
         subprocess.run(cmd,cwd=repo,check=True,timeout=1800)
     invoke(mode,source)
     if mode=="edit":

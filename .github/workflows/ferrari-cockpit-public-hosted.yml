@@ -88,12 +88,26 @@ jobs:
           mkdir -p blender
           tar --extract --xz --file "${name}" -C blender --strip-components=1
           ./blender/blender --version | head -2
+      - name: Install Ubuntu software OpenGL/EGL + Xvfb for headless Blender
+        if: steps.gate.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
+            libegl1 libgl1 libgl1-mesa-dri libglx-mesa0 libx11-6 libxi6 \
+            libxrender1 libxfixes3 libxrandr2 libxkbcommon0 libsm6 \
+            libxext6 xvfb xauth
+          ldconfig -p | grep -F 'libEGL.so.1'
+          command -v xvfb-run
       - name: Model source-native cockpit and encrypt outputs
         if: steps.gate.outputs.ready == 'true'
         shell: bash
         env:
           FERRARI_BUNDLE_KEY_B64: ${{ secrets.FERRARI_BUNDLE_KEY_B64 }}
           MODE: ${{ inputs.mode || 'spec' }}
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          GALLIUM_DRIVER: llvmpipe
         run: |
           set -euo pipefail
           "$RUNNER_TEMP/ferrari-venv/bin/python" tools/car_modeling/hosted_job_runner.py \
