@@ -1,0 +1,10 @@
+# Ferrari SLOT A Daytona — hosted BLOCKED gate (2026-11-09 KST)
+
+- Scope/owner: `active_by_slot.A=daytona365`, original 24-hour start `2026-11-08T04:13:41Z`; SLOT C/Dino untouched.
+- User target `inner_door`: already R45 `COVERED_PARTIAL_QA` (one source-backed checkpoint), not full-car QA; existing original-derived `V5_L_LEATHER_SCULPTED_DOOR` source `object00_group01_material005_a0`. Do not repeat this first-pass edit or touch wheel/dashboard.
+- Original native PMT read-only SHA256: `f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe`. Original imported Blender SHA256: `92c82ee5c4e0631195cb314e0d8e2f56a78a6a58da3c809c46b1da0f9d2c71a3`. Latest accepted private R45 editable Blender SHA256: `224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722` (see R45 report).
+- GitHub-hosted public run [42540030991](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/42540030991), job SLOT A: ciphertext reassembly PASS; `FERRARI_BUNDLE_KEY_B64` empty, `BLOCKED_KEY_OR_UNSELECTED`; decrypt, Blender save/reopen/render, artifact upload skipped. The run's overall green status **does not certify geometry**.
+- Public slot A AES-GCM ciphertext manifest SHA256 `502cf59b193ad45345ca50e6dd093eb88c92248ae044a99d9860991d6fffd520`; originally committed 2026-11-09 00:10:44 UTC, before R45 geometry source commit 2026-11-09 00:39:56 UTC. It cannot certify the latest R45 .blend as input. Do not assume encrypted contents.
+- Windshield-frame work is `BLOCKED` by hosted key/current encrypted input, **not** proven absent in original PMT; no windshield mesh fabricated or edited. Per breadth-first skip policy the next candidate is `visible_seat`. Underlying hosted prerequisites must be resolved before any real geometry edit.
+- No Blender executed on N100, no PMT/OVC/OVC3/game conversion/export, no exterior/wheel, new model, textures/PBR, Model2, Dino, or other slots.
+- This checkpoint has **no material modeling achievement**; `vehicle QA PASS=false`, score delta `+0`. No geometry script committed as an unverified edit.

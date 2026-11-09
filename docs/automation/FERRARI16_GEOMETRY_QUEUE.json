@@ -92,7 +92,7 @@
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437",
       "output_scene_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
-      "notes": "[2026-11-09 SLOT A R45] PMT005 native-guided left inner door original derivative: 41 existing V5_L_LEATHER_SCULPTED_DOOR vertices moved max 15.851mm toward seven verified PMT source door-edge points. 112 others unchanged incl dashboard/wheel. R44 input 638f6936; private R45 .blend 224131c7 Blender 4.5.15 save/independent reopen PASS. inner_door COVERED_PARTIAL_QA only; NEXT windshield_frame. Full vehicle QA pending; 24h original start retained; C/F50 untouched. Source 4ebbeb8, report FERRARI16_SLOTA_DAYTONA_R45_INNER_DOOR_20261109.md.",
+      "notes": "[2026-11-09 SLOT A hosted] inner_door R45 already COVERED_PARTIAL_QA (41 original-derived vertices; no re-edit). windshield_frame BLOCKED_HOSTED_KEY/INPUT: public Actions 42540030991 key missing, decrypted Blender stages skipped; encrypted input commit predates R45 SHA 224131c7. No new source geometry or QA PASS. Next visible_seat; preserve start/24h and C/F50. Report FERRARI16_SLOTA_DAYTONA_HOSTED_BLOCKED_20261109.md.",
       "private_photo_subdir": "02_365_GTS4_Daytona",
       "priority": [
         "dashboard",
@@ -128,7 +128,7 @@
       "game_integration_required": false,
       "progress_history_archive": "docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_HISTORY_20261109.md",
       "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_A_DAYTONA365.json",
-      "strategy_v3_next_component": "windshield_frame",
+      "strategy_v3_next_component": "visible_seat",
       "strategy_v3_p0_revisit_policy": "HOLD_BEFORE_BREADTH_PASS",
       "source_audit_archive": "docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_SOURCE_AUDITS_20261109.json",
       "last_slot_a_audit_r42": {

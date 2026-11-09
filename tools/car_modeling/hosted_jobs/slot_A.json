@@ -3,15 +3,15 @@
   "slot": "A",
   "car_id": "daytona365",
   "mode": "probe",
-  "component": "driver_controls",
+  "component": "visible_seat",
   "original_native_rel": "rea-input/outrun/outrun2006/Cars/obj_plcar_dayts_pmt.sz",
   "original_sha256": "f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe",
   "original_import_blend_rel": "work_handoff/daytona365_rework_20261107/original_game_blender/Daytona365_ORIGINAL_GAME_COCKPIT_COMPARE.blend",
   "original_import_sha256": "92c82ee5c4e0631195cb314e0d8e2f56a78a6a58da3c809c46b1da0f9d2c71a3",
-  "source_blend_rel": "work_handoff/ferrari16_slotA_daytona_dashboard_steering_20261108/Daytona365_SlotA_OriginalPMT018_CenterConsole_R43.blend",
-  "source_sha256": "27c477d18b3737e08b02276bb50a7c5afb21c97fae14ec7fff9e24f7536ef877",
-  "output_blend_rel": "work_handoff/ferrari_hosted_results/slot_A/Daytona365_OriginalPMT_DriverControls_Hosted_V44.blend",
-  "receipt_rel": "work_handoff/ferrari_hosted_results/slot_A/driver_controls_source_probe.json",
+  "source_blend_rel": "work_handoff/ferrari16_slotA_daytona_dashboard_steering_20261108/Daytona365_SlotA_OriginalPMT005_InnerDoor_R45.blend",
+  "source_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
+  "output_blend_rel": "work_handoff/ferrari_hosted_results/slot_A/Daytona365_OriginalPMT_VisibleSeat_R46.blend",
+  "receipt_rel": "work_handoff/ferrari_hosted_results/slot_A/visible_seat_source_probe.json",
   "allowed_existing_meshes": [],
   "edit_script": null,
   "disallowed_actions": [
@@ -20,5 +20,9 @@
     "new synthetic car",
     "game integration",
     "out-of-target cockpit editing"
-  ]
+  ],
+  "target_native_mesh_id": null,
+  "hosted_precondition_status": "BLOCKED_HOSTED_KEY/INPUT",
+  "encrypted_input_ciphertext_sha256": "502cf59b193ad45345ca50e6dd093eb88c92248ae044a99d9860991d6fffd520",
+  "encrypted_input_current_source_provenance_verified": false
 }

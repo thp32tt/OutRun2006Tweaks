@@ -20,7 +20,7 @@
     "steering_wheel",
     "cross_cockpit_qa"
   ],
-  "current_component": "windshield_frame",
+  "current_component": "visible_seat",
   "dispatches_on_component": 0,
   "max_dispatches_per_component": 2,
   "components": {
@@ -88,11 +88,15 @@
       ]
     },
     "windshield_frame": {
-      "status": "NOT_STARTED",
+      "status": "BLOCKED",
       "source_edits_this_phase": 0,
-      "evidence_refs": [],
-      "blocking_reason": null,
-      "last_saved_blend_sha256": null
+      "evidence_refs": [
+        "docs/automation/FERRARI16_SLOTA_DAYTONA_HOSTED_BLOCKED_20261109.md"
+      ],
+      "blocking_reason": "BLOCKED_HOSTED_KEY/INPUT: GitHub Actions 42540030991 SLOT A KEY empty, decrypt/Blender steps skipped; encrypted slot_A bundle 502cf59b (committed 00:10:44Z) predates R45 (00:39:56Z), so current 224131c7 source cannot be authenticated. Native windshield mesh not inspected; no synthetic edit.",
+      "last_saved_blend_sha256": null,
+      "dispatches_consumed_this_phase": 0,
+      "native_source_mesh": "UNVERIFIED_HOSTED_INPUT_BLOCKED"
     },
     "visible_seat": {
       "status": "NOT_STARTED",
@@ -134,10 +138,11 @@
     "exact original game driver-eye camera uncalibrated",
     "seven authenticated car-photo viewpoints incomplete",
     "real proprietary source scene not available in GitHub-hosted Actions",
-    "existing source nonmanifold / connectivity findings unresolved"
+    "existing source nonmanifold / connectivity findings unresolved",
+    "GitHub-hosted AES-GCM key missing and encrypted slot A inputs predate latest R45 scene"
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": "4ebbeb8342d0fe8ebca18d7c830a6be2ac6cee02",
-  "notes": "R45 source-native PMT005 left-front inner door: existing V5_L_LEATHER_SCULPTED_DOOR 41 vertices shifted <=15.851mm, original source 7 point profile verified; other 112 meshes invariant incl held wheel/dash. Blender 4.5.15 save and independent reopen PASS. inner_door COVERED_PARTIAL_QA only (not full-car QA); next windshield_frame. Game eye and 7 authentic photo views pending; 24h Daytona ownership unchanged, C untouched.",
+  "notes": "inner_door R45 COVERED_PARTIAL_QA only, no repeat; windshield_frame BLOCKED_HOSTED_KEY/INPUT (run 42540030991 key empty, ciphertext predates R45). No hosted Blender save/reopen/render or new geometry this call. Next visible_seat pending original PMT source attribution and fresh encrypted inputs; car QA NOT PASS, wheel/dash and C untouched.",
   "latest_accepted_editable_blend_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722"
 }
