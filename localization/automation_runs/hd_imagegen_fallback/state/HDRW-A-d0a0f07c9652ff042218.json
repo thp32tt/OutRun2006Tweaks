@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "98b0ce042a22fdce55278b59e3fea6ba173a346d987404021d12852f7817a71c",
+  "release_approved": false,
+  "roi_id": "Q059_58da97467534c071",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Slipstream To Score!",
+    "korean": "슬립스트림 점수 도전!",
+    "old_candidate_sha256": "98b0ce042a22fdce55278b59e3fea6ba173a346d987404021d12852f7817a71c",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "reference": {
+      "height": 111,
+      "name": "HDRW-A-d0a0f07c9652ff042218_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        700,
+        103
+      ],
+      "sha256": "8f85e72fd4bf8bb3936dd3df1ad666418478179d5d325816200211fc0c5bc9bc",
+      "source_box_xyxy": [
+        709,
+        217,
+        1417,
+        328
+      ],
+      "source_native_size": [
+        2048,
+        512
+      ],
+      "width": 708
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q059_58da97467534c071",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+    "source_dds_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+    "source_native_bbox_xyxy": [
+      717,
+      225,
+      1409,
+      320
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-A-d0a0f07c9652ff042218"
+  },
+  "task_id": "HDRW-A-d0a0f07c9652ff042218",
+  "updated_utc": "2026-11-09T07:07:54+00:00"
+}
