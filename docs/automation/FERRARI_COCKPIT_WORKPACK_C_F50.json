@@ -20,7 +20,7 @@
     "steering_wheel",
     "cross_cockpit_qa"
   ],
-  "current_component": "visible_seat",
+  "current_component": "instrument_cluster",
   "dispatches_on_component": 0,
   "max_dispatches_per_component": 2,
   "components": {
@@ -198,11 +198,17 @@
       }
     },
     "visible_seat": {
-      "status": "NOT_STARTED",
+      "status": "BLOCKED",
       "source_edits_this_phase": 0,
-      "evidence_refs": [],
-      "blocking_reason": null,
-      "last_saved_blend_sha256": null
+      "evidence_refs": [
+        "tools/car_modeling/encrypted_inputs/20261109/slot_C/manifest.json",
+        "docs/automation/F50_SLOT_C_WINDSHIELD_FRAME_NATIVE_HEADER_V41_20261109.md",
+        "GitHub Actions encrypted artifact 13642534956 (v42, unpromoted)"
+      ],
+      "blocking_reason": "BLOCKED_HOSTED_INPUT: latest v42 source geometry exists only in encrypted Actions artifact 13642534956 (run 42546429232); allowed public slot_C AES input is older v41 SHA 016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d. Original PMT seat submesh not positively attributed. Editing v41 would discard v42 inner_door changes. No synthetic seat or Blender edit; promote a verified encrypted v42-derived scene before revisiting.",
+      "last_saved_blend_sha256": null,
+      "dispatches_used": 0,
+      "blocked_at": "2026-11-09T11:33:00+09:00"
     },
     "instrument_cluster": {
       "status": "NOT_STARTED",
@@ -239,11 +245,12 @@
     "real proprietary source scene not available in GitHub-hosted Actions",
     "existing source nonmanifold / connectivity findings unresolved",
     "hosted v42 output scene SHA and photo match contained only in encrypted artifact, not yet privately reviewed/promoted",
-    "v42 encrypted output must be securely carried forward into next source bundle before visible_seat editing"
+    "v42 encrypted output must be securely carried forward into next source bundle before visible_seat editing",
+    "Public slot C AES bundle needs verified v42-source carry-forward before any further geometry edit"
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": "3693c9fc68b570b5e41e7a06156bebc19475efb8",
-  "notes": "2026-11-09 SLOT C windshield_frame hosted second dispatch BLOCKED_HOSTED_INPUT: staged encrypted source v41 SHA 016645f5 while inner_door v42 newer validated source is encrypted-artifact-only (13642534956), output SHA sealed. No Blender/model edit/reopen/render claimed. Preserve v41 windshield COVERED_PARTIAL_QA 1 source edit, 2/2 dispatches; next visible_seat, vehicle NOT_PASS. Slot A untouched.",
+  "notes": "2026-11-09 SLOT C target windshield_frame: native v41 COVERED_PARTIAL_QA preserved; cap 2/2 previously consumed. Next visible_seat BLOCKED_HOSTED_INPUT + native seat attribution missing: public staged v41 input cannot safely replace newer unpromoted encrypted v42 door output. No geometry edit, Blender, new model, CI, or game conversion. Advance same F50 to instrument_cluster SOURCE_IDENTIFICATION_PROBE_ONLY; full-car QA NOT_PASS. Slot A untouched.",
   "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_Windshield_Header_Apillar_v41.blend",
   "current_accepted_blend_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d"
 }

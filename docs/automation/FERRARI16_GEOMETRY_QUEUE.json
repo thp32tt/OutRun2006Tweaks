@@ -290,7 +290,7 @@
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
       "output_scene_sha256": "016645f5fea43ef75c8e80479f49baaff2d3aa8d1647a058f732ac69080da08d",
-      "notes": "[2026-11-09 SLOT C F50 hosted inner_door v42] Actual PMT031 native mesh edit 10 original vertices, source save+independent Blender reopen and Workbench before-after PASS on public Ubuntu Actions 42546429232; 41 other native meshes unchanged. Encrypted artifact 13642534956, SHA256 0fd3e4d9; output .blend SHA in private encrypted receipt; v41 staged source unchanged pending carry-forward. inner_door COVERED_PARTIAL_QA, cap 2/2, NEXT visible_seat, vehicle QA NOT_PASS.",
+      "notes": "2026-11-09 SLOT C F50 requested windshield_frame already 2/2: v41 original-native 13v COVERED_PARTIAL_QA, no repeated geometry. visible_seat BLOCKED_HOSTED_INPUT (public encrypted input only v41; newer v42 result artifact 13642534956 not promoted), original seat ID unproven; NEXT instrument_cluster identification only. Car QA NOT_PASS, score +0. Slot A unchanged.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -359,7 +359,7 @@
       "game_integration_required": false,
       "progress_history_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_HISTORY_20261109.md",
       "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_C_F50.json",
-      "strategy_v3_next_component": "visible_seat",
+      "strategy_v3_next_component": "instrument_cluster",
       "strategy_v3_p0_revisit_policy": "HOLD_BEFORE_BREADTH_PASS",
       "source_audit_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_SOURCE_AUDITS_20261109.json",
       "last_slot_c_center_console_v38": {
