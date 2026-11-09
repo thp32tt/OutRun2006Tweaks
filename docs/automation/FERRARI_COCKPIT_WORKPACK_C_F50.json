@@ -20,7 +20,7 @@
     "steering_wheel",
     "cross_cockpit_qa"
   ],
-  "current_component": "driver_controls",
+  "current_component": "windshield_frame",
   "dispatches_on_component": 0,
   "max_dispatches_per_component": 2,
   "components": {
@@ -67,18 +67,39 @@
       }
     },
     "driver_controls": {
-      "status": "NOT_STARTED",
+      "status": "BLOCKED",
       "source_edits_this_phase": 0,
-      "evidence_refs": [],
-      "blocking_reason": null,
-      "last_saved_blend_sha256": null
+      "evidence_refs": [
+        "docs/automation/F50_SLOT_C_DRIVER_CONTROLS_BLOCKED_INNER_DOOR_V40_20261109.md",
+        "N100 F50 42 original native mesh Blender v39 inspection"
+      ],
+      "blocking_reason": "No positive native original PMT foot-pedal or stalk attribution among 42 source meshes; wheel object21 is on P0 hold, so no invented driver_controls mesh.",
+      "last_saved_blend_sha256": null,
+      "dispatches_used": 1
     },
     "inner_door": {
-      "status": "NOT_STARTED",
-      "source_edits_this_phase": 0,
-      "evidence_refs": [],
-      "blocking_reason": null,
-      "last_saved_blend_sha256": null
+      "status": "COVERED_PARTIAL_QA",
+      "source_edits_this_phase": 1,
+      "evidence_refs": [
+        "docs/automation/F50_SLOT_C_DRIVER_CONTROLS_BLOCKED_INNER_DOOR_V40_20261109.md",
+        "tools/car_modeling/slot_c/f50_inner_door_native_v40.py",
+        "N100 private F50_InnerDoor_UpperRail_v40_IndependentReopen.json"
+      ],
+      "blocking_reason": "Only authentic PMT driver-side upper door rail source region covered; door handle BLOCKED_UNIDENTIFIED_NATIVE_SOURCE. 7-view and game-eye pending.",
+      "last_saved_blend_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a",
+      "dispatches_used": 1,
+      "partial_scope": {
+        "original_native_object": "object00_group01_material031_a0",
+        "original_mesh_verts": 66,
+        "original_mesh_faces": 40,
+        "original_vertices_moved": 10,
+        "max_displacement_mm": 26.495,
+        "other_41_meshes_unchanged": true,
+        "official_blender_save_reopen": "PASS",
+        "full_vehicle_qa_pass": false,
+        "original_photo": "REF5_mecum_interior_01_f8afa7e2a.jpg",
+        "handle": "BLOCKED_UNIDENTIFIED_NATIVE_SOURCE"
+      }
     },
     "windshield_frame": {
       "status": "NOT_STARTED",
@@ -130,8 +151,8 @@
     "existing source nonmanifold / connectivity findings unresolved"
   ],
   "cannot_promote_from_interim_coverage": true,
-  "last_material_commit": "f67d0f1bde0ac3b4a74d0777ea6d85278d8a6405",
-  "notes": "2026-11-09: center_console max 2/2 consumed: v38 original F50 PMT shifter knob + v39 original shaft remodeled; official Blender 4.5.15 save and independent reopen PASS, 41 other meshes unchanged. Gate/base/tunnel BLOCKED_UNIDENTIFIED_NATIVE_SOURCE. Current driver_controls; no further console/P0 repeats, no full car QA PASS.",
-  "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_CenterConsole_Shaft_v39.blend",
-  "current_accepted_blend_sha256": "724df8bcd079299e8781726b25888243dbdcab7368d7d758f81ba8236666072f"
+  "last_material_commit": "7b7e9b514206b888a9728f54ab32ad5fba371fe5",
+  "notes": "2026-11-09 C F50: driver_controls BLOCKED (no identified native PMT stalk/pedal, no synthesis); moved to inner_door. Native PMT material031 driver upper rail 10 existing verts physically reshaped max 26.495mm; 41 others invariant; official Blender 4.5.15 saved/fresh-reopened PASS. Inner_door COVERED_PARTIAL_QA only; handle blocked. Next windshield_frame. No P0/dash, wheel, other slot or full-car QA pass. Retain 24h gate.",
+  "current_accepted_blend": "work_handoff/ferrari16_slotC_f50_source_audit_20261108/F50_OriginalPMT_InnerDoor_UpperRail_v40.blend",
+  "current_accepted_blend_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a"
 }
