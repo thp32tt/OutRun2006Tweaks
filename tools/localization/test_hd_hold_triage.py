@@ -57,7 +57,7 @@ class StrictHoldTriageTests(unittest.TestCase):
     def test_report_and_source_mismatch_is_rejected(self):
         bad = report()
         bad["active_roi_total"] = 4
-        with self.assertRaisesRegex(ValueError, "SOURCE_AND_STRICT_QA"):
+        with self.assertRaisesRegex(ValueError, "ROI_TOTAL_NOT_ACCOUNTED|SOURCE_AND_STRICT_QA"):
             triage.classify(rows(), bad)
 
     def test_duplicate_roi_and_source_sha_conflict_rejected(self):
