@@ -120,6 +120,10 @@ class FakeFallbackGithub:
   assert branch==c.QUEUE_BRANCH
   value=copy.deepcopy(self.records.get(path))
   return value, ("synthetic-sha" if value is not None else None)
+ def req(self,path,branch,payload=None):
+  assert path==c.QROOT+"/state" and branch==c.QUEUE_BRANCH and payload is None
+  return [{"name":Path(p).name,"type":"file"} for p in sorted(self.records)
+          if p.startswith(c.QROOT+"/state/")]
  def write_json(self,path,branch,data,expected=None,overwrite=False):
   assert branch==c.QUEUE_BRANCH
   if path in self.records:
@@ -167,6 +171,35 @@ class FallbackQueueResumeAndPixelTests(unittest.TestCase):
   self.assertEqual(gh.records[self.old_path]["status"],"AB_SENT")
   self.assertEqual(len(gh.writes),1)
   self.assertEqual(json.loads(c.local_task_path(self.task["task_id"]).read_text())["status"],"AB_SENT")
+ def test_remote_ab_sent_is_recovered_without_any_new_send(self):
+  original=self.state()
+  original["source_dds_sha256"]=self.task["source_dds_sha256"]
+  original["old_candidate_sha256"]=self.task["old_candidate_sha256"]
+  original["roi_id"]=self.task["roi_id"]
+  gh=FakeFallbackGithub({self.new_path:original})
+  self.assertEqual(c.restore_remote_active_states(gh),1)
+  saved=json.loads(c.local_task_path(self.task["task_id"]).read_text())
+  self.assertEqual(saved["status"],"AB_SENT")
+  self.assertEqual(saved["ab_chat_url"],self.url)
+  self.assertFalse(saved["release_approved"])
+  self.assertEqual(gh.writes,[])
+  # Idempotent on restart: no duplicate browser send and no local rewrite.
+  self.assertEqual(c.restore_remote_active_states(gh),0)
+
+ def test_remote_unbound_chat_or_terminal_receipt_never_recovered(self):
+  original=self.state()
+  original.update({
+   "source_dds_sha256":self.task["source_dds_sha256"],
+   "old_candidate_sha256":self.task["old_candidate_sha256"],
+   "roi_id":self.task["roi_id"],
+   "ab_chat_url":"https://example.invalid/c/not-a-real-chat"})
+  gh=FakeFallbackGithub({self.new_path:original})
+  self.assertEqual(c.restore_remote_active_states(gh),0)
+  self.assertFalse(c.local_task_path(self.task["task_id"]).exists())
+  original["ab_chat_url"]=self.url
+  original["status"]="C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY"
+  self.assertEqual(c.restore_remote_active_states(FakeFallbackGithub({self.new_path:original})),0)
+
  def test_no_prior_task_may_proceed_as_new(self):
   gh=FakeFallbackGithub()
   self.assertEqual(c.recover_previous_sent_task(gh,self.task),"NEW")
