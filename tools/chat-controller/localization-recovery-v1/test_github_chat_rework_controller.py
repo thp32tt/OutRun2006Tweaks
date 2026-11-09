@@ -348,8 +348,9 @@ class CollectorIntegrationTests(unittest.IsolatedAsyncioTestCase):
    return "commit-sha"
   self.gh.write=put_png
   self.bridge=c.ChatBridge(self.gh,MagicMock())
-  self.bridge.page=AsyncMock(return_value=MagicMock(
-   url="https://chatgpt.com/c/6aebd722-0f74-83e8-8126-f723dca3a685"))
+  pg=MagicMock(url="https://chatgpt.com/c/6aebd722-0f74-83e8-8126-f723dca3a685")
+  pg.wait_for_timeout=AsyncMock()
+  self.bridge.page=AsyncMock(return_value=pg)
  async def asyncTearDown(self):
   c.ROOT=self.old_root
   self.temp.cleanup()
@@ -411,7 +412,7 @@ class ImagegenPollEfficiencyTests(CollectorIntegrationTests):
   self.assertEqual(rescue_probe.await_count,2)
   legacy.assert_awaited_once()
   reload_chat.assert_not_awaited()
-  page.wait_for_timeout.assert_not_called()
+  page.wait_for_timeout.assert_awaited_once_with(1200)
   self.assertEqual(len(self.gh.pngs),0)
   saved=self.gh.records[c.task_state_path(self.task["task_id"])]
   self.assertEqual(saved["status"],"AB_SENT")
