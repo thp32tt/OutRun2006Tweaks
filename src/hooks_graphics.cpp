@@ -744,15 +744,15 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             maxBodyYawStep=maxAuxYawStep=maxCameraYawStep=0.f;
             maxAuxBodyGap=maxSteering=0.f;
         }
-        maxBodyYawStep=std::max(maxBodyYawStep,std::fabs(
+        maxBodyYawStep=(std::max)(maxBodyYawStep,std::fabs(
             OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(bodyWord,prevBody)));
-        maxAuxYawStep=std::max(maxAuxYawStep,std::fabs(
+        maxAuxYawStep=(std::max)(maxAuxYawStep,std::fabs(
             OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(auxWord,prevAux)));
-        maxCameraYawStep=std::max(maxCameraYawStep,std::fabs(
+        maxCameraYawStep=(std::max)(maxCameraYawStep,std::fabs(
             OutRunVR::QuestCockpitV2::YawRadiansStepDegrees(
                 cameraLookYaw,prevCameraLookYaw)));
-        maxAuxBodyGap=std::max(maxAuxBodyGap,std::fabs(auxBodyDeg));
-        maxSteering=std::max(maxSteering,std::fabs(
+        maxAuxBodyGap=(std::max)(maxAuxBodyGap,std::fabs(auxBodyDeg));
+        maxSteering=(std::max)(maxSteering,std::fabs(
             OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(steerWord,0)));
         prevBody=bodyWord;prevAux=auxWord;
         prevCameraLookYaw=cameraLookYaw;
