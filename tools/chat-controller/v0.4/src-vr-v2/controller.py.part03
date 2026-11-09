@@ -2949,9 +2949,7 @@ def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetim
         "part_blend": part.get("last_saved_blend_sha256"),
         "material_commit": workpack.get("last_material_commit"),
     }
-    fingerprint = hashlib.sha256(
-        json.dumps(fingerprint_payload, sort_keys=True).encode("utf-8")
-    ).hexdigest()
+    fingerprint = stable_hash(json.dumps(fingerprint_payload, sort_keys=True))
     admission["fingerprint"] = fingerprint
     if state.get("last_workpack_fingerprint_sent") == fingerprint:
         admission["reason"] = "same workpack checkpoint already dispatched; await SSOT progress"
