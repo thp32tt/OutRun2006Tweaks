@@ -22,7 +22,17 @@
     "out-of-target cockpit editing"
   ],
   "target_native_mesh_id": null,
-  "hosted_precondition_status": "BLOCKED_HOSTED_KEY/INPUT",
-  "encrypted_input_ciphertext_sha256": "502cf59b193ad45345ca50e6dd093eb88c92248ae044a99d9860991d6fffd520",
-  "encrypted_input_current_source_provenance_verified": false
+  "hosted_precondition_status": "R45_AES_INPUT_REFRESHED_NOT_YET_GITHUB_VM_VERIFIED",
+  "encrypted_input_ciphertext_sha256": "13c957e249bd2b65279b971084b921fe62cd3affe3598810333ae1312b5a8d16",
+  "encrypted_input_current_source_provenance_verified": true,
+  "last_requested_component": "windshield_frame",
+  "last_requested_target_native_mesh_id": null,
+  "last_requested_target_status": "BLOCKED_NATIVE_WINDSHIELD_FRAME_ID_UNATTRIBUTED",
+  "encrypted_input_files_count": 5,
+  "encrypted_input_expected_bytes": 9005273,
+  "encrypted_input_stage": "github_ciphertext_only_no_plaintext",
+  "authenticated_reference_photo_sha256": [
+    "6eae2fafd6369c1dbd4b82df8e24834d2d284bc3415cace15a9ea830cadd26eb",
+    "a021ba729a2275c6f73c349f6b2622d4ff42a6dcbd2b4791f6c57ca951b83754"
+  ]
 }

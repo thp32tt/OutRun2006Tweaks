@@ -92,7 +92,7 @@
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437",
       "output_scene_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
-      "notes": "[2026-11-09 SLOT A hosted corrected] inner_door R45 COVERED_PARTIAL_QA; do not repeat. Public run 42543904654: AES key present, decrypted 6 inputs, but hosted edit BLOCKED_SOURCE_SHA because ciphertext input predates private R45 .blend SHA 224131c7. Newer run 42546429232 selected slot C; A model steps skipped. No hosted A geometry/reopen/render or QA PASS. Next visible_seat remains NOT_STARTED until fresh encrypted R45 source is provided. Existing 24h vehicle ownership retained; C/F50 untouched.",
+      "notes": "2026-11-09 SLOT A windshield_frame BLOCKED_NATIVE_SOURCE_ATTRIBUTION (no proved PMT windshield ID / existing R45 target); no model edit. Exact R45 SHA 224131c7 verified, refreshed AES input SHA 13c957e2 staged for public hosted runner but not VM-verified. NEXT visible_seat; previous inner_door R45 COVERED_PARTIAL_QA; C/F50 untouched. No car QA PASS, score +0.",
       "private_photo_subdir": "02_365_GTS4_Daytona",
       "priority": [
         "dashboard",
@@ -230,6 +230,18 @@
         "report": "docs/automation/FERRARI16_SLOTA_DAYTONA_R45_INNER_DOOR_20261109.md",
         "next": "windshield_frame",
         "whole_car_QA_PASS": false
+      },
+      "last_slot_a_hosted_r45_refresh": {
+        "component": "windshield_frame",
+        "status": "BLOCKED_NATIVE_SOURCE_ATTRIBUTION",
+        "original_pmt_sha256": "f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe",
+        "r45_scene_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
+        "encrypted_sha256": "13c957e249bd2b65279b971084b921fe62cd3affe3598810333ae1312b5a8d16",
+        "encrypted_bytes": 9005273,
+        "github_vm_source_admission": "NOT_RUN",
+        "hosted_blender_save_reopen_render": "NOT_RUN",
+        "next": "visible_seat",
+        "score_change": 0
       }
     },
     {

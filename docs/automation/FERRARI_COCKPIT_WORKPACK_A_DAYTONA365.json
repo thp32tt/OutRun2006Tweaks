@@ -91,12 +91,13 @@
       "status": "BLOCKED",
       "source_edits_this_phase": 0,
       "evidence_refs": [
-        "docs/automation/FERRARI16_SLOTA_DAYTONA_HOSTED_BLOCKED_20261109.md"
+        "docs/automation/FERRARI16_SLOTA_DAYTONA_HOSTED_BLOCKED_20261109.md",
+        "docs/automation/FERRARI16_SLOTA_DAYTONA_WINDSHIELD_FRAME_BLOCKED_R45_AES_20261109.md"
       ],
-      "blocking_reason": "BLOCKED_HOSTED_INPUT_STALE (NOT KEY): hosted run 42543904654 slot A had nonempty FERRARI_BUNDLE_KEY_B64, decrypt verified 6 private inputs, then runner rejected stale source .blend (BLOCKED_SOURCE_SHA); ciphertext SHA 502cf59b predates R45 source SHA 224131c7. Native windshield not inspected; do not fabricate.",
+      "blocking_reason": "BLOCKED_NATIVE_SOURCE_ATTRIBUTION: R45 input was re-encrypted and staged (AES-GCM SHA256 13c957e2), but there is no positively verified original PMT windshield-frame mesh object ID or existing R45 derived target. No fabricated source, no hosted geometry edit. Earlier stale-bundle cause is addressed at upload, VM admission and new mesh still unverified.",
       "last_saved_blend_sha256": null,
-      "dispatches_consumed_this_phase": 0,
-      "native_source_mesh": "UNVERIFIED_HOSTED_INPUT_BLOCKED"
+      "dispatches_consumed_this_phase": 1,
+      "native_source_mesh": "UNATTRIBUTED_NOT_PROVEN_ABSENT"
     },
     "visible_seat": {
       "status": "NOT_STARTED",
@@ -137,23 +138,27 @@
   "known_final_qa_blockers": [
     "exact original game driver-eye camera uncalibrated",
     "seven authenticated car-photo viewpoints incomplete",
-    "real proprietary source scene not available in GitHub-hosted Actions",
-    "existing source nonmanifold / connectivity findings unresolved",
-    "Host key is present (run 42543904654); slot A encrypted input is stale against latest R45 source SHA, so hosted source geometry is blocked"
+    "fresh R45 AES-GCM ciphertext staged but Ubuntu VM source admission/save/reopen/render not yet verified",
+    "windshield native original-PMT mesh attribution and existing editable target unverified",
+    "existing source nonmanifold / connectivity findings unresolved"
   ],
   "cannot_promote_from_interim_coverage": true,
   "last_material_commit": "4ebbeb8342d0fe8ebca18d7c830a6be2ac6cee02",
-  "notes": "SLOT A inner_door R45 previously COVERED_PARTIAL_QA; repeated user command is not a new geometry pass. Run 42543904654 proved key/decrypt available but BLOCKED_SOURCE_SHA on stale slot A ciphertext. Run 42546429232 selected slot C; slot A Blender skipped. Current region visible_seat NOT_STARTED, pending fresh encrypted R45 exact input and positive original seat mesh attribution. No new script, render or vehicle QA PASS, no new score.",
+  "notes": "SLOT A Daytona windshield_frame BLOCKED_NATIVE_SOURCE_ATTRIBUTION; no source mesh ID/Blender edit proven, no synthetic edit. Exact R45 source SHA verified on N100; refreshed encrypted input staged for hosted Ubuntu Actions (not yet run). Advance/keep visible_seat NEXT; P0 on hold; whole car QA NOT_PASS; score +0.",
   "latest_accepted_editable_blend_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
   "hosted_a_latest_evidence": {
-    "updated_at_kst": "2026-11-09 10:36",
+    "updated_at_kst": "2026-11-09 11:01+",
     "latest_confirmed_usable_key_run": 42543904654,
-    "decrypt": "PASS_SIX_INPUTS",
-    "blender": "INSTALLED",
-    "source_admission": "BLOCKED_SOURCE_SHA_STALE_CIPHERTEXT",
+    "encrypted_bundle_sha256": "13c957e249bd2b65279b971084b921fe62cd3affe3598810333ae1312b5a8d16",
+    "encrypted_bundle_bytes": 9005273,
+    "encrypted_bundle_files": 5,
+    "original_game_resource_sha256": "f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe",
+    "original_import_blend_sha256": "92c82ee5c4e0631195cb314e0d8e2f56a78a6a58da3c809c46b1da0f9d2c71a3",
     "current_expected_source_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
-    "encrypted_bundle_sha256": "502cf59b193ad45345ca50e6dd093eb88c92248ae044a99d9860991d6fffd520",
+    "source_admission": "PENDING_GITHUB_HOSTED_VM",
+    "target_native_mesh": "UNATTRIBUTED_BLOCKED",
     "new_geometry": false,
+    "independent_blender_reopen": false,
     "whole_car_qa_pass": false,
     "score_delta": 0
   }
