@@ -1,0 +1,109 @@
+name: Ferrari cockpit on public GitHub VM (AES-GCM private assets)
+on:
+  push:
+    branches: [feature/ferrari16-geometry-rework-20261108]
+    paths:
+      - .github/workflows/ferrari-cockpit-public-hosted.yml
+      - tools/car_modeling/hosted_jobs/**
+      - tools/car_modeling/hosted_edits/**
+      - tools/car_modeling/hosted_scene_stage.py
+      - tools/car_modeling/hosted_job_runner.py
+      - tools/car_modeling/secure_bundle.py
+  workflow_dispatch:
+    inputs:
+      slot:
+        type: choice
+        options: [both, A, C]
+        default: both
+      mode:
+        type: choice
+        options: [spec, probe, edit]
+        default: spec
+permissions:
+  contents: read
+jobs:
+  native-source:
+    name: Ferrari slot ${{ matrix.slot }} - GitHub Blender
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        slot: [A, C]
+    concurrency:
+      group: ferrari-encrypted-${{ github.ref }}-${{ matrix.slot }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: gate
+        name: Check private AES key and selected slot
+        shell: bash
+        env:
+          KEY: ${{ secrets.FERRARI_BUNDLE_KEY_B64 }}
+          SELECT_SLOT: ${{ inputs.slot || 'both' }}
+        run: |
+          set -euo pipefail
+          if [[ "$SELECT_SLOT" != both && "$SELECT_SLOT" != "${{ matrix.slot }}" ]] || [[ -z "$KEY" ]]; then
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'BLOCKED_KEY_OR_UNSELECTED: secure source remains encrypted; set FERRARI_BUNDLE_KEY_B64'
+          else
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Setup cryptography
+        if: steps.gate.outputs.ready == 'true'
+        shell: bash
+        run: |
+          python3 -m venv "$RUNNER_TEMP/ferrari-venv"
+          "$RUNNER_TEMP/ferrari-venv/bin/pip" install --disable-pip-version-check 'cryptography>=41,<47'
+      - name: Verify public ciphertext and decrypt in ephemeral VM only
+        if: steps.gate.outputs.ready == 'true'
+        shell: bash
+        env:
+          FERRARI_BUNDLE_KEY_B64: ${{ secrets.FERRARI_BUNDLE_KEY_B64 }}
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0700 -o "$(id -un)" -g "$(id -gn)" /home/chatgpt-runner
+          python3 tools/car_modeling/restore_encrypted_chunks.py --slot "${{ matrix.slot }}" \
+            --manifest-dir "tools/car_modeling/encrypted_inputs/20261109/slot_${{ matrix.slot }}" \
+            --output "$RUNNER_TEMP/slot_${{ matrix.slot }}_input.enc"
+          "$RUNNER_TEMP/ferrari-venv/bin/python" tools/car_modeling/secure_bundle.py unpack \
+            --slot "${{ matrix.slot }}" --root /home/chatgpt-runner \
+            --bundle "$RUNNER_TEMP/slot_${{ matrix.slot }}_input.enc"
+      - name: Install official SHA-verified Blender 4.5.15 LTS
+        if: steps.gate.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://download.blender.org/release/Blender4.5"
+          name="blender-4.5.15-linux-x64.tar.xz"
+          curl -fsSL --retry 3 "${url}/blender-4.5.15.sha256" -o official.sha256
+          curl -fsSL --retry 3 "${url}/${name}" -o "${name}"
+          grep -F "${name}" official.sha256 | head -1 | sha256sum --check -
+          mkdir -p blender
+          tar --extract --xz --file "${name}" -C blender --strip-components=1
+          ./blender/blender --version | head -2
+      - name: Model source-native cockpit and encrypt outputs
+        if: steps.gate.outputs.ready == 'true'
+        shell: bash
+        env:
+          FERRARI_BUNDLE_KEY_B64: ${{ secrets.FERRARI_BUNDLE_KEY_B64 }}
+          MODE: ${{ inputs.mode || 'spec' }}
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/ferrari-venv/bin/python" tools/car_modeling/hosted_job_runner.py \
+            --slot "${{ matrix.slot }}" --mode "$MODE" --root /home/chatgpt-runner \
+            --blender "$PWD/blender/blender" \
+            --spec "tools/car_modeling/hosted_jobs/slot_${{ matrix.slot }}.json" \
+            --queue docs/automation/FERRARI16_GEOMETRY_QUEUE.json \
+            --workpack "docs/automation/FERRARI_COCKPIT_WORKPACK_${{ matrix.slot }}_${{ matrix.slot == 'A' && 'DAYTONA365' || 'F50' }}.json" \
+            --encrypted-output "$RUNNER_TEMP/ferrari_encrypted_${{ matrix.slot }}.enc"
+      - name: Upload ciphertext result only (no PMT/blend/photos)
+        if: steps.gate.outputs.ready == 'true' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ferrari-ciphertext-slot-${{ matrix.slot }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/ferrari_encrypted_${{ matrix.slot }}.enc
+          retention-days: 14
+          if-no-files-found: error
