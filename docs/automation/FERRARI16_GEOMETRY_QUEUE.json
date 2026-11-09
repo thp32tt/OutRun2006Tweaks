@@ -91,8 +91,8 @@
       "geometry_gate": "NEEDS_REWORK",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "30ddcbd01ef7e969bb1e4220ff4318c2f75b7fd7ab70bc4d6dafedcdc7954437",
-      "output_scene_sha256": "638f69369f9ff9d074221320f38f4e137675a911d05939470f6cd24bec73040d",
-      "notes": "[2026-11-09 SLOT A R44] Genuine PMT016-guided slider/toggle control panel: 70 existing vertices moved max 14mm; original 10 anchors matched; 112 others unchanged incl dash/wheel. New private R44 .blend SHA 638f6936, Blender 4.5.15 independent reopen PASS. driver_controls COVERED_PARTIAL_QA only; pedals/stalks BLOCKED original attribution, no fabrication. NEXT inner_door; 24h start and vehicle final QA unchanged; slot C untouched. Source b43347f; report FERRARI16_SLOTA_DAYTONA_R44_DRIVER_CONTROLS_20261109.md.",
+      "output_scene_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
+      "notes": "[2026-11-09 SLOT A R45] PMT005 native-guided left inner door original derivative: 41 existing V5_L_LEATHER_SCULPTED_DOOR vertices moved max 15.851mm toward seven verified PMT source door-edge points. 112 others unchanged incl dashboard/wheel. R44 input 638f6936; private R45 .blend 224131c7 Blender 4.5.15 save/independent reopen PASS. inner_door COVERED_PARTIAL_QA only; NEXT windshield_frame. Full vehicle QA pending; 24h original start retained; C/F50 untouched. Source 4ebbeb8, report FERRARI16_SLOTA_DAYTONA_R45_INNER_DOOR_20261109.md.",
       "private_photo_subdir": "02_365_GTS4_Daytona",
       "priority": [
         "dashboard",
@@ -128,7 +128,7 @@
       "game_integration_required": false,
       "progress_history_archive": "docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_HISTORY_20261109.md",
       "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_A_DAYTONA365.json",
-      "strategy_v3_next_component": "inner_door",
+      "strategy_v3_next_component": "windshield_frame",
       "strategy_v3_p0_revisit_policy": "HOLD_BEFORE_BREADTH_PASS",
       "source_audit_archive": "docs/automation/FERRARI16_A_DAYTONA365_PRE_V3_SOURCE_AUDITS_20261109.json",
       "last_slot_a_audit_r42": {
@@ -209,6 +209,27 @@
         "source_commit": "b43347f41e617aa05b3c44df8c559b993ebd46fa",
         "workpack_commit": "e7924558fe1a9aebf8ecc6de9c4f79af4ce1350c",
         "qa_doc": "docs/automation/FERRARI16_SLOTA_DAYTONA_R44_DRIVER_CONTROLS_20261109.md"
+      },
+      "last_slot_a_r45": {
+        "task_id": "FERRARI16-SLOTA-DAYTONA-R45-NATIVE-PMT005-INNER-DOOR-20261109",
+        "region": "inner_door",
+        "scope_status": "COVERED_PARTIAL_QA",
+        "original_native_object": "object00_group01_material005_a0",
+        "edited_original_derived_mesh": "V5_L_LEATHER_SCULPTED_DOOR",
+        "native_source_points": 7,
+        "vertices_modified": 41,
+        "max_displacement_m": 0.015851131999123982,
+        "protected_meshes_invariant": 112,
+        "input_blend_sha256": "638f69369f9ff9d074221320f38f4e137675a911d05939470f6cd24bec73040d",
+        "output_blend_sha256": "224131c7adc928d5d6f0377d030d5a350c59b8664c13303a2731d6dfc6e9a722",
+        "original_PMT_sha256": "f393ba5c706453a4d3f71604f25cd1631594152380856462fb0a504143ba6abe",
+        "original_import_sha256": "92c82ee5c4e0631195cb314e0d8e2f56a78a6a58da3c809c46b1da0f9d2c71a3",
+        "blender_4_5_15_fresh_reopen": "PASS",
+        "source_commit": "4ebbeb8342d0fe8ebca18d7c830a6be2ac6cee02",
+        "workpack_commit": "1c56b1bea3bf9983b92734b9b328a4291b40ba75",
+        "report": "docs/automation/FERRARI16_SLOTA_DAYTONA_R45_INNER_DOOR_20261109.md",
+        "next": "windshield_frame",
+        "whole_car_QA_PASS": false
       }
     },
     {
