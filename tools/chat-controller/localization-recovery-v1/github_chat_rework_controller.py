@@ -55,6 +55,23 @@ MAX_QUEUE_JSON = 512 * 1024
 SEND_STATES = ("AB_SENT", "C1_READY", "C1_SENT")
 FINAL_STATES = ("C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY", "C1_REWORK_REQUIRED", "HOLD")
 
+# The latest strict HD source QA requires ORIGINAL English/plate separation for
+# these failures. Another transparent Korean text-only image cannot solve them.
+# Keep already-sent ChatGPT/GitHub receipts unchanged, but do not waste the
+# browser polling/collecting them until source CLEAN evidence exists.
+SOURCE_CLEAN_ONLY_REASONS = frozenset((
+    "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT",
+    "QA_SOURCE_LINE_LAYOUT_UNVERIFIED",
+    "OPAQUE_PROTECTED_ART_HOLD",
+))
+
+
+def image_result_actionable(task):
+    """Preserve all receipts; defer source-CLEAN jobs, never auto PASS/DELETE."""
+    return (isinstance(task, dict)
+            and task.get("reason") not in SOURCE_CLEAN_ONLY_REASONS)
+
+
 def utc():
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
 
@@ -227,6 +244,10 @@ def restore_remote_active_states(gh):
         if not isinstance(state, dict) or state.get("status") not in SEND_STATES:
             continue
         task = state.get("task")
+        if state.get("status") == "AB_SENT" and not image_result_actionable(task):
+            # Preserve GitHub state for future source-CLEAN remediation; no
+            # repeated read-only ChatGPT visits for a text-only dead end.
+            continue
         if (state.get("schema") != "outrun-hd-qa-chat-status-v1"
                 or state.get("task_id") != task_id
                 or state.get("release_approved") is not False
@@ -855,6 +876,11 @@ class ChatBridge:
                     continue
                 task=entry["task"]
                 if entry.get("status") not in SEND_STATES:
+                    continue
+                if (entry.get("status") == "AB_SENT"
+                        and not image_result_actionable(task)):
+                    # Obsolete history stays in GitHub; skip without touching
+                    # candidate SHA, source DDS or a previous C1 receipt.
                     continue
                 updated,_=await asyncio.to_thread(self.gh.read_json,
                                   task_state_path(task["task_id"]),QUEUE_BRANCH)
