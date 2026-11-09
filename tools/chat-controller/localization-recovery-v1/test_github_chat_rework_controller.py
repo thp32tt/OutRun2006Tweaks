@@ -77,7 +77,7 @@ class BrowserBootstrapBeforeGithubTests(unittest.IsolatedAsyncioTestCase):
  async def test_vnc_browser_reuses_visible_chrome_login_tab_without_github(self):
   bridge,page,context,chromium=await self.make_bridge()
   result=await bridge.bootstrap_login_page()
-  self.assertEqual(result,"CHATGPT_LOGIN_BROWSER_VISIBLE_NOT_AUTHENTICATED")
+  self.assertEqual(result,"CHATGPT_BROWSER_TAB_VISIBLE_AUTH_UNVERIFIED")
   chromium.connect_over_cdp.assert_awaited_once_with(
       "http://127.0.0.1:9222",timeout=30000)
   context.new_page.assert_not_awaited()
