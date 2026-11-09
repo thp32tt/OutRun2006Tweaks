@@ -96,25 +96,63 @@ ASSISTANT_IMAGE_JS = r"""({task,english,korean,sha})=>{
     if(row.role==='user')break;
     if(row.role==='assistant'&&!replies.includes(row.turn))replies.push(row.turn);
   }
-  if(!replies.length)return {status:'ASSISTANT_TURN_NOT_READY'};
-  // Prefer the image selector if it exists: a single generated image can
-  // simultaneously have a thumbnail and full preview at two URLs.
-  const selectors=[...new Set(replies.flatMap(n=>[...n.querySelectorAll(
+  // ChatGPT ImageGen output can be its own tool/media turn with no
+  // data-message-author-role="assistant" text node. The A/B send receipt
+  // independently proves the exact user turn and ChatGPT conversation URL.
+  // Search only explicitly generated-image elements in document order AFTER
+  // this user turn and BEFORE the next distinct user turn.
+  const generationSelector=[
+    'button[aria-label^="Show generated image "] img',
+    '[data-testid="generated-image-preview"] img',
+    '[data-testid*="generated-image"] img',
+    '[data-testid*="imagegen"] img',
+    'img[alt^="Generated image"]',
+    'img[alt^="generated image"]'
+  ].join(',');
+  const inReply=n=>replies.some(t=>t===n||t.contains?.(n));
+  const anchor=exact.parts[exact.parts.length-1];
+  const nextUser=users[users.indexOf(exact)+1];
+  const nextAnchor=nextUser?nextUser.parts[0]:null;
+  const isWithinBoundedReply=n=>{
+    if(!(anchor.compareDocumentPosition(n)&4))return false;
+    if(nextAnchor&&!(n.compareDocumentPosition(nextAnchor)&4))return false;
+    // Explicitly reject any user message, even one containing imagegen-like
+    // thumbnails or markup. This is an independent provenance boundary.
+    const owner=n.closest?.(
+      '[data-chatgpt-search-unit-key],[data-content-search-unit-key],'+
+      '[data-turn-key],[data-message-author-role],[data-testid="conversation-turn-user"]'
+    );
+    if(owner&&(owner===exact.turn||
+       owner.querySelector?.(
+        '[data-markdown-text-tone="user-message"],'+
+        '[data-message-author-role="user"],[data-testid="conversation-turn-user"]'
+       )))return false;
+    return !n.closest?.(
+      '[data-message-author-role="user"],[data-testid="conversation-turn-user"]'
+    );
+  };
+  // One generated preview can also have a carousel thumbnail. Favor a
+  // carousel's selected/generated image only if it is the sole item.
+  const carousel=[...new Set([...document.querySelectorAll(
     'button[aria-label^="Show generated image "] img'
-  )]))];
-  if(selectors.length>1)return {status:'ASSISTANT_IMAGE_AMBIGUOUS'};
-  let images=selectors;
+  )].filter(isWithinBoundedReply))];
+  if(carousel.length>1)return {status:'ASSISTANT_IMAGE_AMBIGUOUS'};
+  let images=carousel;
   if(!images.length){
-    const selector=[
-      '[data-testid="generated-image-preview"] img',
-      '[data-testid*="generated-image"] img',
-      '[data-testid*="imagegen"] img',
-      'img[alt^="Generated image"]',
-      'img[alt^="generated image"]'
-    ].join(',');
-    images=[...new Set(replies.flatMap(n=>[...n.querySelectorAll(selector)]))];
+    const candidates=[...new Set([...document.querySelectorAll(
+      generationSelector
+    )].filter(isWithinBoundedReply))];
+    if(candidates.length>1){
+      const urls=[...new Set(candidates.map(n=>n.currentSrc||n.src))];
+      if(urls.length>1)return {status:'ASSISTANT_IMAGE_AMBIGUOUS'};
+    }
+    images=candidates;
   }
-  if(!images.length)return {status:'ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING'};
+  if(!images.length)return {
+    status:replies.length?
+      'ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING':
+      'ASSISTANT_GENERATED_IMAGE_NOT_RENDERED'
+  };
   const ready=images.filter(n=>n.complete&&n.naturalWidth>0&&n.naturalHeight>0);
   if(!ready.length)return {status:'ASSISTANT_IMAGE_LOADING'};
   const urls=[...new Set(ready.map(n=>n.currentSrc||n.src).filter(Boolean))];
@@ -277,6 +315,7 @@ async def rescue_single_image_candidate(page, task_id, role, root, binding=None)
             "SOURCE_BOUND_USER_TURN_AMBIGUOUS", "SOURCE_BOUND_USER_TURN_MISSING",
             "ASSISTANT_TURN_NOT_READY", "ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING",
             "ASSISTANT_IMAGE_LOADING", "ASSISTANT_IMAGE_AMBIGUOUS",
+            "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED",
         ):
             status = "ASSISTANT_RESULT_NOT_VERIFIED"
         return "WAIT_ASSISTANT_RESULT_UI", status
