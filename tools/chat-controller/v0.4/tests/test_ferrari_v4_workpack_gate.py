@@ -25,8 +25,8 @@ class FerrariWorkpackAdmission(unittest.TestCase):
             "repository": "thp32tt/imsi1", "branch": "main",
             "active_by_slot": {"A": "daytona365", "C": "f50"},
             "cars": [
-                {"id": "daytona365", "started_at_utc": "2026-11-08T04:13:41Z"},
-                {"id": "f50", "started_at_utc": "2026-11-08T04:35:52Z"},
+                {"id": "daytona365", "slot": "A", "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_A_DAYTONA365.json", "started_at_utc": "2026-11-08T04:13:41Z"},
+                {"id": "f50", "slot": "C", "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_C_F50.json", "started_at_utc": "2026-11-08T04:35:52Z"},
             ],
             "strategy_v3": {"component_sequence": seq},
         }
