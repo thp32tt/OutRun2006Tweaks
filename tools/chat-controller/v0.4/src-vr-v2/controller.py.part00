@@ -79,8 +79,8 @@ MODEL2_TARGET_BRANCH = os.getenv("MODEL2_TARGET_BRANCH", "main").strip()
 # Do not replace or reactivate previous Model2 C; that project remains disabled.
 CAR_MODEL_AUTODEV_ENABLED = os.getenv("CAR_MODEL_AUTODEV_ENABLED", "false").lower() == "true"
 CAR_MODEL_C_AUTODEV_ENABLED = os.getenv("CAR_MODEL_C_AUTODEV_ENABLED", "false").lower() == "true"
-CAR_MODEL_GITHUB_REPO = os.getenv("CAR_MODEL_GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
-CAR_MODEL_TARGET_BRANCH = os.getenv("CAR_MODEL_TARGET_BRANCH", "feature/ferrari16-geometry-rework-20261108").strip()
+CAR_MODEL_GITHUB_REPO = os.getenv("CAR_MODEL_GITHUB_REPO", "thp32tt/imsi1").strip()
+CAR_MODEL_TARGET_BRANCH = os.getenv("CAR_MODEL_TARGET_BRANCH", "main").strip()
 CAR_MODEL_SCOPE_READY = bool(CONFIGURED_PROJECT_ID)
 if CAR_MODEL_AUTODEV_ENABLED and CONVERSION_DX11_ENABLED:
     raise ValueError("Car modeling A and legacy DX11 A cannot both be enabled")
