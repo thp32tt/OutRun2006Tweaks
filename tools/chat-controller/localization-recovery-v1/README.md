@@ -1,3 +1,20 @@
+## 2026-11-09 12:10 KST — current ChatGPT Project DOM recovery repair
+
+**Issue confirmed from source:** the persisted send receipt validator uses current ChatGPT Project selectors `[data-markdown-text-tone="user-message"]` and `[data-chatgpt-search-unit-key]`, but the fallback ImageGen result collector previously only searched `[data-message-author-role]`. Its `USER_TURN_MISSING` result could therefore be misleading even if the source user message was saved. The legacy detector also depends on visible `UPLOAD_TASK_ID`, which can be absent in an older/re-rendered turn. No user-facing screenshot, log, or image success is assumed.
+
+**Correction:**
+- `chat_image_result_rescue.py` now supports both current and older user/assistant message selectors and searches only the assistant turn(s) immediately after one verified user turn.
+- Preferred provenance is the exact `UPLOAD_TASK_ID=<TASK_ID>` in a user turn. If the footer is unavailable, the *same unique user turn* must contain the exact English text, Korean translation **and full source DDS SHA-256** from the GitHub task. Missing or ambiguous metadata fails closed; no generic images or user-uploaded English crops can become Korean candidates.
+- Result extraction prefers the generated-image carousel selector if present (avoids double-counting a single output's thumbnail and preview). It requires exactly one valid generated image, then PNG SHA verification, unapproved state and independent C1 QA. DDS/game approvals remain unchanged.
+- `github_chat_rework_controller.py` passes the SHA-bound task details to this probe and attempts this fast, strictly checked rescue *before* the legacy 12-second chat-turn wait/reload, reducing unnecessary browser reloading and N100 work.
+- Simulated automated checks: **37 Python regression tests PASS**; **8 browser-JavaScript DOM fixtures PASS** on N100 (task marker, source triple, source reference separation, duplicated/ambiguous turns and image candidates). Tests do not prove success on the real authenticated ChatGPT UI.
+
+**Deployment:** manually Pull latest `localization-controller-recovery-20260928` from GitHub, **Rebuild + Redeploy** the same Portainer stack. No new variables or extra containers; keep existing browser profile and data volumes. Confirm the new code by a state moving from `AB_SENT` to `C1_READY` or a new precise `last_result_poll_reason` such as `SOURCE_BOUND_USER_TURN_MISSING`, `CHAT_USER_TURNS_NOT_RENDERED`, or `ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING`. A previous `USER_TURN_MISSING` receipt must not cause another A/B send.
+
+**Release:** manual C1/C3 and native DDS/in-game quality gates remain required. Never claim completion from an `AB_SENT`, PNG export or test-only success.
+
+---
+
 ## 2026-11-09 read-only chat result collector fix (manual rebuild/redeploy)
 
 **Verified live symptoms:** after the browser and worker were restarted around 10:55 KST, Ghost Forest continued recording `WAIT_CHATGPT_COMPOSER_OR_LOGIN` at 10:56 KST. This is a collected-page check failure, **not proof that ChatGPT logout occurred**. N100 load and memory were normal; current queue still had 0 saved PNG candidates.
