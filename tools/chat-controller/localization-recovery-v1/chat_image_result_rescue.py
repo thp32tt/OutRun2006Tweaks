@@ -26,39 +26,102 @@ ALLOWED_IMAGE_HOSTS = ("chatgpt.com", "oaiusercontent.com", "oaistatic.com", "op
 
 # Search ONLY in assistant turns following exactly one matching user turn.
 # Deliberately exclude general <img> and user attachment previews.
-ASSISTANT_IMAGE_JS = r"""(task)=>{
+ASSISTANT_IMAGE_JS = r"""({task,english,korean,sha})=>{
+  // The current ChatGPT Project UI uses data-markdown-text-tone and
+  // data-chatgpt-search-unit-key (confirmed by the upload send receipt).
+  // Older UIs expose data-message-author-role. Accept BOTH, and never search
+  // user-uploaded reference images as candidate assistant outputs.
   if(location.hostname!=='chatgpt.com'||!location.pathname.includes('/c/'))
     return {status:'NOT_CHAT_CONVERSATION'};
-  const marker='UPLOAD_TASK_ID='+task;
-  const msgs=[...document.querySelectorAll(
-    '[data-message-author-role="user"],[data-message-author-role="assistant"]'
-  )];
-  const matches=msgs.map((node,i)=>({node,i})).filter(({node})=>
-     node.getAttribute('data-message-author-role')==='user' &&
-     (node.innerText||node.textContent||'').includes(marker));
-  if(matches.length!==1)return {status:matches.length?'TASK_MARKER_AMBIGUOUS':'USER_TURN_MISSING'};
-  const after=msgs.slice(matches[0].i+1);
-  const reply=[];
-  for(const node of after){
-    if(node.getAttribute('data-message-author-role')==='user')break;
-    if(node.getAttribute('data-message-author-role')==='assistant')reply.push(node);
-  }
-  if(!reply.length)return {status:'ASSISTANT_TURN_NOT_READY'};
-  const selector=[
-    '[data-testid="generated-image-preview"] img',
-    '[data-testid*="generated-image"] img',
-    'img[alt^="Generated image"]',
-    'img[alt^="generated image"]',
-    'button[aria-label^="Show generated image "] img'
+  const roleSelector=[
+    '[data-markdown-text-tone="user-message"]',
+    '[data-markdown-text-tone="assistant"]',
+    '[data-message-author-role="user"]',
+    '[data-message-author-role="assistant"]',
+    '[data-testid="conversation-turn-user"]',
+    '[data-testid="conversation-turn-assistant"]'
   ].join(',');
-  const nodes=[...new Set(reply.flatMap(n=>[...n.querySelectorAll(selector)]))];
-  if(!nodes.length)return {status:'ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING'};
-  const ready=nodes.filter(n=>n.complete&&n.naturalWidth>0&&n.naturalHeight>0);
+  const candidates=[...document.querySelectorAll(roleSelector)];
+  const isUser=n=>n.matches(
+    '[data-markdown-text-tone="user-message"],[data-message-author-role="user"],[data-testid="conversation-turn-user"]'
+  );
+  const isAssistant=n=>n.matches(
+    '[data-markdown-text-tone="assistant"],[data-message-author-role="assistant"],[data-testid="conversation-turn-assistant"]'
+  );
+  const scope=n=>n.closest('[data-chatgpt-search-unit-key]')||
+    n.closest('[data-content-search-unit-key]')||
+    n.closest('[data-turn-key]')||
+    n;
+  // Distinct chat turns; multiple Markdown paragraphs inside one turn should
+  // be grouped without accidentally combining the user and assistant turns.
+  const items=[];
+  for(const node of candidates){
+    const turn=scope(node), role=isUser(node)?'user':isAssistant(node)?'assistant':null;
+    if(!role)continue;
+    const prev=items[items.length-1];
+    if(prev&&prev.turn===turn&&prev.role===role){
+      if(!prev.parts.includes(node))prev.parts.push(node);
+    } else items.push({turn,role,parts:[node]});
+  }
+  const users=items.filter(x=>x.role==='user');
+  if(!users.length)return {status:'CHAT_USER_TURNS_NOT_RENDERED'};
+  const visible=x=>x.parts.map(p=>p.innerText||p.textContent||'').join(' ').replace(/\s+/g,' ');
+  const idMarker='UPLOAD_TASK_ID='+task;
+  const byId=users.filter(x=>visible(x).includes(idMarker));
+  if(byId.length>1)return {status:'TASK_MARKER_AMBIGUOUS'};
+  let exact=byId[0],method='TASK_ID';
+  if(!exact){
+    // Some regenerated ChatGPT turns no longer expose the footer marker.
+    // Accept ONLY the exact original English + Korean + DDS SHA in the same
+    // individual USER turn, anchored to the previously verified chat URL.
+    if(typeof english!=='string'||!english.trim()||
+       typeof korean!=='string'||!korean.trim()||
+       typeof sha!=='string'||!/^[0-9a-f]{64}$/.test(sha))
+      return {status:'SOURCE_BINDING_REQUIRED'};
+    const matches=users.filter(x=>{
+      const content=visible(x);
+      return content.includes('영문 원문: '+english) &&
+        content.includes('한국어 번역: '+korean) &&
+        content.includes('원본 DDS SHA: '+sha);
+    });
+    if(matches.length!==1)return {status:matches.length?
+      'SOURCE_BOUND_USER_TURN_AMBIGUOUS':'SOURCE_BOUND_USER_TURN_MISSING'};
+    exact=matches[0];method='SOURCE_TRIPLE';
+  }
+  const start=items.indexOf(exact);
+  if(start<0)return {status:'USER_TURN_MISSING'};
+  const replies=[];
+  for(let i=start+1;i<items.length;i++){
+    const row=items[i];
+    if(row.role==='user')break;
+    if(row.role==='assistant'&&!replies.includes(row.turn))replies.push(row.turn);
+  }
+  if(!replies.length)return {status:'ASSISTANT_TURN_NOT_READY'};
+  // Prefer the image selector if it exists: a single generated image can
+  // simultaneously have a thumbnail and full preview at two URLs.
+  const selectors=[...new Set(replies.flatMap(n=>[...n.querySelectorAll(
+    'button[aria-label^="Show generated image "] img'
+  )]))];
+  if(selectors.length>1)return {status:'ASSISTANT_IMAGE_AMBIGUOUS'};
+  let images=selectors;
+  if(!images.length){
+    const selector=[
+      '[data-testid="generated-image-preview"] img',
+      '[data-testid*="generated-image"] img',
+      '[data-testid*="imagegen"] img',
+      'img[alt^="Generated image"]',
+      'img[alt^="generated image"]'
+    ].join(',');
+    images=[...new Set(replies.flatMap(n=>[...n.querySelectorAll(selector)]))];
+  }
+  if(!images.length)return {status:'ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING'};
+  const ready=images.filter(n=>n.complete&&n.naturalWidth>0&&n.naturalHeight>0);
   if(!ready.length)return {status:'ASSISTANT_IMAGE_LOADING'};
   const urls=[...new Set(ready.map(n=>n.currentSrc||n.src).filter(Boolean))];
-  if(urls.length!==1)return {status:'ASSISTANT_IMAGE_AMBIGUOUS',count:urls.length};
+  if(urls.length!==1)return {status:'ASSISTANT_IMAGE_AMBIGUOUS'};
   return {status:'ASSISTANT_IMAGE_SOURCE_VERIFIED',url:urls[0],
-          width:ready[0].naturalWidth,height:ready[0].naturalHeight};
+          width:ready[0].naturalWidth,height:ready[0].naturalHeight,
+          match_method:method};
 }"""
 
 
@@ -136,9 +199,11 @@ async def read_assistant_image(page, source):
     return checked_image_bytes(await response.body())
 
 
-def save_candidate_evidence(root, role, task_id, png, dimensions, original_sha):
+def save_candidate_evidence(root, role, task_id, png, dimensions, original_sha, match_method="TASK_ID"):
     if role not in ("A", "B") or not TASK_ID.fullmatch(task_id):
         raise ValueError("UNBOUND_ASSISTANT_CANDIDATE")
+    if match_method not in ("TASK_ID", "SOURCE_TRIPLE"):
+        raise ValueError("UNSUPPORTED_ASSISTANT_TURN_PROOF")
     output = Path(root) / "text_roi_batches" / "candidate_outputs" / role / (task_id + ".png")
     evidence = Path(root) / "text_roi_batches" / "export_evidence" / (task_id + ".json")
     digest = hashlib.sha256(png).hexdigest()
@@ -170,7 +235,7 @@ def save_candidate_evidence(root, role, task_id, png, dimensions, original_sha):
             "name": task_id + ".png", "sha256": digest,
             "generated_dimensions": dimensions, "raw_image_sha256": original_sha,
             "status": "PENDING_INDEPENDENT_C1_QA",
-            "pairing": "ONE_EXACT_USER_MARKER_TO_ONE_ASSISTANT_GENERATED_IMAGE",
+            "pairing": "ONE_VERIFIED_" + match_method + "_USER_TURN_TO_ONE_ASSISTANT_GENERATED_IMAGE",
             "chatgpt_library": "UNVERIFIED"
         }],
     }
@@ -187,18 +252,29 @@ def save_candidate_evidence(root, role, task_id, png, dimensions, original_sha):
     return "LOCAL_CANDIDATES_EXPORTED_UNAPPROVED"
 
 
-async def rescue_single_image_candidate(page, task_id, role, root):
+async def rescue_single_image_candidate(page, task_id, role, root, binding=None):
     """Return (status, safe detail) for one assistant-generated output."""
     if not TASK_ID.fullmatch(task_id) or role not in ("A", "B"):
         raise ValueError("INVALID_ASSISTANT_TASK")
+    binding = binding or {}
+    if not isinstance(binding, dict):
+        raise ValueError("INVALID_ASSISTANT_SOURCE_BINDING")
+    params = {
+        "task": task_id,
+        "english": binding.get("english"),
+        "korean": binding.get("korean"),
+        "sha": binding.get("source_dds_sha256"),
+    }
     try:
-        result = await page.evaluate(ASSISTANT_IMAGE_JS, task_id)
+        result = await page.evaluate(ASSISTANT_IMAGE_JS, params)
     except Exception:
         return "WAIT_ASSISTANT_RESULT_UI", "RESULT_DOM_PROBE_EXCEPTION"
     if not isinstance(result, dict) or result.get("status") != "ASSISTANT_IMAGE_SOURCE_VERIFIED":
         status = (result or {}).get("status") if isinstance(result, dict) else None
         if status not in (
             "NOT_CHAT_CONVERSATION", "TASK_MARKER_AMBIGUOUS", "USER_TURN_MISSING",
+            "CHAT_USER_TURNS_NOT_RENDERED", "SOURCE_BINDING_REQUIRED",
+            "SOURCE_BOUND_USER_TURN_AMBIGUOUS", "SOURCE_BOUND_USER_TURN_MISSING",
             "ASSISTANT_TURN_NOT_READY", "ASSISTANT_GENERATED_IMAGE_SELECTOR_MISSING",
             "ASSISTANT_IMAGE_LOADING", "ASSISTANT_IMAGE_AMBIGUOUS",
         ):
@@ -207,7 +283,10 @@ async def rescue_single_image_candidate(page, task_id, role, root):
     try:
         png, dims = await read_assistant_image(page, result.get("url"))
         sha = hashlib.sha256(png).hexdigest()
-        saved = save_candidate_evidence(root, role, task_id, png, dims, sha)
+        saved = save_candidate_evidence(
+            root, role, task_id, png, dims, sha,
+            match_method=result.get("match_method", "TASK_ID"),
+        )
         return saved, "ASSISTANT_ONLY_ONE_IMAGE_SHA_VERIFIED"
     except (ValueError, OSError, RuntimeError) as e:
         return "WAIT_ASSISTANT_RESULT_EXPORT", type(e).__name__ + "_" + str(e)[:90]
