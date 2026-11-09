@@ -256,8 +256,8 @@
       "geometry_gate": "PARTIAL_NEEDS_QA",
       "reference_gate": "PARTIAL_NEEDS_7_VIEWS",
       "source_scene_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
-      "output_scene_sha256": "724df8bcd079299e8781726b25888243dbdcab7368d7d758f81ba8236666072f",
-      "notes": "[2026-11-09 C F50 center_console 2/2 CLOSED] V38 genuine PMT shifter knob -> V39 genuine PMT lever shaft object20_group00_material001_a0 12v/6f ->108v/150f, 108 vertices moved max 2.188mm; N100 real F50 photo, official Blender 4.5.15 independent reopen PASS; 41 other meshes unchanged incl P0. V39 .blend SHA 724df8bc. Center console COVERED_PARTIAL_QA for source knob/shaft; gate/plate/tunnel BLOCKED original-mesh attribution, no fabrication. NEXT driver_controls; 24h original start & final car gates unchanged; no car advance; report F50_SLOT_C_CENTER_CONSOLE_NATIVE_SHAFT_V39_20261109.md.",
+      "output_scene_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a",
+      "notes": "[2026-11-09 C F50 v40] driver_controls BLOCKED_UNIDENTIFIED_NATIVE_STALK_PEDAL, no fabricated geometry. Advanced to inner_door: original PMT object00_group01_material031_a0 driver upper rail 10 existing vertices moved (max 26.495mm), 41 other source meshes unchanged; official Blender 4.5.15 saved/fresh reopened PASS, private v40 .blend SHA 03b96b1e. inner_door COVERED_PARTIAL_QA only; handle unverified. NEXT windshield_frame. P0 hold; 24h ownership and full QA gate unchanged.",
       "private_photo_subdir": "03_F50",
       "priority": [
         "dashboard",
@@ -326,7 +326,7 @@
       "game_integration_required": false,
       "progress_history_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_HISTORY_20261109.md",
       "workpack_path": "docs/automation/FERRARI_COCKPIT_WORKPACK_C_F50.json",
-      "strategy_v3_next_component": "driver_controls",
+      "strategy_v3_next_component": "windshield_frame",
       "strategy_v3_p0_revisit_policy": "HOLD_BEFORE_BREADTH_PASS",
       "source_audit_archive": "docs/automation/FERRARI16_C_F50_PRE_V3_SOURCE_AUDITS_20261109.json",
       "last_slot_c_center_console_v38": {
@@ -383,6 +383,24 @@
         "workpack_commit": "03511fe62238d7b06b294e4ca8b30951e1f4ab4d",
         "qa_doc": "docs/automation/F50_SLOT_C_CENTER_CONSOLE_NATIVE_SHAFT_V39_20261109.md",
         "score_review": "DISTINCT_SHAFT_SOURCE_VS_PRIOR_KNOB"
+      },
+      "last_slot_c_v40": {
+        "task_id": "FERRARI16-SLOTC-F50-DRIVER-CONTROLS-BLOCKED-INNER-DOOR-V40-20261109",
+        "driver_controls": "BLOCKED_UNIDENTIFIED_NATIVE_STALK_PEDAL",
+        "inner_door": "COVERED_PARTIAL_QA",
+        "original_game_pmt_sha256": "10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab",
+        "original_import_sha256": "d82b3d024a812126da5b38c56572cfc326fbe3d1b5c0ddf8cad4cbd855119d31",
+        "modified_native_object": "object00_group01_material031_a0",
+        "moved_existing_vertices": 10,
+        "max_shift_mm": 26.495,
+        "other_41_meshes_unchanged": true,
+        "input_blend_sha256": "724df8bcd079299e8781726b25888243dbdcab7368d7d758f81ba8236666072f",
+        "output_blend_sha256": "03b96b1eb2293c151c60133919380055fa8393372b0acbf18045edf25faa949a",
+        "blender_save_reopen": "PASS",
+        "full_car_qa": "NOT_PASS",
+        "next": "windshield_frame",
+        "source_commit": "7b7e9b514206b888a9728f54ab32ad5fba371fe5",
+        "report": "docs/automation/F50_SLOT_C_DRIVER_CONTROLS_BLOCKED_INNER_DOOR_V40_20261109.md"
       }
     },
     {
