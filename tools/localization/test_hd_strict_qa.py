@@ -66,6 +66,38 @@ class StrictHDQualityTests(unittest.TestCase):
                 native.imported_candidate, native.conflicting_rois,
                 native.dominant_container_holds)
 
+    def test_native_steering_shadow_bands_are_one_logical_source_line(self):
+        # Native source has top 10px AA band, main 60px letter band and
+        # bottom 3px AA band, all horizontally nested in the same label.
+        im = Image.new("RGBA", (490, 145), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        d.rectangle((103, 27, 444, 36), fill=(255, 255, 255, 65))
+        d.rectangle((71, 44, 444, 103), fill=(255, 255, 255, 255))
+        d.rectangle((191, 109, 304, 111), fill=(255, 255, 255, 20))
+        raw_bands = strict.alpha_lines(im.getchannel("A"))
+        self.assertEqual(len(raw_bands), 3)
+        grouped, receipt = strict.source_effect_band_lines(im.getchannel("A"))
+        self.assertEqual(grouped, [(71, 27, 445, 112)])
+        self.assertIn("SOURCE_AA_SHADOW_BANDS_SINGLE_LOGICAL_LINE_TEST_ONLY", receipt)
+
+    def test_native_two_full_sized_lines_cannot_be_merged_as_shadow(self):
+        im = Image.new("RGBA", (300, 150), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        d.rectangle((24, 22, 260, 66), fill="white")
+        d.rectangle((25, 84, 254, 123), fill="white")
+        grouped, receipt = strict.source_effect_band_lines(im.getchannel("A"))
+        self.assertEqual(len(grouped), 2)
+        self.assertFalse(receipt)
+
+    def test_small_unrelated_external_band_is_never_assigned_to_text(self):
+        im = Image.new("RGBA", (300, 145), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        d.rectangle((60, 40, 250, 100), fill="white")
+        d.rectangle((7, 28, 18, 34), fill="white")
+        grouped, receipt = strict.source_effect_band_lines(im.getchannel("A"))
+        self.assertEqual(len(grouped), 2)
+        self.assertFalse(receipt)
+
     def test_clean_removes_source_english_alpha_and_preserves_protected(self):
         src = source_dds()
         data, final, clean, painted, holds = self.run_case(src)
