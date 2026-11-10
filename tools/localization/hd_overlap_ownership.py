@@ -9,6 +9,8 @@ from collections import deque
 from PIL import Image
 
 MAX_SOURCE_ALPHA_PIXELS = 1500000
+# Only near-invisible antialias pixels are excluded from component anchoring.
+COSMETIC_FRINGE_ALPHA = 8
 
 
 def prove_overlap_ownership(source, rows, conflicting_ids):
@@ -33,7 +35,7 @@ def prove_overlap_ownership(source, rows, conflicting_ids):
         clip = alpha.crop((x0, y0, x1, y1))
         span = x1 - x0
         for offset, opacity in enumerate(clip.getdata()):
-            if not opacity:
+            if opacity <= COSMETIC_FRINGE_ALPHA:
                 continue
             key = (y0 + offset // span) * width + (x0 + offset % span)
             membership.setdefault(key, set()).add(idx)
