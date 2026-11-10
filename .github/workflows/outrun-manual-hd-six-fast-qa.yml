@@ -1,0 +1,71 @@
+name: OutRun Manual HD Six ROI Fast Preview QA (GitHub CPU)
+on:
+  workflow_dispatch:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-manual-hd-six-fast-qa.yml"
+      - "tools/localization/hd_manual_user_fast_qa.py"
+permissions:
+  contents: read
+concurrency:
+  group: outrun-manual-hd-six-qa
+  cancel-in-progress: true
+jobs:
+  manual-six:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Fetch only six exact native HD DDS and localization QA code
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/github_ab_imagegen_atlas_batch.py
+            tools/localization/hd_manual_user_fast_qa.py
+            tools/localization/hd_manual_user_import.py
+            tools/localization/hd_strict_qa.py
+            tools/localization/hd_overlap_ownership.py
+            tools/localization/hd_bc3_index_patch.py
+            tools/localization/hd_bc3_native_codec.py
+            tools/localization/hd_existing_candidate_salvage.py
+            localization/automation_inputs/candidate_outputs
+            localization/automation_inputs/hd_original_png_source_plan.json
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/Switch/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/Xbox/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds
+
+      - name: Fetch SHA-pinned user manual PNG ZIP from separate QA branch
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-qa-queue-20261104
+          path: hd-qa-queue-state
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            localization/automation_inputs/manual_user_20261110/OUTRUN_HD_MANUAL_SUBMISSION_QA_TEST_ONLY_20261110.zip
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow only (no N100, Docker, fonts or paid API)
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+
+      - name: Source-SHA validate six manual PNGs and simulate original DDS placements
+        run: |
+          python tools/localization/hd_manual_user_fast_qa.py --repo-root . --out "$RUNNER_TEMP/manual-six-qa.json"
+
+      - name: Preserve explicit 6-ROI HOLD and test-only results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-manual-six-fast-qa-${{ github.run_id }}
+          path: ${{ runner.temp }}/manual-six-qa.json
+          if-no-files-found: warn
+          retention-days: 30
