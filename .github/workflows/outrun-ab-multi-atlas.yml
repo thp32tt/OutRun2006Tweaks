@@ -10,6 +10,11 @@ on:
     paths:
       - ".github/workflows/outrun-ab-multi-atlas.yml"
       - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/test_hd_strict_qa.py"
+      - "tools/localization/hd_overlap_ownership.py"
+      - "tools/localization/test_hd_overlap_ownership.py"
+      - "tools/localization/hd_existing_candidate_salvage.py"
+      - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_manual_user_import.py"
 
 permissions:
