@@ -1020,26 +1020,30 @@ namespace OutRunVRStereo
                     programmableNativePairBytes,
                     programmableNativePairPoseSequence) &&
                 programmableNativePairPoseSequence==stereo.poseSequence;
+            D3DMATRIX programmableHeadInverse{};
+            if(programmableNativeEyePair || exactWorldSky) {
+                float headBytes[16]{};
+                std::uint32_t headPoseSequence=0;
+                if(!OutRunVRRenderer::GetLatchedHeadInverse(
+                        headBytes,headPoseSequence) ||
+                   headPoseSequence!=stereo.poseSequence)
+                    return EyeBuildResult::FatalError;
+                std::memcpy(&programmableHeadInverse,headBytes,
+                            sizeof(programmableHeadInverse));
+                if(!MatrixFinite(programmableHeadInverse))
+                    return EyeBuildResult::FatalError;
+            }
 			for (int eye = 0; eye < 2; ++eye)
 			{
 				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale * Settings::VRStereoDepth);
 				D3DMATRIX eyeInverse = InverseRigid(eyePose);
                 if(programmableNativeEyePair) {
                     if(exactWorldSky)exactSkyNativeEye[eye]=true;
-                    float headBytes[16]{};
-                    std::uint32_t headPoseSequence=0;
-                    if(!OutRunVRRenderer::GetLatchedHeadInverse(
-                            headBytes,headPoseSequence) ||
-                       headPoseSequence!=stereo.poseSequence)
-                        return EyeBuildResult::FatalError;
-                    D3DMATRIX nativeFullView{},headInverse{};
+                    D3DMATRIX nativeFullView{};
                     std::memcpy(&nativeFullView,
                                 programmableNativePairBytes[eye],
                                 sizeof(nativeFullView));
-                    std::memcpy(&headInverse,headBytes,
-                                sizeof(headInverse));
-                    if(!MatrixFinite(nativeFullView) ||
-                       !MatrixFinite(headInverse))
+                    if(!MatrixFinite(nativeFullView))
                         return EyeBuildResult::FatalError;
                     // This shader c64 source ALREADY contains the head
                     // inverse. Compensate its head transform before applying
@@ -1055,21 +1059,11 @@ namespace OutRunVRStereo
                         nativeFullView._43=0.f;
                     }
                     eyeInverse=MultiplyMatrix(
-                        InverseRigid(headInverse),nativeFullView);
+                        InverseRigid(programmableHeadInverse),nativeFullView);
                     if(!MatrixFinite(eyeInverse))
                         return EyeBuildResult::FatalError;
                 } else if(exactWorldSky) {
-                    float headBytes[16]{};
-                    std::uint32_t headPoseSequence=0;
-                    if(!OutRunVRRenderer::GetLatchedHeadInverse(
-                            headBytes,headPoseSequence) ||
-                       headPoseSequence!=stereo.poseSequence)
-                        return EyeBuildResult::FatalError;
-                    D3DMATRIX headInverse{};
-                    std::memcpy(&headInverse,headBytes,sizeof(headInverse));
-                    if(!MatrixFinite(headInverse))
-                        return EyeBuildResult::FatalError;
-                    D3DMATRIX rotationOnly=headInverse;
+                    D3DMATRIX rotationOnly=programmableHeadInverse;
                     rotationOnly._41=0.f;
                     rotationOnly._42=0.f;
                     rotationOnly._43=0.f;
@@ -1088,7 +1082,7 @@ namespace OutRunVRStereo
                     const D3DMATRIX skyEyeInverse=InverseRigid(skyEyePose);
                     eyeInverse=MultiplyMatrix(
                         MultiplyMatrix(
-                            InverseRigid(headInverse),rotationOnly),
+                            InverseRigid(programmableHeadInverse),rotationOnly),
                         skyEyeInverse);
                     if(!MatrixFinite(eyeInverse))
                         return EyeBuildResult::FatalError;
