@@ -342,7 +342,10 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
         "translated_line_count": len(render),
         "candidate_detected_line_count": detected_line_count,
         "candidate_sha256": hashlib.sha256(candidate_bytes).hexdigest(),
-        "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+        "candidate_source": row.get("_candidate_import_mode",
+                                   "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS"),
+        "manual_original_bbox": row.get("_manual_source_bbox_original"),
+        "manual_source_child_text": row.get("_manual_source_child_text"),
         "auto_salvage": source_salvage + candidate_salvage + line_salvage + (
             ["SOURCE_ALPHA_CONNECTED_COMPONENT_EXCLUSIVE_OWNER_TEST_ONLY"]
             if owner_mask is not None else []) + (
