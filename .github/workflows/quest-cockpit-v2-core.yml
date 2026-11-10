@@ -227,6 +227,14 @@ jobs:
           assert 'frame.eye[eye].orientation,stereo->effectiveEyeOrientation' in r7
           assert 'GetQuestNativeEyeInversePair(' in native_renderer
           assert 'GetQuestNativeEyeInversePair(' in r7
+          # Quest XrRig::locate commits two eyes as one frame. The R7 consumer
+          # must also freeze native-vs-fallback once per Present so the two
+          # original sky layers cannot change eye basis mid-frame.
+          assert 'struct QuestNativePairPresentLatch' in r7
+          assert 'GetQuestNativeEyePairForPresent(' in r7
+          assert 'QuestNativePairLatch.presentEpoch!=PresentEpoch' in r7
+          assert 'GetQuestNativeEyePairForPresent(\n                        stereo.poseSequence,fixedNativePairBytes)' in r7
+          assert 'GetQuestNativeEyePairForPresent(\n                    stereo.poseSequence,programmableNativePairBytes)' in r7
           assert 'InverseRigid(programmableHeadInverse),nativeFullView' in r7
           assert 'stereo.eyeOrientation[eye],skyEyeOffset' in r7
           assert 'programmableNativeEyePair' in r7 and 'fixedNativeEyePair' in r7
