@@ -751,6 +751,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         static float maxRelativeDelta=0.f;
         static std::uint16_t prevBody=0,prevAux=0;
         static float prevCameraLookYaw=0.f;
+        static float prevVisualCarYaw=0.f,prevVisualCameraYaw=0.f;
+        static unsigned turnTraceSamples=0,turnTraceQualified=0;
         static float maxBodyYawStep=0.f,maxAuxYawStep=0.f;
         static float maxCameraYawStep=0.f,maxAuxBodyGap=0.f;
         static float maxVisualCarCameraGap=0.f;
@@ -763,23 +765,59 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             lastRelativeY=b0Y-cameraY;
             prevBody=bodyWord;prevAux=auxWord;
             prevCameraLookYaw=cameraLookYaw;
+            prevVisualCarYaw=visualCarYaw;
+            prevVisualCameraYaw=visualCameraYaw;
+            turnTraceSamples=turnTraceQualified=0;
             maxBodyYawStep=maxAuxYawStep=maxCameraYawStep=0.f;
             maxAuxBodyGap=maxVisualCarCameraGap=maxSteering=0.f;
         }
-        maxBodyYawStep=(std::max)(maxBodyYawStep,std::fabs(
-            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(bodyWord,prevBody)));
-        maxAuxYawStep=(std::max)(maxAuxYawStep,std::fabs(
-            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(auxWord,prevAux)));
-        maxCameraYawStep=(std::max)(maxCameraYawStep,std::fabs(
+        const float bodyStepDeg=
+            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(bodyWord,prevBody);
+        const float auxStepDeg=
+            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(auxWord,prevAux);
+        const float cameraStepDeg=
             OutRunVR::QuestCockpitV2::YawRadiansStepDegrees(
-                cameraLookYaw,prevCameraLookYaw)));
+                cameraLookYaw,prevCameraLookYaw);
+        const float visualCarStepDeg=
+            OutRunVR::QuestCockpitV2::YawRadiansStepDegrees(
+                visualCarYaw,prevVisualCarYaw);
+        const float visualCameraStepDeg=
+            OutRunVR::QuestCockpitV2::YawRadiansStepDegrees(
+                visualCameraYaw,prevVisualCameraYaw);
+        maxBodyYawStep=(std::max)(maxBodyYawStep,std::fabs(bodyStepDeg));
+        maxAuxYawStep=(std::max)(maxAuxYawStep,std::fabs(auxStepDeg));
+        maxCameraYawStep=(std::max)(maxCameraYawStep,std::fabs(cameraStepDeg));
         maxAuxBodyGap=(std::max)(maxAuxBodyGap,std::fabs(auxBodyDeg));
         maxVisualCarCameraGap=(std::max)(
             maxVisualCarCameraGap,std::fabs(visualCarCameraGapDeg));
         maxSteering=(std::max)(maxSteering,std::fabs(
             OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(steerWord,0)));
+        const float steeringDeg=
+            OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(steerWord,0);
+        // Bounded, read-only temporal trace for the user's "camera turns
+        // first" report. Sample only meaningful moving steering and decimate
+        // to every second qualifying player draw; at most 48 lines per player
+        // lifetime, so this cannot become multi-GB per-draw telemetry.
+        if(speed>0.00922849774f && std::fabs(steeringDeg)>=0.5f &&
+           turnTraceSamples<48u && (++turnTraceQualified&1u)==0u) {
+            ++turnTraceSamples;
+            spdlog::info(
+                "VR CAMERA TURN TRACE: sample={} nativeEpoch={} "
+                "interpAlpha={:.4f} steerDeg={:.3f} speed={:.6f} "
+                "step[body={:.3f},aux={:.3f},gameCam={:.3f},"
+                "renderCar={:.3f},renderLook={:.3f}] "
+                "gap[auxBody={:.3f},renderCarCam={:.3f}]",
+                turnTraceSamples,
+                OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch(),
+                interpAlpha,steeringDeg,speed,
+                bodyStepDeg,auxStepDeg,cameraStepDeg,
+                visualCarStepDeg,visualCameraStepDeg,
+                auxBodyDeg,visualCarCameraGapDeg);
+        }
         prevBody=bodyWord;prevAux=auxWord;
         prevCameraLookYaw=cameraLookYaw;
+        prevVisualCarYaw=visualCarYaw;
+        prevVisualCameraYaw=visualCameraYaw;
         const float b0Delta=std::fabs(b0Y-lastB0Y);
         const float f0Delta=std::fabs(f0Y-lastF0Y);
         const float cameraDelta=std::fabs(cameraY-lastCameraY);
