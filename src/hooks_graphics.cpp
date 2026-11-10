@@ -816,7 +816,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             observations=0;
             maxB0Delta=maxF0Delta=maxCameraDelta=maxRelativeDelta=0.f;
             maxBodyYawStep=maxAuxYawStep=maxCameraYawStep=0.f;
-            maxAuxBodyGap=maxSteering=0.f;
+            maxAuxBodyGap=maxVisualCarCameraGap=maxSteering=0.f;
         }
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
