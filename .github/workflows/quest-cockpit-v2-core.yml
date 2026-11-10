@@ -197,6 +197,10 @@ jobs:
           assert 'original 30-car table' in hook
           copy_launcher=Path('QuestCockpit-CopyRun.ps1').read_text(encoding='utf-8')
           assert "QuestCockpitV2F0='ON'" in copy_launcher
+          assert "'NORMAL','SKY','INTERP','TURN'" in copy_launcher
+          assert "if($Mode -eq 'TURN')" in copy_launcher
+          assert "$launchArgs.QuestCockpitV2Interpolation='ON'" in copy_launcher
+          assert "$launchArgs.QuestCockpitV2SkyProbe='ON'" in copy_launcher
           assert "'-VR.QuestCockpitV2SeatBack=-0.08'" in launcher
           assert "'-VR.QuestCockpitV2SeatDown=-0.05'" in launcher
           assert 'SyncNativeSeatProfile(false)' in hook
