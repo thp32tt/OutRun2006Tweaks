@@ -406,7 +406,7 @@ class StrictHDQualityTests(unittest.TestCase):
 
     def test_source_edge_diagonal_native_continuation_is_still_hold(self):
         # Visible native AA must stay HOLD if it crosses the source boundary.
-        # Only alpha <=8 is user-approved cosmetic fringe.
+        # Only alpha <=15 is user-approved cosmetic fringe.
         im = native.native_image(source_dds())
         draw = ImageDraw.Draw(im)
         draw.rectangle((4, 18, 14, 37), fill=(255, 255, 255, 255))
@@ -433,11 +433,11 @@ class StrictHDQualityTests(unittest.TestCase):
                          "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
 
     def test_invisible_native_diagonal_fringe_is_allowed_but_preserved(self):
-        # User explicitly allows native anti-alias alpha<=8 to be ignored;
+        # User explicitly allows native anti-alias alpha<=15 to be ignored;
         # the OUTSIDE original pixel still remains bit-identical.
         im = native.native_image(source_dds())
-        ImageDraw.Draw(im).point((4, 6), fill=(255, 255, 255, 1))
-        ImageDraw.Draw(im).point((3, 5), fill=(255, 255, 255, 1))
+        ImageDraw.Draw(im).point((4, 6), fill=(255, 255, 255, 15))
+        ImageDraw.Draw(im).point((3, 5), fill=(255, 255, 255, 15))
         src = source_dds()[:128] + im.tobytes("raw", "BGRA")
         data, final, clean, painted, holds = self.run_case(src)
         self.assertIsNotNone(data)

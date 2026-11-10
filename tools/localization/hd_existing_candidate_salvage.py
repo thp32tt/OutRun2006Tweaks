@@ -9,8 +9,8 @@ from PIL import Image, ImageChops, ImageFilter, ImageOps
 
 ALPHA_THRESHOLD = 16
 # Explicit user-approved visual tolerance: discard only barely-visible
-# source/candidate antialias fringe (<=8 of 255). Core alpha remains protected.
-COSMETIC_FRINGE_ALPHA = 8
+# source/candidate antialias fringe (<=15 of 255). Core alpha >=16 stays protected.
+COSMETIC_FRINGE_ALPHA = 15
 MIN_COLUMN_GAP = 2
 
 
@@ -32,7 +32,7 @@ def native_alpha_crosses_box_edge(alpha, box, side):
     """Require a REAL 8-connected native ink crossing before an edge HOLD.
 
     An unrelated neighbor farther along the rectangle is not a continuation
-    of the source text. Preserve even the faintest nonzero source alpha.
+    of the source text. Ignore only alpha<=15 cosmetic fringe; preserve alpha>=16.
     """
     x0, y0, x1, y1 = box
     width, height = alpha.size

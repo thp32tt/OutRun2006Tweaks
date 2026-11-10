@@ -394,7 +394,7 @@ def build(root,out):
          "active_roi_total":954,"imported_roi_total":imported_total,
          "c1_preliminary_new_png_count":c1_provisional_count,
          "manual_user_test_only_roi_count":manual_user_count,
-         "cosmetic_alpha_tolerance_max":8,
+         "cosmetic_alpha_tolerance_max":15,
          "cosmetic_bc3_color_channel_error_max":64,
          "manual_stage_child_roi_test_only":manual_user_count > 0,
          "deterministic_salvaged_roi":sum(

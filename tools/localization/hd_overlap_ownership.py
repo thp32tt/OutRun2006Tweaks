@@ -10,7 +10,7 @@ from PIL import Image
 
 MAX_SOURCE_ALPHA_PIXELS = 1500000
 # Only near-invisible antialias pixels are excluded from component anchoring.
-COSMETIC_FRINGE_ALPHA = 8
+COSMETIC_FRINGE_ALPHA = 15
 
 
 def prove_overlap_ownership(source, rows, conflicting_ids):

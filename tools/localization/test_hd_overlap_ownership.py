@@ -97,6 +97,16 @@ class NativeOverlapProofTests(unittest.TestCase):
         self.assertIsNone(clean.getchannel("A").getbbox())
         self.assertEqual(final.getpixel((185, 115)), src.getpixel((185, 115)))
 
+    def test_sub16_shared_alpha_fringe_is_cosmetic_not_overlap_ink(self):
+        src = fixture()
+        draw = ImageDraw.Draw(src)
+        draw.point((75, 25), fill=(255, 255, 255, 15))
+        self.assertFalse(strict.shared_native_alpha(
+            src.getchannel("A"), A["_bbox"], B["_bbox"]))
+        draw.point((75, 25), fill=(255, 255, 255, 16))
+        self.assertTrue(strict.shared_native_alpha(
+            src.getchannel("A"), A["_bbox"], B["_bbox"]))
+
     def test_ambiguous_unanchored_shared_component_keeps_both_held(self):
         src = fixture(ambiguous=True)
         masks, audit = prove_overlap_ownership(

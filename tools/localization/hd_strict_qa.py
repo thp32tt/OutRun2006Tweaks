@@ -175,7 +175,7 @@ def strict_candidate(image_bytes):
     except (OSError, UnidentifiedImageError) as exc:
         raise QualityHold("QA_CANDIDATE_UNREADABLE") from exc
     a = img.getchannel("A")
-    # User-approved sub-3.2% opacity flecks are cosmetic and not lettering.
+    # User-approved <=15/255 (5.9%) opacity flecks are cosmetic, not core lettering.
     a = a.point(lambda n: 0 if n <= COSMETIC_FRINGE_ALPHA else n)
     img.putalpha(a)
     b = a.getbbox()
@@ -372,7 +372,7 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
             ["OVERLAPPING_ROI_REUSED_ONLY_AFTER_DISJOINT_SOURCE_ALPHA_BBOX_PROOF"]
             if overlap_used else []),
         "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
-        "qa_gate": "COSMETIC_ALPHA_LE_8_TOLERATED_C1_C3_GAME_UNTESTED",
+        "qa_gate": "COSMETIC_ALPHA_LE_15_TOLERATED_C1_C3_GAME_UNTESTED",
     }
 
 
