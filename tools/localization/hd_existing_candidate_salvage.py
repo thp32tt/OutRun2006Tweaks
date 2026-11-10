@@ -8,6 +8,9 @@ from itertools import combinations
 from PIL import Image, ImageChops, ImageFilter, ImageOps
 
 ALPHA_THRESHOLD = 16
+# Explicit user-approved visual tolerance: discard only barely-visible
+# source/candidate antialias fringe (<=8 of 255). Core alpha remains protected.
+COSMETIC_FRINGE_ALPHA = 8
 MIN_COLUMN_GAP = 2
 
 
@@ -39,8 +42,8 @@ def native_alpha_crosses_box_edge(alpha, box, side):
         if not 0 <= outside < width:
             return False
         for y in range(y0, y1):
-            if alpha.getpixel((inside, y)) and any(
-                alpha.getpixel((outside, yy))
+            if alpha.getpixel((inside, y)) > COSMETIC_FRINGE_ALPHA and any(
+                alpha.getpixel((outside, yy)) > COSMETIC_FRINGE_ALPHA
                 for yy in (y - 1, y, y + 1) if 0 <= yy < height
             ):
                 return True
@@ -50,8 +53,8 @@ def native_alpha_crosses_box_edge(alpha, box, side):
         if not 0 <= outside < height:
             return False
         for x in range(x0, x1):
-            if alpha.getpixel((x, inside)) and any(
-                alpha.getpixel((xx, outside))
+            if alpha.getpixel((x, inside)) > COSMETIC_FRINGE_ALPHA and any(
+                alpha.getpixel((xx, outside)) > COSMETIC_FRINGE_ALPHA
                 for xx in (x - 1, x, x + 1) if 0 <= xx < width
             ):
                 return True
@@ -68,7 +71,8 @@ def translated_touches_external_native_ink(source, box, rendered):
     region = (max(0, x0 - 1), max(0, y0 - 1),
               min(source.width, x1 + 1), min(source.height, y1 + 1))
     rx0, ry0, rx1, ry1 = region
-    protected = source.getchannel("A").crop(region)
+    protected = source.getchannel("A").crop(region).point(
+        lambda n: n if n > COSMETIC_FRINGE_ALPHA else 0)
     protected.paste(0, (x0 - rx0, y0 - ry0, x1 - rx0, y1 - ry0))
     halo = protected.filter(ImageFilter.MaxFilter(3))
     for glyph, left, top in rendered:
@@ -102,7 +106,8 @@ def prove_source_edge_clear(source, box, extent, margin=2):
         "RIGHT": (x1,y0,x1+margin,y1) if x1+margin <= source.width else None,
         "BOTTOM": (x0,y1,x1,y1+margin) if y1+margin <= source.height else None,
     }
-    alpha = source.getchannel("A")
+    alpha = source.getchannel("A").point(
+        lambda n: n if n > COSMETIC_FRINGE_ALPHA else 0)
     edge_rules = {
         "LEFT": x0 == 0,
         "TOP": y0 == 0,
