@@ -4,6 +4,11 @@ on:
   # The default-branch 30-minute SHA controller is now the only auto dispatcher.
   # No push storm, no daily blind 2-hour rebuild for unchanged A/B assets.
   workflow_dispatch:
+  # One build for this code change, not a push storm for every PNG output.
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-ab-multi-atlas.yml"
 
 permissions:
   contents: write
@@ -27,6 +32,8 @@ jobs:
           sparse-checkout: |
             tools/localization/github_ab_imagegen_atlas_batch.py
             tools/localization/hd_strict_qa.py
+            tools/localization/hd_manual_user_import.py
+            tools/localization/test_hd_manual_user_import.py
             tools/localization/hd_overlap_ownership.py
             tools/localization/test_hd_overlap_ownership.py
             tools/localization/hd_bc3_index_patch.py
@@ -47,7 +54,7 @@ jobs:
             localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
             localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
 
-      - name: Read only previous claimed QA ticket IDs from isolated branch
+      - name: Read previous QA ticket IDs and user manual SHA-pinned PNG pack
         uses: actions/checkout@v4
         with:
           ref: korean-localization-qa-queue-20261104
@@ -55,6 +62,7 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             localization/automation_runs/hd_rework_queue/state
+            localization/automation_inputs/manual_user_20261110/OUTRUN_HD_MANUAL_SUBMISSION_QA_TEST_ONLY_20261110.zip
 
       - name: Prepare pure GitHub Python runner
         uses: actions/setup-python@v5
@@ -68,6 +76,7 @@ jobs:
         run: |
           python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
           python -m unittest discover -s tools/localization -p test_hd_strict_qa.py -v
+          python -m unittest discover -s tools/localization -p test_hd_manual_user_import.py -v
           python -m unittest discover -s tools/localization -p test_hd_overlap_ownership.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
@@ -89,7 +98,9 @@ jobs:
           assert j["schema"]=="outrun.ab-imagegen-hd-strict.v2"
           assert j["release_approved"] is False and j["runtime_validation"]=="UNTESTED"
           assert j["legacy_oversize_outputs_rejected"] is True
-          assert j["translated_roi_generated"] >= 155 # last confirmed existing PNG salvage baseline
+          assert j["translated_roi_generated"] >= 301 # last confirmed 2026-11-10 strict source baseline
+          assert j["manual_user_test_only_roi_count"]==6
+          assert j["release_approved"] is False
           assert j["salvage_policy"]=="EXISTING_AB_PNG_RESIZE_REFLOW_ONLY_NO_NEW_IMAGEGEN_V2"
           assert j["translated_roi_generated"]+sum(j["hold_roi_reason_counts"].values())==954
           for atlas in j["generated"]:
