@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af39cc1-c7a4-83ee-a721-a9c97672f37b",
   "old_candidate_sha256": "2c4577e9e025287ce41b4655e35a435068599cb3ed3268e1ea0c7a3655de0134",
   "release_approved": false,
   "roi_id": "Q121_1899c0152ffdcde2",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "Music will be Randomly Selected.",
     "korean": "음악이 무작위로 선택됩니다.",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-B-bfd81903263da59e0c55"
   },
   "task_id": "HDRW-B-bfd81903263da59e0c55",
-  "updated_utc": "2026-11-10T22:37:49+00:00"
+  "updated_utc": "2026-11-10T22:38:16+00:00"
 }
