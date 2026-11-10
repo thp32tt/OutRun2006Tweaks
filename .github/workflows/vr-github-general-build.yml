@@ -28,6 +28,7 @@ on:
       - 'RUN-QUEST-COCKPIT-V2.cmd'
       - 'RUN-QUEST-APK-COCKPIT.cmd'
       - 'RUN-QUEST-APK-SKY-DIAG.cmd'
+      - 'RUN-QUEST-APK-TURN-DIAG.cmd'
       - 'RUN-QUEST-APK-INTERP-OFF.cmd'
       - 'RESTORE-QUEST-APK-COCKPIT.cmd'
       - 'QuestCockpit-CopyRun.ps1'
@@ -161,6 +162,7 @@ jobs:
           $expected=[ordered]@{
             'RUN-QUEST-APK-COCKPIT.cmd'='NORMAL'
             'RUN-QUEST-APK-SKY-DIAG.cmd'='SKY'
+            'RUN-QUEST-APK-TURN-DIAG.cmd'='TURN'
             'RUN-QUEST-APK-INTERP-OFF.cmd'='INTERP'
           }
           foreach($pair in $expected.GetEnumerator()){
@@ -280,6 +282,7 @@ jobs:
             foreach($item in @(
               'RUN-QUEST-APK-COCKPIT.cmd',
               'RUN-QUEST-APK-SKY-DIAG.cmd',
+              'RUN-QUEST-APK-TURN-DIAG.cmd',
               'RUN-QUEST-APK-INTERP-OFF.cmd',
               'RESTORE-QUEST-APK-COCKPIT.cmd',
               'QuestCockpit-CopyRun.ps1',
@@ -339,6 +342,7 @@ jobs:
               foreach($cmd in @(
                 'RUN-QUEST-APK-COCKPIT.cmd',
                 'RUN-QUEST-APK-SKY-DIAG.cmd',
+                'RUN-QUEST-APK-TURN-DIAG.cmd',
                 'RUN-QUEST-APK-INTERP-OFF.cmd',
                 'RESTORE-QUEST-APK-COCKPIT.cmd')) {
                 & $env:ComSpec /d /v:on /c ('"' + $cmd + '" VERIFY')
@@ -419,6 +423,7 @@ jobs:
               foreach($cmd in @(
                 'RUN-QUEST-APK-COCKPIT.cmd',
                 'RUN-QUEST-APK-SKY-DIAG.cmd',
+                'RUN-QUEST-APK-TURN-DIAG.cmd',
                 'RUN-QUEST-APK-INTERP-OFF.cmd',
                 'RESTORE-QUEST-APK-COCKPIT.cmd')) {
                 & $env:ComSpec /d /v:on /c ('"' + $cmd + '" VERIFY')
