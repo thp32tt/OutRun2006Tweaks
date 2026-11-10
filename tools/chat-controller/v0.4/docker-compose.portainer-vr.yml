@@ -13,25 +13,25 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "conversion"
-      AUTO_SEND: "true"
+      AUTO_SEND: "false"
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
-      VR_FEATURE_DEVELOPMENT_ENABLED: "true"
-      # Operator 2026-11-09: Ferrari A/C use temporary PUBLIC plaintext workspace thp32tt/imsi1; Model2 VR disabled.
-      VR_CONTINUOUS_30M_ENABLED: "true"
-      VR_SCHEDULED_DISPATCH_ENABLED: "true"
+      VR_FEATURE_DEVELOPMENT_ENABLED: "false"
+      # Operator 2026-11-10: Ferrari A/C automatic modeling stopped by user request; preserve workspace/artifacts.
+      VR_CONTINUOUS_30M_ENABLED: "false"
+      VR_SCHEDULED_DISPATCH_ENABLED: "false"
       VR_CONTINUOUS_INTERVAL_SECONDS: "3600"
       VR_FEATURE_PROMOTION_MODE: "ai"
       VR_FEATURE_POLL_SECONDS: "60"
       VR_FEATURE_C6_REMINDER_SECONDS: "300"
       CONVERSION_ACTIVE_LIMIT: "2"
       CONVERSION_DX11_ENABLED: "false"
-      # Two independent cockpit-only vehicle owners (Daytona A, F50 C; Dino excluded).
-      CAR_MODEL_AUTODEV_ENABLED: "true"
+      # Ferrari cockpit modeling stopped (A and C); do not dispatch without explicit user re-enable.
+      CAR_MODEL_AUTODEV_ENABLED: "false"
       CAR_MODEL_GITHUB_REPO: "thp32tt/imsi1"
       CAR_MODEL_TARGET_BRANCH: "main"
       CAR_MODEL_SCHEDULE_MINUTES: "0,30"
-      CAR_MODEL_C_AUTODEV_ENABLED: "true"
+      CAR_MODEL_C_AUTODEV_ENABLED: "false"
       CAR_MODEL_C_SCHEDULE_MINUTES: "15,45"
       CAR_MODEL_CONTINUE_MIN_SECONDS: "1800"
       CAR_MODEL_RESPONSE_STABLE_SECONDS: "30"
