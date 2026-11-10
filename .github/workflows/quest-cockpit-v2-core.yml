@@ -2,10 +2,19 @@ name: QuestCockpitV2 Isolated Core Smoke
 
 on:
   push:
-    branches: [ vr-quest-cockpit-v2 ]
+    branches: [ vr-quest-cockpit-v2, 'vr-quest-cockpit-v2-*' ]
     paths:
       - '.github/workflows/quest-cockpit-v2-core.yml'
       - 'src/vr/d3d9/stereo_renderer_r7.inc'
+      - 'src/vr/game/outrun_renderer.cpp'
+      - 'src/vr/game/quest_cockpit_v2_apk_xr_pose.hpp'
+      - 'QuestCockpit-CopyRun.ps1'
+      - 'RUN-QUEST-COCKPIT-V2.cmd'
+      - 'RUN-QUEST-COCKPIT-V2-F0.cmd'
+      - 'RUN-QUEST-COCKPIT-V2-LOD0.cmd'
+      - 'RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd'
+      - 'RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd'
+      - 'tools/verify_quest_cockpit_launchers.py'
       - 'src/vr/d3d9/direct_gpu_hold_policy.hpp'
       - 'tools/tests/direct_gpu_hold_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
@@ -108,6 +117,8 @@ jobs:
           /tmp/quest-cockpit-glass
       - name: Reversible glass tint brightness ON/OFF synthetic tests
         run: python3 -m unittest discover -s tools/tests -p test_quest_cockpit_glass.py -v
+      - name: Verify all F0-stable cockpit launchers
+        run: python3 tools/verify_quest_cockpit_launchers.py
       - name: Reject removed legacy hooks and unsafe defaults
         run: |
           python3 - <<'PY'
@@ -214,9 +225,11 @@ jobs:
           assert 'The PC OpenXR' in native_renderer
           assert 'LatchedStereo.effectiveEyeOrientation[eye][0]=q.x' not in native_renderer
           assert 'frame.eye[eye].orientation,stereo->effectiveEyeOrientation' in r7
-          assert 'GetQuestNativeEyeInverse(' in native_renderer
-          assert 'GetQuestNativeEyeInverse(' in r7
-          assert 'InverseRigid(headInverse),nativeFullView' in r7
+          assert 'GetQuestNativeEyeInversePair(' in native_renderer
+          assert 'GetQuestNativeEyeInversePair(' in r7
+          assert 'InverseRigid(programmableHeadInverse),nativeFullView' in r7
+          assert 'stereo.eyeOrientation[eye],skyEyeOffset' in r7
+          assert 'programmableNativeEyePair' in r7 and 'fixedNativeEyePair' in r7
           assert 'OriginalQuestModeOneInput(' in Path('src/vr/game/quest_cockpit_v2_seat.hpp').read_text(encoding='utf-8')
           assert "'-VR.QuestCockpitV2ApkNativeCamera=true'" in launcher
           assert "'-VR.QuestCockpitV2NativeSeatProfile=true'" in launcher
