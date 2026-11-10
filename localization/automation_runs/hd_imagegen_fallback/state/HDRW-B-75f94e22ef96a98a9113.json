@@ -1,4 +1,5 @@
 {
+  "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af3aeef-4680-83ec-bfcc-41abc0d01f96",
   "old_candidate_sha256": "8bd0a60cf3cb02545ee6cda5f0cdc8beea720b1e34c77b22e05737de9fe0d5b2",
   "release_approved": false,
   "roi_id": "Q094_d1401e120e386bd1",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
-  "status": "AB_CLAIMED",
+  "status": "AB_SENT",
   "task": {
     "english": "OutRun2 · 15 Continuous Course has been selected.",
     "korean": "OutRun2 · 15코스 연속이 선택되었습니다.",
@@ -57,5 +58,5 @@
     "task_id": "HDRW-B-75f94e22ef96a98a9113"
   },
   "task_id": "HDRW-B-75f94e22ef96a98a9113",
-  "updated_utc": "2026-11-10T23:55:20+00:00"
+  "updated_utc": "2026-11-10T23:55:46+00:00"
 }
