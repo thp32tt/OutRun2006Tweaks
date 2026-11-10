@@ -21,6 +21,7 @@ from hd_existing_candidate_salvage import (
     pad_candidate_edge,
     prove_source_edge_clear,
     translated_touches_external_native_ink,
+    COSMETIC_FRINGE_ALPHA,
 )
 
 MAX_LINES = 3
@@ -65,7 +66,8 @@ def shared_native_alpha(alpha, first_box, second_box):
     y0 = max(first_box[1], second_box[1])
     x1 = min(first_box[2], second_box[2])
     y1 = min(first_box[3], second_box[3])
-    return alpha.crop((x0, y0, x1, y1)).getbbox() is not None
+    return alpha.crop((x0, y0, x1, y1)).point(
+        lambda n: n if n > COSMETIC_FRINGE_ALPHA else 0).getbbox() is not None
 
 
 def source_ink_conflicts(source, rows, geometric_conflict_fn):
@@ -173,6 +175,9 @@ def strict_candidate(image_bytes):
     except (OSError, UnidentifiedImageError) as exc:
         raise QualityHold("QA_CANDIDATE_UNREADABLE") from exc
     a = img.getchannel("A")
+    # User-approved sub-3.2% opacity flecks are cosmetic and not lettering.
+    a = a.point(lambda n: 0 if n <= COSMETIC_FRINGE_ALPHA else n)
+    img.putalpha(a)
     b = a.getbbox()
     if not b:
         raise QualityHold("QA_CANDIDATE_INVISIBLE")
@@ -191,6 +196,8 @@ def source_text_evidence(source: Image.Image, box, owner_mask=None):
     a = area.getchannel("A")
     if owner_mask is not None:
         a = ImageChops.multiply(a, owner_mask.crop(box))
+    # Ignore only visually negligible native alpha. Opaque panels remain HOLD.
+    a = a.point(lambda n: 0 if n <= COSMETIC_FRINGE_ALPHA else n)
     extent = a.getbbox()
     if not extent:
         raise QualityHold("QA_NO_SOURCE_TEXT_ALPHA")
@@ -342,7 +349,7 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
             ["OVERLAPPING_ROI_REUSED_ONLY_AFTER_DISJOINT_SOURCE_ALPHA_BBOX_PROOF"]
             if overlap_used else []),
         "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
-        "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+        "qa_gate": "COSMETIC_ALPHA_LE_8_TOLERATED_C1_C3_GAME_UNTESTED",
     }
 
 
@@ -383,7 +390,8 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
                            not (owner_mask is not None and
                                 shared_native_alpha(source.getchannel("A"),
                                     row["_bbox"], r["_bbox"]))]
-            foreign_alpha = (ImageChops.subtract(source.getchannel("A"), owner_mask)
+            foreign_alpha = (ImageChops.subtract(source.getchannel("A"), owner_mask).point(
+                                 lambda n: n if n > COSMETIC_FRINGE_ALPHA else 0)
                              if owner_mask is not None else None)
             evidence = place_one_source_text(
                 source, clean, result, row, repo, used, import_check, other_boxes,
