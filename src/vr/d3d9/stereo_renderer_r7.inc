@@ -252,6 +252,17 @@ namespace OutRunVRStereo
         std::uint64_t ProgrammableSkyViewModeSwitches = 0;
         bool ProgrammableSkyLastModeKnown = false;
         bool ProgrammableSkyLastNative = false;
+        // Quest XrRig::locate accepts the two eyes as one frame. Keep the
+        // Windows native-vs-fallback decision equally frame-atomic: fixed and
+        // programmable world draws in one Present reuse the first resolution.
+        struct QuestNativePairPresentLatch {
+            std::uint64_t presentEpoch = 0;
+            std::uint32_t poseSequence = 0;
+            bool resolved = false;
+            bool available = false;
+            float matrices[2][16]{};
+        };
+        QuestNativePairPresentLatch QuestNativePairLatch{};
 		bool FirstFixedFunctionWorldLogged = false;
 		bool FirstFixedFunctionSkyRotationLogged = false;
 		std::uint64_t OcclusionQueriesCreated = 0;
@@ -754,6 +765,38 @@ namespace OutRunVRStereo
 		bool ReadTrackedRenderState(IDirect3DDevice9* device,
 			D3DRENDERSTATETYPE state, DWORD& out) noexcept;
 
+        bool GetQuestNativeEyePairForPresent(
+            std::uint32_t poseSequence,float outMatrices[2][16]) noexcept
+        {
+            if(poseSequence==0)return false;
+            if(QuestNativePairLatch.presentEpoch!=PresentEpoch) {
+                QuestNativePairLatch={};
+                QuestNativePairLatch.presentEpoch=PresentEpoch;
+            }
+            if(QuestNativePairLatch.resolved) {
+                if(QuestNativePairLatch.poseSequence!=poseSequence ||
+                   !QuestNativePairLatch.available)
+                    return false;
+                std::memcpy(outMatrices,QuestNativePairLatch.matrices,
+                            sizeof(QuestNativePairLatch.matrices));
+                return true;
+            }
+
+            QuestNativePairLatch.resolved=true;
+            QuestNativePairLatch.poseSequence=poseSequence;
+            float pair[2][16]{};
+            std::uint32_t nativePoseSequence=0;
+            QuestNativePairLatch.available=
+                OutRunVRRenderer::GetQuestNativeEyeInversePair(
+                    pair,nativePoseSequence) &&
+                nativePoseSequence==poseSequence;
+            if(!QuestNativePairLatch.available)
+                return false;
+            std::memcpy(QuestNativePairLatch.matrices,pair,sizeof(pair));
+            std::memcpy(outMatrices,pair,sizeof(pair));
+            return true;
+        }
+
 		enum class EyeBuildResult { NonWorld, WorldStereo, FatalError };
 		struct DrawStereoState
 		{
@@ -906,11 +949,9 @@ namespace OutRunVRStereo
 				}
 
                 float fixedNativePairBytes[2][16]{};
-                std::uint32_t fixedNativePairPoseSequence=0;
                 const bool fixedNativeEyePair=
-                    OutRunVRRenderer::GetQuestNativeEyeInversePair(
-                        fixedNativePairBytes,fixedNativePairPoseSequence) &&
-                    fixedNativePairPoseSequence==stereo.poseSequence;
+                    GetQuestNativeEyePairForPresent(
+                        stereo.poseSequence,fixedNativePairBytes);
 
 				for (int eye = 0; eye < 2; ++eye)
 				{
@@ -1014,12 +1055,9 @@ namespace OutRunVRStereo
 				OutRunVR::GameSemantic::RenderScope::WorldSky;
             bool exactSkyNativeEye[2]{false,false};
             float programmableNativePairBytes[2][16]{};
-            std::uint32_t programmableNativePairPoseSequence=0;
             const bool programmableNativeEyePair=
-                OutRunVRRenderer::GetQuestNativeEyeInversePair(
-                    programmableNativePairBytes,
-                    programmableNativePairPoseSequence) &&
-                programmableNativePairPoseSequence==stereo.poseSequence;
+                GetQuestNativeEyePairForPresent(
+                    stereo.poseSequence,programmableNativePairBytes);
             D3DMATRIX programmableHeadInverse{};
             if(programmableNativeEyePair || exactWorldSky) {
                 float headBytes[16]{};
@@ -2392,7 +2430,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};if(++PresentEpoch==0)PresentEpoch=1;return hr;
 		}
 
-		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;LastMainDepthClearEpoch=0;LastMainDepthClearFlags=0;LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
+		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;QuestNativePairLatch={};LastMainDepthClearEpoch=0;LastMainDepthClearFlags=0;LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
 
 		constexpr std::uint32_t StereoInstallPending = 0;
 		constexpr std::uint32_t StereoInstallReady = 1;
