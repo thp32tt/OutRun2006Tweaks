@@ -129,6 +129,38 @@ def alpha_lines(alpha: Image.Image):
     return ans
 
 
+def source_effect_band_lines(alpha: Image.Image):
+    """Rejoin a single native text line split only by narrow AA/shadow bands.
+
+    A separately stacked subtitle or label is never a shadow: at least one
+    core band must be >=4x taller than *every* other band; all accessory
+    bands must be short, vertically adjacent within 7 source pixels and
+    horizontally contained in the core. This is evidence classification,
+    not a new alpha mask or permission to erase other source text.
+    """
+    bands = alpha_lines(alpha)
+    if len(bands) < 2 or len(bands) > 3:
+        return bands, []
+    heights = [b[3] - b[1] for b in bands]
+    main_index = max(range(len(bands)), key=lambda i: heights[i])
+    core = bands[main_index]
+    ch = heights[main_index]
+    if ch < 16 or any((i != main_index and 4 * h > ch)
+                      for i, h in enumerate(heights)):
+        return bands, []
+    for i, b in enumerate(bands):
+        if i == main_index:
+            continue
+        gap = core[1] - b[3] if b[3] <= core[1] else (
+            b[1] - core[3] if b[1] >= core[3] else 0)
+        if gap > 7 or b[0] < core[0] or b[2] > core[2]:
+            return bands, []
+    return [(min(b[0] for b in bands), min(b[1] for b in bands),
+             max(b[2] for b in bands), max(b[3] for b in bands))], [
+        "SOURCE_AA_SHADOW_BANDS_SINGLE_LOGICAL_LINE_TEST_ONLY"
+    ]
+
+
 def strict_candidate(image_bytes):
     if len(image_bytes) > 4 * 1024 * 1024:
         raise QualityHold("QA_CANDIDATE_OVER_4MB")
@@ -171,7 +203,8 @@ def source_text_evidence(source: Image.Image, box, owner_mask=None):
     occupied = nonzero.histogram()[255] / (area.width * area.height)
     if occupied > MAX_SRC_ALPHA_OCCUPANCY:
         raise QualityHold("QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT")
-    lines = alpha_lines(a)
+    lines, effect_salvage = source_effect_band_lines(a)
+    salvage_actions += effect_salvage
     if not 1 <= len(lines) <= MAX_LINES:
         raise QualityHold("QA_SOURCE_LINE_LAYOUT_UNVERIFIED")
     if any((b[2] - b[0]) < 3 or (b[3] - b[1]) < 3 for b in lines):
