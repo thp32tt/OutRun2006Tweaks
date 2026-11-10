@@ -31,6 +31,7 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             tools/localization/github_ab_imagegen_atlas_batch.py
+            tools/localization/hd_manual_user_import.py
             tools/localization/hd_strict_qa.py
             tools/localization/hd_overlap_ownership.py
             tools/localization/hd_bc3_index_patch.py
