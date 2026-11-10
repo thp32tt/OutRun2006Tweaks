@@ -98,9 +98,21 @@ inline bool OriginalQuestVrProfileAnchor(
 // This is original per-car camera input data, NOT a generic world
 // HMD translation. Never add or subtract the pair again from every OpenXR eye.
 // Quest run_game::$_5 at 0x2E3690..0x2E36C8 enables
-// PcRaceCameraInputs only when guest state==0x10 (STATE_GAME)
-// and the captured PadSnapshot toggle is asserted. This
-// helper verifies the state prerequisite, not the still-missing toggle.
+// PcRaceCameraInputs only when guest state==0x10 (STATE_GAME) and the captured
+// PadSnapshot toggle is asserted. 2026-11-10 exact closure reconstruction
+// closes that former gap: run_game::$_2 closure+0x20 is the same sp+0x48 byte
+// captured by $_5. $_2 asserts it only after profile XYZ lookup succeeds and
+// finally ANDs it with 0.05 < virtual-wheel radius < 0.4 at 0x2E17B0..0x2E1804.
+// run_game::$_3's original debug string proves sp+0x64 is "radius" and sp+0x60
+// is "tilt"; android_main initializes radius to 0.175 at 0x2DBA5C..0x2DBA6C.
+// Thus a valid default Quest profile naturally asserts this gate even without
+// synthesizing any physical-wheel camera-yaw rule on Windows.
+inline constexpr float OriginalQuestDefaultVirtualWheelRadius=0.175f;
+inline bool OriginalQuestPadSnapshotCameraInputValid(
+    bool profileValid,float virtualWheelRadius) noexcept {
+    return profileValid && std::isfinite(virtualWheelRadius) &&
+           virtualWheelRadius>0.05f && virtualWheelRadius<0.4f;
+}
 inline bool OriginalQuestGameCameraState(std::uint32_t guestState) noexcept {
     return guestState==0x10u;
 }
