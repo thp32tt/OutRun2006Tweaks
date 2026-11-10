@@ -13,6 +13,7 @@ on:
       - 'RUN-QUEST-COCKPIT-V2-F0.cmd'
       - 'RUN-QUEST-COCKPIT-V2-LOD0.cmd'
       - 'RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd'
+      - 'RUN-QUEST-COCKPIT-V2-TURN-DIAG.cmd'
       - 'RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd'
       - 'tools/verify_quest_cockpit_launchers.py'
       - 'src/vr/d3d9/direct_gpu_hold_policy.hpp'
@@ -155,6 +156,7 @@ jobs:
                          'RUN-QUEST-COCKPIT-V2-F0.cmd',
                          'RUN-QUEST-COCKPIT-V2-LOD0.cmd',
                           'RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd',
+                          'RUN-QUEST-COCKPIT-V2-TURN-DIAG.cmd',
                           'RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd'):
               launcher_script=Path(script).read_text(encoding='utf-8')
               assert '-QuestCockpitV2ReleaseParity ON' in launcher_script, script
