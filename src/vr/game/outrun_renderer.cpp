@@ -2553,6 +2553,32 @@ namespace OutRunVRRenderer
         return true;
     }
 
+
+    bool GetQuestNativeEyeInversePair(float outMatrices[2][16],
+        std::uint32_t& poseSequence) noexcept
+    {
+        // Original Quest XrRig::locate commits exactly two valid views as one
+        // StereoFrame. Mirror that contract at the D3D9 consumer boundary:
+        // validate the native cockpit state once, then copy both eye matrices
+        // from the same latched pose generation. This also avoids repeating
+        // Game::camera/current_mode/readiness checks for every eye draw.
+        const auto* liveCamera=Game::camera();
+        if(!outMatrices || !QuestNativeEyesValid ||
+           !OutRunVR::QuestCockpitV2::NativeSeatCameraTick.Ready() ||
+           !OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.load(
+               std::memory_order_acquire) ||
+           !liveCamera || liveCamera->cam_mode_34A!=1 ||
+           !Game::current_mode ||
+           !OutRunVR::QuestCockpitV2::OriginalQuestGameCameraState(
+               static_cast<std::uint32_t>(*Game::current_mode)) ||
+           QuestNativeEyePoseSequence==0 ||
+           QuestNativeEyePoseSequence!=LatchedPoseSequence) return false;
+        std::memcpy(outMatrices,QuestNativeEyeInverse,
+                    sizeof(QuestNativeEyeInverse));
+        poseSequence=QuestNativeEyePoseSequence;
+        return true;
+    }
+
 	bool GetLatchedHeadInverse(float outMatrix[16],
 		std::uint32_t& poseSequence) noexcept
 	{
