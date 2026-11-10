@@ -264,10 +264,32 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
         raise QualityHold(str(exc)) from exc
     positions = []
     render = []
+    edge_insets = []
+    native_edges = [side for side in ("LEFT", "TOP", "RIGHT", "BOTTOM")
+                    if "SOURCE_NATIVE_ATLAS_" + side + "_EDGE_INSET_REQUIRED" in source_salvage]
     for s, glyph in zip(src_lines, translated_images):
-        fitted = fit_line(glyph, s)
-        left = x0 + s[0] + ((s[2] - s[0]) - fitted.width) // 2
-        top = y0 + s[1] + ((s[3] - s[1]) - fitted.height) // 2
+        # User-provided STAGE source child bbox touches the physical x=0
+        # edge. A 2px proportional shrink prevents a tiny cosmetic spill,
+        # without moving any source English mask or enlarging Korean pixels.
+        fitted_box = list(s)
+        if row.get("_manual_source_child_text") == "STAGE_ONLY_NOT_GOALS_OR_OUTRUN2":
+            inset = {
+                "LEFT": max(0, MARGIN - (x0+s[0])),
+                "TOP": max(0, MARGIN - (y0+s[1])),
+                "RIGHT": max(0, x0+s[2] - (source.width-MARGIN)),
+                "BOTTOM": max(0, y0+s[3] - (source.height-MARGIN)),
+            }
+            fitted_box[0] += inset["LEFT"] if "LEFT" in native_edges else 0
+            fitted_box[1] += inset["TOP"] if "TOP" in native_edges else 0
+            fitted_box[2] -= inset["RIGHT"] if "RIGHT" in native_edges else 0
+            fitted_box[3] -= inset["BOTTOM"] if "BOTTOM" in native_edges else 0
+            if fitted_box[0] >= fitted_box[2] or fitted_box[1] >= fitted_box[3]:
+                raise QualityHold("QA_MANUAL_NATIVE_ATLAS_INSET_NO_SPACE")
+            if fitted_box != list(s):
+                edge_insets.append("USER_MANUAL_PHYSICAL_EDGE_2PX_INSET_TEST_ONLY")
+        fitted = fit_line(glyph, fitted_box)
+        left = x0 + fitted_box[0] + ((fitted_box[2] - fitted_box[0]) - fitted.width) // 2
+        top = y0 + fitted_box[1] + ((fitted_box[3] - fitted_box[1]) - fitted.height) // 2
         dest = [left, top, left + fitted.width, top + fitted.height]
         assert dest[0] >= x0 + s[0] and dest[1] >= y0 + s[1]
         assert dest[2] <= x0 + s[2] and dest[3] <= y0 + s[3]
@@ -275,8 +297,6 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
         render.append((fitted, left, top))
     # A true image boundary has no external atlas pixels to damage, but
     # newly translated text/effects MUST be fully inside that boundary.
-    native_edges = [side for side in ("LEFT", "TOP", "RIGHT", "BOTTOM")
-                    if "SOURCE_NATIVE_ATLAS_" + side + "_EDGE_INSET_REQUIRED" in source_salvage]
     if native_edges:
         for glyph, left, top in render:
             ink = glyph.getchannel("A").getbbox()
@@ -346,7 +366,7 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
                                    "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS"),
         "manual_original_bbox": row.get("_manual_source_bbox_original"),
         "manual_source_child_text": row.get("_manual_source_child_text"),
-        "auto_salvage": source_salvage + candidate_salvage + line_salvage + (
+        "auto_salvage": source_salvage + candidate_salvage + line_salvage + edge_insets + (
             ["SOURCE_ALPHA_CONNECTED_COMPONENT_EXCLUSIVE_OWNER_TEST_ONLY"]
             if owner_mask is not None else []) + (
             ["OVERLAPPING_ROI_REUSED_ONLY_AFTER_DISJOINT_SOURCE_ALPHA_BBOX_PROOF"]
