@@ -336,6 +336,31 @@ class StrictHDQualityTests(unittest.TestCase):
         self.assertEqual(holds[0]["reason"],
                          "QA_NATIVE_ATLAS_EDGE_TRANSLATED_GLYPH_TOUCH")
 
+    def test_user_manual_stage_child_wide_glyph_is_safely_inset(self):
+        # The earlier full-size label is correctly held. The unique
+        # source-SHA-bound STAGE child can reduce glyph width by 2px to
+        # avoid source atlas physical x=0 without deleting other UI labels.
+        image = native.native_image(source_dds())
+        image.paste((0, 0, 0, 0), (0, 0, image.width, image.height))
+        ImageDraw.Draw(image).rectangle((0, 18, 22, 37),
+                                        fill=(255, 255, 255, 255))
+        src = source_dds()[:128] + image.tobytes("raw", "BGRA")
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            candidate_file(repo / "manual_stage.png")
+            entry = dict(row("manual_stage.png"), _bbox=[0, 6, 116, 100],
+                         _manual_source_child_text="STAGE_ONLY_NOT_GOALS_OR_OUTRUN2")
+            data, final, clean, painted, holds = strict.process_strict_atlas(
+                src, [entry], repo, "NORMAL", native.native_image,
+                native.imported_candidate, native.conflicting_rois,
+                native.dominant_container_holds)
+        self.assertIsNotNone(data)
+        self.assertFalse(holds)
+        self.assertEqual(len(painted), 1)
+        self.assertGreaterEqual(final.getchannel("A").getbbox()[0], strict.MARGIN)
+        self.assertIn("USER_MANUAL_PHYSICAL_EDGE_2PX_INSET_TEST_ONLY",
+                      painted[0]["auto_salvage"])
+
     def test_source_border_touch_is_accepted_only_when_neighbor_pixels_are_clear(self):
         src = source_dds()
         b = bytearray(src)
