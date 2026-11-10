@@ -3,8 +3,10 @@
 // xrLocateViews eye is composed with inverse(yawOrigin).
 // This function does NOT re-add the Quest captured-profile +0.32Y/+0.55Z,
 // nor the additional +0.04 angular term in run_game::$_2's later view-matrix
-// branch. Those belong to the original guest camera/angle source pipeline,
-// not as an extra translation on every tracked OpenXR eye.
+// branch. Original ELF re-disassembly proves those two mirrored branches are
+// gated by VirtualWheel state bytes +0/+1 after VirtualWheel::update; they are
+// virtual-hand wheel corrections, not a generic physical-wheel cockpit pose
+// transform and not an extra translation on every tracked OpenXR eye.
 // No XR handles, game memory writes, or allocations; pure C++17.
 #pragma once
 #include "quest_cockpit_v2_seat.hpp"
