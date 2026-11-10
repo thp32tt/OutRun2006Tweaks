@@ -259,6 +259,14 @@ int main(){
     assert(OriginalQuestGameCameraState(0x10u));
     assert(!OriginalQuestGameCameraState(0x13u));
     assert(!OriginalQuestGameCameraState(0x1bu));
+    // run_game::$_2 -> $_5 exact PadSnapshot camera-input gate.
+    assert(OriginalQuestPadSnapshotCameraInputValid(
+        true,OriginalQuestDefaultVirtualWheelRadius));
+    assert(!OriginalQuestPadSnapshotCameraInputValid(false,0.175f));
+    assert(!OriginalQuestPadSnapshotCameraInputValid(true,0.05f));
+    assert(!OriginalQuestPadSnapshotCameraInputValid(true,0.4f));
+    assert(OriginalQuestPadSnapshotCameraInputValid(true,0.0501f));
+    assert(OriginalQuestPadSnapshotCameraInputValid(true,0.3999f));
     // ARM64 selected profile X/Y/Z is written to x19[64] buffer by
     // 2E1598/2E1650/2E16C4 before the native 2E17F4 YZ addition.
     // Both +.32Y and +.55Z must be present exactly once in the
