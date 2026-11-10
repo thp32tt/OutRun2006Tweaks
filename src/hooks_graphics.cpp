@@ -752,7 +752,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         static std::uint16_t prevBody=0,prevAux=0;
         static float prevCameraLookYaw=0.f;
         static float prevVisualCarYaw=0.f,prevVisualCameraYaw=0.f;
-        static unsigned turnTraceSamples=0,turnTraceQualified=0;
+        static unsigned turnTracePositive=0,turnTraceNegative=0;
+        static unsigned turnTracePositiveQualified=0,turnTraceNegativeQualified=0;
         static float maxBodyYawStep=0.f,maxAuxYawStep=0.f;
         static float maxCameraYawStep=0.f,maxAuxBodyGap=0.f;
         static float maxVisualCarCameraGap=0.f;
@@ -767,7 +768,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             prevCameraLookYaw=cameraLookYaw;
             prevVisualCarYaw=visualCarYaw;
             prevVisualCameraYaw=visualCameraYaw;
-            turnTraceSamples=turnTraceQualified=0;
+            turnTracePositive=turnTraceNegative=0;
+            turnTracePositiveQualified=turnTraceNegativeQualified=0;
             maxBodyYawStep=maxAuxYawStep=maxCameraYawStep=0.f;
             maxAuxBodyGap=maxVisualCarCameraGap=maxSteering=0.f;
         }
@@ -795,24 +797,29 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const float steeringDeg=
             OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(steerWord,0);
         // Bounded, read-only temporal trace for the user's "camera turns
-        // first" report. Sample only meaningful moving steering and decimate
-        // to every second qualifying player draw; at most 48 lines per player
-        // lifetime, so this cannot become multi-GB per-draw telemetry.
-        if(speed>0.00922849774f && std::fabs(steeringDeg)>=0.5f &&
-           turnTraceSamples<48u && (++turnTraceQualified&1u)==0u) {
-            ++turnTraceSamples;
-            spdlog::info(
-                "VR CAMERA TURN TRACE: sample={} nativeEpoch={} "
-                "interpAlpha={:.4f} steerDeg={:.3f} speed={:.6f} "
-                "step[body={:.3f},aux={:.3f},gameCam={:.3f},"
-                "renderCar={:.3f},renderLook={:.3f}] "
-                "gap[auxBody={:.3f},renderCarCam={:.3f}]",
-                turnTraceSamples,
-                OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch(),
-                interpAlpha,steeringDeg,speed,
-                bodyStepDeg,auxStepDeg,cameraStepDeg,
-                visualCarStepDeg,visualCameraStepDeg,
-                auxBodyDeg,visualCarCameraGapDeg);
+        // first" report. Keep independent positive/negative steering budgets
+        // so the first long bend cannot consume every sample before the
+        // opposite direction is tested. At most 24+24 lines per player.
+        if(speed>0.00922849774f && std::fabs(steeringDeg)>=0.5f) {
+            unsigned& traceSamples=steeringDeg>=0.f
+                ? turnTracePositive : turnTraceNegative;
+            unsigned& traceQualified=steeringDeg>=0.f
+                ? turnTracePositiveQualified : turnTraceNegativeQualified;
+            if(traceSamples<24u && (++traceQualified&1u)==0u) {
+                ++traceSamples;
+                spdlog::info(
+                    "VR CAMERA TURN TRACE: dir={} sample={} nativeEpoch={} "
+                    "interpAlpha={:.4f} steerDeg={:.3f} speed={:.6f} "
+                    "step[body={:.3f},aux={:.3f},gameCam={:.3f},"
+                    "renderCar={:.3f},renderLook={:.3f}] "
+                    "gap[auxBody={:.3f},renderCarCam={:.3f}]",
+                    steeringDeg>=0.f?"POS":"NEG",traceSamples,
+                    OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch(),
+                    interpAlpha,steeringDeg,speed,
+                    bodyStepDeg,auxStepDeg,cameraStepDeg,
+                    visualCarStepDeg,visualCameraStepDeg,
+                    auxBodyDeg,visualCarCameraGapDeg);
+            }
         }
         prevBody=bodyWord;prevAux=auxWord;
         prevCameraLookYaw=cameraLookYaw;
