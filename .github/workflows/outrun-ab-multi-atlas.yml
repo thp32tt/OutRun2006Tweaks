@@ -16,7 +16,8 @@ permissions:
 concurrency:
   group: outrun-ab-multi-atlas
   # Only the newest asset/code SHA needs full DDS QA. Avoid wasting runners on obsolete commits.
-  cancel-in-progress: false
+  # Cancel obsolete SHA runs when a newer user-approved manual pack is ready.
+  cancel-in-progress: true
 
 jobs:
   merge-source-native:
