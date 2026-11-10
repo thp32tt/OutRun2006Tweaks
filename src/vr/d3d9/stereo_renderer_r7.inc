@@ -262,6 +262,10 @@ namespace OutRunVRStereo
             bool resolved = false;
             bool available = false;
             QuestNativeEyePairMatrices matrices{};
+            std::uint32_t headPoseSequence = 0;
+            bool headResolved = false;
+            bool headAvailable = false;
+            float headInverse[16]{};
         };
         QuestNativePairPresentLatch QuestNativePairLatch{};
 		bool FirstFixedFunctionWorldLogged = false;
@@ -795,6 +799,31 @@ namespace OutRunVRStereo
             return &QuestNativePairLatch.matrices;
         }
 
+        const float* GetQuestHeadInverseForPresent(
+            std::uint32_t poseSequence) noexcept
+        {
+            if(poseSequence==0)return nullptr;
+            if(QuestNativePairLatch.presentEpoch!=PresentEpoch) {
+                QuestNativePairLatch={};
+                QuestNativePairLatch.presentEpoch=PresentEpoch;
+            }
+            if(QuestNativePairLatch.headResolved) {
+                if(QuestNativePairLatch.headPoseSequence!=poseSequence ||
+                   !QuestNativePairLatch.headAvailable)
+                    return nullptr;
+                return QuestNativePairLatch.headInverse;
+            }
+            QuestNativePairLatch.headResolved=true;
+            QuestNativePairLatch.headPoseSequence=poseSequence;
+            std::uint32_t headPoseSequence=0;
+            QuestNativePairLatch.headAvailable=
+                OutRunVRRenderer::GetLatchedHeadInverse(
+                    QuestNativePairLatch.headInverse,headPoseSequence) &&
+                headPoseSequence==poseSequence;
+            return QuestNativePairLatch.headAvailable
+                ? QuestNativePairLatch.headInverse : nullptr;
+        }
+
 		enum class EyeBuildResult { NonWorld, WorldStereo, FatalError };
 		struct DrawStereoState
 		{
@@ -926,28 +955,27 @@ namespace OutRunVRStereo
 					!MatrixFinite(state.fixedOriginalProjection))
 					return EyeBuildResult::FatalError;
 
-				float headInverseRaw[16]{};
-				std::uint32_t headPoseSequence = 0;
-				D3DMATRIX headInverse{};
-				if (!OutRunVRRenderer::GetLatchedHeadInverse(
-						headInverseRaw, headPoseSequence) ||
-					headPoseSequence != stereo.poseSequence)
-					return EyeBuildResult::FatalError;
-				std::memcpy(&headInverse, headInverseRaw,
-					sizeof(headInverse));
-				if (!MatrixFinite(headInverse))
-					return EyeBuildResult::FatalError;
-
-				D3DMATRIX appliedHeadInverse = headInverse;
-				if (rotationOnly)
-				{
-					appliedHeadInverse._41 = 0.0f;
-					appliedHeadInverse._42 = 0.0f;
-					appliedHeadInverse._43 = 0.0f;
-				}
-
-                const auto* fixedNativeEyePair=
+				const auto* fixedNativeEyePair=
                     GetQuestNativeEyePairForPresent(stereo.poseSequence);
+                D3DMATRIX fallbackHeadRotation{};
+                const D3DMATRIX* appliedHeadInverse=nullptr;
+                if(!fixedNativeEyePair) {
+                    const float* headBytes=
+                        GetQuestHeadInverseForPresent(stereo.poseSequence);
+                    if(!headBytes)return EyeBuildResult::FatalError;
+                    const auto* headInverse=
+                        reinterpret_cast<const D3DMATRIX*>(headBytes);
+                    if(!MatrixFinite(*headInverse))
+                        return EyeBuildResult::FatalError;
+                    appliedHeadInverse=headInverse;
+                    if(rotationOnly) {
+                        fallbackHeadRotation=*headInverse;
+                        fallbackHeadRotation._41=0.f;
+                        fallbackHeadRotation._42=0.f;
+                        fallbackHeadRotation._43=0.f;
+                        appliedHeadInverse=&fallbackHeadRotation;
+                    }
+                }
 
 				for (int eye = 0; eye < 2; ++eye)
 				{
@@ -990,7 +1018,7 @@ namespace OutRunVRStereo
                             MultiplyMatrix(
                                 MultiplyMatrix(
                                     state.fixedOriginalView,
-                                    appliedHeadInverse),
+                                    *appliedHeadInverse),
                                 eyeInverse);
                     }
 					state.fixedEyeProjection[eye] =
@@ -1052,17 +1080,14 @@ namespace OutRunVRStereo
             bool exactSkyNativeEye[2]{false,false};
             const auto* programmableNativeEyePair=
                 GetQuestNativeEyePairForPresent(stereo.poseSequence);
-            D3DMATRIX programmableHeadInverse{};
+            const D3DMATRIX* programmableHeadInverse=nullptr;
             if(programmableNativeEyePair || exactWorldSky) {
-                float headBytes[16]{};
-                std::uint32_t headPoseSequence=0;
-                if(!OutRunVRRenderer::GetLatchedHeadInverse(
-                        headBytes,headPoseSequence) ||
-                   headPoseSequence!=stereo.poseSequence)
-                    return EyeBuildResult::FatalError;
-                std::memcpy(&programmableHeadInverse,headBytes,
-                            sizeof(programmableHeadInverse));
-                if(!MatrixFinite(programmableHeadInverse))
+                const float* headBytes=
+                    GetQuestHeadInverseForPresent(stereo.poseSequence);
+                if(!headBytes)return EyeBuildResult::FatalError;
+                programmableHeadInverse=
+                    reinterpret_cast<const D3DMATRIX*>(headBytes);
+                if(!MatrixFinite(*programmableHeadInverse))
                     return EyeBuildResult::FatalError;
             }
 			for (int eye = 0; eye < 2; ++eye)
@@ -1091,11 +1116,11 @@ namespace OutRunVRStereo
                         nativeFullView._43=0.f;
                     }
                     eyeInverse=MultiplyMatrix(
-                        InverseRigid(programmableHeadInverse),nativeFullView);
+                        InverseRigid(*programmableHeadInverse),nativeFullView);
                     if(!MatrixFinite(eyeInverse))
                         return EyeBuildResult::FatalError;
                 } else if(exactWorldSky) {
-                    D3DMATRIX rotationOnly=programmableHeadInverse;
+                    D3DMATRIX rotationOnly=*programmableHeadInverse;
                     rotationOnly._41=0.f;
                     rotationOnly._42=0.f;
                     rotationOnly._43=0.f;
@@ -1114,7 +1139,7 @@ namespace OutRunVRStereo
                     const D3DMATRIX skyEyeInverse=InverseRigid(skyEyePose);
                     eyeInverse=MultiplyMatrix(
                         MultiplyMatrix(
-                            InverseRigid(programmableHeadInverse),rotationOnly),
+                            InverseRigid(*programmableHeadInverse),rotationOnly),
                         skyEyeInverse);
                     if(!MatrixFinite(eyeInverse))
                         return EyeBuildResult::FatalError;
