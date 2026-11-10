@@ -6,6 +6,27 @@
 #include <limits>
 using namespace OutRunVR::QuestCockpitV2;
 static bool near(float a,float b) {return std::fabs(a-b)<1.e-4f;}
+struct Rot3 {float m[3][3]{};};
+static Rot3 RowRotation(NativeQuat in) {
+    NativeQuat q{}; assert(NormalizeNativeQuat(in,q));
+    const float xx=q.x*q.x,yy=q.y*q.y,zz=q.z*q.z;
+    const float xy=q.x*q.y,xz=q.x*q.z,yz=q.y*q.z;
+    const float xw=q.x*q.w,yw=q.y*q.w,zw=q.z*q.w;
+    return {{{1.f-2.f*(yy+zz),2.f*(xy+zw),2.f*(xz-yw)},
+             {2.f*(xy-zw),1.f-2.f*(xx+zz),2.f*(yz+xw)},
+             {2.f*(xz+yw),2.f*(yz-xw),1.f-2.f*(xx+yy)}}};
+}
+static Rot3 Mul(Rot3 a,Rot3 b) {
+    Rot3 o{};
+    for(int r=0;r<3;++r)for(int col=0;col<3;++col)
+        for(int k=0;k<3;++k)o.m[r][col]+=a.m[r][k]*b.m[k][col];
+    return o;
+}
+static Rot3 InvRotation(Rot3 a) {
+    Rot3 o{};
+    for(int r=0;r<3;++r)for(int col=0;col<3;++col)o.m[r][col]=a.m[col][r];
+    return o;
+}
 int main(){
     // Loading a cockpit hook before the original game has initialized its
     // 30x36 live camera table must NOT snapshot zeroes as original seats.
@@ -68,6 +89,22 @@ int main(){
     assert(near(eyeRight.p.x,.032f));
     assert(near(eyeLeft.p.y,0.f)&&near(eyeRight.p.z,0.f));
     assert(near(eyeLeft.q.w,1.f)&&near(eyeRight.q.w,1.f));
+
+    // D3D row-vector regression: for the exact MatrixFromPose layout used by
+    // outrun_renderer, M(head*eye)==M(eye)*M(head). Therefore the generic
+    // fallback view rotation headInverse*eyeInverse is exactly the inverse
+    // rotation of Quest NativeStereoEye. A fallback->native admission change
+    // must not rotate the sky when translation is removed.
+    NativePose relativeHead{};
+    assert(NativeInverseOriginCompose(origin,worldHead,relativeHead));
+    const NativePose localLeft{{0.f,0.f,0.f,1.f},{-.032f,0.f,0.f}};
+    const Rot3 nativeInv=InvRotation(RowRotation(eyeLeft.q));
+    const Rot3 fallbackInv=Mul(
+        InvRotation(RowRotation(relativeHead.q)),
+        InvRotation(RowRotation(localLeft.q)));
+    for(int rr=0;rr<3;++rr)for(int cc=0;cc<3;++cc)
+        assert(near(nativeInv.m[rr][cc],fallbackInv.m[rr][cc]));
+
     NativePose invalidNative{};
     assert(!NativeYawOrigin({{0,0,0,0},{0,0,0}},invalidNative));
     assert(!NativeStereoEye(origin,worldHead,
