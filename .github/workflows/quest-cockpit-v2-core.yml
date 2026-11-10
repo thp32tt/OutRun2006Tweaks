@@ -245,7 +245,9 @@ jobs:
           assert '(*programmableNativeEyePair)[eye]' in r7
           assert 'GetQuestHeadInverseForPresent(' in r7
           assert 'QuestNativePairLatch.headResolved' in r7
-          assert 'return QuestNativePairLatch.headInverse;' in r7
+          assert 'return &QuestNativePairLatch.headInverse;' in r7
+          assert 'std::memcpy(&QuestNativePairLatch.headInverse,headBytes' in r7
+          assert 'reinterpret_cast<const D3DMATRIX*>(headBytes)' not in r7
           assert 'if(!fixedNativeEyePair)' in r7
           assert 'InverseRigid(*programmableHeadInverse),nativeFullView' in r7
           assert 'stereo.eyeOrientation[eye],skyEyeOffset' in r7
