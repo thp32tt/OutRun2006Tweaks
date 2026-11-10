@@ -216,6 +216,8 @@ jobs:
           assert 'OriginalQuestGameCameraState(' in hook
           assert 'OriginalQuestGameCameraState(' in native_renderer
           assert 'OriginalQuestGameCameraState(0x10u)' in Path('tools/tests/quest_cockpit_v2_seat_smoke.cpp').read_text(encoding='utf-8')
+          assert 'OriginalQuestPadSnapshotCameraInputValid' in Path('src/vr/game/quest_cockpit_v2_seat.hpp').read_text(encoding='utf-8')
+          assert 'OriginalQuestDefaultVirtualWheelRadius' in Path('tools/tests/quest_cockpit_v2_seat_smoke.cpp').read_text(encoding='utf-8')
           assert 'guestProfile.y+0.319999993f' in Path('src/vr/game/quest_cockpit_v2_seat.hpp').read_text(encoding='utf-8')
           assert 'if(rotationOnly) {' in r7 and 'nativeView._41=0.f;' in r7
           assert 'shaderSkyMixedEyes={}' in r7
@@ -235,8 +237,12 @@ jobs:
           assert 'struct QuestNativePairPresentLatch' in r7
           assert 'GetQuestNativeEyePairForPresent(' in r7
           assert 'QuestNativePairLatch.presentEpoch!=PresentEpoch' in r7
-          assert 'GetQuestNativeEyePairForPresent(\n                        stereo.poseSequence,fixedNativePairBytes)' in r7
-          assert 'GetQuestNativeEyePairForPresent(\n                    stereo.poseSequence,programmableNativePairBytes)' in r7
+          assert 'const auto* fixedNativeEyePair=' in r7
+          assert 'const auto* programmableNativeEyePair=' in r7
+          assert 'GetQuestNativeEyePairForPresent(stereo.poseSequence)' in r7
+          assert 'return &QuestNativePairLatch.matrices;' in r7
+          assert '(*fixedNativeEyePair)[eye]' in r7
+          assert '(*programmableNativeEyePair)[eye]' in r7
           assert 'InverseRigid(programmableHeadInverse),nativeFullView' in r7
           assert 'stereo.eyeOrientation[eye],skyEyeOffset' in r7
           assert 'programmableNativeEyePair' in r7 and 'fixedNativeEyePair' in r7
