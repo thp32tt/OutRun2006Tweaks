@@ -1073,8 +1073,23 @@ namespace OutRunVRStereo
                     rotationOnly._41=0.f;
                     rotationOnly._42=0.f;
                     rotationOnly._43=0.f;
+                    // Match the fixed-function 4521C0 fallback exactly:
+                    // keep each OpenXR eye's orientation/cant, but remove
+                    // positional IPD and headset translation. The old shader
+                    // fallback omitted local eye orientation entirely, so the
+                    // two original sky layers could disagree until the native
+                    // Quest eye pair became available.
+                    const float skyEyeOffset[3]{0.f,0.f,0.f};
+                    const D3DMATRIX skyEyePose=
+                        MatrixFromQuaternionTranslation(
+                            stereo.eyeOrientation[eye],skyEyeOffset,
+                            Settings::VRWorldScale *
+                                Settings::VRStereoDepth);
+                    const D3DMATRIX skyEyeInverse=InverseRigid(skyEyePose);
                     eyeInverse=MultiplyMatrix(
-                        InverseRigid(headInverse),rotationOnly);
+                        MultiplyMatrix(
+                            InverseRigid(headInverse),rotationOnly),
+                        skyEyeInverse);
                     if(!MatrixFinite(eyeInverse))
                         return EyeBuildResult::FatalError;
                 }
