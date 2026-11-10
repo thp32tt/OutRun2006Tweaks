@@ -131,7 +131,7 @@ function Assert-ScriptParameters([string]$path,[string[]]$required){
 }
 Assert-ScriptParameters (Join-Path $payload 'scripts/Run-OutRunVRTest.ps1') @(
     'TestProfile','QuestCockpitV2ReleaseParity','QuestCockpitV2',
-    'QuestCockpitV2SkyProbe','QuestCockpitV2Interpolation')
+    'QuestCockpitV2F0','QuestCockpitV2SkyProbe','QuestCockpitV2Interpolation')
 Assert-ScriptParameters (Join-Path $payload 'scripts/Select-OutRunVRBackend.ps1') @(
     'Backend','TestProfile','VariantId')
 
