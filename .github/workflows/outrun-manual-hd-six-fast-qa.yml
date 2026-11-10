@@ -6,6 +6,8 @@ on:
     paths:
       - ".github/workflows/outrun-manual-hd-six-fast-qa.yml"
       - "tools/localization/hd_manual_user_fast_qa.py"
+      - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/test_hd_strict_qa.py"
 permissions:
   contents: read
 concurrency:
