@@ -12,6 +12,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageOps, UnidentifiedImageError
 from hd_strict_qa import process_strict_atlas
 from hd_bc3_index_patch import bc3_shape
 from hd_bc3_native_codec import BC3Hold as NativeBC3Hold
+from hd_manual_user_import import apply_user_manual_candidates
 
 CROSS="localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
 ORIGINAL="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
@@ -332,6 +333,7 @@ def build(root,out):
  out.mkdir(parents=True,exist_ok=True)
  groups=load_cross(root/CROSS)
  orientations=load_pinned_orientations(root,groups)
+ manual_user_count=apply_user_manual_candidates(root,groups)
  c1_provisional_count=apply_c1_preliminary_overrides(root,groups)
  archive={};admitted=[];holds=[];unavailable=0;sha_conflicts=0
  for target,rows in sorted(groups.items()):
@@ -391,6 +393,10 @@ def build(root,out):
          "salvage_policy":"EXISTING_AB_PNG_RESIZE_REFLOW_ONLY_NO_NEW_IMAGEGEN_V2",
          "active_roi_total":954,"imported_roi_total":imported_total,
          "c1_preliminary_new_png_count":c1_provisional_count,
+         "manual_user_test_only_roi_count":manual_user_count,
+         "cosmetic_alpha_tolerance_max":8,
+         "cosmetic_bc3_color_channel_error_max":64,
+         "manual_stage_child_roi_test_only":manual_user_count > 0,
          "deterministic_salvaged_roi":sum(
              1 for atlas_item in admitted for p in atlas_item["painted"] if p.get("auto_salvage")
          ),
