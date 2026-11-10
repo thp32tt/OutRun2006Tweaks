@@ -6,6 +6,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 LAUNCHERS = (
     "RUN-QUEST-COCKPIT-V2.cmd",
+    "RUN-QUEST-COCKPIT-V2-F0.cmd",
+    "RUN-QUEST-COCKPIT-V2-LOD0.cmd",
     "RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd",
     "RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd",
 )
