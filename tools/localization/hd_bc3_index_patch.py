@@ -13,8 +13,10 @@ import io
 import struct
 from PIL import Image
 
-ALPHA_ERROR_LIMIT = 20
-COLOR_ERROR_LIMIT = 24
+# User-authorized small BC3 quantization variance; protected native pixels
+# remain exact and no DDS mip/header format change is permitted.
+ALPHA_ERROR_LIMIT = 24
+COLOR_ERROR_LIMIT = 30
 
 
 class BC3Hold(ValueError):
