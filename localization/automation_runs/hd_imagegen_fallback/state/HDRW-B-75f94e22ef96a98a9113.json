@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "8bd0a60cf3cb02545ee6cda5f0cdc8beea720b1e34c77b22e05737de9fe0d5b2",
+  "release_approved": false,
+  "roi_id": "Q094_d1401e120e386bd1",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "OutRun2 · 15 Continuous Course has been selected.",
+    "korean": "OutRun2 · 15코스 연속이 선택되었습니다.",
+    "old_candidate_sha256": "8bd0a60cf3cb02545ee6cda5f0cdc8beea720b1e34c77b22e05737de9fe0d5b2",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 246,
+      "name": "HDRW-B-75f94e22ef96a98a9113_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        1758,
+        238
+      ],
+      "sha256": "b1a387172f4e8226825fa8644a8e597fa0bebfc5881e89b0b092b6c55ba8e2a9",
+      "source_box_xyxy": [
+        222,
+        216,
+        1988,
+        462
+      ],
+      "source_native_size": [
+        4096,
+        4096
+      ],
+      "width": 1766
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q094_d1401e120e386bd1",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "source_dds_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "source_native_bbox_xyxy": [
+      230,
+      224,
+      1980,
+      454
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-75f94e22ef96a98a9113"
+  },
+  "task_id": "HDRW-B-75f94e22ef96a98a9113",
+  "updated_utc": "2026-11-10T23:55:20+00:00"
+}
