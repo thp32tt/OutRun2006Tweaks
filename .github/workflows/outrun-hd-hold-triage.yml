@@ -36,6 +36,7 @@ jobs:
             tools/localization/hd_existing_candidate_salvage.py
             tools/localization/hd_overlap_ownership.py
             tools/localization/hd_strict_qa.py
+            tools/localization/hd_manual_user_import.py
             localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
 
       - name: Read last strict SHA-bound QA report from isolated queue branch
