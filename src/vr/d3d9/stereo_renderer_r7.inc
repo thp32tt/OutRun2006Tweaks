@@ -69,6 +69,8 @@ namespace OutRunVRRenderer
 {
     bool GetQuestNativeEyeInverse(float outMatrix[16],
         int eye,std::uint32_t& poseSequence) noexcept;
+    bool GetQuestNativeEyeInversePair(float outMatrices[2][16],
+        std::uint32_t& poseSequence) noexcept;
 }
 
 namespace OutRunVRStereo
@@ -903,6 +905,13 @@ namespace OutRunVRStereo
 					appliedHeadInverse._43 = 0.0f;
 				}
 
+                float fixedNativePairBytes[2][16]{};
+                std::uint32_t fixedNativePairPoseSequence=0;
+                const bool fixedNativeEyePair=
+                    OutRunVRRenderer::GetQuestNativeEyeInversePair(
+                        fixedNativePairBytes,fixedNativePairPoseSequence) &&
+                    fixedNativePairPoseSequence==stereo.poseSequence;
+
 				for (int eye = 0; eye < 2; ++eye)
 				{
 					float eyeOffset[3]{
@@ -921,13 +930,9 @@ namespace OutRunVRStereo
                     // view_matrix(compose(inverse(yawOrigin),XrEyePose)).
                     // Mode1 only; menus and all other renderer owners retain
                     // the preexisting headInverse * localEyeInverse route.
-                    float nativeViewBytes[16]{};
-                    std::uint32_t nativePoseSequence=0;
-                    if(OutRunVRRenderer::GetQuestNativeEyeInverse(
-                           nativeViewBytes,eye,nativePoseSequence) &&
-                       nativePoseSequence==stereo.poseSequence) {
+                    if(fixedNativeEyePair) {
                         D3DMATRIX nativeView{};
-                        std::memcpy(&nativeView,nativeViewBytes,
+                        std::memcpy(&nativeView,fixedNativePairBytes[eye],
                                     sizeof(nativeView));
                         if(!MatrixFinite(nativeView))
                             return EyeBuildResult::FatalError;
@@ -1008,15 +1013,18 @@ namespace OutRunVRStereo
 				OutRunVR::GameSemantic::CapturePhysicalDrawCommand().scope ==
 				OutRunVR::GameSemantic::RenderScope::WorldSky;
             bool exactSkyNativeEye[2]{false,false};
+            float programmableNativePairBytes[2][16]{};
+            std::uint32_t programmableNativePairPoseSequence=0;
+            const bool programmableNativeEyePair=
+                OutRunVRRenderer::GetQuestNativeEyeInversePair(
+                    programmableNativePairBytes,
+                    programmableNativePairPoseSequence) &&
+                programmableNativePairPoseSequence==stereo.poseSequence;
 			for (int eye = 0; eye < 2; ++eye)
 			{
 				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale * Settings::VRStereoDepth);
 				D3DMATRIX eyeInverse = InverseRigid(eyePose);
-                float nativeViewBytes[16]{};
-                std::uint32_t nativePoseSequence=0;
-                if(OutRunVRRenderer::GetQuestNativeEyeInverse(
-                       nativeViewBytes,eye,nativePoseSequence) &&
-                   nativePoseSequence==stereo.poseSequence) {
+                if(programmableNativeEyePair) {
                     if(exactWorldSky)exactSkyNativeEye[eye]=true;
                     float headBytes[16]{};
                     std::uint32_t headPoseSequence=0;
@@ -1025,7 +1033,8 @@ namespace OutRunVRStereo
                        headPoseSequence!=stereo.poseSequence)
                         return EyeBuildResult::FatalError;
                     D3DMATRIX nativeFullView{},headInverse{};
-                    std::memcpy(&nativeFullView,nativeViewBytes,
+                    std::memcpy(&nativeFullView,
+                                programmableNativePairBytes[eye],
                                 sizeof(nativeFullView));
                     std::memcpy(&headInverse,headBytes,
                                 sizeof(headInverse));
