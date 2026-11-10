@@ -1,17 +1,17 @@
 {
   "ab_eligible_counts": {
-    "A": 2,
-    "B": 3
+    "A": 1,
+    "B": 2
   },
   "hold_categories": {
-    "AB_IMAGE_AND_CLEAN_REWORK": 5,
-    "ENGINE_OR_COORDINATE_HOLD": 594,
-    "EVIDENCE_REVIEW_HOLD": 17,
-    "SOURCE_CLEAN_MASK_OR_SEGMENTATION_HOLD": 37
+    "AB_IMAGE_AND_CLEAN_REWORK": 3,
+    "ENGINE_OR_COORDINATE_HOLD": 580,
+    "EVIDENCE_REVIEW_HOLD": 18,
+    "SOURCE_CLEAN_MASK_OR_SEGMENTATION_HOLD": 40
   },
-  "hold_count": 653,
+  "hold_count": 641,
   "new_imagegen_disabled": true,
-  "old_painted_count_invalid_for_release": 301,
+  "old_painted_count_invalid_for_release": 313,
   "policy": "hd-existing-ab-salvage-first-v2-20261105",
   "previously_claimed_ticket_count": 8,
   "qa_report_schema": "outrun.ab-imagegen-hd-strict.v2",
@@ -21,7 +21,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-workqueue-v1",
   "selection_policy": "EXISTING_A_B_PNG_ONLY_NO_NEW_IMAGEGEN",
-  "source_asset_sha256": "2a619b1cd95b6425dc32418c417156399a39d4162fe74b420ac2361719ea85ea",
+  "source_asset_sha256": "08dfafcae04a10b9fbcdef3294f04cae903d49ea6ec44d3d8ea571800c677c70",
   "source_reference_count_verified": 0,
   "source_roi_count": 954,
   "tasks": []
