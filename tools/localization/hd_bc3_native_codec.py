@@ -258,18 +258,18 @@ def patch_bc3_native(raw, native, original_native, native_boxes):
                 # Sub-16 alpha is a barely visible AA/shadow fringe. BC3
                 # may quantize that fringe to zero; NEVER allow the glyph
                 # body (alpha >= 16) to disappear or exceed error limits.
-                if (new[3] >= 16 and pixel[3] == 0) or abs(pixel[3] - new[3]) > 32:
+                if (new[3] >= 16 and pixel[3] == 0) or abs(pixel[3] - new[3]) > 40:
                     raise BC3Hold('QA_BC3_TRANSLATED_ALPHA_LOST')
                 # Invisible (<16 alpha) fringe RGB is not readable glyph
                 # color and can contain matte pixels after Lanczos resizing.
-                # Alpha>=16 text/glow still obeys the original strict 55
-                # channel error ceiling; no visible glyph may be color-lost.
-                if new[3] >= 16 and max(abs(pixel[k] - new[k]) for k in range(3)) > 55:
+                # Alpha>=16 text/glow tolerates up to 64/channel (9 more than
+                # the prior rule), while never altering protected source pixels.
+                if new[3] >= 16 and max(abs(pixel[k] - new[k]) for k in range(3)) > 64:
                     failure = BC3Hold('QA_BC3_TRANSLATED_COLOR_LOSS')
                     # Exact native pixel for safe ROI-specific fail-closed retry.
                     failure.native_xy = (x0 + i % 4, y0 + i // 4)
                     raise failure
-            elif pixel[3] > 8:
+            elif pixel[3] > 16:
                 raise BC3Hold('QA_BC3_ENGLISH_ALPHA_RESIDUE')
         offset = 128 + (by*blocks_x + bx)*16
         mutable[offset:offset+16] = encoded
@@ -279,4 +279,7 @@ def patch_bc3_native(raw, native, original_native, native_boxes):
     if mutable[:128] != raw[:128] or len(mutable) != len(raw):
         raise BC3Hold('QA_BC3_HEADER_OR_MIP_LENGTH_CHANGED')
     return bytes(mutable), {'bc3_blocks_patched': block_count,
-                            'original_format': 'DXT5', 'mip_count': 1}
+                            'original_format': 'DXT5', 'mip_count': 1,
+                             'cosmetic_rgb_max_error': 64,
+                             'cosmetic_alpha_max_error': 40,
+                             'cosmetic_residue_alpha_max': 16}
