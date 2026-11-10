@@ -2,7 +2,7 @@
   "active_roi_total": 954,
   "c1_preliminary_new_png_count": 0,
   "clean_plate_qa": "MECHANICAL_ALPHA_ONLY_C1_C3_VISUAL_REVIEW_REQUIRED",
-  "deterministic_salvaged_roi": 295,
+  "deterministic_salvaged_roi": 296,
   "generated": [
     {
       "dds_sha256": "cb9a33335e52129b6ef6e97c37e899243c9265054983ab89f4d73fe5e232c282",
@@ -4859,7 +4859,7 @@
       "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
     },
     {
-      "dds_sha256": "cfe37f84e607c613e6001da8a02cb020fdf520ed315bc4c4f9ca052b0281225f",
+      "dds_sha256": "123eaebf4fa73d6690d1f83183b70373c49b05fcaddfe2e5da9921025f6965f1",
       "holds": [
         {
           "reason": "ROI_OVERLAP_NEEDS_MANUAL_QA",
@@ -4876,10 +4876,6 @@
         {
           "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
           "roi_id": "Q101_1fab381961c8f33b"
-        },
-        {
-          "reason": "QA_DOWNSCALE_LOST_GLYPHS",
-          "roi_id": "Q101_ce6fc95e42c9cdff"
         },
         {
           "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
@@ -4969,6 +4965,45 @@
               861,
               3356,
               903
+            ]
+          ]
+        },
+        {
+          "auto_salvage": [
+            "SOURCE_AA_SHADOW_BANDS_SINGLE_LOGICAL_LINE_TEST_ONLY",
+            "REFLOW_EXISTING_CANDIDATE_13_TO_1_LINES_VISUAL_QA_REQUIRED"
+          ],
+          "candidate_detected_line_count": 13,
+          "candidate_sha256": "7bab91515763b617f3c0795ec21e66bcf9463806184adcb4531aa463478a1311",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "english": "Steering Wheel :",
+          "korean": "스티어링 휠:",
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              3448,
+              854,
+              3822,
+              939
+            ]
+          ],
+          "qa_gate": "MECHANICAL_HOLD_C1_C3_VISUAL_AND_GAME_NOT_APPROVED",
+          "roi": [
+            3385,
+            835,
+            3856,
+            964
+          ],
+          "roi_id": "Q101_ce6fc95e42c9cdff",
+          "source_alpha_occupancy": 0.18261,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              3448,
+              888,
+              3822,
+              904
             ]
           ]
         },
@@ -14184,7 +14219,7 @@
     "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD": 36,
     "QA_BC3_MIP_CHAIN_REQUIRES_ORIGINAL_FORMAT_REBUILD": 13,
     "QA_BC3_TRANSLATED_COLOR_LOSS": 4,
-    "QA_DOWNSCALE_LOST_GLYPHS": 4,
+    "QA_DOWNSCALE_LOST_GLYPHS": 3,
     "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT": 37,
     "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE": 95,
     "QA_TRANSLATION_TOO_SMALL_TO_READ": 2,
@@ -15731,7 +15766,7 @@
   "source": "Existing A/B PNG reused exclusively; native HD bounded pad/reflow/downscale; no new ImageGen or fonts",
   "source_dds_missing_rows": 0,
   "source_sha_conflict_rows": 0,
-  "translated_roi_generated": 300,
+  "translated_roi_generated": 301,
   "visual_qa": "REVIEW_REQUIRED",
-  "zip_sha256": "21f36dfe3d4b17d343c44d372135fb3686802a9515dc495f7be12c4da171a1e9"
+  "zip_sha256": "2a619b1cd95b6425dc32418c417156399a39d4162fe74b420ac2361719ea85ea"
 }
