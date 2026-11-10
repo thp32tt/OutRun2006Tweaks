@@ -1,0 +1,61 @@
+{
+  "old_candidate_sha256": "2c4577e9e025287ce41b4655e35a435068599cb3ed3268e1ea0c7a3655de0134",
+  "release_approved": false,
+  "roi_id": "Q121_1899c0152ffdcde2",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Music will be Randomly Selected.",
+    "korean": "음악이 무작위로 선택됩니다.",
+    "old_candidate_sha256": "2c4577e9e025287ce41b4655e35a435068599cb3ed3268e1ea0c7a3655de0134",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 230,
+      "name": "HDRW-B-bfd81903263da59e0c55_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        964,
+        222
+      ],
+      "sha256": "2b92fe3a132a88a1226da9b0233ecd3c307866ff6d5b46a1cb55f55265f58d29",
+      "source_box_xyxy": [
+        1756,
+        2352,
+        2728,
+        2582
+      ],
+      "source_native_size": [
+        4096,
+        4096
+      ],
+      "width": 972
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q121_1899c0152ffdcde2",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "source_native_bbox_xyxy": [
+      1764,
+      2360,
+      2720,
+      2574
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-bfd81903263da59e0c55"
+  },
+  "task_id": "HDRW-B-bfd81903263da59e0c55",
+  "updated_utc": "2026-11-10T22:37:49+00:00"
+}
