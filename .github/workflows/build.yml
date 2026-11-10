@@ -31,30 +31,10 @@ jobs:
 
       - name: Verify Quest cockpit launchers
         shell: pwsh
+        run: python tools/verify_quest_cockpit_launchers.py
+      - name: Configure
+        shell: pwsh
         run: |
-          $launchers = @(
-            'RUN-QUEST-COCKPIT-V2.cmd',
-            'RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd',
-            'RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd'
-          )
-          foreach ($launcher in $launchers) {
-            if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
-              throw "Missing Quest cockpit launcher: $launcher"
-            }
-            $text = Get-Content -LiteralPath $launcher -Raw
-            if ($text.Contains('\n')) {
-              throw "Literal backslash-n found in Quest cockpit launcher: $launcher"
-            }
-            if ($text -notmatch '-QuestCockpitV2F0 ON') {
-              throw "Verified F0 render scope missing from Quest cockpit launcher: $launcher"
-            }
-            if ($text -notmatch 'tools\\Run-OutRunVRTest\.ps1') {
-              throw "Source-tree runner fallback missing from Quest cockpit launcher: $launcher"
-            }
-          }
-          $runner = Get-Content -LiteralPath 'tools/Run-OutRunVRTest.ps1' -Raw
-          foreach ($parameter in @('QuestCockpitV2','QuestCockpitV2F0','QuestCockpitV2SkyProbe','QuestCockpitV2Interpolation')) {
-            if ($runner -notmatch ('\
           # cmkr intentionally skips regeneration when CI is set. vr-openxr uses
           # cmake.toml as the canonical source graph, so remove CI here just as
           # the dedicated VR workflow does before configuring.
