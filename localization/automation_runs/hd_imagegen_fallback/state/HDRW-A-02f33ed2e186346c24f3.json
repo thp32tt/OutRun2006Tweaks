@@ -1,5 +1,13 @@
 {
   "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af3a319-1024-83ee-8e67-dd26771ee848",
+  "candidate_dimensions": [
+    1767,
+    655
+  ],
+  "candidate_generated_raw_sha256": "deb74886fa08664b10485c80af1cc3b9653609e47981ea6beec14479df2d0866",
+  "candidate_gh_path": "localization/automation_runs/hd_imagegen_fallback/candidates/HDRW-A-02f33ed2e186346c24f3.png",
+  "candidate_sha256": "4f7babf04f45a4bf0e18ad30c1f51be1e0f2279796c3b7b6147aefddf4dc45e5",
+  "candidate_status": "IMAGEGEN_BLOB_SAVED_PENDING_C1",
   "old_candidate_sha256": "3f67eabf9007bdce0438bfd52ec17b3d080db32af15e9ff86b127e635232fa28",
   "release_approved": false,
   "roi_id": "Q205_610a003bbc54f7c3",
@@ -7,7 +15,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
-  "status": "AB_SENT",
+  "status": "C1_READY",
   "task": {
     "english": "SORRY! You need more miles!",
     "korean": "죄송합니다! 마일이 더 필요합니다!",
@@ -58,5 +66,5 @@
     "task_id": "HDRW-A-02f33ed2e186346c24f3"
   },
   "task_id": "HDRW-A-02f33ed2e186346c24f3",
-  "updated_utc": "2026-11-10T23:05:13+00:00"
+  "updated_utc": "2026-11-10T23:07:18+00:00"
 }
