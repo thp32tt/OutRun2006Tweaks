@@ -9,6 +9,8 @@ on:
     branches: [korean-localization-recovery-20260928]
     paths:
       - ".github/workflows/outrun-ab-multi-atlas.yml"
+      - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/hd_manual_user_import.py"
 
 permissions:
   contents: write
