@@ -15,6 +15,8 @@ camera. It does NOT load Dino GLB, replacement meshes or external textures.
    hashes, saves the previously installed DLL/host/DXVK/INI and helper
    files, activates DX9Ex and starts the VR cockpit.
 3. Use RUN-QUEST-APK-SKY-DIAG.cmd to capture bounded sky/vehicle evidence.
+   Use RUN-QUEST-APK-TURN-DIAG.cmd for bounded left/right camera phase
+   traces while keeping normal interpolation and verified F0 scope ON.
    Use RUN-QUEST-APK-INTERP-OFF.cmd for road-jitter interpolation A/B.
 4. RESTORE-QUEST-APK-COCKPIT.cmd restores the files backed up by the
    current test cycle. Close the game first. A successful restore archives
@@ -29,7 +31,7 @@ temporarily switch away from DXVK to DX9Ex, with a backup available.
 
 This remains a WIP test. Quest 3 field feedback 2026-11-10: enabling
 the F11 F0 Render Scope removed body vibration. COPY-RUN now launches
-with QuestCockpitV2F0RenderScope=true in NORMAL, SKY and INTERP modes.
+with QuestCockpitV2F0RenderScope=true in NORMAL, SKY, TURN and INTERP modes.
 This affects only the original car render callback, not simulation.
 The default seat is calibrated 0.08 game units forward and 0.05 upward.
 This is an experimental local adjustment; sky flicker is unresolved.
@@ -42,8 +44,9 @@ TEST AND APK COMPARISON (2026-11-05):
   composition. Signed F11 SeatBack/Down/Right now calibrates the INPUT.
   COPY-RUN overrides stale user.ini calibration with SeatBack=-0.08,
   SeatDown=-0.05, SeatRight=0.0. All zero returns APK-derived input.
-- Normal, SKY and INTERP copy-run entrypoints now all force F0 scope ON;
-  the interpolation comparison changes ONLY interpolation.
+- Normal, SKY, TURN and INTERP copy-run entrypoints all force F0 scope ON.
+  TURN keeps normal interpolation and adds only bounded camera/body phase
+  logging; INTERP changes ONLY interpolation.
 - The original camera table may not be ready at hook installation.
   New logs distinguish deferred startup from successful native-game
   admission and 90-frame permanent failure.
@@ -51,8 +54,9 @@ TEST AND APK COMPARISON (2026-11-05):
   shaderSkyFallback, shaderSkyMixedEyes and shaderSkyModeSwitches per 90
   Presents. shaderExactSkyDraws is now windowed, not lifetime cumulative.
   This is a root-cause probe, not a claimed fix for faint double sky.
-- On a left and right bend, SKY DIAG also logs VR CAMERA YAW PROBE
-  every 90 car callbacks. Compare maxBodyYawStepDeg (body +0x2E),
+- On left and right bends, TURN DIAG logs bounded VR CAMERA TURN TRACE
+  samples separately for positive/negative steering, plus the 90-callback
+  aggregate. Compare maxBodyYawStepDeg (body +0x2E),
   maxAuxYawStepDeg (camera source +0x1FE), maxCameraYawStepDeg
   (native eye/look direction), maxAuxBodyGapDeg and speed.
   These are magnitudes only, not proof of camera lead phase.
