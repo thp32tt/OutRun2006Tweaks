@@ -10,6 +10,7 @@
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
 #include "vr/game/driver_seat_car_space.hpp"
+#include "vr/game/driver_seat_yaw_lock.hpp"
 #include "vr/game/driver_seat_render_pass.hpp"
 #include "vr/game/driver_seat_vehicle_scale.hpp"
 #include "vr/game/driver_seat_occupant.hpp"
@@ -56,6 +57,7 @@ namespace Settings
     extern Setting<float> VRDriverSeatVehicleScale;
     extern Setting<float> VRDriverSeatGlassOpacity;
 	extern Setting<bool> VRDriverSeatCarSpaceBasis;
+	extern Setting<bool> VRDriverSeatVehicleYawLock;
 	extern Setting<int> VRDriverSeatNativeMode;
 	extern Setting<float> VRDriverSeatForward;
 	extern Setting<float> VRDriverSeatRight;
@@ -222,13 +224,19 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     static thread_local OutRunVR::DriverSeatCamera::Vec3 lastLook{};
     static thread_local const EVWORK_CAR* lastPlayer = nullptr;
     static thread_local std::uint64_t lastPoseSessionEpoch = 0;
+    static thread_local bool lastYawLockEnabled = false;
+    static thread_local int carForwardPolarity = 0;
+    const bool yawLockEnabled = Settings::VRDriverSeatVehicleYawLock;
 
     if (!VRDriverSeatGameplayActive() || player != lastPlayer ||
-        lastPoseSessionEpoch != VRDriverSeatPoseSessionEpoch)
+        lastPoseSessionEpoch != VRDriverSeatPoseSessionEpoch ||
+        yawLockEnabled != lastYawLockEnabled)
     {
         hasLastValidPose = false;
+        carForwardPolarity = 0;
         lastPlayer = player;
         lastPoseSessionEpoch = VRDriverSeatPoseSessionEpoch;
+        lastYawLockEnabled = yawLockEnabled;
     }
 
     OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
@@ -243,6 +251,17 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
             Settings::VRDriverSeatUp.get(),
             newPos, newLook, &usedCarSpace))
     {
+        if (yawLockEnabled)
+        {
+            OutRunVR::DriverSeatCamera::Vec3 carLockedLook{};
+            // Opt-in only: keep the HMD-proven native eye-position anchor,
+            // replace yaw from the same-frame player-car body orientation.
+            // Failure preserves the native look and never mutates game state.
+            if (OutRunVR::DriverSeatCamera::ComputeVehicleLockedYawLook(
+                    newPos, newLook, axes.forward, axes.up,
+                    carForwardPolarity, carLockedLook))
+                newLook = carLockedLook;
+        }
         lastPosition = newPos;
         lastLook = newLook;
         hasLastValidPose = true;
