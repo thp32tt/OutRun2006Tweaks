@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 echo QUEST COCKPIT V2 SKY DIAG - 90-PRESENT AGGREGATE ONLY.
 echo Full draw telemetry OFF. Do not use this for normal play.
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Run-OutRunVRTest.ps1" -TestProfile CORRECTNESS -QuestCockpitV2ReleaseParity ON -QuestCockpitV2 ON -QuestCockpitV2SkyProbe ON
+set "RUNNER=%~dp0Run-OutRunVRTest.ps1"\nif not exist "%RUNNER%" set "RUNNER=%~dp0tools\\Run-OutRunVRTest.ps1"\nif not exist "%RUNNER%" (\n    echo [FAILED] Run-OutRunVRTest.ps1 was not found.\n    pause\n    exit /b 2\n)\npowershell -NoProfile -ExecutionPolicy Bypass -File "%RUNNER%" -TestProfile CORRECTNESS -QuestCockpitV2ReleaseParity ON -QuestCockpitV2 ON -QuestCockpitV2F0 ON -QuestCockpitV2SkyProbe ON
 set "ERRORCODE=%ERRORLEVEL%"
 echo.
 echo Exit %ERRORCODE%. Collect-OutRunVRLogs.cmd archives limited sky diagnostics.
