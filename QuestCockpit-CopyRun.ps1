@@ -1,4 +1,4 @@
-param([ValidateSet('NORMAL','SKY','INTERP')][string]$Mode='NORMAL',[switch]$VerifyOnly)
+param([ValidateSet('NORMAL','SKY','INTERP','TURN')][string]$Mode='NORMAL',[switch]$VerifyOnly)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $payload=Join-Path $root 'QUEST_APK_COPYRUN_PAYLOAD'
@@ -250,6 +250,12 @@ $launchArgs=@{
 if($Mode -eq 'SKY'){$launchArgs.QuestCockpitV2SkyProbe='ON'}
 if($Mode -eq 'INTERP'){
     $launchArgs.QuestCockpitV2Interpolation='OFF'
+    $launchArgs.QuestCockpitV2SkyProbe='ON'
+}
+if($Mode -eq 'TURN'){
+    # Keep the normal high-rate interpolation path and verified F0 scope;
+    # only enable bounded camera/body phase telemetry.
+    $launchArgs.QuestCockpitV2Interpolation='ON'
     $launchArgs.QuestCockpitV2SkyProbe='ON'
 }
 $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
