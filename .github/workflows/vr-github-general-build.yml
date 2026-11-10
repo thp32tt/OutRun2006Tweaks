@@ -2,7 +2,7 @@ name: VR GitHub General Test Build
 
 on:
   push:
-    branches: [ vr-d3d9ex-focus, vr-quest-cockpit-v2 ]
+    branches: [ vr-d3d9ex-focus, vr-quest-cockpit-v2, 'vr-quest-cockpit-v2-*' ]
     paths:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
@@ -99,7 +99,7 @@ jobs:
           fetch-depth: 1
 
       - name: Validate cockpit diagnostics PowerShell syntax
-        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
+        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' || startsWith(github.ref_name, 'vr-quest-cockpit-v2-') }}
         shell: pwsh
         run: |
           foreach($file in @(
@@ -123,7 +123,7 @@ jobs:
           Write-Host 'Cockpit test script syntax PASS'
 
       - name: Validate packaged helpers with Windows PowerShell 5.1
-        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
+        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' || startsWith(github.ref_name, 'vr-quest-cockpit-v2-') }}
         shell: pwsh
         run: |
           $validator=Join-Path $env:RUNNER_TEMP 'validate-copyrun-ps51.ps1'
@@ -156,7 +156,7 @@ jobs:
           Write-Host 'Packaged helper Windows PowerShell 5.1/Python syntax PASS'
 
       - name: Validate copy-run CMD control flow
-        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
+        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' || startsWith(github.ref_name, 'vr-quest-cockpit-v2-') }}
         shell: pwsh
         run: |
           $expected=[ordered]@{
@@ -184,7 +184,7 @@ jobs:
           Write-Host 'COPY-RUN CMD control-flow static PASS'
 
       - name: Verify cockpit glass brightness regression
-        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
+        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' || startsWith(github.ref_name, 'vr-quest-cockpit-v2-') }}
         shell: pwsh
         run: |
           python -m unittest discover -s tools/tests -p test_quest_cockpit_glass.py -v
@@ -274,7 +274,7 @@ jobs:
             'analyze_outrun_assets.py')) {
             if(Test-Path "tools/$f"){Copy-Item "tools/$f" $pkg}
           }
-          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
+          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2' -or $env:GITHUB_REF_NAME -like 'vr-quest-cockpit-v2-*') {
             foreach($item in @('RUN-QUEST-COCKPIT-V2.cmd','RUN-QUEST-COCKPIT-V2-F0.cmd','RUN-QUEST-COCKPIT-V2-LOD0.cmd','RUN-QUEST-COCKPIT-V2-DIAG.cmd','RUN-QUEST-COCKPIT-V2-SKY-DIAG.cmd','RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd','Run-QuestCockpitV2-CrashDiag.ps1','QUEST-COCKPIT-V2-START-HERE.txt')) {
               if(!(Test-Path $item)){throw "missing Quest cockpit launcher: $item"}
               Copy-Item $item $pkg
@@ -296,7 +296,7 @@ jobs:
           }
           $env:GITHUB_SHA | Set-Content (Join-Path $backend 'SOURCE_SHA.txt') -Encoding ascii
           'ACTIVE_R26_R43_R44' | Set-Content (Join-Path $backend 'VARIANT_ID.txt') -Encoding ascii
-          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
+          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2' -or $env:GITHUB_REF_NAME -like 'vr-quest-cockpit-v2-*') {
             # Self-contained copy-run payload: extraction touches NONE of the
             # user's existing root DLL/host/INI/renderer files. The launcher
             # validates hashes and backs originals up before selection.
@@ -357,7 +357,7 @@ jobs:
           Compress-Archive -Path "$pkg/*" -DestinationPath $zip -Force
           "GENERAL_ZIP=$zip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
-          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
+          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2' -or $env:GITHUB_REF_NAME -like 'vr-quest-cockpit-v2-*') {
             # This is the ONLY zip intended for "copy into existing game
             # folder and double-click". The general build above includes
             # top-level INI/helpers; never call that a no-overwrite install.
@@ -533,7 +533,7 @@ jobs:
           }
 
       - name: Upload cockpit copy-run ZIP
-        if: github.ref_name == 'vr-quest-cockpit-v2'
+        if: github.ref_name == 'vr-quest-cockpit-v2' || startsWith(github.ref_name, 'vr-quest-cockpit-v2-')
         uses: actions/upload-artifact@v4
         with:
           name: OutRun2-QuestCockpitV2-COPY-RUN-${{ github.sha }}
