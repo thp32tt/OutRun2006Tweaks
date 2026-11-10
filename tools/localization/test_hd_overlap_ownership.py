@@ -98,7 +98,9 @@ class NativeOverlapProofTests(unittest.TestCase):
         self.assertEqual(final.getpixel((185, 115)), src.getpixel((185, 115)))
 
     def test_sub16_shared_alpha_fringe_is_cosmetic_not_overlap_ink(self):
-        src = fixture()
+        # Use an otherwise empty shared ROI; fixture() already has real ink
+        # within the shared rectangle and cannot establish the fringe boundary.
+        src = Image.new("RGBA", (192, 128), (0, 0, 0, 0))
         draw = ImageDraw.Draw(src)
         draw.point((75, 25), fill=(255, 255, 255, 15))
         self.assertFalse(strict.shared_native_alpha(
