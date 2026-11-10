@@ -7,6 +7,8 @@ on:
       - ".github/workflows/outrun-ab-multi-atlas-safety-tests.yml"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_strict_qa.py"
+      - "tools/localization/hd_manual_user_import.py"
+      - "tools/localization/test_hd_manual_user_import.py"
       - "tools/localization/hd_overlap_ownership.py"
       - "tools/localization/test_hd_overlap_ownership.py"
       - "tools/localization/hd_bc3_index_patch.py"
@@ -43,6 +45,8 @@ jobs:
           sparse-checkout: |
             tools/localization/github_ab_imagegen_atlas_batch.py
             tools/localization/hd_strict_qa.py
+            tools/localization/hd_manual_user_import.py
+            tools/localization/test_hd_manual_user_import.py
             tools/localization/hd_overlap_ownership.py
             tools/localization/test_hd_overlap_ownership.py
             tools/localization/hd_bc3_index_patch.py
@@ -68,6 +72,7 @@ jobs:
         run: |
           python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
           python -m unittest discover -s tools/localization -p test_hd_strict_qa.py -v
+          python -m unittest discover -s tools/localization -p test_hd_manual_user_import.py -v
           python -m unittest discover -s tools/localization -p test_hd_overlap_ownership.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
