@@ -13,7 +13,7 @@ MAX_SOURCE_ALPHA_PIXELS = 1500000
 COSMETIC_FRINGE_ALPHA = 15
 
 
-def prove_overlap_ownership(source, rows, conflicting_ids):
+def prove_overlap_ownership(source, rows, conflicting_ids, diagnostics=None):
     """Return (verified per-ROI source-alpha masks, audit).
 
     All non-coarse rows must be passed, including rows without candidate PNGs.
@@ -22,6 +22,8 @@ def prove_overlap_ownership(source, rows, conflicting_ids):
     anchors are ambiguous. An owned component cannot extend outside the
     claimed owner's ROI. Coordinates are in readable DDS orientation.
     """
+    if diagnostics is not None:
+        diagnostics.clear()
     if not conflicting_ids:
         return {}, {"proven": [], "ambiguous": [], "reason": "NO_CONFLICTS"}
     alpha = source.getchannel("A")
@@ -47,6 +49,7 @@ def prove_overlap_ownership(source, rows, conflicting_ids):
                     if r["roi_id"] in conflicting_ids}
     visited = set()
     components = 0
+    unowned_pixels = []
     for first in membership:
         if first in visited:
             continue
@@ -75,12 +78,14 @@ def prove_overlap_ownership(source, rows, conflicting_ids):
                         pending.append(next_key)
         if len(exclusive_anchors) != 1:
             unresolved.update(touched)
+            unowned_pixels.extend(pixels)
             continue
         owner = next(iter(exclusive_anchors))
         box = rows[owner]["_bbox"]
         if any(not (box[0] <= key % width < box[2] and
                     box[1] <= key // width < box[3]) for key in pixels):
             unresolved.update(touched)
+            unowned_pixels.extend(pixels)
             continue
         if owner in pixels_owned:
             pixels_owned[owner].extend(pixels)
@@ -98,6 +103,29 @@ def prove_overlap_ownership(source, rows, conflicting_ids):
         # A safe row must own every source-alpha pixel it is about to erase;
         # any foreign pixels remain untouched by the mask in strict assembler.
         masks[rid] = mask
+    if diagnostics is not None:
+        # Diagnostic ONLY: component fragments cannot grant a held ROI
+        # permission to erase English. Preserve the original all-or-nothing
+        # masks above; expose separately the source-proved islands and the
+        # genuinely unassignable components for protected-art review.
+        partial_masks = {}
+        for idx, pixels in pixels_owned.items():
+            if not pixels:
+                continue
+            segment = Image.new("L", (width, height), 0)
+            dst = segment.load()
+            for key in pixels:
+                dst[key % width, key // width] = 255
+            partial_masks[rows[idx]["roi_id"]] = segment
+        ambiguous = Image.new("L", (width, height), 0)
+        dst = ambiguous.load()
+        for key in unowned_pixels:
+            dst[key % width, key // width] = 255
+        diagnostics.update({
+            "partial_owned_masks": partial_masks,
+            "ambiguous_native_mask": ambiguous,
+            "partial_proof_not_assembly_approval": True,
+        })
     return masks, {
         "proven": sorted(masks),
         "ambiguous": sorted(rows[i]["roi_id"] for i in unresolved
