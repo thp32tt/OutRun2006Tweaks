@@ -69,7 +69,7 @@ class SourceProtectionEvidenceTests(unittest.TestCase):
     def test_mask_preconditions_fail_closed(self):
         img = source()
         owned = Image.new("L", img.size, 0)
-        owned.putpixel((0, 0), 255)  # No source alpha: ownership cannot be fabricated.
+        owned.putpixel((15, 15), 255)  # Inside ROI, outside source alpha.
         with self.assertRaisesRegex(ValueError, "OWNER_PIXEL_NOT_NATIVE_CORE"):
             separate_masks(img, A["_bbox"], owned, None)
         with self.assertRaisesRegex(ValueError, "UNSAFE_NATIVE_BBOX"):
