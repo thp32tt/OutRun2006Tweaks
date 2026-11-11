@@ -35,9 +35,9 @@ class SourceProtectionEvidenceTests(unittest.TestCase):
         self.assertEqual(count(ambiguous), 0)
         self.assertEqual(ImageChops.multiply(own, protected).getbbox(), None)
         # Foreign label at x=90 is outside A and never part of its clean mask.
-        self.assertEqual(own.getpixel((69, 25)), 255)
+        self.assertEqual(own.getpixel((60, 20)), 255)
         view = evidence_overlay(img.crop(A["_bbox"]), own, protected, ambiguous)
-        self.assertEqual(view.getpixel((69, 25)), (25, 220, 65, 255))
+        self.assertEqual(view.getpixel((60, 20)), (25, 220, 65, 255))
         self.assertEqual(img.getpixel((70, 30)), (255, 255, 255, 255))
 
     def test_ambiguous_shared_components_are_protected_not_fake_owned(self):
