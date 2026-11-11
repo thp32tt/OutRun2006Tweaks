@@ -3,7 +3,7 @@ import unittest
 from PIL import Image, ImageDraw, ImageChops
 
 from hd_overlap_ownership import prove_overlap_ownership
-from hd_source_protection_evidence import separate_masks, evidence_overlay, count
+from hd_source_protection_evidence import separate_masks, evidence_overlay, source_clean_preview, count
 
 
 A = {"roi_id": "Q011_1111111111111111", "_bbox": (10, 10, 80, 75)}
@@ -65,6 +65,27 @@ class SourceProtectionEvidenceTests(unittest.TestCase):
         self.assertEqual(count(protected), 1)
         self.assertEqual(protected.getpixel((4, 4)), 255)
         self.assertEqual(count(uncertain), 0)
+
+
+    def test_owner_only_clean_preview_preserves_ambiguous_and_foreign_alpha(self):
+        img = source(ambiguous=True)
+        diag = {}
+        prove_overlap_ownership(
+            img, [A, B], {A["roi_id"], B["roi_id"]}, diagnostics=diag)
+        owned, protected, uncertain = separate_masks(
+            img, A["_bbox"], diag["partial_owned_masks"][A["roi_id"]],
+            diag["ambiguous_native_mask"])
+        original = img.crop(A["_bbox"])
+        clean = source_clean_preview(original, owned)
+        self.assertEqual(clean.getpixel((10, 15))[3], 0)
+        self.assertEqual(clean.getpixel((64, 30)), original.getpixel((64, 30)))
+        self.assertGreater(count(uncertain), 0)
+        self.assertEqual(ImageChops.multiply(clean.getchannel("A"), owned).getbbox(), None)
+        self.assertEqual(ImageChops.difference(original, clean).getbbox() is not None, True)
+
+    def test_clean_preview_refuses_mismatched_native_mask(self):
+        with self.assertRaisesRegex(ValueError, "CLEAN_PREVIEW_MASK_DIMENSIONS_INVALID"):
+            source_clean_preview(source(), Image.new("L", (5, 5), 0))
 
     def test_mask_preconditions_fail_closed(self):
         img = source()

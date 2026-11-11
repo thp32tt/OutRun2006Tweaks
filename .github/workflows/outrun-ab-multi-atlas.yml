@@ -15,6 +15,8 @@ on:
       - "tools/localization/test_hd_overlap_ownership.py"
       - "tools/localization/hd_source_protection_evidence.py"
       - "tools/localization/test_hd_source_protection_evidence.py"
+      - "tools/localization/hd_hold_resolution_plan.py"
+      - "tools/localization/test_hd_hold_resolution_plan.py"
       - "tools/localization/hd_existing_candidate_salvage.py"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_manual_user_import.py"
@@ -48,6 +50,8 @@ jobs:
             tools/localization/test_hd_overlap_ownership.py
             tools/localization/hd_source_protection_evidence.py
             tools/localization/test_hd_source_protection_evidence.py
+            tools/localization/hd_hold_resolution_plan.py
+            tools/localization/test_hd_hold_resolution_plan.py
             tools/localization/hd_bc3_index_patch.py
             tools/localization/hd_bc3_native_codec.py
             tools/localization/test_hd_bc3_index_patch.py
@@ -91,6 +95,7 @@ jobs:
           python -m unittest discover -s tools/localization -p test_hd_manual_user_import.py -v
           python -m unittest discover -s tools/localization -p test_hd_overlap_ownership.py -v
           python -m unittest discover -s tools/localization -p test_hd_source_protection_evidence.py -v
+          python -m unittest discover -s tools/localization -p test_hd_hold_resolution_plan.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
           python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
@@ -144,7 +149,17 @@ jobs:
           set -euo pipefail
           python tools/localization/hd_source_protection_evidence.py --repo-root . \
             --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
-            --out "$RUNNER_TEMP/ab-multi-one/source_protection" --max-previews 32
+            --out "$RUNNER_TEMP/ab-multi-one/source_protection" --max-previews 200
+
+      - name: Write source-bound prioritized repair worklist for every held ROI
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_hold_resolution_plan.py --repo-root . \
+            --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
+            --source-evidence "$RUNNER_TEMP/ab-multi-one/source_protection/source_protection_evidence.json" \
+            --out "$RUNNER_TEMP/ab-multi-one/source_protection"
 
       - name: Preserve existing-art-only HOLD accountability without new ImageGen requests
         if: success()

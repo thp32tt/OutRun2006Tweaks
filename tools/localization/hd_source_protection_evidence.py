@@ -79,10 +79,29 @@ def evidence_overlay(source_crop, owned, protected, ambiguous):
     return view
 
 
-def build(root, qa_report, out, max_previews=32):
+def source_clean_preview(source_crop, owned):
+    """Remove ONLY pixel-proven owned English core; retain all protected art.
+
+    This is a non-installable QA preview, not a completed English clean plate.
+    Weak source fringe <=15 and every ambiguous original pixel remain intact.
+    """
+    if source_crop.size != owned.size or owned.mode != "L":
+        raise ValueError("CLEAN_PREVIEW_MASK_DIMENSIONS_INVALID")
+    clean = source_crop.copy()
+    clean.paste((0, 0, 0, 0), (0, 0), owned)
+    diff = ImageChops.difference(source_crop, clean)
+    outside = ImageOps.invert(owned)
+    if any(ImageChops.multiply(channel, outside).getbbox() for channel in diff.split()):
+        raise ValueError("CLEAN_PREVIEW_MODIFIED_PROTECTED_PIXEL")
+    if ImageChops.multiply(clean.getchannel("A"), owned).getbbox():
+        raise ValueError("CLEAN_PREVIEW_OWNER_ALPHA_RESIDUE")
+    return clean
+
+
+def build(root, qa_report, out, max_previews=200):
     root = Path(root)
     out = Path(out)
-    if max_previews < 0 or max_previews > 128:
+    if max_previews < 0 or max_previews > 200:
         raise ValueError("INVALID_PREVIEW_BUDGET")
     report = json.loads(Path(qa_report).read_text(encoding="utf-8"))
     if (report.get("schema") != "outrun.ab-imagegen-hd-strict.v2"
@@ -167,6 +186,13 @@ def build(root, qa_report, out, max_previews=32):
                 evidence_overlay(crop, owned, protected, unknown).save(
                     preview_dir / name, format="PNG")
                 record["mask_pngs"]["overlay"] = "native_masks/" + name
+                for suffix, preview in (
+                    ("source", crop),
+                    ("owner_only_clean_test", source_clean_preview(crop, owned)),
+                ):
+                    name = rid + "_" + suffix + ".png"
+                    preview.save(preview_dir / name, format="PNG")
+                    record["mask_pngs"][suffix] = "native_masks/" + name
                 selected += 1
             evidence.append(record)
             counts["partial_owner_rows"] += bool(count(owned))
@@ -187,6 +213,7 @@ def build(root, qa_report, out, max_previews=32):
         "full_owner_rows_diagnostic_only": counts["fully_proven_rows"],
         "ambiguous_component_rows": counts["ambiguous_rows"],
         "preview_count": selected,
+        "owner_only_clean_preview_is_not_full_english_removal": True,
         "mask_meaning": {
             "owned": "GREEN native source components anchored uniquely to this ROI; not automatic English cleanup approval",
             "protected": "RED original source alpha that cannot be erased by this ROI",
@@ -201,7 +228,7 @@ def build(root, qa_report, out, max_previews=32):
     print(json.dumps({k: result[k] for k in (
         "overlap_hold_roi", "source_atlases_inspected",
         "partial_owner_rows_diagnostic_only", "ambiguous_component_rows",
-        "preview_count")}, sort_keys=True))
+        "preview_count", "full_owner_rows_diagnostic_only")}, sort_keys=True))
     return result
 
 
@@ -210,7 +237,7 @@ def main():
     p.add_argument("--repo-root", default=".")
     p.add_argument("--qa-report", required=True)
     p.add_argument("--out", required=True)
-    p.add_argument("--max-previews", type=int, default=32)
+    p.add_argument("--max-previews", type=int, default=200)
     a = p.parse_args()
     build(a.repo_root, a.qa_report, a.out, a.max_previews)
 
