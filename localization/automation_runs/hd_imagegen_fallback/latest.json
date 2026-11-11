@@ -5,15 +5,15 @@
   },
   "hold_categories": {
     "AB_IMAGE_AND_CLEAN_REWORK": 3,
-    "ENGINE_OR_COORDINATE_HOLD": 580,
+    "ENGINE_OR_COORDINATE_HOLD": 578,
     "EVIDENCE_REVIEW_HOLD": 18,
-    "SOURCE_CLEAN_MASK_OR_SEGMENTATION_HOLD": 40
+    "SOURCE_CLEAN_MASK_OR_SEGMENTATION_HOLD": 41
   },
-  "hold_count": 641,
+  "hold_count": 640,
   "new_imagegen_disabled": false,
-  "old_painted_count_invalid_for_release": 313,
+  "old_painted_count_invalid_for_release": 314,
   "policy": "hd-existing-ab-salvage-first-v2-20261105",
-  "previously_claimed_ticket_count": 36,
+  "previously_claimed_ticket_count": 39,
   "qa_report_schema": "outrun.ab-imagegen-hd-strict.v2",
   "reference_blockers": {},
   "release_approved": false,
@@ -21,156 +21,8 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-workqueue-v1",
   "selection_policy": "IMAGEGEN FALLBACK ONLY; 8 TOTAL MAX; 4 PER ROLE",
-  "source_asset_sha256": "08dfafcae04a10b9fbcdef3294f04cae903d49ea6ec44d3d8ea571800c677c70",
-  "source_reference_count_verified": 3,
+  "source_asset_sha256": "13c30301198c4588b5bc07a4c7194dcad42c94c8c9b453f42c501e9963ff16e2",
+  "source_reference_count_verified": 0,
   "source_roi_count": 954,
-  "tasks": [
-    {
-      "english": "OutRun2 · 15 Continuous Course has been selected.",
-      "korean": "OutRun2 · 15코스 연속이 선택되었습니다.",
-      "old_candidate_sha256": "8bd0a60cf3cb02545ee6cda5f0cdc8beea720b1e34c77b22e05737de9fe0d5b2",
-      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
-      "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
-      "reference": {
-        "height": 246,
-        "name": "HDRW-B-75f94e22ef96a98a9113_HD_SOURCE.png",
-        "roi_within_reference_xyxy": [
-          8,
-          8,
-          1758,
-          238
-        ],
-        "sha256": "b1a387172f4e8226825fa8644a8e597fa0bebfc5881e89b0b092b6c55ba8e2a9",
-        "source_box_xyxy": [
-          222,
-          216,
-          1988,
-          462
-        ],
-        "source_native_size": [
-          4096,
-          4096
-        ],
-        "width": 1766
-      },
-      "required": [
-        "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
-        "KOREAN_LETTERING_RGBA_PNG",
-        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
-        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
-        "PRESERVE_ORIGINAL_LINE_COUNT",
-        "C1_INDEPENDENT_VISUAL_QA"
-      ],
-      "roi_id": "Q094_d1401e120e386bd1",
-      "role": "B",
-      "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
-      "source_dds_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
-      "source_native_bbox_xyxy": [
-        230,
-        224,
-        1980,
-        454
-      ],
-      "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
-      "task_id": "HDRW-B-75f94e22ef96a98a9113"
-    },
-    {
-      "english": "Music will be Randomly Selected.",
-      "korean": "음악이 무작위로 선택됩니다.",
-      "old_candidate_sha256": "2c4577e9e025287ce41b4655e35a435068599cb3ed3268e1ea0c7a3655de0134",
-      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
-      "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
-      "reference": {
-        "height": 230,
-        "name": "HDRW-B-bfd81903263da59e0c55_HD_SOURCE.png",
-        "roi_within_reference_xyxy": [
-          8,
-          8,
-          964,
-          222
-        ],
-        "sha256": "2b92fe3a132a88a1226da9b0233ecd3c307866ff6d5b46a1cb55f55265f58d29",
-        "source_box_xyxy": [
-          1756,
-          2352,
-          2728,
-          2582
-        ],
-        "source_native_size": [
-          4096,
-          4096
-        ],
-        "width": 972
-      },
-      "required": [
-        "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
-        "KOREAN_LETTERING_RGBA_PNG",
-        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
-        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
-        "PRESERVE_ORIGINAL_LINE_COUNT",
-        "C1_INDEPENDENT_VISUAL_QA"
-      ],
-      "roi_id": "Q121_1899c0152ffdcde2",
-      "role": "B",
-      "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
-      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
-      "source_native_bbox_xyxy": [
-        1764,
-        2360,
-        2720,
-        2574
-      ],
-      "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
-      "task_id": "HDRW-B-bfd81903263da59e0c55"
-    },
-    {
-      "english": "SORRY! You need more miles!",
-      "korean": "죄송합니다! 마일이 더 필요합니다!",
-      "old_candidate_sha256": "3f67eabf9007bdce0438bfd52ec17b3d080db32af15e9ff86b127e635232fa28",
-      "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
-      "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
-      "reference": {
-        "height": 187,
-        "name": "HDRW-A-02f33ed2e186346c24f3_HD_SOURCE.png",
-        "roi_within_reference_xyxy": [
-          8,
-          8,
-          669,
-          186
-        ],
-        "sha256": "08251f741c363d3d3b99c3573a67fd7d538e4b2c26d5d394e9e3df1446e4191f",
-        "source_box_xyxy": [
-          1791,
-          1861,
-          2468,
-          2048
-        ],
-        "source_native_size": [
-          4096,
-          2048
-        ],
-        "width": 677
-      },
-      "required": [
-        "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
-        "KOREAN_LETTERING_RGBA_PNG",
-        "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
-        "EXACT_SOURCE_NATIVE_SIZE_CEILING",
-        "PRESERVE_ORIGINAL_LINE_COUNT",
-        "C1_INDEPENDENT_VISUAL_QA"
-      ],
-      "roi_id": "Q205_610a003bbc54f7c3",
-      "role": "A",
-      "source_dds_path": "textures/load/PlayStation/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
-      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
-      "source_native_bbox_xyxy": [
-        1799,
-        1869,
-        2460,
-        2047
-      ],
-      "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
-      "task_id": "HDRW-A-02f33ed2e186346c24f3"
-    }
-  ]
+  "tasks": []
 }
