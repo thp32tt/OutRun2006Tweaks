@@ -19,6 +19,8 @@ on:
       - "tools/localization/test_hd_hold_resolution_plan.py"
       - "tools/localization/hd_source_edge_rebind.py"
       - "tools/localization/test_hd_source_edge_rebind.py"
+      - "tools/localization/hd_hold_auto_edit.py"
+      - "tools/localization/test_hd_hold_auto_edit.py"
       - "tools/localization/hd_existing_candidate_salvage.py"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_manual_user_import.py"
@@ -56,6 +58,8 @@ jobs:
             tools/localization/test_hd_hold_resolution_plan.py
             tools/localization/hd_source_edge_rebind.py
             tools/localization/test_hd_source_edge_rebind.py
+            tools/localization/hd_hold_auto_edit.py
+            tools/localization/test_hd_hold_auto_edit.py
             tools/localization/hd_bc3_index_patch.py
             tools/localization/hd_bc3_native_codec.py
             tools/localization/test_hd_bc3_index_patch.py
@@ -101,6 +105,7 @@ jobs:
           python -m unittest discover -s tools/localization -p test_hd_source_protection_evidence.py -v
           python -m unittest discover -s tools/localization -p test_hd_hold_resolution_plan.py -v
           python -m unittest discover -s tools/localization -p test_hd_source_edge_rebind.py -v
+          python -m unittest discover -s tools/localization -p test_hd_hold_auto_edit.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
           python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
@@ -174,6 +179,28 @@ jobs:
           python tools/localization/hd_source_edge_rebind.py --repo-root . \
             --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
             --out "$RUNNER_TEMP/ab-multi-one/source_protection" --pad 64
+
+      - name: Automatically edit existing A/B PNG pixels and produce source-protected review previews
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_hold_auto_edit.py --repo-root . \
+            --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
+            --source-evidence "$RUNNER_TEMP/ab-multi-one/source_protection/source_protection_evidence.json" \
+            --edge-proposals "$RUNNER_TEMP/ab-multi-one/source_protection/source_edge_rebind_proposals.json" \
+            --out "$RUNNER_TEMP/ab-multi-one/auto_edits" --max-edits 180
+          python - "$RUNNER_TEMP/ab-multi-one/auto_edits/auto_edit_report.json" <<'PY'
+          import json, sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["schema"]=="outrun-hd-existing-pixel-auto-editor-v1"
+          assert d["source_dds_modified"] is False
+          assert d["input_ab_candidate_overwritten"] is False
+          assert d["release_approved"] is False and d["runtime_validation"]=="UNTESTED"
+          assert d["original_hold_count_unchanged"]==640
+          assert d["attempted_edits"]<=180
+          print("HD_EXISTING_AB_AUTO_EDIT_TEST_ONLY_AUDIT_PASS")
+          PY
 
       - name: Preserve existing-art-only HOLD accountability without new ImageGen requests
         if: success()
