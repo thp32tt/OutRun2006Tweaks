@@ -1,0 +1,99 @@
+name: OutRun HD Auto-Edit Real Existing PNGs (GitHub CPU, source-mask reuse)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-hd-auto-edit-existing-source.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: outrun-hd-auto-edit-existing-source
+  cancel-in-progress: true
+
+jobs:
+  reuse-source-masks-and-edit-png:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout candidate PNG pixels and code only (no DDS, no N100)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/github_ab_imagegen_atlas_batch.py
+            tools/localization/hd_strict_qa.py
+            tools/localization/hd_existing_candidate_salvage.py
+            tools/localization/hd_source_protection_evidence.py
+            tools/localization/hd_source_edge_rebind.py
+            tools/localization/hd_bc3_index_patch.py
+            tools/localization/hd_bc3_native_codec.py
+            tools/localization/hd_overlap_ownership.py
+            tools/localization/hd_rework_queue.py
+            tools/localization/hd_manual_user_import.py
+            tools/localization/hd_hold_auto_edit.py
+            tools/localization/test_hd_hold_auto_edit.py
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+            localization/automation_inputs/candidate_outputs
+      - name: Retrieve 2026-11-12 original-source SHA-verified proof and CLEAN masks
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-ab-multi-atlas-43169137555
+          run-id: 43169137555
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/source-proof
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+      - name: Verify pixel-protection tests on actual editor source
+        run: python -m unittest discover -s tools/localization -p test_hd_hold_auto_edit.py -v
+      - name: Edit real existing Korean PNG pixels, preserve protected original art
+        shell: bash
+        run: |
+          set -euo pipefail
+          src="$RUNNER_TEMP/source-proof"
+          test -f "$src/qa_report.json"
+          test -f "$src/source_protection/source_protection_evidence.json"
+          test -f "$src/source_protection/source_edge_rebind_proposals.json"
+          # Exactly 150 source masks have partial native ownership proof.
+          # Bound work to them, so no source DDS load or new ImageGen request.
+          python tools/localization/hd_hold_auto_edit.py \
+            --repo-root . \
+            --qa-report "$src/qa_report.json" \
+            --source-evidence "$src/source_protection/source_protection_evidence.json" \
+            --edge-proposals "$src/source_protection/source_edge_rebind_proposals.json" \
+            --out "$RUNNER_TEMP/auto-edited-png" --max-edits 150
+          python - "$RUNNER_TEMP/auto-edited-png/auto_edit_report.json" <<'PY'
+          import json,sys,os
+          j=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert j["schema"]=="outrun-hd-existing-pixel-auto-editor-v1"
+          assert j["source_report_zip_sha256"]=="13c30301198c4588b5bc07a4c7194dcad42c94c8c9b453f42c501e9963ff16e2"
+          assert j["attempted_edits"]<=150
+          assert j["release_approved"] is False and j["runtime_validation"]=="UNTESTED"
+          assert j["source_dds_modified"] is False and j["input_ab_candidate_overwritten"] is False
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
+              f.write("## Existing-pixel auto-editor source-bound results\n\n")
+              f.write(f"- Attempted: {j['attempted_edits']}\n")
+              f.write(f"- Real edited transparent PNGs: {j['actual_transparent_png_edits']}\n")
+              f.write(f"- Protected source composite previews: {j['source_composite_preview_count']}\n")
+              f.write(f"- Original QA HOLD count unchanged: {j['original_hold_count_unchanged']}\n")
+              f.write("- Final C1/C3 and game QA: NOT PERFORMED; no release approval.\n")
+          PY
+      - name: Upload edited PNGs and per-ROI SHA receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-source-bound-auto-edited-pngs-${{ github.run_id }}
+          path: ${{ runner.temp }}/auto-edited-png/
+          retention-days: 21
+          if-no-files-found: warn
