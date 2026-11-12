@@ -1,0 +1,54 @@
+name: OutRun HD HOLD Existing-Pixel Auto-Editor Safety CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-hd-hold-auto-edit-ci.yml"
+      - "tools/localization/hd_hold_auto_edit.py"
+      - "tools/localization/test_hd_hold_auto_edit.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: outrun-hd-hold-auto-edit-ci
+  cancel-in-progress: true
+
+jobs:
+  synthetic-image-pixel-edit-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact source-only editor modules (no large DDS assets)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/github_ab_imagegen_atlas_batch.py
+            tools/localization/hd_strict_qa.py
+            tools/localization/hd_existing_candidate_salvage.py
+            tools/localization/hd_source_protection_evidence.py
+            tools/localization/hd_source_edge_rebind.py
+            tools/localization/hd_bc3_index_patch.py
+            tools/localization/hd_bc3_native_codec.py
+            tools/localization/hd_overlap_ownership.py
+            tools/localization/hd_rework_queue.py
+            tools/localization/hd_manual_user_import.py
+            tools/localization/hd_hold_auto_edit.py
+            tools/localization/test_hd_hold_auto_edit.py
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+      - name: Run automatic pixel editing and protected-source regression tests
+        run: python -m unittest discover -s tools/localization -p test_hd_hold_auto_edit.py -v
+      - name: Compile and verify editor CLI
+        run: |
+          python -m py_compile tools/localization/hd_hold_auto_edit.py
+          python tools/localization/hd_hold_auto_edit.py --help
