@@ -17,6 +17,8 @@ on:
       - "tools/localization/test_hd_source_protection_evidence.py"
       - "tools/localization/hd_hold_resolution_plan.py"
       - "tools/localization/test_hd_hold_resolution_plan.py"
+      - "tools/localization/hd_source_edge_rebind.py"
+      - "tools/localization/test_hd_source_edge_rebind.py"
       - "tools/localization/hd_existing_candidate_salvage.py"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
       - "tools/localization/hd_manual_user_import.py"
@@ -52,6 +54,8 @@ jobs:
             tools/localization/test_hd_source_protection_evidence.py
             tools/localization/hd_hold_resolution_plan.py
             tools/localization/test_hd_hold_resolution_plan.py
+            tools/localization/hd_source_edge_rebind.py
+            tools/localization/test_hd_source_edge_rebind.py
             tools/localization/hd_bc3_index_patch.py
             tools/localization/hd_bc3_native_codec.py
             tools/localization/test_hd_bc3_index_patch.py
@@ -96,6 +100,7 @@ jobs:
           python -m unittest discover -s tools/localization -p test_hd_overlap_ownership.py -v
           python -m unittest discover -s tools/localization -p test_hd_source_protection_evidence.py -v
           python -m unittest discover -s tools/localization -p test_hd_hold_resolution_plan.py -v
+          python -m unittest discover -s tools/localization -p test_hd_source_edge_rebind.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_index_patch.py -v
           python -m unittest discover -s tools/localization -p test_hd_bc3_native_codec.py -v
           python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
@@ -160,6 +165,15 @@ jobs:
             --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
             --source-evidence "$RUNNER_TEMP/ab-multi-one/source_protection/source_protection_evidence.json" \
             --out "$RUNNER_TEMP/ab-multi-one/source_protection"
+
+      - name: Propose exact-SHA native alpha edge coordinate rebindings for review (no DDS modifications)
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_source_edge_rebind.py --repo-root . \
+            --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
+            --out "$RUNNER_TEMP/ab-multi-one/source_protection" --pad 64
 
       - name: Preserve existing-art-only HOLD accountability without new ImageGen requests
         if: success()
