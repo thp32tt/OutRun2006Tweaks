@@ -646,6 +646,29 @@ jobs:
           @'
           # OutRun 2006 VR v0.02 Beta - Cockpit
 
+          ## English
+
+          v0.02 introduces the original-game cockpit VR mode as the public beta default.
+
+          ### Main changes
+          - QuestCockpitV2 original-car cockpit enabled in the VR launcher.
+          - F0 render scope enabled; Quest 3 field testing reported the previous vehicle body vibration removed.
+          - Default cockpit calibration: SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0. The eye position is lower than the initial v0.02 setting.
+          - F11 > Settings > VR seat values persist to OutRun2006Tweaks.user.ini, with Save Cockpit View and Reset Cockpit View controls.
+          - Native Quest 30-car seat profile / APK-mode camera input path retained.
+          - Startup sky exact 0x4521C0 programmable layer uses one deterministic rotation-only stereo basis.
+          - Crash handler starts before settings/VR-hook initialization.
+          - Nonthrowing user-INI and CrashDumps filesystem checks.
+          - Crash ZIP no longer depends on the normal release log being enabled.
+          - Partial minidumps are rejected and crash module attribution is corrected.
+
+          ### Run
+          Extract the ZIP into the folder containing OR2006C2C.EXE and run **Start-OutRun-VR.cmd**.
+          Press **F12** while looking forward to recenter. Direct OR2006C2C.EXE launch remains **2D + FFB**.
+
+          ### Beta status
+          Vehicle vibration removal and the current turn behavior were confirmed acceptable on Quest 3 before this release.
+          The deterministic startup-sky change passed source/CI validation; complete removal of the startup sky flicker still needs final Quest 3 visual confirmation.
           ## 한국어
 
           OutRun 2006 VR v0.02 Beta는 원본 게임 차량의 운전석 VR 모드를 기본 VR 실행 모드로 배포합니다.
@@ -671,29 +694,6 @@ jobs:
           차량 떨림 제거와 현재 차량 회전 감각은 Quest 3 실기에서 허용 가능한 수준으로 확인되었습니다.
           시작 하늘 고정 수정은 소스/CI 검증을 통과했지만, 하늘 깜빡임이 완전히 사라졌는지는 Quest 3에서 최종 확인이 필요합니다.
 
-          ## English
-
-          v0.02 introduces the original-game cockpit VR mode as the public beta default.
-
-          ### Main changes
-          - QuestCockpitV2 original-car cockpit enabled in the VR launcher.
-          - F0 render scope enabled; Quest 3 field testing reported the previous vehicle body vibration removed.
-          - Default cockpit calibration: SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0. The eye position is lower than the initial v0.02 setting.
-          - F11 > Settings > VR seat values persist to OutRun2006Tweaks.user.ini, with Save Cockpit View and Reset Cockpit View controls.
-          - Native Quest 30-car seat profile / APK-mode camera input path retained.
-          - Startup sky exact 0x4521C0 programmable layer uses one deterministic rotation-only stereo basis.
-          - Crash handler starts before settings/VR-hook initialization.
-          - Nonthrowing user-INI and CrashDumps filesystem checks.
-          - Crash ZIP no longer depends on the normal release log being enabled.
-          - Partial minidumps are rejected and crash module attribution is corrected.
-
-          ### Run
-          Extract the ZIP into the folder containing OR2006C2C.EXE and run **Start-OutRun-VR.cmd**.
-          Press **F12** while looking forward to recenter. Direct OR2006C2C.EXE launch remains **2D + FFB**.
-
-          ### Beta status
-          Vehicle vibration removal and the current turn behavior were confirmed acceptable on Quest 3 before this release.
-          The deterministic startup-sky change passed source/CI validation; complete removal of the startup sky flicker still needs final Quest 3 visual confirmation.
           '@ | Set-Content -LiteralPath $notes -Encoding utf8
           gh release view v0.02 --repo $env:GITHUB_REPOSITORY *> $null
           if($LASTEXITCODE -eq 0){
