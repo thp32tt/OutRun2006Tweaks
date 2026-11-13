@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "809d72df3683f8adcc2754fc19fb3c23596d39563ac92b4416718b25e1413ea1",
+  "release_approved": false,
+  "roi_id": "Q086_11895901f9313213",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "15 Continuous Course Ranking",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "15코스 연속 랭킹",
+    "old_candidate_sha256": "809d72df3683f8adcc2754fc19fb3c23596d39563ac92b4416718b25e1413ea1",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_TRANSLATION_TOO_SMALL_TO_READ",
+    "reference": {
+      "height": 417,
+      "name": "HDRW-B-f2da45ee25823c2ee9e6_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        1751,
+        417
+      ],
+      "sha256": "f7d872072344cf45e76f2114d9489e3fdb71f9fad99f0eb3cdf7d5ee9c95856f",
+      "source_box_xyxy": [
+        2345,
+        830,
+        4096,
+        1247
+      ],
+      "source_native_size": [
+        1751,
+        417
+      ],
+      "width": 1751
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q086_11895901f9313213",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+    "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+    "source_native_bbox_xyxy": [
+      2345,
+      830,
+      4096,
+      1247
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-B-f2da45ee25823c2ee9e6"
+  },
+  "task_id": "HDRW-B-f2da45ee25823c2ee9e6",
+  "updated_utc": "2026-11-13T06:09:00+00:00"
+}
