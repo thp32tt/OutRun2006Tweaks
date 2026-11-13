@@ -1,5 +1,13 @@
 {
   "ab_chat_url": "https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu/c/6af6af5c-a7b0-83ec-bc76-e183e0bb884e",
+  "candidate_dimensions": [
+    2133,
+    637
+  ],
+  "candidate_generated_raw_sha256": "5c93b95911b2117051777a1227c460e4ce0b95f76d6177f4e4d3afb3e8c6a4bb",
+  "candidate_gh_path": "localization/automation_runs/hd_imagegen_fallback/candidates/HDRW-A-1e37d826c104673e6b57.png",
+  "candidate_sha256": "c4738208ffd2aca9393e5b42229956c1919920a8aff14535d0852d2b8535e884",
+  "candidate_status": "IMAGEGEN_BLOB_SAVED_PENDING_C1",
   "old_candidate_sha256": "f29bcdcc361adfcac759f50600be36065107a1c65b957e652357ce0b2f72e328",
   "release_approved": false,
   "roi_id": "Q086_9dc7cafdc29ca37c",
@@ -7,7 +15,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
-  "status": "AB_SENT",
+  "status": "C1_READY",
   "task": {
     "english": "Imperial Avenue",
     "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
@@ -59,5 +67,5 @@
     "task_id": "HDRW-A-1e37d826c104673e6b57"
   },
   "task_id": "HDRW-A-1e37d826c104673e6b57",
-  "updated_utc": "2026-11-13T06:34:22+00:00"
+  "updated_utc": "2026-11-13T06:46:39+00:00"
 }
