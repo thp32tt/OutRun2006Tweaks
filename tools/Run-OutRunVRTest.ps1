@@ -367,7 +367,7 @@ if($QuestCockpitV2 -eq 'ON'){
         # is upward; override saved user.ini offsets only for COPY-RUN.
         $gameArgs += @(
             '-VR.QuestCockpitV2SeatBack=-0.08',
-            '-VR.QuestCockpitV2SeatDown=-0.05',
+            '-VR.QuestCockpitV2SeatDown=0.05',
             '-VR.QuestCockpitV2SeatRight=0.0'
         )
     }
