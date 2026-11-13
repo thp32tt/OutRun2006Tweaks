@@ -70,7 +70,10 @@ namespace Module
 	bool FileLoggingEnabled() noexcept
 	{
 		bool enabled = ReadIniBool(IniPath, L"VR", L"FileLogging", true);
-		if (std::filesystem::exists(UserIniPath))
+		// A missing/inaccessible user INI must not throw from this noexcept
+		// startup policy function (otherwise std::terminate is invoked).
+		std::error_code userIniError;
+		if (std::filesystem::exists(UserIniPath, userIniError) && !userIniError)
 			enabled = ReadIniBool(UserIniPath, L"VR", L"FileLogging", enabled);
 
 		wchar_t env[16]{};
@@ -112,8 +115,10 @@ namespace Module
 
 void Plugin_Init()
 {
-	// setup our log & INI paths
+	// Establish paths and the crash handler BEFORE settings/FFB/VR hooks.
+	// A malformed or inaccessible configuration can fail during startup too.
 	Module::init();
+	InitExceptionHandler();
 
 	// spdlog setup
 	{
@@ -201,7 +206,8 @@ void Plugin_Init()
 
 	// Create save folder if it doesn't exist, otherwise game will have issues writing savegame...
 	auto saveFolder = Module::ExePath.parent_path() / "SaveGame";
-	if (!std::filesystem::exists(saveFolder))
+	std::error_code saveFolderError;
+	if (!std::filesystem::exists(saveFolder, saveFolderError))
 	{
 		spdlog::warn("Plugin_Init: SaveGame folder doesn't exist, trying to create it...");
 		try
@@ -214,8 +220,6 @@ void Plugin_Init()
 			spdlog::error("Plugin_Init: Failed to create SaveGame folder (may require permissions?) - game might have issues writing savegame!");
 		}
 	}
-
-	InitExceptionHandler();
 
 	HookManager::ApplyHooks();
 

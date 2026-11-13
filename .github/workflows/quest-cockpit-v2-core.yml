@@ -39,6 +39,9 @@ on:
       - 'QuestCockpitV2-GlassControl.ps1'
       - 'RUN-QUEST-COCKPIT-V2-GLASS.cmd'
       - 'src/hooks_graphics.cpp'
+      - 'src/dllmain.cpp'
+      - 'src/hooks_exceptions.cpp'
+      - 'tools/verify_quest_cockpit_crash_recovery.py'
       - 'src/vr/game/quest_cockpit_v2_turn_yaw.hpp'
       - 'tools/tests/quest_cockpit_v2_turn_yaw_smoke.cpp'
       - 'src/vr/settings.cpp'
@@ -55,6 +58,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
+      - name: Guard startup and crash-capture failure paths
+        run: python3 tools/verify_quest_cockpit_crash_recovery.py
       - name: Build QuestCockpitV2 frame and matrix regression tests
         run: |
           c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \

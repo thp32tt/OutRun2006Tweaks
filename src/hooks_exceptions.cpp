@@ -45,22 +45,28 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
     wchar_t     zip_filename[MAX_PATH];
     wchar_t     timestamp[128];
     wchar_t*    modulenameptr{};
-    bool        bDumpSuccess;
+    bool        dumpWritten = false;
     __time64_t  time;
     struct tm   ltime;
     HWND        hWnd;
     HANDLE      hFile;
 
     // Write minidump
-    if (GetModuleFileNameW(GetModuleHandle(NULL), modulename, _countof(modulename)) != 0)
+    const DWORD exePathLength = GetModuleFileNameW(
+        GetModuleHandleW(nullptr), modulename, _countof(modulename));
+    if (exePathLength > 0 && exePathLength < _countof(modulename))
     {
-        modulenameptr = wcsrchr(modulename, '\\');
-        *modulenameptr = L'\0';
-        modulenameptr += 1;
+        if (wchar_t* separator = wcsrchr(modulename, L'\\'))
+        {
+            *separator = L'\0';
+            modulenameptr = separator + 1;
+        }
     }
-    else
+    if (!modulenameptr)
     {
-        modulenameptr = (wchar_t*)L"err.err";
+        // Do not dereference a missing path separator while reporting a crash.
+        wcscpy_s(modulename, L".");
+        modulenameptr = const_cast<wchar_t*>(L"OR2006C2C.EXE");
     }
 
     _time64(&time);
@@ -78,10 +84,13 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
         ex.ExceptionPointers = ExceptionInfo;
         ex.ClientPointers = TRUE;
 
-        if (!(MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpWithDataSegs, &ex, NULL, NULL)))
-            bDumpSuccess = false;
-
+        dumpWritten = MiniDumpWriteDump(GetCurrentProcess(),
+            GetCurrentProcessId(), hFile, MiniDumpWithDataSegs,
+            &ex, NULL, NULL) != FALSE;
         CloseHandle(hFile);
+        if (!dumpWritten)
+            DeleteFileW(dump_filename); // Do not archive a partial .dmp.
+
     }
 
     // Logs exception into buffer and writes to file
@@ -134,7 +143,16 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
                 reinterpret_cast<uintptr_t>(GetModuleHandleW(NULL));
             const uintptr_t faultAddress = reinterpret_cast<uintptr_t>(
                 ExceptionInfo->ExceptionRecord->ExceptionAddress);
-            const bool inMainExe = faultAddress >= moduleBase;
+            MEMORY_BASIC_INFORMATION faultRegion{};
+            const bool resolvedImage =
+                VirtualQuery(ExceptionInfo->ExceptionRecord->ExceptionAddress,
+                    &faultRegion, sizeof(faultRegion)) == sizeof(faultRegion)
+                && faultRegion.Type == MEM_IMAGE;
+            // Other DLLs are often mapped above the EXE. A numeric
+            // address >= exeBase is NOT evidence that the EXE crashed.
+            const bool inMainExe = resolvedImage &&
+                faultRegion.AllocationBase ==
+                    reinterpret_cast<void*>(moduleBase);
             const uintptr_t exeRva = inMainExe ?
                 (faultAddress - moduleBase) : 0;
 
@@ -145,7 +163,7 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
                 "  \"exceptionCode\": \"0x%08X\",\n"
                 "  \"absoluteAddress\": \"0x%p\",\n"
                 "  \"moduleBase\": \"0x%p\",\n"
-                "  \"module\": \"OR2006C2C.EXE\",\n"
+                "  \"module\": \"%s\",\n"
                 "  \"faultInMainExe\": %s,\n"
                 "  \"exeRva\": \"0x%08llX\",\n"
                 "  \"threadId\": %lu\n"
@@ -154,6 +172,7 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
                     ExceptionInfo->ExceptionRecord->ExceptionCode),
                 ExceptionInfo->ExceptionRecord->ExceptionAddress,
                 reinterpret_cast<void*>(moduleBase),
+                inMainExe ? "OR2006C2C.EXE" : "OTHER_OR_UNKNOWN",
                 inMainExe ? "true" : "false",
                 static_cast<unsigned long long>(exeRva),
                 static_cast<unsigned long>(GetCurrentThreadId()));
@@ -170,8 +189,14 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
     {
         swprintf_s(re4t_log_filename, L"%s\\%s\\OutRun2006Tweaks.log", modulename, L"CrashDumps");
 
-        if (std::filesystem::exists(Module::LogPath))
-            std::filesystem::copy_file(Module::LogPath, re4t_log_filename);
+        // The normal release disables file logging; the crash archive must
+        // still be usable without it. Never throw inside an exception filter.
+        std::error_code copyError;
+        if (std::filesystem::exists(Module::LogPath, copyError) && !copyError)
+        {
+            std::filesystem::copy_file(Module::LogPath, re4t_log_filename,
+                std::filesystem::copy_options::overwrite_existing, copyError);
+        }
     }
 
     bool zip_created = false;
@@ -196,8 +221,12 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
             required_entries_ok = false;
           if (!mz_zip_writer_add_file(&zip_archive, "crash.log", crash_log_filename, nullptr, 0, 3))
             required_entries_ok = false;
-          if (!mz_zip_writer_add_file(&zip_archive, "OutRun2006Tweaks.log", re4t_log_filename, nullptr, 0, 3))
-            required_entries_ok = false;
+          // The release normally has no runtime log; it is optional.
+          // Missing telemetry must never invalidate a good dump + crash.log.
+          std::error_code logError;
+          if (std::filesystem::exists(re4t_log_filename, logError) && !logError)
+              mz_zip_writer_add_file(&zip_archive,
+                  "OutRun2006Tweaks.log", re4t_log_filename, nullptr, 0, 3);
 
           // VR diagnostics are optional. A crash can happen while one of these
           // files is still open, so an optional add failure must never suppress
@@ -285,8 +314,10 @@ void InitExceptionHandler()
 {
     std::filesystem::path dumpPath = Module::ExePath.parent_path() / L"CrashDumps";
 
-    if (!std::filesystem::exists(dumpPath))
-        std::filesystem::create_directories(dumpPath);
+    // Start-up may run in a read-only game folder; an inability to make the
+    // dump directory must not itself become an unhandled startup exception.
+    std::error_code directoryError;
+    std::filesystem::create_directories(dumpPath, directoryError);
 
     SetUnhandledExceptionFilter(CustomUnhandledExceptionFilter);
 
