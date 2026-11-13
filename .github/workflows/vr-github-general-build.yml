@@ -6,6 +6,13 @@ on:
     paths:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
+      - 'src/dllmain.cpp'
+      - 'src/hooks_exceptions.cpp'
+      - 'tools/verify_quest_cockpit_crash_recovery.py'
+      - 'Start-OutRun.cmd'
+      - 'Start-OutRun-VR.cmd'
+      - 'VR_RELEASE_VERSION.txt'
+      - 'README_VR_v0.02.txt'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
       - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
       - 'src/vr/game/quest_cockpit_v2_glass_hook.hpp'
@@ -66,7 +73,7 @@ on:
       - 'cmake.toml'
 
 permissions:
-  contents: read
+  contents: write
   statuses: write
 
 jobs:
@@ -97,6 +104,9 @@ jobs:
           submodules: recursive
           clean: true
           fetch-depth: 1
+
+      - name: Verify crash-safe startup and dump evidence
+        run: python tools/verify_quest_cockpit_crash_recovery.py
 
       - name: Validate cockpit diagnostics PowerShell syntax
         if: ${{ github.ref_name == 'vr-quest-cockpit-v2' || startsWith(github.ref_name, 'vr-quest-cockpit-v2-') }}
@@ -552,6 +562,125 @@ jobs:
           path: ${{ env.GENERAL_ZIP }}
           if-no-files-found: error
           retention-days: 7
+
+      - name: Prepare v0.02 public cockpit release ZIP
+        if: github.ref_name == 'vr-quest-cockpit-v2-v0.02-release'
+        shell: pwsh
+        run: |
+          $release='build-general/v002-release'
+          New-Item -ItemType Directory -Force $release | Out-Null
+          $backend='build-general/package/backends/d3d9'
+          foreach($name in @('dinput8.dll','outrun-vr-host.exe')) {
+            $source=Join-Path $backend $name
+            if(!(Test-Path -LiteralPath $source)){throw "v0.02 release payload missing: $name"}
+            Copy-Item -LiteralPath $source -Destination $release -Force
+          }
+          foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','Start-OutRun.cmd','Start-OutRun-VR.cmd','VR_RELEASE_VERSION.txt','README_VR_v0.02.txt')) {
+            if(!(Test-Path -LiteralPath $name)){throw "v0.02 release source file missing: $name"}
+            Copy-Item -LiteralPath $name -Destination $release -Force
+          }
+          foreach($name in @('LICENSE.md','THIRD_PARTY_NOTICES.md','COPYING.GPL3')) {
+            if(Test-Path -LiteralPath $name){Copy-Item -LiteralPath $name -Destination $release -Force}
+          }
+          $exe=Join-Path $release 'OR2006C2C.EXE'
+          Invoke-WebRequest -Uri 'https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE' -OutFile $exe
+          if(!(Test-Path -LiteralPath $exe) -or (Get-Item -LiteralPath $exe).Length -lt 1000000){throw 'replacement OR2006C2C.EXE download is missing or too small'}
+          $launcher=Get-Content -LiteralPath (Join-Path $release 'Start-OutRun.cmd') -Raw
+          foreach($required in @('-VR.QuestCockpitV2Enabled=true','-VR.QuestCockpitV2F0RenderScope=true','-VR.QuestCockpitV2SeatBack=-0.08','-VR.QuestCockpitV2SeatDown=0.05','-VR.QuestCockpitV2NativeSeatProfile=true','-VR.QuestCockpitV2ApkNativeCamera=true','-VR.QuestCockpitV2OccupantCorrection=true','-HudInspector=false')) {
+            if(!$launcher.Contains($required)){throw "v0.02 launcher missing $required"}
+          }
+          if((Get-Content -LiteralPath (Join-Path $release 'VR_RELEASE_VERSION.txt') -Raw) -notmatch 'v0\.02'){throw 'VR_RELEASE_VERSION.txt is not v0.02'}
+          foreach($pe in @('dinput8.dll','outrun-vr-host.exe','OR2006C2C.EXE')) {
+            $bytes=[IO.File]::ReadAllBytes((Join-Path $release $pe))
+            if($bytes.Length -lt 256 -or $bytes[0] -ne 0x4d -or $bytes[1] -ne 0x5a){throw "invalid PE payload in v0.02: $pe"}
+          }
+          $dllBytes=[IO.File]::ReadAllBytes((Join-Path $release 'dinput8.dll'))
+          $dllText=[Text.Encoding]::ASCII.GetString($dllBytes)
+          foreach($marker in @('VR COCKPIT SEAT: original 30-car table','VR SKY PROBE:','VR COCKPIT APK SEAT:','VR stereo: D3D9 full-eye renderer installed')) {
+            if(!$dllText.Contains($marker)){throw "compiled v0.02 DLL marker missing: $marker"}
+          }
+          $shaDir=Join-Path $release 'BUILD_ID'
+          New-Item -ItemType Directory -Force $shaDir | Out-Null
+          $env:GITHUB_SHA | Set-Content -LiteralPath (Join-Path $shaDir 'SOURCE_SHA.txt') -Encoding ascii
+          (Get-FileHash (Join-Path $release 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant() | Set-Content -LiteralPath (Join-Path $shaDir 'DINPUT8_SHA256.txt') -Encoding ascii
+          (Get-FileHash (Join-Path $release 'outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant() | Set-Content -LiteralPath (Join-Path $shaDir 'VRHOST_SHA256.txt') -Encoding ascii
+          $releaseZip='build-general/OutRun2_VR_v0.02_Beta_Cockpit.zip'
+          Compress-Archive -Path "$release/*" -DestinationPath $releaseZip -Force
+          Add-Type -AssemblyName System.IO.Compression
+          $archive=[IO.Compression.ZipFile]::OpenRead((Resolve-Path $releaseZip).Path)
+          try {
+            $names=@($archive.Entries | ForEach-Object {$_.FullName.Replace('\','/')})
+            foreach($required in @('dinput8.dll','outrun-vr-host.exe','OR2006C2C.EXE','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','Start-OutRun.cmd','Start-OutRun-VR.cmd','VR_RELEASE_VERSION.txt','README_VR_v0.02.txt','BUILD_ID/SOURCE_SHA.txt')) {
+              if($required -notin $names){throw "v0.02 ZIP missing: $required"}
+            }
+            if(@($names | Where-Object {$_ -match '\.ps1
+        if: always()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          $state=if($env:JOB_STATUS -eq 'success'){'success'}else{'failure'}
+          $desc=if($state -eq 'success'){'GitHub-hosted clean R26+HUD build succeeded'}else{'GitHub-hosted clean R26+HUD build failed'}
+          $body=@{
+            state=$state
+            context='vr-github-general-build'
+            description=$desc
+            target_url="$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+          } | ConvertTo-Json
+          Invoke-RestMethod -Method Post -Headers @{
+            Authorization="Bearer $env:GH_TOKEN"
+            Accept='application/vnd.github+json'
+            'X-GitHub-Api-Version'='2022-11-28'
+          } -Uri "$env:GITHUB_API_URL/repos/$env:GITHUB_REPOSITORY/statuses/$env:GITHUB_SHA" -Body $body -ContentType 'application/json'
+}).Count -ne 0){throw 'public v0.02 ZIP unexpectedly contains PowerShell scripts'}
+          } finally { $archive.Dispose() }
+          "V002_RELEASE_ZIP=$releaseZip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Upload v0.02 public cockpit ZIP artifact
+        if: github.ref_name == 'vr-quest-cockpit-v2-v0.02-release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-v0.02-Beta-Cockpit-${{ github.sha }}
+          path: ${{ env.V002_RELEASE_ZIP }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish GitHub prerelease v0.02
+        if: github.ref_name == 'vr-quest-cockpit-v2-v0.02-release'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $notes='build-general/v0.02-release-notes.md'
+          @'
+          # OutRun 2006 VR v0.02 Beta - Cockpit
+
+          v0.02 introduces the original-game cockpit VR mode as the public beta default.
+
+          ## Main changes
+          - QuestCockpitV2 original-car cockpit enabled in the VR launcher.
+          - F0 render scope enabled; Quest 3 field testing reported the previous vehicle body vibration removed.
+          - Default cockpit calibration: SeatBack=-0.08, SeatDown=+0.05, SeatRight=0.0.
+          - Native Quest 30-car seat profile / APK-mode camera input path retained.
+          - Startup sky exact 0x4521C0 programmable layer uses one deterministic rotation-only stereo basis.
+          - Crash handler starts before settings/VR-hook initialization.
+          - Nonthrowing user-INI and CrashDumps filesystem checks.
+          - Crash ZIP no longer depends on the normal release log being enabled.
+          - Partial minidumps are rejected and crash module attribution is corrected.
+
+          ## Run
+          Extract the ZIP into the folder containing OR2006C2C.EXE and run **Start-OutRun-VR.cmd**.
+          Press **F12** while looking forward to recenter. Direct OR2006C2C.EXE launch remains **2D + FFB**.
+
+          ## Beta status
+          Vehicle vibration removal and the current turn behavior were confirmed acceptable on Quest 3 before this release.
+          The deterministic startup-sky change passed source/CI validation; complete removal of the startup sky flicker still needs final Quest 3 visual confirmation.
+          '@ | Set-Content -LiteralPath $notes -Encoding utf8
+          gh release view v0.02 --repo $env:GITHUB_REPOSITORY *> $null
+          if($LASTEXITCODE -eq 0){throw 'v0.02 release already exists; refusing to overwrite a public release automatically'}
+          gh release create v0.02 $env:V002_RELEASE_ZIP --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'OutRun 2006 VR v0.02 Beta - Cockpit' --notes-file $notes --prerelease
+          if($LASTEXITCODE -ne 0){throw 'GitHub v0.02 release publication failed'}
 
       - name: Mark build result
         if: always()
