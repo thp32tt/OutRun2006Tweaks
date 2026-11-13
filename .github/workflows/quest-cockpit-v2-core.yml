@@ -207,7 +207,7 @@ jobs:
           assert "$launchArgs.QuestCockpitV2Interpolation='ON'" in copy_launcher
           assert "$launchArgs.QuestCockpitV2SkyProbe='ON'" in copy_launcher
           assert "'-VR.QuestCockpitV2SeatBack=-0.08'" in launcher
-          assert "'-VR.QuestCockpitV2SeatDown=0.05'" in launcher
+          assert "'-VR.QuestCockpitV2SeatDown=0.8'" in launcher
           assert 'SyncNativeSeatProfile(false)' in hook
           assert 'NativeSeatCameraTick.AfterSeatSync(' in hook
           native_renderer=Path('src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')

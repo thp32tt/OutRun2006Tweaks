@@ -586,7 +586,7 @@ jobs:
           Invoke-WebRequest -Uri 'https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE' -OutFile $exe
           if(!(Test-Path -LiteralPath $exe) -or (Get-Item -LiteralPath $exe).Length -lt 1000000){throw 'replacement OR2006C2C.EXE download is missing or too small'}
           $launcher=Get-Content -LiteralPath (Join-Path $release 'Start-OutRun.cmd') -Raw
-          foreach($required in @('-VR.QuestCockpitV2Enabled=true','-VR.QuestCockpitV2F0RenderScope=true','-VR.QuestCockpitV2SeatBack=-0.08','-VR.QuestCockpitV2SeatDown=0.05','-VR.QuestCockpitV2NativeSeatProfile=true','-VR.QuestCockpitV2ApkNativeCamera=true','-VR.QuestCockpitV2OccupantCorrection=true','-HudInspector=false')) {
+          foreach($required in @('-VR.QuestCockpitV2Enabled=true','-VR.QuestCockpitV2F0RenderScope=true','-VR.QuestCockpitV2SeatBack=-0.08','-VR.QuestCockpitV2SeatDown=0.8','-VR.QuestCockpitV2NativeSeatProfile=true','-VR.QuestCockpitV2ApkNativeCamera=true','-VR.QuestCockpitV2OccupantCorrection=true','-HudInspector=false')) {
             if(!$launcher.Contains($required)){throw "v0.02 launcher missing $required"}
           }
           if((Get-Content -LiteralPath (Join-Path $release 'VR_RELEASE_VERSION.txt') -Raw) -notmatch 'v0\.02'){throw 'VR_RELEASE_VERSION.txt is not v0.02'}
@@ -636,12 +636,38 @@ jobs:
           @'
           # OutRun 2006 VR v0.02 Beta - Cockpit
 
+          ## 한국어
+
+          OutRun 2006 VR v0.02 Beta는 원본 게임 차량의 운전석 VR 모드를 기본 VR 실행 모드로 배포합니다.
+
+          ### 주요 변경
+          - QuestCockpitV2 원본 차량 운전석 모드를 VR 런처에서 기본 활성화했습니다.
+          - Quest 3 실기에서 차량 떨림을 없앤 F0 Render Scope를 기본 ON으로 유지합니다.
+          - 기본 운전석 위치: SeatBack=-0.08, SeatDown=+0.8, SeatRight=0.0. 이전 v0.02 초기값보다 시점을 더 아래로 낮췄습니다.
+          - Quest APK 기반 30차종 native seat profile과 APK-mode 카메라 입력 경로를 유지합니다.
+          - 시작 하늘 0x4521C0 레이어를 하나의 deterministic rotation-only stereo basis로 고정했습니다.
+          - 크래시 핸들러를 설정/VR 훅 초기화보다 먼저 설치합니다.
+          - user.ini 및 CrashDumps 경로 접근을 예외 안전 방식으로 변경했습니다.
+          - 일반 릴리즈 로그가 꺼져 있어도 crash ZIP 생성이 가능하도록 수정했습니다.
+          - 불완전 minidump를 제거하고 EXE/DLL 크래시 위치 판별을 개선했습니다.
+
+          ### 실행 방법
+          ZIP을 OR2006C2C.EXE가 있는 게임 폴더에 압축 해제한 뒤 **Start-OutRun-VR.cmd**를 실행합니다.
+          원하는 정면을 바라본 상태에서 **F12**를 누르면 VR 시점이 재정렬됩니다.
+          OR2006C2C.EXE를 직접 실행하면 기존처럼 **2D + FFB**로 실행됩니다.
+
+          ### 베타 상태
+          차량 떨림 제거와 현재 차량 회전 감각은 Quest 3 실기에서 허용 가능한 수준으로 확인되었습니다.
+          시작 하늘 고정 수정은 소스/CI 검증을 통과했지만, 하늘 깜빡임이 완전히 사라졌는지는 Quest 3에서 최종 확인이 필요합니다.
+
+          ## English
+
           v0.02 introduces the original-game cockpit VR mode as the public beta default.
 
-          ## Main changes
+          ### Main changes
           - QuestCockpitV2 original-car cockpit enabled in the VR launcher.
           - F0 render scope enabled; Quest 3 field testing reported the previous vehicle body vibration removed.
-          - Default cockpit calibration: SeatBack=-0.08, SeatDown=+0.05, SeatRight=0.0.
+          - Default cockpit calibration: SeatBack=-0.08, SeatDown=+0.8, SeatRight=0.0. The eye position is lower than the initial v0.02 setting.
           - Native Quest 30-car seat profile / APK-mode camera input path retained.
           - Startup sky exact 0x4521C0 programmable layer uses one deterministic rotation-only stereo basis.
           - Crash handler starts before settings/VR-hook initialization.
@@ -649,11 +675,11 @@ jobs:
           - Crash ZIP no longer depends on the normal release log being enabled.
           - Partial minidumps are rejected and crash module attribution is corrected.
 
-          ## Run
+          ### Run
           Extract the ZIP into the folder containing OR2006C2C.EXE and run **Start-OutRun-VR.cmd**.
           Press **F12** while looking forward to recenter. Direct OR2006C2C.EXE launch remains **2D + FFB**.
 
-          ## Beta status
+          ### Beta status
           Vehicle vibration removal and the current turn behavior were confirmed acceptable on Quest 3 before this release.
           The deterministic startup-sky change passed source/CI validation; complete removal of the startup sky flicker still needs final Quest 3 visual confirmation.
           '@ | Set-Content -LiteralPath $notes -Encoding utf8
