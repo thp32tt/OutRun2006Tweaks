@@ -33,8 +33,9 @@ This remains a WIP test. Quest 3 field feedback 2026-11-10: enabling
 the F11 F0 Render Scope removed body vibration. COPY-RUN now launches
 with QuestCockpitV2F0RenderScope=true in NORMAL, SKY, TURN and INTERP modes.
 This affects only the original car render callback, not simulation.
-The default seat is calibrated 0.08 game units forward and 0.05 upward.
-This is an experimental local adjustment; sky flicker is unresolved.
+The default seat is calibrated 0.08 game units forward and 0.05 downward.
+Quest 3 feedback 2026-11-14 reports body vibration gone with F0 ON and the
+remaining turn feel acceptable. Startup sky flicker remains the active issue.
 
 TEST AND APK COMPARISON (2026-11-05):
 - Keep original view1 (in-car) selected. The native Quest 30-car profile
@@ -43,7 +44,8 @@ TEST AND APK COMPARISON (2026-11-05):
   the original 30-car Quest APK profile and the single +0.32Y/+0.55Z
   composition. Signed F11 SeatBack/Down/Right now calibrates the INPUT.
   COPY-RUN overrides stale user.ini calibration with SeatBack=-0.08,
-  SeatDown=-0.05, SeatRight=0.0. All zero returns APK-derived input.
+  SeatDown=+0.05, SeatRight=0.0. Positive SeatDown lowers the eye. All zero
+  returns the untrimmed APK-derived input.
 - Normal, SKY, TURN and INTERP copy-run entrypoints all force F0 scope ON.
   TURN keeps normal interpolation and adds only bounded camera/body phase
   logging; INTERP changes ONLY interpolation.
@@ -53,7 +55,11 @@ TEST AND APK COMPARISON (2026-11-05):
 - SKY diagnostic output now distinguishes shaderSkyNative,
   shaderSkyFallback, shaderSkyMixedEyes and shaderSkyModeSwitches per 90
   Presents. shaderExactSkyDraws is now windowed, not lifetime cumulative.
-  This is a root-cause probe, not a claimed fix for faint double sky.
+  Quest 3 logs captured on source 3151cbd8 showed zero mixed-eye draws but
+  repeated exact-sky native/fallback mode switches. The current candidate
+  therefore keeps exact original 0x4521C0 programmable sky on one deterministic
+  rotation-only fallback basis while non-sky world draws retain native eyes.
+  Hardware confirmation is still required.
 - On left and right bends, TURN DIAG logs bounded VR CAMERA TURN TRACE
   samples separately for positive/negative steering, plus the 90-callback
   aggregate. Compare maxBodyYawStepDeg (body +0x2E),
