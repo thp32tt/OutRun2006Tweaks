@@ -149,9 +149,9 @@ namespace Settings
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
     Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.f,
-        "Legacy manual seat depth, used ONLY when ApkNativeCamera=false; original Quest source ignores saved F11 manual values.",Range<float>{-1.2f,1.2f} };
+        "Signed seat-depth trim applied to the selected Quest profile before the original mode1 camera consumes it; positive moves rearward. F11 live.",Range<float>{-1.2f,1.2f} };
     Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.f,
-        "Manual seat height, ONLY when ApkNativeCamera=false. APK mode uses original per-model guest captured XYZ and the source-specific Y+0.32/Z+0.55 step.",Range<float>{-1.0f,0.8f} };
+        "Signed seat-height trim applied to the selected Quest profile before the original mode1 camera consumes it; positive moves the eye downward. F11 live.",Range<float>{-1.0f,0.8f} };
     Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
         "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,
