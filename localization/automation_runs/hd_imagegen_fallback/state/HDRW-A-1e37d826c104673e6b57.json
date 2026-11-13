@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "f29bcdcc361adfcac759f50600be36065107a1c65b957e652357ce0b2f72e328",
+  "release_approved": false,
+  "roi_id": "Q086_9dc7cafdc29ca37c",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Imperial Avenue",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "임페리얼 애비뉴",
+    "old_candidate_sha256": "f29bcdcc361adfcac759f50600be36065107a1c65b957e652357ce0b2f72e328",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 244,
+      "name": "HDRW-A-1e37d826c104673e6b57_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        622,
+        244
+      ],
+      "sha256": "f8888649c5d1516a78c285a9ed7087f01fe7050257b302bccd87c71a68047ffa",
+      "source_box_xyxy": [
+        1740,
+        611,
+        2362,
+        855
+      ],
+      "source_native_size": [
+        622,
+        244
+      ],
+      "width": 622
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q086_9dc7cafdc29ca37c",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+    "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+    "source_native_bbox_xyxy": [
+      1740,
+      611,
+      2362,
+      855
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-A-1e37d826c104673e6b57"
+  },
+  "task_id": "HDRW-A-1e37d826c104673e6b57",
+  "updated_utc": "2026-11-13T06:33:59+00:00"
+}
