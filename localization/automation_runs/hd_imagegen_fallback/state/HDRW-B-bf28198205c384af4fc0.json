@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "a0bf0768530a00a8cc6e41bf3c4bd0e898f1aa52020de988584ca2ff5596e0fb",
+  "release_approved": false,
+  "roi_id": "Q054_de92d91948ad02fe",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Honk the horn!",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "경적을 울리세요!",
+    "old_candidate_sha256": "a0bf0768530a00a8cc6e41bf3c4bd0e898f1aa52020de988584ca2ff5596e0fb",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 352,
+      "name": "HDRW-B-bf28198205c384af4fc0_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        967,
+        352
+      ],
+      "sha256": "824a000ff450fc52e635b1ab63ca500ca66ef74832638f5fd0d9285dc3de51c2",
+      "source_box_xyxy": [
+        1689,
+        0,
+        2656,
+        352
+      ],
+      "source_native_size": [
+        967,
+        352
+      ],
+      "width": 967
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q054_de92d91948ad02fe",
+    "role": "B",
+    "source_dds_path": "textures/load/Xbox/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+    "source_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+    "source_native_bbox_xyxy": [
+      1689,
+      0,
+      2656,
+      352
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-B-bf28198205c384af4fc0"
+  },
+  "task_id": "HDRW-B-bf28198205c384af4fc0",
+  "updated_utc": "2026-11-13T06:33:37+00:00"
+}
