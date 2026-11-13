@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "2e48a34c280983b3f125ee11c38332abbd4034878d6057f29f306db47e787ade",
+  "release_approved": false,
+  "roi_id": "Q097_fcfb148739388251",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "TUNED",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "튜닝",
+    "old_candidate_sha256": "2e48a34c280983b3f125ee11c38332abbd4034878d6057f29f306db47e787ade",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 550,
+      "name": "HDRW-A-bd2d76dd976dc50c68fa_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        972,
+        550
+      ],
+      "sha256": "9a320bab2ef0dab73ac948a85f10cd0f71b9c4e264d2be55e7f3532da0f7bb3e",
+      "source_box_xyxy": [
+        526,
+        625,
+        1498,
+        1175
+      ],
+      "source_native_size": [
+        972,
+        550
+      ],
+      "width": 972
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q097_fcfb148739388251",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "source_native_bbox_xyxy": [
+      526,
+      625,
+      1498,
+      1175
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-A-bd2d76dd976dc50c68fa"
+  },
+  "task_id": "HDRW-A-bd2d76dd976dc50c68fa",
+  "updated_utc": "2026-11-13T16:24:33+00:00"
+}
