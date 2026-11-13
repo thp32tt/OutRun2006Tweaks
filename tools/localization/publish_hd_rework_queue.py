@@ -42,8 +42,25 @@ def api(path, token, payload=None):
     except urllib.error.HTTPError as exc:
         if exc.code == 404 and raw is None:
             return None
-        # Do not reveal credentials or untrusted HTTP error bodies in logs.
-        raise RuntimeError("GITHUB_QUEUE_HTTP_"+str(exc.code)) from None
+        # Only return a sanitized GitHub API error *classification*, never
+        # response headers, token, auth URL or arbitrary remote text.
+        try:
+            msg=json.loads(exc.read(4096).decode("utf-8")).get("message","")
+        except (ValueError,UnicodeDecodeError):
+            msg=""
+        if "Resource not accessible by integration" in msg:
+            reason="ACTIONS_TOKEN_CONTENTS_WRITE_DENIED"
+        elif "secondary rate limit" in msg.lower():
+            reason="GITHUB_SECONDARY_RATE_LIMIT"
+        elif "rate limit" in msg.lower():
+            reason="GITHUB_PRIMARY_RATE_LIMIT"
+        elif "branch protection" in msg.lower() or "rule" in msg.lower():
+            reason="GITHUB_BRANCH_RULESET_REJECTED"
+        elif "not permitted" in msg.lower() or "permission" in msg.lower():
+            reason="GITHUB_PERMISSION_DENIED"
+        else:
+            reason="GITHUB_OTHER_API_DENIAL"
+        raise RuntimeError("GITHUB_QUEUE_HTTP_"+str(exc.code)+"_"+reason) from None
 
 
 def content_path(rel):
