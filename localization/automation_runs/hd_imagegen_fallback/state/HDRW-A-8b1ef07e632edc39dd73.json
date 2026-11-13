@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "082ee0f7178f5e9c230ea45861386069967fe8d80c08e2ee00d99e16303ecc3f",
+  "release_approved": false,
+  "roi_id": "Q101_fbfd198e1ca19fd7",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Every player must participate at the same time to play this mode.",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다.",
+    "old_candidate_sha256": "082ee0f7178f5e9c230ea45861386069967fe8d80c08e2ee00d99e16303ecc3f",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "AUTO_EDIT_KOREAN_TOUCHES_PROTECTED_ART",
+    "reference": {
+      "height": 150,
+      "name": "HDRW-A-8b1ef07e632edc39dd73_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        930,
+        150
+      ],
+      "sha256": "5ba4ae9ed26a3ffe3b0878b04c15dc09fa5902bfc31feab4d71796ec5f8702e5",
+      "source_box_xyxy": [
+        3004,
+        16,
+        3934,
+        166
+      ],
+      "source_native_size": [
+        930,
+        150
+      ],
+      "width": 930
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q101_fbfd198e1ca19fd7",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+    "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "source_native_bbox_xyxy": [
+      3004,
+      16,
+      3934,
+      166
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-A-8b1ef07e632edc39dd73"
+  },
+  "task_id": "HDRW-A-8b1ef07e632edc39dd73",
+  "updated_utc": "2026-11-13T16:37:00+00:00"
+}
