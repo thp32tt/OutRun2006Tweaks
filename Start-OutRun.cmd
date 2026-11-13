@@ -71,7 +71,11 @@ start "" "%~dp0OR2006C2C.exe" ^
  -VR.QuestCockpitV2RawB0Camera=false ^
  -VR.QuestCockpitV2NativeSeatProfile=true ^
  -VR.QuestCockpitV2ApkNativeCamera=true ^
+ -VR.QuestCockpitV2GlassEnabled=false ^
+ -VR.QuestCockpitV2GlassHidden=false ^
  -VR.QuestCockpitV2GlassReflectionOff=true ^
+ -VR.QuestCockpitV2PassengerVisible=true ^
+ -VR.QuestCockpitV2SkyProbe=false ^
  -VR.QuestCockpitV2OccupantCorrection=true ^
  -VR.QuestCockpitV2OccupantLod0=false ^
  -VR.QuestCockpitV2F0RenderScope=true ^
