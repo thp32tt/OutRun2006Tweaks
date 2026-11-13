@@ -6,6 +6,9 @@ on:
     paths:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
+      - 'src/dllmain.cpp'
+      - 'src/hooks_exceptions.cpp'
+      - 'tools/verify_quest_cockpit_crash_recovery.py'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
       - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
       - 'src/vr/game/quest_cockpit_v2_glass_hook.hpp'
@@ -97,6 +100,9 @@ jobs:
           submodules: recursive
           clean: true
           fetch-depth: 1
+
+      - name: Verify crash-safe startup and dump evidence
+        run: python tools/verify_quest_cockpit_crash_recovery.py
 
       - name: Validate cockpit diagnostics PowerShell syntax
         if: ${{ github.ref_name == 'vr-quest-cockpit-v2' || startsWith(github.ref_name, 'vr-quest-cockpit-v2-') }}
