@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "476ab24250e8bc8c0498fb429d4ba0c462286b7a42413a7de500b858bfcd66cd",
+  "release_approved": false,
+  "roi_id": "Q111_367c2226ed993362",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Normal balance",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "일반 밸런스",
+    "old_candidate_sha256": "476ab24250e8bc8c0498fb429d4ba0c462286b7a42413a7de500b858bfcd66cd",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 360,
+      "name": "HDRW-A-b0fe83bed7e10b6920c5_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        801,
+        360
+      ],
+      "sha256": "3484433937ec711c4889f0f7c87b5a1ac5f971aae6752f8e2657d09ce463c23c",
+      "source_box_xyxy": [
+        671,
+        1488,
+        1472,
+        1848
+      ],
+      "source_native_size": [
+        801,
+        360
+      ],
+      "width": 801
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q111_367c2226ed993362",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_dds_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "source_native_bbox_xyxy": [
+      671,
+      1488,
+      1472,
+      1848
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-A-b0fe83bed7e10b6920c5"
+  },
+  "task_id": "HDRW-A-b0fe83bed7e10b6920c5",
+  "updated_utc": "2026-11-13T17:50:53+00:00"
+}
