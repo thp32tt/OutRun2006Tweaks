@@ -9,7 +9,7 @@ crash = (root / "src/hooks_exceptions.cpp").read_text(encoding="utf-8")
 assert "std::filesystem::exists(UserIniPath, userIniError)" in startup
 assert "std::filesystem::exists(saveFolder, saveFolderError)" in startup
 assert startup.index("InitExceptionHandler();") < startup.index("Settings::read(Module::IniPath)")
-assert startup.count("InitExceptionHandler();") == 1
+assert startup.count("\n\tInitExceptionHandler();") == 1
 assert "std::filesystem::create_directories(dumpPath, directoryError)" in crash
 assert "std::filesystem::copy_file(Module::LogPath, re4t_log_filename," in crash
 assert "std::filesystem::copy_options::overwrite_existing, copyError)" in crash
