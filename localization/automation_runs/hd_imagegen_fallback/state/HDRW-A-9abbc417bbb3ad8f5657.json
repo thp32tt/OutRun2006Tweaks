@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "eba04465feb1fa54a531a7cb0dfb12876c57baa19c7de4438553102df6bb2ecd",
+  "release_approved": false,
+  "roi_id": "Q046_a38172a1371d1d6c",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Sector4",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "섹터 4",
+    "old_candidate_sha256": "eba04465feb1fa54a531a7cb0dfb12876c57baa19c7de4438553102df6bb2ecd",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 204,
+      "name": "HDRW-A-9abbc417bbb3ad8f5657_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        432,
+        204
+      ],
+      "sha256": "72f7f1518caef20f7cb9ffb3857777cf0f5bdd148ad50099b083b8acbe8d308a",
+      "source_box_xyxy": [
+        67,
+        264,
+        499,
+        468
+      ],
+      "source_native_size": [
+        432,
+        204
+      ],
+      "width": 432
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q046_a38172a1371d1d6c",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+    "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "source_native_bbox_xyxy": [
+      67,
+      264,
+      499,
+      468
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-A-9abbc417bbb3ad8f5657"
+  },
+  "task_id": "HDRW-A-9abbc417bbb3ad8f5657",
+  "updated_utc": "2026-11-13T05:31:10+00:00"
+}
