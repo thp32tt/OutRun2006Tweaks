@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "5baaf1fa33e70415c93be0981897de5340a91d5038021998d392ad1618e100f1",
+  "release_approved": false,
+  "roi_id": "Q137_64b521c49c33d01a",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "MANUAL",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "수동",
+    "old_candidate_sha256": "5baaf1fa33e70415c93be0981897de5340a91d5038021998d392ad1618e100f1",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 582,
+      "name": "HDRW-A-189f3f1befdf60925ec0_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        868,
+        582
+      ],
+      "sha256": "7990dccee22a606825a7d1a748980a2dc2071770b36217eaa646000ccbe93d5b",
+      "source_box_xyxy": [
+        0,
+        0,
+        868,
+        582
+      ],
+      "source_native_size": [
+        868,
+        582
+      ],
+      "width": 868
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q137_64b521c49c33d01a",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+    "source_dds_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+    "source_native_bbox_xyxy": [
+      0,
+      0,
+      868,
+      582
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-A-189f3f1befdf60925ec0"
+  },
+  "task_id": "HDRW-A-189f3f1befdf60925ec0",
+  "updated_utc": "2026-11-13T22:21:51+00:00"
+}
