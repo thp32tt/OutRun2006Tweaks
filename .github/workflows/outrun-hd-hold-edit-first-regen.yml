@@ -80,6 +80,7 @@ jobs:
             --state-dir "$GITHUB_WORKSPACE/queue-state/localization/automation_runs/hd_imagegen_fallback/state" \
             --prior-queue "$GITHUB_WORKSPACE/queue-state/localization/automation_runs/hd_imagegen_fallback/latest.json" \
             --out "$RUNNER_TEMP/hd-hold-retry" --max-tasks 8
+      # Error diagnostic has been hardened; 403 will distinguish token denial and GitHub rate limits.
       - name: Publish bounded verified original-style text-only ImageGen queue to existing A/B Docker bridge
         env:
           GH_TOKEN: ${{ github.token }}
