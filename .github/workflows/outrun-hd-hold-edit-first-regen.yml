@@ -5,6 +5,10 @@ name: OutRun HD HOLD Edit First, Source-Style Text-Only Regen (GitHub CPU)
 # controller against a SHA-verified original reference; no paid image API.
 on:
   workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/outrun-hd-hold-edit-first-regen.yml"
   schedule:
     - cron: "29 */2 * * *"
 
