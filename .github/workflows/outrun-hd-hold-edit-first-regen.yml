@@ -1,0 +1,113 @@
+name: OutRun HD HOLD Edit First, Source-Style Text-Only Regen (GitHub CPU)
+
+# A lightweight (no DDS decode) recurring source-pinned retry lane. New
+# generated letters are sent only by the existing free ChatGPT browser
+# controller against a SHA-verified original reference; no paid image API.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "29 */2 * * *"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: outrun-hd-hold-edit-first-regen
+  cancel-in-progress: false
+
+jobs:
+  edit-and-stage-next-glyphs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact-HD editor and queue publisher only (no native DDS downloads)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/hd_hold_retry_pipeline.py
+            tools/localization/test_hd_hold_retry_pipeline.py
+            tools/localization/publish_hd_rework_queue.py
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+      - name: Read previous authenticated browser receipts; never resend an already sent task
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-qa-queue-20261104
+          path: queue-state
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            localization/automation_runs/hd_imagegen_fallback/latest.json
+            localization/automation_runs/hd_imagegen_fallback/state
+      - name: Read previously verified owner masks from exact native DDS proof
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-ab-multi-atlas-43169137555
+          run-id: 43169137555
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/original-hd-source
+      - name: Read only actual failed existing-PNG pixel editing evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-source-bound-auto-edited-pngs-43185778845
+          run-id: 43185778845
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/previous-auto-edit
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Pillow only (NO image API or new fonts)
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+      - name: Verify source-image protected-pixel and exact-regeneration-task safety
+        run: python -m unittest discover -s tools/localization -p test_hd_hold_retry_pipeline.py -v
+      - name: Repair remaining image overlap without touching protected source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_hold_retry_pipeline.py \
+            --edited-dir "$RUNNER_TEMP/previous-auto-edit" \
+            --source-proof-dir "$RUNNER_TEMP/original-hd-source/source_protection" \
+            --crosswalk "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv" \
+            --state-dir "$GITHUB_WORKSPACE/queue-state/localization/automation_runs/hd_imagegen_fallback/state" \
+            --prior-queue "$GITHUB_WORKSPACE/queue-state/localization/automation_runs/hd_imagegen_fallback/latest.json" \
+            --out "$RUNNER_TEMP/hd-hold-retry" --max-tasks 8
+      - name: Publish bounded verified original-style text-only ImageGen queue to existing A/B Docker bridge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,"tools/localization")
+          import publish_hd_rework_queue as publish
+          out=Path(os.environ["RUNNER_TEMP"])/"hd-hold-retry"
+          summary=json.loads((out/"repair_summary.json").read_text(encoding="utf-8"))
+          queue=json.loads((out/"queue.json").read_text(encoding="utf-8"))
+          if not summary["remote_queue_safe_to_publish"] or not queue["tasks"]:
+              print("NO_UNCLAIMED_GLYPH_REGEN_TASKS_OR_PRESERVE_EXISTING_QUEUE")
+          else:
+              publish.PREFIX="localization/automation_runs/hd_imagegen_fallback"
+              publish.publish(out,os.environ["GH_TOKEN"])
+          assert summary["native_dds_edited"] is False
+          assert summary["release_approved"] is False
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
+              f.write("## OutRun HD source-locked auto repair / text-only fallback\n")
+              f.write(f"- Collision previews safely repaired: {summary['collision_repaired_source_protected_previews']}\n")
+              f.write(f"- New bounded text-only ImageGen tickets: {summary['regeneration_imagegen_tasks_prepared']}\n")
+              f.write(f"- Existing unclaimed tasks preserved: {summary['existing_unclaimed_tasks_not_overwritten']}\n")
+              f.write("- DDS, C1/C3, game runtime and release: UNAPPROVED\n")
+          PY
+      - name: Archive source-safe repainted PNGs, SHA receipts and text-only workorders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-hd-hold-edit-first-regen-${{ github.run_id }}
+          path: ${{ runner.temp }}/hd-hold-retry/
+          retention-days: 14
+          if-no-files-found: warn
