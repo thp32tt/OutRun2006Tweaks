@@ -596,7 +596,7 @@ jobs:
             if($launcher.Contains($forbidden)){throw "v0.02 persistent cockpit setting is still command-line forced: $forbidden"}
           }
           $releaseIni=Get-Content -LiteralPath (Join-Path $release 'OutRun2006Tweaks.ini') -Raw
-          foreach($requiredDefault in @('QuestCockpitV2SeatBack = -0.08','QuestCockpitV2SeatDown = 0.8','QuestCockpitV2SeatRight = 0.0')) {
+          foreach($requiredDefault in @('QuestCockpitV2SeatBack = -0.08','QuestCockpitV2SeatDown = 0.08','QuestCockpitV2SeatRight = 0.0')) {
             if(!$releaseIni.Contains($requiredDefault)){throw "v0.02 cockpit default missing: $requiredDefault"}
           }
           if((Get-Content -LiteralPath (Join-Path $release 'VR_RELEASE_VERSION.txt') -Raw) -notmatch 'v0\.02'){throw 'VR_RELEASE_VERSION.txt is not v0.02'}
@@ -653,7 +653,7 @@ jobs:
           ### 주요 변경
           - QuestCockpitV2 원본 차량 운전석 모드를 VR 런처에서 기본 활성화했습니다.
           - Quest 3 실기에서 차량 떨림을 없앤 F0 Render Scope를 기본 ON으로 유지합니다.
-          - 기본 운전석 위치: SeatBack=-0.08, SeatDown=+0.8, SeatRight=0.0. 이전 v0.02 초기값보다 시점을 더 아래로 낮췄습니다.
+          - 기본 운전석 위치: SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0. 이전 v0.02 초기값보다 시점을 더 아래로 낮췄습니다.
           - F11 > Settings > VR에서 좌석 앞뒤/높이/좌우 값을 변경하면 OutRun2006Tweaks.user.ini에 자동 저장되며, Save Cockpit View와 Reset Cockpit View 버튼을 추가했습니다.
           - Quest APK 기반 30차종 native seat profile과 APK-mode 카메라 입력 경로를 유지합니다.
           - 시작 하늘 0x4521C0 레이어를 하나의 deterministic rotation-only stereo basis로 고정했습니다.
@@ -678,7 +678,7 @@ jobs:
           ### Main changes
           - QuestCockpitV2 original-car cockpit enabled in the VR launcher.
           - F0 render scope enabled; Quest 3 field testing reported the previous vehicle body vibration removed.
-          - Default cockpit calibration: SeatBack=-0.08, SeatDown=+0.8, SeatRight=0.0. The eye position is lower than the initial v0.02 setting.
+          - Default cockpit calibration: SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0. The eye position is lower than the initial v0.02 setting.
           - F11 > Settings > VR seat values persist to OutRun2006Tweaks.user.ini, with Save Cockpit View and Reset Cockpit View controls.
           - Native Quest 30-car seat profile / APK-mode camera input path retained.
           - Startup sky exact 0x4521C0 programmable layer uses one deterministic rotation-only stereo basis.

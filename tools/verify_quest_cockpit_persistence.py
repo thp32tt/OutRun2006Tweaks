@@ -11,11 +11,11 @@ vr = (root / "src/vr/settings.cpp").read_text(encoding="utf-8")
 for forced in ("-VR.QuestCockpitV2SeatBack=", "-VR.QuestCockpitV2SeatDown=", "-VR.QuestCockpitV2SeatRight="):
     assert forced not in launcher, forced
 
-for default in ("QuestCockpitV2SeatBack = -0.08", "QuestCockpitV2SeatDown = 0.8", "QuestCockpitV2SeatRight = 0.0"):
+for default in ("QuestCockpitV2SeatBack = -0.08", "QuestCockpitV2SeatDown = 0.08", "QuestCockpitV2SeatRight = 0.0"):
     assert default in ini, default
 
 assert "VRQuestCockpitV2ReleaseSeatBackDefault = -0.08f" in plugin
-assert "VRQuestCockpitV2ReleaseSeatDownDefault = 0.80f" in plugin
+assert "VRQuestCockpitV2ReleaseSeatDownDefault = 0.08f" in plugin
 assert "VRQuestCockpitV2ReleaseSeatRightDefault = 0.0f" in plugin
 assert "VRQuestCockpitV2ReleaseSeatBackDefault," in vr
 assert "VRQuestCockpitV2ReleaseSeatDownDefault," in vr
