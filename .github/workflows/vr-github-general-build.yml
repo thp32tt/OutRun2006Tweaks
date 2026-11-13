@@ -366,6 +366,7 @@ jobs:
             $entrypoints=@(
               'RUN-QUEST-APK-COCKPIT.cmd',
               'RUN-QUEST-APK-SKY-DIAG.cmd',
+              'RUN-QUEST-APK-TURN-DIAG.cmd',
               'RUN-QUEST-APK-INTERP-OFF.cmd',
               'RESTORE-QUEST-APK-COCKPIT.cmd',
               'QuestCockpit-CopyRun.ps1',
