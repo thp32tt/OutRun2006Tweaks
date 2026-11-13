@@ -26,7 +26,7 @@ start "" "%~dp0OR2006C2C.exe"
 exit /b 0
 
 :MODE_VR
-rem This is the release equivalent of the validated DX9Ex Focus PS1 profile.
+rem v0.02 cockpit release: validated DX9Ex profile + Quest cockpit/F0/seat baseline.
 rem No PowerShell script is required: all launch-only VR settings are passed here.
 taskkill /IM outrun-vr-host.exe /F >nul 2>&1
 set "OUTRUN_VR_LAUNCH=1"
@@ -65,5 +65,20 @@ start "" "%~dp0OR2006C2C.exe" ^
  -VR.MenuScale=0.75 ^
  -VR.CullingUnionFov=true ^
  -VR.CullingUnionMarginDegrees=8.0 ^
+ -VR.QuestCockpitV2Enabled=true ^
+ -VR.QuestCockpitV2FullCar=true ^
+ -VR.QuestCockpitV2HideDriver=true ^
+ -VR.QuestCockpitV2RawB0Camera=false ^
+ -VR.QuestCockpitV2NativeSeatProfile=true ^
+ -VR.QuestCockpitV2ApkNativeCamera=true ^
+ -VR.QuestCockpitV2GlassReflectionOff=true ^
+ -VR.QuestCockpitV2OccupantCorrection=true ^
+ -VR.QuestCockpitV2OccupantLod0=false ^
+ -VR.QuestCockpitV2F0RenderScope=true ^
+ -VR.QuestCockpitV2SeatBack=-0.08 ^
+ -VR.QuestCockpitV2SeatDown=0.05 ^
+ -VR.QuestCockpitV2SeatRight=0.0 ^
+ -VR.CockpitFrameProbe=false ^
+ -HudInspector=false ^
  -VR.FileLogging=false
 exit /b 0
