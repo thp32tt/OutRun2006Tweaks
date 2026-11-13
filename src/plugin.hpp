@@ -88,6 +88,12 @@ namespace Settings
 	extern Setting<float> VRCullingUnionMarginDegrees;      // vr/settings.cpp
 	extern Setting<bool> VRNormalizeReflectionRate;         // vr/settings.cpp
 	extern Setting<float> VRNearPlane;                      // vr/settings.cpp
+	inline constexpr float VRQuestCockpitV2ReleaseSeatBackDefault = -0.08f;
+	inline constexpr float VRQuestCockpitV2ReleaseSeatDownDefault = 0.80f;
+	inline constexpr float VRQuestCockpitV2ReleaseSeatRightDefault = 0.0f;
+	extern Setting<float> VRQuestCockpitV2SeatBack;          // vr/settings.cpp / F11 cockpit persistence
+	extern Setting<float> VRQuestCockpitV2SeatDown;          // vr/settings.cpp / F11 cockpit persistence
+	extern Setting<float> VRQuestCockpitV2SeatRight;         // vr/settings.cpp / F11 cockpit persistence
 
 	extern Setting<float> FramerateInterpolationDebugAlpha; // interpolation.cpp
 	extern Setting<bool> FramerateInterpolationDebugLog;    // interpolation.cpp

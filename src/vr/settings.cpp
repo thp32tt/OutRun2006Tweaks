@@ -148,11 +148,11 @@ namespace Settings
         "Original Quest 30-car selected guest profile and captured Y+0.32/Z+0.55 input before native mode1 swing/blend/ground. In APK mode ignore manual F11 seat tuning; Quest HMD runtime proof is still required." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
-    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.f,
+    Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", VRQuestCockpitV2ReleaseSeatBackDefault,
         "Signed seat-depth trim applied to the selected Quest profile before the original mode1 camera consumes it; positive moves rearward. F11 live.",Range<float>{-1.2f,1.2f} };
-    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.f,
+    Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", VRQuestCockpitV2ReleaseSeatDownDefault,
         "Signed seat-height trim applied to the selected Quest profile before the original mode1 camera consumes it; positive moves the eye downward. F11 live.",Range<float>{-1.0f,0.8f} };
-    Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
+    Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", VRQuestCockpitV2ReleaseSeatRightDefault,
         "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,
         "Experimental original player ROB01 display model W*C correction. Exact original 514E60 hook, native frame and XR pose gated; F0 whole-frame parity remains unverified. Default OFF." };

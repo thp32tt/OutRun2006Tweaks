@@ -42,6 +42,7 @@ on:
       - 'src/dllmain.cpp'
       - 'src/hooks_exceptions.cpp'
       - 'tools/verify_quest_cockpit_crash_recovery.py'
+      - 'tools/verify_quest_cockpit_persistence.py'
       - 'src/vr/game/quest_cockpit_v2_turn_yaw.hpp'
       - 'tools/tests/quest_cockpit_v2_turn_yaw_smoke.cpp'
       - 'src/vr/settings.cpp'
@@ -60,6 +61,8 @@ jobs:
           ref: ${{ github.sha }}
       - name: Guard startup and crash-capture failure paths
         run: python3 tools/verify_quest_cockpit_crash_recovery.py
+      - name: Verify cockpit seat persistence and reset controls
+        run: python3 tools/verify_quest_cockpit_persistence.py
       - name: Build QuestCockpitV2 frame and matrix regression tests
         run: |
           c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
@@ -218,8 +221,8 @@ jobs:
           assert 'OriginalQuestGameCameraState(' in native_eye_getter
           assert 'SeatTablePatched=true;' in hook
           assert 'OriginalQuestVrProfileAnchor(' in hook
-          assert 'QuestCockpitV2SeatBack = 0.0' in ini
-          assert 'QuestCockpitV2SeatDown = 0.0' in ini
+          assert 'QuestCockpitV2SeatBack = -0.08' in ini
+          assert 'QuestCockpitV2SeatDown = 0.8' in ini
           assert 'QuestCockpitV2ApkNativeCamera = true' in ini
           assert 'OriginalQuestModeOneInput(' in hook
           assert 'OriginalQuestGameCameraState(' in hook
@@ -315,5 +318,12 @@ jobs:
           assert 'RawB0Camera is retired' in hook
           assert 'Settings::VRQuestCockpitV2SeatBack.get()' in hook
           assert 'Settings::VRQuestCockpitV2SeatDown.get()' in hook
+          settings_ui=Path('src/overlay/settings_ui.cpp').read_text(encoding='utf-8')
+          assert 'Save Cockpit View' in settings_ui and 'Reset Cockpit View' in settings_ui
+          assert 'VRQuestCockpitV2ReleaseSeatDownDefault' in settings_ui
+          release_launcher=Path('Start-OutRun.cmd').read_text(encoding='utf-8')
+          assert '-VR.QuestCockpitV2SeatBack=' not in release_launcher
+          assert '-VR.QuestCockpitV2SeatDown=' not in release_launcher
+          assert '-VR.QuestCockpitV2SeatRight=' not in release_launcher
           print('QuestCockpitV2 isolated-core contract PASS')
           PY

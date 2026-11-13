@@ -79,9 +79,6 @@ start "" "%~dp0OR2006C2C.exe" ^
  -VR.QuestCockpitV2OccupantCorrection=true ^
  -VR.QuestCockpitV2OccupantLod0=false ^
  -VR.QuestCockpitV2F0RenderScope=true ^
- -VR.QuestCockpitV2SeatBack=-0.08 ^
- -VR.QuestCockpitV2SeatDown=0.8 ^
- -VR.QuestCockpitV2SeatRight=0.0 ^
  -VR.CockpitFrameProbe=false ^
  -HudInspector=false ^
  -VR.FileLogging=false

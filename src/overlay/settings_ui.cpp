@@ -31,6 +31,24 @@ class SettingsWindow : public OverlayWindow
 	// hundreds of times, so the write waits until nothing is being dragged.
 	bool settingsDirty = false;
 	std::vector<Settings::SettingBase*> pendingNotify;
+	std::string cockpitStatus;
+
+	void queue_setting_change(Settings::SettingBase* setting)
+	{
+		settingsDirty = true;
+		if (std::find(pendingNotify.begin(), pendingNotify.end(), setting) == pendingNotify.end())
+			pendingNotify.emplace_back(setting);
+	}
+
+	bool flush_settings()
+	{
+		for (Settings::SettingBase* setting : pendingNotify)
+			setting->notify();
+		pendingNotify.clear();
+		const bool saved = Settings::write(Module::UserIniPath);
+		settingsDirty = false;
+		return saved;
+	}
 
 	// Case-insensitive substring match, so "vib" finds VibrationStrength. An
 	// empty search matches everything.
@@ -277,6 +295,35 @@ public:
 			if (section == "CDSwitcher" && search.empty())
 				ImGui::Text("Custom tracks can be added in OutRun2006Tweaks.ini [CDTracks] section.");
 
+			const bool cockpitViewSearch = search.empty() ||
+				matches_search("Cockpit View", search) ||
+				matches_search("QuestCockpitV2Seat", search) ||
+				matches_search("SeatBack", search) || matches_search("SeatDown", search) ||
+				matches_search("SeatRight", search);
+			if (section == "VR" && cockpitViewSearch)
+			{
+				ImGui::SeparatorText("Cockpit View");
+				ImGui::TextWrapped("Seat Back / Down / Right are live and persist to OutRun2006Tweaks.user.ini.");
+				if (ImGui::Button("Save Cockpit View"))
+					cockpitStatus = flush_settings() ? "Cockpit view saved." : "Cockpit view save failed.";
+				ImGui::SameLine();
+				if (ImGui::Button("Reset Cockpit View"))
+				{
+					Settings::VRQuestCockpitV2SeatBack = Settings::VRQuestCockpitV2ReleaseSeatBackDefault;
+					Settings::VRQuestCockpitV2SeatDown = Settings::VRQuestCockpitV2ReleaseSeatDownDefault;
+					Settings::VRQuestCockpitV2SeatRight = Settings::VRQuestCockpitV2ReleaseSeatRightDefault;
+					queue_setting_change(&Settings::VRQuestCockpitV2SeatBack);
+					queue_setting_change(&Settings::VRQuestCockpitV2SeatDown);
+					queue_setting_change(&Settings::VRQuestCockpitV2SeatRight);
+					cockpitStatus = flush_settings()
+						? "Cockpit view reset to v0.02 defaults and saved."
+						: "Cockpit reset applied live, but saving failed.";
+				}
+				if (!cockpitStatus.empty())
+					ImGui::TextDisabled("%s", cockpitStatus.c_str());
+				ImGui::Spacing();
+			}
+
 			for (Settings::SettingBase* setting : Settings::SettingBase::registry())
 			{
 				if (setting->hidden() || setting->section() != std::string_view(section))
@@ -299,11 +346,7 @@ public:
                         ? "MSAA (AntiAliasing)" : setting->key());
 
 				if (draw_control(setting, label))
-				{
-					settingsDirty = true;
-					if (std::find(pendingNotify.begin(), pendingNotify.end(), setting) == pendingNotify.end())
-						pendingNotify.emplace_back(setting);
-				}
+					queue_setting_change(setting);
 
 				// Failsafe if user has entered framerate above 0 but less than 60
 				// (since game is mainly meant for playing at 60 - it /should/ allow running at lower framerates though, but will likely break things)
@@ -332,14 +375,7 @@ public:
 			return;
 
 		if (settingsDirty)
-		{
-			for (Settings::SettingBase* setting : pendingNotify)
-				setting->notify();
-			pendingNotify.clear();
-
-			Settings::write(Module::UserIniPath);
-			settingsDirty = false;
-		}
+			flush_settings();
 	}
 
 	static SettingsWindow instance;
