@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "13da1d2b358ae19b514455ed34c0265e734e36f521ed7e7d9a0f1c0313b27c4a",
+  "release_approved": false,
+  "roi_id": "Q094_d7652d4ec4bb37cd",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "For Expert Drivers",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "상급자용",
+    "old_candidate_sha256": "13da1d2b358ae19b514455ed34c0265e734e36f521ed7e7d9a0f1c0313b27c4a",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 530,
+      "name": "HDRW-B-1ec1cb3cda20ee2fbf6b_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        1357,
+        530
+      ],
+      "sha256": "a4079dc634ec5a652528641393420179a82af0a8bdbe3fad66f5ad92b85ee82c",
+      "source_box_xyxy": [
+        2514,
+        882,
+        3871,
+        1412
+      ],
+      "source_native_size": [
+        1357,
+        530
+      ],
+      "width": 1357
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q094_d7652d4ec4bb37cd",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "source_dds_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "source_native_bbox_xyxy": [
+      2514,
+      882,
+      3871,
+      1412
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-B-1ec1cb3cda20ee2fbf6b"
+  },
+  "task_id": "HDRW-B-1ec1cb3cda20ee2fbf6b",
+  "updated_utc": "2026-11-13T14:59:52+00:00"
+}
