@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "385eeacd18a157c985622d386f8cd0cf45906633dd95ab1846bbbf7890f08756",
+  "release_approved": false,
+  "roi_id": "Q054_e60dc2a7c26b40c6",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "Run through green!",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "초록색을 통과하세요!",
+    "old_candidate_sha256": "385eeacd18a157c985622d386f8cd0cf45906633dd95ab1846bbbf7890f08756",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 408,
+      "name": "HDRW-B-ee7efa52af87f0d0498c_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        1133,
+        408
+      ],
+      "sha256": "4768b805599b6d62b0886415435ed42594c65609c73dfeceb31882135d4694ad",
+      "source_box_xyxy": [
+        2716,
+        314,
+        3849,
+        722
+      ],
+      "source_native_size": [
+        1133,
+        408
+      ],
+      "width": 1133
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q054_e60dc2a7c26b40c6",
+    "role": "B",
+    "source_dds_path": "textures/load/Switch/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+    "source_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+    "source_native_bbox_xyxy": [
+      2716,
+      314,
+      3849,
+      722
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-B-ee7efa52af87f0d0498c"
+  },
+  "task_id": "HDRW-B-ee7efa52af87f0d0498c",
+  "updated_utc": "2026-11-13T05:55:57+00:00"
+}
