@@ -1079,7 +1079,17 @@ namespace OutRunVRStereo
 				OutRunVR::GameSemantic::CapturePhysicalDrawCommand().scope ==
 				OutRunVR::GameSemantic::RenderScope::WorldSky;
             bool exactSkyNativeEye[2]{false,false};
+            // Exact original 0x4521C0 sky must use one deterministic
+            // rotation-only basis for the whole race. Hardware logs showed
+            // native-eye availability changing across Presents at race start
+            // (and occasionally later), causing the two original sky layers
+            // to alternate between native and fallback transforms. The
+            // fallback already carries the latched head rotation plus each
+            // OpenXR eye orientation with all translation removed, so keep it
+            // as the sole exact-sky path. Non-sky programmable world draws
+            // still use the Quest native eye pair when available.
             const auto* programmableNativeEyePair=
+                exactWorldSky ? nullptr :
                 GetQuestNativeEyePairForPresent(stereo.poseSequence);
             const D3DMATRIX* programmableHeadInverse=nullptr;
             if(programmableNativeEyePair || exactWorldSky) {
