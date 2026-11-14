@@ -3,6 +3,19 @@
 #pragma once
 #include <cstdint>
 namespace OutRunVR::QuestCockpitV2 {
+// Proven in canonical PC OR2006C2C.exe SHA256 68ceb386829066f8...
+// 440110 reads/writes BYTE PTR [eventId+0x79FB48]. It does NOT use
+// sEventWork::field_0; sEventWork callbacks live at 0x799B30+0x3C*eventId.
+inline constexpr std::uintptr_t OriginalEventFlagsRva=0x39fb48u;
+inline constexpr std::uint32_t OriginalDriverEventId=0x16au;
+inline constexpr std::uint8_t OriginalEventPendingInit=0x01u;
+inline constexpr std::uint8_t OriginalEventInitialized=0x02u;
+inline constexpr bool OriginalEventScheduled(std::uint8_t flags) noexcept {
+    return (flags & (OriginalEventPendingInit|OriginalEventInitialized))!=0u;
+}
+inline constexpr bool OriginalEventSetupAccepted(std::uint8_t flags) noexcept {
+    return (flags & OriginalEventPendingInit)!=0u;
+}
 inline constexpr std::uint32_t OriginalPassengerEventId=0x16bu;
 inline constexpr std::uint32_t OriginalPassengerFunctionId=0x39u;
 inline constexpr std::uint32_t OriginalStartAfterPassengerEventId=0x16cu;
