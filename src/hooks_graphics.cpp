@@ -1258,12 +1258,21 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         // Original PC: ROB01 is driver; conditionally active ROB02
         // is passenger. Both use race_robot_driver_display_4879B0.
         // Never assume a missing ROB02 is open or reuse a stale token.
+        const auto* eventFlags=
+            Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva);
         sEventWork* driver=Game::event(EVENT_ROB01);
         sEventWork* passenger=Game::event(EVENT_ROB02);
         const auto expected=reinterpret_cast<decltype(driver->EventFunc.Disp)>(
             Module::exe_ptr(OriginalDriverDisplayRva));
-        const bool d=driver && driver->EventFunc.Disp==expected;
-        const bool p=passenger && passenger->EventFunc.Disp==expected;
+        // Callback/data fields can remain stale after the original event
+        // closes: only the separate 0x79FB48 flag array proves that this
+        // frame's ROB01/ROB02 is initialized and not awaiting destruction.
+        const bool d=eventFlags &&
+            OriginalEventLiveForDisplay(eventFlags[OriginalDriverEventId]) &&
+            driver && driver->EventFunc.Disp==expected;
+        const bool p=eventFlags &&
+            OriginalEventLiveForDisplay(eventFlags[OriginalPassengerEventId]) &&
+            passenger && passenger->EventFunc.Disp==expected;
         return ResolveOriginalCockpitWork(
             reinterpret_cast<std::uintptr_t>(robot),
             d?reinterpret_cast<std::uintptr_t>(
