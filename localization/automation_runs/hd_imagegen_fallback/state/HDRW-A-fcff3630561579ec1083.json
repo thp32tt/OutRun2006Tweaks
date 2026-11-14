@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "6173fa549f0bc9ff2775edb5926ebcba98c49e6db3b8c13b706a618a7fdf1825",
+  "release_approved": false,
+  "roi_id": "Q205_5de4cbae50683601",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "View single player and multiplayer rankings",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "싱글/멀티플레이 랭킹 보기",
+    "old_candidate_sha256": "6173fa549f0bc9ff2775edb5926ebcba98c49e6db3b8c13b706a618a7fdf1825",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "AUTO_EDIT_KOREAN_TOUCHES_PROTECTED_ART",
+    "reference": {
+      "height": 68,
+      "name": "HDRW-A-fcff3630561579ec1083_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        1332,
+        68
+      ],
+      "sha256": "44dbab02d6d083ad5b10c1a1e7a5d01902d6bd4b076fbe9c923788b1aec4aa99",
+      "source_box_xyxy": [
+        2,
+        910,
+        1334,
+        978
+      ],
+      "source_native_size": [
+        1332,
+        68
+      ],
+      "width": 1332
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q205_5de4cbae50683601",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+    "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+    "source_native_bbox_xyxy": [
+      2,
+      910,
+      1334,
+      978
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-A-fcff3630561579ec1083"
+  },
+  "task_id": "HDRW-A-fcff3630561579ec1083",
+  "updated_utc": "2026-11-14T03:10:27+00:00"
+}
