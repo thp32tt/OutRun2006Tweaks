@@ -8,6 +8,11 @@ namespace OutRunVR::QuestCockpitV2 {
 // sEventWork::field_0; sEventWork callbacks live at 0x799B30+0x3C*eventId.
 inline constexpr std::uintptr_t OriginalEventFlagsRva=0x39fb48u;
 inline constexpr std::uint32_t OriginalDriverEventId=0x16au;
+// 487F50 selects Licence[slot] from 0x7C2400; the native table has 6
+// entries. Its caller must not request a new passenger on an invalid slot.
+inline constexpr std::uintptr_t OriginalLicenceSlotRva=0x3c2400u;
+inline constexpr bool OriginalPassengerCharacterIndexValid(
+    std::uint32_t slot) noexcept {return slot<6u;}
 inline constexpr std::uint8_t OriginalEventPendingInit=0x01u;
 inline constexpr std::uint8_t OriginalEventInitialized=0x02u;
 inline constexpr bool OriginalEventScheduled(std::uint8_t flags) noexcept {
