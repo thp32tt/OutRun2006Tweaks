@@ -81,7 +81,10 @@ class SettingsWindow : public OverlayWindow
     {
         return matches_search(setting->key(), search) ||
             (setting->section() == "VR" && setting->key() == "AntiAliasing" &&
-                matches_search("MSAA", search));
+                matches_search("MSAA", search)) ||
+            (setting->section() == "VR" &&
+                setting->key() == "QuestCockpitV2PassengerVisible" &&
+                matches_search("Passenger Always Visible", search));
     }
 
 	static bool section_matches(std::string_view section, std::string_view search)
