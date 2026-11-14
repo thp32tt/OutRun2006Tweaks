@@ -21,6 +21,18 @@ int main() {
     static_assert(OriginalEventSetupAccepted(0x01u));
     static_assert(!OriginalEventSetupAccepted(0x02u));
     static_assert(!OriginalEventSetupAccepted(0x04u));
+    static_assert(OriginalPassengerVacant(0));
+    static_assert(!OriginalPassengerVacant(0x01u));  // init queued
+    static_assert(!OriginalPassengerVacant(0x02u));  // active
+    static_assert(!OriginalPassengerVacant(0x04u));  // destroy queued
+    static_assert(!OriginalPassengerVacant(0x08u));  // suspended
+    static_assert(!OriginalPassengerVacant(0x10u));  // suspended
+    static_assert(OriginalPassengerVacant(0x20u));   // unrelated flags
+    static_assert(OriginalLicenceSlotRva==0x3C2400u);
+    static_assert(OriginalPassengerCharacterIndexValid(0));
+    static_assert(OriginalPassengerCharacterIndexValid(5));
+    static_assert(!OriginalPassengerCharacterIndexValid(6));
+    static_assert(!OriginalPassengerCharacterIndexValid(0xffffffffu));
     static_assert(gate(true,true,true,true,true,0x16c,0x3b,true,false));
     static_assert(!gate(false,true,true,true,true,0x16c,0x3b,true,false));
     static_assert(!gate(true,false,true,true,true,0x16c,0x3b,true,false));
