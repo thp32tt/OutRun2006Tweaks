@@ -1,4 +1,5 @@
 {
+  "hold_reason": "HOLD_IMAGE_TOOL_NOT_VERIFIED",
   "old_candidate_sha256": "fc37176e50c153e06cff857a6fc19b77fea1b7cc4ad9a4f7e520cea2ae55c973",
   "release_approved": false,
   "roi_id": "Q227_50fdfd89e985791b_RB_B",
@@ -6,7 +7,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
-  "status": "AB_CLAIMED",
+  "status": "HOLD",
   "task": {
     "english": "NOVICE",
     "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
@@ -58,5 +59,5 @@
     "task_id": "HDRW-B-a81d6b1f206c4b5cf8ca"
   },
   "task_id": "HDRW-B-a81d6b1f206c4b5cf8ca",
-  "updated_utc": "2026-11-14T04:10:04+00:00"
+  "updated_utc": "2026-11-14T04:10:25+00:00"
 }
