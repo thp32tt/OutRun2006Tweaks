@@ -173,7 +173,7 @@ namespace Settings
     Setting<bool> VRQuestCockpitV2HideDriver{ "VR", "QuestCockpitV2HideDriver", true,
         "Hide only original event 362 driver visual draw in mode1 race; passenger 363 and GOAL unaffected. Default ON." };
     Setting<bool> VRQuestCockpitV2PassengerVisible{ "VR", "QuestCockpitV2PassengerVisible", true,
-        "Keep exact event 363 passenger original PC robot matrix; force visible LOD0 inside only its synchronous draw to avoid missing near-seat model. Default ON." };
+        "Passenger Always Visible: in cockpit mode, also request the ORIGINAL passenger event 363 at the next race START when the game omitted it, preserving native character/animation; force LOD0 only inside its original draw. Default ON. Changes to event creation take effect at the next race start." };
 	Setting<bool> VRQuestCockpitV2SkyProbe{ "VR", "QuestCockpitV2SkyProbe", false,
         "Bounded sky/R9 Present, B0/F0 car motion and Quest/PC original view1 yaw-source comparison (body +0x2E vs auxiliary +0x1FE vs native camera look). One aggregate per 90 calls." };
     Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,

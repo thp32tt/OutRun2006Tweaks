@@ -25,6 +25,9 @@ on:
       - 'src/vr/game/quest_cockpit_v2_seat.hpp'
       - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_occupant.hpp'
+      - 'src/vr/game/quest_cockpit_v2_passenger_event.hpp'
+      - 'tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp'
+      - 'src/overlay/settings_ui.cpp'
       - 'src/vr/game/quest_cockpit_v2_visibility.hpp'
       - 'tools/tests/quest_cockpit_v2_occupant_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp'
@@ -114,6 +117,12 @@ jobs:
             tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp \
             -o /tmp/quest-v2-arm64-parity
           /tmp/quest-v2-arm64-parity
+      - name: Original ROB02 passenger START gating regression
+        run: |
+          c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp \
+            -o /tmp/quest-v2-passenger
+          /tmp/quest-v2-passenger
       - name: Quest original exact player robot model W x C and scoped restore
         run: |
           c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \

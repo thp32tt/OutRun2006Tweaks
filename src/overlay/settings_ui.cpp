@@ -299,11 +299,12 @@ public:
 				matches_search("Cockpit View", search) ||
 				matches_search("QuestCockpitV2Seat", search) ||
 				matches_search("SeatBack", search) || matches_search("SeatDown", search) ||
-				matches_search("SeatRight", search);
+				matches_search("SeatRight", search) ||
+				matches_search("Passenger Always Visible", search);
 			if (section == "VR" && cockpitViewSearch)
 			{
 				ImGui::SeparatorText("Cockpit View");
-				ImGui::TextWrapped("Seat Back / Down / Right are live and persist to OutRun2006Tweaks.user.ini.");
+				ImGui::TextWrapped("Seat Back / Down / Right are live and persist to OutRun2006Tweaks.user.ini. Passenger Always Visible takes effect from the next race START.");
 				if (ImGui::Button("Save Cockpit View"))
 					cockpitStatus = flush_settings() ? "Cockpit view saved." : "Cockpit view save failed.";
 				ImGui::SameLine();
@@ -343,7 +344,9 @@ public:
 
 				const std::string label(
                     setting->section() == "VR" && setting->key() == "AntiAliasing"
-                        ? "MSAA (AntiAliasing)" : setting->key());
+                        ? "MSAA (AntiAliasing)" :
+                    setting->section() == "VR" && setting->key() == "QuestCockpitV2PassengerVisible"
+                        ? "Passenger Always Visible" : setting->key());
 
 				if (draw_control(setting, label))
 					queue_setting_change(setting);

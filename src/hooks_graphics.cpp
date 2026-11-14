@@ -12,6 +12,7 @@
 #include "vr/game/quest_cockpit_v2_seat.hpp"
 #include "vr/game/quest_cockpit_v2_turn_yaw.hpp"
 #include "vr/game/quest_cockpit_v2_occupant.hpp"
+#include "vr/game/quest_cockpit_v2_passenger_event.hpp"
 #include "vr/game/quest_cockpit_v2_visibility.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
 #include "vr/game/quest_cockpit_v2_glass_hook.hpp"
@@ -1121,6 +1122,77 @@ static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
     return OutRunVR::QuestCockpitV2::NativeSeatOffset(
         nativeEye,nativeLook,back,down,right,result);
 }
+// Normal PC START creates ROB02 (passenger) only for some race modes.
+// "PassengerVisible" already forces LOD0 inside an existing ROB02 draw,
+// but cannot render a character whose original event was never opened.
+// Reuse the game's OWN event setup at the exact START stage-60 successor
+// (ROB03/0x3B) rather than manufacturing robot work, cloning a driver,
+// patching simulation flags, or injecting a draw into one stereo eye.
+class QuestCockpitV2PassengerStartEvent final : public Hook {
+    static constexpr int EventSetupRva=0x40110; // original 440110
+    inline static SafetyHookInline SetupHook{};
+
+    static void __cdecl EventSetup(std::uint32_t eventId,
+                                   std::uint32_t functionId) {
+        using namespace OutRunVR::QuestCockpitV2;
+        // Do not read event state outside this original START successor.
+        if(eventId==OriginalStartAfterPassengerEventId &&
+           functionId==OriginalStartAfterPassengerFunctionId &&
+           Settings::VREnabled && Settings::VRQuestCockpitV2Enabled &&
+           Settings::VRQuestCockpitV2PassengerVisible &&
+           NativeOriginalHooksReady.load(std::memory_order_acquire) &&
+           Game::current_mode && *Game::current_mode==STATE_START) {
+            const sEventWork* driver=Game::event(EVENT_ROB01);
+            const sEventWork* passenger=Game::event(EVENT_ROB02);
+            const auto originalDisplay=
+                reinterpret_cast<decltype(driver->EventFunc.Disp)>(
+                    Module::exe_ptr(0x879B0));
+            const bool driverReady=driver &&
+                (driver->field_0 & 0x03u)!=0u &&
+                driver->EventFunc.Disp==originalDisplay;
+            const bool passengerActive=passenger &&
+                (passenger->field_0 & 0x03u)!=0u;
+            if(ShouldOpenMissingPassenger(
+                    true,true,true,true,true,eventId,functionId,
+                    driverReady,passengerActive)) {
+                // Original function 0x39 owns passenger init, control, pose,
+                // motion, animation and teardown. The native event loop
+                // initializes it on the subsequent START control tick.
+                SetupHook.ccall<void>(
+                    OriginalPassengerEventId,OriginalPassengerFunctionId);
+                static unsigned logged=0;
+                if(++logged<=12)
+                    spdlog::info("VR COCKPIT PASSENGER: queued original "
+                        "ROB02/0x39 at START before ROB03 (race={})",logged);
+            }
+        }
+        SetupHook.ccall<void>(eventId,functionId);
+    }
+public:
+    std::string_view description() override {
+        return "QuestCockpitV2PassengerStartEvent";
+    }
+    bool validate() override {
+        return Settings::VREnabled && Settings::VRQuestCockpitV2Enabled;
+    }
+    bool apply() override {
+        // A detour failure only disables forced passenger setup; the
+        // original scheduler and all other cockpit hooks remain unchanged.
+        auto setup=safetyhook::create_inline(
+            Module::exe_ptr(EventSetupRva),EventSetup);
+        if(!setup) {
+            spdlog::warn("VR COCKPIT PASSENGER: original 440110 "
+                         "event setup unavailable; native mode retained");
+            return false;
+        }
+        SetupHook=std::move(setup);
+        return true;
+    }
+    static QuestCockpitV2PassengerStartEvent instance;
+};
+QuestCockpitV2PassengerStartEvent
+    QuestCockpitV2PassengerStartEvent::instance;
+
 class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static constexpr int PlayerCarRva=0x69764, RobotRva=0x114E60;
     static constexpr int OriginalDriverDisplayRva=0x879B0;
