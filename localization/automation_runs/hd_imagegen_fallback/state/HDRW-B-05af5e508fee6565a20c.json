@@ -1,0 +1,62 @@
+{
+  "old_candidate_sha256": "3b5fc2f6c105d25183c1bbfa860aec865a7915a92802b417b4331a47173c1780",
+  "release_approved": false,
+  "roi_id": "Q212_eece084213157579",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "status": "AB_CLAIMED",
+  "task": {
+    "english": "OUTRUN",
+    "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
+    "korean": "아웃런",
+    "old_candidate_sha256": "3b5fc2f6c105d25183c1bbfa860aec865a7915a92802b417b4331a47173c1780",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 689,
+      "name": "HDRW-B-05af5e508fee6565a20c_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        0,
+        0,
+        1588,
+        689
+      ],
+      "sha256": "be2e7e6f33fec67b021244513894e23889d21351dacd9a57fe42ecb319ca8d1a",
+      "source_box_xyxy": [
+        227,
+        1244,
+        1815,
+        1933
+      ],
+      "source_native_size": [
+        1588,
+        689
+      ],
+      "width": 1588
+    },
+    "required": [
+      "ORIGINAL_HD_TEXT_STYLE_COLOR_STROKE_SHADOW_ANGLE",
+      "PRESERVE_SOURCE_LINE_COUNT_AND_SIZE",
+      "KOREAN_GLYPHS_ONLY_TRANSPARENT_RGBA",
+      "NO_ENGLISH_NO_ICONS_NO_BACKGROUND",
+      "SOURCE_CLEAN_IS_SEPARATE_NOT_APPROVED",
+      "C1_C3_VISUAL_AND_NATIVE_DDS_TEST_REQUIRED"
+    ],
+    "roi_id": "Q212_eece084213157579",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+    "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "source_native_bbox_xyxy": [
+      227,
+      1244,
+      1815,
+      1933
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_PIXEL_EDIT_FAILED",
+    "task_id": "HDRW-B-05af5e508fee6565a20c"
+  },
+  "task_id": "HDRW-B-05af5e508fee6565a20c",
+  "updated_utc": "2026-11-14T01:45:29+00:00"
+}
