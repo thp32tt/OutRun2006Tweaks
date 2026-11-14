@@ -121,7 +121,7 @@ if __name__ == "__main__":
             return struct.unpack_from("<I", binary, at)[0]
 
         pe = u32(0x3C)
-        assert binary[0:2] == b"MZ" and binary[pe:pe + 4] == b"PE\\0\\0"
+        assert binary[0:2] == b"MZ" and binary[pe:pe + 4] == bytes.fromhex("50450000")
         nsections = u16(pe + 6)
         optional = pe + 24
         assert u16(optional) == 0x10B, "expected 32-bit original"
@@ -146,7 +146,7 @@ if __name__ == "__main__":
         # event flags at 0x79FB48 + eventId, work at 0x799B30 + id*0x3C,
         # original 0x440110 cdecl function and 20-byte callback table.
         assert at_va(0x440110, len(signature)) == signature
-        assert at_va(0x440110 + 102, 1) == b"\\xc3", "event_setup is not cdecl"
+        assert at_va(0x440110 + 102, 1) == bytes.fromhex("c3"), "event_setup is not cdecl"
         assert at_va(0x440110 + 4, 6) == bytes.fromhex("8a8a48fb7900")
         assert at_va(0x440110 + 21, 6) == bytes.fromhex("888a48fb7900")
         assert at_va(0x4879B0, 4) == bytes.fromhex("a1189d79")
