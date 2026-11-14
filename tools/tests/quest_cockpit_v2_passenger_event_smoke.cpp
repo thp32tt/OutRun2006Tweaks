@@ -8,6 +8,19 @@ int main() {
         return ShouldOpenMissingPassenger(vr,cockpit,show,hooks,start,
                                          id,fn,driver,passenger);
     };
+    // Byte flags are stored separately from 0x3C-byte sEventWork entries;
+    // original 440110 uses BYTE PTR [eventId + 0x79FB48].
+    static_assert(OriginalEventFlagsRva==0x39FB48u);
+    static_assert(OriginalDriverEventId==0x16au);
+    static_assert(OriginalPassengerEventId==0x16bu);
+    static_assert(OriginalEventFlagsRva+OriginalPassengerEventId==0x39FCB3u);
+    static_assert(!OriginalEventScheduled(0u));
+    static_assert(OriginalEventScheduled(OriginalEventPendingInit));
+    static_assert(OriginalEventScheduled(OriginalEventInitialized));
+    static_assert(!OriginalEventScheduled(0x04u));
+    static_assert(OriginalEventSetupAccepted(0x01u));
+    static_assert(!OriginalEventSetupAccepted(0x02u));
+    static_assert(!OriginalEventSetupAccepted(0x04u));
     static_assert(gate(true,true,true,true,true,0x16c,0x3b,true,false));
     static_assert(!gate(false,true,true,true,true,0x16c,0x3b,true,false));
     static_assert(!gate(true,false,true,true,true,0x16c,0x3b,true,false));
