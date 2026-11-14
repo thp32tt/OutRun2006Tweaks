@@ -5,6 +5,7 @@ Complements (does not replace) the C++ pure-gate tests and the real Quest 3
 runtime test. No claim about GPU visibility can be inferred from source alone.
 """
 from pathlib import Path
+import re
 
 hook = Path("src/hooks_graphics.cpp").read_text(encoding="utf-8")
 settings = Path("src/vr/settings.cpp").read_text(encoding="utf-8")
@@ -30,8 +31,13 @@ assert "Settings::VRQuestCockpitV2PassengerVisible" in start
 assert "*Game::current_mode==STATE_START" in start
 assert "NativeOriginalHooksReady.load(std::memory_order_acquire)" in start
 assert "driver->EventFunc.Disp==originalDisplay" in start
-assert "(driver->field_0 & 0x03u)!=0u" in start
-assert "(passenger->field_0 & 0x03u)!=0u" in start
+# Canonical game 440110 uses a *separate* flag array at VA 0x79FB48.
+assert "OriginalEventFlagsRva=0x39fb48u;" in policy
+assert "OriginalDriverEventId=0x16au;" in policy
+assert "OriginalEventScheduled(eventFlags[OriginalDriverEventId])" in start
+assert "OriginalEventScheduled(eventFlags[OriginalPassengerEventId])" in start
+assert "Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva)" in start
+assert "field_0 &" not in start
 assert "ShouldOpenMissingPassenger(" in start
 
 # Only one conditional passenger setup, followed by the *unchanged* original
@@ -42,10 +48,23 @@ forward = "SetupHook.ccall<void>(eventId,functionId);"
 assert start.count("SetupHook.ccall<void>") == 2
 assert request in start and forward in start
 assert start.index(request) < start.index(forward)
-assert "auto setup=safetyhook::create_inline(" in start
+# Verified 27-byte canonical EXE entry 0x440110 is __cdecl (C3 epilogue).
+# The signature includes its separate flag-array read + write instructions.
+sig_match = re.search(
+    r"constexpr std::array<std::uint8_t,27> signature\{\{(.*?)\}\};",
+    start, re.S
+)
+assert sig_match, "missing exact original event setup signature"
+signature = bytes(int(x, 16) for x in re.findall(r"0x([0-9A-Fa-f]{2})", sig_match.group(1)))
+assert signature.hex() == "8b5424048a8a48fb790080e1e78bc280c9016bc03c888a48fb7900"
+assert "VirtualQuery(entry,&info,sizeof(info))" in start
+assert "!std::equal(signature.begin(),signature.end(),entry)" in start
+assert 'return "VRQuestCockpitV2PassengerStartEvent";' in start
+assert "auto setup=safetyhook::create_inline(entry,EventSetup);" in start
 assert "SetupHook=std::move(setup);" in start
-assert "const bool queued=passenger &&" in start
-assert "(passenger->field_0 & 0x01u)!=0u" in start
+assert "const bool queued=eventFlags && passenger &&" in start
+assert "OriginalEventSetupAccepted(" in start
+assert "eventFlags[OriginalPassengerEventId]" in start
 assert "passenger->EventFunc.Disp==originalDisplay" in start
 assert "setup rejected" in start
 assert "original ROB02/0x39 accepted" not in start or "if(queued)" in start
