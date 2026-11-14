@@ -21,6 +21,13 @@ int main() {
     static_assert(OriginalEventSetupAccepted(0x01u));
     static_assert(!OriginalEventSetupAccepted(0x02u));
     static_assert(!OriginalEventSetupAccepted(0x04u));
+    static_assert(!OriginalEventLiveForDisplay(0));
+    static_assert(!OriginalEventLiveForDisplay(0x01u)); // still pending init
+    static_assert(OriginalEventLiveForDisplay(0x02u));  // initialized
+    static_assert(OriginalEventLiveForDisplay(0x03u));  // init+live
+    static_assert(!OriginalEventLiveForDisplay(0x04u)); // pending destroy
+    static_assert(!OriginalEventLiveForDisplay(0x06u)); // active+destroy
+    static_assert(!OriginalEventLiveForDisplay(0x08u)); // suspended
     static_assert(OriginalPassengerVacant(0));
     static_assert(!OriginalPassengerVacant(0x01u));  // init queued
     static_assert(!OriginalPassengerVacant(0x02u));  // active
