@@ -1214,7 +1214,7 @@ public:
             0x00,0x80,0xE1,0xE7,0x8B,0xC2,0x80,0xC9,0x01,
             0x6B,0xC0,0x3C,0x88,0x8A,0x48,0xFB,0x79,0x00
         }};
-        const auto* entry=Module::exe_ptr<std::uint8_t>(EventSetupRva);
+        auto* entry=Module::exe_ptr<std::uint8_t>(EventSetupRva);
         MEMORY_BASIC_INFORMATION info{};
         if(!entry || VirtualQuery(entry,&info,sizeof(info))!=sizeof(info) ||
            info.State!=MEM_COMMIT || (info.Protect&PAGE_GUARD) ||
