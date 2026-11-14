@@ -35,7 +35,11 @@ assert "driver->EventFunc.Disp==originalDisplay" in start
 assert "OriginalEventFlagsRva=0x39fb48u;" in policy
 assert "OriginalDriverEventId=0x16au;" in policy
 assert "OriginalEventScheduled(eventFlags[OriginalDriverEventId])" in start
-assert "OriginalEventScheduled(eventFlags[OriginalPassengerEventId])" in start
+assert "OriginalPassengerVacant(" in start
+assert "eventFlags[OriginalPassengerEventId]" in start
+assert "passengerOccupied" in start
+assert "OriginalLicenceSlotRva=0x3c2400u;" in policy
+assert "OriginalPassengerCharacterIndexValid(*licenceSlot)" in start
 assert "Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva)" in start
 assert "field_0 &" not in start
 assert "ShouldOpenMissingPassenger(" in start
