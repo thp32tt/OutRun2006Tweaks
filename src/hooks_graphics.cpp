@@ -1142,16 +1142,20 @@ class QuestCockpitV2PassengerStartEvent final : public Hook {
            Settings::VRQuestCockpitV2PassengerVisible &&
            NativeOriginalHooksReady.load(std::memory_order_acquire) &&
            Game::current_mode && *Game::current_mode==STATE_START) {
+            // Original 440110 accesses a SEPARATE byte-flag array at
+            // VA 0x79FB48+eventId. sEventWork::field_0 is NOT event flags.
+            const auto* eventFlags=
+                Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva);
             const sEventWork* driver=Game::event(EVENT_ROB01);
             const sEventWork* passenger=Game::event(EVENT_ROB02);
             const auto originalDisplay=
                 reinterpret_cast<decltype(driver->EventFunc.Disp)>(
                     Module::exe_ptr(0x879B0));
-            const bool driverReady=driver &&
-                (driver->field_0 & 0x03u)!=0u &&
+            const bool driverReady=eventFlags && driver &&
+                OriginalEventScheduled(eventFlags[OriginalDriverEventId]) &&
                 driver->EventFunc.Disp==originalDisplay;
-            const bool passengerActive=passenger &&
-                (passenger->field_0 & 0x03u)!=0u;
+            const bool passengerActive=eventFlags &&
+                OriginalEventScheduled(eventFlags[OriginalPassengerEventId]);
             if(ShouldOpenMissingPassenger(
                     true,true,true,true,true,eventId,functionId,
                     driverReady,passengerActive)) {
@@ -1164,8 +1168,9 @@ class QuestCockpitV2PassengerStartEvent final : public Hook {
                 // guest event actually accepted the request: verify that
                 // original 440110 installed its pending-init flag and the
                 // expected ROB02 display callback before reporting success.
-                const bool queued=passenger &&
-                    (passenger->field_0 & 0x01u)!=0u &&
+                const bool queued=eventFlags && passenger &&
+                    OriginalEventSetupAccepted(
+                        eventFlags[OriginalPassengerEventId]) &&
                     passenger->EventFunc.Disp==originalDisplay;
                 static unsigned logged=0;
                 if(++logged<=12) {
@@ -1184,16 +1189,36 @@ class QuestCockpitV2PassengerStartEvent final : public Hook {
     }
 public:
     std::string_view description() override {
-        return "QuestCockpitV2PassengerStartEvent";
+        return "VRQuestCockpitV2PassengerStartEvent";
     }
     bool validate() override {
         return Settings::VREnabled && Settings::VRQuestCockpitV2Enabled;
     }
     bool apply() override {
-        // A detour failure only disables forced passenger setup; the
-        // original scheduler and all other cockpit hooks remain unchanged.
-        auto setup=safetyhook::create_inline(
-            Module::exe_ptr(EventSetupRva),EventSetup);
+        // Exact entry bytes from canonical EXE SHA256 68ceb386829066f8...
+        // 440110 is __cdecl (ret, caller stack cleanup); its initial
+        // instructions read+write 0x79FB48[eventId]. Never install a
+        // detour on an unknown EXE or an already patched entrypoint.
+        constexpr std::array<std::uint8_t,27> signature{{
+            0x8B,0x54,0x24,0x04,0x8A,0x8A,0x48,0xFB,0x79,
+            0x00,0x80,0xE1,0xE7,0x8B,0xC2,0x80,0xC9,0x01,
+            0x6B,0xC0,0x3C,0x88,0x8A,0x48,0xFB,0x79,0x00
+        }};
+        const auto* entry=Module::exe_ptr<std::uint8_t>(EventSetupRva);
+        MEMORY_BASIC_INFORMATION info{};
+        if(!entry || VirtualQuery(entry,&info,sizeof(info))!=sizeof(info) ||
+           info.State!=MEM_COMMIT || (info.Protect&PAGE_GUARD) ||
+           (info.Protect&PAGE_NOACCESS) ||
+           reinterpret_cast<std::uintptr_t>(entry)+signature.size() >
+               reinterpret_cast<std::uintptr_t>(info.BaseAddress)+info.RegionSize ||
+           !std::equal(signature.begin(),signature.end(),entry)) {
+            spdlog::warn("VR COCKPIT PASSENGER: original 440110 "
+                "signature mismatch; event hook disabled");
+            return false;
+        }
+        // A detour failure only disables forced passenger setup; all other
+        // cockpit hooks and the game's original event scheduler remain intact.
+        auto setup=safetyhook::create_inline(entry,EventSetup);
         if(!setup) {
             spdlog::warn("VR COCKPIT PASSENGER: original 440110 "
                          "event setup unavailable; native mode retained");
