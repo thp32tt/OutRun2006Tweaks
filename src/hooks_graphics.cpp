@@ -1154,11 +1154,21 @@ class QuestCockpitV2PassengerStartEvent final : public Hook {
             const bool driverReady=eventFlags && driver &&
                 OriginalEventScheduled(eventFlags[OriginalDriverEventId]) &&
                 driver->EventFunc.Disp==originalDisplay;
-            const bool passengerActive=eventFlags &&
-                OriginalEventScheduled(eventFlags[OriginalPassengerEventId]);
-            if(ShouldOpenMissingPassenger(
+            // A bit-2 DEST pending state is NOT an empty event. 440110
+            // preserves that bit, so never queue init on top of teardown.
+            const bool passengerOccupied=!eventFlags ||
+                !OriginalPassengerVacant(
+                    eventFlags[OriginalPassengerEventId]);
+            // Original 487F50 indexes a 6-entry licence/character table.
+            // In exceptional menus/game variants this selector is not yet
+            // initialized; do not force ROB02 into invalid table indices.
+            const auto* licenceSlot=
+                Module::exe_ptr<std::uint32_t>(OriginalLicenceSlotRva);
+            const bool originalCharacterReady=licenceSlot &&
+                OriginalPassengerCharacterIndexValid(*licenceSlot);
+            if(originalCharacterReady && ShouldOpenMissingPassenger(
                     true,true,true,true,true,eventId,functionId,
-                    driverReady,passengerActive)) {
+                    driverReady,passengerOccupied)) {
                 // Original function 0x39 owns passenger init, control, pose,
                 // motion, animation and teardown. The native event loop
                 // initializes it on the subsequent START control tick.
