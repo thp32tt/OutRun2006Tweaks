@@ -16,6 +16,12 @@ inline constexpr bool OriginalEventScheduled(std::uint8_t flags) noexcept {
 inline constexpr bool OriginalEventSetupAccepted(std::uint8_t flags) noexcept {
     return (flags & OriginalEventPendingInit)!=0u;
 }
+// 440110 preserves the DEST pending bit (0x04). Reopening a closing
+// event would lead to destroy+init on the next event-control pass.
+// 0x08/0x10 are additional suspended/busy flags; fail closed for all.
+inline constexpr bool OriginalPassengerVacant(std::uint8_t flags) noexcept {
+    return (flags & 0x1fu)==0u;
+}
 inline constexpr std::uint32_t OriginalPassengerEventId=0x16bu;
 inline constexpr std::uint32_t OriginalPassengerFunctionId=0x39u;
 inline constexpr std::uint32_t OriginalStartAfterPassengerEventId=0x16cu;
