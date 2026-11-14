@@ -8,6 +8,7 @@
   "candidate_gh_path": "localization/automation_runs/hd_imagegen_fallback/candidates/HDRW-A-aeabcf1e2c842f02f2e4.png",
   "candidate_sha256": "9ab1816b50954af53bda94bbc91a341c2e8931666cd03703a6f94489f26c48d9",
   "candidate_status": "IMAGEGEN_BLOB_SAVED_PENDING_C1",
+  "hold_reason": "HOLD_C1_IMAGE_TOOL_SELECTED",
   "last_result_poll_reason": "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0",
   "last_result_poll_utc": "2026-11-14T13:05:14+00:00",
   "old_candidate_sha256": "8ead3cd87b1c9a20a7b142a902e5b2070c9b7600e96ce221c27baadef9a33eb2",
@@ -17,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
-  "status": "C1_READY",
+  "status": "HOLD",
   "task": {
     "english": "Double!",
     "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
@@ -69,5 +70,5 @@
     "task_id": "HDRW-A-aeabcf1e2c842f02f2e4"
   },
   "task_id": "HDRW-A-aeabcf1e2c842f02f2e4",
-  "updated_utc": "2026-11-14T14:30:06+00:00"
+  "updated_utc": "2026-11-14T18:53:53+00:00"
 }
