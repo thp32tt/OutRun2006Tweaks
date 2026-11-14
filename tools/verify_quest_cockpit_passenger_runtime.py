@@ -17,6 +17,8 @@ policy = Path("src/vr/game/quest_cockpit_v2_passenger_event.hpp").read_text(
 assert "class QuestCockpitV2PassengerStartEvent final : public Hook" in hook
 start = hook.split("class QuestCockpitV2PassengerStartEvent final : public Hook", 1)[1]
 start = start.split("class QuestCockpitV2PlayerCandidateProbe final : public Hook", 1)[0]
+owner = hook.split("ExactOriginalCockpitOccupant(EvWorkRobot* robot) noexcept {", 1)[1]
+owner = owner.split("static bool OriginalRobotDrawSignature()", 1)[0]
 render = hook.split("static void __cdecl RobotDisplay(EvWorkRobot* robot)", 1)[1]
 render = render.split("static void PlayerState(SafetyHookContext& ctx)", 1)[0]
 
@@ -73,6 +75,12 @@ assert "passenger->EventFunc.Disp==originalDisplay" in start
 assert "setup rejected" in start
 assert "original ROB02/0x39 accepted" not in start or "if(queued)" in start
 
+# The original event work callbacks and work tokens outlive the active slot.
+# Only a live event bit (0x02), without destroy pending (0x04), may own a draw.
+assert "OriginalEventLiveForDisplay(eventFlags[OriginalDriverEventId])" in owner
+assert "OriginalEventLiveForDisplay(eventFlags[OriginalPassengerEventId])" in owner
+assert "Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva)" in owner
+assert "OriginalEventLiveForDisplay(std::uint8_t flags)" in policy
 # Renderer must preserve driver hiding, exact ROB02 ownership, native LOD0,
 # and the original fallback. The callback log is evidence of callback entry,
 # explicitly not a claim of GPU visibility.
