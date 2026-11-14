@@ -1160,10 +1160,24 @@ class QuestCockpitV2PassengerStartEvent final : public Hook {
                 // initializes it on the subsequent START control tick.
                 SetupHook.ccall<void>(
                     OriginalPassengerEventId,OriginalPassengerFunctionId);
+                // A successful hook/trampoline is not proof the original
+                // guest event actually accepted the request: verify that
+                // original 440110 installed its pending-init flag and the
+                // expected ROB02 display callback before reporting success.
+                const bool queued=passenger &&
+                    (passenger->field_0 & 0x01u)!=0u &&
+                    passenger->EventFunc.Disp==originalDisplay;
                 static unsigned logged=0;
-                if(++logged<=12)
-                    spdlog::info("VR COCKPIT PASSENGER: queued original "
-                        "ROB02/0x39 at START before ROB03 (race={})",logged);
+                if(++logged<=12) {
+                    if(queued)
+                        spdlog::info("VR COCKPIT PASSENGER: original "
+                            "ROB02/0x39 accepted at START before ROB03 "
+                            "(attempt={})",logged);
+                    else
+                        spdlog::warn("VR COCKPIT PASSENGER: original "
+                            "ROB02/0x39 setup rejected (attempt={}); "
+                            "visual guarantee unavailable",logged);
+                }
             }
         }
         SetupHook.ccall<void>(eventId,functionId);
@@ -1278,6 +1292,19 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             Settings::VRQuestCockpitV2HideDriver,
             Settings::VRQuestCockpitV2PassengerVisible);
         if(action==CockpitOccupantRender::SuppressDriver)return;
+        // This proves that original PC 514E60 was reached for the real
+        // passenger work. It is NOT proof of a visible GPU submission:
+        // PMT existence, LOD, culling and stereo must still succeed.
+        if(slot==OriginalOccupantSlot::Passenger363) {
+            static thread_local unsigned observed=0;
+            if(++observed<=12)
+                spdlog::info("VR COCKPIT PASSENGER: native ROB02 "
+                    "display callback observed epoch={} stereoValid={} "
+                    "mode1={} keepPassenger={} sample={}",
+                    frameEpoch,stereo&&stereo->valid,
+                    camera->cam_mode_34A==1,
+                    Settings::VRQuestCockpitV2PassengerVisible.get(),observed);
+        }
         // Quest event 363 is a full occupant: it needs the SAME scoped W*C
         // correction as event 362, not an early exit to an uncorrected
         // passenger matrix. Keep the passenger visible/LOD0 scope alive
