@@ -18,6 +18,13 @@ inline constexpr std::uint8_t OriginalEventInitialized=0x02u;
 inline constexpr bool OriginalEventScheduled(std::uint8_t flags) noexcept {
     return (flags & (OriginalEventPendingInit|OriginalEventInitialized))!=0u;
 }
+// A stale callback pointer and data token remain in sEventWork after close.
+// Only a genuinely initialized, non-destroy-pending event may own a
+// ROB01/ROB02 model draw.
+inline constexpr bool OriginalEventLiveForDisplay(std::uint8_t flags) noexcept {
+    return (flags & OriginalEventInitialized)!=0u &&
+        (flags & 0x04u)==0u;
+}
 inline constexpr bool OriginalEventSetupAccepted(std::uint8_t flags) noexcept {
     return (flags & OriginalEventPendingInit)!=0u;
 }
