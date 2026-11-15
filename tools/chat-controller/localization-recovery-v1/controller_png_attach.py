@@ -254,14 +254,55 @@ async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
         return "A_PROJECT_NAVIGATION_UNVERIFIED"
 
 
-async def ensure_image_tool(page):
-    """Select and prove the actual Create image tool pill in ChatGPT composer.
+async def selected_image_tool(page):
+    """Prove an active composer selection, never a menu option or sidebar image.
 
-    ChatGPT can render duplicate responsive controls and localized labels. Only
-    visible controls are eligible; identity is finally proven by picture_v2 pill.
+    ChatGPT has used picture_v2 hint pills and newer labelled selection chips.
+    The latter count ONLY when they are a selected composer chip, not when
+    ordinary text or an Images menu item happens to be visible.
     """
-    async def first_visible(locator, limit=12):
-        for i in range(min(await locator.count(),limit)):
+    labels = frozenset(("create image", "images", "이미지 만들기",
+                        "이미지 생성", "이미지"))
+    for css in (
+        '[data-inline-selection-pill]',
+        '[data-testid="composer-tool-chip"]',
+        '[data-testid="tool-selection-pill"]',
+    ):
+        loc = page.locator(css)
+        try:
+            count = min(await loc.count(), 12)
+        except Exception:
+            continue
+        for i in range(count):
+            item = loc.nth(i)
+            try:
+                if not await item.is_visible():
+                    continue
+                hint = await item.get_attribute("data-system-hint-type")
+                if hint == "picture_v2":
+                    return True
+                text = (await item.inner_text()).strip().casefold()
+                if text in labels:
+                    return True
+            except Exception:
+                continue
+    return False
+
+
+async def ensure_image_tool(page):
+    """Select Images/이미지 in *current* More menu; verify active composer chip.
+
+    Never send an ImageGen message merely because a menu item was clicked.
+    If selection is absent the caller records a pre-send retry, not a send.
+    The official UI currently documents More -> Images, while older pages
+    used Add files and more -> Create image.
+    """
+    async def first_visible(locator, limit=10):
+        try:
+            count=min(await locator.count(), limit)
+        except Exception:
+            return None
+        for i in range(count):
             item=locator.nth(i)
             try:
                 if await item.is_visible():
@@ -271,49 +312,70 @@ async def ensure_image_tool(page):
         return None
 
     try:
-        pill=page.locator('[data-inline-selection-pill][data-system-hint-type="picture_v2"]')
-        selected=await first_visible(pill)
-        if selected is not None:
+        if await selected_image_tool(page):
             return "CREATE_IMAGE_TOOL_SELECTED"
 
-        menu_candidates=[
-            page.get_by_role("button",name="Add files and more"),
-            page.get_by_role("button",name="파일 및 기타 추가"),
+        menus=[
+            page.locator('button[data-testid="composer-plus-btn"]'),
+            page.locator('button[data-testid="composer-tools-button"]'),
+            page.get_by_role("button",name="More",exact=True),
+            page.get_by_role("button",name="더보기",exact=True),
+            page.get_by_role("button",name="더 보기",exact=True),
+            page.get_by_role("button",name="Add files and more",exact=True),
+            page.get_by_role("button",name="파일 및 기타 추가",exact=True),
+            page.get_by_role("button",name="Tools",exact=True),
+            page.get_by_role("button",name="도구",exact=True),
+            page.locator('button[aria-label="More"]'),
             page.locator('button[aria-label*="Add files"]'),
             page.locator('button[aria-label*="파일"]'),
         ]
-        menu=None
-        for loc in menu_candidates:
-            menu=await first_visible(loc)
-            if menu is not None: break
-        if menu is None:
-            return "IMAGE_TOOL_MENU_MISSING"
-        await menu.click(timeout=6000)
-
-        option_candidates=[
-            page.get_by_text("Create image",exact=True),
-            page.get_by_text("이미지 만들기",exact=True),
-            page.get_by_text("이미지 생성",exact=True),
-            page.get_by_role("menuitem",name="Create image"),
-            page.locator('[data-testid*="create-image"]'),
-        ]
-        option=None
-        for loc in option_candidates:
-            option=await first_visible(loc)
-            if option is not None: break
-        if option is None:
-            try: await page.keyboard.press("Escape")
-            except Exception: pass
-            return "CREATE_IMAGE_OPTION_MISSING"
-        await option.click(timeout=7000)
-
-        # Responsive UIs may re-render the composer after selection.
-        for _ in range(12):
-            selected=await first_visible(pill)
-            if selected is not None:
-                return "CREATE_IMAGE_TOOL_SELECTED"
-            await page.wait_for_timeout(250)
-        return "CREATE_IMAGE_PILL_NOT_VISIBLE"
+        opened=False
+        option_seen=False
+        for candidate in menus:
+            menu=await first_visible(candidate)
+            if menu is None:
+                continue
+            try:
+                await menu.click(timeout=6000)
+                opened=True
+            except Exception:
+                continue
+            # ImageGen labels have changed from Create image to Images.
+            # Require an actual interactive menu choice, not a sidebar link.
+            options=[
+                page.get_by_role("menuitem",name="Images",exact=True),
+                page.get_by_role("menuitem",name="이미지",exact=True),
+                page.get_by_role("menuitem",name="Create image",exact=True),
+                page.get_by_role("menuitem",name="이미지 만들기",exact=True),
+                page.get_by_role("menuitem",name="이미지 생성",exact=True),
+                page.get_by_role("menuitemradio",name="Images",exact=True),
+                page.get_by_role("menuitemradio",name="이미지",exact=True),
+                page.get_by_role("menuitemradio",name="Create image",exact=True),
+                page.locator('[role="menu"] button').filter(has_text="Images"),
+                page.locator('[role="menu"] button').filter(has_text="이미지"),
+                page.locator('[data-testid*="create-image"]'),
+            ]
+            option=None
+            for loc in options:
+                option=await first_visible(loc)
+                if option is not None:
+                    break
+            if option is None:
+                try:
+                    await page.keyboard.press("Escape")
+                except Exception:
+                    pass
+                continue
+            option_seen=True
+            await option.click(timeout=7000)
+            for _ in range(12):
+                if await selected_image_tool(page):
+                    return "CREATE_IMAGE_TOOL_SELECTED"
+                await page.wait_for_timeout(250)
+            # Selection was clicked but not independently verified: fail closed.
+            return "CREATE_IMAGE_PILL_NOT_VISIBLE"
+        return ("CREATE_IMAGE_OPTION_MISSING" if opened else
+                "IMAGE_TOOL_MENU_MISSING")
     except Exception as exc:
         return "CREATE_IMAGE_TOOL_NOT_VERIFIED:"+type(exc).__name__
 
