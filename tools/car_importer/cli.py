@@ -36,6 +36,10 @@ def stage_model(glb: str | Path, blender: str | Path, output_dir: str | Path,
     out = Path(output_dir).expanduser().resolve()
     if out == inp.parent or inp == out or out in inp.parents:
         raise StageError("Use a dedicated output folder, not the model source folder")
+    # Never stage into an installed game tree, even if the destination is an existing symlink.
+    for parent in (out, *out.parents):
+        if any((parent / name).is_file() for name in ("OR2006C2C.exe", "OR2006C2C.EXE", "or2006c2c.exe")):
+            raise StageError("Stage output must be OUTSIDE the OutRun game installation")
     if reference_blend:
         reference = Path(reference_blend).expanduser().resolve(strict=True)
         if reference.suffix.lower() != ".blend":
@@ -44,15 +48,15 @@ def stage_model(glb: str | Path, blender: str | Path, output_dir: str | Path,
             raise StageError("Output may not overwrite the reference folder")
     else:
         reference = None
+    # Never overwrite existing user files during preview staging.
+    if out.exists() and (not out.is_dir() or any(out.iterdir())):
+        raise StageError("Select a new/empty staging directory (nothing will be overwritten)")
     out.mkdir(parents=True, exist_ok=True)
     manifest = out / "stage_manifest.json"
-    # Require fresh output directory to prevent stale or ambiguous success reports.
-    if manifest.exists() or (out / "staged_car.blend").exists() or (out / "staged_car.glb").exists():
-        raise StageError("Output already contains a stage; select a fresh empty directory")
     worker = Path(__file__).with_name("blender_worker.py")
     if not worker.is_file():
         raise StageError("Blender worker missing from installation")
-    args = [str(exe), "--background", "--factory-startup", "--python", str(worker), "--",
+    args = [str(exe), "--background", "--factory-startup", "--disable-autoexec", "--python", str(worker), "--",
             "--input", str(inp), "--output", str(out), "--slot", profile.slug]
     if reference:
         args.extend(["--reference-blend", str(reference)])
@@ -71,7 +75,7 @@ def stage_model(glb: str | Path, blender: str | Path, output_dir: str | Path,
         if not (out / name).is_file() or (out / name).stat().st_size < 100:
             raise StageError(f"Staging incomplete: {name}")
     try:
-        check = subprocess.run([str(exe), "--background", "--factory-startup", "--python",
+        check = subprocess.run([str(exe), "--background", "--factory-startup", "--disable-autoexec", "--python",
                                 str(worker), "--", "--verify", "--output", str(out)],
                                capture_output=True, text=True, timeout=min(timeout, 180), check=False,
                                env={**os.environ, "PYTHONUTF8": "1"})

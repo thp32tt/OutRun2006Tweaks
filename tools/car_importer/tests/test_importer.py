@@ -91,6 +91,24 @@ class GLBTests(unittest.TestCase):
         with self.assertRaises(InvalidModel):
             inspect_glb(p)
 
+    def test_stage_refuses_to_write_inside_game_tree(self):
+        self.path.write_bytes(sample_glb())
+        game = Path(self.temp.name) / "game"
+        (game / "Cars").mkdir(parents=True)
+        (game / "OR2006C2C.exe").write_bytes(b"game")
+        with self.assertRaisesRegex(StageError, "OUTSIDE"):
+            stage_model(self.path, sys.executable, game / "Cars" / "stage", rights_confirmed=True)
+        self.assertFalse((game / "Cars" / "stage").exists())
+
+    def test_stage_rejects_nonempty_existing_folder(self):
+        self.path.write_bytes(sample_glb())
+        folder = Path(self.temp.name) / "staging"
+        folder.mkdir()
+        (folder / "keep.txt").write_text("do not touch")
+        with self.assertRaisesRegex(StageError, "empty"):
+            stage_model(self.path, sys.executable, folder, rights_confirmed=True)
+        self.assertEqual((folder / "keep.txt").read_text(), "do not touch")
+
     def test_uses_external_rights_gate(self):
         self.path.write_bytes(sample_glb())
         with self.assertRaises(StageError):

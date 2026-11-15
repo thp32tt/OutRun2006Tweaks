@@ -12,8 +12,10 @@ Players obtain **lawfully usable** third-party model files on their own, then pi
 - Inspect GLB 2.0: magic/size/JSON/BIN structure, POSITION and index accessors, capped geometry, meshes, triangles, materials, source hash, reported license metadata, and clear warnings. No network requests or hidden downloads.
 - Source-verified Ferrari F50 game profile (`Cars/obj_plcar_f50_pmt.sz` SHA-256 `10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab`). Unknown versions fail closed.
 - Optionally load user's native PMT-derived `.blend` **read-only**, import GLB into an **independent collection**, align length and ground to verified F50 dimensions, export `staged_car.glb`, `staged_car.blend`, `car_preview.png`, and `stage_manifest.json`. Blender subprocess performs a separate independent reopened-file/hash QA.
-- Verified backup of exact original game F50 PMT to a **directory outside the game**, with SHA-256 receipt; restore command verifies backups and never overwrites a modified unknown game resource.
+- Verified backup of exact original game F50 PMT to a **directory outside the game**, with SHA-256 receipt; the v0.1 restore command **only validates the backup** and never copies files back, because game mod installation is disabled.
 - User must explicitly acknowledge they have verified the right to use/convert the chosen model.
+- The Windows one-file EXE embeds both the Blender worker and the `profiles.py` file needed by Blender’s **separate** Python interpreter. CI includes a headless EXE packaging smoke test.
+- Staging refuses to write into the game folder or a non-empty output directory. Blender auto-execution of scripts embedded in `.blend` files is disabled.
 
 ## What this does NOT do
 

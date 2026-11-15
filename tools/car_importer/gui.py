@@ -57,7 +57,7 @@ class ImporterApp:
         self.add_btn(tools, "2. Blender 시제품 생성", self.stage, 1)
         self.add_btn(tools, "원본 게임 검증", self.verify, 2)
         self.add_btn(tools, "원본 백업", self.backup, 3)
-        self.add_btn(tools, "백업 확인", self.restore, 4)
+        self.add_btn(tools, "백업 검증", self.restore, 4)
         ttk.Button(tools, text="게임 설치 (검증 전)", state="disabled").grid(row=1, column=0, columnspan=5, sticky="ew", pady=(9, 0))
         for c in range(5):
             tools.columnconfigure(c, weight=1)
@@ -158,5 +158,15 @@ def main():
     root.mainloop()
 
 
+def packaged_self_test() -> int:
+    """Headless EXE smoke test of files used by the separate Blender interpreter."""
+    from car_importer import cli
+    helper_dir = Path(cli.__file__).resolve().parent
+    return 0 if all((helper_dir / name).is_file() for name in
+                    ("blender_worker.py", "profiles.py")) else 3
+
+
 if __name__ == "__main__":
+    if "--self-test" in sys.argv:
+        raise SystemExit(packaged_self_test())
     main()
