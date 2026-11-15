@@ -248,9 +248,18 @@ struct Gate {
     bool optIn=false,vr=false,seat=false,gameplay=false,stereo=false;
     bool playerDraw=false,deviceReady=false,stateRecording=false;
     unsigned char carKind=255;
+    // Read-only guest player vehicle ID. Only the explicitly allowed retail
+    // car IDs below may opt into the two additional experimental sidecars.
+    bool allowOtherFerrari=false;
+    unsigned char carId=255,expectedCarId=255;
 };
 inline bool Eligible(const Gate& g) noexcept {
+    const bool matchF50=!g.allowOtherFerrari&&g.carKind==0;
+    const bool knownAdditionalId=g.carId==7u||g.carId==22u||
+        g.carId==11u||g.carId==26u;
+    const bool matchAdditional=g.allowOtherFerrari&&knownAdditionalId&&
+        g.carId==g.expectedCarId;
     return g.optIn&&g.vr&&g.seat&&g.gameplay&&g.stereo&&g.playerDraw&&
-           g.deviceReady&&!g.stateRecording&&g.carKind==0;
+           g.deviceReady&&!g.stateRecording&&(matchF50||matchAdditional);
 }
 } // namespace OutRunVR::DinoSidecar
