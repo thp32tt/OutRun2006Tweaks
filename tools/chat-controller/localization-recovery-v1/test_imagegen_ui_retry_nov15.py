@@ -142,6 +142,56 @@ class BridgePreflightTests(unittest.IsolatedAsyncioTestCase):
         self.b.submit_producer.assert_not_awaited()
 
 
+class StaleAssistantReadOnlyRefreshTests(unittest.IsolatedAsyncioTestCase):
+    async def test_stale_exact_chat_refresh_is_bounded_and_never_resends(self):
+        t=task()
+        url="https://chatgpt.com/c/6aebd722-0f74-83e8-8126-f723dca3a685"
+        why="ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0"
+        stale=hold(t,status="AB_SENT",hold_reason=None,
+                   ab_chat_url=url,last_result_poll_reason=why,
+                   last_result_poll_utc="2026-11-14T03:00:00+00:00")
+        self.assertTrue(bridge.verified_assistant_refresh_due(
+            stale,why,dt.datetime(2026,11,15,14,tzinfo=dt.timezone.utc)))
+        recent=copy.deepcopy(stale)
+        recent["last_assistant_page_refresh_utc"]="2026-11-15T13:50:00+00:00"
+        self.assertFalse(bridge.verified_assistant_refresh_due(
+            recent,why,dt.datetime(2026,11,15,14,tzinfo=dt.timezone.utc)))
+        missing=copy.deepcopy(stale)
+        del missing["ab_chat_url"]
+        self.assertFalse(bridge.verified_assistant_refresh_due(missing,why))
+
+        tmp=tempfile.TemporaryDirectory()
+        old_root=bridge.ROOT
+        bridge.ROOT=Path(tmp.name)
+        try:
+            gh=FakeGithub({bridge.task_state_path(t["task_id"]):stale})
+            instance=bridge.ChatBridge(gh,MagicMock())
+            page=MagicMock()
+            page.url=url
+            page.reload=AsyncMock()
+            page.wait_for_timeout=AsyncMock()
+            instance.page=AsyncMock(return_value=page)
+            probe=AsyncMock(return_value=(
+                "WAIT_ASSISTANT_RESULT_UI",why))
+            with patch.object(bridge,"rescue_single_image_candidate",new=probe),\\
+                 patch("text_roi_queue._probe_imagegen_result",
+                       new=AsyncMock(return_value={"error":"USER_TURN_MISSING"})),\\
+                 patch("text_roi_queue._recover_task_turn",
+                       new=AsyncMock(return_value=False)):
+                output=await instance.collect_producer(stale)
+            self.assertIn("WAIT_IMAGEGEN",output)
+            page.reload.assert_awaited_once_with(
+                wait_until="domcontentloaded",timeout=45000)
+            self.assertEqual(probe.await_count,3)
+            self.assertEqual(gh.records[bridge.task_state_path(t["task_id"])]["status"],
+                             "AB_SENT")
+            self.assertIn("last_assistant_page_refresh_utc",
+                          gh.records[bridge.task_state_path(t["task_id"])])
+        finally:
+            bridge.ROOT=old_root
+            tmp.cleanup()
+
+
 class CurrentChatGPTImagesMenuTests(unittest.IsolatedAsyncioTestCase):
     async def _ui(self,selected_on_click):
         page=MagicMock()
