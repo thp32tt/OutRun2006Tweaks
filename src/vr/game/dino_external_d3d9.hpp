@@ -20,6 +20,7 @@
 #include "dino_external_pbr_shader.hpp"
 
 namespace OutRunVR::DinoSidecar {
+enum class FerrariModelSlot : unsigned char { F50, Gto288, F40 };
 struct GpuDrawResult final {
     HRESULT hr=E_FAIL;
     MeshDrawReceipt receipt{};
@@ -40,6 +41,7 @@ class GpuOwner final {
     bool pbrReady_=false;
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
+    FerrariModelSlot selectedSlot_=FerrariModelSlot::F50;
     // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
     // textures on every eye Draw. Retry only after Reset/device change.
     GpuRetryPolicy gpuRetry_{};
@@ -156,7 +158,9 @@ class GpuOwner final {
             pbrFlag[0]==L'1' && pbrFlag[1]==L'\0';
         constexpr wchar_t stableSuffix[]=L"F50_External_Test.ovc";
         constexpr wchar_t pbrSuffix[]=L"F50_External_Test_PBR.ovc";
-        const wchar_t* suffix=usePbr?pbrSuffix:stableSuffix;
+        const wchar_t* suffix=selectedSlot_==FerrariModelSlot::Gto288 ?
+            L"ExternalCars\\288gto.ovc" : selectedSlot_==FerrariModelSlot::F40 ?
+            L"ExternalCars\\f40.ovc" : (usePbr?pbrSuffix:stableSuffix);
         if(std::wcslen(path)+std::wcslen(suffix)+1>MAX_PATH)return false;
         if(wcscat_s(path,MAX_PATH,suffix)!=0)return false;
         std::vector<std::uint8_t> bytes;
@@ -209,7 +213,8 @@ class GpuOwner final {
         for(const auto& m:cpu_.meshes) {
             GpuMesh next{};
             next.material=m.material;
-            next.glass=m.name.compare(0,10,"F50_GLASS_")==0;
+            next.glass=m.name.compare(0,10,"F50_GLASS_")==0 ||
+                m.name.compare(0,10,"EXT_GLASS_")==0;
             next.vertexCount=static_cast<UINT>(m.vertices.size());
             next.indexCount=static_cast<UINT>(m.indices.size());
             const UINT vertexBytes=next.vertexCount*sizeof(Vertex);
@@ -252,6 +257,18 @@ public:
     ~GpuOwner(){ReleaseGpu();}
     GpuOwner(const GpuOwner&)=delete;
     GpuOwner& operator=(const GpuOwner&)=delete;
+    // Called only from the validated native player callback. One fixed slot
+    // is loaded per race; never accept paths from settings or user input.
+    bool SelectSidecar(FerrariModelSlot next) noexcept {
+        if(next==selectedSlot_)return false;
+        ReleaseGpu();
+        cpu_=Model{};
+        loaded_=false;
+        loadAttempted_=false;
+        gpuRetry_.OnReset();
+        selectedSlot_=next;
+        return true;
+    }
     void OnDeviceReset() noexcept {
         ReleaseGpu();
         gpuRetry_.OnReset();
