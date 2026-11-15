@@ -1,0 +1,63 @@
+name: OutRun Car Importer v0.1 Safe Preview
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/standalone-car-importer-v01-20261115
+    paths:
+      - 'tools/car_importer/**'
+      - '.github/workflows/car-importer-v01.yml'
+  pull_request:
+    paths:
+      - 'tools/car_importer/**'
+      - '.github/workflows/car-importer-v01.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    name: Parser and safety tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests (stdlib only)
+        run: python -m unittest discover -s tools/car_importer/tests -v
+      - name: Compile importers (stdlib only)
+        run: python -m compileall -q tools/car_importer
+  exe:
+    name: Windows GUI standalone executable
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PyInstaller
+        run: python -m pip install "pyinstaller>=6.0,<7"
+      - name: Build safe importer EXE
+        run: python -m PyInstaller --clean --noconfirm --onefile --windowed --name OutRunCarImporter-v0.1 --paths tools --add-data "tools/car_importer/blender_worker.py;car_importer" --add-data "tools/car_importer/profiles.py;car_importer" tools/car_importer/gui.py
+      - name: Smoke-test frozen EXE helper packaging without opening a GUI
+        shell: pwsh
+        run: |
+          $exe = (Resolve-Path "./dist/OutRunCarImporter-v0.1.exe").Path
+          $p = Start-Process -FilePath $exe -ArgumentList "--self-test" -PassThru -Wait
+          if ($p.ExitCode -ne 0) { throw "Frozen GUI missing Blender helper/profile (exit $($p.ExitCode))" }
+      - name: Include README, not any game assets
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force bundle | Out-Null
+          Copy-Item dist/OutRunCarImporter-v0.1.exe bundle/
+          Copy-Item tools/car_importer/README.md bundle/README.md
+          Compress-Archive -Path bundle/* -DestinationPath OutRunCarImporter-v0.1-PREVIEW-Windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRunCarImporter-v0.1-PREVIEW-Windows
+          path: OutRunCarImporter-v0.1-PREVIEW-Windows.zip
+          if-no-files-found: error
