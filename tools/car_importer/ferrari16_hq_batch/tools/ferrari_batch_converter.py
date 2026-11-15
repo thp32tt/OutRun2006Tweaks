@@ -273,12 +273,16 @@ def get_material_textures(g, binary, material):
     base = base or Image.new('RGBA', (16, 16), (255, 255, 255, 255))
     base = multiply_color(base, pbr.get('baseColorFactor', [1, 1, 1, 1]))
     kind = str(material.get('name', '')).lower()
-    transparent = material.get('alphaMode', 'OPAQUE') in ('MASK', 'BLEND') or any(t in kind for t in ('window', 'glass', 'windshield'))
-    if transparent and base.getextrema()[3] == (255, 255):
-        # Source gave no meaningful alpha. Do not make the glass fully opaque.
-        alpha = .20 if any(t in kind for t in ('glass', 'window', 'windshield')) else .5
+    is_glass = any(t in kind for t in ('window', 'glass', 'windshield'))
+    alpha_extrema = base.getextrema()[3]
+    # Some GLB exporters mark opaque painted panels as BLEND even when alpha
+    # is uniformly 255. Never turn those body panels into see-through glass.
+    source_alpha = alpha_extrema[0] < 254
+    transparent = is_glass or (material.get('alphaMode', 'OPAQUE') in ('MASK', 'BLEND') and source_alpha)
+    if is_glass and alpha_extrema == (255, 255):
+        # Name-proven glass without source alpha needs a visible track surface.
         rgba = np.asarray(base).copy()
-        rgba[:, :, 3] = np.uint8(round(alpha*255))
+        rgba[:, :, 3] = np.uint8(round(.20*255))
         base = Image.fromarray(rgba, 'RGBA')
     orm = None
     if mr is not None or ao is not None:
