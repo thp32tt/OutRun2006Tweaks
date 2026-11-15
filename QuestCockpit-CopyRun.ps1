@@ -1,4 +1,4 @@
-param([ValidateSet('NORMAL','SKY','INTERP','DINO','PBR')][string]$Mode='NORMAL',[switch]$VerifyOnly)
+param([ValidateSet('NORMAL','SKY','INTERP','DINO','PBR','F50')][string]$Mode='NORMAL',[switch]$VerifyOnly,[string]$F50ModelDir='')
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $payload=Join-Path $root 'QUEST_APK_COPYRUN_PAYLOAD'
@@ -101,6 +101,183 @@ if($Mode -eq 'PBR') {
        [BitConverter]::ToUInt32($magic,8) -ne 3) {
         throw 'PBR sidecar is not an OVC3 model.'
     }
+}
+if($Mode -eq 'F50') {
+    if([string]::IsNullOrWhiteSpace($F50ModelDir)){throw 'F50 mode requires -F50ModelDir; external model stays outside game files.'}
+    $resolved=Resolve-Path -LiteralPath $F50ModelDir -ErrorAction Stop
+    $F50ModelDir=[string]$resolved.Path
+    $f50Model=Join-Path $F50ModelDir 'F50_External_Test.ovc'
+    $f50Receipt=Join-Path $F50ModelDir 'F50_External_Test_manifest.json'
+    if(!(Test-Path -LiteralPath $f50Model -PathType Leaf) -or
+       !(Test-Path -LiteralPath $f50Receipt -PathType Leaf)){
+        throw 'Missing F50 OVC2 and receipt in selected external folder.'
+    }
+    $f50Json=Get-Content -LiteralPath $f50Receipt -Raw | ConvertFrom-Json
+    if([string]$f50Json.status -ne 'OVRCABH2_STATIC_EXPORT_NOT_GAME_RUNTIME_VALIDATED' -or
+       [string]$f50Json.output_sha256 -notmatch '^[0-9a-f]{64}
+    Write-Host "PASS copy-run source=$($identity.SourceSha), payload verified, no game file modifications."
+    return
+}
+if($Mode -eq 'F50' -and !(Test-Path -LiteralPath (Join-Path $root '.F50_TEST_COPY') -PathType Leaf)){
+    throw 'Refusing to modify active game: first COPY the complete game folder and place an empty .F50_TEST_COPY marker in that COPY.'
+}
+if(!(Test-Path (Join-Path $root 'OR2006C2C.EXE') -PathType Leaf)){
+    throw 'Copy ZIP contents next to YOUR original OR2006C2C.EXE and launch again.'
+}
+$running=Get-Process -ErrorAction SilentlyContinue|Where-Object{
+    $_.ProcessName -ieq 'OR2006C2C' -or $_.ProcessName -ieq 'outrun-vr-host'
+}
+if($running){throw 'Close game and OpenXR host before switching.'}
+# Conflict checks must precede all backend/helper writes.
+if($Mode -eq 'DINO' -or $Mode -eq 'PBR'){
+    $destName=if($Mode -eq 'PBR'){$pbrName}else{$dinoName}
+    $destHash=if($Mode -eq 'PBR'){$expectedPbr}else{$dinoExpected}
+    $destPath=Join-Path $root $destName
+    if((Test-Path -LiteralPath $destPath -PathType Leaf) -and
+       (HashFile $destPath) -ne $destHash){
+        throw "Refusing to overwrite existing different $destName"
+    }
+}
+# One-time baseline snapshot: no root DLL, config, metadata or other helper
+# is touched until complete file-level backup/manifest is written.
+if(!(Test-Path $backupManifest)){
+    if(Test-Path $backup){throw 'Partial original backup detected; refusing unsafe overwrite.'}
+    $rootNames=@('dinput8.dll','outrun-vr-host.exe','d3d9.dll',
+      'multiviewpatcher.dll','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini',
+      'ACTIVE_VR_BACKEND.txt','CURRENT_VR_SESSION.json',
+      'BUILD_INPUTS.json','PC_FAST_BUILD.txt',$dinoName,$pbrName)+$scripts
+    $backendNames=@('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt',
+      'HOST_BUILD_SOURCE_SHA.txt','VARIANT_ID.txt','BUILD_VARIANT.txt',
+      'CMAKE_FLAGS.txt','GAME_DLL_SHA256.txt')
+    $snapshot=[ordered]@{SchemaVersion=1;SourceSha=[string]$identity.SourceSha;
+        CreatedUtc=(Get-Date).ToUniversalTime().ToString('o');Entries=@()}
+    foreach($scope in @('root','backend')){
+        New-Item -ItemType Directory -Path (Join-Path $backup $scope) -Force|Out-Null
+        $base=if($scope -eq 'root'){$root}else{Join-Path $root 'backends/d3d9'}
+        $names=if($scope -eq 'root'){$rootNames}else{$backendNames}
+        foreach($name in $names){
+            $src=Join-Path $base $name
+            $exists=Test-Path -LiteralPath $src -PathType Leaf
+            $sum=''
+            if($exists){
+                $sum=HashFile $src
+                $saved=Join-Path (Join-Path $backup $scope) $name
+                Copy-Item -LiteralPath $src -Destination $saved -Force
+                if((HashFile $saved) -ne $sum){throw "Backup verification failed: $scope/$name"}
+            }
+            $snapshot.Entries+=([ordered]@{
+                Scope=$scope;Name=$name;Existed=[bool]$exists;Sha256=$sum})
+        }
+    }
+    $temp=Join-Path $backup 'original_files.pending.json'
+    $snapshot|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $temp -Encoding UTF8
+    Move-Item -LiteralPath $temp -Destination $backupManifest
+    Write-Host "Original game-folder files backed up: $backup"
+}
+foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')){
+    $dest=Join-Path $root $name
+    if(!(Test-Path $dest -PathType Leaf)){
+        Copy-Item (Join-Path $payload ('defaults/'+$name)) $dest
+    }
+}
+foreach($name in $scripts){
+    $src=Join-Path $payload ('scripts/'+$name);$dest=Join-Path $root $name
+    if(!(Test-Path $dest) -or (HashFile $src) -ne (HashFile $dest)){
+        Copy-Item -LiteralPath $src -Destination $dest -Force
+    }
+    if((HashFile $src) -ne (HashFile $dest)){throw "Helper not installed: $name"}
+}
+$backend=Join-Path $root 'backends/d3d9'
+New-Item -ItemType Directory -Path $backend -Force|Out-Null
+foreach($name in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt',
+    'HOST_BUILD_SOURCE_SHA.txt','VARIANT_ID.txt')){
+    $src=Join-Path $payload ('backend/'+$name);$dest=Join-Path $backend $name
+    if(!(Test-Path $src)){continue}
+    if(!(Test-Path $dest) -or (HashFile $src) -ne (HashFile $dest)){
+        Copy-Item -LiteralPath $src -Destination $dest -Force
+    }
+}
+# Old package-specific identity files were backed up. Do not let their
+# build variant or stale PC Fast SHA override this verified pair.
+foreach($name in @('BUILD_VARIANT.txt','CMAKE_FLAGS.txt','GAME_DLL_SHA256.txt')){
+    $p=Join-Path $backend $name
+    if(Test-Path $p){Remove-Item -LiteralPath $p -Force}
+}
+foreach($name in @('BUILD_INPUTS.json','PC_FAST_BUILD.txt')){
+    $p=Join-Path $root $name
+    if(Test-Path $p){Remove-Item -LiteralPath $p -Force}
+}
+if($Mode -eq 'DINO') {
+    $dinoDest=Join-Path $root $dinoName
+    if((Test-Path -LiteralPath $dinoDest -PathType Leaf) -and
+       (HashFile $dinoDest) -ne $dinoExpected) {
+        throw "Refusing to overwrite a different existing $dinoName"
+    }
+    Copy-Item -LiteralPath $dinoPayload -Destination $dinoDest -Force
+    if((HashFile $dinoDest) -ne $dinoExpected){throw 'Dino FitV6 model copy verification failed.'}
+}
+if($Mode -eq 'PBR'){
+    $pbrDest=Join-Path $root $pbrName
+    Copy-Item -LiteralPath $pbrPayload -Destination $pbrDest -Force
+    if((HashFile $pbrDest) -ne $expectedPbr){throw 'PBR sidecar copy verification failed.'}
+}
+Write-Host "Quest APK test backend activated: $($identity.SourceSha)"
+Write-Host 'The original EXE, models, textures and saved OutRun2006Tweaks.user.ini remain untouched.'
+& (Join-Path $root 'Select-OutRunVRBackend.ps1') -Backend d3d9 -TestProfile CORRECTNESS -VariantId CURRENT_FOCUS
+if(-not $?){throw 'Backend activation failed; backups are preserved.'}
+if((HashFile (Join-Path $root 'dinput8.dll')) -ne $identity.GameDllSha256 -or
+   (HashFile (Join-Path $root 'outrun-vr-host.exe')) -ne $identity.HostExeSha256){
+    throw 'Installed game DLL or OpenXR host does not match this package manifest.'
+}
+$launchArgs=@{
+    TestProfile='CORRECTNESS'
+    QuestCockpitV2ReleaseParity='ON'
+    QuestCockpitV2='ON'
+}
+if($Mode -eq 'SKY'){$launchArgs.QuestCockpitV2SkyProbe='ON'}
+if($Mode -eq 'DINO' -or $Mode -eq 'PBR'){$launchArgs.DinoFitV6='ON'}
+if($Mode -eq 'INTERP'){
+    $launchArgs.QuestCockpitV2Interpolation='OFF'
+    $launchArgs.QuestCockpitV2SkyProbe='ON'
+}
+Write-Host "Starting Quest cockpit; mode=$Mode"
+$oldPbr=[Environment]::GetEnvironmentVariable('OUTRUN_VR_DINO_PBR_TEST','Process')
+$oldF50=[Environment]::GetEnvironmentVariable('OUTRUN_VR_F50_EXTERNAL_TEST','Process')
+$oldF50Dir=[Environment]::GetEnvironmentVariable('OUTRUN_VR_EXTERNAL_MODEL_DIR','Process')
+try {
+    # Native child Start-Process inherits only this temporary opt-in.
+    if($Mode -eq 'PBR') {
+        [Environment]::SetEnvironmentVariable('OUTRUN_VR_DINO_PBR_TEST','1','Process')
+    }else{
+        [Environment]::SetEnvironmentVariable('OUTRUN_VR_DINO_PBR_TEST',$null,'Process')
+    }
+    if($Mode -eq 'F50'){
+        [Environment]::SetEnvironmentVariable('OUTRUN_VR_F50_EXTERNAL_TEST','1','Process')
+        [Environment]::SetEnvironmentVariable('OUTRUN_VR_EXTERNAL_MODEL_DIR',$F50ModelDir,'Process')
+    } else {
+        [Environment]::SetEnvironmentVariable('OUTRUN_VR_F50_EXTERNAL_TEST',$null,'Process')
+        [Environment]::SetEnvironmentVariable('OUTRUN_VR_EXTERNAL_MODEL_DIR',$null,'Process')
+    }
+    & (Join-Path $root 'Run-OutRunVRTest.ps1') @launchArgs
+    if(-not $?){throw 'VR runner failed. See OUTRUNVR_LAUNCH_ERROR.txt or collected logs.'}
+} finally {
+    [Environment]::SetEnvironmentVariable('OUTRUN_VR_DINO_PBR_TEST',$oldPbr,'Process')
+    [Environment]::SetEnvironmentVariable('OUTRUN_VR_F50_EXTERNAL_TEST',$oldF50,'Process')
+    [Environment]::SetEnvironmentVariable('OUTRUN_VR_EXTERNAL_MODEL_DIR',$oldF50Dir,'Process')
+}
+ -or
+       (HashFile $f50Model) -ne [string]$f50Json.output_sha256){
+        throw 'F50 OVC2 source hash/receipt mismatch.'
+    }
+    $stream=[IO.File]::OpenRead($f50Model)
+    try {
+        $head=New-Object byte[] 12
+        if($stream.Read($head,0,12) -ne 12 -or
+           [Text.Encoding]::ASCII.GetString($head,0,8) -ne 'OVRCABH2' -or
+           [BitConverter]::ToUInt32($head,8) -ne 2){
+            throw 'F50 sidecar is not OVC2.'
+        }
+    } finally {$stream.Dispose()}
 }
 if($VerifyOnly){
     Write-Host "PASS copy-run source=$($identity.SourceSha), payload verified, no game file modifications."

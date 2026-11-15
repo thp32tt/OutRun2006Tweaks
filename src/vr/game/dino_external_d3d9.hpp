@@ -20,6 +20,11 @@
 #include "dino_external_pbr_shader.hpp"
 
 namespace OutRunVR::DinoSidecar {
+inline bool F50ExternalTestEnabled() noexcept {
+    wchar_t flag[4]{};
+    return GetEnvironmentVariableW(L"OUTRUN_VR_F50_EXTERNAL_TEST",flag,4)==1 &&
+        flag[0]==L'1' && flag[1]==L'\\0';
+}
 struct GpuDrawResult final {
     HRESULT hr=E_FAIL;
     MeshDrawReceipt receipt{};
@@ -147,15 +152,34 @@ class GpuOwner final {
         wchar_t* last=wcsrchr(path,L'\\');
         if(!last)return false;
         *++last=L'\0';
-        // Never replace or auto-detect the stable OVC2 file. Only the
-        // separate PBR launcher may explicitly opt in to the V3 filename.
-        wchar_t pbrFlag[4]{};
-        const bool usePbr=GetEnvironmentVariableW(
-            L"OUTRUN_VR_DINO_PBR_TEST",pbrFlag,4)==1 &&
-            pbrFlag[0]==L'1' && pbrFlag[1]==L'\0';
+        // F50: model outside Cars/PMT/XPR, opt-in only.
         constexpr wchar_t stableSuffix[]=L"Dino246_Cockpit_LHD_v15.ovc";
         constexpr wchar_t pbrSuffix[]=L"Dino246_Cockpit_LHD_v15_PBR.ovc";
-        const wchar_t* suffix=usePbr?pbrSuffix:stableSuffix;
+        constexpr wchar_t f50Suffix[]=L"ExternalModels\\F50\\F50_External_Test.ovc";
+        constexpr wchar_t f50CustomSuffix[]=L"F50_External_Test.ovc";
+        const wchar_t* suffix=stableSuffix;
+        if(F50ExternalTestEnabled()) {
+            wchar_t dir[MAX_PATH]{};
+            const DWORD len=GetEnvironmentVariableW(
+                L"OUTRUN_VR_EXTERNAL_MODEL_DIR",dir,MAX_PATH);
+            if(len) {
+                if(len>=MAX_PATH || len<3 || dir[1]!=L':' ||
+                   (dir[2]!=L'\\' && dir[2]!=L'/'))return false;
+                if(wcscpy_s(path,MAX_PATH,dir)!=0)return false;
+                const auto length=std::wcslen(path);
+                if(length==0)return false;
+                if(path[length-1]!=L'\\' && path[length-1]!=L'/') {
+                    if(wcscat_s(path,MAX_PATH,L"\\")!=0)return false;
+                }
+                suffix=f50CustomSuffix;
+            } else suffix=f50Suffix;
+        } else {
+            wchar_t pbrFlag[4]{};
+            const bool usePbr=GetEnvironmentVariableW(
+                L"OUTRUN_VR_DINO_PBR_TEST",pbrFlag,4)==1 &&
+                pbrFlag[0]==L'1' && pbrFlag[1]==L'\0';
+            suffix=usePbr?pbrSuffix:stableSuffix;
+        }
         if(std::wcslen(path)+std::wcslen(suffix)+1>MAX_PATH)return false;
         if(wcscat_s(path,MAX_PATH,suffix)!=0)return false;
         std::vector<std::uint8_t> bytes;

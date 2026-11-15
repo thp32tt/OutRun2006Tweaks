@@ -60,6 +60,8 @@ namespace Settings
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
     Setting<bool> VRDinoExternalCockpit{ "VR", "DinoExternalCockpit", false,
         "QuestCockpitV2-only Dino FitV6 external model. Uses the native mode-1 player frame; no legacy DriverSeat camera owner." };
+    Setting<bool> VRF50ExternalSidecar{ "VR", "F50ExternalSidecar", true,
+        "EXPERIMENTAL: F50 model from separate directory. Only enabled by OUTRUN_VR_F50_EXTERNAL_TEST=1." };
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -624,8 +626,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // race rendering. This covers race->loading/menu transitions even when
         // the game does not issue Reset/ResetEx immediately.
         const bool dinoGameplayNow=
-            Settings::VRDinoExternalCockpit && Game::current_mode &&
-            *Game::current_mode==STATE_GAME;
+            (Settings::VRDinoExternalCockpit ||
+             (Settings::VRF50ExternalSidecar &&
+              OutRunVR::DinoSidecar::F50ExternalTestEnabled())) &&
+            Game::current_mode && *Game::current_mode==STATE_GAME;
         if(DinoGameplayResourceArmed && !dinoGameplayNow)
             OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
         DinoGameplayResourceArmed=dinoGameplayNow;
@@ -720,18 +724,23 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         using namespace OutRunVR::QuestCockpitV2;
         DinoFitV6DrawTicket ticket{};
-        if (!Settings::VRDinoExternalCockpit || !Settings::VREnabled ||
+        const bool f50=OutRunVR::DinoSidecar::F50ExternalTestEnabled();
+        const bool requested=f50?Settings::VRF50ExternalSidecar.get():
+                                  Settings::VRDinoExternalCockpit.get();
+        if (!requested || !Settings::VREnabled ||
             !Settings::VRQuestCockpitV2Enabled || !Settings::VRStereo ||
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
             !NativeFrameTrace().Active() || InSceneEffect() ||
             !Game::current_mode || *Game::current_mode != STATE_GAME ||
-            !player || player != Game::pl_car() || player->car_kind_11 != 1)
+            !player || player != Game::pl_car() ||
+            player->car_kind_11 != (f50?0:1))
             return ticket;
         const auto* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
         IDirect3DDevice9* device=Game::D3DDevice();
         OutRunVR::DinoSidecar::Gate gate{};
-        gate.optIn=Settings::VRDinoExternalCockpit.get();
+        gate.optIn=requested;
+        gate.expectedCarKind=static_cast<unsigned char>(f50?0:1);
         gate.vr=Settings::VREnabled.get();
         gate.seat=camera && camera->cam_mode_34A==1 &&
             NativeFrameTrace().Active();
