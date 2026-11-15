@@ -17,6 +17,7 @@
 #include "vr/game/quest_cockpit_v2_glass_hook.hpp"
 #include "vr/game/dino_external_d3d9.hpp"
 #include "vr/game/dino_external_original_car_gate.hpp"
+#include "vr/game/f50_external_pose_filter.hpp"
 #include "vr/state/state_block_tracker.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
@@ -61,6 +62,10 @@ namespace Settings
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
     Setting<bool> VRF50ExternalModel{ "VR", "F50ExternalModel", false,
         "QuestCockpitV2-only external Ferrari F50 test model. Replaces only the player F50 (car kind 0) after a complete sidecar draw; original PMT remains unchanged." };
+    Setting<float> VRF50ExternalLift{ "VR", "F50ExternalLift", 0.22f,
+        "External F50 local vertical offset in metres for wheel/track alignment. No gameplay physics or camera changes.", Range<float>{ -0.25f, 1.0f } };
+    Setting<bool> VRF50ExternalStabilize{ "VR", "F50ExternalStabilize", true,
+        "Light visual-only F50 vertical suspension jitter damping, once per native stereo-frame pair. Snaps on larger terrain changes." };
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -676,8 +681,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const bool f50GameplayNow=
             Settings::VRF50ExternalModel && Game::current_mode &&
             *Game::current_mode==STATE_GAME;
-        if(F50GameplayResourceArmed && !f50GameplayNow)
+        if(F50GameplayResourceArmed && !f50GameplayNow) {
             OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
+            OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
+        }
         F50GameplayResourceArmed=f50GameplayNow;
         // Camera control for the next tick reads this persistent live table.
         // Re-sync here only for live F11/tuning changes; startup apply below
@@ -933,6 +940,11 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
            !QuestCockpitGlassLive::Memory(nativeProjection,sizeof(D3DMATRIX)))
             return ticket;
         ticket.world=player->matrix_B0;
+        OutRunVR::DinoSidecar::GlobalF50PoseFilter().Apply(
+            ticket.world,NativeFrameTrace().ActiveEpoch(),
+            reinterpret_cast<std::uintptr_t>(player),
+            Settings::VRF50ExternalLift.get(),
+            Settings::VRF50ExternalStabilize.get());
         ticket.originalPlayer=reinterpret_cast<std::uintptr_t>(player);
         ticket.view=*nativeView;
         ticket.projection=*nativeProjection;
