@@ -24,7 +24,7 @@ from PIL import Image, UnidentifiedImageError
 from playwright.async_api import async_playwright
 
 from controller_png_attach import (
-    ensure_image_tool, attach_png, attach_batch_pngs,
+    ensure_image_tool, selected_image_tool, attach_png, attach_batch_pngs,
     verify_submission_receipt, clear_attachment_previews,
 )
 from chat_image_result_rescue import rescue_single_image_candidate
@@ -53,6 +53,12 @@ HASH = re.compile(r"^[0-9a-f]{64}$")
 MAX_CONTENTS_PNG = 650 * 1024
 MAX_QUEUE_JSON = 512 * 1024
 SEND_STATES = ("AB_SENT", "C1_READY", "C1_SENT")
+IMAGE_TOOL_RETRY_STATUS = "IMAGE_TOOL_RETRY_PENDING"
+IMAGE_TOOL_RETRY_INTERVAL_SECONDS = 900
+# The old controller explicitly returned HOLD_IMAGE_TOOL_NOT_VERIFIED BEFORE
+# uploading, typing or pressing Enter. Only that exact old status is safe
+# to resume; other HOLD/AB_CLAIMED/AB_SENT states must never be resent.
+SAFE_OLD_PRE_SEND_HOLD = "HOLD_IMAGE_TOOL_NOT_VERIFIED"
 FINAL_STATES = ("C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY", "C1_REWORK_REQUIRED", "HOLD")
 
 # The latest strict HD source QA requires ORIGINAL English/plate separation for
@@ -318,6 +324,10 @@ def recover_previous_sent_task(gh, task):
         })
         return "HOLD_LEGACY_TASK_CONFLICT"
     status = old.get("status")
+    if image_tool_pre_send_retry_safe(old, task):
+        # Historical Create-image selector failure happened before any send.
+        # It is safe to recheck the updated UI without duplicating a message.
+        return "NEW"
     if status == "AB_SENT" and is_saved_chat_url(old.get("ab_chat_url")):
         stage_state(gh, task, "AB_SENT", {
             "ab_chat_url": old["ab_chat_url"],
@@ -332,6 +342,47 @@ def recover_previous_sent_task(gh, task):
         "recovered_from_legacy_queue": False,
     })
     return "HOLD_LEGACY_TASK_NO_RESEND"
+
+
+def image_tool_pre_send_retry_safe(prior, task):
+    """Proof of no send: exact task and only the verified pre-Enter failure lane."""
+    if not isinstance(prior, dict) or not valid_task(task):
+        return False
+    if (prior.get("schema") != "outrun-hd-qa-chat-status-v1"
+            or prior.get("task_id") != task["task_id"]
+            or prior.get("role") != task["role"]
+            or prior.get("roi_id") != task["roi_id"]
+            or prior.get("source_dds_sha256") != task["source_dds_sha256"]
+            or prior.get("old_candidate_sha256") != task["old_candidate_sha256"]
+            or prior.get("task") != task
+            or prior.get("release_approved") is not False):
+        return False
+    if any(prior.get(k) for k in (
+            "ab_chat_url", "c1_chat_url", "candidate_sha256",
+            "candidate_gh_path", "candidate_generated_raw_sha256")):
+        return False
+    status=prior.get("status")
+    if status == "HOLD":
+        return prior.get("hold_reason") == SAFE_OLD_PRE_SEND_HOLD
+    return (status == IMAGE_TOOL_RETRY_STATUS
+            and prior.get("pre_send_no_message") is True)
+
+
+def image_tool_pre_send_retry_due(prior, now=None):
+    """Bound retries; one per 15m at most, never spin every browser poll."""
+    if not isinstance(prior, dict):
+        return False
+    now=now or dt.datetime.now(dt.timezone.utc)
+    stamp=prior.get("image_tool_last_attempt_utc") or prior.get("updated_utc")
+    if not isinstance(stamp, str):
+        return False
+    try:
+        last=dt.datetime.fromisoformat(stamp.replace("Z","+00:00"))
+        return (last.tzinfo is not None and
+                0 <= (now-last).total_seconds() and
+                (now-last).total_seconds() >= IMAGE_TOOL_RETRY_INTERVAL_SECONDS)
+    except (ValueError,TypeError,OverflowError):
+        return False
 
 
 def result_poll_diagnostic(gh, state, reason):
@@ -569,10 +620,11 @@ class ChatBridge:
             return None
         return pg
 
-    async def send_with_png(self,pg,task,prompt,paths,imagegen):
+    async def send_with_png(self,pg,task,prompt,paths,imagegen,
+                            image_tool_preverified=False):
         if pg is None:
             return "HOLD_CHATGPT_LOGIN_REQUIRED"
-        if imagegen:
+        if imagegen and not image_tool_preverified:
             status=await ensure_image_tool(pg)
             if status!="CREATE_IMAGE_TOOL_SELECTED":
                 return "HOLD_IMAGE_TOOL_NOT_VERIFIED"
@@ -593,6 +645,9 @@ class ChatBridge:
         await pg.keyboard.insert_text(prompt+"\n\nUPLOAD_TASK_ID="+task["task_id"])
         if "UPLOAD_TASK_ID="+task["task_id"] not in await box.inner_text():
             return "HOLD_CHAT_COMPOSER_MARKER_MISSING"
+        if imagegen and not await selected_image_tool(pg):
+            # No Enter has occurred: this is a proven safe pre-send retry.
+            return "HOLD_IMAGE_TOOL_LOST_BEFORE_SEND"
         await box.press("Enter")
         receipt=await verify_submission_receipt(
             pg,task["task_id"],[p.name for p in paths])
@@ -602,11 +657,30 @@ class ChatBridge:
             return "HOLD_CHAT_URL_NOT_PERSISTED"
         return "CHAT_SENT_VERIFIED"
 
-    async def submit_producer(self,task):
+    async def submit_producer(self,task,prior=None):
+        if prior is not None and not image_tool_pre_send_retry_safe(prior,task):
+            raise ValueError("UNSAFE_PREVIOUS_TASK_RESEND")
         pg=await self.page(task["role"])
         if pg is None:
             return "HOLD_CHATGPT_LOGIN_REQUIRED"
         source=await asyncio.to_thread(stage_source_ref,self.gh,task)
+        # Select first, BEFORE AB_CLAIMED. A missing/renamed Images control
+        # is not a terminal HOLD and does not produce any ChatGPT user turn.
+        selected=await ensure_image_tool(pg)
+        if selected!="CREATE_IMAGE_TOOL_SELECTED":
+            attempts=(prior or {}).get("image_tool_retry_count",0)
+            if not isinstance(attempts,int) or attempts<0:
+                attempts=0
+            await asyncio.to_thread(stage_state,self.gh,task,
+                IMAGE_TOOL_RETRY_STATUS,{
+                    "image_tool_last_attempt_utc":utc(),
+                    "image_tool_retry_count":min(attempts+1,10000),
+                    "image_tool_diagnostic":re.sub(
+                        r"[^A-Za-z0-9_:]", "_",selected)[:100],
+                    "pre_send_no_message":True,
+                    "hold_reason":None,
+                })
+            return "RETRY_IMAGE_TOOL_PRE_SEND"
         prompt=(
           "@Create image — OutRun 2006 HD 원본 영문 UI 문구를 한글 PNG로 교체.\n"
           "첨부는 원본 HD DDS SHA와 좌표가 검증된 원문 크롭입니다.\n"
@@ -619,10 +693,27 @@ class ChatBridge:
           "\n원문 제거/CLEAN 배경 복원은 독립 QA에서 검증하며 덧쓰기만 하지 않습니다."
           "\n완성이라고 주장하지 말고 생성 PNG만 제공하세요."
           "\n원본 DDS SHA: "+task["source_dds_sha256"])
-        await asyncio.to_thread(stage_state,self.gh,task,"AB_CLAIMED")
-        state=await self.send_with_png(pg,task,prompt,[source],True)
+        await asyncio.to_thread(stage_state,self.gh,task,"AB_CLAIMED",{
+            "pre_send_no_message":False,"hold_reason":None})
+        state=await self.send_with_png(
+            pg,task,prompt,[source],True,image_tool_preverified=True)
+        if state=="HOLD_IMAGE_TOOL_LOST_BEFORE_SEND":
+            attempts=(prior or {}).get("image_tool_retry_count",0)
+            await asyncio.to_thread(stage_state,self.gh,task,
+                IMAGE_TOOL_RETRY_STATUS,{
+                    "pre_send_no_message":True,
+                    "image_tool_last_attempt_utc":utc(),
+                    "image_tool_retry_count":min(
+                        (attempts if isinstance(attempts,int) and attempts>=0 else 0)+1,
+                        10000),
+                    "image_tool_diagnostic":state,
+                })
+            return "RETRY_IMAGE_TOOL_PRE_SEND"
         if state!="CHAT_SENT_VERIFIED":
-            await asyncio.to_thread(stage_state,self.gh,task,"HOLD",{"hold_reason":state})
+            # After the send gate an ambiguous failure could have posted a
+            # message. Keep terminal HOLD and never retry automatically.
+            await asyncio.to_thread(stage_state,self.gh,task,"HOLD",{
+                "hold_reason":state})
             return state
         await asyncio.to_thread(stage_state,self.gh,task,"AB_SENT",{
             "ab_chat_url":pg.url})
@@ -852,6 +943,17 @@ class ChatBridge:
                 if (prior.get("task") == task and
                         prior.get("status") in SEND_STATES):
                     await asyncio.to_thread(local_save, task["task_id"], prior)
+                elif (image_tool_pre_send_retry_safe(prior,task)
+                      and image_tool_pre_send_retry_due(prior)):
+                    try:
+                        result=await self.submit_producer(task,prior=prior)
+                    except Exception as exc:
+                        result="RETRY_IMAGE_TOOL_"+type(exc).__name__
+                    submitted.append({"task_id":task["task_id"],"result":result})
+                    if len(submitted)>=2:
+                        break
+                # All other previous states are immutable submission receipts
+                # or unsafe-for-retry HOLDs. Never submit them a second time.
                 continue
             try:
                 recovery=await asyncio.to_thread(recover_previous_sent_task, self.gh, task)
