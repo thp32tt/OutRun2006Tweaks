@@ -350,6 +350,8 @@ if($QuestCockpitV2 -eq 'ON'){
     $gameArgs += @(
         '-VR.QuestCockpitV2Enabled=true',
         ('-VR.F50ExternalModel=' + $(if($F50ExternalModel -eq 'ON'){'true'}else{'false'})),
+        '-VR.F50ExternalLift=0.22',
+        '-VR.F50ExternalStabilize=true',
         '-VR.QuestCockpitV2FullCar=true',
         '-VR.QuestCockpitV2HideDriver=true',
         '-VR.QuestCockpitV2RawB0Camera=false',
