@@ -2,6 +2,7 @@ param(
     [string]$GameExe = 'OR2006C2C.EXE',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2 = 'OFF',
     [ValidateSet('OFF','ON')][string]$F50ExternalModel = 'OFF',
+    [ValidateSet('OFF','ON')][string]$ExternalFerrariTest = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2F0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Lod0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
@@ -314,6 +315,7 @@ if($QuestCockpitV2FrameOnly -eq 'ON') {
     $gameArgs += @(
         '-VR.QuestCockpitV2Enabled=false',
         '-VR.F50ExternalModel=false',
+        '-VR.ExternalFerrariTest=false',
         '-VR.QuestCockpitV2OccupantCorrection=false',
         '-VR.QuestCockpitV2F0RenderScope=false',
         '-VR.CockpitFrameProbe=true',
@@ -345,11 +347,15 @@ if($QuestCockpitV2F0 -eq 'ON' -and $QuestCockpitV2 -ne 'ON') {
 if($F50ExternalModel -eq 'ON' -and $QuestCockpitV2 -ne 'ON') {
     throw 'F50 external model requires QuestCockpitV2 ON'
 }
+if($ExternalFerrariTest -eq 'ON' -and $QuestCockpitV2 -ne 'ON') {
+    throw 'External Ferrari F40/288 GTO test requires QuestCockpitV2 ON'
+}
 if($QuestCockpitV2 -eq 'ON'){
     if($backend -ne 'd3d9') {throw 'QuestCockpitV2 needs the original DX9Ex backend'}
     $gameArgs += @(
         '-VR.QuestCockpitV2Enabled=true',
         ('-VR.F50ExternalModel=' + $(if($F50ExternalModel -eq 'ON'){'true'}else{'false'})),
+        ('-VR.ExternalFerrariTest=' + $(if($ExternalFerrariTest -eq 'ON'){'true'}else{'false'})),
         '-VR.F50ExternalLift=0.22',
         '-VR.F50ExternalStabilize=true',
         '-VR.QuestCockpitV2FullCar=true',
