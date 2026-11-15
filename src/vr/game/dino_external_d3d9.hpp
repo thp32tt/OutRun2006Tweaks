@@ -30,6 +30,7 @@ class GpuOwner final {
         IDirect3DIndexBuffer9* ib=nullptr;
         UINT vertexCount=0,indexCount=0;
         unsigned material=0;
+        bool glass=false; // sorted transparent sidecar group; never occludes road depth
     };
     Model cpu_{};
     std::vector<GpuMesh> meshes_{};
@@ -208,6 +209,7 @@ class GpuOwner final {
         for(const auto& m:cpu_.meshes) {
             GpuMesh next{};
             next.material=m.material;
+            next.glass=m.name.compare(0,10,"F50_GLASS_")==0;
             next.vertexCount=static_cast<UINT>(m.vertices.size());
             next.indexCount=static_cast<UINT>(m.indices.size());
             const UINT vertexBytes=next.vertexCount*sizeof(Vertex);
@@ -351,6 +353,15 @@ public:
             -(view._41*view._21+view._42*view._22+view._43*view._23),
             -(view._41*view._31+view._42*view._32+view._43*view._33)};
         if(SUCCEEDED(hr))for(const auto& m:meshes_) {
+            // Opaque first, then tagged translucent glass. Transparent glass
+            // must not write the depth buffer or hide the track from cockpit.
+            if(FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE)) ||
+               FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE)) ||
+               FAILED(device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA)) ||
+               FAILED(device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA)) ||
+               FAILED(device->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE,FALSE))) {
+                hr=E_FAIL;break;
+            }
             if(FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||
                FAILED(device->SetIndices(m.ib)) ||
                FAILED(device->SetTexture(0,textures_[m.material]))) {hr=E_FAIL;break;}
