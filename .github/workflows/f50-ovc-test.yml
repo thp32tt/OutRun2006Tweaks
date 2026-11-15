@@ -1,0 +1,23 @@
+name: F50 OVC R26 portable gate smoke
+on:
+  push:
+    branches:
+      - test/f50-external-sidecar-runtime-r26-20261116
+    paths:
+      - 'tests/test_f50_external_sidecar_gate.cpp'
+      - 'src/vr/game/dino_external_sidecar.hpp'
+      - 'src/vr/game/dino_external_d3d9.hpp'
+      - 'src/hooks_graphics.cpp'
+      - '.github/workflows/f50-ovc-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  portable-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile F50/Dino scope isolation test
+        run: g++ -std=c++20 -O2 -Wall -Wextra -I. tests/test_f50_external_sidecar_gate.cpp -o /tmp/f50_sidecar_gate
+      - name: Run test
+        run: /tmp/f50_sidecar_gate
