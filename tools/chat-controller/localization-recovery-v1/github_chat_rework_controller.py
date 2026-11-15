@@ -385,6 +385,36 @@ def image_tool_pre_send_retry_due(prior, now=None):
         return False
 
 
+def verified_assistant_refresh_due(state, reason, now=None):
+    """Allow a bounded read-only refresh of a stale exact-source chat URL.
+
+    This never submits a user message, never changes the source TASK_ID and
+    never treats a reference thumbnail as a generated assistant image.
+    """
+    if (not isinstance(state,dict) or state.get("status") != "AB_SENT"
+            or not is_saved_chat_url(state.get("ab_chat_url"))
+            or not str(reason).startswith(
+                "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0")
+            or state.get("last_result_poll_reason") != reason):
+        return False
+    now=now or dt.datetime.now(dt.timezone.utc)
+    for name, interval in (("last_result_poll_utc",1800),
+                           ("last_assistant_page_refresh_utc",1800)):
+        stamp=state.get(name)
+        if not isinstance(stamp,str):
+            if name=="last_result_poll_utc":
+                return False
+            continue
+        try:
+            age=(now-dt.datetime.fromisoformat(
+                stamp.replace("Z","+00:00"))).total_seconds()
+            if age < interval or age < 0:
+                return False
+        except (ValueError,TypeError,OverflowError):
+            return False
+    return True
+
+
 def result_poll_diagnostic(gh, state, reason):
     """Record a sanitized WAIT code, max once per 30 min for unchanged reason."""
     if state.get("status") != "AB_SENT":
@@ -749,6 +779,29 @@ class ChatBridge:
                 if again in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
                              "EXISTING_CANDIDATES_VERIFIED"):
                     saved=again
+        # Old AB_SENT requests may remain stuck with A0_G0_U1_L0 for hours.
+        # Refresh ONLY their exact, persisted conversation, at most each 30m,
+        # and resume the assistant-only SHA-bound DOM probe. Never re-send.
+        if saved is None and verified_assistant_refresh_due(state,why):
+            expected=state["ab_chat_url"].rstrip("/")
+            try:
+                await pg.reload(wait_until="domcontentloaded",timeout=45000)
+                if pg.url.rstrip("/") != expected:
+                    reason="WAIT_CHATGPT_SOURCE_CHAT_REDIRECT"
+                    await asyncio.to_thread(
+                        result_poll_diagnostic,self.gh,state,reason)
+                    return reason
+                await asyncio.to_thread(stage_state,self.gh,task,"AB_SENT",{
+                    "last_assistant_page_refresh_utc":utc()})
+                await pg.wait_for_timeout(1200)
+                refreshed,detail=await rescue_single_image_candidate(
+                    pg,task["task_id"],task["role"],str(ROOT),binding=task)
+                why=detail
+                if refreshed in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                                 "EXISTING_CANDIDATES_VERIFIED"):
+                    saved=refreshed
+            except Exception as exc:
+                why="ASSISTANT_READ_ONLY_REFRESH_"+type(exc).__name__
         page_reloaded=False
         legacy_export_attempted=False
         probe=({"error":"RESCUED_ASSISTANT_IMAGE"} if saved else
