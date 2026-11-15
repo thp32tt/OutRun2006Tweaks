@@ -1,4 +1,4 @@
-# OutRun 2006 Car Importer v0.1 (safe preview)
+# OutRun 2006 Car Importer v0.2 (GLB -> experimental OVC sidecar preview)
 
 **Status (2026-11-15): GLB preflight + Blender conversion/staging + native-game backup/reopen verification; NOT an installable car mod.**
 
@@ -6,22 +6,29 @@
 
 Players obtain **lawfully usable** third-party model files on their own, then pick a local GLB in the importer. No third-party or original game assets are bundled. Planned end state: one-click compatible model install and rollback. The native serializer / renderer integration is currently **unimplemented**, and the UI's Install button is deliberately disabled; do not describe this as complete one-click OutRun installation.
 
-## Working v0.1 features
+## Working importer features
 
 - Small Windows desktop GUI (Tkinter), Python CLI, single-file Windows `.exe` CI packaging.
 - Inspect GLB 2.0: magic/size/JSON/BIN structure, POSITION and index accessors, capped geometry, meshes, triangles, materials, source hash, reported license metadata, and clear warnings. No network requests or hidden downloads.
 - Source-verified Ferrari F50 game profile (`Cars/obj_plcar_f50_pmt.sz` SHA-256 `10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab`). Unknown versions fail closed.
 - Optionally load user's native PMT-derived `.blend` **read-only**, import GLB into an **independent collection**, align length and ground to verified F50 dimensions, export `staged_car.glb`, `staged_car.blend`, `car_preview.png`, and `stage_manifest.json`. Blender subprocess performs a separate independent reopened-file/hash QA.
-- Verified backup of exact original game F50 PMT to a **directory outside the game**, with SHA-256 receipt; the v0.1 restore command **only validates the backup** and never copies files back, because game mod installation is disabled.
+- Verified backup of exact original game F50 PMT to a **directory outside the game**, with SHA-256 receipt; the v0.2 restore command **only validates the backup** and never copies files back, because game mod installation is disabled.
 - User must explicitly acknowledge they have verified the right to use/convert the chosen model.
 - The Windows one-file EXE embeds both the Blender worker and the `profiles.py` file needed by Blender’s **separate** Python interpreter. CI includes a headless EXE packaging smoke test.
 - Staging refuses to write into the game folder or a non-empty output directory. Blender auto-execution of scripts embedded in `.blend` files is disabled.
 
+## Experimental F50 separate-folder OVC pipeline (2026-11-16)
+
+- GUI **2a. 외부 GLB → OVC 사이드카 테스트** combines preflight, Blender normalization, independent .blend reopen, OVRCABH2 v2 export (RGBA 128px per material), SHA256+CRC+bounded geometry validation. Produces `output/ovc_test/f50_external_test.ovc` while leaving all `Cars/obj_plcar_f50_pmt.sz` originals untouched.
+- Verified locally with an actual user-held F50 GLB: 875 source meshes -> 20 OVC groups, 20 DDS materials, 195,104 vertices, 218,664 triangles, 8,869,368 bytes. **Existing DinoSidecar C++ V2 parser** accepts the exact produced payload. Test source binary contains external model rights still under review; do not redistribute compiled 3D model data.
+- Command: `python tools/car_importer/cli.py stage-sidecar MODEL.glb --blender BLENDER --out EMPTY_FOLDER --slot f50 --rights-confirmed`; output is in `EMPTY_FOLDER/ovc_test/`.
+- The F50 model is **not yet confirmed drawable in the game**. The older verified Dino sidecar format parser is NOT proof of a F50 runtime loader, draw ownership binding, or correct VR positions. Runtime installation remains blocked.
+
 ## What this does NOT do
 
-- No PMT/OVC/OVC3 geometry serialization; no substitution of actual game model; no VR/PC frame verification; no LOD or draw-call merging yet.
+- No native PMT serializer or validated **F50** game-runtime OVC loader / D3D9 draw binding; no substitution of actual game model; no VR/PC frame verification. Experimental OVC geometry serialization is available, but is NOT a verified playable in-game replacement.
 - No guarantee that any purported CC licence on model metadata was issued by an actual underlying rightsholder. No copyrighted binary models included. The previous **CSR2-derived F50** is suitable only as a locally held research sample pending clearance; it is **not an approved redistributable input**.
-- No bulk conversion of all OutRun vehicles. v0.1 recognises **only F50** to prevent guesses or damage.
+- No bulk conversion of all OutRun vehicles. v0.2 recognises **only F50** to prevent guesses or damage.
 - No read/write outside explicitly selected input, staging, and verified backup locations.
 
 ## Install and launch (Windows)
@@ -60,3 +67,9 @@ python -m unittest discover -s tools/car_importer/tests -v
 - Verified external F50 staging experiment: `thp32tt/imsi1@poc/f50-external-model-import-20261115`.
 
 Licence: this new importer code is part of the OutRun2006Tweaks project licence; this does **not** license imported 3D models or original game assets.
+## Isolated F50 sidecar install/remove (preview)
+
+- The enabled **test-only** install button copies a structurally validated output exclusively to `GAME_ROOT/CarImporter/f50/f50_external_test.ovc`, after checking the stock F50 PMT SHA. No Cars/PMT/EXE/DLL files are written.
+- `python tools/car_importer/cli.py install-test-sidecar GAME_ROOT OUT/ovc_test/f50_external_test.ovc --rights-confirmed`
+- `python tools/car_importer/cli.py remove-test-sidecar GAME_ROOT` removes only a matching importer-created receipt and file. Any preexisting sidecar or edited payload is not overwritten/deleted.
+- To actually draw the extra model, use the **separately opt-in, experimental** R26 Dino-lineage F50 sidecar renderer test build from `test/f50-external-sidecar-runtime-r26-20261116`; set `[VR] F50ExternalModelTest=true` explicitly. It is a test overlay, NOT yet replacement of stock car body. The player must be F50 (`car_kind_11=0`) and QuestCockpitV2 mode-1 driver seat with valid stereo scene frame. DLL is not bundled in importer; preserve your current stable mod DLL. Hardware rendering and rollback still require a human PC/Quest test.
