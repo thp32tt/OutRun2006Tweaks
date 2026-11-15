@@ -46,8 +46,9 @@ jobs:
       - name: Smoke-test frozen EXE helper packaging without opening a GUI
         shell: pwsh
         run: |
-          & ./dist/OutRunCarImporter-v0.1.exe --self-test
-          if ($LASTEXITCODE -ne 0) { throw "Frozen GUI missing Blender helper/profile (exit $LASTEXITCODE)" }
+          $exe = (Resolve-Path "./dist/OutRunCarImporter-v0.1.exe").Path
+          $p = Start-Process -FilePath $exe -ArgumentList "--self-test" -PassThru -Wait
+          if ($p.ExitCode -ne 0) { throw "Frozen GUI missing Blender helper/profile (exit $($p.ExitCode))" }
       - name: Include README, not any game assets
         shell: pwsh
         run: |
