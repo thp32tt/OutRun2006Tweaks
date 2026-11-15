@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "purpose": "private standalone external-model source -> lossless-triangle OVRCABH3 conversion staging (not game integration)",
+  "game": "OutRun 2006 Coast 2 Coast",
+  "catalogue_source": "thp32tt/imsi1@main/docs/automation/FERRARI16_GEOMETRY_QUEUE.json (car list only; old source-only geometry queue not modified)",
+  "runtime_supported_for_other_cars": false,
+  "notes": [
+    "F50 HQ V2 separate, currently tested by CI not Quest 3 live",
+    "No verified full external car models beyond F50 on accessible N100 and Drive inventory as of 2026-11-16",
+    "Original OutRun source OBJ/PMT and photo references do not count as external models",
+    "No automatic asset download or unauthorized redistribution",
+    "This tool only creates static OVC sidecars; no wheel/steering animation"
+  ],
+  "cars": [
+    {
+      "order": 1,
+      "id": "daytona365",
+      "name": "Ferrari 365 GTS/4 Daytona",
+      "native_source": "obj_plcar_dayts_pmt.sz",
+      "external_input": "sources/daytona365/source.glb",
+      "external_source_manifest": "sources/daytona365/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game/edited cockpit only; no verified external full-car source"
+    },
+    {
+      "order": 2,
+      "id": "dino246gts",
+      "name": "Dino 246 GTS",
+      "native_source": "obj_plcar_dino_pmt.sz",
+      "external_input": "sources/dino246gts/source.glb",
+      "external_source_manifest": "sources/dino246gts/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "HD cockpit v4 GLB exists; interior-only, not full vehicle"
+    },
+    {
+      "order": 3,
+      "id": "f50",
+      "name": "Ferrari F50",
+      "native_source": "obj_plcar_f50_pmt.sz",
+      "external_input": "sources/f50/source.glb",
+      "external_source_manifest": "sources/f50/source.json",
+      "status": "HQ_V2_SEPARATE_VERIFIED_STATIC",
+      "note": "F50 HQ V2 converted separately; source model provenance unverified"
+    },
+    {
+      "order": 4,
+      "id": "360spider",
+      "name": "Ferrari 360 Spider",
+      "native_source": "obj_plcar_360sp_pmt.sz",
+      "external_input": "sources/360spider/source.glb",
+      "external_source_manifest": "sources/360spider/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game/edited cockpit only"
+    },
+    {
+      "order": 5,
+      "id": "f355spider",
+      "name": "Ferrari F355 Spider",
+      "native_source": "obj_plcar_f355sp_pmt.sz",
+      "external_input": "sources/f355spider/source.glb",
+      "external_source_manifest": "sources/f355spider/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game/edited cockpit only"
+    },
+    {
+      "order": 6,
+      "id": "575superamerica",
+      "name": "Ferrari 575 Superamerica",
+      "native_source": "obj_plcar_575sa_pmt.sz",
+      "external_input": "sources/575superamerica/source.glb",
+      "external_source_manifest": "sources/575superamerica/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 7,
+      "id": "testarossa",
+      "name": "Ferrari Testarossa Spider",
+      "native_source": "obj_plcar_testa_pmt.sz",
+      "external_input": "sources/testarossa/source.glb",
+      "external_source_manifest": "sources/testarossa/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 8,
+      "id": "288gto",
+      "name": "Ferrari 288 GTO",
+      "native_source": "obj_plcar_gto_pmt.sz",
+      "external_input": "sources/288gto/source.glb",
+      "external_source_manifest": "sources/288gto/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 9,
+      "id": "328gts",
+      "name": "Ferrari 328 GTS",
+      "native_source": "obj_plcar_328gts_pmt.sz",
+      "external_input": "sources/328gts/source.glb",
+      "external_source_manifest": "sources/328gts/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 10,
+      "id": "250gto",
+      "name": "Ferrari 250 GTO",
+      "native_source": "obj_plcar_250gto_pmt.sz",
+      "external_input": "sources/250gto/source.glb",
+      "external_source_manifest": "sources/250gto/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 11,
+      "id": "512bb",
+      "name": "Ferrari 512 BB",
+      "native_source": "obj_plcar_512bb_pmt.sz",
+      "external_input": "sources/512bb/source.glb",
+      "external_source_manifest": "sources/512bb/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 12,
+      "id": "f40",
+      "name": "Ferrari F40",
+      "native_source": "obj_plcar_f40_pmt.sz",
+      "external_input": "sources/f40/source.glb",
+      "external_source_manifest": "sources/f40/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 13,
+      "id": "550barchetta",
+      "name": "Ferrari 550 Barchetta",
+      "native_source": "obj_plcar_550b_pmt.sz",
+      "external_input": "sources/550barchetta/source.glb",
+      "external_source_manifest": "sources/550barchetta/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 14,
+      "id": "f430",
+      "name": "Ferrari F430 Coupe",
+      "native_source": "obj_plcar_f430_pmt.sz",
+      "external_input": "sources/f430/source.glb",
+      "external_source_manifest": "sources/f430/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "original game model only"
+    },
+    {
+      "order": 15,
+      "id": "f430spider",
+      "name": "Ferrari F430 Spider",
+      "native_source": "obj_plcar_f430sp_t_pmt.sz",
+      "external_input": "sources/f430spider/source.glb",
+      "external_source_manifest": "sources/f430spider/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "only tuned original PMT file found; variant mapping requires game verification"
+    },
+    {
+      "order": 16,
+      "id": "enzo",
+      "name": "Ferrari Enzo",
+      "native_source": "obj_plcar_fx_pmt.sz",
+      "external_input": "sources/enzo/source.glb",
+      "external_source_manifest": "sources/enzo/source.json",
+      "status": "EXTERNAL_MODEL_NOT_SUPPLIED",
+      "note": "fx source filename candidate; Enzo mapping not verified"
+    }
+  ]
+}
