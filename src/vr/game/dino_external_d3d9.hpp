@@ -271,6 +271,6 @@ inline GpuOwner& GlobalGpu() noexcept {
     static GpuOwner owner(L"Dino246_Cockpit_LHD_v15.ovc");return owner;
 }
 inline GpuOwner& GlobalF50Gpu() noexcept {
-    static GpuOwner owner(L"CarImporter\\\\f50\\\\f50_external_test.ovc");return owner;
+    static GpuOwner owner(L"CarImporter\\f50\\f50_external_test.ovc");return owner;
 }
 } // OutRunVR::DinoSidecar
