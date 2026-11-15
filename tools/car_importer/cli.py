@@ -12,12 +12,12 @@ try:
     from .glb import inspect_glb
     from .game import verify_game, make_backup, restore_backup, install_model
     from .profiles import get_profile
-    from .sidecar import export_experimental_ovc, inspect_ovc
+    from .sidecar import export_experimental_ovc, inspect_ovc, install_test_sidecar, remove_test_sidecar
 except ImportError:
     from glb import inspect_glb
     from game import verify_game, make_backup, restore_backup, install_model
     from profiles import get_profile
-    from sidecar import export_experimental_ovc, inspect_ovc
+    from sidecar import export_experimental_ovc, inspect_ovc, install_test_sidecar, remove_test_sidecar
 
 
 class StageError(RuntimeError):
@@ -122,7 +122,13 @@ def main(argv: list[str] | None = None) -> int:
     a.add_argument("--rights-confirmed", action="store_true")
     a = sub.add_parser("verify-sidecar", help="Independently validate OVRCABH2, does not touch game")
     a.add_argument("ovc")
-    a = sub.add_parser("install", help="Disabled: runtime loader not yet verified")
+    a = sub.add_parser("install-test-sidecar", help="Copy verified OVC to CarImporter/f50 only, PMT untouched")
+    a.add_argument("game_root")
+    a.add_argument("ovc")
+    a.add_argument("--rights-confirmed", action="store_true")
+    a = sub.add_parser("remove-test-sidecar", help="Remove only matching importer-owned sidecar")
+    a.add_argument("game_root")
+    a = sub.add_parser("install", help="Disabled: native PMT installation not supported")
     a.add_argument("game_root")
     a.add_argument("staged_model")
     args = parser.parse_args(argv)
@@ -148,6 +154,10 @@ def main(argv: list[str] | None = None) -> int:
                       "staging": stage, "sidecar": sidecar, "game_files_modified": False}
         elif args.cmd == "verify-sidecar":
             answer = inspect_ovc(args.ovc)
+        elif args.cmd == "install-test-sidecar":
+            answer = install_test_sidecar(args.game_root, args.ovc, args.rights_confirmed)
+        elif args.cmd == "remove-test-sidecar":
+            answer = remove_test_sidecar(args.game_root)
         elif args.cmd == "install":
             answer = install_model(args.game_root, args.staged_model)
         else:

@@ -67,3 +67,9 @@ python -m unittest discover -s tools/car_importer/tests -v
 - Verified external F50 staging experiment: `thp32tt/imsi1@poc/f50-external-model-import-20261115`.
 
 Licence: this new importer code is part of the OutRun2006Tweaks project licence; this does **not** license imported 3D models or original game assets.
+## Isolated F50 sidecar install/remove (preview)
+
+- The enabled **test-only** install button copies a structurally validated output exclusively to `GAME_ROOT/CarImporter/f50/f50_external_test.ovc`, after checking the stock F50 PMT SHA. No Cars/PMT/EXE/DLL files are written.
+- `python tools/car_importer/cli.py install-test-sidecar GAME_ROOT OUT/ovc_test/f50_external_test.ovc --rights-confirmed`
+- `python tools/car_importer/cli.py remove-test-sidecar GAME_ROOT` removes only a matching importer-created receipt and file. Any preexisting sidecar or edited payload is not overwritten/deleted.
+- To actually draw the extra model, use the **separately opt-in, experimental** R26 Dino-lineage F50 sidecar renderer test build from `test/f50-external-sidecar-runtime-r26-20261116`; set `[VR] F50ExternalModelTest=true` explicitly. It is a test overlay, NOT yet replacement of stock car body. The player must be F50 (`car_kind_11=0`) and QuestCockpitV2 mode-1 driver seat with valid stereo scene frame. DLL is not bundled in importer; preserve your current stable mod DLL. Hardware rendering and rollback still require a human PC/Quest test.

@@ -12,7 +12,7 @@ from tkinter import filedialog, messagebox, ttk
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from car_importer.cli import stage_model
-from car_importer.sidecar import export_experimental_ovc
+from car_importer.sidecar import export_experimental_ovc, install_test_sidecar, remove_test_sidecar
 from car_importer.game import make_backup, restore_backup, verify_game
 from car_importer.glb import inspect_glb
 from car_importer.profiles import PROFILES
@@ -61,7 +61,11 @@ class ImporterApp:
         self.add_btn(tools, "백업 검증", self.restore, 4)
         ttk.Button(tools, text="2a. 외부 GLB → OVC 사이드카 테스트 (별도 폴더)",
                    command=self.stage_with_sidecar).grid(row=1, column=0, columnspan=5, sticky="ew", pady=(9, 0))
-        ttk.Button(tools, text="게임 설치 (F50 런타임 검증 전: 잠금)", state="disabled").grid(row=2, column=0, columnspan=5, sticky="ew", pady=(9, 0))
+        ttk.Button(tools, text="3. F50 테스트 OVC 별도 폴더에 설치 (원본 PMT 불변)",
+                   command=self.install_external_test).grid(row=2, column=0, columnspan=5, sticky="ew", pady=(9, 0))
+        ttk.Button(tools, text="4. 테스트 OVC만 안전하게 제거",
+                   command=self.remove_external_test).grid(row=3, column=0, columnspan=5, sticky="ew", pady=(9, 0))
+        ttk.Button(tools, text="원본 PMT 교체 설치: 비활성화", state="disabled").grid(row=4, column=0, columnspan=5, sticky="ew", pady=(9, 0))
         for c in range(5):
             tools.columnconfigure(c, weight=1)
         ttk.Label(outer, text="작업 결과", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(10, 3))
@@ -156,6 +160,25 @@ class ImporterApp:
             return {"status": "OVC_STATIC_TEST_PASS_GAME_UNCHANGED", "stage": stage,
                     "sidecar": ovc, "game_installable": False}
         self.run(job)
+
+    def install_external_test(self):
+        if not self.legal.get():
+            messagebox.showwarning("권한 확인 필요", "외부 모델 사용·변환 권한을 먼저 확인하세요.")
+            return
+        game, output = self.game_root.get(), self.output.get()
+        if not game or not output:
+            messagebox.showwarning("경로 누락", "게임 설치 폴더와 생성된 OVC 출력 폴더를 지정하세요.")
+            return
+        if not messagebox.askyesno("F50 OVC 시험 설치",
+                "게임 CarImporter/f50 폴더에 OVC만 복사합니다.\\n기존 Cars/PMT 및 dinput8.dll은 변경하지 않습니다. 계속할까요?"):
+            return
+        self.run(lambda: install_test_sidecar(game, Path(output)/"ovc_test"/"f50_external_test.ovc", True))
+
+    def remove_external_test(self):
+        game=self.game_root.get()
+        if not game:return
+        if messagebox.askyesno("OVC 테스트 제거","검증된 CarImporter/f50 파일만 제거하시겠습니까?"):
+            self.run(lambda: remove_test_sidecar(game))
 
     def verify(self):
         self.run(lambda: verify_game(self.game_root.get(), self.profile.get()))

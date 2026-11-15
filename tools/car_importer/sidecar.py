@@ -107,3 +107,62 @@ def export_experimental_ovc(staged_blend, blender_exe, output_dir, rights_confir
                    'game_files_modified':False,'status':'EXPERIMENTAL_OVC_VALIDATED_NOT_GAME_LOADED'})
     (out/'validation.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
     return result
+def install_test_sidecar(game_root, sidecar_file, rights_confirmed=False):
+    """Only writes an optional sidecar under CarImporter/f50; never touches Cars/.
+    Game DLL remains separate and must be installed/removed by the user.
+    """
+    if not rights_confirmed:raise SidecarError("Permission confirmation required")
+    from .game import verify_game
+    info=verify_game(game_root,'f50')
+    game=Path(info['root'])
+    src=Path(sidecar_file).resolve(strict=True)
+    if src.name!='f50_external_test.ovc' or game in src.parents:
+        raise SidecarError("Choose external f50_external_test.ovc outside game folder")
+    pre=inspect_ovc(src)
+    folder=game/'CarImporter'/'f50'
+    for p in (game/'CarImporter', folder):
+        if p.is_symlink():raise SidecarError("Symlinked sidecar output path refused")
+    folder.mkdir(parents=True,exist_ok=True)
+    dst=folder/'f50_external_test.ovc'
+    receipt=folder/'sidecar_install_receipt.json'
+    if dst.exists() or dst.is_symlink() or receipt.exists():
+        raise SidecarError("Existing test sidecar or receipt; refusing overwrite")
+    import shutil
+    try:
+        with src.open('rb') as f, dst.open('xb') as out:
+            shutil.copyfileobj(f,out,1024*1024)
+            out.flush();os.fsync(out.fileno())
+        if sha256(dst)!=pre['sha256']:raise SidecarError("Copied sidecar SHA verification failed")
+        data={'status':'F50_SIDECAR_ONLY_INSTALLED_NO_NATIVE_PMT_CHANGED',
+              'source_sha256':pre['sha256'], 'source_game_pmt_sha256':info['source_sha256'],
+              'relative_path':'CarImporter/f50/f50_external_test.ovc'}
+        with receipt.open('x',encoding='utf-8') as out:
+            json.dump(data,out,indent=2);out.write('\n')
+        return {'status':data['status'],'sidecar_file':str(dst),'sidecar_sha256':pre['sha256'],
+                'game_files_modified':False,'original_pmt_unchanged':True,
+                'runtime_tested':False,'game_setting':'[VR] F50ExternalModelTest=true'}
+    except BaseException:
+        dst.unlink(missing_ok=True)
+        receipt.unlink(missing_ok=True)
+        raise
+
+def remove_test_sidecar(game_root):
+    """Remove only importer-owned OVC whose receipt SHA matches; do not touch PMT."""
+    from .game import verify_game
+    info=verify_game(game_root,'f50')
+    folder=Path(info['root'])/'CarImporter'/'f50'
+    dst=folder/'f50_external_test.ovc'
+    receipt=folder/'sidecar_install_receipt.json'
+    if folder.is_symlink() or dst.is_symlink() or receipt.is_symlink():
+        raise SidecarError("Symlinked sidecar file refused")
+    if not dst.is_file() or not receipt.is_file():
+        raise SidecarError("No importer-owned sidecar and matching receipt")
+    data=json.loads(receipt.read_text(encoding='utf-8'))
+    if data.get('status')!='F50_SIDECAR_ONLY_INSTALLED_NO_NATIVE_PMT_CHANGED' or \
+       data.get('source_game_pmt_sha256')!=info['source_sha256'] or \
+       sha256(dst)!=data.get('source_sha256'):
+        raise SidecarError("Unknown or edited sidecar; no files removed")
+    dst.unlink()
+    receipt.unlink()
+    return {'status':'F50_TEST_SIDECAR_REMOVED_NO_NATIVE_PMT_CHANGED',
+            'game_files_modified':False,'original_pmt_unchanged':True}

@@ -15,7 +15,7 @@ from car_importer.glb import inspect_glb, InvalidModel
 from car_importer.game import GameSafetyError, verify_game, make_backup, restore_backup, install_model
 from car_importer.profiles import Profile, PROFILES
 from car_importer.cli import stage_model, StageError
-from car_importer.sidecar import inspect_ovc, SidecarError, export_experimental_ovc
+from car_importer.sidecar import inspect_ovc, SidecarError, export_experimental_ovc, install_test_sidecar, remove_test_sidecar
 
 
 def sample_glb(*, bad_stride=False, license_text="CC-BY-4.0", draco=False, no_indices=False):
@@ -123,6 +123,15 @@ class SidecarTests(unittest.TestCase):
             p.write_bytes(b"X"*100)
             with self.assertRaises(SidecarError):
                 inspect_ovc(p)
+
+    def test_sidecar_install_rights_gate(self):
+        with self.assertRaisesRegex(SidecarError, "Permission"):
+            install_test_sidecar("fake_game", "fake.ovc")
+
+    def test_sidecar_remove_requires_verified_game(self):
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises((ValueError, OSError)):
+                remove_test_sidecar(d)
 
     def test_export_requires_rights_gate(self):
         with self.assertRaisesRegex(SidecarError, "permission"):
