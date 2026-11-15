@@ -1,0 +1,43 @@
+name: OutRun HD Chat ImageGen UI and Recovery Safety CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/outrun-hd-chat-imagegen-ui-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: outrun-hd-chat-imagegen-ui-test
+  cancel-in-progress: true
+
+jobs:
+  validate-browser-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout authorized N100 browser-worker code ONLY (GitHub hosted CPU)
+        uses: actions/checkout@v4
+        with:
+          ref: localization-controller-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/chat-controller/localization-recovery-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test-time Python libraries; no browser session or paid API
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0" "playwright==1.56.0"
+      - name: Verify browser code syntax
+        run: |
+          python -m py_compile tools/chat-controller/localization-recovery-v1/controller_png_attach.py
+          python -m py_compile tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
+          python -m py_compile tools/chat-controller/localization-recovery-v1/chat_image_result_rescue.py
+      - name: Run existing source-pinned ImageGen + C1 safety regressions
+        run: python -m unittest discover -s tools/chat-controller/localization-recovery-v1 -p test_github_chat_rework_controller.py -v
+      - name: Run current Images menu and exact no-duplicate retry regressions
+        run: python -m unittest discover -s tools/chat-controller/localization-recovery-v1 -p test_imagegen_ui_retry_nov15.py -v
