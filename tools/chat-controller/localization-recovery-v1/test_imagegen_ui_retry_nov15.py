@@ -16,6 +16,7 @@ def task():
         "role": "A", "roi_id": "Q044_abcde12345678901",
         "source_dds_sha256": "a"*64,
         "old_candidate_sha256": "b"*64,
+        "qa_authority":"NOT_C1_APPROVED_NOT_GAME_APPROVED",
         "reference": {"name": "HDRW-A-"+"1"*20+"_HD_SOURCE.png",
                       "sha256":"c"*64},
     }
