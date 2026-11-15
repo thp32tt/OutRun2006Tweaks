@@ -200,8 +200,9 @@ struct Gate {
     bool playerDraw=false,deviceReady=false,stateRecording=false;
     unsigned char carKind=255;
 };
-inline bool Eligible(const Gate& g) noexcept {
+inline bool EligibleForCar(const Gate& g,unsigned char expectedCarKind) noexcept {
     return g.optIn&&g.vr&&g.seat&&g.gameplay&&g.stereo&&g.playerDraw&&
-           g.deviceReady&&!g.stateRecording&&g.carKind==1;
+           g.deviceReady&&!g.stateRecording&&g.carKind==expectedCarKind;
 }
+inline bool Eligible(const Gate& g) noexcept {return EligibleForCar(g,1u);}
 } // namespace OutRunVR::DinoSidecar

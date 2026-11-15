@@ -59,6 +59,8 @@ namespace Settings
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
     Setting<bool> VRDinoExternalCockpit{ "VR", "DinoExternalCockpit", false,
         "QuestCockpitV2-only Dino FitV6 external model. Uses the native mode-1 player frame; no legacy DriverSeat camera owner." };
+    Setting<bool> VRF50ExternalModelTest{ "VR", "F50ExternalModelTest", false,
+        "Experimental F50 external sidecar: CarImporter/f50/f50_external_test.ovc. Opt-in; does not alter original PMT." };
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -507,6 +509,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     inline static SafetyHookInline PlayerCallbackHook{};
     inline static thread_local bool F0CallbackActive=false;
     inline static thread_local bool DinoGameplayResourceArmed=false;
+    inline static thread_local bool F50GameplayResourceArmed=false;
     static constexpr std::size_t SeatTableCount=30u;
     inline static bool SeatTableCaptured=false;
     inline static bool SeatTablePatched=false;
@@ -628,6 +631,11 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(DinoGameplayResourceArmed && !dinoGameplayNow)
             OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
         DinoGameplayResourceArmed=dinoGameplayNow;
+        const bool f50GameplayNow=Settings::VRF50ExternalModelTest &&
+            Game::current_mode && *Game::current_mode==STATE_GAME;
+        if(F50GameplayResourceArmed && !f50GameplayNow)
+            OutRunVR::DinoSidecar::GlobalF50Gpu().OnDeviceReset();
+        F50GameplayResourceArmed=f50GameplayNow;
         // Camera control for the next tick reads this persistent live table.
         // Re-sync here only for live F11/tuning changes; startup apply below
         // installs the profile before the first playable camera tick.
@@ -699,13 +707,14 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         D3DMATRIX world{},view{},projection{};
         std::uint64_t nativeFrame=0,xrPose=0;
         bool valid=false;
+        bool f50=false;
         DinoFitV6DrawTicket()=default;
         DinoFitV6DrawTicket(const DinoFitV6DrawTicket&)=delete;
         DinoFitV6DrawTicket& operator=(const DinoFitV6DrawTicket&)=delete;
         DinoFitV6DrawTicket(DinoFitV6DrawTicket&& other) noexcept
             :device(other.device),world(other.world),view(other.view),
              projection(other.projection),nativeFrame(other.nativeFrame),
-             xrPose(other.xrPose),valid(other.valid)
+             xrPose(other.xrPose),valid(other.valid),f50(other.f50)
         {
             other.device=nullptr;other.valid=false;
         }
@@ -718,18 +727,20 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         using namespace OutRunVR::QuestCockpitV2;
         DinoFitV6DrawTicket ticket{};
-        if (!Settings::VRDinoExternalCockpit || !Settings::VREnabled ||
+        const bool f50 = player && player->car_kind_11==0 && Settings::VRF50ExternalModelTest.get();
+        const bool dino = player && player->car_kind_11==1 && Settings::VRDinoExternalCockpit.get();
+        if (!(f50||dino) || !Settings::VREnabled ||
             !Settings::VRQuestCockpitV2Enabled || !Settings::VRStereo ||
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
             !NativeFrameTrace().Active() || InSceneEffect() ||
             !Game::current_mode || *Game::current_mode != STATE_GAME ||
-            !player || player != Game::pl_car() || player->car_kind_11 != 1)
+            !player || player != Game::pl_car())
             return ticket;
         const auto* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
         IDirect3DDevice9* device=Game::D3DDevice();
         OutRunVR::DinoSidecar::Gate gate{};
-        gate.optIn=Settings::VRDinoExternalCockpit.get();
+        gate.optIn=f50?Settings::VRF50ExternalModelTest.get():Settings::VRDinoExternalCockpit.get();
         gate.vr=Settings::VREnabled.get();
         gate.seat=camera && camera->cam_mode_34A==1 &&
             NativeFrameTrace().Active();
@@ -740,7 +751,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         gate.deviceReady=device!=nullptr;
         gate.stateRecording=OutRunVR::State::StateBlockTracker::Recording();
         gate.carKind=static_cast<unsigned char>(player->car_kind_11);
-        if(!OutRunVR::DinoSidecar::Eligible(gate))return ticket;
+        if(!OutRunVR::DinoSidecar::EligibleForCar(gate,f50?0u:1u))return ticket;
         const auto* nativeView=Module::exe_ptr<const D3DMATRIX>(0x55D860);
         const auto* nativeProjection=Module::exe_ptr<const D3DMATRIX>(0x55D8A0);
         if(!QuestCockpitGlassLive::Memory(nativeView,sizeof(D3DMATRIX)) ||
@@ -757,6 +768,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         device->AddRef();
         ticket.device=device;
         ticket.valid=true;
+        ticket.f50=f50;
         return ticket;
     }
     static void DrawPreparedDinoFitV6(DinoFitV6DrawTicket& ticket) noexcept
@@ -771,15 +783,16 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             ticket.valid=false;
             return;
         }
-        const HRESULT hr=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
+        const HRESULT hr=(ticket.f50?OutRunVR::DinoSidecar::GlobalF50Gpu():
+                             OutRunVR::DinoSidecar::GlobalGpu()).DrawNativeScene(
             ticket.device,ticket.world,ticket.view,ticket.projection);
         if(Settings::VRTelemetry) {
             static std::uint64_t attempts=0;
             const auto sample=++attempts;
             if(sample<=8u || (sample&(sample-1u))==0u)
                 spdlog::info(
-                    "VR QUEST DINO FITV6: sample={} nativeFrame={} xrPose={} mode=1 drawHr=0x{:08X} originalPMT=UNCHANGED",
-                    sample,ticket.nativeFrame,ticket.xrPose,
+                    "VR QUEST EXTERNAL SIDECAR: vehicle={} sample={} nativeFrame={} xrPose={} mode=1 drawHr=0x{:08X} originalPMT=UNCHANGED",
+                    ticket.f50?"F50":"Dino",sample,ticket.nativeFrame,ticket.xrPose,
                     static_cast<unsigned int>(hr));
         }
         ticket.valid=false;

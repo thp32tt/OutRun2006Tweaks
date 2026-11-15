@@ -30,6 +30,7 @@ class GpuOwner final {
     std::vector<IDirect3DTexture9*> textures_{};
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
+    const wchar_t* sidecarRelativePath_=nullptr; // literal relative path below executable root, never user-controlled
     // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
     // textures on every eye Draw. Retry only after Reset/device change.
     GpuRetryPolicy gpuRetry_{};
@@ -125,9 +126,8 @@ class GpuOwner final {
         wchar_t* last=wcsrchr(path,L'\\');
         if(!last)return false;
         *++last=L'\0';
-        constexpr wchar_t suffix[]=L"Dino246_Cockpit_LHD_v15.ovc";
-        if(std::wcslen(path)+(sizeof(suffix)/sizeof(suffix[0]))>MAX_PATH)return false;
-        if(wcscat_s(path,MAX_PATH,suffix)!=0)return false;
+        if(!sidecarRelativePath_ || std::wcslen(path)+std::wcslen(sidecarRelativePath_)+1>MAX_PATH)return false;
+        if(wcscat_s(path,MAX_PATH,sidecarRelativePath_)!=0)return false;
         std::vector<std::uint8_t> bytes;
         if(!ReadFile(path,bytes))return false;
         std::string error;
@@ -194,7 +194,7 @@ class GpuOwner final {
         return meshes_.size()==cpu_.meshes.size();
     }
 public:
-    GpuOwner()=default;
+    explicit GpuOwner(const wchar_t* fixedRelativePath) noexcept : sidecarRelativePath_(fixedRelativePath) {}
     ~GpuOwner(){ReleaseGpu();}
     GpuOwner(const GpuOwner&)=delete;
     GpuOwner& operator=(const GpuOwner&)=delete;
@@ -267,5 +267,10 @@ public:
         return FAILED(hr)?hr:restore;
     }
 };
-inline GpuOwner& GlobalGpu() noexcept {static GpuOwner owner;return owner;}
+inline GpuOwner& GlobalGpu() noexcept {
+    static GpuOwner owner(L"Dino246_Cockpit_LHD_v15.ovc");return owner;
+}
+inline GpuOwner& GlobalF50Gpu() noexcept {
+    static GpuOwner owner(L"CarImporter\\f50\\f50_external_test.ovc");return owner;
+}
 } // OutRunVR::DinoSidecar
