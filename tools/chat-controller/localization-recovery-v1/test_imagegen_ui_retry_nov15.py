@@ -173,11 +173,11 @@ class StaleAssistantReadOnlyRefreshTests(unittest.IsolatedAsyncioTestCase):
             instance.page=AsyncMock(return_value=page)
             probe=AsyncMock(return_value=(
                 "WAIT_ASSISTANT_RESULT_UI",why))
-            with patch.object(bridge,"rescue_single_image_candidate",new=probe),\\
-                 patch("text_roi_queue._probe_imagegen_result",
-                       new=AsyncMock(return_value={"error":"USER_TURN_MISSING"})),\\
-                 patch("text_roi_queue._recover_task_turn",
-                       new=AsyncMock(return_value=False)):
+            with (patch.object(bridge,"rescue_single_image_candidate",new=probe),
+                  patch("text_roi_queue._probe_imagegen_result",
+                        new=AsyncMock(return_value={"error":"USER_TURN_MISSING"})),
+                  patch("text_roi_queue._recover_task_turn",
+                        new=AsyncMock(return_value=False))):
                 output=await instance.collect_producer(stale)
             self.assertIn("WAIT_IMAGEGEN",output)
             page.reload.assert_awaited_once_with(
