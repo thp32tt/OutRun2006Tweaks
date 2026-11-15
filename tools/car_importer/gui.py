@@ -21,7 +21,7 @@ from car_importer.profiles import PROFILES
 class ImporterApp:
     def __init__(self, root: tk.Tk):
         self.root = root
-        root.title("OutRun 2006 Car Importer v0.1 — Preview / 안전 테스트")
+        root.title("OutRun 2006 Car Importer v0.2 — Preview / 안전 테스트")
         root.geometry("900x710")
         root.minsize(780, 620)
         self.glb = tk.StringVar()
@@ -48,7 +48,7 @@ class ImporterApp:
         ttk.Label(form, text="차량 프로필").grid(row=5, column=0, sticky="w", pady=8)
         dropdown = ttk.Combobox(form, textvariable=self.profile, values=list(PROFILES), state="readonly", width=18)
         dropdown.grid(row=5, column=1, sticky="w", pady=8)
-        ttk.Label(form, text="v0.1은 검증된 F50 슬롯만 지원").grid(row=5, column=2, sticky="w", padx=6)
+        ttk.Label(form, text="v0.2은 검증된 F50 슬롯만 지원").grid(row=5, column=2, sticky="w", padx=6)
         form.columnconfigure(1, weight=1)
         ttk.Checkbutton(outer, variable=self.legal,
                         text="선택한 외부 모델을 개인적으로 사용·변환할 권한이 있음을 직접 확인했습니다.").pack(anchor="w", pady=(13, 9))

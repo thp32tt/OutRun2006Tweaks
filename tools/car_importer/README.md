@@ -12,7 +12,7 @@ Players obtain **lawfully usable** third-party model files on their own, then pi
 - Inspect GLB 2.0: magic/size/JSON/BIN structure, POSITION and index accessors, capped geometry, meshes, triangles, materials, source hash, reported license metadata, and clear warnings. No network requests or hidden downloads.
 - Source-verified Ferrari F50 game profile (`Cars/obj_plcar_f50_pmt.sz` SHA-256 `10daa1312b6cff0267b38b4c440c6007c68b470a225ca15f0c324876fd80aeab`). Unknown versions fail closed.
 - Optionally load user's native PMT-derived `.blend` **read-only**, import GLB into an **independent collection**, align length and ground to verified F50 dimensions, export `staged_car.glb`, `staged_car.blend`, `car_preview.png`, and `stage_manifest.json`. Blender subprocess performs a separate independent reopened-file/hash QA.
-- Verified backup of exact original game F50 PMT to a **directory outside the game**, with SHA-256 receipt; the v0.1 restore command **only validates the backup** and never copies files back, because game mod installation is disabled.
+- Verified backup of exact original game F50 PMT to a **directory outside the game**, with SHA-256 receipt; the v0.2 restore command **only validates the backup** and never copies files back, because game mod installation is disabled.
 - User must explicitly acknowledge they have verified the right to use/convert the chosen model.
 - The Windows one-file EXE embeds both the Blender worker and the `profiles.py` file needed by Blender’s **separate** Python interpreter. CI includes a headless EXE packaging smoke test.
 - Staging refuses to write into the game folder or a non-empty output directory. Blender auto-execution of scripts embedded in `.blend` files is disabled.
@@ -28,7 +28,7 @@ Players obtain **lawfully usable** third-party model files on their own, then pi
 
 - No native PMT serializer or validated **F50** game-runtime OVC loader / D3D9 draw binding; no substitution of actual game model; no VR/PC frame verification. Experimental OVC geometry serialization is available, but is NOT a verified playable in-game replacement.
 - No guarantee that any purported CC licence on model metadata was issued by an actual underlying rightsholder. No copyrighted binary models included. The previous **CSR2-derived F50** is suitable only as a locally held research sample pending clearance; it is **not an approved redistributable input**.
-- No bulk conversion of all OutRun vehicles. v0.1 recognises **only F50** to prevent guesses or damage.
+- No bulk conversion of all OutRun vehicles. v0.2 recognises **only F50** to prevent guesses or damage.
 - No read/write outside explicitly selected input, staging, and verified backup locations.
 
 ## Install and launch (Windows)
