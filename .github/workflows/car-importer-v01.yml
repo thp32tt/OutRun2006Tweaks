@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/standalone-car-importer-v01-20261115
+      - feature/f50-external-ovc-sidecar-v02-20261116
     paths:
       - 'tools/car_importer/**'
       - '.github/workflows/car-importer-v01.yml'
