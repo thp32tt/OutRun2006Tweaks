@@ -23,6 +23,7 @@
 #include "vr/ipc/xr_eye_extent.hpp"
 #include "vr/ipc/host_process_liveness.hpp"
 #include "vr/d3d9/reset_trace.hpp"
+#include "vr/game/dino_external_d3d9.hpp"
 
 namespace Settings
 {
@@ -497,6 +498,8 @@ namespace OutRunVRD3D9ExUpgrade
             D3DDISPLAYMODEEX fullscreen{};
             D3DDISPLAYMODEEX* fullscreenPtr =
                 BuildFullscreenMode(deviceEx, &effective, fullscreen);
+            // External F50 sidecar uses DEFAULT-pool resources.
+            OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
             const HRESULT hr =
                 deviceEx->ResetEx(&effective, fullscreenPtr);
             LARGE_INTEGER resetReturnQpc{};
