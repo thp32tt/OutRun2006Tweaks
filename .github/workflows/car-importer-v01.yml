@@ -42,7 +42,7 @@ jobs:
       - name: Install PyInstaller
         run: python -m pip install "pyinstaller>=6.0,<7"
       - name: Build safe importer EXE
-        run: python -m PyInstaller --clean --noconfirm --onefile --windowed --name OutRunCarImporter-v0.1 --paths tools --add-data "tools/car_importer/blender_worker.py;car_importer" --add-data "tools/car_importer/profiles.py;car_importer" tools/car_importer/gui.py
+        run: python -m PyInstaller --clean --noconfirm --onefile --windowed --name OutRunCarImporter-v0.1 --paths tools --add-data "tools/car_importer/blender_worker.py;car_importer" --add-data "tools/car_importer/profiles.py;car_importer" --add-data "tools/car_importer/sidecar_worker.py;car_importer" tools/car_importer/gui.py
       - name: Smoke-test frozen EXE helper packaging without opening a GUI
         shell: pwsh
         run: |

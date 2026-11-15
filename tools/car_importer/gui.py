@@ -12,6 +12,7 @@ from tkinter import filedialog, messagebox, ttk
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from car_importer.cli import stage_model
+from car_importer.sidecar import export_experimental_ovc
 from car_importer.game import make_backup, restore_backup, verify_game
 from car_importer.glb import inspect_glb
 from car_importer.profiles import PROFILES
@@ -58,7 +59,9 @@ class ImporterApp:
         self.add_btn(tools, "원본 게임 검증", self.verify, 2)
         self.add_btn(tools, "원본 백업", self.backup, 3)
         self.add_btn(tools, "백업 검증", self.restore, 4)
-        ttk.Button(tools, text="게임 설치 (검증 전)", state="disabled").grid(row=1, column=0, columnspan=5, sticky="ew", pady=(9, 0))
+        ttk.Button(tools, text="2a. 외부 GLB → OVC 사이드카 테스트 (별도 폴더)",
+                   command=self.stage_with_sidecar).grid(row=1, column=0, columnspan=5, sticky="ew", pady=(9, 0))
+        ttk.Button(tools, text="게임 설치 (F50 런타임 검증 전: 잠금)", state="disabled").grid(row=2, column=0, columnspan=5, sticky="ew", pady=(9, 0))
         for c in range(5):
             tools.columnconfigure(c, weight=1)
         ttk.Label(outer, text="작업 결과", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(10, 3))
@@ -137,6 +140,23 @@ class ImporterApp:
         self.log("Blender 시제품 제작 시작. 게임 파일은 변경하지 않습니다.")
         self.run(lambda: stage_model(values[0], values[1], values[2], values[3], True, values[4]))
 
+    def stage_with_sidecar(self):
+        if not self.legal.get():
+            messagebox.showwarning("권한 확인 필요", "외부 모델의 사용·변환 허가를 확인하세요.")
+            return
+        inp, exe, folder, slot = self.glb.get(), self.blender.get(), self.output.get(), self.profile.get()
+        ref = self.ref_blend.get() or None
+        if slot != "f50":
+            messagebox.showerror("미지원", "OVC 실험은 F50만 지원합니다.")
+            return
+        def job():
+            stage = stage_model(inp, exe, folder, slot, True, ref)
+            ovc = export_experimental_ovc(Path(folder)/"staged_car.blend", exe,
+                                          Path(folder)/"ovc_test", True)
+            return {"status": "OVC_STATIC_TEST_PASS_GAME_UNCHANGED", "stage": stage,
+                    "sidecar": ovc, "game_installable": False}
+        self.run(job)
+
     def verify(self):
         self.run(lambda: verify_game(self.game_root.get(), self.profile.get()))
 
@@ -163,7 +183,7 @@ def packaged_self_test() -> int:
     from car_importer import cli
     helper_dir = Path(cli.__file__).resolve().parent
     return 0 if all((helper_dir / name).is_file() for name in
-                    ("blender_worker.py", "profiles.py")) else 3
+                    ("blender_worker.py", "sidecar_worker.py", "profiles.py")) else 3
 
 
 if __name__ == "__main__":

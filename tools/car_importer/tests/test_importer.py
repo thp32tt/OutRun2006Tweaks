@@ -15,6 +15,7 @@ from car_importer.glb import inspect_glb, InvalidModel
 from car_importer.game import GameSafetyError, verify_game, make_backup, restore_backup, install_model
 from car_importer.profiles import Profile, PROFILES
 from car_importer.cli import stage_model, StageError
+from car_importer.sidecar import inspect_ovc, SidecarError, export_experimental_ovc
 
 
 def sample_glb(*, bad_stride=False, license_text="CC-BY-4.0", draco=False, no_indices=False):
@@ -113,6 +114,28 @@ class GLBTests(unittest.TestCase):
         self.path.write_bytes(sample_glb())
         with self.assertRaises(StageError):
             stage_model(self.path, "not_a_blender", Path(self.temp.name) / "output")
+
+
+class SidecarTests(unittest.TestCase):
+    def test_corrupt_magic_refused(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)/"invalid.ovc"
+            p.write_bytes(b"X"*100)
+            with self.assertRaises(SidecarError):
+                inspect_ovc(p)
+
+    def test_export_requires_rights_gate(self):
+        with self.assertRaisesRegex(SidecarError, "permission"):
+            export_experimental_ovc("nonexistent.blend", "blender", "out")
+
+    def test_invalid_crc_rejected(self):
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/"corrupt.ovc"
+            payload=b"x"*40
+            header=b"OVRCABH2"+struct.pack("<7I",2,1,1,3,1,len(payload),0)
+            p.write_bytes(header+payload)
+            with self.assertRaisesRegex(SidecarError, "CRC"):
+                inspect_ovc(p)
 
 
 class GameSafetyTests(unittest.TestCase):
