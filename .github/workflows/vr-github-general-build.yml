@@ -11,6 +11,7 @@ on:
       - 'src/vr/game/quest_cockpit_v2_passenger_event.hpp'
       - 'tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp'
       - 'tools/verify_quest_cockpit_passenger_runtime.py'
+      - 'tools/verify_quest_cockpit_passenger_ten_paths.py'
       - 'src/dllmain.cpp'
       - 'src/hooks_exceptions.cpp'
       - 'tools/verify_quest_cockpit_crash_recovery.py'
