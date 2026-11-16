@@ -161,6 +161,10 @@ def main():
         "before_bounds_blender_zup": [list(before_min), list(before_max)],
     }
 
+    # Assetto Corsa KN5 files share a canonical vehicle axis convention.
+    # Preserve that authored yaw instead of inferring it from wheel names: some
+    # mods use non-standard LF/RF labels, which can rotate a correct car
+    # diagonally and inflate its measured width.
     center_x = (before_min.x + before_max.x) * 0.5
     center_y = (before_min.y + before_max.y) * 0.5
     ground_z = before_min.z
@@ -171,29 +175,27 @@ def main():
         rear = (wheels["lr"]["center"] + wheels["rr"]["center"]) * 0.5
         axle_center = (front + rear) * 0.5
         forward = front - rear
-        if math.hypot(forward.x, forward.y) < 0.5:
-            raise RuntimeError("Wheel axle separation is too small to establish vehicle forward axis")
-        current_angle = math.atan2(forward.y, forward.x)
-        target_angle = -math.pi / 2.0
-        yaw = target_angle - current_angle
-        center_x, center_y = axle_center.x, axle_center.y
+        if forward.length < 0.5:
+            raise RuntimeError("Wheel axle separation is too small for contact QA")
         ground_z = min(wheels[role]["lo"].z for role in ("lf", "rf", "lr", "rr"))
         alignment.update({
             "front_axle_center": list(front),
             "rear_axle_center": list(rear),
             "axle_center": list(axle_center),
-            "yaw_radians": yaw,
+            "wheel_forward_vector": list(forward),
+            "yaw_radians": 0.0,
+            "yaw_policy": "preserve_assetto_corsa_authored_axes",
             "ground_source": "four_wheel_bbox_min_z",
         })
     else:
         alignment.update({
             "yaw_radians": 0.0,
+            "yaw_policy": "preserve_assetto_corsa_authored_axes",
             "ground_source": "whole_vehicle_bbox_min_z_fallback",
         })
 
     transform = (
         Matrix.Translation((0.0, 0.0, -ground_z))
-        @ Matrix.Rotation(yaw, 4, "Z")
         @ Matrix.Translation((-center_x, -center_y, 0.0))
     )
     roots = [o for o in bpy.context.scene.objects if o.parent is None]
