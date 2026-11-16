@@ -6,6 +6,11 @@ on:
     paths:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
+      - 'src/overlay/settings_ui.cpp'
+      - 'src/plugin.hpp'
+      - 'src/vr/game/quest_cockpit_v2_passenger_event.hpp'
+      - 'tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp'
+      - 'tools/verify_quest_cockpit_passenger_runtime.py'
       - 'src/dllmain.cpp'
       - 'src/hooks_exceptions.cpp'
       - 'tools/verify_quest_cockpit_crash_recovery.py'
