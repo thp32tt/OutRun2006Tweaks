@@ -23,6 +23,7 @@
 
 namespace OutRunVR::DinoSidecar {
 enum class FerrariModelSlot : unsigned char { F50, Gto288, F40, GenericId };
+enum class SidecarRole : unsigned char { Vehicle, DashboardOverlay };
 struct GpuDrawResult final {
     HRESULT hr=E_FAIL;
     MeshDrawReceipt receipt{};
@@ -44,6 +45,7 @@ class GpuOwner final {
     bool pbrReady_=false;
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
+    SidecarRole role_=SidecarRole::Vehicle;
     FerrariModelSlot selectedSlot_=FerrariModelSlot::F50;
     unsigned char selectedCarId_=255u;
     float modelMinLocalY_=0.f;
@@ -155,27 +157,36 @@ class GpuOwner final {
         *++last=L'\0';
         // Explicit fixed filename allowlist. No config-controlled arbitrary
         // path, no directory scan, and no unvalidated 'install' marker.
-        wchar_t pbrFlag[4]{};
-        const bool usePbr=GetEnvironmentVariableW(
-            L"OUTRUN_VR_F50_PBR_TEST",pbrFlag,4)==1 &&
-            pbrFlag[0]==L'1' && pbrFlag[1]==L'\0';
-        constexpr wchar_t stableSuffix[]=L"F50_External_Test.ovc";
-        constexpr wchar_t pbrSuffix[]=L"F50_External_Test_PBR.ovc";
-        wchar_t genericSuffix[64]{};
+        wchar_t genericSuffix[96]{};
         const wchar_t* suffix=nullptr;
-        if(selectedSlot_==FerrariModelSlot::Gto288)
-            suffix=L"ExternalCars\\288gto.ovc";
-        else if(selectedSlot_==FerrariModelSlot::F40)
-            suffix=L"ExternalCars\\f40.ovc";
-        else if(selectedSlot_==FerrariModelSlot::GenericId) {
+        if(role_==SidecarRole::DashboardOverlay) {
             if(selectedCarId_>=30u)return false;
             if(swprintf_s(genericSuffix,_countof(genericSuffix),
-                          L"ExternalCars\\car_id_%02u.ovc",
+                          L"ExternalCars\\Dashboard\\car_id_%02u.ovc",
                           static_cast<unsigned>(selectedCarId_))<=0)
                 return false;
             suffix=genericSuffix;
-        } else
-            suffix=usePbr?pbrSuffix:stableSuffix;
+        } else {
+            wchar_t pbrFlag[4]{};
+            const bool usePbr=GetEnvironmentVariableW(
+                L"OUTRUN_VR_F50_PBR_TEST",pbrFlag,4)==1 &&
+                pbrFlag[0]==L'1' && pbrFlag[1]==L'\0';
+            constexpr wchar_t stableSuffix[]=L"F50_External_Test.ovc";
+            constexpr wchar_t pbrSuffix[]=L"F50_External_Test_PBR.ovc";
+            if(selectedSlot_==FerrariModelSlot::Gto288)
+            suffix=L"ExternalCars\\288gto.ovc";
+        else if(selectedSlot_==FerrariModelSlot::F40)
+            suffix=L"ExternalCars\\f40.ovc";
+            else if(selectedSlot_==FerrariModelSlot::GenericId) {
+                if(selectedCarId_>=30u)return false;
+                if(swprintf_s(genericSuffix,_countof(genericSuffix),
+                              L"ExternalCars\\car_id_%02u.ovc",
+                              static_cast<unsigned>(selectedCarId_))<=0)
+                    return false;
+                suffix=genericSuffix;
+            } else
+                suffix=usePbr?pbrSuffix:stableSuffix;
+        }
         if(std::wcslen(path)+std::wcslen(suffix)+1>MAX_PATH)return false;
         return wcscat_s(path,MAX_PATH,suffix)==0;
     }
@@ -196,9 +207,17 @@ class GpuOwner final {
         for(const auto& mesh:next.meshes)
             for(const auto& vertex:mesh.vertices)
                 lowest=(std::min)(lowest,vertex.y);
-        float validatedLift=0.f;
-        if(!ComputeExternalFloorLift(0.22f,lowest,validatedLift))
-            return false; // invalid scale/axis: retain original car
+        if(role_==SidecarRole::Vehicle) {
+            float validatedLift=0.f;
+            if(!ComputeExternalFloorLift(0.22f,lowest,validatedLift))
+                return false; // invalid scale/axis: retain original car
+        } else {
+            // Dashboard overlays are authored directly in OutRun car-local
+            // metres and intentionally sit above the road plane. They must not
+            // be rejected by the vehicle floor-clearance contract.
+            if(!std::isfinite(lowest) || lowest < -10.f || lowest > 10.f)
+                return false;
+        }
         modelMinLocalY_=lowest;
         modelBoundsReady_=true;
         cpu_=std::move(next);
@@ -310,7 +329,7 @@ class GpuOwner final {
         return out;
     }
 public:
-    GpuOwner()=default;
+    explicit GpuOwner(SidecarRole role=SidecarRole::Vehicle) noexcept:role_(role){}
     ~GpuOwner(){ReleaseGpu();}
     GpuOwner(const GpuOwner&)=delete;
     GpuOwner& operator=(const GpuOwner&)=delete;
@@ -357,7 +376,8 @@ public:
     }
     bool SafeFloorLift(float requested,float& effective) noexcept {
         try {
-            if(!Installed() || !EnsureLoaded() || !modelBoundsReady_)
+            if(role_!=SidecarRole::Vehicle ||
+               !Installed() || !EnsureLoaded() || !modelBoundsReady_)
                 return false;
             return ComputeExternalFloorLift(
                 requested,modelMinLocalY_,effective);
@@ -502,5 +522,8 @@ public:
         return result;
     }
 };
-inline GpuOwner& GlobalGpu() noexcept {static GpuOwner owner;return owner;}
+inline GpuOwner& GlobalGpu() noexcept {static GpuOwner owner{SidecarRole::Vehicle};return owner;}
+inline GpuOwner& GlobalDashboardGpu() noexcept {
+    static GpuOwner owner{SidecarRole::DashboardOverlay};return owner;
+}
 } // OutRunVR::DinoSidecar
