@@ -42,6 +42,27 @@ class HoldRetrySafety(unittest.TestCase):
         self.assertIsNone(output)
         self.assertEqual(status,"NO_NONCOLLIDING_NATIVE_FIT")
 
+
+    def test_displaced_candidate_recenter_uses_native_source_slot(self):
+        source=Image.new("RGBA",(240,52),(0,0,0,0))
+        draw=ImageDraw.Draw(source)
+        draw.rectangle((10,10,219,30),fill=(255,255,255,255))
+        draw.rectangle((120,10,180,30),fill=(0,128,255,255))
+        owner=Image.new("L",source.size,0)
+        ImageDraw.Draw(owner).rectangle((10,10,219,30),fill=255)
+        ImageDraw.Draw(owner).rectangle((120,10,180,30),fill=0)
+        protect=Image.new("L",source.size,0)
+        ImageDraw.Draw(protect).rectangle((120,10,180,30),fill=255)
+        ambiguous=Image.new("L",source.size,0)
+        text=Image.new("RGBA",source.size,(0,0,0,0))
+        ImageDraw.Draw(text).rectangle((140,12,189,28),fill=(235,220,30,255))
+        lines=[{"source":[10,10,220,31],"translated":[140,12,190,29]}]
+        output,status,ops=safe_fit_existing(source,owner,protect,ambiguous,text,lines)
+        self.assertIsNotNone(output)
+        self.assertEqual(status,"REVIEW_REQUIRED_PARTIAL_OWNER")
+        self.assertEqual(ops[0]["scale_pct"],100)
+        self.assertEqual(output[2].getpixel((150,20)),source.getpixel((150,20)))
+
     def test_mask_partition_rejects_invented_owner(self):
         source,owner,protect,uncertain,text,lines=fixture()
         owner.putpixel((75,1),255)
