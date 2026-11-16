@@ -19,18 +19,20 @@ int main() {
     static_assert(!OriginalPassengerVacant(0x04u));
     static_assert(OriginalPassengerVacant(0u));
 
-    // Follow Camera 0 = native event/visuals; never create missing ROB02.
+    // Camera 0 always preserves the original ROB02 passenger in BOTH modes.
     constexpr auto suppress=[](bool vr,bool cockpit,bool follow,
-                               bool race,bool passenger) {
+                               bool race,bool camera1,bool passenger) {
         return ShouldSuppressOriginalPassenger(
-            vr,cockpit,follow,race,passenger);
+            vr,cockpit,follow,race,camera1,passenger);
     };
-    static_assert(!suppress(true,true,true,true,true));
-    static_assert(!suppress(true,true,true,true,false)); // no native ROB02
-    static_assert(suppress(true,true,false,true,true));  // remove in ANY camera
-    static_assert(!suppress(true,true,false,true,false)); // never suppress NPC
-    static_assert(!suppress(false,true,false,true,true));
-    static_assert(!suppress(true,false,false,true,true));
-    static_assert(!suppress(true,true,false,false,true)); // menus unchanged
-    assert(suppress(true,true,false,true,true));
+    static_assert(!suppress(true,true,true,true,false,true));   // follow, camera0
+    static_assert(!suppress(true,true,false,true,false,true));  // remove, camera0
+    static_assert(!suppress(true,true,true,true,true,true));    // follow, cockpit
+    static_assert(suppress(true,true,false,true,true,true));    // remove, cockpit
+    static_assert(!suppress(true,true,false,true,true,false));  // NPCs unaffected
+    static_assert(!suppress(false,true,false,true,true,true));  // VR off
+    static_assert(!suppress(true,false,false,true,true,true));  // cockpit off
+    static_assert(!suppress(true,true,false,false,true,true));  // menu unchanged
+    assert(!suppress(true,true,false,true,false,true));
+    assert(suppress(true,true,false,true,true,true));
 }
