@@ -21,8 +21,15 @@ def fixture():
         im=base.resize((w>>level,h>>level),Image.Resampling.BOX)
         for y in range(0,im.height,4):
             for x in range(0,im.width,4):
-                out.extend(encode_bc3_block(
-                    [im.getpixel((x+i%4,y+i//4)) for i in range(16)]))
+                pixels=[im.getpixel((x+i%4,y+i//4)) for i in range(16)]
+                block=bytearray(encode_bc3_block(pixels))
+                if all(p[3]==0 for p in pixels):
+                    # Transparent BC3 sprites may retain original white
+                    # endpoints; this fixture tests the safe existing
+                    # palette path without inventing new RGB endpoints.
+                    struct.pack_into("<HH",block,8,0xffff,0)
+                    block[12:16]=bytes(4)
+                out.extend(block)
     owner=Image.new("L",(w,h),0)
     ImageDraw.Draw(owner).rectangle((16,16,17,47),fill=255)
     korean=Image.new("RGBA",(w,h),(0,0,0,0))
@@ -59,7 +66,8 @@ class FourMips(unittest.TestCase):
         self.assertNotEqual(updated,raw)
         before,after=read_levels(raw),read_levels(updated)
         for a,b in zip(before,after):
-            pos=(56>>(a[3].width.bit_length()-1-3),56>>(a[3].height.bit_length()-1-3))
+            scale=64//a[3].width
+            pos=(56//scale,56//scale)
             self.assertEqual(a[3].getpixel(pos),b[3].getpixel(pos))
 
 if __name__=="__main__":
