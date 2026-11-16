@@ -81,8 +81,7 @@ class SettingsWindow : public OverlayWindow
     {
         return matches_search(setting->key(), search) ||
             (setting->section() == "VR" && setting->key() == "AntiAliasing" &&
-                matches_search("MSAA", search)) ||
-            false; // passenger uses an exclusive pair of custom F11 checkboxes
+                matches_search("MSAA", search)); // passenger uses custom F11 controls
     }
 
 	static bool section_matches(std::string_view section, std::string_view search)
@@ -99,7 +98,9 @@ class SettingsWindow : public OverlayWindow
         if(section == "VR" &&
            (matches_search("Passenger",search) ||
             matches_search("Follow Camera 0",search) ||
-            matches_search("Remove Passenger",search)))
+            matches_search("Remove Passenger",search) ||
+            matches_search("Passenger: Follow Camera 0",search) ||
+            matches_search("Passenger: Remove",search)))
             return true;
 
 		for (const Settings::SettingBase* setting : Settings::SettingBase::registry())
@@ -313,7 +314,9 @@ public:
 				matches_search("SeatRight", search) ||
                 matches_search("Passenger", search) ||
                 matches_search("Follow Camera 0", search) ||
-                matches_search("Remove Passenger", search);
+                matches_search("Remove Passenger", search) ||
+                matches_search("Passenger: Follow Camera 0", search) ||
+                matches_search("Passenger: Remove", search);
 			if (section == "VR" && cockpitViewSearch)
 			{
 				ImGui::SeparatorText("Cockpit View");
@@ -322,7 +325,9 @@ public:
                     matches_search("Cockpit View", search) ||
                     matches_search("Passenger", search) ||
                     matches_search("Follow Camera 0", search) ||
-                    matches_search("Remove Passenger", search);
+                    matches_search("Remove Passenger", search) ||
+                matches_search("Passenger: Follow Camera 0", search) ||
+                matches_search("Passenger: Remove", search);
                 if(showPassenger) {
                     ImGui::SeparatorText("Passenger (select one)");
                     // Both checkboxes share one persisted bool. Clicking
