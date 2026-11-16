@@ -6,6 +6,7 @@ approval. This is the narrow repair for false 4-mip classification of DXT5.
 import io
 from PIL import Image,ImageChops,ImageFilter,ImageOps
 from hd_bc3_index_patch import patch_mip1,bc3_shape,BC3Hold
+from hd_bc3_native_codec import patch_bc3_native, BC3Hold as ReencodeHold
 
 def apply(original,source_crop,owned,ambiguous,text,box,orientation="RAW"):
     width,height=bc3_shape(original) # rejects *actual* multi mip, not FOURCC=4
@@ -50,7 +51,23 @@ def apply(original,source_crop,owned,ambiguous,text,box,orientation="RAW"):
             raise BC3Hold("OWNER_ORIGINAL_FOREIGN_ART_CHANGED")
     physical=ImageOps.flip(final) if orientation=="FLIPY" else final
     physbox=(x0,height-y1,x1,height-y0) if orientation=="FLIPY" else box
-    output,proof=patch_mip1(original,physical,[physbox],native)
+    try:
+        output,proof=patch_mip1(original,physical,[physbox],native)
+        proof["owner_repair_method"]="ORIGINAL_ENDPOINTS_INDEX_ONLY"
+    except BC3Hold as exc:
+        if str(exc) not in (
+            "QA_BC3_EXISTING_ALPHA_PALETTE_INSUFFICIENT",
+            "QA_BC3_EXISTING_RGB_PALETTE_INSUFFICIENT"):
+            raise
+        # Only the original 4x4 blocks that actually change are recoded.
+        # This fallback still requires exact native protected-art decoded
+        # pixel readback after re-encoding, below.
+        try:
+            output,proof=patch_bc3_native(original,physical,native,[physbox])
+        except ReencodeHold as err:
+            raise BC3Hold("OWNER_BC3_SAFE_REENCODE_"+str(err)) from err
+        proof["owner_repair_method"]="SOURCE_PROTECTED_BLOCK_REENCODE_TEST_ONLY"
+        proof["original_palette_hold_reason"]=str(exc)
     with Image.open(io.BytesIO(output)) as im:
         im.load();saved=im.convert("RGBA")
     saved=ImageOps.flip(saved) if orientation=="FLIPY" else saved
