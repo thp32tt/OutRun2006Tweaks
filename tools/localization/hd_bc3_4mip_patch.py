@@ -33,7 +33,10 @@ def safe_patch(raw,owner,text,boxes,orientation="RAW"):
     if orientation=="FLIPY":base=ImageOps.flip(base)
     if owner.mode!="L" or text.mode!="RGBA" or owner.size!=base.size or text.size!=base.size:
         raise BC3Hold("SOURCE_OWNER_TEXT_DIMENSIONS")
-    foreign=ImageChops.subtract(ink(base.getchannel("A")),owner)
+    native_ink=ink(base.getchannel("A"))
+    if ImageChops.subtract(owner,native_ink).getbbox():
+        raise BC3Hold("OWNER_NOT_NATIVE_SOURCE_ALPHA")
+    foreign=ImageChops.subtract(native_ink,owner)
     if not owner.getbbox() or not text.getchannel("A").getbbox():
         raise BC3Hold("NO_NATIVE_OWNER_OR_KOREAN_INK")
     if ImageChops.multiply(owner,foreign).getbbox():
