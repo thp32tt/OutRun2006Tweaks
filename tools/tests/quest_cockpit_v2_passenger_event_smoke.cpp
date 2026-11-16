@@ -35,4 +35,22 @@ int main() {
     static_assert(!suppress(true,true,false,false,true,true));  // menu unchanged
     assert(!suppress(true,true,false,true,false,true));
     assert(suppress(true,true,false,true,true,true));
+    // 64-state cross-product: only cockpit camera 1 can hide a native ROB02.
+    // The "gameplay" bit is the stricter racing && !sceneEffect predicate,
+    // so GOAL, menu, pause effects and incomplete START remain untouched.
+    for(unsigned mask=0;mask<64u;++mask) {
+        const bool vr=(mask&1u)!=0u;
+        const bool cockpit=(mask&2u)!=0u;
+        const bool follow=(mask&4u)!=0u;
+        const bool raceNoEffect=(mask&8u)!=0u;
+        const bool camera1=(mask&16u)!=0u;
+        const bool realPassenger=(mask&32u)!=0u;
+        const bool expected=vr && cockpit && !follow &&
+            raceNoEffect && camera1 && realPassenger;
+        assert(suppress(vr,cockpit,follow,raceNoEffect,
+                        camera1,realPassenger)==expected);
+        if(!camera1)
+            assert(!suppress(vr,cockpit,follow,raceNoEffect,
+                             camera1,realPassenger));
+    }
 }
