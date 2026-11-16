@@ -1,0 +1,76 @@
+name: OutRun HD BC3 4-Mip Source-Owner Canaries (GitHub CPU)
+
+# 12 exact full-owner overlap HOLDs were previously trapped by 4-level BC3.
+# Verify all four original mip levels and protect every unrelated source pixel.
+# This workflow creates only test DDS, never installed artifacts or release PASS.
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/outrun-hd-bc3-4mip-owner-canary.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: outrun-hd-bc3-4mip-source-owner
+  cancel-in-progress: true
+
+jobs:
+  source-locked-4mip-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    steps:
+      - name: Checkout SHA-bound exact format native DXT5 code (no N100)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/hd_bc3_native_codec.py
+            tools/localization/hd_bc3_index_patch.py
+            tools/localization/hd_bc3_4mip_patch.py
+            tools/localization/hd_bc3_4mip_canary.py
+            tools/localization/hd_hold_closure_audit.py
+            tools/localization/test_hd_bc3_4mip_patch.py
+      - name: Read original source-DDS SHA-bound owner masks
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-ab-multi-atlas-43169137555
+          run-id: 43169137555
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/hd-source-evidence
+      - name: Read original existing A/B pixel-edited Korean PNGs
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-source-bound-auto-edited-pngs-43185778845
+          run-id: 43185778845
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/hd-edited
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Pillow only
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+      - name: Test four original mip levels, alpha ownership and untouched source
+        run: python -m unittest discover -s tools/localization -p test_hd_bc3_4mip_patch.py -v
+      - name: Test original-SHA real native DXT5 4-mip at one ROI per DDS
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_bc3_4mip_canary.py \
+            --proof-dir "$RUNNER_TEMP/hd-source-evidence/source_protection" \
+            --edited-dir "$RUNNER_TEMP/hd-edited" \
+            --out "$RUNNER_TEMP/hd-mip4-proof"
+      - name: Archive only original-format verified test DDS and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-hd-bc3-four-mip-canary-${{ github.run_id }}
+          path: ${{ runner.temp }}/hd-mip4-proof/
+          retention-days: 14
+          if-no-files-found: warn
