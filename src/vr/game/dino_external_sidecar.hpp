@@ -255,8 +255,10 @@ struct Gate {
 };
 inline bool Eligible(const Gate& g) noexcept {
     const bool matchF50=!g.allowOtherFerrari&&g.carKind==0;
-    const bool knownAdditionalId=g.carId==7u||g.carId==22u||
-        g.carId==11u||g.carId==26u;
+    // PC retail player-car IDs are bounded by the 30-row native seat/car
+    // table. Every extra external model still uses a fixed per-ID filename,
+    // verified player identity and the same fail-closed parser/GPU gates.
+    const bool knownAdditionalId=g.carId<30u;
     const bool matchAdditional=g.allowOtherFerrari&&knownAdditionalId&&
         g.carId==g.expectedCarId;
     return g.optIn&&g.vr&&g.seat&&g.gameplay&&g.stereo&&g.playerDraw&&
