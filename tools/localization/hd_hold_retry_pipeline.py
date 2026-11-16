@@ -27,7 +27,7 @@ GLYPH_ERRORS = frozenset(("QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
                           "QA_TRANSLATION_TOO_SMALL_TO_READ"))
 SOURCE_ERRORS = frozenset(("AUTO_EDIT_SOURCE_OWNER_LINE_LAYOUT",))
 MIN_SIDE = 4
-MAX_REFERENCE = 650 * 1024
+MAX_REFERENCE = 4 * 1024 * 1024  # Match publish_hd_rework_queue.MAX_PNG.
 
 
 def sha(data):
