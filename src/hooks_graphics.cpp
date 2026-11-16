@@ -1185,12 +1185,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     }
     static void __cdecl RobotDisplay(EvWorkRobot* robot) {
         using namespace OutRunVR::QuestCockpitV2;
-        // Nested original draws already see the outer scoped corrected W.
-        // Let the original draw run, but never correct/stage it a second time.
-        if(OriginalRobotCorrectionActive()) {
-            RobotHook.ccall<void>(robot);
-            return;
-        }
+        // The passenger mode must be checked BEFORE the recursive fallback:
+        // an original ROB01 draw may synchronously invoke ROB02 while W*C
+        // correction is active. Nested ROB02 must still honor Remove.
         // Original ROB display runs outside races too. Event state is safe
         // to inspect only after original native hooks and gameplay are ready.
         if (!robot || !Settings::VREnabled ||
@@ -1208,16 +1205,30 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             return;
         }
         const auto slot=ExactOriginalCockpitOccupant(robot);
-        // Hide only the exact live original passenger in cockpit mode 1.
-        // No event teardown, altered animation, driver/NPC suppression or
-        // changes to the third-person camera-0 rendering path.
+        const bool racing=Game::current_mode &&
+            (*Game::current_mode==STATE_GAME ||
+             (*Game::current_mode==STATE_START &&
+              Game::game_start_progress_code &&
+              *Game::game_start_progress_code==65));
+        // STATE_GOAL is still "playable" for camera/matrix purposes, but
+        // must never hide a passenger during the original goal scene.
+        // Likewise a scene-effect draw is never a normal cockpit draw.
+        // Remove only the exact live passenger in cockpit mode 1; native
+        // camera 0, driver, NPCs, goal and event work are untouched.
         if(ShouldSuppressOriginalPassenger(
                 Settings::VREnabled.get(),
                 Settings::VRQuestCockpitV2Enabled.get(),
                 Settings::VRQuestCockpitV2PassengerVisible.get(),
-                IsPlayableCarGameplay(),
+                racing && !InSceneEffect(),
                 camera->cam_mode_34A==1,
                 slot==OriginalOccupantSlot::Passenger363)) {
+            return;
+        }
+        // Nested original draws already see the outer scoped corrected W.
+        // Every nested non-removed draw must forward untouched, without
+        // staging/multiplying its work a second time.
+        if(OriginalRobotCorrectionActive()) {
+            RobotHook.ccall<void>(robot);
             return;
         }
         if(!NativeFrameTrace().Active() || InSceneEffect()) {
@@ -1226,11 +1237,6 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         }
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
-        const bool racing=Game::current_mode &&
-            (*Game::current_mode==STATE_GAME ||
-             (*Game::current_mode==STATE_START &&
-              Game::game_start_progress_code &&
-              *Game::game_start_progress_code==65));
         const auto action=SelectCockpitOccupantRender(
             slot,QuestCockpitV2Active(camera),racing,
             Settings::VRQuestCockpitV2HideDriver,
