@@ -402,7 +402,7 @@ def parse_dashboard_bindings(g, metadata, placement=None):
     return node_to_binding, records
 
 
-def collect_groups(g, binary, placement, texture_records, node_bindings):
+def collect_groups(g, binary, placement, texture_records, node_bindings, native_origin=False):
     materials = g.get('materials', [])
     ensure(1 <= len(materials) <= MAX_MATERIALS, 'material limit (1-64) exceeded')
     parts = defaultdict(list)
@@ -461,7 +461,7 @@ def collect_groups(g, binary, placement, texture_records, node_bindings):
     batchid = 0
     for mid, binding in sorted(parts, key=lambda k: (texture_records[k[0]][-1], k[0], k[1])):
         transp = texture_records[mid][-1]
-        name_prefix = 'EXT_GLASS_' if transp else 'EXT_OPAQUE_'
+        name_prefix = ('NATIVE_GLASS_' if transp else 'NATIVE_OPAQUE_') if native_origin else ('EXT_GLASS_' if transp else 'EXT_OPAQUE_')
         for vertex, inds in parts[(mid, binding)]:
             # The model contains original vertex positions and indexed triangles.
             # Split only at 1M vertices/group, NEVER decimate triangles.
@@ -485,7 +485,8 @@ def encode_sidecar(g, binary, metadata):
     materials = g.get('materials', [])
     texture_records = [get_material_textures(g, binary, mat) for mat in materials]
     node_bindings, dashboard_specs = parse_dashboard_bindings(g, metadata, matrix)
-    groups, triangle_count, bounds = collect_groups(g, binary, matrix, texture_records, node_bindings)
+    native_origin = metadata.get('origin_type') == 'original_game_private_remaster'
+    groups, triangle_count, bounds = collect_groups(g, binary, matrix, texture_records, node_bindings, native_origin)
     ensure(metadata.get('geometry_space') == 'outrun_local_y_up_meters',
            'only verified game-local metre coordinates accepted')
     # Independent geometry QA: all original triangles appear once in output.
@@ -505,7 +506,7 @@ def encode_sidecar(g, binary, metadata):
         payload.extend(index_data)
         nv += len(group.vertices)
         gpu_bytes += len(vertex_data)+len(index_data)
-        if group.group.startswith('EXT_GLASS_'):
+        if group.group.startswith(('EXT_GLASS_', 'NATIVE_GLASS_')):
             nglass += len(group.indices)//3
     for base, _, _, _, _ in textures:
         raw = rgba_dds(base)
@@ -563,7 +564,7 @@ def audit_entry(root, car, strict_source=False):
         ensure(meta.get('geometry_space') == 'outrun_local_y_up_meters', 'car source native alignment not verified')
         ensure(meta.get('alignment_verified') is True, 'car origin/height/axis calibration not verified')
         ensure(meta.get('model_scope') == 'full_car', 'cockpit-only source is not a complete external car')
-        ensure(meta.get('origin_type') in ('external_mod','user_authored'), 'source provenance not declared')
+        ensure(meta.get('origin_type') in ('external_mod','user_authored','original_game_private_remaster'), 'source provenance not declared')
         ensure(len(meta.get('external_to_game_matrix', [])) == 16, 'game coordinate matrix missing')
         result.update(status='READY_PRIVATE_CONVERSION', model_bytes=glb.stat().st_size,
                       sha256=actual, origin_type=meta['origin_type'])
@@ -657,7 +658,7 @@ def check_output(ovc: Path):
         need = nl+32*nv+width*ni
         ensure(need <= len(raw)-p, 'group body truncated')
         name = raw[p:p+nl].decode('ascii')
-        ensure(name.startswith(('EXT_OPAQUE_', 'EXT_GLASS_')), 'unexpected group identity')
+        ensure(name.startswith(('EXT_OPAQUE_', 'EXT_GLASS_', 'NATIVE_OPAQUE_', 'NATIVE_GLASS_')), 'unexpected group identity')
         p += nl
         arr = np.frombuffer(raw, dtype='<f4', count=nv*8, offset=p)
         ensure(np.all(np.isfinite(arr)) and np.max(np.abs(arr)) < 10_000, 'vertex has invalid components')
