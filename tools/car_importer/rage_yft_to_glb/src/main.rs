@@ -169,6 +169,17 @@ fn audit_yft_mode(yft_path: &str) -> Result<()> {
     println!("fragment={}", fragment.name);
     println!("bone_transforms={}", fragment.bone_transforms.len());
     println!("children={}", fragment.children.len());
+    for (index, child) in fragment.children.iter().enumerate() {
+        let t = child.transform.translation();
+        println!(
+            "CHILD_TRANSFORM\tindex={}\tbone_tag={}\twheel_slot={:?}\ttranslation={:.6},{:.6},{:.6}\thas_drawable={}",
+            index,
+            child.bone_tag,
+            rage_formats::yft::wheel_slot(child.bone_tag),
+            t.x, t.y, t.z,
+            child.drawable.is_some()
+        );
+    }
 
     let mut candidates = 0usize;
     let mut audit_drawable = |part_name: &str, drawable: &rage_formats::ydd::Drawable| {
