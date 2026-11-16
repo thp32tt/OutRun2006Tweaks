@@ -30,7 +30,7 @@ class MipOneOwnerTest(unittest.TestCase):
         self.assertLess(got.getpixel((16,20))[3],16)
     def test_original_source_pixels_cannot_be_substituted(self):
         original,crop,owner,amb,text,bbox=self.inputs()
-        crop.putpixel((4,4),(0,0,0,255))
+        crop.putpixel((4,4),(25,75,125,119))
         with self.assertRaisesRegex(BC3Hold,"SHA_CROP_MISMATCH"):
             apply(original,crop,owner,amb,text,bbox)
     def test_ambiguous_owner_is_not_erased(self):
