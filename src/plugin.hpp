@@ -94,7 +94,7 @@ namespace Settings
 	extern Setting<float> VRQuestCockpitV2SeatBack;          // vr/settings.cpp / F11 cockpit persistence
 	extern Setting<float> VRQuestCockpitV2SeatDown;          // vr/settings.cpp / F11 cockpit persistence
 	extern Setting<float> VRQuestCockpitV2SeatRight;         // vr/settings.cpp / F11 cockpit persistence
-	extern Setting<bool> VRQuestCockpitV2PassengerVisible;   // true: follow camera 0; false: remove ROB02
+	extern Setting<bool> VRQuestCockpitV2PassengerVisible;   // true: follow camera 0; false: remove ROB02 only in cockpit
 
 	extern Setting<float> FramerateInterpolationDebugAlpha; // interpolation.cpp
 	extern Setting<bool> FramerateInterpolationDebugLog;    // interpolation.cpp
