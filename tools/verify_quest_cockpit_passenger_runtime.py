@@ -31,21 +31,31 @@ assert "OriginalEventLiveForDisplay(eventFlags[OriginalDriverEventId])" in owner
 assert "OriginalEventLiveForDisplay(eventFlags[OriginalPassengerEventId])" in owner
 assert "Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva)" in owner
 
-# The REMOVE gate precedes camera!=1 and native-frame early returns:
-# exact live ROB02 disappears from camera 0 AND cockpit, without touching
-# driver, unrelated NPC, original event setup, animation or work pointers.
-assert "const auto slot=ExactOriginalCockpitOccupant(robot);" in render
+# Camera-0 must reach the original renderer regardless of passenger mode.
+# Only after rejecting camera!=1 may the exact live ROB02 suppression run.
+camera_guard = "if(!camera || camera->cam_mode_34A!=1 || !Game::pl_car())"
+assert camera_guard in render
+before_suppress=render.split("ShouldSuppressOriginalPassenger(", 1)[0]
+assert before_suppress.index(camera_guard) < before_suppress.index(
+    "const auto slot=ExactOriginalCockpitOccupant(robot);"
+)
+assert "RobotHook.ccall<void>(robot);" in before_suppress.split(
+    camera_guard, 1
+)[1]
 assert "ShouldSuppressOriginalPassenger(" in render
-assert "slot==OriginalOccupantSlot::Passenger363" in render
+after_suppress=render.split("ShouldSuppressOriginalPassenger(", 1)[1]
+assert "camera->cam_mode_34A==1" in after_suppress.split("))", 1)[0]
+assert "slot==OriginalOccupantSlot::Passenger363" in after_suppress
+assert "return;" in after_suppress.split(
+    "if(!NativeFrameTrace().Active()", 1
+)[0]
 assert render.index("ShouldSuppressOriginalPassenger(") < render.index(
     "if(!NativeFrameTrace().Active() || InSceneEffect())"
 )
-assert render.index("ShouldSuppressOriginalPassenger(") < render.index(
-    "camera->cam_mode_34A!=1"
-)
-assert "return;" in render.split("ShouldSuppressOriginalPassenger(", 1)[1].split(
-    "if(!NativeFrameTrace().Active()", 1
-)[0]
+assert "nativeCameraModeOne && exactLivePassenger" in policy
+assert "camera 0" in ini.lower() or "Camera 0" in ini
+assert "ONLY in cockpit mode 1" in settings
+assert "ONLY in cockpit view" in overlay
 assert "RobotHook.ccall<void>(robot);" in render
 assert "SelectCockpitOccupantRender(" in render
 assert "ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);" in render
@@ -65,7 +75,7 @@ assert "VRQuestCockpitV2PassengerVisible;" in plugin
 assert "flush_settings();" in overlay
 assert 'matches_search("Remove Passenger",search)' in overlay
 
-print("PASS: native camera-0 ROB02 parity, both-view removal, F11 exclusive mode")
+print("PASS: native camera-0 untouched, cockpit-only ROB02 removal, F11 exclusive mode")
 
 # Actual game entrypoint 0x440110 reads 0x79FB48[eventId], cdecl, and its
 # callbacks are identified by the exact original native table. It is not
