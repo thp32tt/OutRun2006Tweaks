@@ -23,6 +23,8 @@ on:
       - "tools/localization/test_hd_hold_auto_edit.py"
       - "tools/localization/hd_existing_candidate_salvage.py"
       - "tools/localization/github_ab_imagegen_atlas_batch.py"
+      - "tools/localization/hd_bc3_source_owner_import.py"
+      - "localization/automation_inputs/native_source_owner_canary/**"
       - "tools/localization/hd_manual_user_import.py"
 
 permissions:
@@ -65,6 +67,8 @@ jobs:
             tools/localization/test_hd_bc3_index_patch.py
             tools/localization/test_hd_bc3_native_codec.py
             tools/localization/hd_existing_candidate_salvage.py
+            tools/localization/hd_bc3_source_owner_import.py
+            tools/localization/test_hd_bc3_source_owner_import.py
             tools/localization/hd_rework_queue.py
             tools/localization/hd_hold_triage.py
             tools/localization/test_hd_hold_triage.py
@@ -73,6 +77,7 @@ jobs:
             tools/localization/test_hd_strict_qa.py
             tools/localization/test_github_ab_imagegen_atlas_batch.py
             localization/automation_inputs/candidate_outputs
+            localization/automation_inputs/native_source_owner_canary
             localization/automation_inputs/qa_rework/approved
             localization/automation_inputs/hd_original_png_source_plan.json
             localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
@@ -101,6 +106,7 @@ jobs:
           python -m unittest discover -s tools/localization -p test_github_ab_imagegen_atlas_batch.py -v
           python -m unittest discover -s tools/localization -p test_hd_strict_qa.py -v
           python -m unittest discover -s tools/localization -p test_hd_manual_user_import.py -v
+          python -m unittest discover -s tools/localization -p test_hd_bc3_source_owner_import.py -v
           python -m unittest discover -s tools/localization -p test_hd_overlap_ownership.py -v
           python -m unittest discover -s tools/localization -p test_hd_source_protection_evidence.py -v
           python -m unittest discover -s tools/localization -p test_hd_hold_resolution_plan.py -v
@@ -128,6 +134,7 @@ jobs:
           assert j["legacy_oversize_outputs_rejected"] is True
           assert j["translated_roi_generated"] >= 301 # last confirmed 2026-11-10 strict source baseline
           assert j["manual_user_test_only_roi_count"]==6
+          assert j["native_source_owner_pixel_edits_test_only"]==8
           assert j["release_approved"] is False
           assert j["salvage_policy"]=="EXISTING_AB_PNG_RESIZE_REFLOW_ONLY_NO_NEW_IMAGEGEN_V2"
           assert j["translated_roi_generated"]+sum(j["hold_roi_reason_counts"].values())==954
