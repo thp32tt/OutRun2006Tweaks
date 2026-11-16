@@ -65,17 +65,15 @@ def count(mask):
 def evidence_overlay(source_crop, owned, protected, ambiguous):
     """Lossless RGB preview; mask PNGs remain authoritative pixel evidence."""
     view = source_crop.convert("RGBA")
+    if not (view.size == owned.size == protected.size == ambiguous.size):
+        raise ValueError("OVERLAY_MASK_DIMENSIONS_INVALID")
     # Green=one-owner island; amber=ambiguous; red=other/protected ink.
-    pixels = view.load()
-    a, b, c = owned.load(), protected.load(), ambiguous.load()
-    for y in range(view.height):
-        for x in range(view.width):
-            if a[x, y]:
-                pixels[x, y] = (25, 220, 65, 255)
-            elif c[x, y]:
-                pixels[x, y] = (255, 170, 10, 255)
-            elif b[x, y]:
-                pixels[x, y] = (245, 45, 45, 255)
+    # Pillow executes these masked pastes in C. protected intentionally includes
+    # ambiguous source ink, so apply red first and amber afterward; owned is
+    # disjoint from protected by separate_masks() and remains highest priority.
+    view.paste((245, 45, 45, 255), (0, 0), protected)
+    view.paste((255, 170, 10, 255), (0, 0), ambiguous)
+    view.paste((25, 220, 65, 255), (0, 0), owned)
     return view
 
 
@@ -157,7 +155,10 @@ def build(root, qa_report, out, max_previews=200):
             rid = row["roi_id"]
             owned, protected, unknown = separate_masks(
                 source, row["_bbox"], partial.get(rid), ambiguous)
-            core = count(owned) + count(protected)
+            owned_pixels = count(owned)
+            protected_pixels = count(protected)
+            ambiguous_pixels = count(unknown)
+            core = owned_pixels + protected_pixels
             if not core:
                 raise ValueError("EMPTY_OVERLAP_CORE")
             record = {
@@ -169,9 +170,9 @@ def build(root, qa_report, out, max_previews=200):
                 "english": row["english"],
                 "korean": row["korean"],
                 "native_alpha_core_pixels": core,
-                "exclusive_anchored_component_pixels": count(owned),
-                "protected_or_unclaimed_pixels": count(protected),
-                "ambiguous_component_pixels": count(unknown),
+                "exclusive_anchored_component_pixels": owned_pixels,
+                "protected_or_unclaimed_pixels": protected_pixels,
+                "ambiguous_component_pixels": ambiguous_pixels,
                 "full_component_owner_proven": rid in full,
                 "native_bc3_four_mips_requires_separate_codec_gate": bc3_mips,
                 "status": "MASK_DIAGNOSTIC_ONLY_NO_CLEAN_ERASURE_OR_GAME_QA",
@@ -180,7 +181,7 @@ def build(root, qa_report, out, max_previews=200):
             # Save a bounded number of original-resolution masks, prioritizing
             # rows with actual isolated components to accelerate manual review.
             # Never invent an owner for fully ambiguous components.
-            if selected < max_previews and count(owned):
+            if selected < max_previews and owned_pixels:
                 crop = source.crop(tuple(row["_bbox"]))
                 for label, mask in (("owned", owned), ("protected", protected), ("ambiguous", unknown)):
                     name = rid + "_" + label + ".png"
@@ -199,9 +200,9 @@ def build(root, qa_report, out, max_previews=200):
                     record["mask_pngs"][suffix] = "native_masks/" + name
                 selected += 1
             evidence.append(record)
-            counts["partial_owner_rows"] += bool(count(owned))
+            counts["partial_owner_rows"] += bool(owned_pixels)
             counts["fully_proven_rows"] += rid in full
-            counts["ambiguous_rows"] += bool(count(unknown))
+            counts["ambiguous_rows"] += bool(ambiguous_pixels)
     if {r["roi_id"] for r in evidence} != overlap_holds:
         raise ValueError("UNACCOUNTED_NATIVE_OVERLAP_HOLD")
     result = {
