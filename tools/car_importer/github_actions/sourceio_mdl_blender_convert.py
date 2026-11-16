@@ -118,64 +118,53 @@ def main():
     before_dims = before_hi - before_lo
     wheels = wheel_bones()
 
-    # Source 1 vehicle convention is +X forward, +Y left, +Z up.
-    # Prefer explicit wheel bones when available; otherwise keep that canonical convention.
-    current_forward = Vector((1.0, 0.0, 0.0))
+    # SourceIO presents the TDM vehicles in Blender Z-up coordinates with
+    # +Y as the longitudinal axis. Preserve the imported hierarchy/armature and
+    # encode the vehicle-local normalization in the OVC placement matrix instead
+    # of mutating Blender roots (which can double-transform skinned child meshes).
     center = (before_lo + before_hi) * 0.5
-    ground = before_lo.z
-    alignment = {"wheel_bones_found": sorted(wheels.keys()), "source_convention": "+X forward,+Y left,+Z up"}
+    ground = float(before_lo.z)
+    alignment = {
+        "wheel_bones_found": sorted(wheels.keys()),
+        "sourceio_blender_axes": {"right":"+X","forward":"+Y","up":"+Z"},
+        "normalization_policy": "leave_source_glb_unmodified; apply center/ground/Z-mirror in external_to_game_matrix",
+    }
 
     if all(k in wheels for k in ("lf", "rf", "lr", "rr")):
         front = (wheels["lf"] + wheels["rf"]) * 0.5
         rear = (wheels["lr"] + wheels["rr"]) * 0.5
-        current_forward = front - rear
-        current_forward.z = 0
-        if current_forward.length < 0.5:
+        forward = front - rear
+        forward.z = 0
+        if forward.length < 0.5:
             raise RuntimeError("Wheel-bone axle separation too small")
+        forward.normalize()
+        if forward.y < 0.90 or abs(forward.x) > 0.20:
+            raise RuntimeError(f"Unexpected SourceIO vehicle forward axis: {list(forward)}")
         axle_center = (front + rear) * 0.5
-        center.x, center.y = axle_center.x, axle_center.y
+        center.x = axle_center.x
+        center.y = axle_center.y
         alignment.update({
             "front_axle_center": list(front),
             "rear_axle_center": list(rear),
             "axle_center": list(axle_center),
-            "wheel_forward_vector": list(current_forward),
+            "wheel_forward_unit": list(forward),
         })
 
-    current_angle = math.atan2(current_forward.y, current_forward.x)
-    target_angle = -math.pi / 2.0  # Blender -Y -> glTF +Z
-    yaw = target_angle - current_angle
-
-    roots = [o for o in bpy.context.scene.objects if o.parent is None]
-    if not roots:
-        raise RuntimeError("Imported scene has no roots")
-    transform = (
-        Matrix.Translation((0.0, 0.0, -ground))
-        @ Matrix.Rotation(yaw, 4, "Z")
-        @ Matrix.Translation((-center.x, -center.y, 0.0))
-    )
-    for root in roots:
-        root.matrix_world = transform @ root.matrix_world
-    bpy.context.view_layer.update()
-
-    after_lo, after_hi = scene_bounds(meshes)
-    dims = after_hi - after_lo
-    width, length, height = float(dims.x), float(dims.y), float(dims.z)
+    width = float(before_hi.x - before_lo.x)
+    length = float(before_hi.y - before_lo.y)
+    height = float(before_hi.z - before_lo.z)
     print("SOURCEIO_BOUNDS", json.dumps({
-        "before": [list(before_lo), list(before_hi)],
-        "after": [list(after_lo), list(after_hi)],
+        "source_blender_bounds": [list(before_lo), list(before_hi)],
         "dimensions_width_length_height": [width, length, height],
-        "yaw": yaw,
         **alignment,
     }))
 
     if not (1.2 <= width <= 2.6):
-        raise RuntimeError(f"vehicle width invalid after normalization: {width:.3f}")
+        raise RuntimeError(f"vehicle width invalid: {width:.3f}")
     if not (3.0 <= length <= 6.0):
-        raise RuntimeError(f"vehicle length invalid after normalization: {length:.3f}")
+        raise RuntimeError(f"vehicle length invalid: {length:.3f}")
     if not (0.7 <= height <= 2.2):
-        raise RuntimeError(f"vehicle height invalid after normalization: {height:.3f}")
-    if after_lo.z < -0.04 or after_lo.z > 0.10:
-        raise RuntimeError(f"vehicle ground contact invalid: minZ={after_lo.z:.4f}")
+        raise RuntimeError(f"vehicle height invalid: {height:.3f}")
 
     vertices = triangles = 0
     for obj in meshes:
@@ -215,10 +204,13 @@ def main():
         "alignment_verified": True,
         "model_scope": "full_car",
         "origin_type": "external_mod",
+        # Blender -> glTF export maps (X,Y,Z) to (X,Z,-Y). SourceIO cars
+        # face +Y in Blender, therefore -Z in glTF. Mirror glTF Z to make
+        # OutRun +Z forward, center on axle/body XZ and lift source ground to Y=0.
         "external_to_game_matrix": [
-            1,0,0,0,
-            0,1,0,0,
-            0,0,1,0,
+            1,0,0,-float(center.x),
+            0,1,0,-ground,
+            0,0,-1,-float(center.y),
             0,0,0,1,
         ],
         "rights_note": "PRIVATE_TEST_ONLY; public repository redistribution exists but upstream 3D model is credited to Turn 10; no public redistribution permission asserted",
@@ -230,11 +222,12 @@ def main():
         "converter": "REDxEYE/SourceIO 6.0.0 + Blender 5.2.4",
         "normalization": {
             **alignment,
-            "yaw_radians": yaw,
-            "before_bounds_blender_zup": [list(before_lo), list(before_hi)],
-            "after_bounds_blender_zup": [list(after_lo), list(after_hi)],
+            "source_bounds_blender_zup": [list(before_lo), list(before_hi)],
             "dimensions_m_width_length_height": [width, length, height],
-            "glb_expected_axes": {"right": "+X", "up": "+Y", "forward": "+Z"},
+            "source_glb_axes": {"right":"+X","up":"+Y","forward":"-Z"},
+            "game_axes": {"right":"+X","up":"+Y","forward":"+Z"},
+            "ground_source_blender_z": ground,
+            "center_source_blender_xy": [float(center.x), float(center.y)],
         },
         "mesh_stats": {
             "visible_mesh_objects": len(meshes),
