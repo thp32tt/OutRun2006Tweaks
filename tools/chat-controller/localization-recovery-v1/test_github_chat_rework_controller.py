@@ -50,6 +50,19 @@ class ReworkBridgeProtocol(unittest.TestCase):
   with self.assertRaises(ValueError):
    c.task_state_path("bad")
   self.assertLessEqual(c.MAX_CONTENTS_PNG,650*1024)
+  self.assertEqual(c.MAX_SOURCE_REFERENCE_PNG,4*1024*1024)
+
+ def test_large_source_reference_uses_git_blob_fallback(self):
+  gh=c.Github("test-token")
+  ref_bytes=b"x"*(700*1024)
+  blob_sha="d"*40
+  gh.req=lambda rel,branch,payload=None: {
+      "encoding":"none","size":len(ref_bytes),"sha":blob_sha}
+  gh.read_blob=lambda sha: ref_bytes if sha==blob_sha else b""
+  rel=c.QROOT+"/refs/HDRW-A-"+("a"*20)+"_HD_SOURCE.png"
+  raw,sha=gh.read(rel,c.QUEUE_BRANCH)
+  self.assertEqual(raw,ref_bytes)
+  self.assertEqual(sha,blob_sha)
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
