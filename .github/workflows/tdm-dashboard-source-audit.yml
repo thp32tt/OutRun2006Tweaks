@@ -1,0 +1,127 @@
+name: TDM Ferrari Dashboard Source Audit
+
+on:
+  push:
+    branches:
+      - audit/dashboard-candidates-20261116
+    paths:
+      - '.github/workflows/tdm-dashboard-source-audit.yml'
+      - 'tools/car_importer/github_actions/dashboard_glb_audit_blender.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - car_id: enzo
+            runtime_id: 14
+            vehicle_name: Ferrari Enzo
+            mdl: fer_enzo
+            material_dir: enzo
+          - car_id: f430
+            runtime_id: 13
+            vehicle_name: Ferrari F430 Coupe
+            mdl: fer_f430
+            material_dir: fer_f430
+          - car_id: 250gto
+            runtime_id: 9
+            vehicle_name: Ferrari 250 GTO
+            mdl: fer_250gto
+            material_dir: fer_250gto
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Blender 5.2.4 and SourceIO 6.0.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          mkdir -p "$WORK"
+          curl -fL --retry 3 https://mirror.blender.org/release/Blender5.2/blender-5.2.4-linux-x64.tar.xz -o "$WORK/blender.tar.xz"
+          tar -xf "$WORK/blender.tar.xz" -C "$WORK"
+          BLENDER="$(find "$WORK" -maxdepth 2 -type f -name blender | head -1)"
+          echo "BLENDER=$BLENDER" >> "$GITHUB_ENV"
+          curl -fL --retry 3 https://github.com/REDxEYE/SourceIO/releases/download/6.0.0/SourceIO.zip -o "$WORK/SourceIO.zip"
+          echo "57d9f317aab5f89d19dbcb159a341a818046cb9e51b73145f61d0d1bcb1ec428  $WORK/SourceIO.zip" | sha256sum -c -
+          mkdir -p "$WORK/sourceio_extract"
+          unzip -q "$WORK/SourceIO.zip" -d "$WORK/sourceio_extract"
+          if test -f "$WORK/sourceio_extract/SourceIO/__init__.py"; then
+            SOURCEIO_PARENT="$WORK/sourceio_extract"
+          else
+            INIT="$(find "$WORK/sourceio_extract" -type f -path '*/SourceIO/__init__.py' | head -1)"
+            test -n "$INIT"
+            SOURCEIO_PARENT="$(dirname "$(dirname "$INIT")")"
+          fi
+          echo "SOURCEIO_PARENT=$SOURCEIO_PARENT" >> "$GITHUB_ENV"
+
+      - name: Fetch exact TDM source
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          SRC="$WORK/tdm"
+          git clone --filter=blob:none --no-checkout https://github.com/iamaman24287/TDM-cars-SVN.git "$SRC"
+          cd "$SRC"
+          git checkout a7c011708fddbb5d8a6c5218365624d2771a2f79 -- \
+            "models/tdmcars/${{ matrix.mdl }}.mdl" \
+            "models/tdmcars/${{ matrix.mdl }}.vvd" \
+            "models/tdmcars/${{ matrix.mdl }}.dx90.vtx" \
+            "models/tdmcars/${{ matrix.mdl }}.dx80.vtx" \
+            "models/tdmcars/${{ matrix.mdl }}.sw.vtx" \
+            "materials/models/tdmcars/${{ matrix.material_dir }}" \
+            "materials/models/tdmcars/shared"
+          echo "TDM_ROOT=$SRC" >> "$GITHUB_ENV"
+
+      - name: SourceIO to normalized GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          mkdir -p "$WORK/output"
+          "$BLENDER" -b --python tools/car_importer/github_actions/sourceio_mdl_blender_convert.py -- \
+            --sourceio-parent "$SOURCEIO_PARENT" \
+            --content-root "$TDM_ROOT" \
+            --mdl "$TDM_ROOT/models/tdmcars/${{ matrix.mdl }}.mdl" \
+            --output "$WORK/output" \
+            --car-id "${{ matrix.car_id }}" \
+            --runtime-id "${{ matrix.runtime_id }}" \
+            --vehicle-name "${{ matrix.vehicle_name }}" \
+            --source-repo "iamaman24287/TDM-cars-SVN" \
+            --source-commit "a7c011708fddbb5d8a6c5218365624d2771a2f79"
+
+      - name: Audit dashboard candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          "$BLENDER" -b --python tools/car_importer/github_actions/dashboard_glb_audit_blender.py -- \
+            --glb "$WORK/output/source.glb" \
+            --out "$WORK/output/dashboard_audit.json"
+          python - <<'PY'
+          import json,os,pathlib
+          car=os.environ["CAR_ID"]
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/f"sourceio-{car}"/"output"/"dashboard_audit.json"
+          d=json.loads(p.read_text())
+          print("AUDIT_SUMMARY",car,"mesh_count",d["mesh_count"],"candidate_count",d["candidate_count"])
+          for x in d["candidates"]:
+              print("CANDIDATE",json.dumps(x,ensure_ascii=False))
+          PY
+        env:
+          CAR_ID: ${{ matrix.car_id }}
+
+      - name: Upload source audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dashboard-Audit-${{ matrix.car_id }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/sourceio-${{ matrix.car_id }}/output/source.json
+            ${{ runner.temp }}/sourceio-${{ matrix.car_id }}/output/dashboard_audit.json
+          if-no-files-found: error
+          retention-days: 1
