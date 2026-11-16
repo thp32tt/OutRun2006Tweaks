@@ -32,4 +32,18 @@ inline bool ComputeExternalFloorLift(float requestedLift,
     appliedLift=lift;
     return true;
 }
+
+inline bool ComputeSidecarFloorLift(bool nativeOriginPreserved,
+                                    float requestedLift,
+                                    float modelMinY,
+                                    float& appliedLift) noexcept {
+    if(nativeOriginPreserved) {
+        if(!std::isfinite(requestedLift) || !std::isfinite(modelMinY) ||
+           modelMinY < -1.20f || modelMinY > 0.25f)
+            return false;
+        appliedLift=0.f;
+        return true;
+    }
+    return ComputeExternalFloorLift(requestedLift,modelMinY,appliedLift);
+}
 } // namespace OutRunVR::DinoSidecar
