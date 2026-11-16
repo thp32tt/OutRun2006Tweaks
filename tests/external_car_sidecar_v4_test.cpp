@@ -76,6 +76,7 @@ static std::vector<std::uint8_t> Make(bool goodAxis=true) {
 }
 
 int main() {
+    static_assert(MaxMaterials==128,"external HQ material budget regression");
     std::string error;Model model;
     auto good=Make(true);
     assert(Parse(good.data(),good.size(),model,error));
