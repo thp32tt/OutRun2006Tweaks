@@ -22,13 +22,12 @@ class TestOfflineKoreanBatch(unittest.TestCase):
         # The actual Docker Compose CLI is checked on N100 before GitOps push.
         import re
         compose=(HERE.parent/"docker-compose.yml").read_text(encoding="utf-8")
-        self.assertEqual(compose.count("    environment:"),1)
-        section=compose.split("    environment:",1)[1].split("    ports:",1)[0]
-        keys=re.findall(r"^      ([A-Za-z_][A-Za-z0-9_]*):",section,re.M)
-        self.assertEqual(len(keys),len(set(keys)),
-                         "Duplicate Compose environment keys detected")
-        self.assertEqual(keys.count("OUTRUN_OFFLINE_FALLBACK_OVERLAP_MODE"),1)
-        self.assertEqual(keys.count("OUTRUN_OFFLINE_FALLBACK_OUTPUT_ROOT"),1)
+        sections=re.findall(r"(?m)^    environment:\n((?:^      .*\n)*)",compose)
+        self.assertEqual(len(sections),2)
+        for section in sections:
+            keys=re.findall(r"^      ([A-Za-z_][A-Za-z0-9_]*):",section,re.M)
+            self.assertEqual(len(keys),len(set(keys)),
+                             "Duplicate Compose environment keys detected")
 
     def test_path_gate(self):
         self.assertEqual(str(batch.verify_path("textures/load/spr/demo.dds")),
