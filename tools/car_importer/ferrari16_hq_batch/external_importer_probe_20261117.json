@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-17",
+  "blender": "5.2.4 LTS",
+  "sollumz": {
+    "version": "2.9.0",
+    "source_commit": "389bd9bd1f7bfe9e73bc291eb473175848d2b567",
+    "register": "PASS"
+  },
+  "kn5_blender_tools": {
+    "version": "2.0.2",
+    "register": "PASS",
+    "operators": ["assetto_corsa_car","assetto_corsa_kn5","assetto_corsa_track"]
+  },
+  "meaning": "Importer registration smoke test only. No remaining9 source bytes imported yet; does not count as a converted car."
+}
