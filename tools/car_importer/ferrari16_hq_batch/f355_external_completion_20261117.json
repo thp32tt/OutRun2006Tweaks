@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-17",
+  "car_id": "f355spider",
+  "source": {
+    "kind": "GTA5 external full-car",
+    "archive": "f355spider.7z",
+    "archive_bytes": 62970783,
+    "archive_sha256": "37948adda656fc5935ef5ede748f034cc2fa4bc01b9ec392a7ad3858afcef99d",
+    "yft": "FiveM/ff355s/stream/f355s.yft",
+    "yft_bytes": 11489603,
+    "ytd": "FiveM/ff355s/stream/f355s.ytd",
+    "ytd_bytes": 13053420
+  },
+  "parser": {
+    "rage_formats_commit": "f31f11b137ac14884ff5ea5d8209755f6cd03e9b",
+    "rage_render_commit": "9d7977a011cbe8808f1adb62f32363effffe9a50",
+    "converter_source_commit": "ec9d24f88eaf3719a353e90b9d7ace14f2bd3ddb",
+    "converter_binary_commit": "925c8b47c1fea565dde1c70ee24d6d8a199d0793",
+    "converter_binary_sha256": "91e886d1d3b0073861da85014525a0405897cf723a36ed384cfed3758a730f25"
+  },
+  "conversion": {
+    "status": "PASS",
+    "fragment": "pack:/f355s",
+    "parts": 5,
+    "triangles": 445093,
+    "geometries": 142,
+    "decoded_texture_slots": 65,
+    "texture_aliases": [
+      [
+        "script_rt_dials_race",
+        "script_rt_dials_race "
+      ]
+    ],
+    "missing_textures": [
+      "black",
+      "specw",
+      "vehicle_generic_carbon",
+      "vehicle_generic_detail2",
+      "vehicle_generic_glasswindows2",
+      "vehicle_generic_smallspecmap"
+    ],
+    "glb_bytes": 17880068,
+    "glb_sha256": "f31f6d97108565624114fecb168b8dbed7246170ff5d19ecd7eedcc8e3955361"
+  },
+  "blender_reopen": {
+    "blender": "5.2.4 LTS",
+    "status": "PASS",
+    "mesh_objects": 1,
+    "vertices": 366054,
+    "polygons": 444971,
+    "materials": 40,
+    "embedded_images": 49,
+    "bounds_min": [
+      -0.9755529761314392,
+      -2.526033401489258,
+      -0.5483652949333191
+    ],
+    "bounds_max": [
+      0.9755529761314392,
+      1.8057656288146973,
+      0.5961101055145264
+    ]
+  },
+  "dashboard": {
+    "texture_present_after_alias": true,
+    "telemetry_runtime": "OVRCABH4 ready",
+    "needle_mesh_binding": "PENDING",
+    "sweep_calibration": "PENDING"
+  },
+  "game_qa": {
+    "quest3_live": false,
+    "outrun_runtime": false
+  },
+  "completion_status": "EXTERNAL_FULLCAR_GLB_REOPEN_PASS_DASHBOARD_BINDING_PENDING"
+}
