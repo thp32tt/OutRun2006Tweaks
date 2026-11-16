@@ -928,7 +928,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // 7/22=288 GTO, 11/26=F40. Every other ID uses a fixed car_id_XX.ovc.
         // Keep every user-supplied OVC confined to player cockpit view 1.
         const bool f50Car=Settings::VRF50ExternalModel && player &&
-            player->car_kind_11==0;
+            OutRunVR::DinoSidecar::IsF50RetailCarId(carId);
         const bool extraCar=Settings::VRExternalFerrariTest && player &&
             !f50Car && carId<30u;
         if ((!extraCar && !f50Car) || !Settings::VREnabled ||
@@ -1029,7 +1029,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const auto* livePlayer=liveRace?Game::pl_car():nullptr;
         const bool f50Slot=ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F50;
         const bool sameCar=livePlayer && livePlayer->car_id_10==ticket.carId &&
-            (f50Slot ? (Settings::VRF50ExternalModel && livePlayer->car_kind_11==0) :
+            (f50Slot ? (Settings::VRF50ExternalModel &&
+                         OutRunVR::DinoSidecar::IsF50RetailCarId(livePlayer->car_id_10)) :
              (Settings::VRExternalFerrariTest && ticket.carId<30u));
         const OutRunVR::DinoSidecar::OriginalCarGate gate{
             sameCar && Settings::VREnabled &&
