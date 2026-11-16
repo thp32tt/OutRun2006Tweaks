@@ -26,7 +26,7 @@ start "" "%~dp0OR2006C2C.exe"
 exit /b 0
 
 :MODE_VR
-rem v0.02 cockpit release: validated DX9Ex profile + Quest cockpit/F0/seat baseline.
+rem v0.03 cockpit release: v0.02 stable cockpit baseline + camera-0 passenger follow/remove controls.
 rem No PowerShell script is required: all launch-only VR settings are passed here.
 taskkill /IM outrun-vr-host.exe /F >nul 2>&1
 set "OUTRUN_VR_LAUNCH=1"
