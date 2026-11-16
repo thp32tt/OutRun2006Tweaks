@@ -4,6 +4,7 @@
 #include "../src/vr/game/external_car_ground.hpp"
 int main() {
     using OutRunVR::DinoSidecar::ComputeExternalFloorLift;
+    using OutRunVR::DinoSidecar::ComputeSidecarFloorLift;
     float applied=-99.f;
     // Measured 2026-11-16 directly from the real delivered 3-car OVC ZIP.
     assert(ComputeExternalFloorLift(0.22f,-0.16723822f,applied));
@@ -19,5 +20,11 @@ int main() {
     assert(!ComputeExternalFloorLift(NAN,-0.33f,applied));
     assert(!ComputeExternalFloorLift(0.22f,NAN,applied));
     assert(!ComputeExternalFloorLift(100.f,-0.33f,applied));
-    std::cout<<"OVC_FLOOR_GUARD_PASS F50=0.22 F40=0.369088 288GTO=0.361950\n";
+    // Native remasters preserve the original PMT origin and therefore get
+    // exactly zero visual lift even though their original min-Y is below road 0.
+    assert(ComputeSidecarFloorLift(true,0.0f,-0.38403529f,applied));
+    assert(std::fabs(applied)<0.000001f);
+    assert(ComputeSidecarFloorLift(false,0.0f,-0.38403529f,applied));
+    assert(std::fabs(applied-0.41903529f)<0.00002f);
+    std::cout<<"OVC_FLOOR_GUARD_PASS F50=0.22 F40=0.369088 288GTO=0.361950 NATIVE=0\n";
 }
