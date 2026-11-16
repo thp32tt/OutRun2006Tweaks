@@ -1,0 +1,110 @@
+name: Ferrari Enzo External Model Conversion
+
+on:
+  push:
+    branches:
+      - vr-quest-cockpit-v2-external-dino-actions-20261116
+    paths:
+      - '.github/workflows/enzo-external-convert.yml'
+      - 'tools/car_importer/github_actions/dlcfun_fetch_audit.py'
+      - 'tools/car_importer/github_actions/ac_kn5_blender_convert.py'
+      - 'tools/car_importer/ferrari16_hq_batch/tools/ferrari_batch_converter.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  convert:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install converter dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy pillow
+
+      - name: Download Blender 5.2.4 and pinned KN5 importer
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/enzo"
+          mkdir -p "$WORK"
+          curl -fL --retry 3             https://mirror.blender.org/release/Blender5.2/blender-5.2.4-linux-x64.tar.xz             -o "$WORK/blender.tar.xz"
+          tar -xf "$WORK/blender.tar.xz" -C "$WORK"
+          BLENDER="$(find "$WORK" -maxdepth 2 -type f -name blender | head -1)"
+          test -x "$BLENDER"
+          echo "BLENDER=$BLENDER" >> "$GITHUB_ENV"
+          git clone --depth 1 https://github.com/nazariyKul/kn5-blender-tools.git "$WORK/kn5-tools"
+          cd "$WORK/kn5-tools"
+          test "$(git rev-parse HEAD)" = "502ab4861dd3f324a794db5874c0f8237dbeaa79"
+          echo "KN5_TOOLS=$WORK/kn5-tools" >> "$GITHUB_ENV"
+
+      - name: Fetch Enzo source and bundled rights audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/enzo"
+          python tools/car_importer/github_actions/dlcfun_fetch_audit.py             --work "$WORK"             --page-url 'https://dlcfun.com/en/assetto-corsa/ferrari-enzo-mod-2'             --token enzo --token ferrari
+
+      - name: Blender highest-detail KN5 to normalized GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/enzo"
+          mkdir -p "$WORK/output"
+          "$BLENDER" -b             --python tools/car_importer/github_actions/ac_kn5_blender_convert.py --             --source-audit "$WORK/source_audit.json"             --kn5-tools "$KN5_TOOLS"             --output "$WORK/output"             --car-id enzo             --vehicle-name 'Ferrari Enzo'
+
+      - name: Convert GLB to OVC3 and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="tools/car_importer/ferrari16_hq_batch"
+          mkdir -p "$ROOT/sources/enzo" "$ROOT/outputs/enzo"
+          cp "${RUNNER_TEMP}/enzo/output/source.glb" "$ROOT/sources/enzo/source.glb"
+          cp "${RUNNER_TEMP}/enzo/output/source.json" "$ROOT/sources/enzo/source.json"
+          rm -f "$ROOT/outputs/enzo/enzo_External_Test.ovc" "$ROOT/outputs/enzo/conversion_report.json"
+          python "$ROOT/tools/ferrari_batch_converter.py" audit --workspace "$ROOT" --car enzo --strict
+          python "$ROOT/tools/ferrari_batch_converter.py" convert --workspace "$ROOT" --car enzo
+          python "$ROOT/tools/ferrari_batch_converter.py" verify --workspace "$ROOT" --car enzo
+
+      - name: Package private test artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          PKG="${RUNNER_TEMP}/FerrariEnzo_Private_Test"
+          mkdir -p "$PKG/ExternalCars" "$PKG/QA"
+          cp tools/car_importer/ferrari16_hq_batch/outputs/enzo/enzo_External_Test.ovc              "$PKG/ExternalCars/car_id_14.ovc"
+          cp tools/car_importer/ferrari16_hq_batch/outputs/enzo/conversion_report.json "$PKG/QA/"
+          cp "${RUNNER_TEMP}/enzo/output/source.json" "$PKG/QA/"
+          cp "${RUNNER_TEMP}/enzo/source_audit.json" "$PKG/QA/"
+          python - <<'PY'
+          import hashlib, json, os, pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'FerrariEnzo_Private_Test'
+          ovc=root/'ExternalCars'/'car_id_14.ovc'
+          report={
+            'car_id':14,
+            'vehicle':'Ferrari Enzo',
+            'ovc_bytes':ovc.stat().st_size,
+            'ovc_sha256':hashlib.sha256(ovc.read_bytes()).hexdigest(),
+            'distribution':'PRIVATE_TEST_ONLY',
+            'runtime_state':'OVC_STATIC_QA_PASS_NOT_QUEST_LIVE_TESTED',
+          }
+          (root/'QA'/'package_report.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+
+      - name: Upload private test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: FerrariEnzo-Private-Test-${{ github.sha }}
+          path: ${{ runner.temp }}/FerrariEnzo_Private_Test
+          if-no-files-found: error
+          retention-days: 1
