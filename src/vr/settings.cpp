@@ -175,7 +175,7 @@ namespace Settings
     // Existing persisted key retained for upgrades: true=follow camera 0,
     // false=remove. F11 presents two exclusive checkboxes (one setting).
     Setting<bool> VRQuestCockpitV2PassengerVisible{ "VR", "QuestCockpitV2PassengerVisible", true,
-        "Passenger: Follow Camera 0 (ON) draws original ROB02 in the cockpit only when the game also has it in the third-person view; no synthetic passenger event. Remove Passenger (OFF) skips exact ROB02 draws in gameplay in both views. F11 switches live; default Follow Camera 0." };
+        "Passenger: Follow Camera 0 (ON) draws original ROB02 in the cockpit only when the game also has it in the third-person view; no synthetic passenger event. Remove Passenger (OFF) hides exact ROB02 only in cockpit mode 1. Camera 0 stays unchanged in both modes. F11 switches live; default Follow Camera 0." };
 	Setting<bool> VRQuestCockpitV2SkyProbe{ "VR", "QuestCockpitV2SkyProbe", false,
         "Bounded sky/R9 Present, B0/F0 car motion and Quest/PC original view1 yaw-source comparison (body +0x2E vs auxiliary +0x1FE vs native camera look). One aggregate per 90 calls." };
     Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
