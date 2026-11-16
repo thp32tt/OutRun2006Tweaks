@@ -1,0 +1,178 @@
+[
+  {
+    "car": "250gto",
+    "blend_reopen": "PASS",
+    "blend_meshes": 82,
+    "blend_vertices": 11991,
+    "blend_polygons": 13062,
+    "glb_reimport": "PASS",
+    "glb_meshes": 82,
+    "glb_vertices": 15007,
+    "glb_polygons": 17176
+  },
+  {
+    "car": "288gto",
+    "blend_reopen": "PASS",
+    "blend_meshes": 109,
+    "blend_vertices": 14245,
+    "blend_polygons": 12151,
+    "glb_reimport": "PASS",
+    "glb_meshes": 109,
+    "glb_vertices": 17723,
+    "glb_polygons": 17876
+  },
+  {
+    "car": "328gts",
+    "blend_reopen": "PASS",
+    "blend_meshes": 113,
+    "blend_vertices": 13982,
+    "blend_polygons": 12147,
+    "glb_reimport": "PASS",
+    "glb_meshes": 113,
+    "glb_vertices": 16995,
+    "glb_polygons": 16949
+  },
+  {
+    "car": "360spider",
+    "blend_reopen": "PASS",
+    "blend_meshes": 75,
+    "blend_vertices": 12424,
+    "blend_polygons": 11789,
+    "glb_reimport": "PASS",
+    "glb_meshes": 75,
+    "glb_vertices": 16878,
+    "glb_polygons": 18583
+  },
+  {
+    "car": "512bb",
+    "blend_reopen": "PASS",
+    "blend_meshes": 116,
+    "blend_vertices": 13041,
+    "blend_polygons": 11718,
+    "glb_reimport": "PASS",
+    "glb_meshes": 116,
+    "glb_vertices": 16278,
+    "glb_polygons": 17280
+  },
+  {
+    "car": "550barchetta",
+    "blend_reopen": "PASS",
+    "blend_meshes": 79,
+    "blend_vertices": 9882,
+    "blend_polygons": 9333,
+    "glb_reimport": "PASS",
+    "glb_meshes": 79,
+    "glb_vertices": 14925,
+    "glb_polygons": 17173
+  },
+  {
+    "car": "575superamerica",
+    "blend_reopen": "PASS",
+    "blend_meshes": 83,
+    "blend_vertices": 12547,
+    "blend_polygons": 11998,
+    "glb_reimport": "PASS",
+    "glb_meshes": 83,
+    "glb_vertices": 18649,
+    "glb_polygons": 21010
+  },
+  {
+    "car": "daytona365",
+    "blend_reopen": "PASS",
+    "blend_meshes": 97,
+    "blend_vertices": 15823,
+    "blend_polygons": 14512,
+    "glb_reimport": "PASS",
+    "glb_meshes": 97,
+    "glb_vertices": 18660,
+    "glb_polygons": 19289
+  },
+  {
+    "car": "dino246gts",
+    "blend_reopen": "PASS",
+    "blend_meshes": 86,
+    "blend_vertices": 12374,
+    "blend_polygons": 13432,
+    "glb_reimport": "PASS",
+    "glb_meshes": 86,
+    "glb_vertices": 18055,
+    "glb_polygons": 22460
+  },
+  {
+    "car": "enzo",
+    "blend_reopen": "PASS",
+    "blend_meshes": 111,
+    "blend_vertices": 14704,
+    "blend_polygons": 13132,
+    "glb_reimport": "PASS",
+    "glb_meshes": 111,
+    "glb_vertices": 18311,
+    "glb_polygons": 18684
+  },
+  {
+    "car": "f355spider",
+    "blend_reopen": "PASS",
+    "blend_meshes": 96,
+    "blend_vertices": 13354,
+    "blend_polygons": 11681,
+    "glb_reimport": "PASS",
+    "glb_meshes": 96,
+    "glb_vertices": 16529,
+    "glb_polygons": 16827
+  },
+  {
+    "car": "f40",
+    "blend_reopen": "PASS",
+    "blend_meshes": 103,
+    "blend_vertices": 13245,
+    "blend_polygons": 10811,
+    "glb_reimport": "PASS",
+    "glb_meshes": 103,
+    "glb_vertices": 15902,
+    "glb_polygons": 15288
+  },
+  {
+    "car": "f430",
+    "blend_reopen": "PASS",
+    "blend_meshes": 76,
+    "blend_vertices": 10781,
+    "blend_polygons": 9057,
+    "glb_reimport": "PASS",
+    "glb_meshes": 76,
+    "glb_vertices": 14195,
+    "glb_polygons": 13545
+  },
+  {
+    "car": "f430spider",
+    "blend_reopen": "PASS",
+    "blend_meshes": 75,
+    "blend_vertices": 12816,
+    "blend_polygons": 11349,
+    "glb_reimport": "PASS",
+    "glb_meshes": 75,
+    "glb_vertices": 17314,
+    "glb_polygons": 17733
+  },
+  {
+    "car": "f50",
+    "blend_reopen": "PASS",
+    "blend_meshes": 103,
+    "blend_vertices": 14891,
+    "blend_polygons": 15808,
+    "glb_reimport": "PASS",
+    "glb_meshes": 103,
+    "glb_vertices": 21886,
+    "glb_polygons": 27193
+  },
+  {
+    "car": "testarossa",
+    "blend_reopen": "PASS",
+    "blend_meshes": 91,
+    "blend_vertices": 12735,
+    "blend_polygons": 10032,
+    "glb_reimport": "PASS",
+    "glb_meshes": 91,
+    "glb_vertices": 14205,
+    "glb_polygons": 12288
+  }
+]
