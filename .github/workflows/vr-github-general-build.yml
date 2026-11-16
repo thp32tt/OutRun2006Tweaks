@@ -11,6 +11,7 @@ on:
       - 'src/vr/game/quest_cockpit_v2_passenger_event.hpp'
       - 'tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp'
       - 'tools/verify_quest_cockpit_passenger_runtime.py'
+      - 'tools/verify_quest_cockpit_passenger_static10.py'
       - 'src/dllmain.cpp'
       - 'src/hooks_exceptions.cpp'
       - 'tools/verify_quest_cockpit_crash_recovery.py'
@@ -115,6 +116,12 @@ jobs:
         run: python tools/verify_quest_cockpit_crash_recovery.py
       - name: Verify cockpit seat persistence and reset controls
         run: python tools/verify_quest_cockpit_persistence.py
+      - name: Ten-path cockpit passenger static gate before packaging
+        run: |
+          python tools/verify_quest_cockpit_passenger_runtime.py
+          if($LASTEXITCODE -ne 0){throw 'native passenger path verification failed'}
+          python tools/verify_quest_cockpit_passenger_static10.py
+          if($LASTEXITCODE -ne 0){throw '10 independent passenger audits failed'}
 
       - name: Validate cockpit diagnostics PowerShell syntax
         if: ${{ github.ref_name == 'vr-quest-cockpit-v2' || startsWith(github.ref_name, 'vr-quest-cockpit-v2-') }}
