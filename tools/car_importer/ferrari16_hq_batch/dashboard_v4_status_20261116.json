@@ -1,0 +1,312 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-16",
+  "runtime_branch": "vr-external-dashboard-v4-20261116",
+  "runtime_head_before_status_commit": "6a28832acc21a20bd91f91b4be742eaa042fb67a",
+  "dashboard_format": "OVRCABH4/OVCDASH4",
+  "game_telemetry": {
+    "speed_kph": "EVWORK_CAR+0x1F8 field_1F8",
+    "gear": "EVWORK_CAR+0x208 cur_gear_208",
+    "rpm": "EVWORK_CAR+0x20C dword20C",
+    "stereo_policy": "native-frame/player latch; both eyes reuse one sample"
+  },
+  "status_meaning": {
+    "DASHBOARD_RUNTIME_READY": "runtime/converter support exists but this car has no verified V4 binding yet",
+    "NEEDLE_SPLIT_VERIFIED": "source needle geometry was actually separated and reopened in Blender",
+    "V3_MODEL_REPRODUCIBLE": "a real full-car OVC3 exists and source conversion is reproducible",
+    "V3_MODEL_LOCAL_SOURCE": "a real full-car OVC3/source exists in project storage",
+    "FULLCAR_SOURCE_MISSING": "no verified full-car external source available in the current workspace"
+  },
+  "cars": [
+    {
+      "id": "dino246gts",
+      "name": "Dino 246 GTS",
+      "runtime_ids": [
+        0,
+        15
+      ],
+      "native_pmt": "obj_plcar_dino_pmt.sz",
+      "model_status": "V3_MODEL_REPRODUCIBLE",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "audit KN5-derived GLB for independent needle meshes; calibrate sweep"
+    },
+    {
+      "id": "daytona365",
+      "name": "365 GTS/4 Daytona",
+      "runtime_ids": [
+        1,
+        16
+      ],
+      "native_pmt": "obj_plcar_dayts_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "retain native PMT reference; acquire/verify full-car external source"
+    },
+    {
+      "id": "f50",
+      "name": "Ferrari F50",
+      "runtime_ids": [
+        2,
+        17
+      ],
+      "native_pmt": "obj_plcar_f50_pmt.sz",
+      "model_status": "V3_MODEL_LOCAL_SOURCE",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "identify/separate real gauge needles in external GLB; use existing native instrument-cluster reference for calibration",
+      "dashboard_audit": {
+        "finding": "External GLB exposes broad Interior/InteriorTilling meshes but no explicit speed/tach/needle node by name; exact component isolation remains required."
+      }
+    },
+    {
+      "id": "360spider",
+      "name": "Ferrari 360 Spider",
+      "runtime_ids": [
+        3,
+        18
+      ],
+      "native_pmt": "obj_plcar_360sp_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "retain native PMT reference; acquire/verify full-car external source"
+    },
+    {
+      "id": "f355spider",
+      "name": "Ferrari F355 Spider",
+      "runtime_ids": [
+        4,
+        19
+      ],
+      "native_pmt": "obj_plcar_f355sp_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "retain native PMT reference; acquire/verify full-car external source"
+    },
+    {
+      "id": "575superamerica",
+      "name": "Ferrari 575 Superamerica",
+      "runtime_ids": [
+        5,
+        20
+      ],
+      "native_pmt": "obj_plcar_575sa_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "retain native PMT reference; acquire/verify exact Superamerica full-car source"
+    },
+    {
+      "id": "testarossa",
+      "name": "Ferrari Testarossa",
+      "runtime_ids": [
+        6,
+        21
+      ],
+      "native_pmt": "obj_plcar_testa_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "retain native PMT reference; acquire/verify exact Testarossa full-car source"
+    },
+    {
+      "id": "288gto",
+      "name": "Ferrari 288 GTO",
+      "runtime_ids": [
+        7,
+        22
+      ],
+      "native_pmt": "obj_plcar_gto_pmt.sz",
+      "model_status": "V3_MODEL_LOCAL_SOURCE",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "identify/separate real gauge needles in external GLB; calibrate sweep",
+      "dashboard_audit": {
+        "finding": "External GLB exposes steering-related nodes/materials but no explicit gauge needle node by name; exact dashboard component isolation remains required."
+      }
+    },
+    {
+      "id": "328gts",
+      "name": "Ferrari 328 GTS",
+      "runtime_ids": [
+        8,
+        23
+      ],
+      "native_pmt": "obj_plcar_328gts_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "retain native PMT reference; acquire/verify full-car external source"
+    },
+    {
+      "id": "250gto",
+      "name": "Ferrari 250 GTO",
+      "runtime_ids": [
+        9,
+        24
+      ],
+      "native_pmt": "obj_plcar_250gto_pmt.sz",
+      "model_status": "V3_MODEL_REPRODUCIBLE",
+      "dashboard_status": "COCKPIT_SUBMESH_SPLIT_REQUIRED",
+      "next": "run connected-component cockpit audit, isolate verified needle geometry, then calibrate sweep",
+      "dashboard_audit": {
+        "status": "COCKPIT_SUBMESH_SPLIT_REQUIRED",
+        "run": 43812867088,
+        "mesh_count": 5,
+        "cockpit_candidates": [
+          {
+            "node": "cockpit.smd",
+            "vertices": 17080,
+            "triangles": 20016
+          },
+          {
+            "node": "cockpit1.smd",
+            "vertices": 16362,
+            "triangles": 20676
+          }
+        ],
+        "finding": "No separately named gauge needle survived SourceIO GLB export; needle must be isolated from cockpit connected geometry before binding."
+      }
+    },
+    {
+      "id": "512bb",
+      "name": "Ferrari 512 BB",
+      "runtime_ids": [
+        10,
+        25
+      ],
+      "native_pmt": "obj_plcar_512bb_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "retain native PMT reference; acquire/verify exact 512 BB full-car source"
+    },
+    {
+      "id": "f40",
+      "name": "Ferrari F40",
+      "runtime_ids": [
+        11,
+        26
+      ],
+      "native_pmt": "obj_plcar_f40_pmt.sz",
+      "model_status": "V3_MODEL_LOCAL_SOURCE",
+      "dashboard_status": "NEEDLE_SPLIT_VERIFIED",
+      "next": "set vehicle placement metadata and visually calibrate speed/RPM sweep before V4 OVC promotion",
+      "evidence": {
+        "split_glb_sha256": "d0e43e16925e2fcd634924b636aefe7d74fad767679677302351b4c325693657",
+        "split_blend_sha256": "1d1f95c3fe398eb5b8f0fdaa41b62319d05ca10a15472a017b794b90a552e03f",
+        "speed_node": "F40_SPEED_NEEDLE",
+        "rpm_node": "F40_RPM_NEEDLE",
+        "speed_vertices": 8,
+        "speed_triangles": 10,
+        "rpm_vertices": 8,
+        "rpm_triangles": 10,
+        "blender_reopen": "PASS"
+      }
+    },
+    {
+      "id": "550barchetta",
+      "name": "Ferrari 550 Barchetta",
+      "runtime_ids": [
+        12,
+        27
+      ],
+      "native_pmt": "obj_plcar_550b_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "retain native PMT reference; acquire/verify exact Barchetta full-car source"
+    },
+    {
+      "id": "f430",
+      "name": "Ferrari F430 Coupe",
+      "runtime_ids": [
+        13
+      ],
+      "native_pmt": "obj_plcar_f430_pmt.sz",
+      "model_status": "V3_MODEL_REPRODUCIBLE",
+      "dashboard_status": "COCKPIT_SUBMESH_SPLIT_REQUIRED",
+      "next": "run connected-component cockpit audit, isolate verified needle geometry, then calibrate sweep",
+      "dashboard_audit": {
+        "status": "COCKPIT_SUBMESH_SPLIT_REQUIRED",
+        "run": 43812867088,
+        "mesh_count": 6,
+        "cockpit_candidates": [
+          {
+            "node": "cockpit.smd",
+            "vertices": 18366,
+            "triangles": 20451
+          },
+          {
+            "node": "cockpit1.smd",
+            "vertices": 16925,
+            "triangles": 19855
+          }
+        ],
+        "finding": "No separately named gauge needle survived SourceIO GLB export; needle must be isolated from cockpit connected geometry before binding."
+      }
+    },
+    {
+      "id": "f430spider",
+      "name": "Ferrari F430 Spider",
+      "runtime_ids": [
+        28
+      ],
+      "native_pmt": "obj_plcar_f430sp_t_pmt.sz",
+      "model_status": "FULLCAR_SOURCE_MISSING",
+      "dashboard_status": "DASHBOARD_RUNTIME_READY",
+      "next": "acquire/verify Spider full-car source; do not substitute Coupe geometry"
+    },
+    {
+      "id": "enzo",
+      "name": "Ferrari Enzo / FX",
+      "runtime_ids": [
+        14,
+        29
+      ],
+      "native_pmt": "obj_plcar_fx_pmt.sz",
+      "model_status": "V3_MODEL_REPRODUCIBLE",
+      "dashboard_status": "COCKPIT_SUBMESH_SPLIT_REQUIRED",
+      "next": "run connected-component cockpit audit, isolate verified needle geometry, then calibrate sweep",
+      "dashboard_audit": {
+        "status": "COCKPIT_SUBMESH_SPLIT_REQUIRED",
+        "run": 43812867088,
+        "mesh_count": 3,
+        "cockpit_candidates": [
+          {
+            "node": "cockpit.smd",
+            "vertices": 29904,
+            "triangles": 38884
+          }
+        ],
+        "finding": "No separately named gauge needle survived SourceIO GLB export; needle must be isolated from cockpit connected geometry before binding."
+      }
+    }
+  ],
+  "tdm_dashboard_audit": {
+    "branch": "audit/dashboard-candidates-20261116",
+    "head": "cf75f34f581d570532cdb21e4a09378f48eda017",
+    "workflow_run": 43812867088,
+    "conclusion": "SUCCESS",
+    "cars": [
+      "250gto",
+      "f430",
+      "enzo"
+    ]
+  },
+  "ci": {
+    "runtime_head": "6a28832acc21a20bd91f91b4be742eaa042fb67a",
+    "windows_build": {
+      "run": 43811607786,
+      "conclusion": "SUCCESS"
+    },
+    "external_unit": {
+      "run": 43811607793,
+      "conclusion": "SUCCESS"
+    },
+    "first_dashboard_commit_windows_build": {
+      "run": 43810522646,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run": 43810522684,
+      "conclusion": "SUCCESS"
+    },
+    "first_dashboard_unit": {
+      "run": 43810522673,
+      "conclusion": "SUCCESS"
+    }
+  }
+}
