@@ -63,7 +63,7 @@ namespace Settings
     Setting<bool> VRF50ExternalModel{ "VR", "F50ExternalModel", false,
         "QuestCockpitV2-only external Ferrari F50 test model. Replaces only the player F50 (car kind 0) after a complete sidecar draw; original PMT remains unchanged." };
     Setting<bool> VRExternalFerrariTest{ "VR", "ExternalFerrariTest", false,
-        "EXPERIMENTAL: render downloaded 288 GTO and F40 OVC sidecars for explicitly mapped player car IDs only. Default OFF. Original game models remain untouched." };
+        "EXPERIMENTAL: render installed external Ferrari OVC sidecars for validated player car IDs 0..29 in cockpit view only. Existing 288 GTO/F40 filenames stay compatible; other cars use ExternalCars/car_id_XX.ovc. Missing/invalid files fall back to original game models." };
     Setting<float> VRF50ExternalLift{ "VR", "F50ExternalLift", 0.22f,
         "External F50 local vertical offset in metres for wheel/track alignment. No gameplay physics or camera changes.", Range<float>{ -0.25f, 1.0f } };
     Setting<bool> VRF50ExternalStabilize{ "VR", "F50ExternalStabilize", true,
@@ -921,13 +921,14 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         using namespace OutRunVR::QuestCockpitV2;
         F50ExternalDrawTicket ticket{};
         const unsigned char carId=player ? player->car_id_10 : 255u;
-        // Retail guest vehicle selection IDs from the game car roster:
-        // 7/22=288 GTO, 11/26=F40 (standard / alternate entries).
-        // Keep the user-supplied OVC confined to player cockpit view 1.
-        const bool extraCar=Settings::VRExternalFerrariTest &&
-            (carId==7u || carId==22u || carId==11u || carId==26u);
+        // Retail guest vehicle selection IDs are bounded by the native 30-row
+        // player car/seat table. Existing aliases remain compatible:
+        // 7/22=288 GTO, 11/26=F40. Every other ID uses a fixed car_id_XX.ovc.
+        // Keep every user-supplied OVC confined to player cockpit view 1.
         const bool f50Car=Settings::VRF50ExternalModel && player &&
             player->car_kind_11==0;
+        const bool extraCar=Settings::VRExternalFerrariTest && player &&
+            !f50Car && carId<30u;
         if ((!extraCar && !f50Car) || !Settings::VREnabled ||
             !Settings::VRQuestCockpitV2Enabled || !Settings::VRStereo ||
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
@@ -959,13 +960,16 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(!QuestCockpitGlassLive::Memory(nativeView,sizeof(D3DMATRIX)) ||
            !QuestCockpitGlassLive::Memory(nativeProjection,sizeof(D3DMATRIX)))
             return ticket;
-        ticket.slot=extraCar ? ((carId==7u || carId==22u) ?
-            OutRunVR::DinoSidecar::FerrariModelSlot::Gto288 :
-            OutRunVR::DinoSidecar::FerrariModelSlot::F40) :
-            OutRunVR::DinoSidecar::FerrariModelSlot::F50;
+        ticket.slot=!extraCar ?
+            OutRunVR::DinoSidecar::FerrariModelSlot::F50 :
+            (carId==7u || carId==22u) ?
+                OutRunVR::DinoSidecar::FerrariModelSlot::Gto288 :
+            (carId==11u || carId==26u) ?
+                OutRunVR::DinoSidecar::FerrariModelSlot::F40 :
+                OutRunVR::DinoSidecar::FerrariModelSlot::GenericId;
         ticket.carId=carId;
         auto& external=OutRunVR::DinoSidecar::GlobalGpu();
-        if(external.SelectSidecar(ticket.slot))
+        if(external.SelectSidecar(ticket.slot,carId))
             OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
         // Only installed, CRC-validated model assets can enter the stereo
         // player callback. Parse includes PBR map and mesh-envelope QA.
@@ -1002,8 +1006,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const bool f50Slot=ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F50;
         const bool sameCar=livePlayer && livePlayer->car_id_10==ticket.carId &&
             (f50Slot ? (Settings::VRF50ExternalModel && livePlayer->car_kind_11==0) :
-             (Settings::VRExternalFerrariTest &&
-               (ticket.carId==7u||ticket.carId==22u||ticket.carId==11u||ticket.carId==26u)));
+             (Settings::VRExternalFerrariTest && ticket.carId<30u));
         const OutRunVR::DinoSidecar::OriginalCarGate gate{
             sameCar && Settings::VREnabled &&
                 Settings::VRQuestCockpitV2Enabled && Settings::VRStereo,
