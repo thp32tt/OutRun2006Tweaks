@@ -1,0 +1,150 @@
+name: TDM Ferrari Enzo F430 SourceIO Conversion
+
+on:
+  push:
+    branches:
+      - vr-quest-cockpit-v2-external-dino-actions-20261116
+    paths:
+      - '.github/workflows/tdm-enzo-f430-sourceio.yml'
+      - 'tools/car_importer/github_actions/sourceio_mdl_blender_convert.py'
+      - 'tools/car_importer/ferrari16_hq_batch/tools/ferrari_batch_converter.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  convert:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - car_id: enzo
+            runtime_id: 14
+            vehicle_name: Ferrari Enzo
+            mdl: fer_enzo
+            material_dir: enzo
+          - car_id: f430
+            runtime_id: 13
+            vehicle_name: Ferrari F430 Coupe
+            mdl: fer_f430
+            material_dir: fer_f430
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare Python and OVC dependencies
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install converter dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy pillow
+
+      - name: Download Blender 5.2.4 and SourceIO 6.0.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          mkdir -p "$WORK"
+          curl -fL --retry 3             https://mirror.blender.org/release/Blender5.2/blender-5.2.4-linux-x64.tar.xz             -o "$WORK/blender.tar.xz"
+          tar -xf "$WORK/blender.tar.xz" -C "$WORK"
+          BLENDER="$(find "$WORK" -maxdepth 2 -type f -name blender | head -1)"
+          test -x "$BLENDER"
+          echo "BLENDER=$BLENDER" >> "$GITHUB_ENV"
+
+          curl -fL --retry 3             https://github.com/REDxEYE/SourceIO/releases/download/6.0.0/SourceIO.zip             -o "$WORK/SourceIO.zip"
+          echo "57d9f317aab5f89d19dbcb159a341a818046cb9e51b73145f61d0d1bcb1ec428  $WORK/SourceIO.zip" | sha256sum -c -
+          mkdir -p "$WORK/sourceio_extract"
+          unzip -q "$WORK/SourceIO.zip" -d "$WORK/sourceio_extract"
+          if test -f "$WORK/sourceio_extract/SourceIO/__init__.py"; then
+            SOURCEIO_PARENT="$WORK/sourceio_extract"
+          elif test -f "$WORK/sourceio_extract/__init__.py"; then
+            mkdir -p "$WORK/addons/SourceIO"
+            cp -a "$WORK/sourceio_extract/." "$WORK/addons/SourceIO/"
+            SOURCEIO_PARENT="$WORK/addons"
+          else
+            INIT="$(find "$WORK/sourceio_extract" -type f -path '*/SourceIO/__init__.py' | head -1)"
+            test -n "$INIT"
+            SOURCEIO_PARENT="$(dirname "$(dirname "$INIT")")"
+          fi
+          echo "SOURCEIO_PARENT=$SOURCEIO_PARENT" >> "$GITHUB_ENV"
+          test -f "$SOURCEIO_PARENT/SourceIO/__init__.py"
+
+      - name: Fetch exact TDM source files from GitHub
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          SRC="$WORK/tdm"
+          git clone --filter=blob:none --no-checkout             https://github.com/iamaman24287/TDM-cars-SVN.git "$SRC"
+          cd "$SRC"
+          git checkout a7c011708fddbb5d8a6c5218365624d2771a2f79 --             "models/tdmcars/${{ matrix.mdl }}.mdl"             "models/tdmcars/${{ matrix.mdl }}.vvd"             "models/tdmcars/${{ matrix.mdl }}.dx90.vtx"             "models/tdmcars/${{ matrix.mdl }}.dx80.vtx"             "models/tdmcars/${{ matrix.mdl }}.sw.vtx"             "materials/models/tdmcars/${{ matrix.material_dir }}"             "materials/models/tdmcars/shared"
+          test -s "models/tdmcars/${{ matrix.mdl }}.mdl"
+          test -s "models/tdmcars/${{ matrix.mdl }}.vvd"
+          test -s "models/tdmcars/${{ matrix.mdl }}.dx90.vtx"
+          echo "TDM_ROOT=$SRC" >> "$GITHUB_ENV"
+
+      - name: SourceIO MDL to normalized GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          mkdir -p "$WORK/output"
+          "$BLENDER" -b --python tools/car_importer/github_actions/sourceio_mdl_blender_convert.py --             --sourceio-parent "$SOURCEIO_PARENT"             --content-root "$TDM_ROOT"             --mdl "$TDM_ROOT/models/tdmcars/${{ matrix.mdl }}.mdl"             --output "$WORK/output"             --car-id "${{ matrix.car_id }}"             --runtime-id "${{ matrix.runtime_id }}"             --vehicle-name "${{ matrix.vehicle_name }}"             --source-repo "iamaman24287/TDM-cars-SVN"             --source-commit "a7c011708fddbb5d8a6c5218365624d2771a2f79"
+
+      - name: Convert GLB to OVC3 and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          ROOT="tools/car_importer/ferrari16_hq_batch"
+          mkdir -p "$ROOT/sources/${{ matrix.car_id }}" "$ROOT/outputs/${{ matrix.car_id }}"
+          cp "$WORK/output/source.glb" "$ROOT/sources/${{ matrix.car_id }}/source.glb"
+          cp "$WORK/output/source.json" "$ROOT/sources/${{ matrix.car_id }}/source.json"
+          rm -f "$ROOT/outputs/${{ matrix.car_id }}/${{ matrix.car_id }}_External_Test.ovc"                 "$ROOT/outputs/${{ matrix.car_id }}/conversion_report.json"
+          python "$ROOT/tools/ferrari_batch_converter.py" audit --workspace "$ROOT" --car "${{ matrix.car_id }}" --strict
+          python "$ROOT/tools/ferrari_batch_converter.py" convert --workspace "$ROOT" --car "${{ matrix.car_id }}"
+          python "$ROOT/tools/ferrari_batch_converter.py" verify --workspace "$ROOT" --car "${{ matrix.car_id }}"
+
+      - name: Package private test artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/sourceio-${{ matrix.car_id }}"
+          PKG="$WORK/package"
+          mkdir -p "$PKG/ExternalCars" "$PKG/QA"
+          cp "tools/car_importer/ferrari16_hq_batch/outputs/${{ matrix.car_id }}/${{ matrix.car_id }}_External_Test.ovc"              "$PKG/ExternalCars/car_id_$(printf '%02d' ${{ matrix.runtime_id }}).ovc"
+          cp "tools/car_importer/ferrari16_hq_batch/outputs/${{ matrix.car_id }}/conversion_report.json" "$PKG/QA/"
+          cp "$WORK/output/source.json" "$PKG/QA/"
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          car=os.environ["CAR_ID"]; rid=int(os.environ["RUNTIME_ID"]); vehicle=os.environ["VEHICLE_NAME"]
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])/f"sourceio-{car}"/"package"
+          ovc=root/"ExternalCars"/f"car_id_{rid:02d}.ovc"
+          report={
+            "car_id":rid,"registry_id":car,"vehicle":vehicle,
+            "ovc_bytes":ovc.stat().st_size,
+            "ovc_sha256":hashlib.sha256(ovc.read_bytes()).hexdigest(),
+            "distribution":"PRIVATE_TEST_ONLY_NO_PUBLIC_REDISTRIBUTION_RIGHT_ASSERTED",
+            "runtime_state":"OVC_STATIC_QA_PASS_NOT_QUEST_LIVE_TESTED",
+          }
+          (root/"QA"/"package_report.json").write_text(json.dumps(report,indent=2)+"\n")
+          print(json.dumps(report,indent=2))
+          PY
+        env:
+          CAR_ID: ${{ matrix.car_id }}
+          RUNTIME_ID: ${{ matrix.runtime_id }}
+          VEHICLE_NAME: ${{ matrix.vehicle_name }}
+
+      - name: Upload one-day private test artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TDM-${{ matrix.car_id }}-Private-Test-${{ github.sha }}
+          path: ${{ runner.temp }}/sourceio-${{ matrix.car_id }}/package
+          if-no-files-found: error
+          retention-days: 1
