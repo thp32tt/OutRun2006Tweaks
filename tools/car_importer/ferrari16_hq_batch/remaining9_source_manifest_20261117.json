@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-17",
+  "purpose": "Remaining 9 external full-car acquisition and conversion staging; native OutRun geometry does not count",
+  "completion_rule": "Exact model + full interior/UV/materials + legal/private-use admissibility + conversion + dashboard binding + in-game QA",
+  "cars": [
+    {
+      "id": "daytona365",
+      "name": "Ferrari 365 GTS/4 Daytona",
+      "selected": {
+        "kind": "Sketchfab",
+        "uid": "b7510383e3fb4a63a26d45e424a9f292",
+        "title": "365 GTS/4 Daytona",
+        "license": "CC Attribution",
+        "url": "https://sketchfab.com/3d-models/none-b7510383e3fb4a63a26d45e424a9f292",
+        "vertices": 55780
+      },
+      "fallback": {
+        "kind": "GTA5",
+        "url": "https://dlcfun.com/en/gta-5/ferrari-365-gts4-daitona-1971",
+        "note": "exact GTS4 Daytona, but published mod notes dials missing"
+      },
+      "status": "SOURCE_SELECTED_DOWNLOAD_PENDING"
+    },
+    {
+      "id": "360spider",
+      "name": "Ferrari 360 Spider",
+      "selected": {
+        "kind": "Sketchfab",
+        "uid": "216e8f0ad97e44588c7cd55690bacc0a",
+        "title": "Ferrari 360 Mondena Spyder",
+        "license": "CC Attribution",
+        "url": "https://sketchfab.com/3d-models/none-216e8f0ad97e44588c7cd55690bacc0a",
+        "vertices": 716760
+      },
+      "status": "SOURCE_SELECTED_DOWNLOAD_PENDING"
+    },
+    {
+      "id": "f355spider",
+      "name": "Ferrari F355 Spider",
+      "selected": {
+        "kind": "GTA5",
+        "title": "1994 Ferrari F355 Spider",
+        "url": "https://www.gta5-mods.com/vehicles/1994-ferrari-f355-spider-add-on-fivem-pop-up-headlights",
+        "features": [
+          "HQ exterior",
+          "HQ interior",
+          "working dials",
+          "steering wheel"
+        ],
+        "credits": "Base Model CG; interior adaptation from Forza; adapted/rigged Asyr0n"
+      },
+      "status": "SOURCE_SELECTED_DOWNLOAD_PENDING_PRIVATE_CONVERSION_ONLY"
+    },
+    {
+      "id": "575superamerica",
+      "name": "Ferrari 575 Superamerica",
+      "selected": {
+        "kind": "GTA San Andreas",
+        "title": "Ferrari 575 Superamerica",
+        "url": "https://www.gtainside.com/sanandreas/cars/5652-ferrari-575-superamerica/download/",
+        "direct_filename": "1126029864_superamerica.zip",
+        "size_mb": 5.47
+      },
+      "status": "SOURCE_SELECTED_DOWNLOAD_PENDING_QUALITY_AUDIT"
+    },
+    {
+      "id": "testarossa",
+      "name": "Ferrari Testarossa",
+      "selected": {
+        "kind": "Sketchfab",
+        "uid": "a977e5df447343f48febe499ef4a681b",
+        "title": "1986 Ferrari 512 Testarossa Miami Vice Edition",
+        "license": "CC Attribution-NonCommercial-ShareAlike",
+        "url": "https://sketchfab.com/3d-models/1986-ferrari-512-testarossa-miami-vice-edition-a977e5df447343f48febe499ef4a681b",
+        "vertices": 153000
+      },
+      "status": "SOURCE_SELECTED_DOWNLOAD_PENDING"
+    },
+    {
+      "id": "328gts",
+      "name": "Ferrari 328 GTS",
+      "selected": null,
+      "rejected": [
+        {
+          "title": "1986 Ferrari 308 GTS",
+          "reason": "wrong model"
+        },
+        {
+          "title": "1989 Ferrari 348 TB",
+          "reason": "wrong model"
+        }
+      ],
+      "candidate": {
+        "kind": "commercial",
+        "url": "https://88cars3d.com/product/ferrari-328-gts-3d-model/",
+        "reason": "exact model but paid; not automatically acquired"
+      },
+      "status": "BLOCKED_EXACT_FREE_SOURCE_NOT_ACQUIRED"
+    },
+    {
+      "id": "512bb",
+      "name": "Ferrari 512 BB",
+      "selected": {
+        "kind": "Assetto Corsa",
+        "title": "Ferrari 512 BB 1976 by GeroDa74 v0.9",
+        "url": "https://assettoland10.wixsite.com/assettoland/ferrari",
+        "note": "exact road 512 BB listed; mirror/source acquisition required"
+      },
+      "rejected": [
+        {
+          "title": "512 BB LM",
+          "reason": "race body differs from road 512 BB"
+        }
+      ],
+      "status": "SOURCE_SELECTED_DOWNLOAD_PENDING"
+    },
+    {
+      "id": "550barchetta",
+      "name": "Ferrari 550 Barchetta",
+      "selected": {
+        "kind": "Sketchfab",
+        "uid": "e5de7426fc8f4ae5a6b60c0b5d7c34f4",
+        "title": "Ferrari 550 barchetta",
+        "license": "CC Attribution",
+        "url": "https://sketchfab.com/3d-models/none-e5de7426fc8f4ae5a6b60c0b5d7c34f4",
+        "vertices": 72074
+      },
+      "status": "SOURCE_SELECTED_DOWNLOAD_PENDING"
+    },
+    {
+      "id": "f430spider",
+      "name": "Ferrari F430 Spider",
+      "selected": {
+        "kind": "GTA5",
+        "title": "Ferrari F430 Scuderia Spider 16M 2009",
+        "url": "https://www.gta5-mods.com/vehicles/ferrari-f430-scuderia-spider-16m-2009",
+        "note": "Spider body but 16M/Scuderia trim; requires visual compatibility decision before use"
+      },
+      "rejected": [
+        {
+          "title": "2007 F430 Spider Nexus Enhanced",
+          "reason": "page explicitly forbids conversion to other games and asset use without permission"
+        }
+      ],
+      "status": "CANDIDATE_SELECTED_VARIANT_AUDIT_REQUIRED"
+    }
+  ]
+}
