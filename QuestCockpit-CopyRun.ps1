@@ -1,4 +1,4 @@
-param([ValidateSet('NORMAL','SKY','INTERP','TURN')][string]$Mode='NORMAL',[switch]$VerifyOnly)
+param([ValidateSet('NORMAL','SKY','INTERP','TURN','PASSENGER')][string]$Mode='NORMAL',[switch]$VerifyOnly)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $payload=Join-Path $root 'QUEST_APK_COPYRUN_PAYLOAD'
@@ -131,7 +131,8 @@ function Assert-ScriptParameters([string]$path,[string[]]$required){
 }
 Assert-ScriptParameters (Join-Path $payload 'scripts/Run-OutRunVRTest.ps1') @(
     'TestProfile','QuestCockpitV2ReleaseParity','QuestCockpitV2',
-    'QuestCockpitV2F0','QuestCockpitV2SkyProbe','QuestCockpitV2Interpolation')
+    'QuestCockpitV2F0','QuestCockpitV2SkyProbe','QuestCockpitV2Interpolation',
+    'QuestCockpitV2PassengerDiagnostics')
 Assert-ScriptParameters (Join-Path $payload 'scripts/Select-OutRunVRBackend.ps1') @(
     'Backend','TestProfile','VariantId')
 
@@ -248,6 +249,7 @@ $launchArgs=@{
     QuestCockpitV2F0='ON'
 }
 if($Mode -eq 'SKY'){$launchArgs.QuestCockpitV2SkyProbe='ON'}
+if($Mode -eq 'PASSENGER'){$launchArgs.QuestCockpitV2PassengerDiagnostics='ON'}
 if($Mode -eq 'INTERP'){
     $launchArgs.QuestCockpitV2Interpolation='OFF'
     $launchArgs.QuestCockpitV2SkyProbe='ON'

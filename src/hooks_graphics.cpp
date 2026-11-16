@@ -1183,6 +1183,73 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         if(lo>hi || hi-lo<kOriginal.size())return false;
         return std::equal(kOriginal.begin(),kOriginal.end(),ptr);
     }
+
+    // Read-only, bounded event and draw diagnostics. Neither creates nor
+    // reopens ROB02, so original camera 0 and race state stay authoritative.
+    inline static std::atomic<std::uint64_t> PassengerCamera0Draws{0};
+    inline static std::atomic<std::uint64_t> PassengerCamera1Draws{0};
+    static bool PassengerTraceOn() noexcept {
+        char flag[8]{};
+        const DWORD n=GetEnvironmentVariableA("OUTRUN_VR_PASSENGER_DIAG",
+            flag,static_cast<DWORD>(sizeof(flag)));
+        return n==1 && flag[0]=='1';
+    }
+    static void PassengerFrameTrace(const EvWorkCamera* camera) noexcept {
+        if(!PassengerTraceOn())return;
+        static thread_local unsigned sample=0;
+        ++sample;
+        if(sample!=1u && sample%180u!=0u)return;
+        using namespace OutRunVR::QuestCockpitV2;
+        const auto* flags=Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva);
+        const unsigned dflag=flags?flags[OriginalDriverEventId]:255u;
+        const unsigned pflag=flags?flags[OriginalPassengerEventId]:255u;
+        const sEventWork* driver=Game::event(EVENT_ROB01);
+        const sEventWork* passenger=Game::event(EVENT_ROB02);
+        const auto expected=reinterpret_cast<decltype(driver->EventFunc.Disp)>(
+            Module::exe_ptr(OriginalDriverDisplayRva));
+        const bool driverCallback=driver&&driver->EventFunc.Disp==expected;
+        const bool passengerCallback=passenger&&passenger->EventFunc.Disp==expected;
+        const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
+        spdlog::info(
+            "VR PASSENGER STATE: tick={} camera={} gameState={} "
+            "followCamera0={} hideDriver={} hookReady={} cockpitActive={} "
+            "sceneEffect={} dFlag=0x{:02X} dCallback={} "
+            "pFlag=0x{:02X} pCallback={} pLive={} "
+            "callbacksCam0={} callbacksCam1={} epoch={} stereoValid={}",
+            sample,camera?static_cast<int>(camera->cam_mode_34A):-1,
+            Game::current_mode?static_cast<int>(*Game::current_mode):-1,
+            Settings::VRQuestCockpitV2PassengerVisible.get(),
+            Settings::VRQuestCockpitV2HideDriver.get(),
+            NativeOriginalHooksReady.load(std::memory_order_acquire),
+            QuestCockpitV2Active(camera),InSceneEffect(),
+            dflag,driverCallback,pflag,passengerCallback,
+            OriginalEventLiveForDisplay(static_cast<std::uint8_t>(pflag))&&passengerCallback,
+            PassengerCamera0Draws.load(std::memory_order_relaxed),
+            PassengerCamera1Draws.load(std::memory_order_relaxed),
+            NativeFrameTrace().ActiveEpoch(),stereo&&stereo->valid);
+    }
+    static void PassengerDrawTrace(EvWorkRobot* robot,
+                                   const EvWorkCamera* camera) noexcept {
+        if(!PassengerTraceOn()||!robot)return;
+        using namespace OutRunVR::QuestCockpitV2;
+        if(ExactOriginalCockpitOccupant(robot)!=OriginalOccupantSlot::Passenger363)
+            return;
+        const bool inCockpit=camera&&camera->cam_mode_34A==1;
+        const auto count=inCockpit
+            ?PassengerCamera1Draws.fetch_add(1,std::memory_order_relaxed)+1
+            :PassengerCamera0Draws.fetch_add(1,std::memory_order_relaxed)+1;
+        if(count<=12u || count%180u==0u) {
+            const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
+            spdlog::info(
+                "VR PASSENGER CALLBACK: count={} camera={} cockpit={} "
+                "epoch={} stereoValid={} followCamera0={} "
+                "(callback entry, not physical mesh evidence)",
+                count,camera?static_cast<int>(camera->cam_mode_34A):-1,
+                inCockpit,NativeFrameTrace().ActiveEpoch(),
+                stereo&&stereo->valid,
+                Settings::VRQuestCockpitV2PassengerVisible.get());
+        }
+    }
     static void __cdecl RobotDisplay(EvWorkRobot* robot) {
         using namespace OutRunVR::QuestCockpitV2;
         // Original ROB display runs outside races too. Event state is safe
@@ -1197,6 +1264,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         // Camera 0, menu and all other non-cockpit views are ALWAYS native:
         // the "Remove" option must never suppress third-person ROB02.
         const EvWorkCamera* camera=Game::camera();
+        PassengerDrawTrace(robot,camera);
         if(!camera || camera->cam_mode_34A!=1 || !Game::pl_car()) {
             RobotHook.ccall<void>(robot);
             return;
@@ -1370,6 +1438,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const EvWorkCamera* cam=Game::camera();
         const auto mode=cam?
             static_cast<std::uint8_t>(cam->cam_mode_34A):0xff;
+        PassengerFrameTrace(cam);
         if(Settings::VRCockpitFrameProbe){
             OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(mode);
             OutRunVR::QuestCockpitV2::NativeFrameTrace().OnPlayerCar();
@@ -1411,6 +1480,7 @@ public:
         auto robot=safetyhook::create_inline(Module::exe_ptr(RobotRva),RobotDisplay);
         if(!robot)return false; // car RAII rollback
         PlayerHook=std::move(car);RobotHook=std::move(robot);
+        if(PassengerTraceOn())spdlog::info("VR PASSENGER TRACE: 514E60 robot hook installed");
         return true;
     }
     static QuestCockpitV2PlayerCandidateProbe instance;

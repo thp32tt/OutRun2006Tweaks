@@ -41,6 +41,7 @@ on:
       - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
       - 'RUN-QUEST-COCKPIT-V2.cmd'
       - 'RUN-QUEST-APK-COCKPIT.cmd'
+      - 'RUN-QUEST-APK-PASSENGER-DIAG.cmd'
       - 'RUN-QUEST-APK-SKY-DIAG.cmd'
       - 'RUN-QUEST-APK-TURN-DIAG.cmd'
       - 'RUN-QUEST-APK-INTERP-OFF.cmd'
@@ -306,6 +307,7 @@ jobs:
             }
             foreach($item in @(
               'RUN-QUEST-APK-COCKPIT.cmd',
+                'RUN-QUEST-APK-PASSENGER-DIAG.cmd',
               'RUN-QUEST-APK-SKY-DIAG.cmd',
               'RUN-QUEST-APK-TURN-DIAG.cmd',
               'RUN-QUEST-APK-INTERP-OFF.cmd',
@@ -366,6 +368,7 @@ jobs:
             try {
               foreach($cmd in @(
                 'RUN-QUEST-APK-COCKPIT.cmd',
+                'RUN-QUEST-APK-PASSENGER-DIAG.cmd',
                 'RUN-QUEST-APK-SKY-DIAG.cmd',
                 'RUN-QUEST-APK-TURN-DIAG.cmd',
                 'RUN-QUEST-APK-INTERP-OFF.cmd',
@@ -390,6 +393,7 @@ jobs:
             New-Item -ItemType Directory -Force $thin | Out-Null
             $entrypoints=@(
               'RUN-QUEST-APK-COCKPIT.cmd',
+                'RUN-QUEST-APK-PASSENGER-DIAG.cmd',
               'RUN-QUEST-APK-SKY-DIAG.cmd',
               'RUN-QUEST-APK-TURN-DIAG.cmd',
               'RUN-QUEST-APK-INTERP-OFF.cmd',
@@ -448,6 +452,7 @@ jobs:
             try {
               foreach($cmd in @(
                 'RUN-QUEST-APK-COCKPIT.cmd',
+                'RUN-QUEST-APK-PASSENGER-DIAG.cmd',
                 'RUN-QUEST-APK-SKY-DIAG.cmd',
                 'RUN-QUEST-APK-TURN-DIAG.cmd',
                 'RUN-QUEST-APK-INTERP-OFF.cmd',

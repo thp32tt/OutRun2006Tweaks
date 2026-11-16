@@ -13,7 +13,9 @@ if /I "%~1"=="VERIFY" goto :verify
 if not exist "%~dp0OR2006C2C.EXE" goto :missing_game
 
 echo QUEST APK COCKPIT: copy and run
-"%PS%" -NoProfile -ExecutionPolicy Bypass -File "%~dp0QuestCockpit-CopyRun.ps1" -Mode NORMAL
+set "MODE=NORMAL"
+if /I "%~1"=="PASSENGER" set "MODE=PASSENGER"
+"%PS%" -NoProfile -ExecutionPolicy Bypass -File "%~dp0QuestCockpit-CopyRun.ps1" -Mode %MODE%
 set "EC=%ERRORLEVEL%"
 if not "%EC%"=="0" echo [FAILED] Exit %EC%. To revert, run RESTORE-QUEST-APK-COCKPIT.cmd
 pause

@@ -6,6 +6,7 @@ param(
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2ReleaseParity = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Diagnostics = 'OFF',
+    [ValidateSet('OFF','ON')][string]$QuestCockpitV2PassengerDiagnostics = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2SkyProbe = 'OFF',
     [ValidateSet('ON','OFF')][string]$QuestCockpitV2Interpolation = 'ON',
     [ValidateSet('EX','CLASSIC')][string]$QuestCockpitV2DeviceMode = 'EX',
@@ -383,6 +384,22 @@ if($QuestCockpitV2 -eq 'ON'){
         Write-Host 'Quest cockpit SKY PROBE: 90-Present bounded summary; full draw telemetry OFF.'
     }
 }
+if($QuestCockpitV2PassengerDiagnostics -eq 'ON') {
+    if($QuestCockpitV2 -ne 'ON' -or $backend -ne 'd3d9') {
+        throw 'Passenger diagnostics require D3D9Ex QuestCockpitV2 ON.'
+    }
+    # Native passenger evidence only: do not activate 1.7 GB generic telemetry.
+    $gameArgs=@($gameArgs|Where-Object {
+        $_ -notmatch '^-(VR\\.)?FileLogging=' -and
+        $_ -notmatch '^-VR\\.(Telemetry|CockpitFrameProbe)='
+    })
+    $gameArgs+=@('-FileLogging=true','-VR.Telemetry=false','-VR.CockpitFrameProbe=false')
+    $env:OUTRUN_VR_FILE_LOG='1'
+    $env:OUTRUN_VR_PASSENGER_DIAG='1'
+    Write-Host 'PASSENGER TRACE ON: bounded ROB02 state and callback log.'
+} else {
+    $env:OUTRUN_VR_PASSENGER_DIAG='0'
+}
 if($backend -ne '2d'){
     # Match v0.01 Beta explicit VR entrypoint. A release VERSION marker
     # can survive when users unzip a test package over the beta folder.
@@ -450,6 +467,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "cockpitReleaseParity=$QuestCockpitV2ReleaseParity"
     "cockpitDeviceMode=$QuestCockpitV2DeviceMode"
     "cockpitDiagnostics=$QuestCockpitV2Diagnostics"
+    "cockpitPassengerDiagnostics=$QuestCockpitV2PassengerDiagnostics"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
