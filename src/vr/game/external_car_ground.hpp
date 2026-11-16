@@ -25,7 +25,7 @@ inline bool ComputeExternalFloorLift(float requestedLift,
         return false;
     constexpr float kMinimumStaticClearance=0.035f; // 3.5 cm
     constexpr float kMaximumLift=1.25f;
-    const float lift=std::max(requestedLift,
+    const float lift=(std::max)(requestedLift,
         kMinimumStaticClearance-modelMinY);
     if(!std::isfinite(lift) || lift>kMaximumLift)
         return false;
