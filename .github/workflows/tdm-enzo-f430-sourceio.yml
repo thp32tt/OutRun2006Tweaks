@@ -31,6 +31,11 @@ jobs:
             vehicle_name: Ferrari F430 Coupe
             mdl: fer_f430
             material_dir: fer_f430
+          - car_id: 250gto
+            runtime_id: 9
+            vehicle_name: Ferrari 250 GTO
+            mdl: fer_250gto
+            material_dir: fer_250gto
 
     steps:
       - uses: actions/checkout@v4
