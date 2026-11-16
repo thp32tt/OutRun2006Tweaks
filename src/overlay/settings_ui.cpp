@@ -96,7 +96,12 @@ class SettingsWindow : public OverlayWindow
         // The canonical passenger-mode setting is hidden: the two visible
         // exclusive checkboxes are drawn as a cockpit group below.
         if(section == "VR" &&
-           (matches_search("Passenger",search) ||
+           (matches_search("Cockpit View",search) ||
+            matches_search("QuestCockpitV2Seat",search) ||
+            matches_search("SeatBack",search) ||
+            matches_search("SeatDown",search) ||
+            matches_search("SeatRight",search) ||
+            matches_search("Passenger",search) ||
             matches_search("Follow Camera 0",search) ||
             matches_search("Remove Passenger",search) ||
             matches_search("Passenger: Follow Camera 0",search) ||
