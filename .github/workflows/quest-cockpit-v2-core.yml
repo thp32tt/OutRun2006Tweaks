@@ -28,6 +28,7 @@ on:
       - 'src/vr/game/quest_cockpit_v2_passenger_event.hpp'
       - 'tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp'
       - 'tools/verify_quest_cockpit_passenger_runtime.py'
+      - 'tools/verify_quest_cockpit_passenger_ten_paths.py'
       - 'src/overlay/settings_ui.cpp'
       - 'src/plugin.hpp'
       - 'src/vr/game/quest_cockpit_v2_visibility.hpp'
@@ -121,6 +122,8 @@ jobs:
           /tmp/quest-v2-arm64-parity
       - name: Verify camera-0 passenger parity and F11 exclusive checkboxes
         run: python3 tools/verify_quest_cockpit_passenger_runtime.py
+      - name: Audit ten distinct cockpit passenger source call paths
+        run: python3 tools/verify_quest_cockpit_passenger_ten_paths.py
       - name: Native ROB02 follow/remove policy C++ regression
         run: |
           c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
