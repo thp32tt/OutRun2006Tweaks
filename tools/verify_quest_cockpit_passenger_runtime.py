@@ -54,7 +54,7 @@ assert render.index("ShouldSuppressOriginalPassenger(") < render.index(
 )
 assert "nativeCameraModeOne && exactLivePassenger" in policy
 assert "camera 0" in ini.lower() or "Camera 0" in ini
-assert "ONLY in cockpit mode 1" in settings
+assert "only in cockpit mode 1" in settings
 assert "ONLY in cockpit view" in overlay
 assert "RobotHook.ccall<void>(robot);" in render
 assert "SelectCockpitOccupantRender(" in render
