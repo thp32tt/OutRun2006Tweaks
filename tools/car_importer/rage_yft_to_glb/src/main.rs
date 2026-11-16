@@ -4,7 +4,7 @@ use rage_formats::renderware::{dff::Dff, txd::Txd};
 use rage_render::{export_glb, GlbOptions, RenderPart, TextureSet};
 use std::{env, fs, path::Path};
 
-fn export_parts(parts: &[RenderPart<'_>], textures: &TextureSet, output: &Path) -> Result<rage_render::GlbReport> {
+fn export_parts(parts: &[RenderPart<'_>], textures: &TextureSet, output: &Path) -> Result<rage_render::RenderReport> {
     let options = GlbOptions {
         max_texture: 2048,
         jpeg_quality: 92,
@@ -99,9 +99,9 @@ fn dff_mode(dff_path: &str, txd_path: Option<&str>, out_path: &str) -> Result<()
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     match args.as_slice() {
-        [_, yft, ytd, output] => yft_mode(yft, ytd, output),
         [_, mode, dff, output] if mode == "dff" => dff_mode(dff, None, output),
         [_, mode, dff, txd, output] if mode == "dff" => dff_mode(dff, Some(txd), output),
+        [_, yft, ytd, output] => yft_mode(yft, ytd, output),
         _ => anyhow::bail!(
             "usage:\n  rage-yft-to-glb INPUT.yft INPUT.ytd OUTPUT.glb\n  rage-yft-to-glb dff INPUT.dff [INPUT.txd] OUTPUT.glb"
         ),
