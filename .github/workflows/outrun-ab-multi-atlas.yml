@@ -166,7 +166,7 @@ jobs:
           set -euo pipefail
           python tools/localization/hd_source_protection_evidence.py --repo-root . \
             --qa-report "$RUNNER_TEMP/ab-multi-one/qa_report.json" \
-            --out "$RUNNER_TEMP/ab-multi-one/source_protection" --max-previews 200
+            --out "$RUNNER_TEMP/ab-multi-one/source_protection" --max-previews 80
 
       - name: Write source-bound prioritized repair worklist for every held ROI
         if: success()
