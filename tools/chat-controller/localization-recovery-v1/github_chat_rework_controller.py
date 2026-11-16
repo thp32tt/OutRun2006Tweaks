@@ -59,6 +59,10 @@ IMAGE_TOOL_RETRY_INTERVAL_SECONDS = 900
 # uploading, typing or pressing Enter. Only that exact old status is safe
 # to resume; other HOLD/AB_CLAIMED/AB_SENT states must never be resent.
 SAFE_OLD_PRE_SEND_HOLD = "HOLD_IMAGE_TOOL_NOT_VERIFIED"
+# Regression 2026-11-16: the old image_tool_preverified=True branch entered
+# C1-only validation BEFORE any attachment/Enter and emitted this exact HOLD.
+# Only A/B task records without Chat URLs or candidate receipts qualify.
+SAFE_PRE_SEND_C1_BRANCH_BUG_HOLD = "HOLD_C1_IMAGE_TOOL_SELECTED"
 FINAL_STATES = ("C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY", "C1_REWORK_REQUIRED", "HOLD")
 
 # The latest strict HD source QA requires ORIGINAL English/plate separation for
@@ -363,7 +367,14 @@ def image_tool_pre_send_retry_safe(prior, task):
         return False
     status=prior.get("status")
     if status == "HOLD":
-        return prior.get("hold_reason") == SAFE_OLD_PRE_SEND_HOLD
+        reason=prior.get("hold_reason")
+        if reason==SAFE_OLD_PRE_SEND_HOLD:
+            return True
+        if reason==SAFE_PRE_SEND_C1_BRANCH_BUG_HOLD:
+            # Exact short-circuit before upload and Enter in the historical
+            # preverified A/B branch. C1 submissions have candidate_sha256.
+            return prior.get("pre_send_no_message") is False
+        return False
     return (status == IMAGE_TOOL_RETRY_STATUS
             and prior.get("pre_send_no_message") is True)
 
@@ -654,11 +665,14 @@ class ChatBridge:
                             image_tool_preverified=False):
         if pg is None:
             return "HOLD_CHATGPT_LOGIN_REQUIRED"
-        if imagegen and not image_tool_preverified:
-            status=await ensure_image_tool(pg)
-            if status!="CREATE_IMAGE_TOOL_SELECTED":
-                return "HOLD_IMAGE_TOOL_NOT_VERIFIED"
+        if imagegen:
+            if not image_tool_preverified:
+                status=await ensure_image_tool(pg)
+                if status!="CREATE_IMAGE_TOOL_SELECTED":
+                    return "HOLD_IMAGE_TOOL_NOT_VERIFIED"
         else:
+            # The C1-only guard must never run for an A/B ImageGen task
+            # whose selected tool was already independently preverified.
             selected=pg.locator('[data-inline-selection-pill][data-system-hint-type="picture_v2"]')
             if await selected.count():
                 return "HOLD_C1_IMAGE_TOOL_SELECTED"
