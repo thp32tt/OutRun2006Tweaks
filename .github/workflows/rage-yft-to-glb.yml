@@ -1,0 +1,29 @@
+name: Build rage-yft-to-glb Linux
+
+on:
+  push:
+    branches:
+      - vr-external-dashboard-v4-20261116
+    paths:
+      - "tools/car_importer/rage_yft_to_glb/**"
+      - ".github/workflows/rage-yft-to-glb.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build converter
+        run: cargo build --manifest-path tools/car_importer/rage_yft_to_glb/Cargo.toml --release
+      - name: Smoke help
+        run: |
+          set +e
+          tools/car_importer/rage_yft_to_glb/target/release/rage-yft-to-glb
+          test $? -ne 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rage-yft-to-glb-linux
+          path: tools/car_importer/rage_yft_to_glb/target/release/rage-yft-to-glb
+          if-no-files-found: error
