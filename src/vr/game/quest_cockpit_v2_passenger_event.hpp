@@ -45,9 +45,12 @@ inline constexpr std::uint32_t OriginalStartAfterPassengerFunctionId=0x3bu;
 // rendering regardless of which passenger checkbox is selected.
 inline constexpr bool ShouldSuppressOriginalPassenger(
     bool vrEnabled,bool cockpitEnabled,bool followCamera0,
-    bool gameplay,bool nativeCameraModeOne,
+    bool activeRacingCockpit,bool nativeCameraModeOne,
     bool exactLivePassenger) noexcept {
+    // A GOAL frame is "playable" for other cockpit effects but must never
+    // hide the original finish-scene passenger. The caller also excludes
+    // scene effects via QuestCockpitV2Active().
     return vrEnabled && cockpitEnabled && !followCamera0 &&
-        gameplay && nativeCameraModeOne && exactLivePassenger;
+        activeRacingCockpit && nativeCameraModeOne && exactLivePassenger;
 }
 }
