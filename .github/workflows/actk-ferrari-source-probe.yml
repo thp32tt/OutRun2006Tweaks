@@ -1,0 +1,46 @@
+name: ACTK Ferrari Exact Sources Probe
+
+on:
+  push:
+    branches:
+      - vr-quest-cockpit-v2-external-dino-actions-20261116
+    paths:
+      - '.github/workflows/actk-ferrari-source-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Inspect ACTK Ferrari garage links and target contexts
+        shell: python
+        run: |
+          import html, re, urllib.parse, urllib.request
+          url='https://assetto-fr.com/garage/ferrari'
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+          r=urllib.request.urlopen(req,timeout=30)
+          body=r.read().decode('utf-8','ignore')
+          print('STATUS',getattr(r,'status',None),'BYTES',len(body),'FINAL',r.geturl())
+          targets=[
+            'Ferrari F430 "KingStriker v1.0"',
+            'Ferrari 360 Spider F1',
+            'Ferrari 512 BB "GeroDa74',
+            'Ferrari 365 GTS/4 Daytona Spider',
+            'Ferrari Superamerica',
+            'Ferrari Enzo "ACTK',
+          ]
+          for target in targets:
+              key=target.split('"')[0].strip()
+              print('\nTARGET',key)
+              for m in list(re.finditer(re.escape(key),body,re.I))[:10]:
+                  chunk=body[max(0,m.start()-2000):min(len(body),m.end()+4000)]
+                  print('CONTEXT',re.sub(r'\s+',' ',chunk)[:6000])
+                  links=[]
+                  for x in re.findall(r'(?:href|action|data-url|data-href|onclick)=["\']([^"\']+)["\']',chunk,re.I):
+                      x=html.unescape(x)
+                      if x not in links: links.append(x)
+                  print('LINKS',links[:100])
