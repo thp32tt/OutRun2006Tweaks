@@ -75,8 +75,6 @@ def verify_pixel_ownership(t,record,proof_dir,edited_dir):
         return "AMBIGUOUS_NATIVE_SOURCE_EXISTS"
     if not owned.getbbox():
         return "OWNER_MASK_EMPTY"
-    if int(t.get("native_bc3_four_mips_requires_separate_codec_gate",0)):
-        return "BC3_MIP_NATIVE_CODEC_GATE_PENDING"
     # The glyph must NOT extend over another original source sprite (1px
     # alpha halo). An RGBA source-crop replacement would destroy this art.
     glyph=text.getchannel("A").point(lambda n:255 if n>15 else 0)
@@ -96,6 +94,8 @@ def verify_pixel_ownership(t,record,proof_dir,edited_dir):
         raise ValueError("CLEAN_DAMAGED_PROTECTED_SOURCE")
     if ImageChops.multiply(clean.getchannel("A"),owned).getbbox():
         raise ValueError("SOURCE_ENGLISH_OWNER_NOT_REMOVED")
+    if int(t.get("native_bc3_four_mips_requires_separate_codec_gate",0)):
+        return "BC3_MIP_NATIVE_CODEC_GATE_PENDING"
     if record.get("status") not in EDITED_STATUSES:
         return "PIXEL_EDIT_NOT_AVAILABLE_FOR_C1"
     return "READY_FOR_C1_STATIC_SOURCE_OWNER_TEST_ONLY"
