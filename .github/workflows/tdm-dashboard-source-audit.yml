@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/tdm-dashboard-source-audit.yml'
       - 'tools/car_importer/github_actions/dashboard_glb_audit_blender.py'
+      - 'tools/car_importer/github_actions/dashboard_component_audit_blender.py'
   workflow_dispatch:
 
 permissions:
@@ -104,14 +105,21 @@ jobs:
           "$BLENDER" -b --python tools/car_importer/github_actions/dashboard_glb_audit_blender.py -- \
             --glb "$WORK/output/source.glb" \
             --out "$WORK/output/dashboard_audit.json"
+          "$BLENDER" -b --python tools/car_importer/github_actions/dashboard_component_audit_blender.py -- \
+            --glb "$WORK/output/source.glb" \
+            --out "$WORK/output/dashboard_component_audit.json"
           python - <<'PY'
           import json,os,pathlib
           car=os.environ["CAR_ID"]
-          p=pathlib.Path(os.environ["RUNNER_TEMP"])/f"sourceio-{car}"/"output"/"dashboard_audit.json"
-          d=json.loads(p.read_text())
-          print("AUDIT_SUMMARY",car,"mesh_count",d["mesh_count"],"candidate_count",d["candidate_count"])
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])/f"sourceio-{car}"/"output"
+          d=json.loads((root/"dashboard_audit.json").read_text())
+          c=json.loads((root/"dashboard_component_audit.json").read_text())
+          print("AUDIT_SUMMARY",car,"mesh_count",d["mesh_count"],"candidate_count",d["candidate_count"],
+                "component_count",c["component_count"],"needle_like_count",c["needle_like_count"])
           for x in d["candidates"]:
               print("CANDIDATE",json.dumps(x,ensure_ascii=False))
+          for x in c["needle_like_candidates"][:30]:
+              print("NEEDLE_COMPONENT",json.dumps(x,ensure_ascii=False))
           PY
         env:
           CAR_ID: ${{ matrix.car_id }}
@@ -123,5 +131,6 @@ jobs:
           path: |
             ${{ runner.temp }}/sourceio-${{ matrix.car_id }}/output/source.json
             ${{ runner.temp }}/sourceio-${{ matrix.car_id }}/output/dashboard_audit.json
+            ${{ runner.temp }}/sourceio-${{ matrix.car_id }}/output/dashboard_component_audit.json
           if-no-files-found: error
           retention-days: 1
