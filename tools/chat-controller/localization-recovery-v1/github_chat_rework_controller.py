@@ -45,7 +45,7 @@ API = "https://api.github.com/repos/" + REPO
 ROOT = Path(os.getenv("OUTRUN_REWORK_HOME", "/data/hd-rework")).resolve()
 PROJECT_URL = os.getenv("CHATGPT_PROJECT_URL", "https://chatgpt.com/").strip()
 TOKEN = os.getenv("OUTRUN_GITHUB_CONTENTS_TOKEN", "").strip()
-POLL = int(os.getenv("OUTRUN_REWORK_POLL_SECONDS", "600"))
+POLL = int(os.getenv("OUTRUN_REWORK_POLL_SECONDS", "300"))
 # User policy 2026-11-05: reuse existing A/B PNGs; no new ImageGen sends.
 REUSE_ONLY = os.getenv("OUTRUN_REWORK_REUSE_ONLY", "1").strip() != "0"
 CHAT_TASK = re.compile(r"^HDRW-[AB]-[0-9a-f]{20}$")
