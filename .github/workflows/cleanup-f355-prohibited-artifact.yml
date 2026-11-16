@@ -1,0 +1,22 @@
+name: Cleanup prohibited F355 conversion artifact
+
+on:
+  push:
+    branches:
+      - tooling/f355-spider-private-yft-convert-20261116
+    paths:
+      - '.github/workflows/cleanup-f355-prohibited-artifact.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Delete transient F355 converted artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method DELETE repos/${{ github.repository }}/actions/artifacts/14194336255
