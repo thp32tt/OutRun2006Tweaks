@@ -343,7 +343,7 @@ public:
                         Settings::VRQuestCockpitV2PassengerVisible=!remove;
                         queue_setting_change(&Settings::VRQuestCockpitV2PassengerVisible);
                     }
-                    ImGui::TextWrapped("Follow: use the original third-person passenger only when native ROB02 exists. Remove: hide that passenger in camera 0 and cockpit view. Changes apply live; the original passenger event and animations are not modified.");
+                    ImGui::TextWrapped("Follow: show the original camera-0 passenger in the cockpit when native ROB02 exists. Remove: hide the passenger ONLY in cockpit view. Camera 0 always stays original. Changes apply live; passenger events and animations are unchanged.");
                     ImGui::Spacing();
                 }
 				if (ImGui::Button("Save Cockpit View"))
