@@ -1,0 +1,19 @@
+name: Build OR2 YFT2GLB Linux
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build
+        working-directory: tools/yft2glb
+        run: cargo build --release --locked || cargo build --release
+      - name: Smoke
+        run: tools/yft2glb/target/release/or2-yft2glb 2>&1 | grep -q "usage: or2-yft2glb"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: or2-yft2glb-linux
+          path: tools/yft2glb/target/release/or2-yft2glb
+          if-no-files-found: error
