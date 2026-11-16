@@ -3397,6 +3397,27 @@ class DisableStageCulling : public Hook
            OutRunVR::QuestCockpitV2::OriginalOccupantLod0Active() &&
            !OutRunVR::QuestCockpitV2::InSceneEffect() &&
            ctx.esp != 0) {
+            // Optional bounded evidence at the real PC PMT node-visibility
+            // return gate. No additional scene traversal or pointer escape.
+            char passengerDiag[8]{};
+            const DWORD passengerDiagLen=GetEnvironmentVariableA(
+                "OUTRUN_VR_PASSENGER_DIAG",passengerDiag,
+                static_cast<DWORD>(sizeof(passengerDiag)));
+            if(passengerDiagLen==1u && passengerDiag[0]=='1') {
+                static thread_local std::uint64_t nodeSamples=0;
+                ++nodeSamples;
+                if(nodeSamples<=12u || nodeSamples%180u==0u) {
+                    std::int32_t originalLod=0;
+                    std::memcpy(&originalLod,reinterpret_cast<const void*>(
+                        static_cast<std::uintptr_t>(ctx.esp)+0x1Cu),
+                        sizeof(originalLod));
+                    spdlog::info(
+                        "VR PASSENGER PMT NODE: sample={} nativeVisible={} "
+                        "nativeLod={} overrideVisible=1 overrideLod=0 "
+                        "(cull gate, not confirmed GPU draw)",
+                        nodeSamples,ctx.eax,originalLod);
+                }
+            }
             const std::int32_t forcedLod=0;
             std::memcpy(reinterpret_cast<void*>(
                 static_cast<std::uintptr_t>(ctx.esp)+0x1Cu),
