@@ -1,0 +1,101 @@
+name: Private F355 Spider native YFT to GLB
+
+on:
+  push:
+    branches:
+      - tooling/f355-spider-private-yft-convert-20261116
+    paths:
+      - '.github/workflows/f355-private-yft-convert.yml'
+      - 'tools/car_importer/f355_private_yft_to_glb.py'
+
+permissions:
+  contents: read
+
+jobs:
+  convert:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    env:
+      F355_ARCHIVE_SHA256: 37948adda656fc5935ef5ede748f034cc2fa4bc01b9ec392a7ad3858afcef99d
+      SOLLUMZ_SHA256: 547b996073215b23f087d06a3f7f98f1353c987690bb9ba795a38a0659432e3e
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download and verify official Blender 5.2.4 portable
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $work=Join-Path $env:RUNNER_TEMP 'f355-convert'
+          New-Item -ItemType Directory -Force $work | Out-Null
+          $zip=Join-Path $work 'blender-5.2.4-windows-x64.zip'
+          $shaFile=Join-Path $work 'blender-5.2.4.sha256'
+          Invoke-WebRequest -UseBasicParsing -Uri 'https://download.blender.org/release/Blender5.2/blender-5.2.4-windows-x64.zip' -OutFile $zip
+          Invoke-WebRequest -UseBasicParsing -Uri 'https://download.blender.org/release/Blender5.2/blender-5.2.4.sha256' -OutFile $shaFile
+          $line=Get-Content $shaFile | Where-Object {$_ -match 'blender-5\.2\.4-windows-x64\.zip'} | Select-Object -First 1
+          if(-not $line){throw 'Official Blender SHA line missing'}
+          $expected=($line -split '\s+')[0].ToLowerInvariant()
+          $actual=(Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($actual -ne $expected){throw "Blender SHA mismatch expected=$expected actual=$actual"}
+          Expand-Archive $zip -DestinationPath $work -Force
+          $exe=(Get-ChildItem $work -Recurse -Filter blender.exe | Select-Object -First 1).FullName
+          if(-not $exe){throw 'blender.exe missing after extraction'}
+          "F355_BLENDER=$exe" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "F355_WORK=$work" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          & $exe --version
+
+      - name: Install and verify Sollumz 2.9.1 with Windows native dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $zip=Join-Path $env:F355_WORK 'Sollumz-2.9.1.zip'
+          Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/Sollumz/Sollumz/releases/download/v2.9.1/Sollumz.zip' -OutFile $zip
+          $actual=(Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($actual -ne $env:SOLLUMZ_SHA256){throw "Sollumz SHA mismatch: $actual"}
+          & $env:F355_BLENDER --command extension install-file -r user_default -e $zip
+          if($LASTEXITCODE -ne 0){throw "Sollumz extension install failed: $LASTEXITCODE"}
+          & $env:F355_BLENDER --command extension list
+          if($LASTEXITCODE -ne 0){throw 'Blender extension list failed'}
+
+      - name: Download exact public F355 Spider source and extract
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $archive=Join-Path $env:F355_WORK 'Ferrari_F355_Spider_1994_V1.2.7z'
+          $url='https://files.gtainside.com/202210/1666638503_Ferrari%20F355%20Spider%201994%20-%20V1.2.7z'
+          Invoke-WebRequest -UseBasicParsing -Headers @{'Referer'='https://www.gtainside.com/';'User-Agent'='Mozilla/5.0'} -Uri $url -OutFile $archive
+          $actual=(Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($actual -ne $env:F355_ARCHIVE_SHA256){throw "F355 archive SHA mismatch: $actual"}
+          $src=Join-Path $env:F355_WORK 'source'
+          New-Item -ItemType Directory -Force $src | Out-Null
+          & 7z x -y $archive "-o$src"
+          if($LASTEXITCODE -ne 0){throw "7z extraction failed: $LASTEXITCODE"}
+          $stream=Join-Path $src 'FiveM\ff355s\stream'
+          foreach($name in @('f355s.yft','f355s_hi.yft','f355s.ytd')){
+            if(!(Test-Path (Join-Path $stream $name))){throw "F355 source missing $name"}
+          }
+          "F355_STREAM=$stream" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Import native YFT/YTD and export diagnostic GLB
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $out=Join-Path $env:F355_WORK 'output'
+          New-Item -ItemType Directory -Force $out | Out-Null
+          "F355_OUTPUT=$out" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          $env:F355_OUTPUT=$out
+          & $env:F355_BLENDER -b --python (Resolve-Path 'tools/car_importer/f355_private_yft_to_glb.py').Path
+          if($LASTEXITCODE -ne 0){throw "Blender F355 import failed: $LASTEXITCODE"}
+          foreach($name in @('f355_import_report.json','f355_raw_import.glb')){
+            if(!(Test-Path (Join-Path $out $name))){throw "F355 output missing $name"}
+          }
+          Get-FileHash (Join-Path $out 'f355_raw_import.glb') -Algorithm SHA256
+          Get-Item (Join-Path $out 'f355_raw_import.glb') | Format-List Name,Length
+
+      - name: Upload private conversion diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: F355-Spider-Private-RawGLB-${{ github.sha }}
+          path: ${{ env.F355_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 1
