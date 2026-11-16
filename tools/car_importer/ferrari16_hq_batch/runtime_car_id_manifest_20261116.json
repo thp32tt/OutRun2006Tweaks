@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-11-16",
+  "source_mapping": {
+    "repo": "r4dius/outrun2-decomp",
+    "commit": "e1e1c592b802a6f3f7020a676abd3ba1be479e62",
+    "file": "src/platform/frontend_vehicle_data.hpp",
+    "relation": "VehicleMenuModels[car_id] -> VehicleResourcePaths[model]"
+  },
+  "runtime": {
+    "bounded_car_ids": [
+      0,
+      29
+    ],
+    "generic_filename_pattern": "ExternalCars/car_id_%02u.ovc",
+    "legacy_aliases": {
+      "7": "ExternalCars/288gto.ovc",
+      "11": "ExternalCars/f40.ovc",
+      "22": "ExternalCars/288gto.ovc",
+      "26": "ExternalCars/f40.ovc"
+    },
+    "f50_special": "F50_External_Test.ovc when F50ExternalModel is enabled",
+    "fallback": "original game car on missing/invalid/failed sidecar"
+  },
+  "ids": [
+    {
+      "car_id": 0,
+      "name": "Dino 246 GTS",
+      "resource": "obj_plcar_dino_pmt.sz",
+      "generic_file": "ExternalCars/car_id_00.ovc"
+    },
+    {
+      "car_id": 1,
+      "name": "365 GTS/4 Daytona",
+      "resource": "obj_plcar_dayts_pmt.sz",
+      "generic_file": "ExternalCars/car_id_01.ovc"
+    },
+    {
+      "car_id": 2,
+      "name": "F50",
+      "resource": "obj_plcar_f50_pmt.sz",
+      "generic_file": "ExternalCars/car_id_02.ovc"
+    },
+    {
+      "car_id": 3,
+      "name": "360 Spider",
+      "resource": "obj_plcar_360sp_pmt.sz",
+      "generic_file": "ExternalCars/car_id_03.ovc"
+    },
+    {
+      "car_id": 4,
+      "name": "F355 Spider",
+      "resource": "obj_plcar_f355sp_pmt.sz",
+      "generic_file": "ExternalCars/car_id_04.ovc"
+    },
+    {
+      "car_id": 5,
+      "name": "575 Superamerica",
+      "resource": "obj_plcar_575sa_pmt.sz",
+      "generic_file": "ExternalCars/car_id_05.ovc"
+    },
+    {
+      "car_id": 6,
+      "name": "Testarossa",
+      "resource": "obj_plcar_testa_pmt.sz",
+      "generic_file": "ExternalCars/car_id_06.ovc"
+    },
+    {
+      "car_id": 7,
+      "name": "288 GTO",
+      "resource": "obj_plcar_gto_pmt.sz",
+      "generic_file": "ExternalCars/car_id_07.ovc"
+    },
+    {
+      "car_id": 8,
+      "name": "328 GTS",
+      "resource": "obj_plcar_328gts_pmt.sz",
+      "generic_file": "ExternalCars/car_id_08.ovc"
+    },
+    {
+      "car_id": 9,
+      "name": "250 GTO",
+      "resource": "obj_plcar_250gto_pmt.sz",
+      "generic_file": "ExternalCars/car_id_09.ovc"
+    },
+    {
+      "car_id": 10,
+      "name": "512 BB",
+      "resource": "obj_plcar_512bb_pmt.sz",
+      "generic_file": "ExternalCars/car_id_10.ovc"
+    },
+    {
+      "car_id": 11,
+      "name": "F40",
+      "resource": "obj_plcar_f40_pmt.sz",
+      "generic_file": "ExternalCars/car_id_11.ovc"
+    },
+    {
+      "car_id": 12,
+      "name": "550 Barchetta",
+      "resource": "obj_plcar_550b_pmt.sz",
+      "generic_file": "ExternalCars/car_id_12.ovc"
+    },
+    {
+      "car_id": 13,
+      "name": "F430 Coupe",
+      "resource": "obj_plcar_f430_pmt.sz",
+      "generic_file": "ExternalCars/car_id_13.ovc"
+    },
+    {
+      "car_id": 14,
+      "name": "Enzo / FX",
+      "resource": "obj_plcar_fx_pmt.sz",
+      "generic_file": "ExternalCars/car_id_14.ovc"
+    },
+    {
+      "car_id": 15,
+      "name": "Dino tuned",
+      "resource": "obj_plcar_dino_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_15.ovc"
+    },
+    {
+      "car_id": 16,
+      "name": "Daytona tuned",
+      "resource": "obj_plcar_dayts_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_16.ovc"
+    },
+    {
+      "car_id": 17,
+      "name": "F50 tuned",
+      "resource": "obj_plcar_f50_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_17.ovc"
+    },
+    {
+      "car_id": 18,
+      "name": "360 tuned (retail resource 360m_t)",
+      "resource": "obj_plcar_360m_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_18.ovc"
+    },
+    {
+      "car_id": 19,
+      "name": "F355 Spider tuned",
+      "resource": "obj_plcar_f355sp_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_19.ovc"
+    },
+    {
+      "car_id": 20,
+      "name": "575 Superamerica tuned",
+      "resource": "obj_plcar_575sa_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_20.ovc"
+    },
+    {
+      "car_id": 21,
+      "name": "Testarossa tuned",
+      "resource": "obj_plcar_testa_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_21.ovc"
+    },
+    {
+      "car_id": 22,
+      "name": "288 GTO tuned",
+      "resource": "obj_plcar_gto_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_22.ovc"
+    },
+    {
+      "car_id": 23,
+      "name": "328 GTS tuned",
+      "resource": "obj_plcar_328gts_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_23.ovc"
+    },
+    {
+      "car_id": 24,
+      "name": "250 GTO tuned",
+      "resource": "obj_plcar_250gto_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_24.ovc"
+    },
+    {
+      "car_id": 25,
+      "name": "512 BB tuned",
+      "resource": "obj_plcar_512bb_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_25.ovc"
+    },
+    {
+      "car_id": 26,
+      "name": "F40 tuned",
+      "resource": "obj_plcar_f40_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_26.ovc"
+    },
+    {
+      "car_id": 27,
+      "name": "550 Barchetta tuned",
+      "resource": "obj_plcar_550b_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_27.ovc"
+    },
+    {
+      "car_id": 28,
+      "name": "F430 Spider tuned",
+      "resource": "obj_plcar_f430sp_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_28.ovc"
+    },
+    {
+      "car_id": 29,
+      "name": "Enzo / FX tuned",
+      "resource": "obj_plcar_fx_t_pmt.sz",
+      "generic_file": "ExternalCars/car_id_29.ovc"
+    }
+  ]
+}
