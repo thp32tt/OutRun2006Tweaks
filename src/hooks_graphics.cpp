@@ -1208,14 +1208,22 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             return;
         }
         const auto slot=ExactOriginalCockpitOccupant(robot);
-        // Hide only the exact live original passenger in cockpit mode 1.
-        // No event teardown, altered animation, driver/NPC suppression or
-        // changes to the third-person camera-0 rendering path.
+        // IsPlayableCarGameplay() also includes STATE_GOAL. Passenger removal
+        // must NOT hide the original guest in GOAL/results, and must not
+        // change original draws during scene effects or inactive camera work.
+        const bool racing=Game::current_mode &&
+            (*Game::current_mode==STATE_GAME ||
+             (*Game::current_mode==STATE_START &&
+              Game::game_start_progress_code &&
+              *Game::game_start_progress_code==65));
+        const bool cockpitActive=QuestCockpitV2Active(camera);
+        // Only the real active mode-1 cockpit during a racing frame may
+        // suppress its exact original ROB02. Camera 0 was forwarded above.
         if(ShouldSuppressOriginalPassenger(
                 Settings::VREnabled.get(),
                 Settings::VRQuestCockpitV2Enabled.get(),
                 Settings::VRQuestCockpitV2PassengerVisible.get(),
-                IsPlayableCarGameplay(),
+                cockpitActive && racing,
                 camera->cam_mode_34A==1,
                 slot==OriginalOccupantSlot::Passenger363)) {
             return;
@@ -1226,13 +1234,8 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         }
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
-        const bool racing=Game::current_mode &&
-            (*Game::current_mode==STATE_GAME ||
-             (*Game::current_mode==STATE_START &&
-              Game::game_start_progress_code &&
-              *Game::game_start_progress_code==65));
         const auto action=SelectCockpitOccupantRender(
-            slot,QuestCockpitV2Active(camera),racing,
+            slot,cockpitActive,racing,
             Settings::VRQuestCockpitV2HideDriver,
             Settings::VRQuestCockpitV2PassengerVisible);
         if(action==CockpitOccupantRender::SuppressDriver)return;
