@@ -34,6 +34,7 @@ jobs:
           sparse-checkout: |
             tools/localization/hd_hold_retry_pipeline.py
             tools/localization/test_hd_hold_retry_pipeline.py
+            tools/localization/test_hd_hold_live_count_queue.py
             tools/localization/publish_hd_rework_queue.py
             localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
       - name: Read previous authenticated browser receipts; never resend an already sent task
@@ -102,7 +103,9 @@ jobs:
       - name: Install Pillow only (NO image API or new fonts)
         run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
       - name: Verify source-image protected-pixel and exact-regeneration-task safety
-        run: python -m unittest discover -s tools/localization -p test_hd_hold_retry_pipeline.py -v
+        run: |
+          python -m unittest discover -s tools/localization -p test_hd_hold_retry_pipeline.py -v
+          python -m unittest discover -s tools/localization -p test_hd_hold_live_count_queue.py -v
       - name: Repair remaining image overlap without touching protected source
         shell: bash
         run: |
