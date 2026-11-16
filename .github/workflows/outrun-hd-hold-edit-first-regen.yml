@@ -46,22 +46,56 @@ jobs:
           sparse-checkout: |
             localization/automation_runs/hd_imagegen_fallback/latest.json
             localization/automation_runs/hd_imagegen_fallback/state
-      - name: Read previously verified owner masks from exact native DDS proof
-        uses: actions/download-artifact@v4
-        with:
-          name: outrun-ab-multi-atlas-43169137555
-          run-id: 43169137555
-          repository: thp32tt/OutRun2006Tweaks
-          github-token: ${{ github.token }}
-          path: ${{ runner.temp }}/original-hd-source
-      - name: Read only actual failed existing-PNG pixel editing evidence
-        uses: actions/download-artifact@v4
-        with:
-          name: outrun-source-bound-auto-edited-pngs-43185778845
-          run-id: 43185778845
-          repository: thp32tt/OutRun2006Tweaks
-          github-token: ${{ github.token }}
-          path: ${{ runner.temp }}/previous-auto-edit
+      - name: Download newest SUCCESSFUL source-SHA-bound native QA, not permanently frozen 640-HOLD artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="thp32tt/OutRun2006Tweaks"
+          latest="$(gh run list --repo "$repo" --workflow outrun-ab-multi-atlas.yml \
+            --branch korean-localization-recovery-20260928 \
+            --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          if ! [[ "$latest" =~ ^[0-9]{8,}$ ]]; then
+            echo "NO_VERIFIED_FULL_NATIVE_QA_RUN_TO_BASE_NEXT_HOLD_RETRY_ON"
+            exit 1
+          fi
+          gh run download "$latest" --repo "$repo" \
+            --name "outrun-ab-multi-atlas-$latest" \
+            --dir "$RUNNER_TEMP/native-full-evidence"
+          test -s "$RUNNER_TEMP/native-full-evidence/source_protection/source_protection_evidence.json"
+          test -s "$RUNNER_TEMP/native-full-evidence/qa_report.json"
+          mkdir -p "$RUNNER_TEMP/original-hd-source"
+          ln -s "$RUNNER_TEMP/native-full-evidence/source_protection" \
+            "$RUNNER_TEMP/original-hd-source/source_protection"
+          if test -s "$RUNNER_TEMP/native-full-evidence/auto_edits/auto_edit_report.json"; then
+            ln -s "$RUNNER_TEMP/native-full-evidence/auto_edits" \
+              "$RUNNER_TEMP/previous-auto-edit"
+          else
+            # The first historical source-evidence run preceded the editor.
+            # Only in this old run, fall back to its exact SHA-pinned edited
+            # PNG artifact rather than pretending a new image was generated.
+            gh run download 43185778845 --repo "$repo" \
+              --name outrun-source-bound-auto-edited-pngs-43185778845 \
+              --dir "$RUNNER_TEMP/previous-auto-edit"
+          fi
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          full=Path(os.environ["RUNNER_TEMP"])/"native-full-evidence"
+          qa=json.loads((full/"qa_report.json").read_text(encoding="utf-8"))
+          proof=json.loads((full/"source_protection"/"source_protection_evidence.json").read_text(encoding="utf-8"))
+          edited=json.loads((Path(os.environ["RUNNER_TEMP"])/"previous-auto-edit"/"auto_edit_report.json").read_text(encoding="utf-8"))
+          assert qa["active_roi_total"]==954
+          assert qa["translated_roi_generated"]+sum(qa["hold_roi_reason_counts"].values())==954
+          assert edited["original_hold_count_unchanged"]==proof["source_holds"]
+          assert edited["source_report_zip_sha256"]==proof["source_report_zip_sha256"]==qa["zip_sha256"]
+          assert qa["release_approved"] is False
+          print(json.dumps({"selected_source_native_holds":proof["source_holds"],
+                            "selected_source_translated":qa["translated_roi_generated"],
+                            "source_sha_verified":True,"release_approved":False}))
+          PY
+          echo "FULL_NATIVE_SOURCE_RUN=$latest" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
