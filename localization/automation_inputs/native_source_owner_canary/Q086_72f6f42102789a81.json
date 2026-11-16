@@ -1,0 +1,24 @@
+{
+  "candidate_sha256": "139b2ff0666f1697f9b06cf2b1cc6d873aa101c413b830c871fba5ca3cdd7d51",
+  "native_canary_method": "SOURCE_PROTECTED_BLOCK_REENCODE_TEST_ONLY",
+  "native_test_dds_sha256": "c32ca42ca2fa723f78e6a536cf8d1a1b6a337e7dab002198e90732d1de10327f",
+  "old_candidate_sha256": "e3922cbe908c1f155268527924291e63f2975b4c49365f9c29a82304015d4b4c",
+  "real_game_test": "NOT_PERFORMED",
+  "release_approved": false,
+  "roi_id": "Q086_72f6f42102789a81",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-bc3-single-mip-full-owner-pixel-fix-testonly-v1",
+  "source_dds_native_mips": 1,
+  "source_dds_path": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+  "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+  "source_native_bbox_xyxy": [
+    1585,
+    692,
+    1819,
+    766
+  ],
+  "source_native_ownership_proof_sha256": "13c30301198c4588b5bc07a4c7194dcad42c94c8c9b453f42c501e9963ff16e2",
+  "status": "MIP1_INDEX_ONLY_SOURCE_AND_PROTECTED_PASS_TEST_ONLY",
+  "visual_qa": "C1_C3_UNTESTED"
+}
