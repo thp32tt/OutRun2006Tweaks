@@ -205,6 +205,25 @@ def main():
     after_min, after_max = scene_mesh_bounds(meshes)
     dims = after_max - after_min
     width, length, height = dims.x, dims.y, dims.z
+
+    # Diagnose spatial outliers before failing a model. Keep this in the Actions
+    # log so a single misplaced helper/blur mesh cannot be silently accepted.
+    bounds_rows = []
+    for obj in meshes:
+        lo, hi = mesh_bounds(obj)
+        bounds_rows.append({
+            "name": obj.name,
+            "original": str(obj.get("kn5_original_name", "")),
+            "min": list(lo), "max": list(hi),
+            "span": list(hi - lo),
+            "abs_x": max(abs(lo.x), abs(hi.x)),
+            "abs_y": max(abs(lo.y), abs(hi.y)),
+            "abs_z": max(abs(lo.z), abs(hi.z)),
+        })
+    if not (1.20 <= width <= 2.50 and 3.00 <= length <= 6.00 and 0.70 <= height <= 2.20):
+        print("BOUND_OUTLIERS_X", json.dumps(sorted(bounds_rows, key=lambda r:r["abs_x"], reverse=True)[:20], ensure_ascii=False))
+        print("BOUND_OUTLIERS_Y", json.dumps(sorted(bounds_rows, key=lambda r:r["abs_y"], reverse=True)[:20], ensure_ascii=False))
+        print("BOUND_OUTLIERS_Z", json.dumps(sorted(bounds_rows, key=lambda r:r["abs_z"], reverse=True)[:20], ensure_ascii=False))
     if not (1.20 <= width <= 2.50):
         raise RuntimeError(f"Normalized vehicle width out of range: {width:.3f}m")
     if not (3.00 <= length <= 6.00):
