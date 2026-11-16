@@ -686,6 +686,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             *Game::current_mode==STATE_GAME;
         if(F50GameplayResourceArmed && !f50GameplayNow) {
             OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
+            OutRunVR::DinoSidecar::GlobalDashboardGpu().OnDeviceReset();
             OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
         }
         F50GameplayResourceArmed=f50GameplayNow;
@@ -972,6 +973,11 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         auto& external=OutRunVR::DinoSidecar::GlobalGpu();
         if(external.SelectSidecar(ticket.slot,carId))
             OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
+        // Dashboard overlays are independent sidecars so an already-verified
+        // high-detail external body never has to be rebuilt merely to animate
+        // speed/RPM/gear. Aliased retail IDs resolve to fixed per-ID files.
+        OutRunVR::DinoSidecar::GlobalDashboardGpu().SelectSidecar(
+            OutRunVR::DinoSidecar::FerrariModelSlot::GenericId,carId);
         // Only installed, CRC-validated model assets can enter the stereo
         // player callback. Parse includes PBR map and mesh-envelope QA.
         // Missing/corrupt models retain the untouched original vehicle.
@@ -1049,6 +1055,14 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             gate,draw.receipt);
         const bool suppressOriginal=
             route!=OutRunVR::DinoSidecar::OriginalCarRoute::OriginalFallback;
+        // Overlay failure never causes the stock body to be composited on top
+        // of a successfully submitted external body. The overlay has its own
+        // CRC/parser/GPU quarantine and can recover after a device reset.
+        OutRunVR::DinoSidecar::GpuDrawResult dashboardDraw{};
+        if(route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete)
+            dashboardDraw=OutRunVR::DinoSidecar::GlobalDashboardGpu().DrawNativeScene(
+                ticket.device,ticket.world,ticket.view,ticket.projection,
+                ticket.dashboard);
         if(Settings::VRTelemetry) {
             static std::uint64_t attempts=0;
             const auto sample=++attempts;
@@ -1058,7 +1072,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     "VR QUEST FERRARI EXTERNAL: sample={} nativeFrame={} xrPose={} "
                     "carId={} slot={} localFloorLift={:.4f} "
                     "dash[speedKph={:.1f},rpm={:.0f},gear={}] "
-                    "drawHr=0x{:08X} submitted={}/{} stateRestored={} route={} "
+                    "drawHr=0x{:08X} submitted={}/{} stateRestored={} "
+                    "dashOverlayHr=0x{:08X} dashOverlay={}/{} route={} "
                     "originalPMT=UNCHANGED",
                     sample,ticket.nativeFrame,ticket.xrPose,
                     static_cast<unsigned>(ticket.carId),
@@ -1068,6 +1083,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     static_cast<unsigned int>(draw.hr),
                     draw.receipt.submittedMeshes,draw.receipt.expectedMeshes,
                     draw.receipt.stateRestored,
+                    static_cast<unsigned int>(dashboardDraw.hr),
+                    dashboardDraw.receipt.submittedMeshes,
+                    dashboardDraw.receipt.expectedMeshes,
                     route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete ?
                         "EXTERNAL_COMPLETE" :
                     route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial ?
