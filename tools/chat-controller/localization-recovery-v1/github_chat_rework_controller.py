@@ -51,6 +51,7 @@ REUSE_ONLY = os.getenv("OUTRUN_REWORK_REUSE_ONLY", "1").strip() != "0"
 CHAT_TASK = re.compile(r"^HDRW-[AB]-[0-9a-f]{20}$")
 HASH = re.compile(r"^[0-9a-f]{64}$")
 MAX_CONTENTS_PNG = 650 * 1024
+MAX_SOURCE_REFERENCE_PNG = 4 * 1024 * 1024
 MAX_QUEUE_JSON = 512 * 1024
 SEND_STATES = ("AB_SENT", "C1_READY", "C1_SENT")
 IMAGE_TOOL_RETRY_STATUS = "IMAGE_TOOL_RETRY_PENDING"
@@ -154,16 +155,46 @@ class Github:
             # Do not print request URL, response body or bearer token.
             raise RuntimeError("GITHUB_CONTENTS_HTTP_"+str(exc.code)) from None
 
+    def read_blob(self,sha):
+        if not isinstance(sha,str) or not re.fullmatch(r"[0-9a-f]{40}",sha):
+            raise ValueError("INVALID_GITHUB_BLOB_SHA")
+        uri=API+"/git/blobs/"+sha
+        req=urllib.request.Request(uri,method="GET",
+            headers={"Accept":"application/vnd.github+json",
+                     "X-GitHub-Api-Version":"2022-11-28",
+                     "User-Agent":"outrun-hd-qa-chat-bridge",
+                     "Authorization":"Bearer "+self.token})
+        try:
+            with urllib.request.urlopen(req,timeout=40) as res:
+                body=res.read(7*1024*1024)
+            blob=json.loads(body)
+        except urllib.error.HTTPError as exc:
+            raise RuntimeError("GITHUB_BLOB_HTTP_"+str(exc.code)) from None
+        if not isinstance(blob,dict) or blob.get("encoding")!="base64":
+            raise ValueError("GITHUB_BLOB_NOT_BASE64")
+        return base64.b64decode(blob.get("content",""),validate=False)
+
     def read(self,rel,branch):
         j=self.req(rel,branch)
         if j is None:
             return None,None
-        if not isinstance(j,dict) or j.get("encoding")!="base64":
-            raise ValueError("QUEUE_CONTENT_NOT_INLINE_BASE64")
-        raw=base64.b64decode(j.get("content",""),validate=False)
+        if not isinstance(j,dict):
+            raise ValueError("QUEUE_CONTENT_RESPONSE_INVALID")
+        if j.get("encoding")=="base64":
+            raw=base64.b64decode(j.get("content",""),validate=False)
+        elif (j.get("encoding")=="none" and rel.startswith(QROOT+"/refs/")
+              and rel.endswith(".png")):
+            if not isinstance(j.get("size"),int) or j["size"]>MAX_SOURCE_REFERENCE_PNG:
+                raise ValueError("QUEUE_SOURCE_REFERENCE_TOO_BIG")
+            raw=self.read_blob(j.get("sha"))
+        else:
+            raise ValueError("QUEUE_CONTENT_ENCODING_UNSUPPORTED")
         if len(raw)>MAX_QUEUE_JSON and not rel.endswith(".png"):
             raise ValueError("QUEUE_JSON_TOO_BIG")
-        if len(raw)>MAX_CONTENTS_PNG and rel.endswith(".png"):
+        if rel.startswith(QROOT+"/refs/") and rel.endswith(".png"):
+            if len(raw)>MAX_SOURCE_REFERENCE_PNG:
+                raise ValueError("QUEUE_SOURCE_REFERENCE_TOO_BIG")
+        elif rel.endswith(".png") and len(raw)>MAX_CONTENTS_PNG:
             raise ValueError("QUEUE_PNG_TOO_BIG")
         return raw,j["sha"]
 
@@ -478,7 +509,7 @@ def stage_source_ref(gh,task):
     return target
 
 def compact_generated_png_lossless(raw):
-    """Normalize sparse lettering PNG before the 650 KiB GitHub Contents gate.
+    """Normalize sparse lettering PNG before the 650 KiB candidate-output gate.
 
     Only transparent empty margins may be removed; no glyph pixels, alpha,
     dimensions of the original source HD atlas, or text effects are resampled.
