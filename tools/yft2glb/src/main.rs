@@ -12,7 +12,7 @@ fn main() -> Result<()> {
     let decode_failed=set.push_layer(&textures);
     let raw=frag.render_parts();
     let parts: Vec<RenderPart<'_>> = raw.into_iter().map(RenderPart::from).collect();
-    let opts=GlbOptions{max_texture:0,jpeg_quality:100,facing:Facing::Vehicle,..Default::default()};
+    let opts=GlbOptions{max_texture:0,jpeg_quality:100,facing:Facing::PositiveY,..Default::default()};
     let (glb,report)=export_glb(&parts,&set,&opts).context("export GLB")?;
     fs::write(&a[3],&glb).with_context(|| format!("write {}",a[3]))?;
     println!("OR2_YFT2GLB_PASS parts={} textures={} decode_failed={} triangles={} missing_textures={} untextured={} bytes={}",
