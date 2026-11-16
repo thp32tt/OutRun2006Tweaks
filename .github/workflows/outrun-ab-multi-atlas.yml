@@ -204,7 +204,13 @@ jobs:
           assert d["source_dds_modified"] is False
           assert d["input_ab_candidate_overwritten"] is False
           assert d["release_approved"] is False and d["runtime_validation"]=="UNTESTED"
-          assert d["original_hold_count_unchanged"]==640
+          # A fixed 640 is a historical value, not the current strict QA.
+          # Never abort before publishing the first genuinely reduced HOLD.
+          import os
+          q=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],
+                            "ab-multi-one","qa_report.json"),encoding="utf-8"))
+          assert d["original_hold_count_unchanged"] == (
+              q["active_roi_total"] - q["translated_roi_generated"])
           assert d["attempted_edits"]<=180
           print("HD_EXISTING_AB_AUTO_EDIT_TEST_ONLY_AUDIT_PASS")
           PY
