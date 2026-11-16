@@ -12,10 +12,12 @@
 #include <algorithm>
 #include <cstring>
 #include <cwchar>
+#include <cmath>
 #include <iterator>
 #include <string>
 #include <vector>
 #include "dino_external_sidecar.hpp"
+#include "external_car_ground.hpp"
 #include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
 
@@ -42,6 +44,8 @@ class GpuOwner final {
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
     FerrariModelSlot selectedSlot_=FerrariModelSlot::F50;
+    float modelMinLocalY_=0.f;
+    bool modelBoundsReady_=false;
     // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
     // textures on every eye Draw. Retry only after Reset/device change.
     GpuRetryPolicy gpuRetry_{};
@@ -141,17 +145,14 @@ class GpuOwner final {
         ReleaseGpu();
         gpuRetry_.NoteFailure(device);
     }
-    bool EnsureLoaded() {
-        if(loadAttempted_)return loaded_;
-        loadAttempted_=true;
-        wchar_t path[MAX_PATH]{};
+    bool BuildSidecarPath(wchar_t (&path)[MAX_PATH]) const noexcept {
         const DWORD n=GetModuleFileNameW(nullptr,path,MAX_PATH);
         if(n==0 || n>=MAX_PATH)return false;
         wchar_t* last=wcsrchr(path,L'\\');
         if(!last)return false;
         *++last=L'\0';
-        // Never replace or auto-detect the stable OVC2 file. Only the
-        // separate PBR launcher may explicitly opt in to the V3 filename.
+        // Explicit fixed filename allowlist. No config-controlled arbitrary
+        // path, no directory scan, and no unvalidated 'install' marker.
         wchar_t pbrFlag[4]{};
         const bool usePbr=GetEnvironmentVariableW(
             L"OUTRUN_VR_F50_PBR_TEST",pbrFlag,4)==1 &&
@@ -162,12 +163,30 @@ class GpuOwner final {
             L"ExternalCars\\288gto.ovc" : selectedSlot_==FerrariModelSlot::F40 ?
             L"ExternalCars\\f40.ovc" : (usePbr?pbrSuffix:stableSuffix);
         if(std::wcslen(path)+std::wcslen(suffix)+1>MAX_PATH)return false;
-        if(wcscat_s(path,MAX_PATH,suffix)!=0)return false;
+        return wcscat_s(path,MAX_PATH,suffix)==0;
+    }
+    bool EnsureLoaded() {
+        if(loadAttempted_)return loaded_;
+        loadAttempted_=true;
+        wchar_t path[MAX_PATH]{};
+        if(!BuildSidecarPath(path))return false;
         std::vector<std::uint8_t> bytes;
         if(!ReadFile(path,bytes))return false;
         std::string error;
         Model next;
         if(!Parse(bytes.data(),bytes.size(),next,error))return false;
+        // The OVC is an actual native-axis model; its lowest vertex is
+        // used as a conservative LOCAL wheel/ground clearance bound.
+        // Reject wildly misaligned models instead of hiding them in the road.
+        float lowest=10000.f;
+        for(const auto& mesh:next.meshes)
+            for(const auto& vertex:mesh.vertices)
+                lowest=std::min(lowest,vertex.y);
+        float validatedLift=0.f;
+        if(!ComputeExternalFloorLift(0.22f,lowest,validatedLift))
+            return false; // invalid scale/axis: retain original car
+        modelMinLocalY_=lowest;
+        modelBoundsReady_=true;
         cpu_=std::move(next);
         loaded_=true;
         return true;
@@ -205,10 +224,11 @@ class GpuOwner final {
                 }
             }
             if(mapsReady)pbrReady_=pbrShaders_.Ensure(dev);
-            if(!pbrReady_) {
-                for(auto& t:normals_){if(t)t->Release();t=nullptr;}
-                for(auto& t:orms_){if(t)t->Release();t=nullptr;}
-            }
+            // Normal/ORM maps are material input, never decorative.
+            // If the shader or required source map fails, do not silently
+            // render an unlit/flat "textured" external car: original native
+            // car remains the only safe fallback for this device generation.
+            if(!pbrReady_)return RejectGpu(dev);
         }
         for(const auto& m:cpu_.meshes) {
             GpuMesh next{};
@@ -267,6 +287,8 @@ public:
         loadAttempted_=false;
         gpuRetry_.OnReset();
         selectedSlot_=next;
+        modelBoundsReady_=false;
+        modelMinLocalY_=0.f;
         return true;
     }
     void OnDeviceReset() noexcept {
@@ -280,6 +302,25 @@ public:
         if(!loaded_)loadAttempted_=false;
     }
     bool Loaded() const noexcept {return loaded_;}
+    // Only a real installed sidecar with a resolvable fixed filename may
+    // become a render candidate. Parse/CRC/PBR/ground QA still guard draw.
+    bool Installed() const noexcept {
+        wchar_t path[MAX_PATH]{};
+        if(!BuildSidecarPath(path))return false;
+        const DWORD flags=GetFileAttributesW(path);
+        return flags!=INVALID_FILE_ATTRIBUTES &&
+            (flags&FILE_ATTRIBUTE_DIRECTORY)==0;
+    }
+    bool SafeFloorLift(float requested,float& effective) noexcept {
+        try {
+            if(!Installed() || !EnsureLoaded() || !modelBoundsReady_)
+                return false;
+            return ComputeExternalFloorLift(
+                requested,modelMinLocalY_,effective);
+        } catch(...) {
+            return false; // never crash native player callback
+        }
+    }
     bool EnsureResources(IDirect3DDevice9* device) noexcept {
         try{return EnsureGpu(device);}catch(...){return RejectGpu(device);}
     }
@@ -359,10 +400,9 @@ public:
                FAILED(device->SetSamplerState(1,D3DSAMP_SRGBTEXTURE,FALSE)) ||
                FAILED(device->SetSamplerState(2,D3DSAMP_SRGBTEXTURE,FALSE)) ||
                FAILED(pbrShaders_.Bind(device,world,view,projection))) {
-                // Preserve the color-texture path even on a shader bind error.
-                pbrReady_=false;
-                if(FAILED(device->SetVertexShader(nullptr)) ||
-                   FAILED(device->SetPixelShader(nullptr)))hr=E_FAIL;
+                // Never draw a broken normal map or silently switch a
+                // PBR asset to a different, unlit material path.
+                hr=E_FAIL;
             }
         }
         const float eye[3]{
