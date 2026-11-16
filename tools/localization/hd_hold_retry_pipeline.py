@@ -224,7 +224,16 @@ def build(edited_dir,proof_dir,out_dir,crosswalk,state_dir,prior_queue=None,max_
     tasks=[]
     for record in manifest["records"]:
         rid=record.get("roi_id")
-        if rid not in masks or not RID.fullmatch(rid):
+        if not RID.fullmatch(rid):
+            raise ValueError("UNVERIFIED_EDIT_SOURCE_ROI")
+        if rid not in masks:
+            # The pixel editor also writes EDGE-bbox diagnostic records.
+            # The overlap owner-mask proof intentionally has no such rows.
+            # Skipping is safe; inventing an owner or crashing the entire
+            # production queue is not. A separate source-edge QA handles it.
+            if record.get("lane") == "EDGE":
+                failed["EDGE_NEEDS_SEPARATE_SOURCE_REBIND_QA"] += 1
+                continue
             raise ValueError("UNVERIFIED_EDIT_SOURCE_ROI")
         if record["status"] not in ("RGBA_EDITED_BUT_PROTECTED_COLLISION_HOLD",
                                     "EDIT_UNSAFE_HOLD"):
