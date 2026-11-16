@@ -975,7 +975,17 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // player callback. Parse includes PBR map and mesh-envelope QA.
         // Missing/corrupt models retain the untouched original vehicle.
         float localLift=0.f;
-        if(!external.SafeFloorLift(Settings::VRF50ExternalLift.get(),localLift))
+        // Preserve the measured legacy package offsets for the three already
+        // converted models. New source-ready IDs start from zero requested
+        // lift so the validated model's actual lowest vertex determines the
+        // minimum 3.5 cm static clearance instead of inheriting F50's 0.22 m.
+        const bool legacyExternal=
+            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F50 ||
+            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::Gto288 ||
+            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F40;
+        const float requestedLift=legacyExternal ?
+            Settings::VRF50ExternalLift.get() : 0.f;
+        if(!external.SafeFloorLift(requestedLift,localLift))
             return ticket;
         ticket.appliedLift=localLift;
         ticket.world=player->matrix_B0;
