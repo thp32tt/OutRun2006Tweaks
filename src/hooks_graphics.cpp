@@ -1122,126 +1122,10 @@ static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
     return OutRunVR::QuestCockpitV2::NativeSeatOffset(
         nativeEye,nativeLook,back,down,right,result);
 }
-// Normal PC START creates ROB02 (passenger) only for some race modes.
-// "PassengerVisible" already forces LOD0 inside an existing ROB02 draw,
-// but cannot render a character whose original event was never opened.
-// Reuse the game's OWN event setup at the exact START stage-60 successor
-// (ROB03/0x3B) rather than manufacturing robot work, cloning a driver,
-// patching simulation flags, or injecting a draw into one stereo eye.
-class QuestCockpitV2PassengerStartEvent final : public Hook {
-    static constexpr int EventSetupRva=0x40110; // original 440110
-    inline static SafetyHookInline SetupHook{};
-
-    static void __cdecl EventSetup(std::uint32_t eventId,
-                                   std::uint32_t functionId) {
-        using namespace OutRunVR::QuestCockpitV2;
-        // Do not read event state outside this original START successor.
-        if(eventId==OriginalStartAfterPassengerEventId &&
-           functionId==OriginalStartAfterPassengerFunctionId &&
-           Settings::VREnabled && Settings::VRQuestCockpitV2Enabled &&
-           Settings::VRQuestCockpitV2PassengerVisible &&
-           NativeOriginalHooksReady.load(std::memory_order_acquire) &&
-           Game::current_mode && *Game::current_mode==STATE_START) {
-            // Original 440110 accesses a SEPARATE byte-flag array at
-            // VA 0x79FB48+eventId. sEventWork::field_0 is NOT event flags.
-            const auto* eventFlags=
-                Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva);
-            const sEventWork* driver=Game::event(EVENT_ROB01);
-            const sEventWork* passenger=Game::event(EVENT_ROB02);
-            const auto originalDisplay=
-                reinterpret_cast<decltype(driver->EventFunc.Disp)>(
-                    Module::exe_ptr(0x879B0));
-            const bool driverReady=eventFlags && driver &&
-                OriginalEventScheduled(eventFlags[OriginalDriverEventId]) &&
-                driver->EventFunc.Disp==originalDisplay;
-            // A bit-2 DEST pending state is NOT an empty event. 440110
-            // preserves that bit, so never queue init on top of teardown.
-            const bool passengerOccupied=!eventFlags ||
-                !OriginalPassengerVacant(
-                    eventFlags[OriginalPassengerEventId]);
-            // Original 487F50 indexes a 6-entry licence/character table.
-            // In exceptional menus/game variants this selector is not yet
-            // initialized; do not force ROB02 into invalid table indices.
-            const auto* licenceSlot=
-                Module::exe_ptr<std::uint32_t>(OriginalLicenceSlotRva);
-            const bool originalCharacterReady=licenceSlot &&
-                OriginalPassengerCharacterIndexValid(*licenceSlot);
-            if(originalCharacterReady && ShouldOpenMissingPassenger(
-                    true,true,true,true,true,eventId,functionId,
-                    driverReady,passengerOccupied)) {
-                // Original function 0x39 owns passenger init, control, pose,
-                // motion, animation and teardown. The native event loop
-                // initializes it on the subsequent START control tick.
-                SetupHook.ccall<void>(
-                    OriginalPassengerEventId,OriginalPassengerFunctionId);
-                // A successful hook/trampoline is not proof the original
-                // guest event actually accepted the request: verify that
-                // original 440110 installed its pending-init flag and the
-                // expected ROB02 display callback before reporting success.
-                const bool queued=eventFlags && passenger &&
-                    OriginalEventSetupAccepted(
-                        eventFlags[OriginalPassengerEventId]) &&
-                    passenger->EventFunc.Disp==originalDisplay;
-                static unsigned logged=0;
-                if(++logged<=12) {
-                    if(queued)
-                        spdlog::info("VR COCKPIT PASSENGER: original "
-                            "ROB02/0x39 accepted at START before ROB03 "
-                            "(attempt={})",logged);
-                    else
-                        spdlog::warn("VR COCKPIT PASSENGER: original "
-                            "ROB02/0x39 setup rejected (attempt={}); "
-                            "visual guarantee unavailable",logged);
-                }
-            }
-        }
-        SetupHook.ccall<void>(eventId,functionId);
-    }
-public:
-    std::string_view description() override {
-        return "VRQuestCockpitV2PassengerStartEvent";
-    }
-    bool validate() override {
-        return Settings::VREnabled && Settings::VRQuestCockpitV2Enabled;
-    }
-    bool apply() override {
-        // Exact entry bytes from canonical EXE SHA256 68ceb386829066f8...
-        // 440110 is __cdecl (ret, caller stack cleanup); its initial
-        // instructions read+write 0x79FB48[eventId]. Never install a
-        // detour on an unknown EXE or an already patched entrypoint.
-        constexpr std::array<std::uint8_t,27> signature{{
-            0x8B,0x54,0x24,0x04,0x8A,0x8A,0x48,0xFB,0x79,
-            0x00,0x80,0xE1,0xE7,0x8B,0xC2,0x80,0xC9,0x01,
-            0x6B,0xC0,0x3C,0x88,0x8A,0x48,0xFB,0x79,0x00
-        }};
-        auto* entry=Module::exe_ptr<std::uint8_t>(EventSetupRva);
-        MEMORY_BASIC_INFORMATION info{};
-        if(!entry || VirtualQuery(entry,&info,sizeof(info))!=sizeof(info) ||
-           info.State!=MEM_COMMIT || (info.Protect&PAGE_GUARD) ||
-           (info.Protect&PAGE_NOACCESS) ||
-           reinterpret_cast<std::uintptr_t>(entry)+signature.size() >
-               reinterpret_cast<std::uintptr_t>(info.BaseAddress)+info.RegionSize ||
-           !std::equal(signature.begin(),signature.end(),entry)) {
-            spdlog::warn("VR COCKPIT PASSENGER: original 440110 "
-                "signature mismatch; event hook disabled");
-            return false;
-        }
-        // A detour failure only disables forced passenger setup; all other
-        // cockpit hooks and the game's original event scheduler remain intact.
-        auto setup=safetyhook::create_inline(entry,EventSetup);
-        if(!setup) {
-            spdlog::warn("VR COCKPIT PASSENGER: original 440110 "
-                         "event setup unavailable; native mode retained");
-            return false;
-        }
-        SetupHook=std::move(setup);
-        return true;
-    }
-    static QuestCockpitV2PassengerStartEvent instance;
-};
-QuestCockpitV2PassengerStartEvent
-    QuestCockpitV2PassengerStartEvent::instance;
-
+// Camera-0 parity: the native game decides whether ROB02 exists at START.
+// Do not synthesize passenger events for cockpit mode. When original ROB02 is
+// live, camera-1 draws the very same original character and animations;
+// suppressing it is a render-only choice (no event/work teardown changes).
 class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static constexpr int PlayerCarRva=0x69764, RobotRva=0x114E60;
     static constexpr int OriginalDriverDisplayRva=0x879B0;
@@ -1307,14 +1191,28 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             RobotHook.ccall<void>(robot);
             return;
         }
-        // Original ROB display runs outside races too. Access to event work,
-        // camera, or OpenXR latched frame before game/device initialization
-        // is not safe; let original guest render without probing these.
+        // Original ROB display runs outside races too. Event state is safe
+        // to inspect only after original native hooks and gameplay are ready.
         if (!robot || !Settings::VREnabled ||
             !Settings::VRQuestCockpitV2Enabled ||
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
-            !NativeFrameTrace().Active() || InSceneEffect() ||
             !IsPlayableCarGameplay()) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
+        const auto slot=ExactOriginalCockpitOccupant(robot);
+        // "Remove" hides only the exact, currently live original ROB02 draw,
+        // in BOTH camera 0 and cockpit camera 1. Do not mutate guest work,
+        // close the event, affect ROB01/NPCs or suppress GOAL/menu graphics.
+        if(ShouldSuppressOriginalPassenger(
+                Settings::VREnabled.get(),
+                Settings::VRQuestCockpitV2Enabled.get(),
+                Settings::VRQuestCockpitV2PassengerVisible.get(),
+                IsPlayableCarGameplay(),
+                slot==OriginalOccupantSlot::Passenger363)) {
+            return;
+        }
+        if(!NativeFrameTrace().Active() || InSceneEffect()) {
             RobotHook.ccall<void>(robot);
             return;
         }
@@ -1325,7 +1223,6 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         }
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
-        const auto slot=ExactOriginalCockpitOccupant(robot);
         const bool racing=Game::current_mode &&
             (*Game::current_mode==STATE_GAME ||
              (*Game::current_mode==STATE_START &&
@@ -1344,7 +1241,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             if(++observed<=12)
                 spdlog::info("VR COCKPIT PASSENGER: native ROB02 "
                     "display callback observed epoch={} stereoValid={} "
-                    "mode1={} keepPassenger={} sample={}",
+                    "mode1={} followCamera0={} sample={}",
                     frameEpoch,stereo&&stereo->valid,
                     camera->cam_mode_34A==1,
                     Settings::VRQuestCockpitV2PassengerVisible.get(),observed);
