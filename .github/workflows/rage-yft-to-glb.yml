@@ -5,15 +5,21 @@ on:
     branches:
       - vr-external-dashboard-v4-20261116
     paths:
-      - "tools/car_importer/rage_yft_to_glb/**"
+      - "tools/car_importer/rage_yft_to_glb/Cargo.toml"
+      - "tools/car_importer/rage_yft_to_glb/src/**"
       - ".github/workflows/rage-yft-to-glb.yml"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: vr-external-dashboard-v4-20261116
       - uses: dtolnay/rust-toolchain@stable
       - name: Build converter
         run: cargo build --manifest-path tools/car_importer/rage_yft_to_glb/Cargo.toml --release
@@ -22,8 +28,23 @@ jobs:
           set +e
           tools/car_importer/rage_yft_to_glb/target/release/rage-yft-to-glb
           test $? -ne 0
+      - name: Stage Linux converter
+        run: |
+          mkdir -p tools/car_importer/rage_yft_to_glb/bin
+          cp tools/car_importer/rage_yft_to_glb/target/release/rage-yft-to-glb tools/car_importer/rage_yft_to_glb/bin/rage-yft-to-glb-linux-x86_64
+      - name: Commit Linux converter
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/car_importer/rage_yft_to_glb/bin/rage-yft-to-glb-linux-x86_64
+          if git diff --cached --quiet; then
+            echo "binary unchanged"
+          else
+            git commit -m "Build Linux GTA5 YFT to GLB converter binary"
+            git push origin HEAD:vr-external-dashboard-v4-20261116
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: rage-yft-to-glb-linux
-          path: tools/car_importer/rage_yft_to_glb/target/release/rage-yft-to-glb
+          path: tools/car_importer/rage_yft_to_glb/bin/rage-yft-to-glb-linux-x86_64
           if-no-files-found: error
