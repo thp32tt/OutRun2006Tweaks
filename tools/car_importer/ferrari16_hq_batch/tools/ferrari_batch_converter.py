@@ -218,30 +218,27 @@ def resolve_texture(g, binary, material, field):
 
 
 def rgba_dds(image: Image.Image, *, normal=False):
+    """Encode a full DXT5 mip chain.
+
+    The runtime/parser already supports DXT5.  This keeps the source texture
+    resolution while cutting x86/GPU payload to roughly one quarter of ARGB32.
+    Each mip is independently encoded by Pillow; only the first DDS header is
+    retained and its mip metadata is promoted to the complete chain.
+    """
     ensure(image.width > 0 and image.height > 0, 'empty texture')
     ensure(image.width <= MAX_TEXTURE_DIM and image.height <= MAX_TEXTURE_DIM,
            'texture exceeds native sidecar 2048x2048 cap')
     ensure(image.width & (image.width-1) == 0 and image.height & (image.height-1) == 0,
            'texture must have power-of-two dimensions')
-    head = bytearray(128)
-    head[:4] = b'DDS '
-    struct.pack_into('<I', head, 4, 124)
-    struct.pack_into('<I', head, 8, 0x0002100F)
-    struct.pack_into('<I', head, 12, image.height)
-    struct.pack_into('<I', head, 16, image.width)
-    struct.pack_into('<I', head, 20, image.width*4)
-    mips = int(math.log2(max(image.width, image.height)))+1
-    struct.pack_into('<I', head, 28, mips)
-    struct.pack_into('<I', head, 76, 32)
-    struct.pack_into('<I', head, 80, 0x41)
-    struct.pack_into('<I', head, 88, 32)
-    struct.pack_into('<4I', head, 92, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000)
-    struct.pack_into('<I', head, 108, 0x401008)
-    b = bytearray(head)
-    im = image
-    for _ in range(mips):
-        rgba = np.asarray(im.convert('RGBA'), dtype=np.uint8)
-        b.extend(rgba[:, :, [2, 1, 0, 3]].tobytes(order='C'))
+    levels = []
+    im = image.convert('RGBA')
+    while True:
+        buf = io.BytesIO()
+        im.save(buf, format='DDS', pixel_format='DXT5')
+        raw = buf.getvalue()
+        ensure(len(raw) >= 128 and raw[:4] == b'DDS ' and raw[84:88] == b'DXT5',
+               'Pillow DXT5 encoder returned invalid DDS')
+        levels.append(raw[128:])
         if im.size == (1, 1):
             break
         next_size = (max(1, im.width//2), max(1, im.height//2))
@@ -253,7 +250,13 @@ def rgba_dds(image: Image.Image, *, normal=False):
             out = np.rint(np.clip((channels+1)*127.5, 0, 255)).astype(np.uint8)
             rgba_new = np.concatenate([out, np.full(out.shape[:2]+(1,), 255, dtype=np.uint8)], axis=2)
             im = Image.fromarray(rgba_new, 'RGBA')
-    return bytes(b)
+    first = io.BytesIO()
+    image.convert('RGBA').save(first, format='DDS', pixel_format='DXT5')
+    head = bytearray(first.getvalue()[:128])
+    struct.pack_into('<I', head, 8, 0x000A1007)   # mip count + linear size
+    struct.pack_into('<I', head, 28, len(levels))
+    struct.pack_into('<I', head, 108, 0x00401008) # texture | complex | mipmap
+    return bytes(head) + b''.join(levels)
 
 
 def multiply_color(image: Image.Image, factor):
@@ -562,7 +565,7 @@ def audit_entry(root, car, strict_source=False):
         ensure(meta.get('source_sha256') == actual, 'car source SHA-256 mismatch')
         ensure(meta.get('geometry_space') == 'outrun_local_y_up_meters', 'car source native alignment not verified')
         ensure(meta.get('alignment_verified') is True, 'car origin/height/axis calibration not verified')
-        ensure(meta.get('model_scope') == 'full_car', 'cockpit-only source is not a complete external car')
+        ensure(meta.get('model_scope') in ('full_car','dashboard_overlay'), 'unsupported source model_scope')
         ensure(meta.get('origin_type') in ('external_mod','user_authored'), 'source provenance not declared')
         ensure(len(meta.get('external_to_game_matrix', [])) == 16, 'game coordinate matrix missing')
         result.update(status='READY_PRIVATE_CONVERSION', model_bytes=glb.stat().st_size,
@@ -642,10 +645,21 @@ def check_output(ovc: Path):
                w & (w-1) == 0 and h & (h-1) == 0 and 1 <= n <= 12,
                'DDS dimensions/mip count invalid')
         fmt, bpp = struct.unpack_from('<II', d, 84)
-        ensure(fmt == 0 and bpp == 32, 'DDS must be ARGB32')
         required = 128
+        if fmt == 0x31545844:      # DXT1
+            block = 8
+        elif fmt == 0x35545844:    # DXT5
+            block = 16
+        elif fmt == 0 and bpp == 32:
+            block = 0
+        else:
+            raise ConversionError('DDS format must match runtime ARGB32/DXT1/DXT5 support')
         for m in range(n):
-            required += max(w >> m, 1) * max(h >> m, 1)*4
+            mw, mh = max(w >> m, 1), max(h >> m, 1)
+            if block:
+                required += max(1, (mw+3)//4) * max(1, (mh+3)//4) * block
+            else:
+                required += mw * mh * 4
         ensure(required == length, 'DDS mip payload length mismatch')
     p, nvert, ntri, mem = 36, 0, 0, 0
     for _ in range(groups):
