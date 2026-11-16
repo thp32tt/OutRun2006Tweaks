@@ -962,13 +962,20 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             OutRunVR::DinoSidecar::FerrariModelSlot::F40) :
             OutRunVR::DinoSidecar::FerrariModelSlot::F50;
         ticket.carId=carId;
-        if(OutRunVR::DinoSidecar::GlobalGpu().SelectSidecar(ticket.slot))
+        auto& external=OutRunVR::DinoSidecar::GlobalGpu();
+        if(external.SelectSidecar(ticket.slot))
             OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
+        // Only installed, CRC-validated model assets can enter the stereo
+        // player callback. Parse includes PBR map and mesh-envelope QA.
+        // Missing/corrupt models retain the untouched original vehicle.
+        float localLift=0.f;
+        if(!external.SafeFloorLift(Settings::VRF50ExternalLift.get(),localLift))
+            return ticket;
         ticket.world=player->matrix_B0;
         OutRunVR::DinoSidecar::GlobalF50PoseFilter().Apply(
             ticket.world,NativeFrameTrace().ActiveEpoch(),
             reinterpret_cast<std::uintptr_t>(player),
-            Settings::VRF50ExternalLift.get(),
+            localLift,
             Settings::VRF50ExternalStabilize.get());
         ticket.originalPlayer=reinterpret_cast<std::uintptr_t>(player);
         ticket.view=*nativeView;
