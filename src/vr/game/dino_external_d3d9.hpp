@@ -24,6 +24,13 @@
 namespace OutRunVR::DinoSidecar {
 enum class FerrariModelSlot : unsigned char { F50, Gto288, F40, GenericId };
 enum class SidecarRole : unsigned char { Vehicle, DashboardOverlay };
+inline unsigned char CanonicalFerrariExternalCarId(unsigned char carId) noexcept {
+    // Retail alternate entries 15..27 reuse base models 0..12.
+    // ID 29 is Enzo/FX alternate -> 14. ID 28 is the distinct F430 Spider.
+    if(carId>=15u && carId<=27u)return static_cast<unsigned char>(carId-15u);
+    if(carId==29u)return 14u;
+    return carId;
+}
 struct GpuDrawResult final {
     HRESULT hr=E_FAIL;
     MeshDrawReceipt receipt{};
@@ -161,9 +168,10 @@ class GpuOwner final {
         const wchar_t* suffix=nullptr;
         if(role_==SidecarRole::DashboardOverlay) {
             if(selectedCarId_>=30u)return false;
+            const auto canonicalId=CanonicalFerrariExternalCarId(selectedCarId_);
             if(swprintf_s(genericSuffix,_countof(genericSuffix),
                           L"ExternalCars\\Dashboard\\car_id_%02u.ovc",
-                          static_cast<unsigned>(selectedCarId_))<=0)
+                          static_cast<unsigned>(canonicalId))<=0)
                 return false;
             suffix=genericSuffix;
         } else {
@@ -179,9 +187,10 @@ class GpuOwner final {
             suffix=L"ExternalCars\\f40.ovc";
             else if(selectedSlot_==FerrariModelSlot::GenericId) {
                 if(selectedCarId_>=30u)return false;
+                const auto canonicalId=CanonicalFerrariExternalCarId(selectedCarId_);
                 if(swprintf_s(genericSuffix,_countof(genericSuffix),
                               L"ExternalCars\\car_id_%02u.ovc",
-                              static_cast<unsigned>(selectedCarId_))<=0)
+                              static_cast<unsigned>(canonicalId))<=0)
                     return false;
                 suffix=genericSuffix;
             } else
