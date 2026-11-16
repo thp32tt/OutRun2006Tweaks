@@ -895,6 +895,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         std::uintptr_t originalPlayer=0;
         std::uint64_t nativeFrame=0,xrPose=0;
         unsigned char carId=255;
+        float appliedLift=0.f; // native car-local visual floor correction
         OutRunVR::DinoSidecar::FerrariModelSlot slot=
             OutRunVR::DinoSidecar::FerrariModelSlot::F50;
         bool valid=false;
@@ -905,7 +906,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             :device(other.device),world(other.world),view(other.view),
              projection(other.projection),originalPlayer(other.originalPlayer),
              nativeFrame(other.nativeFrame),xrPose(other.xrPose),
-             carId(other.carId),slot(other.slot),valid(other.valid)
+             carId(other.carId),appliedLift(other.appliedLift),
+             slot(other.slot),valid(other.valid)
         {
             other.device=nullptr;other.valid=false;
         }
@@ -971,6 +973,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         float localLift=0.f;
         if(!external.SafeFloorLift(Settings::VRF50ExternalLift.get(),localLift))
             return ticket;
+        ticket.appliedLift=localLift;
         ticket.world=player->matrix_B0;
         OutRunVR::DinoSidecar::GlobalF50PoseFilter().Apply(
             ticket.world,NativeFrameTrace().ActiveEpoch(),
@@ -1031,9 +1034,12 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial)
                 spdlog::info(
                     "VR QUEST FERRARI EXTERNAL: sample={} nativeFrame={} xrPose={} "
+                    "carId={} slot={} localFloorLift={:.4f} "
                     "drawHr=0x{:08X} submitted={}/{} stateRestored={} route={} "
                     "originalPMT=UNCHANGED",
                     sample,ticket.nativeFrame,ticket.xrPose,
+                    static_cast<unsigned>(ticket.carId),
+                    static_cast<unsigned>(ticket.slot),ticket.appliedLift,
                     static_cast<unsigned int>(draw.hr),
                     draw.receipt.submittedMeshes,draw.receipt.expectedMeshes,
                     draw.receipt.stateRestored,
