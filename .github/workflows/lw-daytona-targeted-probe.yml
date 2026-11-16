@@ -1,0 +1,35 @@
+name: LoneWolfie Daytona Targeted Probe
+
+on:
+  push:
+    branches:
+      - vr-quest-cockpit-v2-external-dino-actions-20261116
+    paths:
+      - '.github/workflows/lw-daytona-targeted-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Probe exact 365 GTS4 paths only
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq subversion
+          ROOT='https://svn.code.sf.net/p/lwcarssvn/code'
+          echo '--- MODEL DIRECTORY ---'
+          timeout 120 svn ls "$ROOT/models/LoneWolfie/" | grep -Ei '365|ferrari' | head -n 200 || true
+          echo '--- MATERIAL ROOT ---'
+          timeout 120 svn ls "$ROOT/materials/models/LoneWolfie/" | grep -Ei '365|ferrari' | head -n 200 || true
+          echo '--- EXACT MODEL INFO ---'
+          timeout 120 svn info "$ROOT/models/LoneWolfie/ferrari_365gts.mdl" || true
+          for ext in mdl vvd dx90.vtx dx80.vtx sw.vtx phy; do
+            url="$ROOT/models/LoneWolfie/ferrari_365gts.$ext"
+            if timeout 120 svn info "$url" >/dev/null 2>&1; then echo "FOUND $url"; fi
+          done
