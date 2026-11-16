@@ -48,7 +48,7 @@ struct Model {
     std::vector<PbrMaterial> pbrMaterials;
     std::vector<DashboardBinding> dashboardBindings;
     unsigned vertices=0,triangles=0;
-    bool highQuality=false,pbrEnabled=false,dashboardEnabled=false;
+    bool highQuality=false,pbrEnabled=false,dashboardEnabled=false,nativeOriginPreserved=false;
 };
 inline unsigned U32(const std::uint8_t* p) noexcept {
     return unsigned(p[0])|(unsigned(p[1])<<8)|(unsigned(p[2])<<16)|(unsigned(p[3])<<24);
@@ -138,6 +138,7 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
     parsed.meshes.reserve(groups);
     std::size_t pos=36,bytesGpu=0;
     std::uint64_t nv=0,nt=0;
+    unsigned nativeGroups=0;
     for(unsigned g=0;g<groups;++g) {
         const unsigned headBytes=legacy?12u:16u;
         if(!Bounds(pos,headBytes,size))return fail("group header");
@@ -161,6 +162,10 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
         if(mesh.name.empty() || mesh.name.find('\0')!=std::string::npos ||
            (legacy && mesh.name.compare(0,3,"LHD")!=0))
             return fail("group identity");
+        const bool nativeGroup=
+            mesh.name.compare(0,14,"NATIVE_OPAQUE_")==0 ||
+            mesh.name.compare(0,13,"NATIVE_GLASS_")==0;
+        if(nativeGroup)++nativeGroups;
         mesh.material=mat;mesh.index32=indexWidth==4;
         pos+=nameLen;
         mesh.vertices.resize(n);
@@ -185,6 +190,9 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
         parsed.meshes.push_back(std::move(mesh));
     }
     if(nv!=vertices || nt!=triangles)return fail("model total");
+    if(nativeGroups!=0u && nativeGroups!=groups)
+        return fail("mixed native-origin groups");
+    parsed.nativeOriginPreserved=nativeGroups==groups;
     parsed.textures.reserve(materials);
     for(unsigned i=0;i<materials;++i) {
         if(!Bounds(pos,4,size))return fail("dds length");
