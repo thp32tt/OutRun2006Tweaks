@@ -34,9 +34,11 @@ jobs:
             tools/localization/hd_bc3_native_codec.py
             tools/localization/hd_bc3_index_patch.py
             tools/localization/hd_bc3_4mip_patch.py
+            tools/localization/hd_bc3_native_owner_mip1.py
             tools/localization/hd_bc3_4mip_canary.py
             tools/localization/hd_hold_closure_audit.py
             tools/localization/test_hd_bc3_4mip_patch.py
+            tools/localization/test_hd_bc3_native_owner_mip1.py
       - name: Read original source-DDS SHA-bound owner masks
         uses: actions/download-artifact@v4
         with:
@@ -60,7 +62,9 @@ jobs:
         run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
       - name: Test four original mip levels, alpha ownership and untouched source
         run: python -m unittest discover -s tools/localization -p test_hd_bc3_4mip_patch.py -v
-      - name: Test original-SHA real native DXT5 4-mip at one ROI per DDS
+      - name: Test one-mip DXT5 source-owner correction without any foreign edits
+        run: python -m unittest discover -s tools/localization -p test_hd_bc3_native_owner_mip1.py -v
+      - name: Test original-SHA real native DXT5 single or 4-mip at one ROI per DDS
         run: |
           set -euo pipefail
           python tools/localization/hd_bc3_4mip_canary.py \
