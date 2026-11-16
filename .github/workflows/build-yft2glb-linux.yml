@@ -1,5 +1,7 @@
 name: Build OR2 YFT2GLB Linux
 on:
+  push:
+    branches: [tools/yft2glb-linux-20261116]
   workflow_dispatch:
 jobs:
   build:
@@ -9,9 +11,17 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Build
         working-directory: tools/yft2glb
-        run: cargo build --release --locked || cargo build --release
+        run: cargo build --release
       - name: Smoke
-        run: tools/yft2glb/target/release/or2-yft2glb 2>&1 | grep -q "usage: or2-yft2glb"
+        shell: bash
+        run: |
+          set +e
+          out="$(tools/yft2glb/target/release/or2-yft2glb 2>&1)"
+          code=$?
+          set -e
+          echo "$out"
+          test "$code" -ne 0
+          echo "$out" | grep -q "usage: or2-yft2glb"
       - uses: actions/upload-artifact@v4
         with:
           name: or2-yft2glb-linux
