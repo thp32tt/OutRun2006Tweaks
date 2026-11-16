@@ -390,8 +390,8 @@ if($QuestCockpitV2PassengerDiagnostics -eq 'ON') {
     }
     # Native passenger evidence only: do not activate 1.7 GB generic telemetry.
     $gameArgs=@($gameArgs|Where-Object {
-        $_ -notmatch '^-(VR\\.)?FileLogging=' -and
-        $_ -notmatch '^-VR\\.(Telemetry|CockpitFrameProbe)='
+        $_ -notmatch '^-(VR\.)?FileLogging=' -and
+        $_ -notmatch '^-VR\.(Telemetry|CockpitFrameProbe)='
     })
     $gameArgs+=@('-FileLogging=true','-VR.Telemetry=false','-VR.CockpitFrameProbe=false')
     $env:OUTRUN_VR_FILE_LOG='1'
