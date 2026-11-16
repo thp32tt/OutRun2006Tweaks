@@ -99,11 +99,8 @@ def safe_fit_existing(source, owned, protected, ambiguous, text, lines):
             im=component.resize((w,h),Image.Resampling.LANCZOS)
             mask=im.getchannel("A").point(lambda a:255 if a>15 else 0)
             if mask.getbbox() is None: continue
-            # Search around the verified English/source line slot, not the
-            # failed Korean candidate's old offset. The translated bbox may
-            # itself be displaced into protected art and can bias every retry.
-            cx=(slot[0]+slot[2]-w)//2
-            cy=(slot[1]+slot[3]-h)//2
+            cx=(b[0]+b[2]-w)//2
+            cy=(b[1]+b[3]-h)//2
             xs=candidate_positions(cx,slot[0],slot[2]-w)
             ys=candidate_positions(cy,slot[1],slot[3]-h)
             for y in ys:
