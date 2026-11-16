@@ -1185,12 +1185,6 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     }
     static void __cdecl RobotDisplay(EvWorkRobot* robot) {
         using namespace OutRunVR::QuestCockpitV2;
-        // Nested original draws already see the outer scoped corrected W.
-        // Let the original draw run, but never correct/stage it a second time.
-        if(OriginalRobotCorrectionActive()) {
-            RobotHook.ccall<void>(robot);
-            return;
-        }
         // Original ROB display runs outside races too. Event state is safe
         // to inspect only after original native hooks and gameplay are ready.
         if (!robot || !Settings::VREnabled ||
@@ -1226,6 +1220,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 cockpitActive && racing,
                 camera->cam_mode_34A==1,
                 slot==OriginalOccupantSlot::Passenger363)) {
+            return;
+        }
+        // A nested original robot display may be ROB02 while another
+        // occupant owns the scoped W*C matrix. Apply the render-only hide
+        // decision BEFORE recursion bypass, but never apply W*C twice.
+        if(OriginalRobotCorrectionActive()) {
+            RobotHook.ccall<void>(robot);
             return;
         }
         if(!NativeFrameTrace().Active() || InSceneEffect()) {
