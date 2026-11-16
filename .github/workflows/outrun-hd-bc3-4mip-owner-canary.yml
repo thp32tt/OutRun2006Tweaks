@@ -1,5 +1,6 @@
 name: OutRun HD BC3 4-Mip Source-Owner Canaries (GitHub CPU)
 
+# One-mip original-owner BC3 can now retry protected-block reencode after fixed-index failure.
 # Real source DDS checks distinguish DDPF_FOURCC=4 from true mipmap count.
 # 12 exact full-owner overlap HOLDs were previously trapped by 4-level BC3.
 # Revalidate synthetic white source-endpoint BC3 coverage before source DDS canary.
