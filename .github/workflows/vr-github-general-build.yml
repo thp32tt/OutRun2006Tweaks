@@ -19,7 +19,7 @@ on:
       - 'Start-OutRun.cmd'
       - 'Start-OutRun-VR.cmd'
       - 'VR_RELEASE_VERSION.txt'
-      - 'README_VR_v0.02.txt'
+      - 'README_VR_v0.03.txt'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
       - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
       - 'src/vr/game/quest_cockpit_v2_glass_hook.hpp'
@@ -578,20 +578,20 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Prepare v0.02 public cockpit release ZIP
-        if: github.ref_name == 'vr-quest-cockpit-v2-v0.02-release'
+      - name: Prepare v0.03 public cockpit release ZIP
+        if: github.ref_name == 'vr-quest-cockpit-v2-v0.03-release'
         shell: pwsh
         run: |
-          $release='build-general/v002-release'
+          $release='build-general/v003-release'
           New-Item -ItemType Directory -Force $release | Out-Null
           $backend='build-general/package/backends/d3d9'
           foreach($name in @('dinput8.dll','outrun-vr-host.exe')) {
             $source=Join-Path $backend $name
-            if(!(Test-Path -LiteralPath $source)){throw "v0.02 release payload missing: $name"}
+            if(!(Test-Path -LiteralPath $source)){throw "v0.03 release payload missing: $name"}
             Copy-Item -LiteralPath $source -Destination $release -Force
           }
-          foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','Start-OutRun.cmd','Start-OutRun-VR.cmd','VR_RELEASE_VERSION.txt','README_VR_v0.02.txt')) {
-            if(!(Test-Path -LiteralPath $name)){throw "v0.02 release source file missing: $name"}
+          foreach($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','Start-OutRun.cmd','Start-OutRun-VR.cmd','VR_RELEASE_VERSION.txt','README_VR_v0.03.txt')) {
+            if(!(Test-Path -LiteralPath $name)){throw "v0.03 release source file missing: $name"}
             Copy-Item -LiteralPath $name -Destination $release -Force
           }
           foreach($name in @('LICENSE.md','THIRD_PARTY_NOTICES.md','COPYING.GPL3')) {
@@ -602,120 +602,131 @@ jobs:
           if(!(Test-Path -LiteralPath $exe) -or (Get-Item -LiteralPath $exe).Length -lt 1000000){throw 'replacement OR2006C2C.EXE download is missing or too small'}
           $launcher=Get-Content -LiteralPath (Join-Path $release 'Start-OutRun.cmd') -Raw
           foreach($required in @('-VR.QuestCockpitV2Enabled=true','-VR.QuestCockpitV2F0RenderScope=true','-VR.QuestCockpitV2NativeSeatProfile=true','-VR.QuestCockpitV2ApkNativeCamera=true','-VR.QuestCockpitV2OccupantCorrection=true','-HudInspector=false')) {
-            if(!$launcher.Contains($required)){throw "v0.02 launcher missing $required"}
+            if(!$launcher.Contains($required)){throw "v0.03 launcher missing $required"}
           }
           foreach($forbidden in @('-VR.QuestCockpitV2SeatBack=','-VR.QuestCockpitV2SeatDown=','-VR.QuestCockpitV2SeatRight=')) {
-            if($launcher.Contains($forbidden)){throw "v0.02 persistent cockpit setting is still command-line forced: $forbidden"}
+            if($launcher.Contains($forbidden)){throw "v0.03 persistent cockpit setting is still command-line forced: $forbidden"}
           }
           $releaseIni=Get-Content -LiteralPath (Join-Path $release 'OutRun2006Tweaks.ini') -Raw
           foreach($requiredDefault in @('QuestCockpitV2SeatBack = -0.08','QuestCockpitV2SeatDown = 0.08','QuestCockpitV2SeatRight = 0.0')) {
-            if(!$releaseIni.Contains($requiredDefault)){throw "v0.02 cockpit default missing: $requiredDefault"}
+            if(!$releaseIni.Contains($requiredDefault)){throw "v0.03 cockpit default missing: $requiredDefault"}
           }
-          if((Get-Content -LiteralPath (Join-Path $release 'VR_RELEASE_VERSION.txt') -Raw) -notmatch 'v0\.02'){throw 'VR_RELEASE_VERSION.txt is not v0.02'}
+          if((Get-Content -LiteralPath (Join-Path $release 'VR_RELEASE_VERSION.txt') -Raw) -notmatch 'v0\.02'){throw 'VR_RELEASE_VERSION.txt is not v0.03'}
           foreach($pe in @('dinput8.dll','outrun-vr-host.exe','OR2006C2C.EXE')) {
             $bytes=[IO.File]::ReadAllBytes((Join-Path $release $pe))
-            if($bytes.Length -lt 256 -or $bytes[0] -ne 0x4d -or $bytes[1] -ne 0x5a){throw "invalid PE payload in v0.02: $pe"}
+            if($bytes.Length -lt 256 -or $bytes[0] -ne 0x4d -or $bytes[1] -ne 0x5a){throw "invalid PE payload in v0.03: $pe"}
           }
           $dllBytes=[IO.File]::ReadAllBytes((Join-Path $release 'dinput8.dll'))
           $dllText=[Text.Encoding]::ASCII.GetString($dllBytes)
           foreach($marker in @('VR COCKPIT SEAT: original 30-car table','VR SKY PROBE:','VR COCKPIT APK SEAT:','VR stereo: D3D9 full-eye renderer installed')) {
-            if(!$dllText.Contains($marker)){throw "compiled v0.02 DLL marker missing: $marker"}
+            if(!$dllText.Contains($marker)){throw "compiled v0.03 DLL marker missing: $marker"}
           }
           $shaDir=Join-Path $release 'BUILD_ID'
           New-Item -ItemType Directory -Force $shaDir | Out-Null
           $env:GITHUB_SHA | Set-Content -LiteralPath (Join-Path $shaDir 'SOURCE_SHA.txt') -Encoding ascii
           (Get-FileHash (Join-Path $release 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant() | Set-Content -LiteralPath (Join-Path $shaDir 'DINPUT8_SHA256.txt') -Encoding ascii
           (Get-FileHash (Join-Path $release 'outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant() | Set-Content -LiteralPath (Join-Path $shaDir 'VRHOST_SHA256.txt') -Encoding ascii
-          $releaseZip='build-general/OutRun2_VR_v0.02_Beta_Cockpit.zip'
+          $releaseZip='build-general/OutRun2_VR_v0.03_Beta_Cockpit.zip'
           Compress-Archive -Path "$release/*" -DestinationPath $releaseZip -Force
           Add-Type -AssemblyName System.IO.Compression
           $archive=[IO.Compression.ZipFile]::OpenRead((Resolve-Path $releaseZip).Path)
           try {
             $names=@($archive.Entries | ForEach-Object {$_.FullName.Replace('\','/')})
-            foreach($required in @('dinput8.dll','outrun-vr-host.exe','OR2006C2C.EXE','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','Start-OutRun.cmd','Start-OutRun-VR.cmd','VR_RELEASE_VERSION.txt','README_VR_v0.02.txt','BUILD_ID/SOURCE_SHA.txt')) {
-              if($required -notin $names){throw "v0.02 ZIP missing: $required"}
+            foreach($required in @('dinput8.dll','outrun-vr-host.exe','OR2006C2C.EXE','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','Start-OutRun.cmd','Start-OutRun-VR.cmd','VR_RELEASE_VERSION.txt','README_VR_v0.03.txt','BUILD_ID/SOURCE_SHA.txt')) {
+              if($required -notin $names){throw "v0.03 ZIP missing: $required"}
             }
-            if(@($names | Where-Object {$_ -match '\.ps1$'}).Count -ne 0){throw 'public v0.02 ZIP unexpectedly contains PowerShell scripts'}
+            if(@($names | Where-Object {$_ -match '\.ps1$'}).Count -ne 0){throw 'public v0.03 ZIP unexpectedly contains PowerShell scripts'}
           } finally { $archive.Dispose() }
-          "V002_RELEASE_ZIP=$releaseZip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "V003_RELEASE_ZIP=$releaseZip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
-      - name: Upload v0.02 public cockpit ZIP artifact
-        if: github.ref_name == 'vr-quest-cockpit-v2-v0.02-release'
+      - name: Upload v0.03 public cockpit ZIP artifact
+        if: github.ref_name == 'vr-quest-cockpit-v2-v0.03-release'
         uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-v0.02-Beta-Cockpit-${{ github.sha }}
-          path: ${{ env.V002_RELEASE_ZIP }}
+          name: OutRun2-VR-v0.03-Beta-Cockpit-${{ github.sha }}
+          path: ${{ env.V003_RELEASE_ZIP }}
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish GitHub prerelease v0.02
-        if: github.ref_name == 'vr-quest-cockpit-v2-v0.02-release'
+      - name: Publish GitHub prerelease v0.03
+        if: github.ref_name == 'vr-quest-cockpit-v2-v0.03-release'
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $notes='build-general/v0.02-release-notes.md'
+          $notes='build-general/v0.03-release-notes.md'
           @'
-          # OutRun 2006 VR v0.02 Beta - Cockpit
+          # OutRun 2006 VR v0.03 Beta - Cockpit Passenger Update
 
           ## English
 
-          v0.02 introduces the original-game cockpit VR mode as the public beta default.
+          v0.03 keeps the validated v0.02 cockpit baseline and updates passenger handling.
 
-          ### Main changes
-          - QuestCockpitV2 original-car cockpit enabled in the VR launcher.
-          - F0 render scope enabled; Quest 3 field testing reported the previous vehicle body vibration removed.
-          - Default cockpit calibration: SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0. The eye position is lower than the initial v0.02 setting.
-          - F11 > Settings > VR seat values persist to OutRun2006Tweaks.user.ini, with Save Cockpit View and Reset Cockpit View controls.
-          - Startup sky exact 0x4521C0 programmable layer uses one deterministic rotation-only stereo basis.
-          - Crash handler starts before settings/VR-hook initialization.
-          - Nonthrowing user-INI and CrashDumps filesystem checks.
-          - Crash ZIP no longer depends on the normal release log being enabled.
-          - Partial minidumps are rejected and crash module attribution is corrected.
+          ### Passenger controls
+          - F11 > Settings > VR now exposes two exclusive passenger choices:
+            - **Passenger: Follow Camera 0** (default): the cockpit follows the game's native camera-0 passenger state.
+            - **Passenger: Remove**: hides the passenger only in cockpit camera mode 1.
+          - Camera 0 is never suppressed or modified by the Remove option.
+          - The mod never creates a missing ROB02 passenger event and does not rewrite/close the native passenger lifecycle.
+          - Goal/finish-scene passenger rendering is preserved.
+          - Passenger mode changes apply live and persist through the normal user settings path.
+
+          ### Existing cockpit baseline retained
+          - F0 Render Scope remains enabled by the VR launcher.
+          - SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0 defaults are unchanged.
+          - Driver remains hidden in cockpit while the original full car is retained.
+          - Cockpit glass reflection suppression remains enabled.
+          - Crash hardening and fail-safe dump generation from v0.02 are retained.
+
+          ### Verification
+          - The release CI runs the native passenger runtime verifier and 10 independent passenger-path static audits before packaging.
+          - The normal build also validates the original ROB02 passenger-hook ABI against the replacement OR2006C2C.EXE.
 
           ### Run
           Extract the ZIP into the folder containing OR2006C2C.EXE and run **Start-OutRun-VR.cmd**.
           Press **F12** while looking forward to recenter. Direct OR2006C2C.EXE launch remains **2D + FFB**.
 
-          ### Beta status
-          Vehicle vibration removal and the current turn behavior were confirmed acceptable on Quest 3 before this release.
-          The deterministic startup-sky change passed source/CI validation; complete removal of the startup sky flicker still needs final Quest 3 visual confirmation.
           ## 한국어
 
-          OutRun 2006 VR v0.02 Beta는 원본 게임 차량의 운전석 VR 모드를 기본 VR 실행 모드로 배포합니다.
+          v0.03은 검증된 v0.02 운전석 기준을 그대로 유지하면서 동승자 표시 동작을 수정한 버전입니다.
 
-          ### 주요 변경
-          - QuestCockpitV2 원본 차량 운전석 모드를 VR 런처에서 기본 활성화했습니다.
-          - Quest 3 실기에서 차량 떨림을 없앤 F0 Render Scope를 기본 ON으로 유지합니다.
-          - 기본 운전석 위치: SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0. 이전 v0.02 초기값보다 시점을 더 아래로 낮췄습니다.
-          - F11 > Settings > VR에서 좌석 앞뒤/높이/좌우 값을 변경하면 OutRun2006Tweaks.user.ini에 자동 저장되며, Save Cockpit View와 Reset Cockpit View 버튼을 추가했습니다.
-          - 시작 하늘 0x4521C0 레이어를 하나의 deterministic rotation-only stereo basis로 고정했습니다.
-          - 크래시 핸들러를 설정/VR 훅 초기화보다 먼저 설치합니다.
-          - user.ini 및 CrashDumps 경로 접근을 예외 안전 방식으로 변경했습니다.
-          - 일반 릴리즈 로그가 꺼져 있어도 crash ZIP 생성이 가능하도록 수정했습니다.
-          - 불완전 minidump를 제거하고 EXE/DLL 크래시 위치 판별을 개선했습니다.
+          ### 동승자 옵션
+          - F11 > Settings > VR에 서로 배타적인 두 옵션을 제공합니다.
+            - **Passenger: Follow Camera 0** (기본값): 게임의 0번 3인칭 시점에 원래 존재하는 동승자 상태를 운전석에서도 따라갑니다.
+            - **Passenger: Remove**: 동승자를 운전석 카메라(mode 1)에서만 숨깁니다.
+          - Remove를 선택해도 0번 3인칭 시점의 원본 동승자는 절대 제거하거나 변경하지 않습니다.
+          - 원본 ROB02 동승자 이벤트가 없을 때 모드가 임의로 새 이벤트를 만들지 않으며, 원본 이벤트 생명주기도 변경하거나 종료하지 않습니다.
+          - 골/피니시 장면의 원본 동승자 렌더링을 보존합니다.
+          - 동승자 옵션은 즉시 적용되며 기존 사용자 설정 저장 경로를 통해 유지됩니다.
+
+          ### 기존 운전석 기준 유지
+          - VR 런처의 F0 Render Scope 기본 ON을 유지합니다.
+          - SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0 기본값은 그대로입니다.
+          - 운전석에서는 운전자만 숨기고 원본 차량 전체 모델은 유지합니다.
+          - 유리 반사 억제 설정을 유지합니다.
+          - v0.02의 시작 크래시 방지 및 크래시 덤프 안전화 변경을 그대로 포함합니다.
+
+          ### 검증
+          - 릴리즈 패키징 전에 native passenger runtime 검증과 10개의 독립 동승자 경로 정적 검증을 모두 실행합니다.
+          - 일반 빌드에서도 교체 OR2006C2C.EXE를 대상으로 원본 ROB02 동승자 훅 ABI를 확인합니다.
 
           ### 실행 방법
           ZIP을 OR2006C2C.EXE가 있는 게임 폴더에 압축 해제한 뒤 **Start-OutRun-VR.cmd**를 실행합니다.
           원하는 정면을 바라본 상태에서 **F12**를 누르면 VR 시점이 재정렬됩니다.
           OR2006C2C.EXE를 직접 실행하면 기존처럼 **2D + FFB**로 실행됩니다.
 
-          ### 베타 상태
-          차량 떨림 제거와 현재 차량 회전 감각은 Quest 3 실기에서 허용 가능한 수준으로 확인되었습니다.
-          시작 하늘 고정 수정은 소스/CI 검증을 통과했지만, 하늘 깜빡임이 완전히 사라졌는지는 Quest 3에서 최종 확인이 필요합니다.
-
           '@ | Set-Content -LiteralPath $notes -Encoding utf8
-          gh release view v0.02 --repo $env:GITHUB_REPOSITORY *> $null
+          gh release view v0.03 --repo $env:GITHUB_REPOSITORY *> $null
           if($LASTEXITCODE -eq 0){
-            gh api --method PATCH "repos/$env:GITHUB_REPOSITORY/git/refs/tags/v0.02" -f sha="$env:GITHUB_SHA" -F force=true *> $null
-            if($LASTEXITCODE -ne 0){throw 'v0.02 tag retarget failed'}
-            gh release upload v0.02 $env:V002_RELEASE_ZIP --repo $env:GITHUB_REPOSITORY --clobber
-            if($LASTEXITCODE -ne 0){throw 'v0.02 release asset replacement failed'}
-            gh release edit v0.02 --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'OutRun 2006 VR v0.02 Beta - Cockpit' --notes-file $notes --prerelease
-            if($LASTEXITCODE -ne 0){throw 'v0.02 release metadata update failed'}
+            gh api --method PATCH "repos/$env:GITHUB_REPOSITORY/git/refs/tags/v0.03" -f sha="$env:GITHUB_SHA" -F force=true *> $null
+            if($LASTEXITCODE -ne 0){throw 'v0.03 tag retarget failed'}
+            gh release upload v0.03 $env:V003_RELEASE_ZIP --repo $env:GITHUB_REPOSITORY --clobber
+            if($LASTEXITCODE -ne 0){throw 'v0.03 release asset replacement failed'}
+            gh release edit v0.03 --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'OutRun 2006 VR v0.03 Beta - Cockpit' --notes-file $notes --prerelease
+            if($LASTEXITCODE -ne 0){throw 'v0.03 release metadata update failed'}
           } else {
-            gh release create v0.02 $env:V002_RELEASE_ZIP --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'OutRun 2006 VR v0.02 Beta - Cockpit' --notes-file $notes --prerelease
-            if($LASTEXITCODE -ne 0){throw 'GitHub v0.02 release publication failed'}
+            gh release create v0.03 $env:V003_RELEASE_ZIP --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'OutRun 2006 VR v0.03 Beta - Cockpit' --notes-file $notes --prerelease
+            if($LASTEXITCODE -ne 0){throw 'GitHub v0.03 release publication failed'}
           }
 
       - name: Mark build result
