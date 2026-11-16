@@ -60,7 +60,7 @@ jobs:
           assert 'if CONTROLLER_MODE == "localization" and slot.name not in ("A", "B")' in result
           print('PATCHED CONTROLLER: two roles, staggered schedule, fresh-chat and fail-closed PASS')
           PY
-      - name: Validate Compose without deployment
+      - name: Validate current GitOps + HOLD browser Compose without deployment
         run: |
           docker compose -f tools/chat-controller/localization-recovery-v1/docker-compose.yml config --quiet
           python - <<'PY'
@@ -68,35 +68,26 @@ jobs:
           import yaml
           root=Path('tools/chat-controller/localization-recovery-v1')
           compose=yaml.safe_load((root/'docker-compose.yml').read_text())
-          assert len(compose['services'])==1
-          c=compose['services']['outrun-chat-controller-localization-recovery']
-          e=c['environment']
-          assert e['CHAT_SLOTS']=='2'
-          assert e['AUTO_SEND']=='true'
-          assert e['SCHEDULE_MINUTES']=='0,5,10,15,20,25,30,35,40,45,50,55'
-          assert e['FRESH_CHAT_EACH_RUN']=='true'
-          assert e['CHAT_RECYCLE_RUNS']=='0'
-          assert e['OUTRUN_AB_BATCH_QUEUE']=='true'
-          assert e['OUTRUN_AB_BATCH_SIZE']=='5'
-          assert e['OUTRUN_AB_LIBRARY_FOLDER']=='아웃런 한글화 신규'
-          assert e['OUTRUN_AB_PROJECT_LIBRARY_NAME']=='아웃런 한글화 신규'
-          assert e['OUTRUN_AB_PROJECT_NAME']=='아웃런 한글화 신규'
-          assert e['OUTRUN_A_TILE_BATCH_QUEUE']=='false'
-          assert e['WATCHDOG_ENABLED']=='false'
-          assert e['REQUIRE_PROJECT_URL']=='false'
-          assert c['pull_policy']=='build'
-          assert c['ports']==['6082:6080','8788:8787']
-          assert any(isinstance(m,dict) and m.get('type')=='bind' and
-             m['source']=='/home/chatgpt-runner2/work/image-src' and
-             m['target']=='/data/imagegen' and m.get('bind',{}).get('create_host_path') is False
-             for m in c['volumes'])
-          assert 'outrun_chat_localization_recovery_data:/data' in c['volumes']
-          assert 'outrun_chat_localization_recovery_logs:/logs' in c['volumes']
-          docker=(root/'Dockerfile').read_text()
-          for module in ['ab_batch_queue.py','controller_png_attach.py',
-                         'tile_orientation_policy.py','project_library_gate.py']:
-             assert 'COPY '+module+' /opt/outrun/app/'+module in docker
-          print('A/B Compose, mounts, service isolation and Docker copies: PASS')
+          assert set(compose['services'])=={
+              'outrun-chat-controller-localization-recovery','outrun-chat-qa-rework'}
+          gitops=compose['services']['outrun-chat-controller-localization-recovery']
+          qa=compose['services']['outrun-chat-qa-rework']
+          assert gitops['pull_policy']=='build'
+          assert gitops['build']['dockerfile']=='Dockerfile.gitops'
+          assert gitops['read_only'] is True
+          assert qa['pull_policy']=='build'
+          assert qa['build']['dockerfile']=='Dockerfile.chat-rework'
+          assert 'hd_imagegen_fallback' in qa['environment']['OUTRUN_REWORK_QUEUE_NAME']
+          assert ':-0}' in qa['environment']['OUTRUN_REWORK_REUSE_ONLY']
+          assert any('6084' in str(port) and '6080' in str(port) for port in qa['ports'])
+          assert 'outrun_chat_localization_recovery_data:/data' in qa['volumes']
+          assert 'outrun_chat_localization_recovery_logs:/logs' in qa['volumes']
+          assert 'outrun_chat_browser_profile_clean_v2:/browser-profile' in qa['volumes']
+          docker=(root/'Dockerfile.chat-rework').read_text()
+          for module in ['github_chat_rework_controller.py','controller_png_attach.py',
+                         'chat_image_result_rescue.py','test_github_chat_rework_controller.py']:
+             assert 'COPY ' in docker and module in docker
+          print('GitOps + HOLD browser Compose and Docker copies: PASS')
           PY
       - name: Execute role queue, Library gate and orientation unit tests
         run: |
