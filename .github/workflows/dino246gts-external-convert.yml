@@ -89,7 +89,7 @@ jobs:
           set -euo pipefail
           PKG="${RUNNER_TEMP}/Dino246GTS_Private_Test"
           mkdir -p "$PKG/ExternalCars" "$PKG/QA"
-          cp tools/car_importer/ferrari16_hq_batch/outputs/dino246gts/dino246gts_External_Test.ovc              "$PKG/ExternalCars/car_id_01.ovc"
+          cp tools/car_importer/ferrari16_hq_batch/outputs/dino246gts/dino246gts_External_Test.ovc              "$PKG/ExternalCars/car_id_00.ovc"
           cp tools/car_importer/ferrari16_hq_batch/outputs/dino246gts/conversion_report.json "$PKG/QA/"
           cp "${RUNNER_TEMP}/dino246/output/source.json" "$PKG/QA/"
           cp "${RUNNER_TEMP}/dino246/source_audit.json" "$PKG/QA/"
@@ -98,7 +98,7 @@ jobs:
           root=pathlib.Path(os.environ['RUNNER_TEMP'])/'Dino246GTS_Private_Test'
           ovc=root/'ExternalCars'/'car_id_01.ovc'
           report={
-            'car_id': 1,
+            'car_id': 0,
             'vehicle': 'Dino 246 GTS',
             'ovc_bytes': ovc.stat().st_size,
             'ovc_sha256': hashlib.sha256(ovc.read_bytes()).hexdigest(),
