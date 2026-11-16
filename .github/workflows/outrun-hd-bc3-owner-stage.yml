@@ -1,0 +1,85 @@
+name: OutRun HD Proven BC3 A/B Pixel Candidate Staging (GitHub CPU)
+
+# Stages only native-tested real existing A/B Korean RGBA art for the
+# full strict HD pipeline. No C1 approval, no install, no original replacement.
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/outrun-hd-bc3-owner-stage.yml"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: outrun-hd-bc3-owner-stage
+  cancel-in-progress: false
+
+jobs:
+  source-verified-pixel-art-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout native source-owner importer and SHA crosswalk
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/hd_bc3_source_owner_stage.py
+            tools/localization/hd_bc3_source_owner_import.py
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+            localization/automation_inputs/native_source_owner_canary
+      - name: Read native/source/protection proof
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-ab-multi-atlas-43169137555
+          run-id: 43169137555
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/source-evidence
+      - name: Read existing source-identified Korean PNG edit bytes
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-source-bound-auto-edited-pngs-43185778845
+          run-id: 43185778845
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/old-pixel-edits
+      - name: Read successful real original DDS byte-verified machine canaries
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-hd-bc3-four-mip-canary-43813078385
+          run-id: 43813078385
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/mip1-machine-canary
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Stage EXACT 8 pixel-only A/B candidates and canary SHA receipts
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_bc3_source_owner_stage.py \
+            --proof-dir "$RUNNER_TEMP/source-evidence/source_protection" \
+            --edits-dir "$RUNNER_TEMP/old-pixel-edits" \
+            --canary-dir "$RUNNER_TEMP/mip1-machine-canary" \
+            --crosswalk localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv \
+            --out localization/automation_inputs/native_source_owner_canary
+      - name: Persist source-bound TEST_ONLY candidates on the asset branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add localization/automation_inputs/native_source_owner_canary/
+          if git diff --cached --quiet; then
+            echo "EXACT_EIGHT_CANDIDATES_ALREADY_STAGED_NO_DUPLICATE_COMMIT"
+          else
+            git commit -m "localization(hd): stage 8 source-owned BC3 proven pixel edits TEST_ONLY"
+            git push origin HEAD:korean-localization-recovery-20260928
+          fi
+          test "$(git ls-remote origin refs/heads/korean-localization-recovery-20260928 | cut -f1)" = "$(git rev-parse HEAD)"
+          echo 'SOURCE_OWNER_STAGE_REMOTE_HEAD_VERIFIED'
