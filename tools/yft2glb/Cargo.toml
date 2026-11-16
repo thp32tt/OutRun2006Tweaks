@@ -1,0 +1,9 @@
+[package]
+name = "or2-yft2glb"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+rage-formats = "0.5.1"
+rage-render = { git = "https://github.com/VIRUXE/rage-render", tag = "v0.7.0" }
