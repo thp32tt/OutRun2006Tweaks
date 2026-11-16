@@ -3,7 +3,7 @@ import io
 import unittest
 
 from PIL import Image, ImageDraw
-from hd_hold_retry_pipeline import safe_fit_existing, make_task, assert_safe_mask
+from hd_hold_retry_pipeline import safe_fit_existing, make_task, assert_safe_mask, MAX_REFERENCE
 
 
 def fixture(protected_x=(62,66)):
@@ -23,6 +23,9 @@ def fixture(protected_x=(62,66)):
 
 
 class HoldRetrySafety(unittest.TestCase):
+    def test_reference_cap_matches_publisher_limit(self):
+        self.assertEqual(MAX_REFERENCE,4*1024*1024)
+
     def test_collision_attempt_rescues_without_foreign_pixel_change(self):
         source,owner,protect,uncertain,text,lines=fixture()
         output,status,ops=safe_fit_existing(source,owner,protect,uncertain,text,lines)
