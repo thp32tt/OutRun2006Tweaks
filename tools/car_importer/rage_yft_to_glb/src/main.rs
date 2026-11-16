@@ -96,9 +96,70 @@ fn dff_mode(dff_path: &str, txd_path: Option<&str>, out_path: &str) -> Result<()
     Ok(())
 }
 
+
+fn audit_yft_mode(yft_path: &str) -> Result<()> {
+    let yft = fs::read(yft_path).with_context(|| format!("read {yft_path}"))?;
+    let fragment = parse_yft(&yft).context("parse YFT")?;
+
+    println!("YFT_DASHBOARD_AUDIT_PASS");
+    println!("fragment={}", fragment.name);
+    println!("bone_transforms={}", fragment.bone_transforms.len());
+    println!("children={}", fragment.children.len());
+
+    let mut candidates = 0usize;
+    let mut audit_drawable = |part_name: &str, drawable: &rage_formats::ydd::Drawable| {
+        let Some(lod) = drawable.best_lod() else {
+            println!("PART\t{part_name}\tNO_LOD");
+            return;
+        };
+        for bounds in drawable.geometry_bounds(lod) {
+            let model = &lod.models[bounds.model];
+            let diffuse = drawable.diffuse_texture_name(bounds.shader_id).unwrap_or("");
+            let lower = diffuse.to_ascii_lowercase();
+            let is_candidate = ["dial", "gauge", "speed", "tach", "rpm", "needle", "cluster"]
+                .iter()
+                .any(|needle| lower.contains(needle));
+            if is_candidate {
+                candidates += 1;
+            }
+            println!(
+                "{}\tpart={}\tmodel={}\tbone={}\tgeometry={}\tshader={}\tdiffuse={}\tverts={}\ttris={}\tmin={:.6},{:.6},{:.6}\tmax={:.6},{:.6},{:.6}\tcentroid={:.6},{:.6},{:.6}",
+                if is_candidate { "DASH_CANDIDATE" } else { "GEOMETRY" },
+                part_name,
+                bounds.model,
+                model.bone_index(),
+                bounds.geometry,
+                bounds.shader_id,
+                diffuse,
+                bounds.vertices,
+                bounds.triangles,
+                bounds.min.x, bounds.min.y, bounds.min.z,
+                bounds.max.x, bounds.max.y, bounds.max.z,
+                bounds.centroid.x, bounds.centroid.y, bounds.centroid.z,
+            );
+        }
+    };
+
+    if let Some(drawable) = &fragment.drawable {
+        audit_drawable("main", drawable);
+    }
+    for (index, child) in fragment.children.iter().enumerate() {
+        if let Some(drawable) = &child.drawable {
+            audit_drawable(&format!("child_{index}_bone_{}", child.bone_tag), drawable);
+        }
+    }
+    for (index, extra) in fragment.extra_drawables.iter().enumerate() {
+        audit_drawable(&format!("extra_{index}_{}", extra.name), &extra.drawable);
+    }
+
+    println!("dashboard_candidates={candidates}");
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     match args.as_slice() {
+        [_, mode, yft] if mode == "audit-yft" => audit_yft_mode(yft),
         [_, mode, dff, output] if mode == "dff" => dff_mode(dff, None, output),
         [_, mode, dff, txd, output] if mode == "dff" => dff_mode(dff, Some(txd), output),
         [_, yft, ytd, output] => yft_mode(yft, ytd, output),
