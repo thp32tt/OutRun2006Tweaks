@@ -43,6 +43,21 @@ inline constexpr std::uint32_t OriginalStartAfterPassengerFunctionId=0x3bu;
 // from 0x79FB48 flag 0x02 plus the 4879B0 callback and work pointer.
 // "Remove" is cockpit-only. Camera 0 must preserve original ROB02
 // rendering regardless of which passenger checkbox is selected.
+// The unmodified PC 0x4879B0 driver/passenger display wrapper only
+// forwards to 0x487880 when player-car flags[0x4] has 0x4000 selected in
+// its 0xC000 mask. In mode 1, this gate often closes while the genuine
+// ROB02 event remains initialized and its native callback still executes.
+// Restore ONLY this display call for the existing passenger at that gate;
+// never fabricate a new event, change simulation car flags, or affect
+// third-person/GOAL/driver/NPCs.
+inline constexpr bool ShouldBypassPassengerCarDisplayGate(
+    bool vrEnabled,bool cockpitEnabled,bool followCamera0,
+    bool activeRacingCockpit,bool nativeCameraModeOne,
+    bool exactLivePassenger,std::uint32_t nativeCarFlags) noexcept {
+    return vrEnabled && cockpitEnabled && followCamera0 &&
+        activeRacingCockpit && nativeCameraModeOne && exactLivePassenger &&
+        ((nativeCarFlags & 0xc000u)!=0x4000u);
+}
 inline constexpr bool ShouldSuppressOriginalPassenger(
     bool vrEnabled,bool cockpitEnabled,bool followCamera0,
     bool activeRacingCockpit,bool nativeCameraModeOne,

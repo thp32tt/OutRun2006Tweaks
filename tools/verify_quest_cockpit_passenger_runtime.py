@@ -26,6 +26,16 @@ assert "ShouldOpenMissingPassenger(" not in hook + policy
 assert "SetupHook.ccall<void>(\n                    OriginalPassengerEventId" not in hook
 assert "OriginalEventFlagsRva=0x39fb48u;" in policy
 assert "OriginalPassengerEventId=0x16bu;" in policy
+assert "ShouldBypassPassengerCarDisplayGate(" in policy
+assert "OriginalPassengerDisplayGateSignature()" in hook
+assert "PassengerGateHook=std::move(guest);" in hook
+assert "Module::fn_ptr<NativeRobotDisplay>(" in hook
+assert "OriginalCommonRobotDisplayRva)(work);" in hook
+assert "PassengerGateRestores.fetch_add(" in hook
+assert "car->flags_4" in hook
+assert "static void __cdecl PassengerDriverDisplay(EvWorkRobot* work)" in hook
+assert "0xA1,0x18,0x9D,0x79" in hook
+assert "if(!restore){original();return;}" in hook
 assert "OriginalEventLiveForDisplay(std::uint8_t flags)" in policy
 assert "OriginalEventLiveForDisplay(eventFlags[OriginalDriverEventId])" in owner
 assert "OriginalEventLiveForDisplay(eventFlags[OriginalPassengerEventId])" in owner

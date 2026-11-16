@@ -15,6 +15,26 @@ constexpr bool PassengerGateTruthTable() {
     return true;
 }
 static_assert(PassengerGateTruthTable(),"camera0/GOAL/effect must not hide ROB02");
+constexpr bool PassengerDisplayBypassTruthTable() {
+    // 64 boolean combinations x 4 distinct original car presentation states.
+    for(unsigned bits=0;bits<64u;++bits) {
+        for(auto flags:{0x0000u,0x4000u,0x8000u,0xc000u}) {
+            const bool actual=ShouldBypassPassengerCarDisplayGate(
+                (bits&1u)!=0u,(bits&2u)!=0u,(bits&4u)!=0u,
+                (bits&8u)!=0u,(bits&16u)!=0u,(bits&32u)!=0u,flags);
+            if(actual!=(bits==63u && flags!=0x4000u))return false;
+        }
+    }
+    return true;
+}
+static_assert(PassengerDisplayBypassTruthTable(),
+    "only existing native ROB02 in active camera-1 follow may bypass the native car flag gate");
+static_assert(!ShouldBypassPassengerCarDisplayGate(
+    true,true,true,true,false,true,0x8000u),"camera 0 must be untouched");
+static_assert(!ShouldBypassPassengerCarDisplayGate(
+    true,true,false,true,true,true,0x8000u),"Remove never forces a passenger");
+static_assert(!ShouldBypassPassengerCarDisplayGate(
+    true,true,true,false,true,true,0x8000u),"GOAL cannot force display");
 int main() {
     // Original PC: 440110 event byte flags live separately from sEventWork.
     static_assert(OriginalEventFlagsRva==0x39FB48u);
@@ -49,4 +69,5 @@ int main() {
     static_assert(!suppress(true,true,false,false,true,true));  // menu unchanged
     assert(!suppress(true,true,false,true,false,true));
     assert(suppress(true,true,false,true,true,true));
+    assert(PassengerDisplayBypassTruthTable());
 }
