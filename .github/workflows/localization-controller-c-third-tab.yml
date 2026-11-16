@@ -25,7 +25,7 @@ jobs:
           python-version: '3.12'
       - name: Three slots and pinned A/B/C build-time patch (no ChatGPT)
         run: python tools/chat-controller/localization-recovery-v1/tests/test_controller_c_third_tab.py
-      - name: Compose has same one default controller service
+      - name: Current Compose keeps historical three-tab patch retired
         run: |
           python -m pip install PyYAML==6.0.2
           python - <<'PY'
@@ -33,15 +33,18 @@ jobs:
           import yaml
           p=Path('tools/chat-controller/localization-recovery-v1/docker-compose.yml')
           c=yaml.safe_load(p.read_text())
-          assert list(c['services']['outrun-chat-controller-localization-recovery']['environment'].keys())
-          controller=c['services']['outrun-chat-controller-localization-recovery']
-          env=controller['environment']
-          assert env['CHAT_SLOTS']=='3'
-          times={int(x) for x in env['SCHEDULE_MINUTES'].split(',')}
-          assert times == set(range(0,60,5)) | {3,33}, times
-          assert env['OUTRUN_AB_BATCH_QUEUE']=='true'
-          assert env['OUTRUN_AB_PROJECT_NAME']=='아웃런 한글화 신규'
-          optional=c['services'].get('outrun-c-salvage-offline')
-          assert optional is None or optional.get('profiles') == ['optional-offline-c']
-          print('PASS: A/B preserved, C :03/:33, one default Docker service')
+          services=c['services']
+          assert set(services)=={
+              'outrun-chat-controller-localization-recovery',
+              'outrun-chat-qa-rework',
+          }
+          gitops=services['outrun-chat-controller-localization-recovery']
+          qa=services['outrun-chat-qa-rework']
+          assert gitops['build']['dockerfile']=='Dockerfile.gitops'
+          assert 'CHAT_SLOTS' not in gitops['environment']
+          assert qa['build']['dockerfile']=='Dockerfile.chat-rework'
+          assert 'hd_imagegen_fallback' in qa['environment']['OUTRUN_REWORK_QUEUE_NAME']
+          assert 'OUTRUN_REWORK_REUSE_ONLY' in qa['environment']
+          assert 'outrun-c-salvage-offline' not in services
+          print('PASS: historical C third-tab patch remains regression-only; active HOLD worker owns browser QA')
           PY
