@@ -97,6 +97,70 @@ fn dff_mode(dff_path: &str, txd_path: Option<&str>, out_path: &str) -> Result<()
 }
 
 
+
+fn extract_yft_geometry_mode(
+    yft_path: &str,
+    ytd_path: &str,
+    model_index: usize,
+    geometry_index: usize,
+    out_path: &str,
+) -> Result<()> {
+    let yft = fs::read(yft_path).with_context(|| format!("read {yft_path}"))?;
+    let ytd = fs::read(ytd_path).with_context(|| format!("read {ytd_path}"))?;
+    let fragment = parse_yft(&yft).context("parse YFT")?;
+    let external = parse_ytd(&ytd).context("parse YTD")?;
+
+    let source = fragment.drawable.as_ref().context("YFT main drawable missing")?;
+    let lod = source.best_lod().context("YFT main drawable has no LOD")?;
+    let source_model = lod.models.get(model_index).context("model index out of range")?;
+    let source_geometry = source_model
+        .geometries
+        .get(geometry_index)
+        .context("geometry index out of range")?
+        .clone();
+
+    let mut selected_model = source_model.clone();
+    selected_model.geometries = vec![source_geometry.clone()];
+    let mut selected_lod = lod.clone();
+    selected_lod.models = vec![selected_model];
+
+    let mut selected_drawable = source.clone();
+    selected_drawable.lods = vec![selected_lod];
+
+    let mut textures = TextureSet::new();
+    let mut decode_failures = Vec::new();
+    if let Some(group) = &selected_drawable.shader_group {
+        decode_failures.extend(textures.push_layer(&group.textures));
+    }
+    decode_failures.extend(textures.push_layer(&external));
+
+    let mut trimmed_aliases = Vec::new();
+    for texture in &external {
+        let trimmed = texture.name.trim();
+        if trimmed != texture.name && !trimmed.is_empty() && textures.alias(trimmed, &texture.name) {
+            trimmed_aliases.push((trimmed.to_string(), texture.name.clone()));
+        }
+    }
+
+    let part = RenderPart::new(&selected_drawable);
+    let report = export_parts(&[part], &textures, Path::new(out_path))?;
+    println!("YFT_GEOMETRY_EXTRACT_PASS");
+    println!("model={model_index}");
+    println!("geometry={geometry_index}");
+    println!("shader={}", source_geometry.shader_id);
+    println!(
+        "diffuse={}",
+        source.diffuse_texture_name(source_geometry.shader_id).unwrap_or("")
+    );
+    println!("vertices={}", source_geometry.vertices_count);
+    println!("triangles={}", source_geometry.triangles_count);
+    println!("decode_failures={:?}", decode_failures);
+    println!("trimmed_aliases={:?}", trimmed_aliases);
+    println!("export_triangles={}", report.triangles);
+    println!("export_geometries={}", report.geometries);
+    Ok(())
+}
+
 fn audit_yft_mode(yft_path: &str) -> Result<()> {
     let yft = fs::read(yft_path).with_context(|| format!("read {yft_path}"))?;
     let fragment = parse_yft(&yft).context("parse YFT")?;
@@ -159,6 +223,11 @@ fn audit_yft_mode(yft_path: &str) -> Result<()> {
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     match args.as_slice() {
+        [_, mode, yft, ytd, model, geometry, output] if mode == "extract-yft-geometry" => {
+            let model_index = model.parse::<usize>().context("invalid model index")?;
+            let geometry_index = geometry.parse::<usize>().context("invalid geometry index")?;
+            extract_yft_geometry_mode(yft, ytd, model_index, geometry_index, output)
+        },
         [_, mode, yft] if mode == "audit-yft" => audit_yft_mode(yft),
         [_, mode, dff, output] if mode == "dff" => dff_mode(dff, None, output),
         [_, mode, dff, txd, output] if mode == "dff" => dff_mode(dff, Some(txd), output),
