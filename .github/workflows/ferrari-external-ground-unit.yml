@@ -4,13 +4,18 @@ on:
   push:
     branches:
       - 'vr-quest-cockpit-v2-external-installed-only-*'
+      - 'vr-external-dashboard-*'
     paths:
       - '.github/workflows/ferrari-external-ground-unit.yml'
       - 'src/vr/game/external_car_ground.hpp'
+      - 'src/vr/game/external_car_dashboard.hpp'
       - 'src/vr/game/dino_external_d3d9.hpp'
       - 'src/hooks_graphics.cpp'
       - 'tests/external_car_ground_test.cpp'
       - 'tests/external_car_gate_test.cpp'
+      - 'tests/external_car_dashboard_test.cpp'
+      - 'tests/external_car_sidecar_v4_test.cpp'
+      - 'tools/car_importer/ferrari16_hq_batch/tools/ferrari_batch_converter.py'
   workflow_dispatch:
 
 permissions:
@@ -30,6 +35,19 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
              tests/external_car_gate_test.cpp -o /tmp/ferrari_external_gate
           /tmp/ferrari_external_gate
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+             tests/external_car_dashboard_test.cpp -o /tmp/ferrari_external_dashboard
+          /tmp/ferrari_external_dashboard
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+             tests/external_car_sidecar_v4_test.cpp -o /tmp/ferrari_external_sidecar_v4
+          /tmp/ferrari_external_sidecar_v4
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          p=Path('tools/car_importer/ferrari16_hq_batch/tools/ferrari_batch_converter.py')
+          ast.parse(p.read_text(), filename=str(p))
+          print('FERRARI_CONVERTER_PYTHON_AST_PASS')
+          PY
       - name: Static verifier for source-only installed-and-PBR path
         run: |
           python3 - <<'PY'
@@ -37,6 +55,9 @@ jobs:
           source=Path('src/vr/game/dino_external_d3d9.hpp').read_text()
           hooks=Path('src/hooks_graphics.cpp').read_text()
           gate=Path('src/vr/game/dino_external_original_car_gate.hpp').read_text()
+          dashboard=Path('src/vr/game/external_car_dashboard.hpp').read_text()
+          sidecar=Path('src/vr/game/dino_external_sidecar.hpp').read_text()
+          converter=Path('tools/car_importer/ferrari16_hq_batch/tools/ferrari_batch_converter.py').read_text()
           assert 'bool Installed() const noexcept' in source
           assert 'ExternalCars\\\\car_id_%02u.ovc' in source
           assert 'FerrariModelSlot::GenericId' in source
@@ -52,5 +73,10 @@ jobs:
           assert 'CanReplaceOriginalCar(gate)' in hooks
           assert 'return gate.optedIn && gate.ownedPlayer' in gate
           assert 'route!=OutRunVR::DinoSidecar::OriginalCarRoute::OriginalFallback' in hooks
-          print('INSTALLED_ONLY_COCKPIT_PBR_FALLBACK_SOURCE_QA_PASS')
+          assert 'DashboardFrameLatch dashboardLatch' in hooks
+          assert 'player->field_1F8' in hooks and 'player->dword20C' in hooks and 'player->cur_gear_208' in hooks
+          assert 'OVRCABH4' in sidecar and 'OVCDASH4' in sidecar
+          assert 'DashboardWorldMatrix' in dashboard and 'DashboardMeshVisible' in dashboard
+          assert "header = b'OVRCABH4'" in converter and "payload.extend(b'OVCDASH4')" in converter
+          print('INSTALLED_ONLY_COCKPIT_PBR_DASHBOARD_SOURCE_QA_PASS')
           PY

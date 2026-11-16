@@ -162,6 +162,11 @@ public:
         }
         return true;
     }
+    HRESULT SetWorld(IDirect3DDevice9* device,const D3DMATRIX& world) noexcept {
+        if(!device||!vs_)return E_FAIL;
+        return FAILED(device->SetVertexShaderConstantF(
+            0,&world.m[0][0],4)) ? E_FAIL:S_OK;
+    }
     HRESULT Bind(IDirect3DDevice9* device,const D3DMATRIX& world,
                  const D3DMATRIX& view,const D3DMATRIX& projection) noexcept {
         if(!device||!vs_||!ps_)return E_FAIL;
@@ -169,12 +174,13 @@ public:
             -(view._41*view._11+view._42*view._12+view._43*view._13),
             -(view._41*view._21+view._42*view._22+view._43*view._23),
             -(view._41*view._31+view._42*view._32+view._43*view._33),0.f};
-        return FAILED(device->SetVertexShader(vs_)) ||
-               FAILED(device->SetPixelShader(ps_)) ||
-               FAILED(device->SetVertexShaderConstantF(0,&world.m[0][0],4)) ||
-               FAILED(device->SetVertexShaderConstantF(4,&view.m[0][0],4)) ||
-               FAILED(device->SetVertexShaderConstantF(8,&projection.m[0][0],4)) ||
-               FAILED(device->SetPixelShaderConstantF(1,eye,1)) ? E_FAIL:S_OK;
+        if(FAILED(device->SetVertexShader(vs_)) ||
+           FAILED(device->SetPixelShader(ps_)) ||
+           FAILED(device->SetVertexShaderConstantF(4,&view.m[0][0],4)) ||
+           FAILED(device->SetVertexShaderConstantF(8,&projection.m[0][0],4)) ||
+           FAILED(device->SetPixelShaderConstantF(1,eye,1)))
+            return E_FAIL;
+        return SetWorld(device,world);
     }
 };
 } // namespace OutRunVR::DinoSidecar

@@ -896,6 +896,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         std::uint64_t nativeFrame=0,xrPose=0;
         unsigned char carId=255;
         float appliedLift=0.f; // native car-local visual floor correction
+        OutRunVR::DinoSidecar::DashboardTelemetry dashboard{};
         OutRunVR::DinoSidecar::FerrariModelSlot slot=
             OutRunVR::DinoSidecar::FerrariModelSlot::F50;
         bool valid=false;
@@ -907,7 +908,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
              projection(other.projection),originalPlayer(other.originalPlayer),
              nativeFrame(other.nativeFrame),xrPose(other.xrPose),
              carId(other.carId),appliedLift(other.appliedLift),
-             slot(other.slot),valid(other.valid)
+             dashboard(other.dashboard),slot(other.slot),valid(other.valid)
         {
             other.device=nullptr;other.valid=false;
         }
@@ -999,6 +1000,13 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         ticket.projection=*nativeProjection;
         ticket.nativeFrame=NativeFrameTrace().ActiveEpoch();
         ticket.xrPose=xr->poseSequence;
+        // The retail HUD reads speed from +0x1F8, current gear from +0x208
+        // and tachometer RPM from +0x20C. Latch exactly once per native frame
+        // so replayed stereo eyes cannot observe different dashboard values.
+        static thread_local OutRunVR::DinoSidecar::DashboardFrameLatch dashboardLatch;
+        ticket.dashboard=dashboardLatch.Capture(
+            ticket.nativeFrame,ticket.originalPlayer,player->field_1F8,
+            player->dword20C,player->cur_gear_208);
         device->AddRef();
         ticket.device=device;
         ticket.valid=true;
@@ -1035,7 +1043,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(!OutRunVR::DinoSidecar::CanReplaceOriginalCar(gate))
             return false;
         const auto draw=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
-            ticket.device,ticket.world,ticket.view,ticket.projection);
+            ticket.device,ticket.world,ticket.view,ticket.projection,
+            ticket.dashboard);
         const auto route=OutRunVR::DinoSidecar::ChooseOriginalCarRoute(
             gate,draw.receipt);
         const bool suppressOriginal=
@@ -1048,11 +1057,14 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 spdlog::info(
                     "VR QUEST FERRARI EXTERNAL: sample={} nativeFrame={} xrPose={} "
                     "carId={} slot={} localFloorLift={:.4f} "
+                    "dash[speedKph={:.1f},rpm={:.0f},gear={}] "
                     "drawHr=0x{:08X} submitted={}/{} stateRestored={} route={} "
                     "originalPMT=UNCHANGED",
                     sample,ticket.nativeFrame,ticket.xrPose,
                     static_cast<unsigned>(ticket.carId),
                     static_cast<unsigned>(ticket.slot),ticket.appliedLift,
+                    ticket.dashboard.speedKph,ticket.dashboard.rpm,
+                    ticket.dashboard.gear,
                     static_cast<unsigned int>(draw.hr),
                     draw.receipt.submittedMeshes,draw.receipt.expectedMeshes,
                     draw.receipt.stateRestored,

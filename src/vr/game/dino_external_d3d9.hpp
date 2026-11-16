@@ -33,6 +33,7 @@ class GpuOwner final {
         IDirect3DIndexBuffer9* ib=nullptr;
         UINT vertexCount=0,indexCount=0;
         unsigned material=0;
+        int dashboardBinding=-1;
         bool glass=false; // sorted transparent sidecar group; never occludes road depth
     };
     Model cpu_{};
@@ -243,9 +244,15 @@ class GpuOwner final {
             // car remains the only safe fallback for this device generation.
             if(!pbrReady_)return RejectGpu(dev);
         }
-        for(const auto& m:cpu_.meshes) {
+        for(std::size_t meshIndex=0;meshIndex<cpu_.meshes.size();++meshIndex) {
+            const auto& m=cpu_.meshes[meshIndex];
             GpuMesh next{};
             next.material=m.material;
+            for(std::size_t binding=0;binding<cpu_.dashboardBindings.size();++binding)
+                if(cpu_.dashboardBindings[binding].meshIndex==meshIndex) {
+                    next.dashboardBinding=static_cast<int>(binding);
+                    break;
+                }
             next.glass=m.name.compare(0,10,"F50_GLASS_")==0 ||
                 m.name.compare(0,10,"EXT_GLASS_")==0;
             next.vertexCount=static_cast<UINT>(m.vertices.size());
@@ -284,6 +291,23 @@ class GpuOwner final {
             meshes_.push_back(next);
         }
         return meshes_.size()==cpu_.meshes.size();
+    }
+    const DashboardBinding* DashboardFor(const GpuMesh& mesh) const noexcept {
+        if(mesh.dashboardBinding<0 ||
+           static_cast<std::size_t>(mesh.dashboardBinding)>=cpu_.dashboardBindings.size())
+            return nullptr;
+        return &cpu_.dashboardBindings[static_cast<std::size_t>(mesh.dashboardBinding)];
+    }
+    static D3DMATRIX AnimatedWorld(const D3DMATRIX& base,
+                                   const DashboardBinding* binding,
+                                   const DashboardTelemetry& telemetry) noexcept {
+        DashboardMatrix input{};
+        std::memcpy(input.data(),&base.m[0][0],sizeof(D3DMATRIX));
+        const DashboardMatrix animated=
+            DashboardWorldMatrix(input,binding,telemetry);
+        D3DMATRIX out{};
+        std::memcpy(&out.m[0][0],animated.data(),sizeof(D3DMATRIX));
+        return out;
     }
 public:
     GpuOwner()=default;
@@ -349,10 +373,13 @@ public:
     // duplicates these fixed-function DrawIndexedPrimitive calls per eye.
     GpuDrawResult DrawNativeScene(IDirect3DDevice9* device,
                     const D3DMATRIX& world,const D3DMATRIX& view,
-                    const D3DMATRIX& projection) noexcept {
+                    const D3DMATRIX& projection,
+                    const DashboardTelemetry& dashboard) noexcept {
         GpuDrawResult result{};
         if(!EnsureResources(device))return result;
-        result.receipt.expectedMeshes=static_cast<std::uint32_t>(meshes_.size());
+        for(const auto& mesh:meshes_)
+            if(DashboardMeshVisible(DashboardFor(mesh),dashboard))
+                ++result.receipt.expectedMeshes;
         IDirect3DStateBlock9* saved=nullptr;
         if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&saved))||!saved)
             return result;
@@ -430,9 +457,14 @@ public:
             -(view._41*view._21+view._42*view._22+view._43*view._23),
             -(view._41*view._31+view._42*view._32+view._43*view._33)};
         if(SUCCEEDED(hr))for(const auto& m:meshes_) {
+            const DashboardBinding* binding=DashboardFor(m);
+            if(!DashboardMeshVisible(binding,dashboard))continue;
+            const D3DMATRIX meshWorld=AnimatedWorld(world,binding,dashboard);
             // Opaque first, then tagged translucent glass. Transparent glass
             // must not write the depth buffer or hide the track from cockpit.
-            if(FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE)) ||
+            if(FAILED(device->SetTransform(D3DTS_WORLD,&meshWorld)) ||
+               (pbrReady_ && FAILED(pbrShaders_.SetWorld(device,meshWorld))) ||
+               FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE)) ||
                FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE)) ||
                FAILED(device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA)) ||
                FAILED(device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA)) ||

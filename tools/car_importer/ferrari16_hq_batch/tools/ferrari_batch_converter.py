@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed, no-LOD glTF/GLB -> OutRun experimental OVRCABH3 sidecars.
+"""Fail-closed, no-LOD glTF/GLB -> OutRun experimental OVRCABH4 sidecars with optional live dashboard bindings.
 
 This is an OFFLINE conversion tool, not a game-ready installer. Only explicitly
 provided GLBs with attested car_id/source SHA and verified game coordinate
@@ -312,9 +312,71 @@ class Geometry:
     material: int
     vertices: np.ndarray
     indices: np.ndarray
+    binding: int = -1
 
 
-def collect_groups(g, binary, placement, texture_records):
+DASH_KIND = {'speed': 1, 'rpm': 2, 'gear': 3}
+
+
+def parse_dashboard_bindings(g, metadata):
+    """Resolve explicit GLB node -> live dashboard records without name guessing."""
+    config = metadata.get('dashboard', {})
+    raw = config.get('bindings', []) if isinstance(config, dict) else []
+    ensure(isinstance(raw, list) and len(raw) <= 128, 'dashboard bindings must be a bounded list')
+    nodes = g.get('nodes', [])
+    names = {}
+    for i, node in enumerate(nodes):
+        name = node.get('name')
+        if isinstance(name, str) and name:
+            names.setdefault(name, []).append(i)
+    node_to_binding = {}
+    records = []
+    for item in raw:
+        ensure(isinstance(item, dict), 'dashboard binding must be an object')
+        name = item.get('node')
+        kind_name = item.get('kind')
+        ensure(isinstance(name, str) and name, 'dashboard node name missing')
+        ensure(kind_name in DASH_KIND, 'dashboard kind must be speed/rpm/gear')
+        ids = names.get(name, [])
+        ensure(len(ids) == 1, 'dashboard node must resolve exactly once: '+name)
+        node_id = ids[0]
+        ensure('mesh' in nodes[node_id], 'dashboard node has no mesh: '+name)
+        ensure(node_id not in node_to_binding, 'dashboard node bound twice: '+name)
+        kind = DASH_KIND[kind_name]
+        rec = dict(node=name, kind=kind, gear=0, pivot=[0.,0.,0.],
+                   axis=[0.,0.,1.], input=[0.,1.], angle_rad=[0.,0.])
+        if kind == 3:
+            gear = item.get('gear')
+            ensure(isinstance(gear, int) and 0 <= gear <= 7, 'gear binding requires gear 0..7')
+            rec['gear'] = gear
+        else:
+            pivot = item.get('pivot')
+            axis = item.get('axis')
+            input_range = item.get('input')
+            angle_deg = item.get('angle_deg')
+            ensure(isinstance(pivot, list) and len(pivot) == 3, 'dashboard pivot requires xyz')
+            ensure(isinstance(axis, list) and len(axis) == 3, 'dashboard axis requires xyz')
+            ensure(isinstance(input_range, list) and len(input_range) == 2, 'dashboard input requires min/max')
+            ensure(isinstance(angle_deg, list) and len(angle_deg) == 2, 'dashboard angle_deg requires min/max')
+            vals = [float(v) for v in pivot+axis+input_range+angle_deg]
+            ensure(all(math.isfinite(v) for v in vals), 'dashboard binding contains nonfinite value')
+            ensure(max(abs(float(v)) for v in pivot) < 10000, 'dashboard pivot outside model bounds')
+            axis = [float(v) for v in axis]
+            axis_len = math.sqrt(sum(v*v for v in axis))
+            ensure(.99 <= axis_len <= 1.01, 'dashboard axis must be normalized')
+            input_range = [float(v) for v in input_range]
+            ensure(input_range[1] > input_range[0], 'dashboard input range invalid')
+            angle_deg = [float(v) for v in angle_deg]
+            ensure(max(abs(v) for v in angle_deg) <= 720, 'dashboard angle exceeds safety bound')
+            rec.update(pivot=[float(v) for v in pivot], axis=axis,
+                       input=input_range,
+                       angle_rad=[math.radians(v) for v in angle_deg])
+        node_to_binding[node_id] = len(records)
+        records.append(rec)
+    return node_to_binding, records
+
+
+def collect_groups(g, binary, placement, texture_records, node_bindings):
     materials = g.get('materials', [])
     ensure(1 <= len(materials) <= MAX_MATERIALS, 'material limit (1-64) exceeded')
     parts = defaultdict(list)
@@ -364,17 +426,17 @@ def collect_groups(g, binary, placement, texture_records):
             ensure(len(uv) == len(pos) and len(normals) == len(pos), 'attribute vertex count mismatch')
             vertex = np.concatenate((xyz.astype(np.float32), normals.astype(np.float32), uv), axis=1)
             ensure(vertex.shape[1] == 8, 'D3D9 FVF stride mismatch')
-            parts[mid].append((vertex, index))
+            parts[(mid, node_bindings.get(node_id, -1))].append((vertex, index))
             count_triangles += len(index)//3
             count_primitives += 1
             ensure(count_triangles <= MAX_TRIANGLES, 'total triangles exceed native sidecar budget')
     ensure(count_triangles > 0 and count_primitives > 0, 'empty model')
     output = []
     batchid = 0
-    for mid in sorted(parts, key=lambda k: (texture_records[k][-1], k)):
+    for mid, binding in sorted(parts, key=lambda k: (texture_records[k[0]][-1], k[0], k[1])):
         transp = texture_records[mid][-1]
         name_prefix = 'EXT_GLASS_' if transp else 'EXT_OPAQUE_'
-        for vertex, inds in parts[mid]:
+        for vertex, inds in parts[(mid, binding)]:
             # The model contains original vertex positions and indexed triangles.
             # Split only at 1M vertices/group, NEVER decimate triangles.
             for ix in range(0, len(inds), 3*250_000):
@@ -383,7 +445,8 @@ def collect_groups(g, binary, placement, texture_records):
                 geom = vertex[used]
                 ensure(len(geom) <= MAX_VERTEX, 'mesh group exceeds native vertex budget')
                 output.append(Geometry(name_prefix+f'{mid:02d}_{batchid:03d}', mid,
-                                       geom.astype('<f4', copy=False), mapped.astype('<u4', copy=False)))
+                                       geom.astype('<f4', copy=False), mapped.astype('<u4', copy=False),
+                                       binding))
                 batchid += 1
                 ensure(batchid <= MAX_GROUPS, 'draw group count exceeds sidecar limit')
     ensure(len(output) > 0, 'no drawable meshes')
@@ -395,7 +458,8 @@ def encode_sidecar(g, binary, metadata):
     ensure(len(matrix) == 16, 'explicit 4x4 source-to-game matrix required')
     materials = g.get('materials', [])
     texture_records = [get_material_textures(g, binary, mat) for mat in materials]
-    groups, triangle_count, bounds = collect_groups(g, binary, matrix, texture_records)
+    node_bindings, dashboard_specs = parse_dashboard_bindings(g, metadata)
+    groups, triangle_count, bounds = collect_groups(g, binary, matrix, texture_records, node_bindings)
     ensure(metadata.get('geometry_space') == 'outrun_local_y_up_meters',
            'only verified game-local metre coordinates accepted')
     # Independent geometry QA: all original triangles appear once in output.
@@ -432,16 +496,26 @@ def encode_sidecar(g, binary, metadata):
             payload.extend(raw)
             gpu_bytes += len(raw)
         normal_count += normal is not None
+    payload.extend(b'OVCDASH4')
+    dashboard_groups = [(mesh_index, dashboard_specs[group.binding])
+                        for mesh_index, group in enumerate(groups) if group.binding >= 0]
+    payload.extend(struct.pack('<I', len(dashboard_groups)))
+    for mesh_index, spec in dashboard_groups:
+        payload.extend(struct.pack(
+            '<4I10f', mesh_index, spec['kind'], spec['gear'], 0,
+            *spec['pivot'], *spec['axis'], *spec['input'], *spec['angle_rad']))
     ensure(nv <= MAX_VERTEX and triangle_count <= MAX_TRIANGLES, 'native geometry cap exceeded')
     ensure(gpu_bytes <= MAX_GPU_BYTES and 36+len(payload) <= MAX_SIDECAR_BYTES,
            f'file exceeds native x86 sidecar budget; lossless compressor/streaming needed (GPU {gpu_bytes:,} bytes)')
-    header = b'OVRCABH3'+struct.pack('<7I', 3, len(groups), len(materials), nv,
+    header = b'OVRCABH4'+struct.pack('<7I', 4, len(groups), len(materials), nv,
                                     triangle_count, len(payload), zlib.crc32(payload) & 0xffffffff)
     result = header+payload
     ensure(len(result) < MAX_SIDECAR_BYTES, 'sidecar exceeds native loader cap')
     return result, dict(triangles=triangle_count, vertices=nv, groups=len(groups),
                         materials=len(materials), glass_triangles=nglass,
                         normal_map_materials=normal_count,
+                        dashboard_nodes=len(dashboard_specs),
+                        dashboard_mesh_bindings=len(dashboard_groups),
                         source_images=len(g.get('images', [])), game_bounds=bounds,
                         gpu_payload_bytes=gpu_bytes)
 
@@ -469,11 +543,15 @@ def audit_entry(root, car, strict_source=False):
                       sha256=actual, origin_type=meta['origin_type'])
         if strict_source:
             g, binary = load_glb(glb)
+            _, dashboard_specs = parse_dashboard_bindings(g, meta)
+            if meta.get('dashboard_required') is True:
+                ensure(dashboard_specs, 'dashboard_required but no verified bindings supplied')
             result.update(source_meshes=len(g.get('meshes', [])),
                           source_materials=len(g.get('materials', [])),
                           source_textures=len(g.get('textures', [])),
-                          source_images=len(g.get('images', [])))
-    except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+                          source_images=len(g.get('images', [])),
+                          dashboard_nodes=len(dashboard_specs))
+    except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
         result.update(status='BLOCKED_SOURCE_QA', reason=str(exc))
     return result
 
@@ -503,7 +581,7 @@ def convert_one(root, car):
     try:
         ovc.write_bytes(output)
         check_output(ovc)
-        summary.update(status='OVRCABH3_STATIC_CONVERSION_PASS_NOT_GAME_TESTED',
+        summary.update(status='OVRCABH4_DASHBOARD_READY_CONVERSION_PASS_NOT_GAME_TESTED',
                        car_id=car['id'], source_sha256=sha256(src),
                        output_sha256=sha256(ovc), output_bytes=len(output),
                        source_scope=meta['model_scope'], runtime_tested=False,
@@ -520,11 +598,14 @@ def convert_one(root, car):
 def check_output(ovc: Path):
     """Second-pass file/data validation, independent of exporter data buffers."""
     raw = ovc.read_bytes()
-    ensure(36 <= len(raw) <= MAX_SIDECAR_BYTES and raw[:8] == b'OVRCABH3', 'not OVC3 file')
+    signature = raw[:8] if len(raw) >= 8 else b''
+    ensure(36 <= len(raw) <= MAX_SIDECAR_BYTES and signature in (b'OVRCABH3', b'OVRCABH4'),
+           'not OVC3/OVC4 file')
     version, groups, materials, vertices, triangles, payload, crc = struct.unpack_from('<7I', raw, 8)
-    ensure(version == 3 and 0 < groups <= MAX_GROUPS and 0 < materials <= MAX_MATERIALS,
-           'invalid OVC3 header')
-    ensure(payload == len(raw)-36 and zlib.crc32(raw[36:]) & 0xffffffff == crc, 'OVC3 CRC mismatch')
+    expected_version = 4 if signature == b'OVRCABH4' else 3
+    ensure(version == expected_version and 0 < groups <= MAX_GROUPS and 0 < materials <= MAX_MATERIALS,
+           'invalid OVC header')
+    ensure(payload == len(raw)-36 and zlib.crc32(raw[36:]) & 0xffffffff == crc, 'OVC CRC mismatch')
     def dds_at(offset, length):
         ensure(length >= 128 and offset+length <= len(raw), 'DDS byte bounds')
         d = memoryview(raw)[offset:offset+length]
@@ -586,9 +667,35 @@ def check_output(ovc: Path):
                 dds_at(p, size)
                 mem += size
                 p += size
+    dashboard_bindings = 0
+    if signature == b'OVRCABH4':
+        ensure(p+12 <= len(raw) and raw[p:p+8] == b'OVCDASH4', 'dashboard extension missing')
+        dashboard_bindings = struct.unpack_from('<I', raw, p+8)[0]
+        p += 12
+        ensure(dashboard_bindings <= groups, 'dashboard binding count invalid')
+        seen = set()
+        for _ in range(dashboard_bindings):
+            ensure(p+56 <= len(raw), 'dashboard record truncated')
+            mesh, kind, gear, reserved, *vals = struct.unpack_from('<4I10f', raw, p)
+            p += 56
+            ensure(mesh < groups and mesh not in seen and kind in (1,2,3) and reserved == 0,
+                   'dashboard record identity invalid')
+            seen.add(mesh)
+            pivot, axis = vals[:3], vals[3:6]
+            inp, angles = vals[6:8], vals[8:10]
+            ensure(all(math.isfinite(v) for v in vals) and max(abs(v) for v in pivot) < 10000,
+                   'dashboard record nonfinite')
+            if kind == 3:
+                ensure(gear <= 7, 'dashboard gear invalid')
+            else:
+                axis_len = sum(v*v for v in axis)
+                ensure(.9801 <= axis_len <= 1.0201 and inp[1] > inp[0] and
+                       max(abs(v) for v in angles) <= 12.566371,
+                       'dashboard needle bounds invalid')
     ensure(p == len(raw) and mem <= MAX_GPU_BYTES, 'OVC trailer or GPU budget invalid')
     return dict(sha256=hashlib.sha256(raw).hexdigest(), groups=groups,
-                materials=materials, vertices=vertices, triangles=triangles, size=len(raw))
+                materials=materials, vertices=vertices, triangles=triangles,
+                dashboard_bindings=dashboard_bindings, size=len(raw))
 
 
 def main(argv=None):
@@ -619,7 +726,7 @@ def main(argv=None):
                 continue
             try:
                 results.append(convert_one(root, car))
-            except (ValueError, OSError) as exc:
+            except (ValueError, TypeError, OSError) as exc:
                 results.append(dict(id=car['id'], status='CONVERSION_BLOCKED', reason=str(exc)))
         print(json.dumps(results, ensure_ascii=False, indent=2))
         if any(r['status'] == 'CONVERSION_BLOCKED' for r in results):
@@ -636,6 +743,6 @@ def main(argv=None):
 if __name__ == '__main__':
     try:
         sys.exit(main())
-    except (ConversionError, OSError, KeyError, json.JSONDecodeError) as e:
+    except (ConversionError, OSError, TypeError, KeyError, json.JSONDecodeError) as e:
         print(f'BLOCKED: {e}', file=sys.stderr)
         sys.exit(2)

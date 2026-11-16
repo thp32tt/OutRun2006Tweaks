@@ -1,6 +1,6 @@
 #pragma once
 // OutRun VR native-PMT-free cockpit sidecars.
-// V1 128px BC1, V2 HQ DDS and V3 optional tangent-space normal/ORM PBR maps.
+// V1 128px BC1, V2 HQ DDS, V3 PBR and V4 PBR + animated dashboard bindings.
 // All offsets and counts are validated before GPU allocation.
 #include <algorithm>
 #include <array>
@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "external_car_dashboard.hpp"
 
 namespace OutRunVR::DinoSidecar {
 constexpr unsigned Groups=70, Materials=19, Vertices=21100, Triangles=38992;
@@ -45,8 +46,9 @@ struct Model {
     std::vector<Mesh> meshes;
     std::vector<Texture> textures;
     std::vector<PbrMaterial> pbrMaterials;
+    std::vector<DashboardBinding> dashboardBindings;
     unsigned vertices=0,triangles=0;
-    bool highQuality=false,pbrEnabled=false;
+    bool highQuality=false,pbrEnabled=false,dashboardEnabled=false;
 };
 inline unsigned U32(const std::uint8_t* p) noexcept {
     return unsigned(p[0])|(unsigned(p[1])<<8)|(unsigned(p[2])<<16)|(unsigned(p[3])<<24);
@@ -117,10 +119,12 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
     const bool legacy=std::memcmp(d,"OVRCAB15",8)==0;
     const bool v2=std::memcmp(d,"OVRCABH2",8)==0;
     const bool v3=std::memcmp(d,"OVRCABH3",8)==0;
-    if(!legacy && !v2 && !v3)return fail("sidecar signature");
+    const bool v4=std::memcmp(d,"OVRCABH4",8)==0;
+    if(!legacy && !v2 && !v3 && !v4)return fail("sidecar signature");
     const unsigned version=U32(d+8),groups=U32(d+12),materials=U32(d+16);
     const unsigned vertices=U32(d+20),triangles=U32(d+24);
-    if(version!=(legacy?1u:(v2?2u:3u)) || groups==0 || materials==0 ||
+    const unsigned expectedVersion=legacy?1u:(v2?2u:(v3?3u:4u));
+    if(version!=expectedVersion || groups==0 || materials==0 ||
        groups>MaxGroups || materials>MaxMaterials ||
        vertices>MaxVertices || triangles>MaxTriangles ||
        (legacy && (groups!=Groups || materials!=Materials ||
@@ -129,7 +133,8 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
         return fail("sidecar header/CRC");
     Model parsed;
     parsed.highQuality=!legacy;
-    parsed.pbrEnabled=v3;
+    parsed.pbrEnabled=v3||v4;
+    parsed.dashboardEnabled=v4;
     parsed.meshes.reserve(groups);
     std::size_t pos=36,bytesGpu=0;
     std::uint64_t nv=0,nt=0;
@@ -192,7 +197,7 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
         parsed.textures.push_back(std::move(texture));
         pos+=len;
     }
-    if(v3) {
+    if(v3 || v4) {
         constexpr char pbrMagic[]="OVCPBR3!";
         if(!Bounds(pos,8,size) || std::memcmp(d+pos,pbrMagic,8)!=0)
             return fail("pbr extension");
@@ -223,6 +228,35 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
                 pos+=len;
             }
             parsed.pbrMaterials.push_back(std::move(mat));
+        }
+    }
+    if(v4) {
+        constexpr char dashMagic[]="OVCDASH4";
+        if(!Bounds(pos,12,size) || std::memcmp(d+pos,dashMagic,8)!=0)
+            return fail("dashboard extension");
+        const unsigned bindings=U32(d+pos+8);
+        pos+=12;
+        if(bindings>MaxGroups)return fail("dashboard binding count");
+        parsed.dashboardBindings.reserve(bindings);
+        std::vector<bool> meshBound(groups,false);
+        for(unsigned i=0;i<bindings;++i) {
+            constexpr std::size_t RecordBytes=56;
+            if(!Bounds(pos,RecordBytes,size))
+                return fail("dashboard binding record");
+            DashboardBinding b;
+            b.meshIndex=U32(d+pos);
+            b.kind=static_cast<DashboardKind>(U32(d+pos+4));
+            b.gear=U32(d+pos+8);
+            if(U32(d+pos+12)!=0u)return fail("dashboard reserved field");
+            for(unsigned k=0;k<3;++k)b.pivot[k]=F32(d+pos+16+k*4u);
+            for(unsigned k=0;k<3;++k)b.axis[k]=F32(d+pos+28+k*4u);
+            b.inputMin=F32(d+pos+40);b.inputMax=F32(d+pos+44);
+            b.angleMinRad=F32(d+pos+48);b.angleMaxRad=F32(d+pos+52);
+            pos+=RecordBytes;
+            if(!ValidDashboardBinding(b,groups) || meshBound[b.meshIndex])
+                return fail("dashboard binding bounds");
+            meshBound[b.meshIndex]=true;
+            parsed.dashboardBindings.push_back(b);
         }
     }
     if(pos!=size)return fail("trailing sidecar data");

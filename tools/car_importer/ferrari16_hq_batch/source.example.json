@@ -1,0 +1,41 @@
+{
+  "car_id": "REPLACE_WITH_REGISTRY_ID",
+  "source_sha256": "REPLACE_WITH_64_HEX_SHA256",
+  "geometry_space": "outrun_local_y_up_meters",
+  "alignment_verified": false,
+  "model_scope": "full_car",
+  "origin_type": "external_mod",
+  "rights_note": "USER_MUST_VERIFY",
+  "external_to_game_matrix": [
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 1.0
+  ],
+  "dashboard_required": true,
+  "dashboard": {
+    "bindings": [
+      {
+        "node": "REPLACE_SPEED_NEEDLE_NODE",
+        "kind": "speed",
+        "pivot": [0.0, 0.0, 0.0],
+        "axis": [0.0, 0.0, 1.0],
+        "input": [0.0, 320.0],
+        "angle_deg": [-130.0, 130.0]
+      },
+      {
+        "node": "REPLACE_RPM_NEEDLE_NODE",
+        "kind": "rpm",
+        "pivot": [0.0, 0.0, 0.0],
+        "axis": [0.0, 0.0, 1.0],
+        "input": [0.0, 10000.0],
+        "angle_deg": [-130.0, 130.0]
+      },
+      {
+        "node": "REPLACE_GEAR_1_NODE",
+        "kind": "gear",
+        "gear": 1
+      }
+    ]
+  }
+}
