@@ -29,6 +29,7 @@ on:
       - 'tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp'
       - 'tools/verify_quest_cockpit_passenger_runtime.py'
       - 'src/overlay/settings_ui.cpp'
+      - 'src/plugin.hpp'
       - 'src/vr/game/quest_cockpit_v2_visibility.hpp'
       - 'tools/tests/quest_cockpit_v2_occupant_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp'
@@ -118,9 +119,9 @@ jobs:
             tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp \
             -o /tmp/quest-v2-arm64-parity
           /tmp/quest-v2-arm64-parity
-      - name: Check cockpit passenger event lifecycle and F11 wiring
+      - name: Verify camera-0 passenger parity and F11 exclusive checkboxes
         run: python3 tools/verify_quest_cockpit_passenger_runtime.py
-      - name: Original ROB02 passenger START gating regression
+      - name: Native ROB02 follow/remove policy C++ regression
         run: |
           c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
             tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp \
