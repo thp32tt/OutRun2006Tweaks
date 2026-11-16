@@ -192,6 +192,56 @@ class StaleAssistantReadOnlyRefreshTests(unittest.IsolatedAsyncioTestCase):
             tmp.cleanup()
 
 
+class CorrectImageGenPreverifiedBranchTests(unittest.IsolatedAsyncioTestCase):
+    async def test_preverified_ab_skips_c1_only_chip_guard(self):
+        t=task()
+        page=MagicMock()
+        page.locator.side_effect=AssertionError("C1_CHIP_GUARD_MUST_NOT_RUN")
+        with patch.object(bridge,"clear_attachment_previews",
+                          new=AsyncMock(return_value="HOLD_DIAGNOSTIC_PRE_SEND")),\\
+             patch.object(bridge,"ensure_image_tool",new=AsyncMock()) as selector:
+            worker=bridge.ChatBridge(FakeGithub(), MagicMock())
+            result=await worker.send_with_png(
+                page,t,"Korean","source",True,image_tool_preverified=True)
+        self.assertEqual(result,"HOLD_COMPOSER_ATTACHMENTS_NOT_CLEAR")
+        page.locator.assert_not_called()
+        selector.assert_not_awaited()
+
+    async def test_actual_c1_send_still_rejects_imagegen_tool_chip(self):
+        t=task()
+        page=MagicMock()
+        chip=MagicMock()
+        chip.count=AsyncMock(return_value=1)
+        page.locator.return_value=chip
+        worker=bridge.ChatBridge(FakeGithub(),MagicMock())
+        with patch.object(bridge,"clear_attachment_previews",
+                          new=AsyncMock()) as clear:
+            result=await worker.send_with_png(
+                page,t,"C1","source",False,image_tool_preverified=False)
+        self.assertEqual(result,"HOLD_C1_IMAGE_TOOL_SELECTED")
+        clear.assert_not_awaited()
+
+    def test_exact_old_ab_preverified_bug_hold_recoverable_without_resend_proof(self):
+        t=task()
+        old=hold(t,hold_reason="HOLD_C1_IMAGE_TOOL_SELECTED",
+                 pre_send_no_message=False)
+        self.assertTrue(bridge.image_tool_pre_send_retry_safe(old,t))
+        self.assertTrue(bridge.image_tool_pre_send_retry_due(
+            old,dt.datetime(2026,11,16,1,tzinfo=dt.timezone.utc)))
+        # A C1 attempt, a prior candidate, a chat send or a non-exact
+        # task MUST NEVER inherit the safe A/B regression exemption.
+        for changed in (
+            {"candidate_sha256":"e"*64},
+            {"ab_chat_url":"https://chatgpt.com/c/old"},
+            {"pre_send_no_message":True},
+            {"task_id":"HDRW-A-"+"2"*20},
+            {"status":"AB_CLAIMED"},
+        ):
+            self.assertFalse(bridge.image_tool_pre_send_retry_safe(
+                hold(t,hold_reason="HOLD_C1_IMAGE_TOOL_SELECTED",
+                     pre_send_no_message=False,**changed),t))
+
+
 class CurrentChatGPTImagesMenuTests(unittest.IsolatedAsyncioTestCase):
     async def _ui(self,selected_on_click):
         page=MagicMock()
