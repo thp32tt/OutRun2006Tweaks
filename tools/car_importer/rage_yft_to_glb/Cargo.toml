@@ -1,0 +1,12 @@
+[package]
+name = "rage-yft-to-glb"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+rage-formats = { git = "https://github.com/VIRUXE/rage-formats.git", rev = "f31f11b137ac14884ff5ea5d8209755f6cd03e9b" }
+rage-render = { git = "https://github.com/VIRUXE/rage-render.git", rev = "9d7977a011cbe8808f1adb62f32363effffe9a50" }
+
+[patch.crates-io]
+rage-formats = { git = "https://github.com/VIRUXE/rage-formats.git", rev = "f31f11b137ac14884ff5ea5d8209755f6cd03e9b" }
