@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Source-level passenger event lifecycle checks for the Quest cockpit test branch.
+"""Native camera-0 parity and removal static proof for cockpit passenger.
 
-Complements (does not replace) the C++ pure-gate tests and the real Quest 3
-runtime test. No claim about GPU visibility can be inferred from source alone.
+The game decides whether its original ROB02 exists, independently of camera.
+No code may fabricate ROB02 or claim a GPU screenshot without HMD evidence.
+Run without args for source checks or --exe PATH for canonical PC ABI proof.
 """
 from pathlib import Path
-import re
 
 hook = Path("src/hooks_graphics.cpp").read_text(encoding="utf-8")
 settings = Path("src/vr/settings.cpp").read_text(encoding="utf-8")
@@ -14,97 +14,66 @@ ini = Path("OutRun2006Tweaks.ini").read_text(encoding="utf-8")
 policy = Path("src/vr/game/quest_cockpit_v2_passenger_event.hpp").read_text(
     encoding="utf-8"
 )
-assert "class QuestCockpitV2PassengerStartEvent final : public Hook" in hook
-start = hook.split("class QuestCockpitV2PassengerStartEvent final : public Hook", 1)[1]
-start = start.split("class QuestCockpitV2PlayerCandidateProbe final : public Hook", 1)[0]
+plugin = Path("src/plugin.hpp").read_text(encoding="utf-8")
 owner = hook.split("ExactOriginalCockpitOccupant(EvWorkRobot* robot) noexcept {", 1)[1]
 owner = owner.split("static bool OriginalRobotDrawSignature()", 1)[0]
 render = hook.split("static void __cdecl RobotDisplay(EvWorkRobot* robot)", 1)[1]
 render = render.split("static void PlayerState(SafetyHookContext& ctx)", 1)[0]
 
-# Source provenance: the original PC START successor is event 0x16C/0x3B;
-# 0x16B/0x39 installs the game's original passenger callbacks.
-assert "OriginalPassengerEventId=0x16bu;" in policy
-assert "OriginalPassengerFunctionId=0x39u;" in policy
-assert "OriginalStartAfterPassengerEventId=0x16cu;" in policy
-assert "OriginalStartAfterPassengerFunctionId=0x3bu;" in policy
-assert "static constexpr int EventSetupRva=0x40110" in start
-assert "Settings::VRQuestCockpitV2PassengerVisible" in start
-assert "*Game::current_mode==STATE_START" in start
-assert "NativeOriginalHooksReady.load(std::memory_order_acquire)" in start
-assert "driver->EventFunc.Disp==originalDisplay" in start
-# Canonical game 440110 uses a *separate* flag array at VA 0x79FB48.
+# The native game, not the mod, creates ROB02 at stage 60 when required.
+assert "class QuestCockpitV2PassengerStartEvent final : public Hook" not in hook
+assert "ShouldOpenMissingPassenger(" not in hook + policy
+assert "SetupHook.ccall<void>(\n                    OriginalPassengerEventId" not in hook
 assert "OriginalEventFlagsRva=0x39fb48u;" in policy
-assert "OriginalDriverEventId=0x16au;" in policy
-assert "OriginalEventScheduled(eventFlags[OriginalDriverEventId])" in start
-assert "OriginalPassengerVacant(" in start
-assert "eventFlags[OriginalPassengerEventId]" in start
-assert "passengerOccupied" in start
-assert "OriginalLicenceSlotRva=0x3c2400u;" in policy
-assert "OriginalPassengerCharacterIndexValid(*licenceSlot)" in start
-assert "Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva)" in start
-assert "field_0 &" not in start
-assert "ShouldOpenMissingPassenger(" in start
-
-# Only one conditional passenger setup, followed by the *unchanged* original
-# requested setup. No extra work allocation, player-state mutation, or render
-# redirection is allowed here.
-request = "SetupHook.ccall<void>(\n                    OriginalPassengerEventId,OriginalPassengerFunctionId);"
-forward = "SetupHook.ccall<void>(eventId,functionId);"
-assert start.count("SetupHook.ccall<void>") == 2
-assert request in start and forward in start
-assert start.index(request) < start.index(forward)
-# Verified 27-byte canonical EXE entry 0x440110 is __cdecl (C3 epilogue).
-# The signature includes its separate flag-array read + write instructions.
-sig_match = re.search(
-    r"constexpr std::array<std::uint8_t,27> signature\{\{(.*?)\}\};",
-    start, re.S
-)
-assert sig_match, "missing exact original event setup signature"
-signature = bytes(int(x, 16) for x in re.findall(r"0x([0-9A-Fa-f]{2})", sig_match.group(1)))
-assert signature.hex() == "8b5424048a8a48fb790080e1e78bc280c9016bc03c888a48fb7900"
-assert "VirtualQuery(entry,&info,sizeof(info))" in start
-assert "!std::equal(signature.begin(),signature.end(),entry)" in start
-assert 'return "VRQuestCockpitV2PassengerStartEvent";' in start
-assert "auto setup=safetyhook::create_inline(entry,EventSetup);" in start
-assert "SetupHook=std::move(setup);" in start
-assert "const bool queued=eventFlags && passenger &&" in start
-assert "OriginalEventSetupAccepted(" in start
-assert "eventFlags[OriginalPassengerEventId]" in start
-assert "passenger->EventFunc.Disp==originalDisplay" in start
-assert "setup rejected" in start
-assert "original ROB02/0x39 accepted" not in start or "if(queued)" in start
-
-# The original event work callbacks and work tokens outlive the active slot.
-# Only a live event bit (0x02), without destroy pending (0x04), may own a draw.
+assert "OriginalPassengerEventId=0x16bu;" in policy
+assert "OriginalEventLiveForDisplay(std::uint8_t flags)" in policy
 assert "OriginalEventLiveForDisplay(eventFlags[OriginalDriverEventId])" in owner
 assert "OriginalEventLiveForDisplay(eventFlags[OriginalPassengerEventId])" in owner
 assert "Module::exe_ptr<std::uint8_t>(OriginalEventFlagsRva)" in owner
-assert "OriginalEventLiveForDisplay(std::uint8_t flags)" in policy
-# Renderer must preserve driver hiding, exact ROB02 ownership, native LOD0,
-# and the original fallback. The callback log is evidence of callback entry,
-# explicitly not a claim of GPU visibility.
-assert "ExactOriginalCockpitOccupant(robot)" in render
-assert "if(action==CockpitOccupantRender::SuppressDriver)return;" in render
-assert "slot==OriginalOccupantSlot::Passenger363" in render
-assert "display callback observed" in render
-assert "not proof" in render.lower() or "NOT proof" in render
-assert "ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);" in render
-assert "RobotHook.ccall<void>(robot);" in render
 
-# F11 must remain live, user-INI-persistent, and searchable by its displayed
-# name. Default ON is only for configured cockpit; non-cockpit is original.
+# The REMOVE gate precedes camera!=1 and native-frame early returns:
+# exact live ROB02 disappears from camera 0 AND cockpit, without touching
+# driver, unrelated NPC, original event setup, animation or work pointers.
+assert "const auto slot=ExactOriginalCockpitOccupant(robot);" in render
+assert "ShouldSuppressOriginalPassenger(" in render
+assert "slot==OriginalOccupantSlot::Passenger363" in render
+assert render.index("ShouldSuppressOriginalPassenger(") < render.index(
+    "if(!NativeFrameTrace().Active() || InSceneEffect())"
+)
+assert render.index("ShouldSuppressOriginalPassenger(") < render.index(
+    "camera->cam_mode_34A!=1"
+)
+assert "return;" in render.split("ShouldSuppressOriginalPassenger(", 1)[1].split(
+    "if(!NativeFrameTrace().Active()", 1
+)[0]
+assert "RobotHook.ccall<void>(robot);" in render
+assert "SelectCockpitOccupantRender(" in render
+assert "ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);" in render
+
+# One persistent bool drives two checkboxes; complement guarantees exactly
+# one selected even when an existing user INI supplies the older key.
 assert 'VRQuestCockpitV2PassengerVisible{ "VR", "QuestCockpitV2PassengerVisible", true,' in settings
 assert "QuestCockpitV2PassengerVisible = true" in ini
-assert 'matches_search("Passenger Always Visible", search)' in overlay
-assert '? "Passenger Always Visible" : setting->key());' in overlay
-assert "queue_setting_change(setting);" in overlay
+assert "VRQuestCockpitV2PassengerVisible.hidden(true);" in overlay
+assert 'ImGui::Checkbox("Passenger: Follow Camera 0",&follow)' in overlay
+assert 'ImGui::Checkbox("Passenger: Remove",&remove)' in overlay
+assert "bool remove=!Settings::VRQuestCockpitV2PassengerVisible.get();" in overlay
+assert "Settings::VRQuestCockpitV2PassengerVisible=follow;" in overlay
+assert "Settings::VRQuestCockpitV2PassengerVisible=!remove;" in overlay
+assert overlay.count("queue_setting_change(&Settings::VRQuestCockpitV2PassengerVisible)") == 2
+assert "VRQuestCockpitV2PassengerVisible;" in plugin
 assert "flush_settings();" in overlay
-print("PASS: original ROB02 setup, hook ordering, postcondition, renderer, F11")
+assert 'matches_search("Remove Passenger",search)' in overlay
 
-# Optional CI binary contract: Windows Build downloads the actual upstream
-# replacement EXE and proves the addresses and callbacks above are native,
-# not merely textual assumptions.
+print("PASS: native camera-0 ROB02 parity, both-view removal, F11 exclusive mode")
+
+# Actual game entrypoint 0x440110 reads 0x79FB48[eventId], cdecl, and its
+# callbacks are identified by the exact original native table. It is not
+# hooked by this mode; this constant exists solely for binary contract QA.
+signature=bytes.fromhex(
+    "8b5424048a8a48fb790080e1e78bc280c9016bc03c888a48fb7900"
+)
+
 if __name__ == "__main__":
     import hashlib
     import struct
