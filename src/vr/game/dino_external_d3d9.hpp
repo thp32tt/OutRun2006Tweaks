@@ -181,7 +181,7 @@ class GpuOwner final {
         float lowest=10000.f;
         for(const auto& mesh:next.meshes)
             for(const auto& vertex:mesh.vertices)
-                lowest=std::min(lowest,vertex.y);
+                lowest=(std::min)(lowest,vertex.y);
         float validatedLift=0.f;
         if(!ComputeExternalFloorLift(0.22f,lowest,validatedLift))
             return false; // invalid scale/axis: retain original car
