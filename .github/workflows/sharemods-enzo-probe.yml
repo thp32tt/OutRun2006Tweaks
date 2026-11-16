@@ -5,7 +5,7 @@ on:
     branches:
       - vr-quest-cockpit-v2-external-dino-actions-20261116
     paths:
-      - '.github/workflows/modsfire-enzo-probe.yml'
+      - '.github/workflows/sharemods-enzo-probe.yml'
   workflow_dispatch:
 
 permissions:
