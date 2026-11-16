@@ -1200,24 +1200,27 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             RobotHook.ccall<void>(robot);
             return;
         }
+        // Camera 0, menu and all other non-cockpit views are ALWAYS native:
+        // the "Remove" option must never suppress third-person ROB02.
+        const EvWorkCamera* camera=Game::camera();
+        if(!camera || camera->cam_mode_34A!=1 || !Game::pl_car()) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
         const auto slot=ExactOriginalCockpitOccupant(robot);
-        // "Remove" hides only the exact, currently live original ROB02 draw,
-        // in BOTH camera 0 and cockpit camera 1. Do not mutate guest work,
-        // close the event, affect ROB01/NPCs or suppress GOAL/menu graphics.
+        // Hide only the exact live original passenger in cockpit mode 1.
+        // No event teardown, altered animation, driver/NPC suppression or
+        // changes to the third-person camera-0 rendering path.
         if(ShouldSuppressOriginalPassenger(
                 Settings::VREnabled.get(),
                 Settings::VRQuestCockpitV2Enabled.get(),
                 Settings::VRQuestCockpitV2PassengerVisible.get(),
                 IsPlayableCarGameplay(),
+                camera->cam_mode_34A==1,
                 slot==OriginalOccupantSlot::Passenger363)) {
             return;
         }
         if(!NativeFrameTrace().Active() || InSceneEffect()) {
-            RobotHook.ccall<void>(robot);
-            return;
-        }
-        const EvWorkCamera* camera=Game::camera();
-        if(!camera || camera->cam_mode_34A!=1 || !Game::pl_car()) {
             RobotHook.ccall<void>(robot);
             return;
         }
