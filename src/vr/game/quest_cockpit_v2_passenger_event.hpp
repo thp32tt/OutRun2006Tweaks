@@ -1,5 +1,6 @@
-// Optional cockpit-only original ROB02 setup. Pure gate deliberately separates
-// native start-event admission from guest-memory access and function hooks.
+// Original ROB02 event identity and render-only passenger policy.
+// Camera 0 owns the native passenger decision; camera 1 follows that result.
+// Never synthesize a missing event or mutate/close native passenger work.
 #pragma once
 #include <cstdint>
 namespace OutRunVR::QuestCockpitV2 {
@@ -38,15 +39,14 @@ inline constexpr std::uint32_t OriginalPassengerEventId=0x16bu;
 inline constexpr std::uint32_t OriginalPassengerFunctionId=0x39u;
 inline constexpr std::uint32_t OriginalStartAfterPassengerEventId=0x16cu;
 inline constexpr std::uint32_t OriginalStartAfterPassengerFunctionId=0x3bu;
-inline constexpr bool ShouldOpenMissingPassenger(
-    bool vrEnabled,bool cockpitEnabled,bool keepPassenger,
-    bool originalHooksReady,bool startMode,
-    std::uint32_t eventId,std::uint32_t functionId,
-    bool driverEventReady,bool passengerEventActive) noexcept {
-    return vrEnabled && cockpitEnabled && keepPassenger &&
-        originalHooksReady && startMode &&
-        eventId==OriginalStartAfterPassengerEventId &&
-        functionId==OriginalStartAfterPassengerFunctionId &&
-        driverEventReady && !passengerEventActive;
+// The caller must pass an exact LIVE original ROB02 owner, established
+// from 0x79FB48 flag 0x02 plus the 4879B0 callback and work pointer.
+// Hide mode affects the original ROB02 draw in either camera, while the
+// follow mode admits only a character already present in camera 0.
+inline constexpr bool ShouldSuppressOriginalPassenger(
+    bool vrEnabled,bool cockpitEnabled,bool followCamera0,
+    bool gameplay,bool exactLivePassenger) noexcept {
+    return vrEnabled && cockpitEnabled && !followCamera0 &&
+        gameplay && exactLivePassenger;
 }
 }
