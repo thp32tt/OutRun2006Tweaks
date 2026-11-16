@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-17",
+  "car_id": "f355spider",
+  "source_archive_sha256": "37948adda656fc5935ef5ede748f034cc2fa4bc01b9ec392a7ad3858afcef99d",
+  "external_glb_sha256": "17fb06c9cc36391067b51c6590d2a36f8a580ffee32bbde36cc5162fe2dfe83f",
+  "alignment": {
+    "method": "four-wheel axle-center fit to original OutRun F355 PMT reconstructed topology",
+    "scale": 0.9813018122729475,
+    "translation": [
+      0,
+      0.630896449028058,
+      0.3200860824374927
+    ],
+    "native_front_wheel_center_yz": [
+      0.3974926325,
+      -1.0578275019999999
+    ],
+    "native_rear_wheel_center_yz": [
+      0.410729811,
+      1.355962995
+    ],
+    "external_front_wheel_center_yz": [
+      -0.242646,
+      -1.404169
+    ],
+    "external_rear_wheel_center_yz": [
+      -0.219567,
+      1.055615
+    ]
+  },
+  "dashboard": {
+    "speed_node": "F355_SPEED_NEEDLE",
+    "rpm_node": "F355_RPM_NEEDLE",
+    "axis_node": [
+      0,
+      0,
+      -1
+    ],
+    "speed_input": [
+      0,
+      320
+    ],
+    "rpm_input": [
+      0,
+      10000
+    ],
+    "angle_deg": [
+      -135,
+      135
+    ],
+    "blender_reopen": "PASS_NAMES_ORIGINS_VERTICES; glTF triangulates each 5-vertex pointer face to 3 triangles"
+  },
+  "preprocessing": {
+    "normal_scale_clamped": [
+      {
+        "materials": [
+          "Material_3",
+          "Material_6",
+          "Material_13",
+          "Material_14",
+          "Material_16"
+        ],
+        "from": 3,
+        "to": 2
+      }
+    ],
+    "npot_upscale": [
+      {
+        "image": "Image_5",
+        "from": [
+          2048,
+          210
+        ],
+        "to": [
+          2048,
+          256
+        ]
+      },
+      {
+        "image": "Image_24",
+        "from": [
+          1957,
+          2048
+        ],
+        "to": [
+          2048,
+          2048
+        ]
+      },
+      {
+        "image": "Image_47",
+        "from": [
+          684,
+          504
+        ],
+        "to": [
+          1024,
+          512
+        ]
+      }
+    ],
+    "note": "No texture downscale and no mesh decimation."
+  },
+  "conversion": {
+    "audit_strict": "PASS",
+    "convert": "PASS",
+    "verify": "PASS",
+    "status": "OVRCABH4_DASHBOARD_READY_CONVERSION_PASS_NOT_GAME_TESTED",
+    "triangles": 444977,
+    "vertices": 381456,
+    "groups": 42,
+    "materials": 41,
+    "glass_triangles": 12236,
+    "normal_map_materials": 12,
+    "dashboard_nodes": 2,
+    "dashboard_mesh_bindings": 2,
+    "source_images": 52,
+    "gpu_payload_bytes": 98435936,
+    "output_bytes": 98438465,
+    "output_sha256": "9429bca61dbbd8dcef401690d3a4f33dfc9ca2138c97641b70c32c154ede578b",
+    "game_bounds": [
+      [
+        -0.9573119034460489,
+        0.09278459132240258,
+        -1.4519150016585685
+      ],
+      [
+        0.9573119034460489,
+        1.2158603758836808,
+        2.7988872371808995
+      ]
+    ]
+  },
+  "rights": "PRIVATE_PERSONAL_CONVERSION_ONLY_NO_REDISTRIBUTION; upstream page/archive checked, no explicit cross-game prohibition found; third-party asset provenance not fully verified",
+  "runtime_tested": false,
+  "scope_boundary": "Static verifier PASS; OutRun/Quest3 live rendering and visual sweep calibration remain pending."
+}
