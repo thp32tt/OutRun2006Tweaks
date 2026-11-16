@@ -97,7 +97,7 @@ def main():
         directory=str(mdl.parent),
         files=[{"name": mdl.name}],
         discover_resources=True,
-        scale=0.0254,
+        scale=0.01905,
         import_physics=False,
         import_textures=True,
         bodygroup_grouping=True,
@@ -155,6 +155,7 @@ def main():
     )
     for root in roots:
         root.matrix_world = transform @ root.matrix_world
+    bpy.context.view_layer.update()
 
     after_lo, after_hi = scene_bounds(meshes)
     dims = after_hi - after_lo
