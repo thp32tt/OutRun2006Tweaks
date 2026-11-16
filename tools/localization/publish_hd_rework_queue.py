@@ -69,21 +69,33 @@ def content_path(rel):
     return "/repos/"+REPO+"/contents/"+PREFIX+"/"+rel
 
 
+def read_exact(endpoint, token):
+    """Read a queue file exactly even when Contents returns encoding=none."""
+    meta=api(endpoint+"?ref="+BRANCH,token)
+    if meta is None:
+        return None,None
+    blob_sha=meta.get("sha")
+    if not isinstance(blob_sha,str) or not re.fullmatch(r"[0-9a-f]{40}",blob_sha):
+        raise ValueError("INVALID_QUEUE_BLOB_SHA")
+    if meta.get("encoding")=="base64":
+        return base64.b64decode(meta.get("content","")),blob_sha
+    if meta.get("encoding")=="none":
+        blob=api("/repos/"+REPO+"/git/blobs/"+blob_sha,token)
+        if not isinstance(blob,dict) or blob.get("encoding")!="base64":
+            raise ValueError("QUEUE_BLOB_NOT_BASE64")
+        return base64.b64decode(blob.get("content","")),blob_sha
+    raise ValueError("QUEUE_CONTENT_ENCODING_UNSUPPORTED")
+
+
 def put_exact(rel, raw, token, allow_update=False):
     endpoint = content_path(rel)
-    old = api(endpoint+"?ref="+BRANCH,token)
+    old_raw,old_sha = read_exact(endpoint,token)
     encoded = base64.b64encode(raw).decode("ascii")
-    if old:
+    if old_raw is not None:
         if not allow_update:
-            if old.get("encoding") != "base64" or (
-                base64.b64decode(old.get("content","")) != raw):
+            if old_raw != raw:
                 raise ValueError("IMMUTABLE_QUEUE_REF_CONTENT_CONFLICT")
             return "EXACT_ALREADY_PRESENT"
-        old_sha = old.get("sha")
-        if not isinstance(old_sha,str) or not re.fullmatch(r"[0-9a-f]{40}",old_sha):
-            raise ValueError("INVALID_OLD_QUEUE_SHA")
-    else:
-        old_sha = None
     payload={"message":"localization(qa): publish HD source/queue "+rel,
              "content":encoded,"branch":BRANCH}
     if old_sha:
@@ -92,9 +104,8 @@ def put_exact(rel, raw, token, allow_update=False):
     if not re.fullmatch(r"[0-9a-f]{40}",res.get("commit",{}).get("sha","")):
         raise RuntimeError("QUEUE_COMMIT_MISSING")
     # Hash+content readback; no self-reported success.
-    updated=api(endpoint+"?ref="+BRANCH,token)
-    if updated is None or updated.get("encoding")!="base64" or (
-        base64.b64decode(updated.get("content","")) != raw):
+    updated,_=read_exact(endpoint,token)
+    if updated != raw:
         raise RuntimeError("QUEUE_REMOTE_READBACK_MISMATCH")
     return "VERIFIED_COMMIT"
 
