@@ -1,5 +1,6 @@
 name: OutRun HD Source-Owner HOLD Closure Audit (GitHub CPU)
 
+# 2026-11-16: re-evaluate real collision safety before BC3 mip codec gate.
 # Verify whether the 12 fully source-owned overlapping HOLDs have reusable
 # real Korean A/B pixels; do NOT reduce official HOLD without a native C1/C3 gate.
 on:
