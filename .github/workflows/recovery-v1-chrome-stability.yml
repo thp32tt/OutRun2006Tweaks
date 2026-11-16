@@ -28,29 +28,30 @@ jobs:
         run: python tools/chat-controller/localization-recovery-v1/tests/test_recovery_maintenance.py
       - name: Prove Chrome cookies and session files survive cleaning
         run: bash tools/chat-controller/localization-recovery-v1/tests/test_chrome_cache_clean.sh
-      - name: Check active A+B Compose and exact mount contract
+      - name: Check active GitOps + HOLD browser Compose contract
         run: |
           docker compose -f tools/chat-controller/localization-recovery-v1/docker-compose.yml config --quiet
           python - <<'PY'
           from pathlib import Path
-          x=Path('tools/chat-controller/localization-recovery-v1/docker-compose.yml').read_text()
-          assert 'CHAT_SLOTS: "2"' in x
-          assert 'SCHEDULE_MINUTES: "0,5,10,15,20,25,30,35,40,45,50,55"' in x
-          assert 'OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""' in x
-          assert 'source: /home/chatgpt-runner2/work/image-src' in x
-          assert 'target: /data/imagegen' in x
-          assert 'CHROME_RECYCLE_INTERVAL_MINUTES: "120"' in x
-          assert 'CHAT_RECYCLE_RUNS: "0"' in x
-          assert 'FRESH_CHAT_EACH_RUN: "true"' in x
-          assert 'OUTRUN_AB_BATCH_QUEUE: "true"' in x
-          assert 'AUTO_SEND: "true"' in x
-          assert 'REQUIRE_PROJECT_URL: "false"' in x
-          assert '6082:6080' in x and '8788:8787' in x
-          assert 'outrun_chat_localization_recovery_data' in x
-          assert 'outrun_chat_localization_recovery_logs' in x
-          src=''.join(p.read_text() for p in sorted(Path('tools/chat-controller/localization-recovery-v1/src').glob('controller.py.part*')))
+          import yaml
+          root=Path('tools/chat-controller/localization-recovery-v1')
+          compose=yaml.safe_load((root/'docker-compose.yml').read_text())
+          assert set(compose['services'])=={
+              'outrun-chat-controller-localization-recovery','outrun-chat-qa-rework'}
+          gitops=compose['services']['outrun-chat-controller-localization-recovery']
+          qa=compose['services']['outrun-chat-qa-rework']
+          assert gitops['build']['dockerfile']=='Dockerfile.gitops'
+          assert gitops['read_only'] is True
+          assert qa['build']['dockerfile']=='Dockerfile.chat-rework'
+          assert 'hd_imagegen_fallback' in qa['environment']['OUTRUN_REWORK_QUEUE_NAME']
+          assert ':-0}' in qa['environment']['OUTRUN_REWORK_REUSE_ONLY']
+          assert any('6084' in str(p) and '6080' in str(p) for p in qa['ports'])
+          assert 'outrun_chat_browser_profile_clean_v2:/browser-profile' in qa['volumes']
+          assert 'outrun_chat_localization_recovery_data:/data' in qa['volumes']
+          assert 'outrun_chat_localization_recovery_logs:/logs' in qa['volumes']
+          src=''.join(p.read_text() for p in sorted((root/'src').glob('controller.py.part*')))
           assert 'next_production_id' not in src and 'task_events' not in src
-          print("PASS A/B image-src Compose predeployment and original v1 source contract")
+          print("PASS GitOps dispatcher + HOLD browser Compose contract")
           PY
       - name: Build patched A+B recovery image
         run: docker build -t recovery-v1-chrome:test tools/chat-controller/localization-recovery-v1
