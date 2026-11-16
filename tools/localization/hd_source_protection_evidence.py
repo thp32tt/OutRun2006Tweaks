@@ -147,7 +147,11 @@ def build(root, qa_report, out, max_previews=200):
         full, audit = prove_overlap_ownership(source, noncoarse, conflicts, diagnostics=diagnostic)
         partial = diagnostic.get("partial_owned_masks", {})
         ambiguous = diagnostic.get("ambiguous_native_mask")
-        bc3_mips = raw[84:88] == b"DXT5" and struct.unpack_from("<I", raw, 80)[0] == 4
+        # Header offset 80 is DDPF_FOURCC=4, not the mipmap count.
+        # The actual number of mips lives at DDS header offset 28.
+        bc3_mips = (raw[84:88] == b"DXT5" and
+                    struct.unpack_from("<I", raw, 80)[0] == 4 and
+                    struct.unpack_from("<I", raw, 28)[0] > 1)
         atlases += 1
         for row in sorted(present, key=lambda r: r["roi_id"]):
             rid = row["roi_id"]
