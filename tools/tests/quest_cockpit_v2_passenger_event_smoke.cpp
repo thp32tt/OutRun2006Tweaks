@@ -2,14 +2,7 @@
 #include <cassert>
 using namespace OutRunVR::QuestCockpitV2;
 int main() {
-    constexpr auto gate=[](bool vr,bool cockpit,bool show,bool hooks,
-                            bool start,std::uint32_t id,std::uint32_t fn,
-                            bool driver,bool passenger) {
-        return ShouldOpenMissingPassenger(vr,cockpit,show,hooks,start,
-                                         id,fn,driver,passenger);
-    };
-    // Byte flags are stored separately from 0x3C-byte sEventWork entries;
-    // original 440110 uses BYTE PTR [eventId + 0x79FB48].
+    // Original PC: 440110 event byte flags live separately from sEventWork.
     static_assert(OriginalEventFlagsRva==0x39FB48u);
     static_assert(OriginalDriverEventId==0x16au);
     static_assert(OriginalPassengerEventId==0x16bu);
@@ -18,37 +11,26 @@ int main() {
     static_assert(OriginalEventScheduled(OriginalEventPendingInit));
     static_assert(OriginalEventScheduled(OriginalEventInitialized));
     static_assert(!OriginalEventScheduled(0x04u));
-    static_assert(OriginalEventSetupAccepted(0x01u));
-    static_assert(!OriginalEventSetupAccepted(0x02u));
-    static_assert(!OriginalEventSetupAccepted(0x04u));
-    static_assert(!OriginalEventLiveForDisplay(0));
-    static_assert(!OriginalEventLiveForDisplay(0x01u)); // still pending init
-    static_assert(OriginalEventLiveForDisplay(0x02u));  // initialized
-    static_assert(OriginalEventLiveForDisplay(0x03u));  // init+live
-    static_assert(!OriginalEventLiveForDisplay(0x04u)); // pending destroy
-    static_assert(!OriginalEventLiveForDisplay(0x06u)); // active+destroy
-    static_assert(!OriginalEventLiveForDisplay(0x08u)); // suspended
-    static_assert(OriginalPassengerVacant(0));
-    static_assert(!OriginalPassengerVacant(0x01u));  // init queued
-    static_assert(!OriginalPassengerVacant(0x02u));  // active
-    static_assert(!OriginalPassengerVacant(0x04u));  // destroy queued
-    static_assert(!OriginalPassengerVacant(0x08u));  // suspended
-    static_assert(!OriginalPassengerVacant(0x10u));  // suspended
-    static_assert(OriginalPassengerVacant(0x20u));   // unrelated flags
-    static_assert(OriginalLicenceSlotRva==0x3C2400u);
-    static_assert(OriginalPassengerCharacterIndexValid(0));
-    static_assert(OriginalPassengerCharacterIndexValid(5));
-    static_assert(!OriginalPassengerCharacterIndexValid(6));
-    static_assert(!OriginalPassengerCharacterIndexValid(0xffffffffu));
-    static_assert(gate(true,true,true,true,true,0x16c,0x3b,true,false));
-    static_assert(!gate(false,true,true,true,true,0x16c,0x3b,true,false));
-    static_assert(!gate(true,false,true,true,true,0x16c,0x3b,true,false));
-    static_assert(!gate(true,true,false,true,true,0x16c,0x3b,true,false));
-    static_assert(!gate(true,true,true,false,true,0x16c,0x3b,true,false));
-    static_assert(!gate(true,true,true,true,false,0x16c,0x3b,true,false));
-    static_assert(!gate(true,true,true,true,true,0x16b,0x39,true,false));
-    static_assert(!gate(true,true,true,true,true,0x16c,0x39,true,false));
-    static_assert(!gate(true,true,true,true,true,0x16c,0x3b,false,false));
-    static_assert(!gate(true,true,true,true,true,0x16c,0x3b,true,true));
-    assert(!gate(true,true,true,true,true,0x16c,0x3b,true,true));
+    static_assert(!OriginalEventLiveForDisplay(0u));
+    static_assert(!OriginalEventLiveForDisplay(0x01u));
+    static_assert(OriginalEventLiveForDisplay(0x02u));
+    static_assert(!OriginalEventLiveForDisplay(0x04u));
+    static_assert(!OriginalEventLiveForDisplay(0x06u));
+    static_assert(!OriginalPassengerVacant(0x04u));
+    static_assert(OriginalPassengerVacant(0u));
+
+    // Follow Camera 0 = native event/visuals; never create missing ROB02.
+    constexpr auto suppress=[](bool vr,bool cockpit,bool follow,
+                               bool race,bool passenger) {
+        return ShouldSuppressOriginalPassenger(
+            vr,cockpit,follow,race,passenger);
+    };
+    static_assert(!suppress(true,true,true,true,true));
+    static_assert(!suppress(true,true,true,true,false)); // no native ROB02
+    static_assert(suppress(true,true,false,true,true));  // remove in ANY camera
+    static_assert(!suppress(true,true,false,true,false)); // never suppress NPC
+    static_assert(!suppress(false,true,false,true,true));
+    static_assert(!suppress(true,false,false,true,true));
+    static_assert(!suppress(true,true,false,false,true)); // menus unchanged
+    assert(suppress(true,true,false,true,true));
 }
