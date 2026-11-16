@@ -39,6 +39,7 @@ jobs:
           python -m py_compile tools/chat-controller/localization-recovery-v1/chat_image_result_rescue.py
       - name: Run existing source-pinned ImageGen + C1 safety regressions
         run: python -m unittest discover -s tools/chat-controller/localization-recovery-v1 -p test_github_chat_rework_controller.py -v
-      # Also covers read-only 30m stale AB_SENT source-chat recovery without duplicate sends.
+      # Covers source-pinned 30m AB_SENT recovery and the 2026-11-16
+      # preverified ImageGen / C1 branch split: prevent false A/B HOLD.
       - name: Run current Images menu and exact no-duplicate retry regressions
         run: python -m unittest discover -s tools/chat-controller/localization-recovery-v1 -p test_imagegen_ui_retry_nov15.py -v
