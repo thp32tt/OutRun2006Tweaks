@@ -190,7 +190,10 @@ def build(edited_dir,proof_dir,out_dir,crosswalk,state_dir,prior_queue=None,max_
     if (manifest.get("schema")!="outrun-hd-existing-pixel-auto-editor-v1"
         or evidence.get("schema")!="outrun-hd-source-protected-component-evidence-v1"
         or manifest.get("source_report_zip_sha256")!=evidence.get("source_report_zip_sha256")
-        or manifest.get("original_hold_count_unchanged")!=640
+        or not isinstance(manifest.get("original_hold_count_unchanged"),int)
+        or manifest.get("original_hold_count_unchanged")!=evidence.get("source_holds")
+        or evidence.get("source_total_roi")!=954
+        or not 0<=manifest["original_hold_count_unchanged"]<=954
         or manifest.get("release_approved") is not False
         or evidence.get("release_approved") is not False
         or not 0<=max_tasks<=8):
@@ -288,8 +291,9 @@ def build(edited_dir,proof_dir,out_dir,crosswalk,state_dir,prior_queue=None,max_
        "policy":"HD_AUTO_EDIT_FIRST_ORIGINAL_STYLE_TEXT_ONLY_REGEN_20261113",
        "source_asset_sha256":manifest["source_report_zip_sha256"],
        "qa_report_schema":"outrun.ab-imagegen-hd-strict.v2",
-       "source_roi_count":954,"hold_count":640,
-       "old_painted_count_invalid_for_release":314,
+       "source_roi_count":954,
+       "hold_count":manifest["original_hold_count_unchanged"],
+       "old_painted_count_invalid_for_release":954-manifest["original_hold_count_unchanged"],
        "selection_policy":"UNRESOLVED_GLYPHS_ONLY_SOURCE_STYLE_RGBA_NO_BACKGROUND",
        "new_imagegen_disabled":False,
        "release_approved":False,"runtime_validation":"UNTESTED",
