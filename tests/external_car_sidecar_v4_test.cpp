@@ -43,9 +43,9 @@ static std::vector<std::uint8_t> Dds1x1() {
     return d;
 }
 
-static std::vector<std::uint8_t> Make(bool goodAxis=true) {
+static std::vector<std::uint8_t> Make(bool goodAxis=true,bool native=false) {
     std::vector<std::uint8_t> payload;
-    const std::string name="EXT_OPAQUE_00";
+    const std::string name=native?"NATIVE_OPAQUE_00":"EXT_OPAQUE_00";
     PutU16(payload,static_cast<std::uint16_t>(name.size()));
     PutU16(payload,0);PutU32(payload,3);PutU32(payload,3);PutU32(payload,4);
     Append(payload,name.data(),name.size());
@@ -80,10 +80,17 @@ int main() {
     auto good=Make(true);
     assert(Parse(good.data(),good.size(),model,error));
     assert(model.highQuality && model.pbrEnabled && model.dashboardEnabled);
+    assert(!model.nativeOriginPreserved);
     assert(model.meshes.size()==1 && model.dashboardBindings.size()==1);
     const auto& b=model.dashboardBindings[0];
     assert(b.meshIndex==0 && b.kind==DashboardKind::SpeedNeedle);
     assert(std::fabs(b.inputMax-320.f)<0.001f);
+
+    auto native=Make(true,true);Model nativeModel;
+    assert(Parse(native.data(),native.size(),nativeModel,error));
+    assert(nativeModel.nativeOriginPreserved);
+    assert(nativeModel.meshes.size()==1 &&
+           nativeModel.meshes[0].name=="NATIVE_OPAQUE_00");
 
     auto bad=Make(false);Model rejected;
     assert(!Parse(bad.data(),bad.size(),rejected,error));
