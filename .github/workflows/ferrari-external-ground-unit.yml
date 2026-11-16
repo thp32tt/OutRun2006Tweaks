@@ -10,6 +10,7 @@ on:
       - 'src/vr/game/dino_external_d3d9.hpp'
       - 'src/hooks_graphics.cpp'
       - 'tests/external_car_ground_test.cpp'
+      - 'tests/external_car_gate_test.cpp'
   workflow_dispatch:
 
 permissions:
@@ -26,6 +27,9 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
              tests/external_car_ground_test.cpp -o /tmp/ferrari_external_floor
           /tmp/ferrari_external_floor
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+             tests/external_car_gate_test.cpp -o /tmp/ferrari_external_gate
+          /tmp/ferrari_external_gate
       - name: Static verifier for source-only installed-and-PBR path
         run: |
           python3 - <<'PY'
@@ -34,11 +38,15 @@ jobs:
           hooks=Path('src/hooks_graphics.cpp').read_text()
           gate=Path('src/vr/game/dino_external_original_car_gate.hpp').read_text()
           assert 'bool Installed() const noexcept' in source
+          assert 'ExternalCars\\\\car_id_%02u.ovc' in source
+          assert 'FerrariModelSlot::GenericId' in source
           assert 'GetFileAttributesW(path)' in source
           assert 'return RejectGpu(dev);' in source
           assert 'if(!pbrReady_)return RejectGpu(dev);' in source
           assert 'if(!external.SafeFloorLift(Settings::VRF50ExternalLift.get(),localLift))' in hooks
           assert 'camera && camera->cam_mode_34A==1' in hooks
+          assert 'carId<30u' in hooks
+          assert 'ticket.carId<30u' in hooks
           assert 'CanReplaceOriginalCar(gate)' in hooks
           assert 'return gate.optedIn && gate.ownedPlayer' in gate
           assert 'route!=OutRunVR::DinoSidecar::OriginalCarRoute::OriginalFallback' in hooks
