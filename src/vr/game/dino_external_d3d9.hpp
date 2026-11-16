@@ -254,7 +254,8 @@ class GpuOwner final {
                     break;
                 }
             next.glass=m.name.compare(0,10,"F50_GLASS_")==0 ||
-                m.name.compare(0,10,"EXT_GLASS_")==0;
+                m.name.compare(0,10,"EXT_GLASS_")==0 ||
+                m.name.compare(0,13,"NATIVE_GLASS_")==0;
             next.vertexCount=static_cast<UINT>(m.vertices.size());
             next.indexCount=static_cast<UINT>(m.indices.size());
             const UINT vertexBytes=next.vertexCount*sizeof(Vertex);
@@ -359,8 +360,10 @@ public:
         try {
             if(!Installed() || !EnsureLoaded() || !modelBoundsReady_)
                 return false;
-            return ComputeExternalFloorLift(
-                requested,modelMinLocalY_,effective);
+            // Native OutRun remasters retain the original PMT local origin.
+            // Never apply the external-mod ground normalization/lift to them.
+            return ComputeSidecarFloorLift(
+                cpu_.nativeOriginPreserved,requested,modelMinLocalY_,effective);
         } catch(...) {
             return false; // never crash native player callback
         }
