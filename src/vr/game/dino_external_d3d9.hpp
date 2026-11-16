@@ -22,7 +22,7 @@
 #include "dino_external_pbr_shader.hpp"
 
 namespace OutRunVR::DinoSidecar {
-enum class FerrariModelSlot : unsigned char { F50, Gto288, F40 };
+enum class FerrariModelSlot : unsigned char { F50, Gto288, F40, GenericId };
 struct GpuDrawResult final {
     HRESULT hr=E_FAIL;
     MeshDrawReceipt receipt{};
@@ -44,6 +44,7 @@ class GpuOwner final {
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
     FerrariModelSlot selectedSlot_=FerrariModelSlot::F50;
+    unsigned char selectedCarId_=255u;
     float modelMinLocalY_=0.f;
     bool modelBoundsReady_=false;
     // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
@@ -159,9 +160,21 @@ class GpuOwner final {
             pbrFlag[0]==L'1' && pbrFlag[1]==L'\0';
         constexpr wchar_t stableSuffix[]=L"F50_External_Test.ovc";
         constexpr wchar_t pbrSuffix[]=L"F50_External_Test_PBR.ovc";
-        const wchar_t* suffix=selectedSlot_==FerrariModelSlot::Gto288 ?
-            L"ExternalCars\\288gto.ovc" : selectedSlot_==FerrariModelSlot::F40 ?
-            L"ExternalCars\\f40.ovc" : (usePbr?pbrSuffix:stableSuffix);
+        wchar_t genericSuffix[64]{};
+        const wchar_t* suffix=nullptr;
+        if(selectedSlot_==FerrariModelSlot::Gto288)
+            suffix=L"ExternalCars\\288gto.ovc";
+        else if(selectedSlot_==FerrariModelSlot::F40)
+            suffix=L"ExternalCars\\f40.ovc";
+        else if(selectedSlot_==FerrariModelSlot::GenericId) {
+            if(selectedCarId_>=30u)return false;
+            if(swprintf_s(genericSuffix,_countof(genericSuffix),
+                          L"ExternalCars\\car_id_%02u.ovc",
+                          static_cast<unsigned>(selectedCarId_))<=0)
+                return false;
+            suffix=genericSuffix;
+        } else
+            suffix=usePbr?pbrSuffix:stableSuffix;
         if(std::wcslen(path)+std::wcslen(suffix)+1>MAX_PATH)return false;
         return wcscat_s(path,MAX_PATH,suffix)==0;
     }
@@ -279,14 +292,21 @@ public:
     GpuOwner& operator=(const GpuOwner&)=delete;
     // Called only from the validated native player callback. One fixed slot
     // is loaded per race; never accept paths from settings or user input.
-    bool SelectSidecar(FerrariModelSlot next) noexcept {
-        if(next==selectedSlot_)return false;
+    // GenericId resolves only to ExternalCars/car_id_00..29.ovc.
+    bool SelectSidecar(FerrariModelSlot next,
+                       unsigned char carId=255u) noexcept {
+        const unsigned char nextCarId=
+            next==FerrariModelSlot::GenericId?carId:255u;
+        if(next==FerrariModelSlot::GenericId && nextCarId>=30u)
+            return false;
+        if(next==selectedSlot_ && nextCarId==selectedCarId_)return false;
         ReleaseGpu();
         cpu_=Model{};
         loaded_=false;
         loadAttempted_=false;
         gpuRetry_.OnReset();
         selectedSlot_=next;
+        selectedCarId_=nextCarId;
         modelBoundsReady_=false;
         modelMinLocalY_=0.f;
         return true;
