@@ -96,7 +96,7 @@ jobs:
           python - <<'PY'
           import hashlib, json, os, pathlib
           root=pathlib.Path(os.environ['RUNNER_TEMP'])/'Dino246GTS_Private_Test'
-          ovc=root/'ExternalCars'/'car_id_01.ovc'
+          ovc=root/'ExternalCars'/'car_id_00.ovc'
           report={
             'car_id': 0,
             'vehicle': 'Dino 246 GTS',
