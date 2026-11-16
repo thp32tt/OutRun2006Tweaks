@@ -127,3 +127,12 @@ CI와 로컬 단위테스트는 다음을 검증합니다.
 - 변환기 Python AST 및 source-level linkage 검증
 
 현재 실제 외부 모델이 없는 차종은 런타임 준비 완료 상태일 뿐, 모델 자산 완료 상태가 아닙니다.
+## 2026-11-17 작업 범위 정정 (외부 차량 16종 최종 완료 기준)
+
+**중요: `native_hq_completion_20261116.json`의 16/16은 원본 OutRun OBJ의 bevel/smoothing 결과만 뜻한다. Assetto Corsa·GTA5·기타 외부 고품질 full-car 모델 16종 완성이 아니다. 이 결과를 외부 모델 완료율에 합산하지 않는다.**
+
+외부 모델 실재 증거가 있는 차량은 현재 작업 상태 파일 기준 Dino 246 GTS, F50, 288 GTO, 250 GTO, F40, F430, Enzo **7종**이다. 그중 Dino/250/F430/Enzo는 TDM 변환 경로가 있고 F40은 속도계/RPM 바늘의 실제 분리 및 Blender 재열기 검증이 되어 있다. 나머지 **9종**(Daytona 365, 360 Spider, F355 Spider, 575 Superamerica, Testarossa, 328 GTS, 512 BB, 550 Barchetta, F430 Spider)은 외부 full-car 원본이 미확보다. 7종도 실제 게임 내 완성/계기판 눈금 보정이 모두 통과한 것은 아니다.
+
+최종 완료 판정은 각 차종별로 (1) 라이선스 확인 또는 사용자 개인 로컬 소스 확보, (2) 외부 full-car 모델 및 실내/UV/PBR 검증, (3) 원본 차종과 좌표/지면/시트/핸들 정렬, (4) 속도/RPM/기어 메시를 정확히 분리하고 OVRCABH4로 변환, (5) 게임의 실제 EVWORK_CAR 값을 받아 0/중간/최대/기어 변화를 검증, (6) 좌/우 눈 동일 프레임 데이터 및 Quest 3 게임 실측, (7) 설치된 차량만 표시되는 로더 테스트가 모두 PASS일 때만 허용한다. NativeHQ 결과는 외부 모델이 없는 차종의 대체 완료로 간주하지 않는다.
+
+현재 판정: **외부 full-car 16종 완료 = NO / 계기판 16종 최종 캘리브레이션 = NO / VR 실게임 16종 QA = NO**.
