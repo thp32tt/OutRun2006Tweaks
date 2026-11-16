@@ -1,5 +1,6 @@
 #include "../../src/vr/game/quest_cockpit_v2_passenger_event.hpp"
 #include <cassert>
+#include <initializer_list>
 using namespace OutRunVR::QuestCockpitV2;
 // Exhaustive six-boolean native removal truth table: only 0x3B, i.e.
 // VR=1, cockpit=1, follow=0, racing=1, mode1=1, native ROB02=1, hides.
