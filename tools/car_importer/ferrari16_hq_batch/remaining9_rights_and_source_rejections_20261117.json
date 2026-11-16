@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-17",
+  "policy": "Only sources without explicit cross-game-conversion/modification prohibition may proceed to OutRun integration. Technical conversion experiments are not completion when source terms prohibit reuse.",
+  "cars": {
+    "360spider": {
+      "technical_result": "TEXTURED_GLB_REOPEN_PASS",
+      "archive_sha256": "e7614ed4940b5d774263f035bf962db9ced388986c01a0cde04f8b02923af42e",
+      "glb_sha256": "de90a5936a44b3770fd1f79295a40fd57e774ebd6a69fbb8c843351265bc33f6",
+      "gauge_mesh": "spider00_gauges",
+      "gauge_vertices": 394,
+      "gauge_polygons": 249,
+      "source_terms": "ReadMe_ENG_Spider00.txt explicitly prohibits conversion to other games without author permission and use of model parts in third-party projects.",
+      "integration_status": "REJECTED_RIGHTS_DO_NOT_USE_FOR_OUTRUN",
+      "score_delta": 0
+    },
+    "575superamerica": {
+      "archive_sha256": "2ae69d06fbc67774b3608318b4ca38714eb1d5ec6eef4390aa791eada83c2e19",
+      "parser_result": "Both top-up/top-down DFFs fail independent DragonFF/rage-formats parsing at identical malformed trailing chunk.",
+      "integration_status": "REJECTED_MALFORMED_SOURCE",
+      "score_delta": 0
+    },
+    "testarossa": {
+      "archive_sha256": "1706a5a818faae1bd7ff3a681a9754f9af0765d05f409cba7f47f85511314e5f",
+      "source_terms": "Archive comment explicitly prohibits conversion to other games without author permission.",
+      "integration_status": "REJECTED_RIGHTS_DO_NOT_USE_FOR_OUTRUN",
+      "score_delta": 0
+    },
+    "550barchetta": {
+      "archive_sha256": "414707fba2aa11fa2d31b99e2b0db0a2afa6e5088d67ba617c2472a7c520630b",
+      "source_terms": "Included readme prohibits any editing/reworking/modification and use in compilations.",
+      "integration_status": "REJECTED_RIGHTS_DO_NOT_USE_FOR_OUTRUN",
+      "score_delta": 0,
+      "preferred_alternative": "Sketchfab CC-BY/CC-BY-NC exact 550 Barchetta source; acquire through permitted download path."
+    }
+  }
+}
