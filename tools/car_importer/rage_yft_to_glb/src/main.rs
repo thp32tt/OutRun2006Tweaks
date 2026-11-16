@@ -26,6 +26,18 @@ fn main() -> Result<()> {
     }
     decode_failures.extend(textures.push_layer(&external));
 
+    // GTA vehicle mods sometimes carry accidental trailing spaces in YTD
+    // texture names while the YFT shader references the trimmed name.
+    // Preserve the source texture and add an exact lookup alias rather than
+    // silently renaming or dropping it.
+    let mut trimmed_aliases = Vec::new();
+    for texture in &external {
+        let trimmed = texture.name.trim();
+        if trimmed != texture.name && !trimmed.is_empty() && textures.alias(trimmed, &texture.name) {
+            trimmed_aliases.push((trimmed.to_string(), texture.name.clone()));
+        }
+    }
+
     let options = GlbOptions {
         max_texture: 2048,
         jpeg_quality: 92,
@@ -45,6 +57,7 @@ fn main() -> Result<()> {
     println!("external_textures={}", external.len());
     println!("decoded_texture_slots={}", textures.len());
     println!("decode_failures={:?}", decode_failures);
+    println!("trimmed_aliases={:?}", trimmed_aliases);
     println!("triangles={}", report.triangles);
     println!("geometries={}", report.geometries);
     println!("untextured_geometries={}", report.untextured_geometries);
