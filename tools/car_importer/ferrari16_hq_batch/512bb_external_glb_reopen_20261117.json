@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-17",
+  "car_id": "512bb",
+  "source": {
+    "description": "Ferrari 512 BB / RAC1 Race, GeroDa74 + RAC 2026, street 1976 v0.96",
+    "archive_bytes": 35636429,
+    "archive_sha256": "99fe30be76b602f73e35e9870853aedc30c1924cd25eb4e46ae64f788b81bdf5",
+    "main_kn5": "gd_ferrari_512_bb.kn5",
+    "main_kn5_bytes": 38236738
+  },
+  "import": {
+    "blender": "5.2.4 LTS",
+    "importer": "KN5 Blender Tools 2.0.2",
+    "status": "PASS_WITH_5_SHADER_NORMAL_WARNINGS",
+    "objects": 461,
+    "meshes": 217,
+    "vertices": 180277,
+    "polygons": 265611,
+    "materials": 97,
+    "images": 73,
+    "blend_sha256": "cf5e9f69668e1f4bd081160542d0b099c8eb25bcaf1663ff03e625568d7f7679",
+    "glb_sha256": "925c6be4d464a2362702194841a21e52d6416ab6119a72ada61e90b5d8a3f7ce"
+  },
+  "reopen": {
+    "status": "PASS",
+    "mesh_objects": 217,
+    "vertices": 180400,
+    "polygons": 265611,
+    "materials": 97,
+    "images": 61,
+    "bounds_min": [
+      -0.9274858832359314,
+      -2.3518617153167725,
+      -0.11152145266532898
+    ],
+    "bounds_max": [
+      0.9315433502197266,
+      2.0541982650756836,
+      1.0518375635147095
+    ]
+  },
+  "dashboard": {
+    "speed_node": "ARROW_SPEED",
+    "rpm_node": "ARROW_RPM",
+    "speed_pivot_world_blender": [
+      0.396861732006073,
+      -0.6460767984390259,
+      0.6179459691047668
+    ],
+    "rpm_pivot_world_blender": [
+      0.17567943036556244,
+      -0.6463874578475952,
+      0.6190918684005737
+    ],
+    "additional_arrows": [
+      "ARROW_OIL_TEMP",
+      "ARROW_W_TEMP",
+      "ARROW_FUEL",
+      "ARROW_AMPERE",
+      "ARROW_OIL_PSI"
+    ],
+    "status": "ORIGINAL_KN5_ARROW_MESHES_AND_PARENT_PIVOTS_VERIFIED"
+  },
+  "alignment_work": {
+    "native_front_axle_z": -1.080301403,
+    "native_rear_axle_z": 1.4488980200000001,
+    "native_wheelbase": 2.529199423,
+    "external_front_axle_blender_y": -1.239367663860321,
+    "external_rear_axle_blender_y": 1.2720944285392761,
+    "external_wheelbase": 2.511462092399597,
+    "provisional_uniform_scale": 1.0070625515925886,
+    "status": "WHEELBASE_FIT_IDENTIFIED_PIVOT_PRESERVING_EXPORT_PENDING"
+  },
+  "rights": "PRIVATE_PERSONAL_CONVERSION_ONLY_NO_REDISTRIBUTION; mirror/package has no explicit redistribution grant; do not publish source assets.",
+  "scope_boundary": "External full-car GLB fresh-reopen baseline only; OVRCABH4 sidecar not yet complete."
+}
