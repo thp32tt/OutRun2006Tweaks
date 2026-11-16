@@ -387,10 +387,14 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
     coarse = coarse_fn(rows)
     noncoarse = [r for r in rows if r["roi_id"] not in coarse]
     conflicts = source_ink_conflicts(source, noncoarse, conflict_fn)
-    # Preserve the existing fail-closed BC3 codec path: shared-block ROI
-    # ownership is not inferred from per-pixel uncompressed coordinates.
+    # DDPF_FOURCC is the pixel-format flag at byte 80; byte 28 stores
+    # dwMipMapCount. Do not mistake FOURCC flag=4 for a four-mip DDS.
+    # Exact one-mip BC3 owner masks can use the existing index-only codec,
+    # which verifies protected original pixels after saved-byte decoding.
     ownership_masks = {}
-    if conflicts and not (raw[84:88] == b"DXT5" and struct.unpack_from("<I", raw, 80)[0] == 4):
+    is_bc3 = raw[84:88] == b"DXT5" and struct.unpack_from("<I", raw, 80)[0] == 4
+    mip_count = struct.unpack_from("<I", raw, 28)[0]
+    if conflicts and not (is_bc3 and mip_count != 1):
         ownership_masks, _ = prove_overlap_ownership(source, noncoarse, conflicts)
     conflicts = conflicts - set(ownership_masks)
     placed_alpha = Image.new("L", source.size, 0)
