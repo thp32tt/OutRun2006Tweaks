@@ -45,16 +45,16 @@ GLB 내부의 계기판 바늘/기어 숫자가 **독립 mesh node**여야 합�
       {
         "node": "SpeedNeedle",
         "kind": "speed",
-        "pivot": [0.0, 0.0, 0.0],
-        "axis": [0.0, 0.0, 1.0],
+        "pivot": "node_origin",
+        "axis_node": [0.0, 1.0, 0.0],
         "input": [0.0, 320.0],
         "angle_deg": [-130.0, 130.0]
       },
       {
         "node": "RpmNeedle",
         "kind": "rpm",
-        "pivot": [0.0, 0.0, 0.0],
-        "axis": [0.0, 0.0, 1.0],
+        "pivot": "node_origin",
+        "axis_node": [0.0, 1.0, 0.0],
         "input": [0.0, 10000.0],
         "angle_deg": [-130.0, 130.0]
       },
@@ -65,9 +65,20 @@ GLB 내부의 계기판 바늘/기어 숫자가 **독립 mesh node**여야 합�
 }
 ~~~
 
-pivot/axis는 변환 후 OutRun 로컬 좌표 기준입니다. 실제 계기판 눈금에 맞는 입력 범위와 각도는 차량별로 측정해서 넣어야 합니다. 바늘이 대시보드와 하나의 메시로 합쳐진 모델은 Blender 단계에서 바늘을 분리한 뒤 사용합니다.
+권장 방식은 Blender에서 바늘 오브젝트의 origin을 실제 회전축에 둔 뒤 pivot=node_origin과 axis_node를 사용하는 것입니다. 변환기가 노드 원점/축을 최종 OutRun 로컬 좌표로 자동 변환합니다. 명시적 pivot/axis 숫자도 계속 지원합니다. 실제 계기판 눈금에 맞는 입력 범위와 회전각은 차량별로 측정합니다. 바늘이 하나의 메시로 합쳐진 모델은 Blender 단계에서 바늘을 분리한 뒤 사용합니다.
 
 전체 예시는 source.example.json을 참조합니다.
+
+
+### 합쳐진 바늘 메시 분리
+
+F40처럼 속도계/RPM 바늘이 한 메시/재질에 합쳐진 소스는 Blender 5.x에서 다음 보조 스크립트로 coincident seam만 1e-5 단위로 weld한 뒤 loose part를 분리할 수 있습니다.
+
+~~~bash
+blender --background --python tools/split_dashboard_needles_blender.py --   source.glb dashboard_split.glb dashboard_split.blend F40_Strelki F40_DASH   F40_SPEED_NEEDLE,F40_RPM_NEEDLE
+~~~
+
+이 도구는 원본 GLB를 덮어쓰지 않고 새 GLB/.blend를 만들며, 분리된 각 바늘의 object origin을 회전축 후보인 geometry bounds center에 둡니다. 실제 speed/RPM 역할과 눈금 회전방향은 실차 계기판/렌더 QA로 확인한 뒤 source.json에 기록합니다.
 
 ## 변환
 

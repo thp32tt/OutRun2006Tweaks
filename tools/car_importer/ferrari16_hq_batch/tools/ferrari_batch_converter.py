@@ -318,8 +318,13 @@ class Geometry:
 DASH_KIND = {'speed': 1, 'rpm': 2, 'gear': 3}
 
 
-def parse_dashboard_bindings(g, metadata):
-    """Resolve explicit GLB node -> live dashboard records without name guessing."""
+def parse_dashboard_bindings(g, metadata, placement=None):
+    """Resolve explicit GLB node -> live dashboard records without name guessing.
+
+    A needle may use pivot='node_origin' + axis_node=[x,y,z]. In that mode
+    the converter transforms the authored node pivot/axis into final OutRun local
+    coordinates, avoiding hand-copied Blender/world coordinates.
+    """
     config = metadata.get('dashboard', {})
     raw = config.get('bindings', []) if isinstance(config, dict) else []
     ensure(isinstance(raw, list) and len(raw) <= 128, 'dashboard bindings must be a bounded list')
@@ -331,6 +336,10 @@ def parse_dashboard_bindings(g, metadata):
             names.setdefault(name, []).append(i)
     node_to_binding = {}
     records = []
+    node_transforms = {}
+    if placement is not None:
+        node_transforms = {node_id: transform
+                           for node_id, _mesh, transform in ordered_mesh_nodes(g, placement)}
     for item in raw:
         ensure(isinstance(item, dict), 'dashboard binding must be an object')
         name = item.get('node')
@@ -354,16 +363,33 @@ def parse_dashboard_bindings(g, metadata):
             axis = item.get('axis')
             input_range = item.get('input')
             angle_deg = item.get('angle_deg')
-            ensure(isinstance(pivot, list) and len(pivot) == 3, 'dashboard pivot requires xyz')
-            ensure(isinstance(axis, list) and len(axis) == 3, 'dashboard axis requires xyz')
+            if pivot == 'node_origin':
+                ensure(node_id in node_transforms,
+                       'node_origin dashboard binding requires game placement transform')
+                axis_node = item.get('axis_node')
+                ensure(isinstance(axis_node, list) and len(axis_node) == 3,
+                       'node_origin dashboard binding requires axis_node xyz')
+                axis_node = np.asarray([float(v) for v in axis_node], dtype=np.float64)
+                ensure(np.all(np.isfinite(axis_node)) and .99 <= np.linalg.norm(axis_node) <= 1.01,
+                       'axis_node must be normalized')
+                transform = node_transforms[node_id]
+                pivot = transform[:3, 3].astype(np.float64).tolist()
+                axis_world = transform[:3, :3] @ axis_node
+                axis_len = float(np.linalg.norm(axis_world))
+                ensure(math.isfinite(axis_len) and axis_len > 1e-10,
+                       'dashboard transformed axis degenerate')
+                axis = (axis_world/axis_len).tolist()
+            else:
+                ensure(isinstance(pivot, list) and len(pivot) == 3, 'dashboard pivot requires xyz or node_origin')
+                ensure(isinstance(axis, list) and len(axis) == 3, 'dashboard axis requires xyz')
+                axis = [float(v) for v in axis]
+                axis_len = math.sqrt(sum(v*v for v in axis))
+                ensure(.99 <= axis_len <= 1.01, 'dashboard axis must be normalized')
             ensure(isinstance(input_range, list) and len(input_range) == 2, 'dashboard input requires min/max')
             ensure(isinstance(angle_deg, list) and len(angle_deg) == 2, 'dashboard angle_deg requires min/max')
             vals = [float(v) for v in pivot+axis+input_range+angle_deg]
             ensure(all(math.isfinite(v) for v in vals), 'dashboard binding contains nonfinite value')
             ensure(max(abs(float(v)) for v in pivot) < 10000, 'dashboard pivot outside model bounds')
-            axis = [float(v) for v in axis]
-            axis_len = math.sqrt(sum(v*v for v in axis))
-            ensure(.99 <= axis_len <= 1.01, 'dashboard axis must be normalized')
             input_range = [float(v) for v in input_range]
             ensure(input_range[1] > input_range[0], 'dashboard input range invalid')
             angle_deg = [float(v) for v in angle_deg]
@@ -458,7 +484,7 @@ def encode_sidecar(g, binary, metadata):
     ensure(len(matrix) == 16, 'explicit 4x4 source-to-game matrix required')
     materials = g.get('materials', [])
     texture_records = [get_material_textures(g, binary, mat) for mat in materials]
-    node_bindings, dashboard_specs = parse_dashboard_bindings(g, metadata)
+    node_bindings, dashboard_specs = parse_dashboard_bindings(g, metadata, matrix)
     groups, triangle_count, bounds = collect_groups(g, binary, matrix, texture_records, node_bindings)
     ensure(metadata.get('geometry_space') == 'outrun_local_y_up_meters',
            'only verified game-local metre coordinates accepted')
@@ -543,7 +569,7 @@ def audit_entry(root, car, strict_source=False):
                       sha256=actual, origin_type=meta['origin_type'])
         if strict_source:
             g, binary = load_glb(glb)
-            _, dashboard_specs = parse_dashboard_bindings(g, meta)
+            _, dashboard_specs = parse_dashboard_bindings(g, meta, meta['external_to_game_matrix'])
             if meta.get('dashboard_required') is True:
                 ensure(dashboard_specs, 'dashboard_required but no verified bindings supplied')
             result.update(source_meshes=len(g.get('meshes', [])),

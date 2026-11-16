@@ -18,16 +18,16 @@
       {
         "node": "REPLACE_SPEED_NEEDLE_NODE",
         "kind": "speed",
-        "pivot": [0.0, 0.0, 0.0],
-        "axis": [0.0, 0.0, 1.0],
+        "pivot": "node_origin",
+        "axis_node": [0.0, 1.0, 0.0],
         "input": [0.0, 320.0],
         "angle_deg": [-130.0, 130.0]
       },
       {
         "node": "REPLACE_RPM_NEEDLE_NODE",
         "kind": "rpm",
-        "pivot": [0.0, 0.0, 0.0],
-        "axis": [0.0, 0.0, 1.0],
+        "pivot": "node_origin",
+        "axis_node": [0.0, 1.0, 0.0],
         "input": [0.0, 10000.0],
         "angle_deg": [-130.0, 130.0]
       },

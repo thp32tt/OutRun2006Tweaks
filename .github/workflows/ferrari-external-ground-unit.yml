@@ -16,6 +16,7 @@ on:
       - 'tests/external_car_dashboard_test.cpp'
       - 'tests/external_car_sidecar_v4_test.cpp'
       - 'tools/car_importer/ferrari16_hq_batch/tools/ferrari_batch_converter.py'
+      - 'tools/car_importer/ferrari16_hq_batch/tools/split_dashboard_needles_blender.py'
   workflow_dispatch:
 
 permissions:
@@ -44,9 +45,10 @@ jobs:
           python3 - <<'PY'
           import ast
           from pathlib import Path
-          p=Path('tools/car_importer/ferrari16_hq_batch/tools/ferrari_batch_converter.py')
-          ast.parse(p.read_text(), filename=str(p))
-          print('FERRARI_CONVERTER_PYTHON_AST_PASS')
+          for name in ('ferrari_batch_converter.py','split_dashboard_needles_blender.py'):
+              p=Path('tools/car_importer/ferrari16_hq_batch/tools')/name
+              ast.parse(p.read_text(), filename=str(p))
+          print('FERRARI_CONVERTER_AND_BLENDER_HELPER_PYTHON_AST_PASS')
           PY
       - name: Static verifier for source-only installed-and-PBR path
         run: |
