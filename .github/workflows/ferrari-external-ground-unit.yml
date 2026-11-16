@@ -43,7 +43,9 @@ jobs:
           assert 'GetFileAttributesW(path)' in source
           assert 'return RejectGpu(dev);' in source
           assert 'if(!pbrReady_)return RejectGpu(dev);' in source
-          assert 'if(!external.SafeFloorLift(Settings::VRF50ExternalLift.get(),localLift))' in hooks
+          assert 'const float requestedLift=legacyExternal ?' in hooks
+          assert 'Settings::VRF50ExternalLift.get() : 0.f;' in hooks
+          assert 'if(!external.SafeFloorLift(requestedLift,localLift))' in hooks
           assert 'camera && camera->cam_mode_34A==1' in hooks
           assert 'carId<30u' in hooks
           assert 'ticket.carId<30u' in hooks
