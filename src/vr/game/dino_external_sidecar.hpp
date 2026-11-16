@@ -19,7 +19,7 @@ constexpr unsigned Groups=70, Materials=19, Vertices=21100, Triangles=38992;
 constexpr unsigned DdsSize=11136;
 constexpr std::size_t MaxSidecarBytes=128u*1024u*1024u;
 constexpr std::size_t MaxGpuPayloadBytes=112u*1024u*1024u;
-constexpr unsigned MaxGroups=512,MaxMaterials=64,MaxVertices=1000000,MaxTriangles=2000000;
+constexpr unsigned MaxGroups=512,MaxMaterials=128,MaxVertices=1000000,MaxTriangles=2000000;
 enum class TextureFormat : std::uint8_t { DXT1,DXT5,ARGB32 };
 struct Vertex {float x,y,z,nx,ny,nz,u,v;};
 static_assert(sizeof(Vertex)==32,"Dino fixed function vertex stride");
