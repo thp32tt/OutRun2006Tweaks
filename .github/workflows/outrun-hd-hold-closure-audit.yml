@@ -1,0 +1,84 @@
+name: OutRun HD Source-Owner HOLD Closure Audit (GitHub CPU)
+
+# Verify whether the 12 fully source-owned overlapping HOLDs have reusable
+# real Korean A/B pixels; do NOT reduce official HOLD without a native C1/C3 gate.
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/outrun-hd-hold-closure-audit.yml"
+  schedule:
+    - cron: "11 */6 * * *"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: outrun-hd-hold-closure-audit
+  cancel-in-progress: false
+
+jobs:
+  audit-fully-owned-holds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout exact native owner and candidate audit code (no N100)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/hd_hold_closure_audit.py
+            tools/localization/test_hd_hold_closure_audit.py
+      - name: Read exactly SHA-pinned source-native alpha masks
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-ab-multi-atlas-43169137555
+          run-id: 43169137555
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/source-evidence
+      - name: Read prior real A/B pixel-only corrected PNGs
+        uses: actions/download-artifact@v4
+        with:
+          name: outrun-source-bound-auto-edited-pngs-43185778845
+          run-id: 43185778845
+          repository: thp32tt/OutRun2006Tweaks
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/real-ab-edits
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pillow only, no ImageGen API, no new font rendering
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+      - name: Test original-mask protection, ambiguity, BC3 and exact SHA refusal
+        run: python -m unittest discover -s tools/localization -p test_hd_hold_closure_audit.py -v
+      - name: Count FULL native component-owned HOLDs actually eligible for independent C1
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/hd_hold_closure_audit.py \
+            --proof-dir "$RUNNER_TEMP/source-evidence/source_protection" \
+            --edited-dir "$RUNNER_TEMP/real-ab-edits" \
+            --out "$RUNNER_TEMP/full-owner-closure-audit"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"full-owner-closure-audit"/"hold_closure_audit.json"
+          d=json.loads(p.read_text(encoding="utf-8"))
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
+              f.write("## OutRun HD native owner overlap HOLD diagnosis\n")
+              f.write(f"- Native source-owned original HOLDs: {d['full_native_owner_source_rows']}\n")
+              f.write(f"- Already pixel-edited A/B candidates among them: {d['source_owned_rows_with_pixel_edits']}\n")
+              f.write(f"- Source-protected, non-BC3, no-ambiguous C1 workorders: {d['next_c1_static_candidate_count']}\n")
+              f.write("- Official HOLD=640 until independent image+CLEAN/native DDS QA.\n")
+          PY
+      - name: Publish exact source-bound report, no fake HOLD unlock
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-hd-full-owner-closure-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/full-owner-closure-audit/
+          retention-days: 30
