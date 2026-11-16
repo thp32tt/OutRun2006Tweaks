@@ -1,0 +1,45 @@
+name: ModsFire Ferrari Exact Sources Probe
+
+on:
+  push:
+    branches:
+      - vr-quest-cockpit-v2-external-dino-actions-20261116
+    paths:
+      - '.github/workflows/modsfire-ferrari-sources-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Inspect F430 and Superamerica ModsFire flows
+        shell: python
+        run: |
+          import http.cookiejar, html, re, urllib.parse, urllib.request
+          urls={
+            'f430':'https://modsfire.com/zyce00VcEe14JBX',
+            'superamerica':'https://modsfire.com/wk64NpSOjACp5rv',
+          }
+          for name,url in urls.items():
+              print('\n===',name,url,'===')
+              jar=http.cookiejar.CookieJar()
+              opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+              r=opener.open(req,timeout=30)
+              body=r.read().decode('utf-8','ignore')
+              print('STATUS',getattr(r,'status',None),'FINAL',r.geturl(),'BYTES',len(body),'COOKIES',[(c.name,c.value[:20]) for c in jar])
+              title=re.search(r'<title>(.*?)</title>',body,re.I|re.S)
+              print('TITLE',re.sub(r'\s+',' ',title.group(1)).strip() if title else '')
+              for m in re.finditer(r'<form\b[^>]*>.*?</form>',body,re.I|re.S):
+                  form=re.sub(r'\s+',' ',m.group(0))
+                  print('FORM',form[:5000])
+              links=[]
+              for x in re.findall(r'(?:href|action|data-url|data-href)=["\']([^"\']+)["\']',body,re.I):
+                  x=html.unescape(x)
+                  if any(k in x.lower() for k in ('download','file','cdn','storage')):
+                      if x not in links: links.append(x)
+              print('LINKS',links[:100])
