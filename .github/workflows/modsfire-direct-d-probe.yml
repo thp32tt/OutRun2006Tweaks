@@ -1,0 +1,38 @@
+name: ModsFire Direct D Ferrari Probe
+
+on:
+  push:
+    branches:
+      - vr-quest-cockpit-v2-external-dino-actions-20261116
+    paths:
+      - '.github/workflows/modsfire-direct-d-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Probe direct d routes
+        shell: python
+        run: |
+          import urllib.request
+          for name,url in {
+            'f430':'https://modsfire.com/d/zyce00VcEe14JBX',
+            'superamerica':'https://modsfire.com/d/wk64NpSOjACp5rv',
+            '512bb':'https://modsfire.com/d/21X7u2WnH1e656Q',
+          }.items():
+              print('\n',name,url)
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+              try:
+                  r=urllib.request.urlopen(req,timeout=30)
+                  print('STATUS',getattr(r,'status',None),'FINAL',r.geturl(),
+                        'TYPE',r.headers.get('content-type'),'LEN',r.headers.get('content-length'),
+                        'DISP',r.headers.get('content-disposition'))
+                  first=r.read(512)
+                  print('FIRST',first[:200])
+              except Exception as exc:
+                  print('ERROR',repr(exc))
