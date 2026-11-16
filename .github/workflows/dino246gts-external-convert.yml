@@ -37,7 +37,7 @@ jobs:
           set -euo pipefail
           WORK="${RUNNER_TEMP}/dino246"
           mkdir -p "$WORK"
-          curl -fL --retry 3             https://download.blender.org/release/Blender5.2/blender-5.2.4-linux-x64.tar.xz             -o "$WORK/blender.tar.xz"
+          curl -fL --retry 3             https://mirror.blender.org/release/Blender5.2/blender-5.2.4-linux-x64.tar.xz             -o "$WORK/blender.tar.xz"
           tar -xf "$WORK/blender.tar.xz" -C "$WORK"
           BLENDER="$(find "$WORK" -maxdepth 2 -type f -name blender | head -1)"
           test -x "$BLENDER"
