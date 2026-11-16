@@ -197,9 +197,9 @@ class CorrectImageGenPreverifiedBranchTests(unittest.IsolatedAsyncioTestCase):
         t=task()
         page=MagicMock()
         page.locator.side_effect=AssertionError("C1_CHIP_GUARD_MUST_NOT_RUN")
-        with patch.object(bridge,"clear_attachment_previews",
-                          new=AsyncMock(return_value="HOLD_DIAGNOSTIC_PRE_SEND")),\\
-             patch.object(bridge,"ensure_image_tool",new=AsyncMock()) as selector:
+        with (patch.object(bridge,"clear_attachment_previews",
+                           new=AsyncMock(return_value="HOLD_DIAGNOSTIC_PRE_SEND")),
+              patch.object(bridge,"ensure_image_tool",new=AsyncMock()) as selector):
             worker=bridge.ChatBridge(FakeGithub(), MagicMock())
             result=await worker.send_with_png(
                 page,t,"Korean","source",True,image_tool_preverified=True)
@@ -237,9 +237,10 @@ class CorrectImageGenPreverifiedBranchTests(unittest.IsolatedAsyncioTestCase):
             {"task_id":"HDRW-A-"+"2"*20},
             {"status":"AB_CLAIMED"},
         ):
-            self.assertFalse(bridge.image_tool_pre_send_retry_safe(
-                hold(t,hold_reason="HOLD_C1_IMAGE_TOOL_SELECTED",
-                     pre_send_no_message=False,**changed),t))
+            record=hold(t,hold_reason="HOLD_C1_IMAGE_TOOL_SELECTED",
+                        pre_send_no_message=False)
+            record.update(changed)
+            self.assertFalse(bridge.image_tool_pre_send_retry_safe(record,t))
 
 
 class CurrentChatGPTImagesMenuTests(unittest.IsolatedAsyncioTestCase):
