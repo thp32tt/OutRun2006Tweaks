@@ -3,6 +3,7 @@ name: OutRun HD 8 Existing A/B Source-Owner STRICT Native QA (GitHub CPU)
 # Test the real multi-ROI native DDS assembler on the six atlases containing
 # eight SHA-pinned and previously BC3-preserved source-owner Korean PNGs.
 # The result can lower machine HOLD counts only if the strict assembler does.
+# It emits a SHA-bound original-format TEST_ONLY DDS ZIP, never a game install.
 # It is NOT a C1/C3 release approval.
 on:
   workflow_dispatch:
