@@ -51,6 +51,7 @@ jobs:
             tools/localization/test_hd_overlap_ownership.py
             tools/localization/hd_bc3_index_patch.py
             tools/localization/hd_bc3_native_codec.py
+            tools/localization/hd_bc3_source_owner_import.py
             tools/localization/test_hd_bc3_index_patch.py
             tools/localization/test_hd_bc3_native_codec.py
             tools/localization/hd_existing_candidate_salvage.py
