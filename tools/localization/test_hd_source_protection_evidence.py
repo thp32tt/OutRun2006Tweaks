@@ -40,6 +40,21 @@ class SourceProtectionEvidenceTests(unittest.TestCase):
         self.assertEqual(view.getpixel((60, 20)), (25, 220, 65, 255))
         self.assertEqual(img.getpixel((70, 30)), (255, 255, 255, 255))
 
+    def test_overlay_keeps_owned_ambiguous_protected_priority(self):
+        src = Image.new("RGBA", (4, 1), (1, 2, 3, 255))
+        owned = Image.new("L", src.size, 0)
+        protected = Image.new("L", src.size, 0)
+        ambiguous = Image.new("L", src.size, 0)
+        owned.putpixel((0, 0), 255)
+        protected.putpixel((1, 0), 255)
+        protected.putpixel((2, 0), 255)
+        ambiguous.putpixel((2, 0), 255)
+        view = evidence_overlay(src, owned, protected, ambiguous)
+        self.assertEqual(view.getpixel((0, 0)), (25, 220, 65, 255))
+        self.assertEqual(view.getpixel((1, 0)), (245, 45, 45, 255))
+        self.assertEqual(view.getpixel((2, 0)), (255, 170, 10, 255))
+        self.assertEqual(view.getpixel((3, 0)), (1, 2, 3, 255))
+
     def test_ambiguous_shared_components_are_protected_not_fake_owned(self):
         img = source(ambiguous=True)
         diag = {}
