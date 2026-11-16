@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "as_of": "2026-11-16",
+  "acquisition_status": "0_OF_13_DOWNLOADED",
+  "conversion_status": "0_OF_13_CONVERTED",
+  "test_status": "0_OF_13_TESTED",
+  "source_catalog": "Sketchfab public Data API; download requires official user OAuth",
+  "rights_review_required": true,
+  "cars": [
+    {
+      "id": "daytona365",
+      "name": "Ferrari 365 GTS/4 Daytona",
+      "uid": "b7510383e3fb4a63a26d45e424a9f292",
+      "author": "Car2022",
+      "triangles": 88059,
+      "license": "CC-BY",
+      "status": "OFFICIAL_OAUTH_REQUIRED",
+      "url": "https://sketchfab.com/3d-models/b7510383e3fb4a63a26d45e424a9f292"
+    },
+    {
+      "id": "dino246gts",
+      "name": "Dino 246 GTS",
+      "uid": "3fefdbf09db342de8279b352bd5f325d",
+      "author": "outpiston",
+      "triangles": 286494,
+      "license": "CC-BY-NC-SA",
+      "status": "RIGHTS_UNVERIFIED_CSR2_EXTRACT",
+      "url": "https://sketchfab.com/3d-models/3fefdbf09db342de8279b352bd5f325d"
+    },
+    {
+      "id": "360spider",
+      "name": "Ferrari 360 Spider",
+      "uid": "216e8f0ad97e44588c7cd55690bacc0a",
+      "author": "romanian_guy_0069",
+      "triangles": 1437245,
+      "license": "CC-BY",
+      "status": "OFFICIAL_OAUTH_REQUIRED",
+      "url": "https://sketchfab.com/3d-models/216e8f0ad97e44588c7cd55690bacc0a"
+    },
+    {
+      "id": "f355spider",
+      "name": "Ferrari F355 Spider",
+      "uid": null,
+      "author": null,
+      "triangles": null,
+      "license": null,
+      "status": "EXACT_MODEL_NOT_FOUND",
+      "url": null
+    },
+    {
+      "id": "575superamerica",
+      "name": "Ferrari 575 Superamerica",
+      "uid": null,
+      "author": null,
+      "triangles": null,
+      "license": null,
+      "status": "EXACT_MODEL_NOT_FOUND",
+      "url": null
+    },
+    {
+      "id": "testarossa",
+      "name": "Ferrari Testarossa Spider",
+      "uid": null,
+      "author": null,
+      "triangles": null,
+      "license": null,
+      "status": "EXACT_MODEL_NOT_FOUND",
+      "url": null
+    },
+    {
+      "id": "328gts",
+      "name": "Ferrari 328 GTS",
+      "uid": null,
+      "author": null,
+      "triangles": null,
+      "license": null,
+      "status": "EXACT_MODEL_NOT_FOUND",
+      "url": null
+    },
+    {
+      "id": "250gto",
+      "name": "Ferrari 250 GTO",
+      "uid": "b12954e759df43e882a0136c1403a800",
+      "author": "Tyler_Dave",
+      "triangles": 46015,
+      "license": "CC-BY",
+      "status": "OFFICIAL_OAUTH_REQUIRED",
+      "url": "https://sketchfab.com/3d-models/b12954e759df43e882a0136c1403a800"
+    },
+    {
+      "id": "512bb",
+      "name": "Ferrari 512 BB",
+      "uid": null,
+      "author": null,
+      "triangles": null,
+      "license": null,
+      "status": "EXACT_MODEL_NOT_FOUND",
+      "url": null
+    },
+    {
+      "id": "550barchetta",
+      "name": "Ferrari 550 Barchetta",
+      "uid": "e5de7426fc8f4ae5a6b60c0b5d7c34f4",
+      "author": "cloudhub",
+      "triangles": 117447,
+      "license": "CC-BY",
+      "status": "OFFICIAL_OAUTH_REQUIRED",
+      "url": "https://sketchfab.com/3d-models/e5de7426fc8f4ae5a6b60c0b5d7c34f4"
+    },
+    {
+      "id": "f430",
+      "name": "Ferrari F430 Coupe",
+      "uid": "2790d9ffd8ef4ca681d350a27c0ec0cb",
+      "author": "CGDELUXE",
+      "triangles": 2284171,
+      "license": "CC-BY",
+      "status": "OAUTH_AND_RUNTIME_MEMORY_LIMIT",
+      "url": "https://sketchfab.com/3d-models/2790d9ffd8ef4ca681d350a27c0ec0cb"
+    },
+    {
+      "id": "f430spider",
+      "name": "Ferrari F430 Spider",
+      "uid": null,
+      "author": null,
+      "triangles": null,
+      "license": null,
+      "status": "EXACT_MODEL_NOT_FOUND",
+      "url": null
+    },
+    {
+      "id": "enzo",
+      "name": "Ferrari Enzo",
+      "uid": "8553d226088e4497ae05decc15df6609",
+      "author": "LuizZed36",
+      "triangles": 30661,
+      "license": "CC-BY",
+      "status": "OFFICIAL_OAUTH_REQUIRED",
+      "url": "https://sketchfab.com/3d-models/8553d226088e4497ae05decc15df6609"
+    }
+  ]
+}
