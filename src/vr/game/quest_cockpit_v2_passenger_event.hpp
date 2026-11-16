@@ -41,12 +41,13 @@ inline constexpr std::uint32_t OriginalStartAfterPassengerEventId=0x16cu;
 inline constexpr std::uint32_t OriginalStartAfterPassengerFunctionId=0x3bu;
 // The caller must pass an exact LIVE original ROB02 owner, established
 // from 0x79FB48 flag 0x02 plus the 4879B0 callback and work pointer.
-// Hide mode affects the original ROB02 draw in either camera, while the
-// follow mode admits only a character already present in camera 0.
+// "Remove" is cockpit-only. Camera 0 must preserve original ROB02
+// rendering regardless of which passenger checkbox is selected.
 inline constexpr bool ShouldSuppressOriginalPassenger(
     bool vrEnabled,bool cockpitEnabled,bool followCamera0,
-    bool gameplay,bool exactLivePassenger) noexcept {
+    bool gameplay,bool nativeCameraModeOne,
+    bool exactLivePassenger) noexcept {
     return vrEnabled && cockpitEnabled && !followCamera0 &&
-        gameplay && exactLivePassenger;
+        gameplay && nativeCameraModeOne && exactLivePassenger;
 }
 }
