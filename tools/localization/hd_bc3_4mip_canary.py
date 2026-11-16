@@ -5,6 +5,7 @@ from collections import Counter
 from pathlib import Path
 from PIL import Image,ImageChops,ImageOps
 from hd_bc3_4mip_patch import safe_patch,read_levels,BC3Hold
+from hd_bc3_native_owner_mip1 import apply as apply_mip1
 from hd_hold_closure_audit import exact_mask_files,png
 from hd_bc3_native_codec import bc3_header
 
@@ -16,7 +17,7 @@ EDIT_EVIDENCE="outrun-hd-existing-pixel-auto-editor-v1"
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 
-def canary(proof_dir,edit_dir,out,max_output=2):
+def canary(proof_dir,edit_dir,out,max_output=12):
     proof_dir,edit_dir,out=map(Path,(proof_dir,edit_dir,out))
     out.mkdir(parents=True,exist_ok=True)
     evidence=json.loads((proof_dir/"source_protection_evidence.json").read_text())
@@ -65,28 +66,36 @@ def canary(proof_dir,edit_dir,out,max_output=2):
               "edited_candidate_sha256":e["edited_transparent_sha256"],
               "approval":False}
         try:
+            shape=bc3_header(raw)
+            item["actual_mip_count"]=shape[2] if shape else None
             masks=exact_mask_files(proof_dir,t)
-            source=read_levels(raw)[0][3]
-            if t["native_orientation"]=="FLIPY":source=ImageOps.flip(source)
             box=tuple(t["bbox_xyxy"])
-            crop=source.crop(box)
-            if ImageChops.difference(crop,masks["source"]).getbbox():
-                raise BC3Hold("SOURCE_CROP_SHA_OWNERSHIP_NOT_SAME_DDS")
-            if masks["ambiguous"].getbbox():
-                raise BC3Hold("AMBIGUOUS_MASK_NOT_NATIVE_OWNER")
-            owner=Image.new("L",source.size,0)
-            owner.paste(masks["owned"],box[:2])
-            korean=Image.new("RGBA",source.size,(0,0,0,0))
-            korean.alpha_composite(png(edit_dir/e["edited_transparent_png"]),box[:2])
-            if korean.getchannel("A").getbbox() is None:
-                raise BC3Hold("EDITED_SOURCE_TRANSLATION_MISSING")
-            data,receipts=safe_patch(
-                raw,owner,korean,[box],t["native_orientation"])
-            item["status"]="MIP4_INDEX_ONLY_SOURCE_AND_PROTECTED_PASS_TEST_ONLY"
+            text=png(edit_dir/e["edited_transparent_png"])
+            if shape and shape[2]==1:
+                data,receipt=apply_mip1(
+                    raw,masks["source"],masks["owned"],masks["ambiguous"],
+                    text,box,t["native_orientation"])
+                item["status"]="MIP1_INDEX_ONLY_SOURCE_AND_PROTECTED_PASS_TEST_ONLY"
+                item["mip_receipts"]=[receipt]
+            elif shape and shape[2]==4:
+                source=read_levels(raw)[0][3]
+                if t["native_orientation"]=="FLIPY":
+                    source=ImageOps.flip(source)
+                if ImageChops.difference(source.crop(box),masks["source"]).getbbox():
+                    raise BC3Hold("SOURCE_CROP_SHA_OWNERSHIP_NOT_SAME_DDS")
+                owner=Image.new("L",source.size,0)
+                owner.paste(masks["owned"],box[:2])
+                korean=Image.new("RGBA",source.size,(0,0,0,0))
+                korean.alpha_composite(text,box[:2])
+                data,receipts=safe_patch(
+                    raw,owner,korean,[box],t["native_orientation"])
+                item["status"]="MIP4_INDEX_ONLY_SOURCE_AND_PROTECTED_PASS_TEST_ONLY"
+                item["mip_receipts"]=receipts
+            else:
+                raise BC3Hold("SOURCE_MIP_COUNT_NEEDS_SEPARATE_GATE")
             item["saved_sha256"]=sha(data)
-            item["mip_receipts"]=receipts
             if max_output>0:
-                p=out/(rid+"_MIP4_TEST_ONLY.dds")
+                p=out/(rid+"_SOURCE_BOUND_TEST_ONLY.dds")
                 p.write_bytes(data)
                 item["test_dds_filename"]=p.name
                 max_output-=1
@@ -99,8 +108,8 @@ def canary(proof_dir,edit_dir,out,max_output=2):
             "full_proven_bc3_rows":12,"source_dds_targets":len(raws),
             "source_dds_modified":False,"release_approved":False,
             "runtime_validation":"UNTESTED","c1_c3":"UNTESTED",
-            "machine_canary_pass_count":counts.get(
-                "MIP4_INDEX_ONLY_SOURCE_AND_PROTECTED_PASS_TEST_ONLY",0),
+            "machine_canary_pass_count":sum(v for k,v in counts.items()
+                if k.endswith("_SOURCE_AND_PROTECTED_PASS_TEST_ONLY")),
             "statuses":counts,"records":results}
     (out/"mip4_canary_report.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
     print(json.dumps({k:v for k,v in report.items() if k!="records"},sort_keys=True))
