@@ -1,6 +1,20 @@
 #include "../../src/vr/game/quest_cockpit_v2_passenger_event.hpp"
 #include <cassert>
 using namespace OutRunVR::QuestCockpitV2;
+// Exhaustive six-boolean native removal truth table: only 0x3B, i.e.
+// VR=1, cockpit=1, follow=0, racing=1, mode1=1, native ROB02=1, hides.
+// Every one of the other 63 states (notably camera0 and GOAL) must draw.
+constexpr bool PassengerGateTruthTable() {
+    for(unsigned bits=0;bits<64u;++bits) {
+        const bool actual=ShouldSuppressOriginalPassenger(
+            (bits&0x01u)!=0u, (bits&0x02u)!=0u,
+            (bits&0x04u)!=0u, (bits&0x08u)!=0u,
+            (bits&0x10u)!=0u, (bits&0x20u)!=0u);
+        if(actual!=(bits==0x3bu))return false;
+    }
+    return true;
+}
+static_assert(PassengerGateTruthTable(),"camera0/GOAL/effect must not hide ROB02");
 int main() {
     // Original PC: 440110 event byte flags live separately from sEventWork.
     static_assert(OriginalEventFlagsRva==0x39FB48u);
