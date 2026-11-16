@@ -1,0 +1,22 @@
+name: Cancel prohibited F355 private conversion
+
+on:
+  push:
+    branches:
+      - tooling/f355-spider-private-yft-convert-20261116
+    paths:
+      - '.github/workflows/cancel-f355-private-convert.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Cancel conversion run after source README rights check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST repos/${{ github.repository }}/actions/runs/43795254676/cancel
