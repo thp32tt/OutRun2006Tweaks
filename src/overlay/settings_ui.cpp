@@ -82,9 +82,7 @@ class SettingsWindow : public OverlayWindow
         return matches_search(setting->key(), search) ||
             (setting->section() == "VR" && setting->key() == "AntiAliasing" &&
                 matches_search("MSAA", search)) ||
-            (setting->section() == "VR" &&
-                setting->key() == "QuestCockpitV2PassengerVisible" &&
-                matches_search("Passenger Always Visible", search));
+            false; // passenger uses an exclusive pair of custom F11 checkboxes
     }
 
 	static bool section_matches(std::string_view section, std::string_view search)
@@ -96,6 +94,13 @@ class SettingsWindow : public OverlayWindow
 			(matches_search("Input Bindings", search) ||
 			 matches_search("Configure Input Bindings", search)))
 			return true;
+        // The canonical passenger-mode setting is hidden: the two visible
+        // exclusive checkboxes are drawn as a cockpit group below.
+        if(section == "VR" &&
+           (matches_search("Passenger",search) ||
+            matches_search("Follow Camera 0",search) ||
+            matches_search("Remove Passenger",search)))
+            return true;
 
 		for (const Settings::SettingBase* setting : Settings::SettingBase::registry())
 			if (!setting->hidden() && setting->section() == section && setting_matches(setting, search))
@@ -193,6 +198,9 @@ public:
 
 	void init() override
 	{
+        // Keep the existing persistent setting key but replace the former
+        // "Always Visible" control with two mutually-exclusive checkboxes.
+        Settings::VRQuestCockpitV2PassengerVisible.hidden(true);
 		// Build the section list once, in the shipped INI's order.
 		for (const char* section : SectionOrder)
 			for (const Settings::SettingBase* setting : Settings::SettingBase::registry())
@@ -303,11 +311,36 @@ public:
 				matches_search("QuestCockpitV2Seat", search) ||
 				matches_search("SeatBack", search) || matches_search("SeatDown", search) ||
 				matches_search("SeatRight", search) ||
-				matches_search("Passenger Always Visible", search);
+                matches_search("Passenger", search) ||
+                matches_search("Follow Camera 0", search) ||
+                matches_search("Remove Passenger", search);
 			if (section == "VR" && cockpitViewSearch)
 			{
 				ImGui::SeparatorText("Cockpit View");
-				ImGui::TextWrapped("Seat Back / Down / Right are live and persist to OutRun2006Tweaks.user.ini. Passenger Always Visible takes effect from the next race START.");
+				ImGui::TextWrapped("Seat Back / Down / Right and passenger mode save to OutRun2006Tweaks.user.ini.");
+                const bool showPassenger=search.empty() ||
+                    matches_search("Cockpit View", search) ||
+                    matches_search("Passenger", search) ||
+                    matches_search("Follow Camera 0", search) ||
+                    matches_search("Remove Passenger", search);
+                if(showPassenger) {
+                    ImGui::SeparatorText("Passenger (select one)");
+                    // Both checkboxes share one persisted bool. Clicking
+                    // either always selects the opposite mode immediately:
+                    // no both-checked or both-unchecked state is possible.
+                    bool follow=Settings::VRQuestCockpitV2PassengerVisible.get();
+                    if(ImGui::Checkbox("Passenger: Follow Camera 0",&follow)) {
+                        Settings::VRQuestCockpitV2PassengerVisible=follow;
+                        queue_setting_change(&Settings::VRQuestCockpitV2PassengerVisible);
+                    }
+                    bool remove=!Settings::VRQuestCockpitV2PassengerVisible.get();
+                    if(ImGui::Checkbox("Passenger: Remove",&remove)) {
+                        Settings::VRQuestCockpitV2PassengerVisible=!remove;
+                        queue_setting_change(&Settings::VRQuestCockpitV2PassengerVisible);
+                    }
+                    ImGui::TextWrapped("Follow: use the original third-person passenger only when native ROB02 exists. Remove: hide that passenger in camera 0 and cockpit view. Changes apply live; the original passenger event and animations are not modified.");
+                    ImGui::Spacing();
+                }
 				if (ImGui::Button("Save Cockpit View"))
 					cockpitStatus = flush_settings() ? "Cockpit view saved." : "Cockpit view save failed.";
 				ImGui::SameLine();
@@ -347,9 +380,7 @@ public:
 
 				const std::string label(
                     setting->section() == "VR" && setting->key() == "AntiAliasing"
-                        ? "MSAA (AntiAliasing)" :
-                    setting->section() == "VR" && setting->key() == "QuestCockpitV2PassengerVisible"
-                        ? "Passenger Always Visible" : setting->key());
+                        ? "MSAA (AntiAliasing)" : setting->key());
 
 				if (draw_control(setting, label))
 					queue_setting_change(setting);
