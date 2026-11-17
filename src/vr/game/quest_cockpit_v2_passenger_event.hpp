@@ -62,6 +62,27 @@ inline constexpr bool ShouldBypassPassengerCarDisplayGate(
         activeRacingCockpit && nativeCameraModeOne && exactLivePassenger &&
         ((nativeCarFlags & 0xc000u)!=0x4000u);
 }
+// Native original EXE verified: event_display_43FB40 iterates the current
+// layer (1 << layer), 0x80 for ROB01/ROB02 (source descriptors 0x16A/B).
+// If a LIVE guest's render scene has been masked away while the driver is
+// still admitted to the SAME ORIGINAL 0x80 pass, recover the draw only
+// after that pass has completed and proved it did not call the ROB02 wrapper.
+// No fallback to another layer, no event creation or persistent scene edit.
+inline constexpr std::uint32_t OriginalRobDisplayLayer=0x80u;
+inline constexpr bool ShouldRecoverOriginalPassengerScenePass(
+    bool vr,bool cockpit,bool follow,bool racing,
+    bool modeOne,bool liveOriginalGuest,bool validFrame,bool validStereo,
+    std::uint32_t renderMask,std::int32_t first,std::int32_t last,
+    std::uint32_t driverScene,std::uint32_t passengerScene,
+    bool guestWrapperReached) noexcept {
+    return vr && cockpit && follow && racing && modeOne &&
+        liveOriginalGuest && validFrame && validStereo &&
+        renderMask==OriginalRobDisplayLayer &&
+        first<=static_cast<std::int32_t>(OriginalPassengerEventId) &&
+        last>=static_cast<std::int32_t>(OriginalPassengerEventId) &&
+        (driverScene&renderMask)!=0u &&
+        (passengerScene&renderMask)==0u && !guestWrapperReached;
+}
 inline constexpr bool ShouldSuppressOriginalPassenger(
     bool vrEnabled,bool cockpitEnabled,bool followCamera0,
     bool activeRacingCockpit,bool nativeCameraModeOne,

@@ -1130,9 +1130,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static constexpr int PlayerCarRva=0x69764, RobotRva=0x114E60;
     static constexpr int OriginalDriverDisplayRva=0x879B0;
     static constexpr int OriginalCommonRobotDisplayRva=0x87880;
+    static constexpr int OriginalEventSceneDisplayRva=0x3FB40;
     inline static SafetyHookMid PlayerHook{};
     inline static SafetyHookInline RobotHook{};
     inline static SafetyHookInline PassengerGateHook{};
+    inline static SafetyHookInline PassengerSceneHook{};
+    inline static std::atomic<std::uint64_t> PassengerScenePasses{0};
+    inline static std::atomic<std::uint64_t> PassengerSceneRestores{0};
     inline static std::atomic<std::uint64_t> PassengerGateEntries{0};
     inline static std::atomic<std::uint64_t> PassengerGateCamera1Entries{0};
     inline static std::atomic<std::uint64_t> PassengerGateNonPassenger{0};
@@ -1229,6 +1233,8 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             "callbacksCam0={} callbacksCam1={} callbacksOther={} "
             "gateEntries={} gateCamera1={} gateNonPassenger={} "
             "gateCalls={} gateRestores={} "
+            "robDriverScene=0x{:X} robGuestScene=0x{:X} "
+            "scenePasses={} sceneRestores={} "
             "carFlags=0x{:08X} epoch={} stereoValid={}",
             sample,camera?static_cast<int>(camera->cam_mode_34A):-1,
             Game::current_mode?static_cast<int>(*Game::current_mode):-1,
@@ -1246,6 +1252,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             PassengerGateNonPassenger.load(std::memory_order_relaxed),
             PassengerGateCalls.load(std::memory_order_relaxed),
             PassengerGateRestores.load(std::memory_order_relaxed),
+            driver?driver->field_C:0u,passenger?passenger->field_C:0u,
+            PassengerScenePasses.load(std::memory_order_relaxed),
+            PassengerSceneRestores.load(std::memory_order_relaxed),
             Game::pl_car()?Game::pl_car()->flags_4:0u,
             NativeFrameTrace().ActiveEpoch(),stereo&&stereo->valid);
     }
@@ -1370,6 +1379,83 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         Module::fn_ptr<NativeRobotDisplay>(
             OriginalCommonRobotDisplayRva)(work);
     }
+
+    // Original canonical EXE 43FB40 starts:
+    // 83 EC 10 83 3D 58 02 78 00 02 53 55 56 57 ...
+    // Original PC declaration is cdecl(mask, first, last). Never hook an
+    // unrecognized EXE or a function already detoured by another module.
+    static bool OriginalEventSceneDisplaySignature() noexcept {
+        constexpr std::array<std::uint8_t,14> expected{
+            0x83,0xEC,0x10,0x83,0x3D,0x58,0x02,0x78,0x00,0x02,
+            0x53,0x55,0x56,0x57
+        };
+        const auto* entry=Module::exe_ptr<std::uint8_t>(
+            OriginalEventSceneDisplayRva);
+        MEMORY_BASIC_INFORMATION mbi{};
+        if(!entry || VirtualQuery(entry,&mbi,sizeof(mbi))!=sizeof(mbi) ||
+           mbi.State!=MEM_COMMIT ||
+           (mbi.Protect&(PAGE_GUARD|PAGE_NOACCESS)))return false;
+        const auto addr=reinterpret_cast<std::uintptr_t>(entry);
+        const auto end=reinterpret_cast<std::uintptr_t>(mbi.BaseAddress)
+            +mbi.RegionSize;
+        return addr<=end && end-addr>=expected.size() &&
+            std::equal(expected.begin(),expected.end(),entry);
+    }
+    static void __cdecl PassengerEventSceneDisplay(
+        std::uint32_t mask,std::int32_t first,std::int32_t last) {
+        using namespace OutRunVR::QuestCockpitV2;
+        const auto before=PassengerGateCalls.load(std::memory_order_relaxed);
+        // Always dispatch unmodified original scene first. The fallback is
+        // never allowed to replace the native event display loop.
+        PassengerSceneHook.ccall<void>(mask,first,last);
+        if(mask!=OriginalRobDisplayLayer || first>static_cast<std::int32_t>(
+               OriginalPassengerEventId) ||
+           last<static_cast<std::int32_t>(OriginalPassengerEventId) ||
+           !Settings::VREnabled || !Settings::VRQuestCockpitV2Enabled ||
+           !Settings::VRQuestCockpitV2PassengerVisible ||
+           !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
+           !NativeFrameTrace().Active() || InSceneEffect())return;
+        const auto* cam=Game::camera();
+        if(!cam || cam->cam_mode_34A!=1 || !Game::pl_car())return;
+        const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
+        const bool stereoReady=stereo&&stereo->valid&&stereo->poseSequence!=0;
+        const bool race=Game::current_mode &&
+            (*Game::current_mode==STATE_GAME ||
+             (*Game::current_mode==STATE_START &&
+              Game::game_start_progress_code &&
+              *Game::game_start_progress_code==65));
+        if(!race)return;
+        auto* driver=Game::event(EVENT_ROB01);
+        auto* passenger=Game::event(EVENT_ROB02);
+        if(!driver || !passenger)return;
+        auto* work=passenger->data<EvWorkRobot>();
+        const bool live=work && ExactOriginalCockpitOccupant(work)==
+            OriginalOccupantSlot::Passenger363;
+        const auto after=PassengerGateCalls.load(std::memory_order_relaxed);
+        PassengerScenePasses.fetch_add(1,std::memory_order_relaxed);
+        const bool recover=ShouldRecoverOriginalPassengerScenePass(
+            Settings::VREnabled.get(),
+            Settings::VRQuestCockpitV2Enabled.get(),
+            Settings::VRQuestCockpitV2PassengerVisible.get(),
+            QuestCockpitV2Active(cam) && race,cam->cam_mode_34A==1,
+            live,NativeFrameTrace().Active(),stereoReady,
+            mask,first,last,driver->field_C,passenger->field_C,after!=before);
+        if(!recover)return;
+        const auto count=PassengerSceneRestores.fetch_add(
+            1,std::memory_order_relaxed)+1;
+        if(PassengerTraceOn() && (count<=12u || count%180u==0u))
+            spdlog::info(
+                "VR PASSENGER SCENE RESTORE: count={} epoch={} "
+                "mask=0x{:X} driverScene=0x{:X} guestScene=0x{:X} "
+                "nativeWrapperCallsBefore={} after={} (not GPU proof)",
+                count,NativeFrameTrace().ActiveEpoch(),mask,
+                driver->field_C,passenger->field_C,before,after);
+        // A genuine live ROB02 native work pointer, same frame, same
+        // verified 0x80 actor pass. No event allocation/flag/scene mutation.
+        // This function calls the existing car-gate-aware original renderer.
+        PassengerDriverDisplay(work);
+    }
+
     static void __cdecl RobotDisplay(EvWorkRobot* robot) {
         using namespace OutRunVR::QuestCockpitV2;
         // Original ROB display runs outside races too. Event state is safe
@@ -1622,8 +1708,21 @@ public:
         if(!guest)return false; // car + robot hooks RAII rollback
         PlayerHook=std::move(car);RobotHook=std::move(robot);
         PassengerGateHook=std::move(guest);
+        // Optional fail-closed safety: game still works if another plugin
+        // already owns the native scene entry or the ABI differs.
+        if(OriginalEventSceneDisplaySignature()) {
+            auto scene=safetyhook::create_inline(
+                Module::exe_ptr(OriginalEventSceneDisplayRva),
+                PassengerEventSceneDisplay);
+            if(scene)PassengerSceneHook=std::move(scene);
+            else spdlog::warn("VR PASSENGER: original 43FB40 scene hook unavailable; scene-mask recovery disabled");
+        } else {
+            spdlog::warn("VR PASSENGER: original 43FB40 signature mismatch; scene-mask recovery disabled");
+        }
         if(PassengerTraceOn())spdlog::info(
-            "VR PASSENGER TRACE: 514E60 robot + 4879B0 passenger gate hooks installed");
+            "VR PASSENGER TRACE: 514E60 robot + 4879B0 car gate + "
+            "43FB40 scene diagnostics installed={} ",
+            !!PassengerSceneHook);
         return true;
     }
     static QuestCockpitV2PlayerCandidateProbe instance;

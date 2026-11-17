@@ -34,3 +34,12 @@ the C++17 `tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp` exhausts
 64 Remove cases and 256 Follow gate states, plus native event flag edge cases.
 Win32 and x64 GitHub Actions must pass on an exact SHA before packaging.
 No v0.03 public release should be published from this experimental branch.
+
+## Additional exact-original preflight and scene-mask recovery (2026-11-17)
+
+- Canonical upstream v0.1 EXE SHA256 verified via exact PE32 mapping in a read-only GitHub Actions preflight.
+- Exact original display routine `0x43FB40` starts `83 EC 10 83 3D 58 02 78 00 02 53 55 56 57` and takes cdecl mask, first, last. `0x4879B0` starts `A1 18 9D 79 00 ...` and has the stock car `0x4000` gate.
+- Critically, the native `ROB01/362` and `ROB02/363` source event descriptors both use `display_scene=0x80`, not `0x40`. The decompiled PC frame renderer calls event_display with `1u<<layer` for layer 7, every game frame. Forcing another layer would be wrong and is prohibited.
+- New guarded scene-pass wrapper first invokes original `43FB40`. It only recovers genuine existing `ROB02` after the exact `0x80` pass, only when driver has `0x80` but passenger's current scene mask does not, game/VR/stereo are active, and original real passenger wrapper was **not** reached in that same pass. Draws via the existing, native car-gate-aware passenger path. Does not write the original event table, flags, model or game state.
+- If native `ROB02` field_C still has `0x80`, the new path **does not** produce a duplicate. The preexisting `4879B0` closed-car-gate bypass is the only recovery for that case. Original scene hook is signature verified and optional/fail-closed.
+- No HMD test has yet shown actual visible passenger pixels; static/CI checks cannot prove visual correctness.

@@ -36,6 +36,36 @@ static_assert(!ShouldBypassPassengerCarDisplayGate(
     true,true,false,true,true,true,0x8000u),"Remove never forces a passenger");
 static_assert(!ShouldBypassPassengerCarDisplayGate(
     true,true,true,false,true,true,0x8000u),"GOAL cannot force display");
+// Original source event 362/363 masks = 0x80 (verified from canonical EXE).
+// Trigger ONLY a missing passenger mask, not a closed car gate (handled by
+// 4879B0), and never on 0/1/2/4/6/8/0x100 layers or out-of-range scans.
+constexpr bool PassengerSceneRecoveryTruthTable() {
+  for(unsigned bits=0;bits<256u;++bits) {
+    const bool native=(bits&1u)!=0u, cockpit=(bits&2u)!=0u;
+    const bool follow=(bits&4u)!=0u, race=(bits&8u)!=0u;
+    const bool mode=(bits&16u)!=0u, live=(bits&32u)!=0u;
+    const bool frame=(bits&64u)!=0u, stereo=(bits&128u)!=0u;
+    constexpr auto guestScene=0u, driverScene=0x80u;
+    const bool result=ShouldRecoverOriginalPassengerScenePass(
+      native,cockpit,follow,race,mode,live,frame,stereo,
+      0x80u,0,409,driverScene,guestScene,false);
+    if(result!=(bits==255u))return false;
+  }
+  return true;
+}
+static_assert(PassengerSceneRecoveryTruthTable());
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x40u,0,409,0x40u,0u,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0u,true));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,362,0x80u,0u,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,364,409,0x80u,0u,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0u,0u,false));
 int main() {
     // Original PC: 440110 event byte flags live separately from sEventWork.
     static_assert(OriginalEventFlagsRva==0x39FB48u);
@@ -74,4 +104,5 @@ int main() {
     assert(!suppress(true,true,false,true,false,true));
     assert(suppress(true,true,false,true,true,true));
     assert(PassengerDisplayBypassTruthTable());
+    assert(PassengerSceneRecoveryTruthTable());
 }

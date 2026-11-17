@@ -138,6 +138,18 @@ def pass_07_nested_draw_and_restore():
           "force draw must own native render and a live paired XR pose")
     check("VR PASSENGER WXC:" in robot,
           "missing read-only passenger raw/corrected matrix trace")
+    scene=hook.split("static void __cdecl PassengerEventSceneDisplay(",1)[1].split(
+        "static void __cdecl RobotDisplay(",1)[0]
+    check_order(scene,"PassengerSceneHook.ccall<void>(mask,first,last);",
+                "ShouldRecoverOriginalPassengerScenePass(",
+                "if(!recover)return;",
+                "PassengerDriverDisplay(work);")
+    check("OriginalRobDisplayLayer=0x80u;" in policy,
+          "canonical ROB01/ROB02 mask must be 0x80")
+    check("OriginalEventSceneDisplaySignature()" in hook,
+          "original scene hook must be signature-verified and fail closed")
+    check("PassengerSceneRestores.fetch_add(" in hook,
+          "missing actual upstream scene restore counter")
     check("if(!correctionOwner.Active())" in robot,
           "nested W*C correction not rejected")
 
