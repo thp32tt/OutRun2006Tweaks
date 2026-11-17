@@ -43,6 +43,16 @@ static std::vector<std::uint8_t> Dds1x1() {
     return d;
 }
 
+static std::vector<std::uint8_t> Dds1x1Dxt5() {
+    std::vector<std::uint8_t> d(144,0);
+    std::memcpy(d.data(),"DDS ",4);
+    SetU32(d,4,124);SetU32(d,8,0x000A1007u);
+    SetU32(d,12,1);SetU32(d,16,1);SetU32(d,20,16);SetU32(d,28,1);
+    SetU32(d,76,32);SetU32(d,80,0x4);SetU32(d,84,0x35545844u);
+    SetU32(d,108,0x401008u);
+    return d;
+}
+
 static std::vector<std::uint8_t> Make(bool goodAxis=true) {
     std::vector<std::uint8_t> payload;
     const std::string name="EXT_OPAQUE_00";
@@ -78,6 +88,10 @@ static std::vector<std::uint8_t> Make(bool goodAxis=true) {
 int main() {
     static_assert(MaxMaterials==128,"external HQ material budget regression");
     std::string error;Model model;
+    Texture compressedTexture;
+    auto compressedDds=Dds1x1Dxt5();
+    assert(ParseDds(compressedDds.data(),compressedDds.size(),compressedTexture,false));
+    assert(compressedTexture.format==TextureFormat::DXT5);
     auto good=Make(true);
     assert(Parse(good.data(),good.size(),model,error));
     assert(model.highQuality && model.pbrEnabled && model.dashboardEnabled);
