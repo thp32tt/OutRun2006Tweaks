@@ -217,31 +217,50 @@ def resolve_texture(g, binary, material, field):
     return raw_image(g, binary, tex['source']), tex['source']
 
 
-def rgba_dds(image: Image.Image, *, normal=False):
+def rgba_dds(image: Image.Image, *, normal=False, compressed=True):
     ensure(image.width > 0 and image.height > 0, 'empty texture')
     ensure(image.width <= MAX_TEXTURE_DIM and image.height <= MAX_TEXTURE_DIM,
            'texture exceeds native sidecar 2048x2048 cap')
     ensure(image.width & (image.width-1) == 0 and image.height & (image.height-1) == 0,
            'texture must have power-of-two dimensions')
+    mips = int(math.log2(max(image.width, image.height)))+1
     head = bytearray(128)
     head[:4] = b'DDS '
     struct.pack_into('<I', head, 4, 124)
-    struct.pack_into('<I', head, 8, 0x0002100F)
+    struct.pack_into('<I', head, 8, 0x000A1007 if compressed else 0x0002100F)
     struct.pack_into('<I', head, 12, image.height)
     struct.pack_into('<I', head, 16, image.width)
-    struct.pack_into('<I', head, 20, image.width*4)
-    mips = int(math.log2(max(image.width, image.height)))+1
+    if compressed:
+        top_bytes = max(1, (image.width+3)//4) * max(1, (image.height+3)//4) * 16
+        struct.pack_into('<I', head, 20, top_bytes)
+    else:
+        struct.pack_into('<I', head, 20, image.width*4)
     struct.pack_into('<I', head, 28, mips)
     struct.pack_into('<I', head, 76, 32)
-    struct.pack_into('<I', head, 80, 0x41)
-    struct.pack_into('<I', head, 88, 32)
-    struct.pack_into('<4I', head, 92, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000)
+    if compressed:
+        struct.pack_into('<I', head, 80, 0x4)
+        head[84:88] = b'DXT5'
+    else:
+        struct.pack_into('<I', head, 80, 0x41)
+        struct.pack_into('<I', head, 88, 32)
+        struct.pack_into('<4I', head, 92, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000)
     struct.pack_into('<I', head, 108, 0x401008)
     b = bytearray(head)
-    im = image
+    im = image.convert('RGBA')
     for _ in range(mips):
-        rgba = np.asarray(im.convert('RGBA'), dtype=np.uint8)
-        b.extend(rgba[:, :, [2, 1, 0, 3]].tobytes(order='C'))
+        if compressed:
+            encoded = io.BytesIO()
+            im.save(encoded, format='DDS', pixel_format='DXT5')
+            raw = encoded.getvalue()
+            ensure(len(raw) >= 128 and raw[:4] == b'DDS ' and raw[84:88] == b'DXT5',
+                   'Pillow DXT5 encoder returned invalid DDS')
+            payload = raw[128:]
+            expected = max(1, (im.width+3)//4) * max(1, (im.height+3)//4) * 16
+            ensure(len(payload) == expected, 'DXT5 mip payload length mismatch')
+            b.extend(payload)
+        else:
+            rgba = np.asarray(im, dtype=np.uint8)
+            b.extend(rgba[:, :, [2, 1, 0, 3]].tobytes(order='C'))
         if im.size == (1, 1):
             break
         next_size = (max(1, im.width//2), max(1, im.height//2))
@@ -254,7 +273,6 @@ def rgba_dds(image: Image.Image, *, normal=False):
             rgba_new = np.concatenate([out, np.full(out.shape[:2]+(1,), 255, dtype=np.uint8)], axis=2)
             im = Image.fromarray(rgba_new, 'RGBA')
     return bytes(b)
-
 
 def multiply_color(image: Image.Image, factor):
     f = np.asarray(factor, dtype=np.float32)
@@ -642,10 +660,15 @@ def check_output(ovc: Path):
                w & (w-1) == 0 and h & (h-1) == 0 and 1 <= n <= 12,
                'DDS dimensions/mip count invalid')
         fmt, bpp = struct.unpack_from('<II', d, 84)
-        ensure(fmt == 0 and bpp == 32, 'DDS must be ARGB32')
         required = 128
-        for m in range(n):
-            required += max(w >> m, 1) * max(h >> m, 1)*4
+        if fmt == 0x35545844:
+            for m in range(n):
+                mw, mh = max(w >> m, 1), max(h >> m, 1)
+                required += max(1, (mw+3)//4) * max(1, (mh+3)//4) * 16
+        else:
+            ensure(fmt == 0 and bpp == 32, 'DDS must be DXT5 or ARGB32')
+            for m in range(n):
+                required += max(w >> m, 1) * max(h >> m, 1)*4
         ensure(required == length, 'DDS mip payload length mismatch')
     p, nvert, ntri, mem = 36, 0, 0, 0
     for _ in range(groups):
