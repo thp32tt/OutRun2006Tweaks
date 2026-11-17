@@ -81,7 +81,10 @@ inline constexpr bool ShouldRecoverOriginalPassengerScenePass(
         first<=static_cast<std::int32_t>(OriginalPassengerEventId) &&
         last>=static_cast<std::int32_t>(OriginalPassengerEventId) &&
         (driverScene&renderMask)!=0u &&
-        (passengerScene&renderMask)==0u && !guestWrapperReached;
+        // Only a fully disabled original scene is safe to recover.
+        // If another bit (e.g. 0x40/0x100) is set, the game may draw
+        // the character in that other pass, and forcing 0x80 can duplicate.
+        passengerScene==0u && !guestWrapperReached;
 }
 inline constexpr bool ShouldSuppressOriginalPassenger(
     bool vrEnabled,bool cockpitEnabled,bool followCamera0,

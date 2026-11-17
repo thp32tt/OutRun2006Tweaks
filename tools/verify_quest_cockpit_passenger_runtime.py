@@ -31,7 +31,9 @@ assert "OriginalRobDisplayLayer=0x80u" in policy
 assert "ShouldRecoverOriginalPassengerScenePass(" in policy
 assert "OriginalEventSceneDisplaySignature()" in hook
 assert "PassengerSceneHook.ccall<void>(mask,first,last);" in hook
-assert "PassengerGateCalls.load(std::memory_order_relaxed)" in hook
+assert "PassengerGateThreadCalls" in hook
+assert "const auto before=PassengerGateThreadCalls;" in hook
+assert "const auto after=PassengerGateThreadCalls;" in hook
 assert "PassengerDriverDisplay(work);" in hook
 assert "driver->field_C,passenger->field_C,after!=before" in hook
 assert "0x83,0xEC,0x10,0x83,0x3D,0x58,0x02,0x78,0x00,0x02" in hook

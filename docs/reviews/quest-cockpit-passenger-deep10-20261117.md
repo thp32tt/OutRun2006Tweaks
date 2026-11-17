@@ -43,3 +43,9 @@ No v0.03 public release should be published from this experimental branch.
 - New guarded scene-pass wrapper first invokes original `43FB40`. It only recovers genuine existing `ROB02` after the exact `0x80` pass, only when driver has `0x80` but passenger's current scene mask does not, game/VR/stereo are active, and original real passenger wrapper was **not** reached in that same pass. Draws via the existing, native car-gate-aware passenger path. Does not write the original event table, flags, model or game state.
 - If native `ROB02` field_C still has `0x80`, the new path **does not** produce a duplicate. The preexisting `4879B0` closed-car-gate bypass is the only recovery for that case. Original scene hook is signature verified and optional/fail-closed.
 - No HMD test has yet shown actual visible passenger pixels; static/CI checks cannot prove visual correctness.
+
+## Final risk closure: no alternate-layer duplication
+
+- A missing `0x80` bit does not by itself mean the passenger has no other valid render scene. The scene recovery gate therefore requires `passengerScene==0` (completely disabled), rather than simply `(passengerScene&0x80)==0`; alternate `0x40` and `0x100` masks are negative regression cases.
+- The pre/post original wrapper comparison uses a **thread-local** counter instead of the aggregate cross-thread diagnostic counter. This prevents eye/renderer thread traffic from suppressing a genuinely missing original event in the current scene pass.
+- The regular original `0x4879B0` car display gate recovery still applies to any scene where the native event callback actually executes. No cross-layer re-render is attempted when event scenes differ from original `0x80`.

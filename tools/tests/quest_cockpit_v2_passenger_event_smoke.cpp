@@ -59,6 +59,10 @@ static_assert(!ShouldRecoverOriginalPassengerScenePass(
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
   true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x40u,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x100u,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
   true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0u,true));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
   true,true,true,true,true,true,true,true,0x80u,0,362,0x80u,0u,false));

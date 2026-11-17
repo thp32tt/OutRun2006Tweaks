@@ -1141,6 +1141,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     inline static std::atomic<std::uint64_t> PassengerGateCamera1Entries{0};
     inline static std::atomic<std::uint64_t> PassengerGateNonPassenger{0};
     inline static std::atomic<std::uint64_t> PassengerGateCalls{0};
+    // The per-native-scene duplicate guard must not consume another
+    // renderer thread's passenger callback (atomics remain telemetry).
+    inline static thread_local std::uint64_t PassengerGateThreadCalls=0;
     inline static std::atomic<std::uint64_t> PassengerGateRestores{0};
     inline static thread_local bool PassengerGateBypassInFlight=false;
     inline static std::uint64_t TraceCount=0;
@@ -1334,6 +1337,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             PassengerGateNonPassenger.fetch_add(1,std::memory_order_relaxed);
             original();return;
         }
+        ++PassengerGateThreadCalls;
         const auto calls=PassengerGateCalls.fetch_add(
             1,std::memory_order_relaxed)+1;
         const auto flags=car->flags_4;
@@ -1404,7 +1408,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static void __cdecl PassengerEventSceneDisplay(
         std::uint32_t mask,std::int32_t first,std::int32_t last) {
         using namespace OutRunVR::QuestCockpitV2;
-        const auto before=PassengerGateCalls.load(std::memory_order_relaxed);
+        const auto before=PassengerGateThreadCalls;
         // Always dispatch unmodified original scene first. The fallback is
         // never allowed to replace the native event display loop.
         PassengerSceneHook.ccall<void>(mask,first,last);
@@ -1431,7 +1435,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         auto* work=passenger->data<EvWorkRobot>();
         const bool live=work && ExactOriginalCockpitOccupant(work)==
             OriginalOccupantSlot::Passenger363;
-        const auto after=PassengerGateCalls.load(std::memory_order_relaxed);
+        const auto after=PassengerGateThreadCalls;
         PassengerScenePasses.fetch_add(1,std::memory_order_relaxed);
         const bool recover=ShouldRecoverOriginalPassengerScenePass(
             Settings::VREnabled.get(),
