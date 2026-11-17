@@ -12,7 +12,7 @@ assert sha=="68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",s
 u16=lambda offset:struct.unpack_from("<H",a,offset)[0]
 u32=lambda offset:struct.unpack_from("<I",a,offset)[0]
 pe=u32(0x3c)
-assert a[pe:pe+4]==b"PE\\0\\0" and u16(pe+24)==0x10b
+assert a[pe:pe+4]==bytes.fromhex("50450000") and u16(pe+24)==0x10b
 base=u32(pe+24+28)
 assert base==0x400000
 table=pe+24+u16(pe+20)
