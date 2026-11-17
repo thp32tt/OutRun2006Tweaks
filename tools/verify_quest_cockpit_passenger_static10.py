@@ -146,6 +146,12 @@ def pass_07_nested_draw_and_restore():
                 "PassengerDriverDisplay(work);")
     check("OriginalRobDisplayLayer=0x80u;" in policy,
           "canonical ROB01/ROB02 mask must be 0x80")
+    check("(driverScene&renderMask)" not in policy,
+          "both-hidden mode1 driver mask must not gate guest recovery")
+    check("if(!passenger)return;" in scene,
+          "guest identity alone is enough even if ROB01 is hidden")
+    check("mask,first,last,passenger->field_C,after!=before" in scene,
+          "native passenger scene recovery must ignore driver scene")
     check("OriginalEventSceneDisplaySignature()" in hook,
           "original scene hook must be signature-verified and fail closed")
     check("PassengerSceneRestores.fetch_add(" in hook,

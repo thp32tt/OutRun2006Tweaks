@@ -45,31 +45,33 @@ constexpr bool PassengerSceneRecoveryTruthTable() {
     const bool follow=(bits&4u)!=0u, race=(bits&8u)!=0u;
     const bool mode=(bits&16u)!=0u, live=(bits&32u)!=0u;
     const bool frame=(bits&64u)!=0u, stereo=(bits&128u)!=0u;
-    constexpr auto guestScene=0u, driverScene=0x80u;
+    constexpr auto guestScene=0u;
     const bool result=ShouldRecoverOriginalPassengerScenePass(
       native,cockpit,follow,race,mode,live,frame,stereo,
-      0x80u,0,409,driverScene,guestScene,false);
+      0x80u,0,409,guestScene,false);
     if(result!=(bits==255u))return false;
   }
   return true;
 }
 static_assert(PassengerSceneRecoveryTruthTable());
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x40u,0,409,0x40u,0u,false));
+  true,true,true,true,true,true,true,true,0x40u,0,409,0u,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x40u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x40u,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x100u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x100u,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0u,true));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0u,true));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,362,0x80u,0u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,362,0u,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,364,409,0x80u,0u,false));
-static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0u,0u,false));
+  true,true,true,true,true,true,true,true,0x80u,364,409,0u,false));
+// Regression: driver and guest are BOTH hidden (driverScene=0).
+// A live original passenger can still recover in camera 1.
+static_assert(ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0u,false));
 int main() {
     // Original PC: 440110 event byte flags live separately from sEventWork.
     static_assert(OriginalEventFlagsRva==0x39FB48u);

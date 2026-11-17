@@ -1431,7 +1431,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         if(!race)return;
         auto* driver=Game::event(EVENT_ROB01);
         auto* passenger=Game::event(EVENT_ROB02);
-        if(!driver || !passenger)return;
+        if(!passenger)return;
+        // ROB01 may be hidden with ROB02 in mode 1. Only original
+        // ROB02's exact live native work is relevant for recovery.
         auto* work=passenger->data<EvWorkRobot>();
         const bool live=work && ExactOriginalCockpitOccupant(work)==
             OriginalOccupantSlot::Passenger363;
@@ -1443,7 +1445,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             Settings::VRQuestCockpitV2PassengerVisible.get(),
             QuestCockpitV2Active(cam) && race,cam->cam_mode_34A==1,
             live,NativeFrameTrace().Active(),stereoReady,
-            mask,first,last,driver->field_C,passenger->field_C,after!=before);
+            mask,first,last,passenger->field_C,after!=before);
         if(!recover)return;
         const auto count=PassengerSceneRestores.fetch_add(
             1,std::memory_order_relaxed)+1;
@@ -1453,7 +1455,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 "mask=0x{:X} driverScene=0x{:X} guestScene=0x{:X} "
                 "nativeWrapperCallsBefore={} after={} (not GPU proof)",
                 count,NativeFrameTrace().ActiveEpoch(),mask,
-                driver->field_C,passenger->field_C,before,after);
+                driver?driver->field_C:0u,passenger->field_C,before,after);
         // A genuine live ROB02 native work pointer, same frame, same
         // verified 0x80 actor pass. No event allocation/flag/scene mutation.
         // This function calls the existing car-gate-aware original renderer.

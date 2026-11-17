@@ -10,6 +10,7 @@ on:
       - 'src/plugin.hpp'
       - 'src/vr/game/quest_cockpit_v2_passenger_event.hpp'
       - 'tools/tests/quest_cockpit_v2_passenger_event_smoke.cpp'
+      - 'tools/tests/quest_cockpit_v2_passenger_pipeline_smoke.cpp'
       - 'tools/verify_quest_cockpit_passenger_runtime.py'
       - 'tools/verify_quest_cockpit_passenger_static10.py'
       - 'src/dllmain.cpp'

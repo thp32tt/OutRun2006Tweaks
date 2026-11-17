@@ -64,23 +64,23 @@ inline constexpr bool ShouldBypassPassengerCarDisplayGate(
 }
 // Native original EXE verified: event_display_43FB40 iterates the current
 // layer (1 << layer), 0x80 for ROB01/ROB02 (source descriptors 0x16A/B).
-// If a LIVE guest's render scene has been masked away while the driver is
-// still admitted to the SAME ORIGINAL 0x80 pass, recover the draw only
-// after that pass has completed and proved it did not call the ROB02 wrapper.
+// If a LIVE guest's render scene has been masked away in mode 1,
+// recover its draw only after the native 0x80 pass and proof that the
+// ROB02 wrapper was not called. Original driver ROB01 may ALSO be
+// masked off in cockpit view; requiring driverScene & 0x80 is a
+// false-negative when both native occupants are hidden.
 // No fallback to another layer, no event creation or persistent scene edit.
 inline constexpr std::uint32_t OriginalRobDisplayLayer=0x80u;
 inline constexpr bool ShouldRecoverOriginalPassengerScenePass(
     bool vr,bool cockpit,bool follow,bool racing,
     bool modeOne,bool liveOriginalGuest,bool validFrame,bool validStereo,
     std::uint32_t renderMask,std::int32_t first,std::int32_t last,
-    std::uint32_t driverScene,std::uint32_t passengerScene,
-    bool guestWrapperReached) noexcept {
+    std::uint32_t passengerScene,bool guestWrapperReached) noexcept {
     return vr && cockpit && follow && racing && modeOne &&
         liveOriginalGuest && validFrame && validStereo &&
         renderMask==OriginalRobDisplayLayer &&
         first<=static_cast<std::int32_t>(OriginalPassengerEventId) &&
         last>=static_cast<std::int32_t>(OriginalPassengerEventId) &&
-        (driverScene&renderMask)!=0u &&
         // Only a fully disabled original scene is safe to recover.
         // If another bit (e.g. 0x40/0x100) is set, the game may draw
         // the character in that other pass, and forcing 0x80 can duplicate.
