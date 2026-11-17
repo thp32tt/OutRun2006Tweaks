@@ -10,6 +10,17 @@ camera. It does NOT load Dino GLB, replacement meshes or external textures.
 
 1. Close the game/VR host and extract ALL ZIP contents into your own
    OR2006C2C.EXE folder, preserving QUEST_APK_COPYRUN_PAYLOAD.
+ONE-TEST PASSENGER CHECK (recommended for this experimental build):
+- Run RUN-QUEST-APK-PASSENGER-DIAG.cmd once, NOT the ordinary cockpit CMD.
+- It auto-enables Follow Camera 0, uses the existing native cockpit and
+  original ROB02 passenger, enables bounded source/scene/model logs, and
+  collects the compressed diagnostic session after exiting the game.
+- Drive in camera 0 only long enough to see the original passenger, switch
+  to cockpit mode 1, then exit normally; upload the newest
+  OutRun2_VR_ANALYZE_*.zip if the passenger is absent.
+- Normal cockpit mode retains the saved F11 passenger preference.
+- No Quest 3 live visual proof exists yet. This is an experimental test.
+
 2. Double-click RUN-QUEST-APK-COCKPIT.cmd. No installer or manual
    settings change is needed. First launch verifies x86/x64 DLL/host
    hashes, saves the previously installed DLL/host/DXVK/INI and helper

@@ -393,7 +393,15 @@ if($QuestCockpitV2PassengerDiagnostics -eq 'ON') {
         $_ -notmatch '^-(VR\.)?FileLogging=' -and
         $_ -notmatch '^-VR\.(Telemetry|CockpitFrameProbe)='
     })
-    $gameArgs+=@('-FileLogging=true','-VR.Telemetry=false','-VR.CockpitFrameProbe=false')
+    # One-test field QA: an older saved user.ini must not silently leave
+    # Remove selected. The explicit PASSENGER diagnostic always follows
+    # original camera 0, while NORMAL/F11 selection remains untouched.
+    $gameArgs=@($gameArgs|Where-Object {
+        $_ -notmatch '^-VR\.QuestCockpitV2PassengerVisible='
+    })
+    $gameArgs+=@('-FileLogging=true','-VR.Telemetry=false',
+        '-VR.CockpitFrameProbe=false',
+        '-VR.QuestCockpitV2PassengerVisible=true')
     $env:OUTRUN_VR_FILE_LOG='1'
     $env:OUTRUN_VR_PASSENGER_DIAG='1'
     Write-Host 'PASSENGER TRACE ON: bounded ROB02 state and callback log.'

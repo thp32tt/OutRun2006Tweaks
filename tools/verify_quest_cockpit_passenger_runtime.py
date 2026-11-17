@@ -8,6 +8,13 @@ Run without args for source checks or --exe PATH for canonical PC ABI proof.
 from pathlib import Path
 
 hook = Path("src/hooks_graphics.cpp").read_text(encoding="utf-8")
+launcher = Path("tools/Run-OutRunVRTest.ps1").read_text(encoding="utf-8")
+assert "-VR.QuestCockpitV2PassengerVisible=true" in launcher, (
+    "one-test PASSENGER diagnostics must force Follow Camera 0"
+)
+assert "if($QuestCockpitV2PassengerDiagnostics -eq 'ON')" in launcher, (
+    "Follow Camera 0 must be limited to explicit passenger diagnostics"
+)
 settings = Path("src/vr/settings.cpp").read_text(encoding="utf-8")
 overlay = Path("src/overlay/settings_ui.cpp").read_text(encoding="utf-8")
 ini = Path("OutRun2006Tweaks.ini").read_text(encoding="utf-8")
