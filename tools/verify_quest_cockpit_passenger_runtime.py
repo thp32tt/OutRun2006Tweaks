@@ -27,6 +27,11 @@ assert "SetupHook.ccall<void>(\n                    OriginalPassengerEventId" no
 assert "OriginalEventFlagsRva=0x39fb48u;" in policy
 assert "OriginalPassengerEventId=0x16bu;" in policy
 assert "ShouldBypassPassengerCarDisplayGate(" in policy
+assert "(flags & (OriginalEventPendingInit|OriginalEventInitialized)) ==" in policy
+assert "PassengerOtherCameraDraws.fetch_add(" in hook
+assert "PassengerGateCamera1Entries.fetch_add(" in hook
+assert "PassengerGateNonPassenger.fetch_add(" in hook
+assert "cockpit && race && frameReady && stereoReady" in hook
 assert "OriginalPassengerDisplayGateSignature()" in hook
 assert "PassengerGateHook=std::move(guest);" in hook
 assert "Module::fn_ptr<NativeRobotDisplay>(" in hook

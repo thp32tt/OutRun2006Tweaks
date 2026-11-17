@@ -61,6 +61,10 @@ def pass_02_live_owner_identity():
         )
     check("passenger->EventFunc.Disp==expected" in owner, "missing callback identity")
     check("passenger->data<EvWorkRobot>()" in owner, "missing native work identity")
+    check("(flags & (OriginalEventPendingInit|OriginalEventInitialized)) ==" in policy,
+          "native event state must compare low two bits to 2")
+    check("!OriginalEventLiveForDisplay(0x03u)" in source_test,
+          "pending-init+active low-bit regression missing")
     check("ResolveOriginalCockpitWork(" in owner, "missing exact pointer join")
     check("if(driver==passenger)return OriginalOccupantSlot::None;" in occupant,
           "ambiguous player-token alias may reach suppression")
@@ -78,6 +82,8 @@ def pass_03_camera0_passthrough():
 
 def pass_04_follow_requires_real_guest():
     check("SelectCockpitOccupantRender(" in robot, "missing original display selector")
+    check("PassengerOtherCameraDraws.fetch_add(" in hook,
+          "camera 2/30 were incorrectly counted as original camera 0")
     check("slot==OriginalOccupantSlot::Passenger363&&keepPassenger" in occupant,
           "follow no longer gated to native passenger")
     check("OriginalPassengerForceVisible" in occupant, "scoped LOD0 mode lost")
@@ -121,6 +127,17 @@ def pass_07_nested_draw_and_restore():
           "W*C recursion owner lost")
     check("ScopedOriginalRobotWorkMatrix scoped(" in robot,
           "original robot work restore lost")
+    gate = hook.split("static void __cdecl PassengerDriverDisplay(EvWorkRobot* work)",1)[1].split(
+        "static void __cdecl RobotDisplay(EvWorkRobot* robot)",1)[0]
+    check_order(gate, "PassengerGateEntries.fetch_add(", "if(!owner){",
+                "PassengerGateNonPassenger.fetch_add(", "const bool frameReady=",
+                "const bool stereoReady=", "ShouldBypassPassengerCarDisplayGate(",
+                "if(!restore){original();return;}",
+                "OriginalCommonRobotDisplayRva)(work);")
+    check("cockpit && race && frameReady && stereoReady" in gate,
+          "force draw must own native render and a live paired XR pose")
+    check("VR PASSENGER WXC:" in robot,
+          "missing read-only passenger raw/corrected matrix trace")
     check("if(!correctionOwner.Active())" in robot,
           "nested W*C correction not rejected")
 

@@ -20,11 +20,15 @@ inline constexpr bool OriginalEventScheduled(std::uint8_t flags) noexcept {
     return (flags & (OriginalEventPendingInit|OriginalEventInitialized))!=0u;
 }
 // A stale callback pointer and data token remain in sEventWork after close.
-// Only a genuinely initialized, non-destroy-pending event may own a
-// ROB01/ROB02 model draw.
+// Original game consumers admit an event when (flags & 3) == 2.
+// Bit 0 (pending init) and bit 1 (initialized) must NOT both be set:
+// the earlier loose bit-1 check accidentally accepted the 0x03 transition.
+// Bits 0x08/0x10 can accompany a live 0x02 event (the user's GOAL log
+// contains 0x0A and 0x12), so do not reject them as state by themselves.
+// A pending destroy (0x04) is never eligible for a forced passenger draw.
 inline constexpr bool OriginalEventLiveForDisplay(std::uint8_t flags) noexcept {
-    return (flags & OriginalEventInitialized)!=0u &&
-        (flags & 0x04u)==0u;
+    return (flags & (OriginalEventPendingInit|OriginalEventInitialized)) ==
+        OriginalEventInitialized && (flags & 0x04u)==0u;
 }
 inline constexpr bool OriginalEventSetupAccepted(std::uint8_t flags) noexcept {
     return (flags & OriginalEventPendingInit)!=0u;

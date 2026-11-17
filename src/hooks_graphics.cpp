@@ -1133,6 +1133,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     inline static SafetyHookMid PlayerHook{};
     inline static SafetyHookInline RobotHook{};
     inline static SafetyHookInline PassengerGateHook{};
+    inline static std::atomic<std::uint64_t> PassengerGateEntries{0};
+    inline static std::atomic<std::uint64_t> PassengerGateCamera1Entries{0};
+    inline static std::atomic<std::uint64_t> PassengerGateNonPassenger{0};
     inline static std::atomic<std::uint64_t> PassengerGateCalls{0};
     inline static std::atomic<std::uint64_t> PassengerGateRestores{0};
     inline static thread_local bool PassengerGateBypassInFlight=false;
@@ -1193,6 +1196,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     // reopens ROB02, so original camera 0 and race state stay authoritative.
     inline static std::atomic<std::uint64_t> PassengerCamera0Draws{0};
     inline static std::atomic<std::uint64_t> PassengerCamera1Draws{0};
+    // A prior trace incorrectly counted ALL non-mode-1 callbacks as camera 0.
+    // Modes 2/30 are distinct, and mixing them obscured the HMD diagnosis.
+    inline static std::atomic<std::uint64_t> PassengerOtherCameraDraws{0};
     static bool PassengerTraceOn() noexcept {
         char flag[8]{};
         const DWORD n=GetEnvironmentVariableA("OUTRUN_VR_PASSENGER_DIAG",
@@ -1220,7 +1226,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             "followCamera0={} hideDriver={} hookReady={} cockpitActive={} "
             "sceneEffect={} dFlag=0x{:02X} dCallback={} "
             "pFlag=0x{:02X} pCallback={} pLive={} "
-            "callbacksCam0={} callbacksCam1={} gateCalls={} gateRestores={} "
+            "callbacksCam0={} callbacksCam1={} callbacksOther={} "
+            "gateEntries={} gateCamera1={} gateNonPassenger={} "
+            "gateCalls={} gateRestores={} "
             "carFlags=0x{:08X} epoch={} stereoValid={}",
             sample,camera?static_cast<int>(camera->cam_mode_34A):-1,
             Game::current_mode?static_cast<int>(*Game::current_mode):-1,
@@ -1232,6 +1240,10 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             OriginalEventLiveForDisplay(static_cast<std::uint8_t>(pflag))&&passengerCallback,
             PassengerCamera0Draws.load(std::memory_order_relaxed),
             PassengerCamera1Draws.load(std::memory_order_relaxed),
+            PassengerOtherCameraDraws.load(std::memory_order_relaxed),
+            PassengerGateEntries.load(std::memory_order_relaxed),
+            PassengerGateCamera1Entries.load(std::memory_order_relaxed),
+            PassengerGateNonPassenger.load(std::memory_order_relaxed),
             PassengerGateCalls.load(std::memory_order_relaxed),
             PassengerGateRestores.load(std::memory_order_relaxed),
             Game::pl_car()?Game::pl_car()->flags_4:0u,
@@ -1243,10 +1255,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         using namespace OutRunVR::QuestCockpitV2;
         if(ExactOriginalCockpitOccupant(robot)!=OriginalOccupantSlot::Passenger363)
             return;
-        const bool inCockpit=camera&&camera->cam_mode_34A==1;
+        const int mode=camera?static_cast<int>(camera->cam_mode_34A):-1;
+        const bool inCockpit=mode==1;
         const auto count=inCockpit
             ?PassengerCamera1Draws.fetch_add(1,std::memory_order_relaxed)+1
-            :PassengerCamera0Draws.fetch_add(1,std::memory_order_relaxed)+1;
+            :mode==0
+                ?PassengerCamera0Draws.fetch_add(1,std::memory_order_relaxed)+1
+                :PassengerOtherCameraDraws.fetch_add(1,std::memory_order_relaxed)+1;
         if(count<=12u || count%180u==0u) {
             const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
             spdlog::info(
@@ -1282,6 +1297,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     // its own "player-car mode" predicate would suppress the ROB02 draw.
     static void __cdecl PassengerDriverDisplay(EvWorkRobot* work) {
         using namespace OutRunVR::QuestCockpitV2;
+        // Count the native wrapper *before* filtering: 0 matched ROB02
+        // callbacks then means a real missing owner/entry, not a closed flag.
+        PassengerGateEntries.fetch_add(1,std::memory_order_relaxed);
         const auto original=[&]() {PassengerGateHook.ccall<void>(work);};
         if(PassengerGateBypassInFlight || !work ||
            !Settings::VREnabled || !Settings::VRQuestCockpitV2Enabled ||
@@ -1294,6 +1312,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const EVWORK_CAR* car=Game::pl_car();
         if(!cam || !car || cam->cam_mode_34A!=1 ||
            InSceneEffect()) {original();return;}
+        PassengerGateCamera1Entries.fetch_add(1,std::memory_order_relaxed);
         const bool race=Game::current_mode &&
             (*Game::current_mode==STATE_GAME ||
              (*Game::current_mode==STATE_START &&
@@ -1302,21 +1321,33 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const bool cockpit=QuestCockpitV2Active(cam);
         const bool owner=ExactOriginalCockpitOccupant(work)==
             OriginalOccupantSlot::Passenger363;
-        if(!owner){original();return;}
+        if(!owner){
+            PassengerGateNonPassenger.fetch_add(1,std::memory_order_relaxed);
+            original();return;
+        }
         const auto calls=PassengerGateCalls.fetch_add(
             1,std::memory_order_relaxed)+1;
         const auto flags=car->flags_4;
+        // The original game's event callback can also run outside a verified
+        // native render frame. Never force an extra 487880 call in that case.
+        const bool frameReady=NativeFrameTrace().Active();
+        const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
+        const bool stereoReady=stereo&&stereo->valid&&
+            stereo->poseSequence!=0;
         const bool restore=ShouldBypassPassengerCarDisplayGate(
             Settings::VREnabled.get(),
             Settings::VRQuestCockpitV2Enabled.get(),
             Settings::VRQuestCockpitV2PassengerVisible.get(),
-            cockpit && race,cam->cam_mode_34A==1,owner,flags);
+            cockpit && race && frameReady && stereoReady,
+            cam->cam_mode_34A==1,owner,flags);
         if(PassengerTraceOn() && (calls<=16u || calls%180u==0u))
             spdlog::info(
                 "VR PASSENGER CAR GATE: calls={} carFlags=0x{:08X} "
-                "nativeGate={} restore={} cam={} race={} active={}",
+                "nativeGate={} restore={} cam={} race={} active={} "
+                "frameReady={} stereoReady={}",
                 calls,flags,(flags&0xc000u)==0x4000u,restore,
-                static_cast<int>(cam->cam_mode_34A),race,cockpit);
+                static_cast<int>(cam->cam_mode_34A),race,cockpit,
+                frameReady,stereoReady);
         if(!restore){original();return;}
         // Directly invoke the native common ROB renderer (487880), which
         // calls our existing 514E60 original-robot hook for same verified
@@ -1482,6 +1513,20 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                     static_assert(sizeof(robot->d3dmatrix10)==sizeof(Matrix));
                     std::memcpy(work.data(),&robot->d3dmatrix10,sizeof(Matrix));
                     if(own&&ComposeOccupantModel(work,own->occupantCorrection,corrected)) {
+                        if(slot==OriginalOccupantSlot::Passenger363 &&
+                           PassengerTraceOn()) {
+                            static thread_local std::uint64_t wxcSamples=0;
+                            const auto count=++wxcSamples;
+                            if(count<=12u || count%180u==0u)
+                                spdlog::info(
+                                    "VR PASSENGER WXC: sample={} nativeEpoch={} "
+                                    "raw=({:.3f},{:.3f},{:.3f}) "
+                                    "corrected=({:.3f},{:.3f},{:.3f}) "
+                                    "(matrix only, not GPU proof)",
+                                    count,frameEpoch,
+                                    work[12],work[13],work[14],
+                                    corrected[12],corrected[13],corrected[14]);
+                        }
                         // Keep the recursion gate until AFTER scoped work
                         // restoration (reverse destructor order).
                         ScopedOriginalRobotCorrectionOwner correctionOwner(true);

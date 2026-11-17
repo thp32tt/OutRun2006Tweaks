@@ -49,6 +49,9 @@ int main() {
     static_assert(!OriginalEventLiveForDisplay(0u));
     static_assert(!OriginalEventLiveForDisplay(0x01u));
     static_assert(OriginalEventLiveForDisplay(0x02u));
+    static_assert(!OriginalEventLiveForDisplay(0x03u)); // pending init + active is NOT native state 2
+    static_assert(OriginalEventLiveForDisplay(0x0Au));  // GOAL overlay, low state 2
+    static_assert(OriginalEventLiveForDisplay(0x12u));  // transition overlay, low state 2
     static_assert(!OriginalEventLiveForDisplay(0x04u));
     static_assert(!OriginalEventLiveForDisplay(0x06u));
     static_assert(!OriginalPassengerVacant(0x04u));
