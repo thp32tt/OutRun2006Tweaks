@@ -27,9 +27,15 @@ constexpr Result NativeLayerWithGuestFix(const Trial& t) {
     (t.guestScene&t.mask)!=0u;
   if(native) {
     ++r.wrapperCalls; // 4879B0
-    if((t.carFlags&0xc000u)==0x4000u ||
-       ShouldBypassPassengerCarDisplayGate(t.vr,t.cockpit,t.follow,
-             t.racing&&t.frame&&t.stereo,t.cam1,t.live,t.carFlags))
+    // 487880 enters 514E60, but the cockpit-only Remove option then
+    // suppresses the exact guest inside RobotDisplay. Count the native
+    // submission only if the render-only Remove policy admits it.
+    const bool suppressed=ShouldSuppressOriginalPassenger(
+        t.vr,t.cockpit,t.follow,t.racing,t.cam1,t.live);
+    if(!suppressed &&
+       ((t.carFlags&0xc000u)==0x4000u ||
+        ShouldBypassPassengerCarDisplayGate(t.vr,t.cockpit,t.follow,
+              t.racing&&t.frame&&t.stereo,t.cam1,t.live,t.carFlags)))
       ++r.robotDraws; // 487880 -> 514E60
   }
   // Hooked event pass, after native scan. No second draw if wrapper called.
@@ -63,6 +69,7 @@ constexpr bool VerifyNativePassengerPipeline() {
     // Camera0: native game unchanged regardless of Follow/Remove.
     const unsigned orig=((guest&0x80u)!=0u && car==0x4000u)?1u:0u;
     if(!t.cam1&&r.robotDraws!=orig)return false;
+    if(t.cam1&&!t.follow&&r.robotDraws!=0u)return false;
     if(t.cam1&&t.follow) {
       const unsigned want=(guest==0u||(guest&0x80u)!=0u)?1u:0u;
       if(r.robotDraws!=want)return false;
