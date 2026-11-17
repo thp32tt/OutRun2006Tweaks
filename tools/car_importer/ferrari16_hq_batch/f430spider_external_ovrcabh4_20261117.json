@@ -1,0 +1,253 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-17",
+  "car": "f430spider",
+  "scope": "external full-car private conversion; evidence only, binaries not committed",
+  "source": {
+    "car_id": "f430spider",
+    "source_sha256": "5febf6fdcdb48b8704ddd86b3bc4bb47ba9d68935b30eee4764209eaa4f3aa1f",
+    "geometry_space": "outrun_local_y_up_meters",
+    "alignment_verified": true,
+    "model_scope": "full_car",
+    "origin_type": "external_mod",
+    "rights_note": "PRIVATE_PERSONAL_CONVERSION_ONLY_NO_REDISTRIBUTION; GTA San Andreas mod archive credits DERK7 and Test Drive Unlimited 2 source, no redistribution grant verified.",
+    "external_to_game_matrix": [
+      0.9432155116287835,
+      0,
+      0,
+      0,
+      0,
+      0.9432155116287835,
+      0,
+      0.45629044594225343,
+      0,
+      0,
+      0.9432155116287835,
+      -0.034559431951388664,
+      0,
+      0,
+      0,
+      1
+    ],
+    "alignment_evidence": {
+      "method": "OutRun reconstructed native OBJ tire-sidewall circle RANSAC fit vs external GTA SA DFF four wheel dummy centers",
+      "native_front_axle_yz": [
+        0.31759456174396067,
+        -1.1803118582280838
+      ],
+      "native_rear_axle_yz": [
+        0.360261061532912,
+        1.4350717264081159
+      ],
+      "external_front_axle_gltf_yz": [
+        -0.13445761799812317,
+        -1.2147302627563477
+      ],
+      "external_rear_axle_gltf_yz": [
+        -0.11439883708953857,
+        1.5581074953079224
+      ],
+      "uniform_scale": 0.9432155116287835,
+      "vertical_translation": 0.45629044594225343,
+      "longitudinal_translation": -0.034559431951388664,
+      "wheelbase_native": 2.6153835846362,
+      "wheelbase_external": 2.77283775806427,
+      "vertical_fit_residual_m": 0.01187237345714545
+    },
+    "dashboard_required": true,
+    "dashboard": {
+      "bindings": [
+        {
+          "node": "F430SPIDER_SPEED_NEEDLE",
+          "kind": "speed",
+          "pivot": "node_origin",
+          "axis_node": [
+            0,
+            0,
+            -1
+          ],
+          "input": [
+            0,
+            320
+          ],
+          "angle_deg": [
+            -135,
+            135
+          ]
+        },
+        {
+          "node": "F430SPIDER_RPM_NEEDLE",
+          "kind": "rpm",
+          "pivot": "node_origin",
+          "axis_node": [
+            0,
+            0,
+            -1
+          ],
+          "input": [
+            0,
+            10000
+          ],
+          "angle_deg": [
+            -135,
+            135
+          ]
+        }
+      ]
+    },
+    "sanitization_evidence": {
+      "materials_before": 114,
+      "materials_after": 33,
+      "removed_vertex_colors": "gauges only; three BYTE_COLOR layers all RGBA=1.0",
+      "fresh_reopen_color_attributes": 0,
+      "sanitized_glb_qa": "f430spider_runtime_dashboard_sanitized_qa.json"
+    }
+  },
+  "blender_reopen_qa": {
+    "status": "PASS",
+    "source_sha256": "aaea2d25ba3400e6f63f2efa602137bb77c4d347a8dd00f535716f8b6cc86b20",
+    "glb_sha256": "5febf6fdcdb48b8704ddd86b3bc4bb47ba9d68935b30eee4764209eaa4f3aa1f",
+    "glb_bytes": 4377520,
+    "blend_sha256": "b4d4ad11a066824a555f1004356070b93fd68e35a20da4f034b97ab6ef38846e",
+    "materials_before": 114,
+    "materials_after": 33,
+    "material_slot_replacements": 81,
+    "removed_white_vertex_colors": [
+      [
+        "gauges",
+        "Color",
+        708
+      ],
+      [
+        "gauges",
+        "Color.001",
+        708
+      ],
+      [
+        "gauges",
+        "Color.002",
+        708
+      ]
+    ],
+    "fresh_reopen_color_attributes": 0,
+    "meshes": 25,
+    "vertices": 64981,
+    "polygons": 77979,
+    "focus": {
+      "F430SPIDER_SPEED_NEEDLE": {
+        "parent": "speedo_dummy",
+        "origin": [
+          -0.26618480682373047,
+          0.6869522929191589,
+          0.2526291608810425
+        ],
+        "verts": 67,
+        "polys": 53
+      },
+      "F430SPIDER_RPM_NEEDLE": {
+        "parent": "speedo_dummy",
+        "origin": [
+          -0.3946388065814972,
+          0.6881908178329468,
+          0.2693517208099365
+        ],
+        "verts": 44,
+        "polys": 41
+      },
+      "gauges": {
+        "parent": "chassis_dummy",
+        "origin": [
+          0,
+          0.0015038847923278809,
+          0
+        ],
+        "verts": 366,
+        "polys": 236
+      },
+      "wheel_rf": {
+        "parent": "wheel_rf_dummy",
+        "origin": [
+          0.8928487300872803,
+          1.2147302627563477,
+          -0.13445761799812317
+        ],
+        "verts": 2465,
+        "polys": 2552
+      },
+      "wheel_lf": {
+        "parent": "wheel_lf_dummy",
+        "origin": [
+          -0.885903537273407,
+          1.2147302627563477,
+          -0.13445761799812317
+        ],
+        "verts": 2465,
+        "polys": 2552
+      },
+      "wheel_lb": {
+        "parent": "wheel_lb_dummy",
+        "origin": [
+          -0.8750439286231995,
+          -1.5581074953079224,
+          -0.11439883708953857
+        ],
+        "verts": 2465,
+        "polys": 2552
+      },
+      "wheel_rb": {
+        "parent": "wheel_rb_dummy",
+        "origin": [
+          0.8749560117721558,
+          -1.5581074953079224,
+          -0.11439883708953857
+        ],
+        "verts": 2465,
+        "polys": 2552
+      }
+    },
+    "runtime_tested": false
+  },
+  "conversion": {
+    "triangles": 77979,
+    "vertices": 64981,
+    "groups": 126,
+    "materials": 33,
+    "glass_triangles": 2634,
+    "normal_map_materials": 0,
+    "dashboard_nodes": 2,
+    "dashboard_mesh_bindings": 4,
+    "source_images": 23,
+    "game_bounds": [
+      [
+        -1.0539555604492266,
+        0.004274441390209882,
+        -2.2807580276610726
+      ],
+      [
+        1.0539580130478399,
+        1.1202333181341415,
+        2.2622451699674633
+      ]
+    ],
+    "gpu_payload_bytes": 6043796,
+    "status": "OVRCABH4_DASHBOARD_READY_CONVERSION_PASS_NOT_GAME_TESTED",
+    "car_id": "f430spider",
+    "source_sha256": "5febf6fdcdb48b8704ddd86b3bc4bb47ba9d68935b30eee4764209eaa4f3aa1f",
+    "output_sha256": "474dc3d088bb684a7d10d278aca981a80899cb6aa181be40b7c72d31fae2cb9b",
+    "output_bytes": 6048989,
+    "source_scope": "full_car",
+    "runtime_tested": false,
+    "author_rights": "PRIVATE_PERSONAL_CONVERSION_ONLY_NO_REDISTRIBUTION; GTA San Andreas mod archive credits DERK7 and Test Drive Unlimited 2 source, no redistribution grant verified."
+  },
+  "independent_verify": {
+    "status": "PASS",
+    "sha256": "474dc3d088bb684a7d10d278aca981a80899cb6aa181be40b7c72d31fae2cb9b",
+    "groups": 126,
+    "materials": 33,
+    "vertices": 64981,
+    "triangles": 77979,
+    "dashboard_bindings": 4,
+    "size": 6048989
+  },
+  "game_tested": false
+}
