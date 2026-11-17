@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-17",
+  "car_id": "512bb",
+  "source_glb_sha256": "4da1aa1d9934553796470c28cfdab37ac27947bb84006290713155b9a975a43e",
+  "alignment": {
+    "method": "original OutRun reconstructed axle centers vs Assetto KN5 wheel-node centers; 180deg Y rotation + wheelbase fit",
+    "matrix": [
+      -1.0070625515925886,
+      0,
+      0,
+      0,
+      0,
+      1.0070625515925886,
+      0,
+      0.354788898326895,
+      0,
+      0,
+      -1.0070625515925886,
+      0.16781935892852073,
+      0,
+      0,
+      0,
+      1
+    ],
+    "native_front_axle_yz": [
+      0.590091899,
+      -1.080301403
+    ],
+    "native_rear_axle_yz": [
+      0.59136370575,
+      1.4488980200000001
+    ],
+    "external_front_axle_blender_yz": [
+      -1.239367663860321,
+      0.23051658272743225
+    ],
+    "external_rear_axle_blender_yz": [
+      1.2720944285392761,
+      0.23805193603038788
+    ]
+  },
+  "dashboard": {
+    "speed_node": "ARROW_SPEED",
+    "rpm_node": "ARROW_RPM",
+    "axis_node": [
+      0,
+      1,
+      0
+    ],
+    "speed_input": [
+      0,
+      320
+    ],
+    "rpm_input": [
+      0,
+      10000
+    ],
+    "angle_deg": [
+      -135,
+      135
+    ],
+    "pivots_preserved": true,
+    "speed_pivot_blender": [
+      0.396861732006073,
+      -0.6460767984390259,
+      0.6179459691047668
+    ],
+    "rpm_pivot_blender": [
+      0.17567943036556244,
+      -0.6463874578475952,
+      0.6190918684005737
+    ],
+    "real_cluster_reference": "320 km/h speedometer; tach x100 with 7k redline"
+  },
+  "runtime_changes": {
+    "max_materials": 128,
+    "gpu_budget_unchanged_bytes": 117440512,
+    "sidecar_budget_unchanged_bytes": 134217728,
+    "texture_encoding": "DXT5 full-resolution mip chain; no texture dimension downscale",
+    "commits": [
+      "a96c0ee07cf3a00f217776f52710c13aecb868d6",
+      "a13b0f613dacacf464b4527bcdae58e1900272b6",
+      "0ee5d27d492d9b8087c798cb82f60af281fbfb01",
+      "1216c0aadb1cbffedaedeb662fb0ebb5ded74259",
+      "93c9971986249ca6d4f119fe30da8905ad092cf7"
+    ]
+  },
+  "conversion": {
+    "audit_strict": "PASS",
+    "convert": "PASS",
+    "verify": "PASS",
+    "status": "OVRCABH4_DASHBOARD_READY_CONVERSION_PASS_NOT_GAME_TESTED",
+    "triangles": 265611,
+    "vertices": 180400,
+    "groups": 217,
+    "materials": 97,
+    "glass_triangles": 5152,
+    "normal_map_materials": 48,
+    "dashboard_nodes": 2,
+    "dashboard_mesh_bindings": 2,
+    "source_images": 61,
+    "gpu_payload_bytes": 76069908,
+    "output_bytes": 76079561,
+    "output_sha256": "33b8a6e5fb9e763b87feae5154f651f4879c4eb75e280dcdde18a3f03dda00ef",
+    "game_bounds": [
+      [
+        -0.9381223118716818,
+        0.24248003365635423,
+        -2.2006515823266954
+      ],
+      [
+        0.9340359418978125,
+        1.4140534114938517,
+        2.2365244771824533
+      ]
+    ]
+  },
+  "ci": {
+    "material_128_floor_guard_run": 43983864636,
+    "material_128_windows_build_run": 43983864789,
+    "status_at_record": "128-material change unit+Windows build SUCCESS; DXT5 latest floor-guard SUCCESS; latest full Build was still running at time of record"
+  },
+  "rights": "PRIVATE_PERSONAL_CONVERSION_ONLY_NO_REDISTRIBUTION",
+  "runtime_tested": false
+}
