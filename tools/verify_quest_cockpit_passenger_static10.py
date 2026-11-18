@@ -168,6 +168,10 @@ def pass_07_nested_draw_and_restore():
           "one-session diagnostic does not distinguish layer from wrapper")
     check("if(!correctionOwner.Active())" in robot,
           "nested W*C correction not rejected")
+    check("VR PASSENGER NATIVE LOCK:" in hook and "nativeWorkLocked=1" in hook,
+          "passenger can still switch between corrected and native matrices")
+    check("ScopedCockpitSkySingleLayer" in hook and "VR SKY SINGLE LAYER:" in hook,
+          "overlapping original sky transition layers are not collapsed in cockpit")
 
 def pass_08_f11_exclusive_and_search():
     for phrase in ("Passenger: Follow Camera 0", "Passenger: Remove"):

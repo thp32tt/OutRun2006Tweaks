@@ -1023,10 +1023,64 @@ class VrOriginalRaceSkyOwner final : public Hook
     static constexpr int RaceSkyDisplayRva = 0x521C0;
     inline static SafetyHookInline RaceSkyDisplayHook{};
 
+    // The original renderer deliberately overlaps two 0x90-byte sky
+    // records while race_sky_step_451e90 cross-fades course skies. On a
+    // flat monitor that overlap is harmless, but Quest3 field logs show the
+    // second sphere as a counter-moving duplicate during the first-stage
+    // low-speed transition. Keep the game's state machine untouched: only
+    // during the synchronous cockpit draw, suppress the old transition layer
+    // once the destination layer is live, then restore both flags immediately.
+    class ScopedCockpitSkySingleLayer final
+    {
+        std::uint8_t* base_=nullptr;
+        std::uint32_t oldC8_=0, oldCC_=0;
+        bool active_=false;
+    public:
+        explicit ScopedCockpitSkySingleLayer(void* work) noexcept
+        {
+            if(!work || !Settings::VREnabled ||
+               !Settings::VRQuestCockpitV2Enabled ||
+               !IsPlayableCarGameplay() ||
+               OutRunVR::QuestCockpitV2::InSceneEffect())
+                return;
+            const auto* cam=Game::camera();
+            if(!cam || cam->cam_mode_34A!=1)return;
+            base_=reinterpret_cast<std::uint8_t*>(work);
+            std::uint32_t layer0A=0,layer0B=0,layer1A=0,layer1B=0;
+            std::memcpy(&layer0A,base_+0x38,sizeof(layer0A));
+            std::memcpy(&layer0B,base_+0x3c,sizeof(layer0B));
+            std::memcpy(&layer1A,base_+0xc8,sizeof(layer1A));
+            std::memcpy(&layer1B,base_+0xcc,sizeof(layer1B));
+            if((layer0A|layer0B)==0u || (layer1A|layer1B)==0u)return;
+            oldC8_=layer1A;oldCC_=layer1B;
+            const std::uint32_t zero=0;
+            std::memcpy(base_+0xc8,&zero,sizeof(zero));
+            std::memcpy(base_+0xcc,&zero,sizeof(zero));
+            active_=true;
+            static std::atomic<std::uint64_t> collapsed{0};
+            const auto count=collapsed.fetch_add(1,std::memory_order_relaxed)+1;
+            if(Settings::VRQuestCockpitV2SkyProbe &&
+               (count<=16u || count%180u==0u))
+                spdlog::info(
+                    "VR SKY SINGLE LAYER: count={} destinationFlags=0x{:X}/0x{:X} "
+                    "suppressedOldFlags=0x{:X}/0x{:X} renderOnly=1",
+                    count,layer0A,layer0B,layer1A,layer1B);
+        }
+        ~ScopedCockpitSkySingleLayer() noexcept
+        {
+            if(!active_ || !base_)return;
+            std::memcpy(base_+0xc8,&oldC8_,sizeof(oldC8_));
+            std::memcpy(base_+0xcc,&oldCC_,sizeof(oldCC_));
+        }
+        ScopedCockpitSkySingleLayer(const ScopedCockpitSkySingleLayer&)=delete;
+        ScopedCockpitSkySingleLayer& operator=(const ScopedCockpitSkySingleLayer&)=delete;
+    };
+
     static void __cdecl RaceSkyDisplayDest(void* work)
     {
         OutRunVR::GameSemantic::ScopedExactProducerSemantic sky(
             OutRunVR::GameSemantic::RenderScope::WorldSky);
+        ScopedCockpitSkySingleLayer singleLayer(work);
         RaceSkyDisplayHook.ccall<void>(work);
     }
 
@@ -1559,6 +1613,27 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const bool passengerLod0=
             action==CockpitOccupantRender::OriginalPassengerForceVisible;
         ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);
+        // Field run 2026-11-19: the visible ROB02 position is correct when
+        // the stock Windows work matrix is used. The previous 4-unit W*C
+        // guard caused a temporal path switch: early frames used corrected
+        // W*C, then larger body/camera deltas fell back to native, and later
+        // crossings could toggle again. That matches "missing at start,
+        // appears later, occasional flicker". Passenger 363 therefore keeps
+        // its native model matrix for the entire cockpit draw; only the
+        // verified visible/LOD0 scope is retained. Driver 362 still uses the
+        // Quest occupant correction path below.
+        if(slot==OriginalOccupantSlot::Passenger363) {
+            static thread_local std::uint64_t nativeLocks=0;
+            const auto count=++nativeLocks;
+            if(PassengerTraceOn() && (count<=16u || count%180u==0u))
+                spdlog::info(
+                    "VR PASSENGER NATIVE LOCK: count={} epoch={} "
+                    "nativeWorkLocked=1 visibleScope={} stereoValid={}",
+                    count,frameEpoch,OriginalOccupantLod0Active(),
+                    stereo&&stereo->valid);
+            RobotHook.ccall<void>(robot);
+            return;
+        }
         if(!Settings::VRQuestCockpitV2OccupantCorrection) {
             RobotHook.ccall<void>(robot);
             return;

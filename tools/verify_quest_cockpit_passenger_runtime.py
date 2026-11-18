@@ -56,6 +56,10 @@ assert "QuestCockpitV2SkyProbe='ON'" in passenger_block
 assert "DriverGateThreadCalls" in hook
 assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
 assert "VR PASSENGER SCENE PASS:" in hook
+assert "VR PASSENGER NATIVE LOCK:" in hook
+assert "nativeWorkLocked=1" in hook
+assert "ScopedCockpitSkySingleLayer" in hook
+assert "VR SKY SINGLE LAYER:" in hook
 assert "afterDriver!=beforeDriver,after!=before" in hook
 assert "passengerScene==OriginalRobDisplayLayer" in policy
 assert "driverWrapperReached" in policy
