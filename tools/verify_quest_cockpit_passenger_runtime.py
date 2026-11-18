@@ -48,7 +48,8 @@ assert "driverWrapperReached" in policy
 assert "const auto before=PassengerGateThreadCalls;" in hook
 assert "const auto after=PassengerGateThreadCalls;" in hook
 assert "PassengerDriverDisplay(work);" in hook
-assert "driver->field_C,passenger->field_C,after!=before" in hook
+assert "driver->field_C,passenger->field_C," in hook
+assert "afterDriver!=beforeDriver,after!=before);" in hook
 assert "0x83,0xEC,0x10,0x83,0x3D,0x58,0x02,0x78,0x00,0x02" in hook
 assert "(flags & (OriginalEventPendingInit|OriginalEventInitialized)) ==" in policy
 assert "PassengerOtherCameraDraws.fetch_add(" in hook
