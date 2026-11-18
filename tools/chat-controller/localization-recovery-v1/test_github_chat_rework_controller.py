@@ -652,3 +652,63 @@ class CurrentProjectDOMContractTests(unittest.IsolatedAsyncioTestCase):
 
 if __name__=="__main__":
  unittest.main()
+
+
+class BrowserLivenessWatchdogTests(unittest.IsolatedAsyncioTestCase):
+ async def test_healthy_tab_does_not_reload_or_replace(self):
+  bridge=c.ChatBridge(MagicMock(),MagicMock())
+  bridge.ensure_context=AsyncMock()
+  page=MagicMock()
+  page.is_closed.return_value=False
+  page.evaluate=AsyncMock(return_value="complete")
+  page.reload=AsyncMock()
+  bridge.pages["A"]=page
+  result=await bridge.browser_watchdog()
+  self.assertEqual(result,"BROWSER_HEALTHY")
+  page.reload.assert_not_awaited()
+
+ async def test_unresponsive_tab_reloads_before_new_tab(self):
+  bridge=c.ChatBridge(MagicMock(),MagicMock())
+  bridge.ensure_context=AsyncMock()
+  page=MagicMock()
+  page.url="https://chatgpt.com/"
+  page.is_closed.return_value=False
+  page.evaluate=AsyncMock(side_effect=[TimeoutError("hung"),"complete"])
+  page.reload=AsyncMock()
+  bridge.pages["A"]=page
+  result=await bridge.browser_watchdog()
+  self.assertIn("BROWSER_RECOVERED_A:BROWSER_PAGE_RELOADED",result)
+  page.reload.assert_awaited_once()
+  self.assertIs(bridge.pages["A"],page)
+
+ async def test_failed_reload_uses_one_fresh_same_profile_tab(self):
+  bridge=c.ChatBridge(MagicMock(),MagicMock())
+  bridge.ensure_context=AsyncMock()
+  old=MagicMock()
+  old.url="https://chatgpt.com/"
+  old.is_closed.return_value=False
+  old.evaluate=AsyncMock(side_effect=TimeoutError("hung"))
+  old.reload=AsyncMock(side_effect=TimeoutError("reload hung"))
+  old.close=AsyncMock()
+  fresh=MagicMock()
+  fresh.url="https://chatgpt.com/"
+  fresh.is_closed.return_value=False
+  fresh.goto=AsyncMock()
+  fresh.evaluate=AsyncMock(return_value="complete")
+  context=MagicMock()
+  context.new_page=AsyncMock(return_value=fresh)
+  bridge.context=context
+  bridge.pages["A"]=old
+  result=await bridge.browser_watchdog()
+  self.assertIn("BROWSER_RECOVERED_A:BROWSER_FRESH_TAB_READY",result)
+  self.assertIs(bridge.pages["A"],fresh)
+  fresh.goto.assert_awaited_once()
+  old.close.assert_awaited_once()
+
+ def test_watchdog_is_independent_of_queue_poll_interval(self):
+  self.assertEqual(c.POLL,600)
+  self.assertEqual(c.BROWSER_HEARTBEAT_SECONDS,60)
+  self.assertGreaterEqual(c.BROWSER_JS_TIMEOUT_SECONDS,10)
+  entrypoint=Path("entrypoint.chat-rework.sh").read_text(encoding="utf-8")
+  self.assertIn("BROWSER_WATCHDOG_ESCALATION",entrypoint)
+  self.assertIn("chrome_cdp_ready",entrypoint)
