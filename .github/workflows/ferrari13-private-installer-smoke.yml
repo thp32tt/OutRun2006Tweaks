@@ -1,0 +1,87 @@
+name: Ferrari13 private installer syntax and rollback smoke
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-ferrari16-v4-integrated-20261118
+    paths:
+      - tools/car_importer/ferrari16_hq_batch/tools/ferrari13_install.ps1
+      - tools/car_importer/ferrari16_hq_batch/tools/ferrari13_restore.ps1
+      - .github/workflows/ferrari13-private-installer-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  windows-sandbox-smoke:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse PowerShell scripts without private game assets
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $scripts=@(
+            'tools/car_importer/ferrari16_hq_batch/tools/ferrari13_install.ps1',
+            'tools/car_importer/ferrari16_hq_batch/tools/ferrari13_restore.ps1'
+          )
+          foreach ($file in $scripts) {
+            $t=$null; $errors=$null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $file).Path,[ref]$t,[ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              throw ("PowerShell syntax error in " + $file + ": " + ($errors | Out-String))
+            }
+          }
+          Write-Host 'PASS PowerShell syntax parser'
+      - name: Test SHA gate, backup, install and restore with synthetic fixture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $stage=Join-Path $env:RUNNER_TEMP 'Ferrari13Synthetic'
+          $game=Join-Path $env:RUNNER_TEMP 'OutRunTestDummy'
+          New-Item -ItemType Directory -Path $stage,$game -Force | Out-Null
+          Copy-Item tools/car_importer/ferrari16_hq_batch/tools/ferrari13_install.ps1 (Join-Path $stage 'INSTALL_FERRARI13.ps1')
+          Copy-Item tools/car_importer/ferrari16_hq_batch/tools/ferrari13_restore.ps1 (Join-Path $stage 'RESTORE_FERRARI13.ps1')
+          Set-Content -Path (Join-Path $game 'OR2006C2C.EXE') -Value 'DUMMY NEVER LAUNCHED' -NoNewline
+          $originalExe=(Get-FileHash (Join-Path $game 'OR2006C2C.EXE') -Algorithm SHA256).Hash
+          New-Item -ItemType Directory -Path (Join-Path $game 'ExternalCars') -Force | Out-Null
+          Set-Content -Path (Join-Path $game 'ExternalCars/asset_00.bin') -Value 'old body bytes' -NoNewline
+          $oldBody=(Get-FileHash (Join-Path $game 'ExternalCars/asset_00.bin') -Algorithm SHA256).Hash
+          $files=@()
+          foreach($i in 0..29) {
+            $srcRel=('source/asset_{0:00}.bin' -f $i)
+            $dstRel=('ExternalCars/asset_{0:00}.bin' -f $i)
+            $src=Join-Path $stage $srcRel
+            New-Item -ItemType Directory -Path (Split-Path $src -Parent) -Force | Out-Null
+            Set-Content -Path $src -Value ("new fixture for exact car $i") -NoNewline
+            $files+=@{
+              Source=$srcRel;Target=$dstRel
+              Bytes=(Get-Item $src).Length
+              Sha256=(Get-FileHash $src -Algorithm SHA256).Hash.ToLowerInvariant()
+              Mode='always'
+            }
+          }
+          @{Schema=1;CarCount=13;Status='STATIC_QA_PASS_NOT_QUEST3_TESTED';Files=$files} |
+            ConvertTo-Json -Depth 6 | Set-Content -Path (Join-Path $stage 'manifest.json')
+          & (Join-Path $stage 'INSTALL_FERRARI13.ps1') -VerifyOnly
+          & (Join-Path $stage 'INSTALL_FERRARI13.ps1') -GameDir $game
+          if((Get-FileHash (Join-Path $game 'OR2006C2C.EXE') -Algorithm SHA256).Hash -ne $originalExe) {
+            throw 'Original dummy game executable was modified'
+          }
+          if((Get-FileHash (Join-Path $game 'ExternalCars/asset_00.bin') -Algorithm SHA256).Hash -eq $oldBody) {
+            throw 'Install did not replace expected fixture file'
+          }
+          $backups=Get-ChildItem $game -Directory -Filter 'FERRARI13_PRIVATE_BACKUP_*'
+          if($backups.Count -ne 1){throw 'Expected exactly one backup'}
+          & (Join-Path $stage 'RESTORE_FERRARI13.ps1') -GameDir $game -BackupDir $backups[0].FullName
+          if((Get-FileHash (Join-Path $game 'ExternalCars/asset_00.bin') -Algorithm SHA256).Hash -ne $oldBody) {
+            throw 'Rollback did not restore pre-existing asset'
+          }
+          if(Test-Path (Join-Path $game 'ExternalCars/asset_29.bin')) {
+            throw 'Rollback did not remove package-only asset'
+          }
+          if((Get-FileHash (Join-Path $game 'OR2006C2C.EXE') -Algorithm SHA256).Hash -ne $originalExe) {
+            throw 'Rollback touched executable'
+          }
+          Write-Host 'PASS: synthetic Ferrari13 SHA -> backup -> installation -> rollback, original exe unchanged'
