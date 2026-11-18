@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "task_id": "FERRARI575-SUPERAMERICA-EXACT-UVREPAIR-OVC4-20261118",
+  "date_kst": "2026-11-18",
+  "car_id": "575superamerica",
+  "status": "EXACT_MODEL_OVC4_CONVERTED_PASS_OPTIONAL_LOW_TRI_NOT_QUEST3_TESTED",
+  "source": {
+    "origin": "Assetto Garage Ferrari Superamerica v241116; Assetto Corsa exact model",
+    "reference_url": "https://assettocorsamods.io/cars/gt/ferrari_superamerica/",
+    "archived_source_sha256": "d59d29f3867bdc050c51ad76b37a4caf2ddf6858a23185aedc86444f2c38780e",
+    "original_glb_sha256": "765e89af297a5823aa751c89835c1de97a75e6eac1e746dd38c17b8b629f46a4",
+    "repaired_glb_sha256": "c4536032e93fc03fe68c9c88079234aaabaa414aa63f9df277378be6ed47040a",
+    "original_glb_bytes": 4899840,
+    "meshes": 78,
+    "materials": 30,
+    "images": 43,
+    "normal_mapped_materials": 16,
+    "rights": "PRIVATE_PERSONAL_TEST_ONLY; cross-game and redistribution rights unconfirmed"
+  },
+  "uv_repair": {
+    "scope": "exactly 1 UV record; no vertex positions, normals, topology, material count or texture downscaling",
+    "mesh": "COCKPIT_HR_SUB0",
+    "accessor": 137,
+    "vertex_index": 2031,
+    "original": [
+      638.5,
+      -20721
+    ],
+    "fixed": [
+      11.5,
+      -8
+    ],
+    "neighbors": [
+      [
+        11.046875,
+        -6.76171875
+      ],
+      [
+        11.125,
+        -8.94921875
+      ]
+    ],
+    "derivation": "preserve UV fractional texture-wrap phase; apply integer repeat shift to nearest neighbor triangle median. Repacked JSON with updated accessor min/max; original GLB retained for comparison.",
+    "condition": "one UV V exceeded finite native check 10,000; original conversion blocked until repair"
+  },
+  "conversion": {
+    "format": "OVRCABH4",
+    "result": "CONVERT_PASS; INDEPENDENT_PYTHON_VERIFIER_PASS",
+    "file_bytes": 7157035,
+    "sha256": "0e902c45f1131c7438b57b515973e874efb9c014fb31bbb2030ea3ac4f68463d",
+    "triangles": 51444,
+    "vertices": 56323,
+    "groups": 78,
+    "materials": 30,
+    "glass_triangles": 1145,
+    "normal_mapped_materials": 16,
+    "image_count": 43,
+    "gpu_payload_bytes": 7153696,
+    "dashboard_bindings": 0,
+    "game_bounds": [
+      [
+        -1.0455262451361804,
+        4.11768641961352e-8,
+        -2.270145763036254
+      ],
+      [
+        1.0455261144493875,
+        1.2000045162637232,
+        2.270145867641644
+      ]
+    ],
+    "stereo_tested": false,
+    "dashboard_overlay": "Existing 16-car independent live overlay; this full-car source carries no animated V4 dashboard bindings"
+  },
+  "comparison": {
+    "current_575M_donor_triangles": 200071,
+    "optional_exact_575_triangles": 51444,
+    "auto_replace": false,
+    "reason": "Exact variant has about 74.3% fewer triangles than 575M donor; do not automatically replace high-detail donor.",
+    "comparison_type": "triangle count only; shading/visual quality not HMD tested"
+  },
+  "private_artifact": {
+    "name": "Ferrari_575_Superamerica_Exact_OVC4_OPTIONAL_PRIVATE_20261118.zip",
+    "bytes": 8950325,
+    "sha256": "084ed6d6acca828deab00f910b5c95811f968c488c556e0c2e35a7cc294723e7",
+    "retained_where": "ChatGPT current conversation sandbox; not uploaded to public GitHub",
+    "install_gate": "SHA256 + compatible integrated dinput8.dll + explicit -Install -AllowLowerDetail",
+    "default_action": "VERIFY_ONLY",
+    "backup_and_rollback": true
+  },
+  "qa_note": "No game-install, visual screenshot, road-contact or Quest3 runtime success implied."
+}
