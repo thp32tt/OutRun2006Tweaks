@@ -1,0 +1,78 @@
+name: Ferrari13 cockpit launcher activation smoke
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-ferrari16-v4-integrated-20261118
+    paths:
+      - tools/car_importer/ferrari16_hq_batch/tools/run_ferrari13_cockpit.ps1
+      - tools/car_importer/ferrari16_hq_batch/tools/run_ferrari13_cockpit.cmd
+      - tools/car_importer/ferrari16_hq_batch/tools/verify_ferrari13_cockpit.cmd
+      - .github/workflows/ferrari13-cockpit-launcher-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  windows-powershell-launcher:
+    runs-on: windows-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PowerShell 5.1 syntax, required environment and VR flags
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $scriptPath='tools/car_importer/ferrari16_hq_batch/tools/run_ferrari13_cockpit.ps1'
+          $cmdPath='tools/car_importer/ferrari16_hq_batch/tools/run_ferrari13_cockpit.cmd'
+          $verifyPath='tools/car_importer/ferrari16_hq_batch/tools/verify_ferrari13_cockpit.cmd'
+          $tokens=$null; $errors=$null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path $scriptPath).Path,[ref]$tokens,[ref]$errors
+          ) | Out-Null
+          if(@($errors).Count -gt 0){throw ('PowerShell parse error: '+($errors | Out-String))}
+          $ps=Get-Content -LiteralPath $scriptPath -Raw
+          foreach($required in @(
+            'OUTRUN_VR_LAUNCH',
+            'OUTRUN_VR_FILE_LOG',
+            '-VR.Enabled=true',
+            '-VR.Stereo=true',
+            '-VR.AutoLaunchHost=true',
+            '-VR.QuestCockpitV2Enabled=true',
+            '-VR.QuestCockpitV2NativeSeatProfile=true',
+            '-VR.QuestCockpitV2ApkNativeCamera=true',
+            '-VR.F50ExternalModel=true',
+            '-VR.ExternalFerrariTest=true',
+            '313d9925b48fab98dbe2445201cfc54a1e2a05ab34fb940b6bc3761c94e97a4e',
+            'e12a136cba5110216180b68ee2c20cadac1e0fe365bc0a58c4d42003360b5e40',
+            'Start-Process',
+            'QuestCockpitV2'
+          )) {
+            if(-not $ps.Contains($required)){throw "Missing required activation: $required"}
+          }
+          $cmd=Get-Content -LiteralPath $cmdPath -Raw
+          $verify=Get-Content -LiteralPath $verifyPath -Raw
+          if(-not $cmd.Contains('RUN_FERRARI13_COCKPIT.ps1')){throw 'Launch CMD does not call PS launcher'}
+          if(-not $verify.Contains('-VerifyOnly')){throw 'Verification CMD does not pass -VerifyOnly'}
+          Write-Host 'PASS Windows PowerShell 5.1 syntax and actual cockpit activation contract'
+      - name: Fail closed on incomplete install, never launching dummy EXE
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $scriptPath=(Resolve-Path 'tools/car_importer/ferrari16_hq_batch/tools/run_ferrari13_cockpit.ps1').Path
+          $game=Join-Path $env:RUNNER_TEMP 'F13DummyGame'
+          New-Item -ItemType Directory -Path $game -Force | Out-Null
+          Set-Content -LiteralPath (Join-Path $game 'OR2006C2C.EXE') -Value 'NOT_EXECUTABLE' -NoNewline
+          $before=(Get-FileHash -LiteralPath (Join-Path $game 'OR2006C2C.EXE') -Algorithm SHA256).Hash
+          $failed=$false
+          try {
+            & $scriptPath -GameDir $game -VerifyOnly
+          } catch {
+            if($_.Exception.Message -match 'Required file missing'){$failed=$true}
+            else {throw}
+          }
+          if(-not $failed){throw 'Launcher did not fail closed on missing dinput8.dll'}
+          $after=(Get-FileHash -LiteralPath (Join-Path $game 'OR2006C2C.EXE') -Algorithm SHA256).Hash
+          if($before -ne $after){throw 'Launcher modified original game executable'}
+          if(Get-Process -Name 'OR2006C2C' -ErrorAction SilentlyContinue){throw 'Unexpected dummy game process'}
+          Write-Host 'PASS missing-DLL fail-close, untouched original EXE, no launch'
