@@ -1,0 +1,47 @@
+name: Ferrari13 recovery host x64 from current source
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-ferrari16-v4-integrated-20261118
+    paths:
+      - .github/workflows/ferrari13-recovery-host-pair-build.yml
+      - tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/FERRARI13_RUN.ps1
+permissions:
+  contents: read
+jobs:
+  build-host-x64:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure host x64
+        shell: pwsh
+        run: cmake -S vrhost -B build-ferrari13-host -G "Visual Studio 17 2022" -A x64
+      - name: Build host from this exact source revision
+        shell: pwsh
+        run: cmake --build build-ferrari13-host --config Release --target outrun-vr-host --parallel 2
+      - name: Verify x64 host and produce source identity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $source = Get-ChildItem build-ferrari13-host -Recurse -Filter outrun-vr-host.exe | Where-Object {$_.FullName -match '[\\/]Release[\\/]'} | Select-Object -First 1
+          if (-not $source) { $source = Get-ChildItem build-ferrari13-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1 }
+          if (-not $source) { throw 'Built host missing' }
+          $data = [IO.File]::ReadAllBytes($source.FullName)
+          $pe = [BitConverter]::ToInt32($data,0x3c)
+          if([BitConverter]::ToUInt16($data,$pe+4) -ne 0x8664){throw 'Host is not AMD64'}
+          New-Item -ItemType Directory -Path ferrari13-matched-host -Force | Out-Null
+          Copy-Item $source.FullName ferrari13-matched-host/outrun-vr-host.exe
+          $sha = (Get-FileHash ferrari13-matched-host/outrun-vr-host.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          "source_sha=$env:GITHUB_SHA" | Set-Content ferrari13-matched-host/HOST_SOURCE_SHA.txt
+          "host_sha256=$sha" | Add-Content ferrari13-matched-host/HOST_SOURCE_SHA.txt
+          Write-Host "host_sha256=$sha"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Ferrari13-matched-host-${{ github.sha }}
+          path: ferrari13-matched-host/*
+          if-no-files-found: error
+          retention-days: 30
