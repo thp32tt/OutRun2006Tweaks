@@ -709,6 +709,6 @@ class BrowserLivenessWatchdogTests(unittest.IsolatedAsyncioTestCase):
   self.assertEqual(c.POLL,600)
   self.assertEqual(c.BROWSER_HEARTBEAT_SECONDS,60)
   self.assertGreaterEqual(c.BROWSER_JS_TIMEOUT_SECONDS,10)
-  entrypoint=Path("entrypoint.chat-rework.sh").read_text(encoding="utf-8")
+  entrypoint=Path(__file__).with_name("entrypoint.chat-rework.sh").read_text(encoding="utf-8")
   self.assertIn("BROWSER_WATCHDOG_ESCALATION",entrypoint)
   self.assertIn("chrome_cdp_ready",entrypoint)
