@@ -1,0 +1,69 @@
+name: Ferrari13 private small recovery hotfix Windows smoke
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-ferrari16-v4-integrated-20261118
+    paths:
+      - tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/APPLY-FERRARI13-RECOVERY.ps1
+      - tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/APPLY-AND-START-FERRARI13-RECOVERY.cmd
+      - .github/workflows/ferrari13-small-recovery-hotfix-smoke.yml
+permissions:
+  contents: read
+jobs:
+  windows-ps51:
+    runs-on: windows-2022
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse real recovery host installer and verify copy and restore safety
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $p='tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/APPLY-FERRARI13-RECOVERY.ps1'
+          $tok=$null;$errors=$null
+          [Management.Automation.Language.Parser]::ParseFile((Resolve-Path $p).Path,[ref]$tok,[ref]$errors)|Out-Null
+          if(@($errors).Count){throw ($errors|Out-String)}
+          $src=Get-Content $p -Raw
+          foreach($required in @('FERRARI13_PAYLOAD','Sha256','Get-Process','FERRARI13_HOST_BACKUP_','Copy-Item','oldSha','newSha','dllSha','Get-FileHash')){
+            if(-not $src.Contains($required)){throw "Missing fail-closed contract $required"}
+          }
+          $cmd=Get-Content 'tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/APPLY-AND-START-FERRARI13-RECOVERY.cmd' -Raw
+          if(-not ($cmd.Contains('APPLY-FERRARI13-RECOVERY.ps1') -and $cmd.Contains('START-FERRARI13-VR.cmd'))){throw 'Command script does not apply then launch'}
+          Write-Host 'PASS real recovery installer syntax, backup contract, and CMD chain.'
+      - name: Run synthetic host-update backup and idempotency with same script
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $p=(Resolve-Path 'tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/APPLY-FERRARI13-RECOVERY.ps1').Path
+          $sandbox=Join-Path $env:RUNNER_TEMP 'Ferrari13RecoveryHostSmoke'
+          $b=Join-Path $sandbox 'FERRARI13_PAYLOAD'
+          New-Item -ItemType Directory -Path (Join-Path $b 'backend') -Force | Out-Null
+          Set-Content (Join-Path $sandbox 'OR2006C2C.EXE') -Value 'ORIGINAL GAME DUMMY' -NoNewline
+          Set-Content (Join-Path $sandbox 'dinput8.dll') -Value 'dummy x86 DLL' -NoNewline
+          Set-Content (Join-Path $sandbox 'outrun-vr-host.exe') -Value 'old host' -NoNewline
+          Set-Content (Join-Path $b 'backend/outrun-vr-host.exe') -Value 'new host' -NoNewline
+          Set-Content (Join-Path $sandbox 'FERRARI13_RUN.ps1') -Value 'dummy launcher'
+          $old=(Get-FileHash (Join-Path $sandbox 'outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
+          $new=(Get-FileHash (Join-Path $b 'backend/outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
+          $dll=(Get-FileHash (Join-Path $sandbox 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant()
+          $originalExe=(Get-FileHash (Join-Path $sandbox 'OR2006C2C.EXE') -Algorithm SHA256).Hash
+          $m=[ordered]@{Schema=1;CarCount=13;Files=@()}
+          foreach($i in 0..28){$m.Files+=@{Target=("ExternalCars/asset"+$i+".ovc");Sha256='dummy'}}
+          $m.Files+=@{Target='outrun-vr-host.exe';Sha256=$new}
+          $m|ConvertTo-Json -Depth 8|Set-Content (Join-Path $b 'manifest.json')
+          $temp=Get-Content $p -Raw
+          $temp=$temp.Replace('9ecc80a902985506a66b93446f38d724190d622eba09a0f2683891714579460c',$new)
+          $temp=$temp.Replace('e12a136cba5110216180b68ee2c20cadac1e0fe365bc0a58c4d42003360b5e40',$old)
+          $temp=$temp.Replace('313d9925b48fab98dbe2445201cfc54a1e2a05ab34fb940b6bc3761c94e97a4e',$dll)
+          $script=Join-Path $sandbox 'APPLY-FERRARI13-RECOVERY.ps1'
+          Set-Content -Path $script -Value $temp
+          & $script
+          if((Get-FileHash (Join-Path $sandbox 'outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant() -ne $new){throw 'new host failed to install'}
+          $backup=@(Get-ChildItem -LiteralPath $sandbox -Directory -Filter 'FERRARI13_HOST_BACKUP_*')
+          if($backup.Count -ne 1){throw 'No old-host backup'}
+          if((Get-FileHash (Join-Path $backup[0].FullName 'outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant() -ne $old){throw 'host backup mismatch'}
+          & $script
+          if(@(Get-ChildItem -LiteralPath $sandbox -Directory -Filter 'FERRARI13_HOST_BACKUP_*').Count -ne 1){throw 'idempotent call made extra backup'}
+          if((Get-FileHash (Join-Path $sandbox 'OR2006C2C.EXE') -Algorithm SHA256).Hash -ne $originalExe){throw 'original EXE modified'}
+          Write-Host 'PASS actual synthetic apply/backup/idempotency; original game exe untouched.'
