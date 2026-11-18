@@ -58,3 +58,11 @@ No v0.03 public release should be published from this experimental branch.
 - Added bounded `VR PASSENGER SCENE PASS` counters (driver/guest wrapper pair, source scene masks, current native epoch, stereo), useful if Quest3 still fails; does not claim GPU proof.
 - The one-shot `RUN-QUEST-APK-PASSENGER-DIAG.cmd` keeps Follow Camera 0 forced on this diagnostic launch and collects logs automatically.
 - Scope boundary: no new event, original game files untouched, no public v0.03, no live HMD result yet.
+
+## 2026-11-19 user field-run follow-up: passenger pixel gap and low-speed sky double-image
+
+- Uploaded session `20261118T165428567Z-5fc963ca`, exact source `5a56acf5c858b1e6c360bd6e56dbb8151c09e059`, original EXE SHA `68ceb386...`, correct DLL, game exit=0.
+- While cockpit camera1 active the original ROB02 renderer was invoked **6413 times**, car-flag gate recovered **6368** genuine draws, original display-scene driver/guest 0x80, original guest wrapper reached=true, scene restores=0. Current root cause is NOT missing 4879B0/43FB40 callbacks.
+- The model-space correction was applied on every observed ROB02 draw but yielded huge off-cockpit translation: native (3.620,-2.379,-254.995) -> W*C (2.931,-44.230,-250.776); later native (821.016,-7.100,-354.080) -> W*C (819.698,+49.760,-354.715). PMT forced-visible=1 LOD0=0 observed, not proof of GPU pixels. New guard rejects only ROB02 W*C displacements over 4 game units and forwards unmodified native work within existing scoped PMT visibility.
+- Original `0x4521C0` naturally contains two sky layers. Programmable exact-sky drew using rotation-only head fallback; fixed-function rotationOnly could use the native Quest eye pair or fallback depending on pose readiness, so layers could disagree. Fixed rotation-only sky now ALWAYS uses the same head fallback as programmable sky; non-sky world native pair unchanged. No pixel-level low-speed cause is proven before HMD retest.
+- PASSENGER-DIAG one-run enables bounded SKY probe, `VR SKY COHERENT BASIS`, `VR PASSENGER NATIVE MATRIX`, original PMT and game/host evidence. Release v0.03 remains rejected until live confirmation.

@@ -39,6 +39,16 @@ assert "ShouldRecoverOriginalPassengerScenePass(" in policy
 assert "OriginalEventSceneDisplaySignature()" in hook
 assert "PassengerSceneHook.ccall<void>(mask,first,last);" in hook
 assert "PassengerGateThreadCalls" in hook
+assert "PassengerModelCorrectionNearNative(work,corrected)" in hook
+assert "VR PASSENGER NATIVE MATRIX:" in hook
+assert "reason=out_of_cockpit" in hook
+sky = Path("src/vr/d3d9/stereo_renderer_r7.inc").read_text(encoding="utf-8")
+assert "fixedNativeEyePair=rotationOnly ? nullptr :" in sky
+assert "exactWorldSky ? nullptr :" in sky
+assert "VR SKY COHERENT BASIS:" in sky
+copyrun = Path("QuestCockpit-CopyRun.ps1").read_text(encoding="utf-8")
+assert "$Mode -eq 'PASSENGER'" in copyrun
+assert "QuestCockpitV2SkyProbe='ON'" in copyrun
 assert "DriverGateThreadCalls" in hook
 assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
 assert "VR PASSENGER SCENE PASS:" in hook

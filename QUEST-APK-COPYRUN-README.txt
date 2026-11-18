@@ -12,6 +12,8 @@ camera. It does NOT load Dino GLB, replacement meshes or external textures.
    OR2006C2C.EXE folder, preserving QUEST_APK_COPYRUN_PAYLOAD.
 ONE-TEST PASSENGER CHECK (recommended for this experimental build):
 - Run RUN-QUEST-APK-PASSENGER-DIAG.cmd once, NOT the ordinary cockpit CMD.
+- The SAME run now gathers the original 4521C0 first-stage dual-sky
+  counter-rotation diagnostic; do not launch a separate SKY test.
 - It auto-enables Follow Camera 0, uses the existing native cockpit and
   original ROB02 passenger, enables bounded source/scene/model logs, and
   collects the compressed diagnostic session after exiting the game.

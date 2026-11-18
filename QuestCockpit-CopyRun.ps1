@@ -249,7 +249,12 @@ $launchArgs=@{
     QuestCockpitV2F0='ON'
 }
 if($Mode -eq 'SKY'){$launchArgs.QuestCockpitV2SkyProbe='ON'}
-if($Mode -eq 'PASSENGER'){$launchArgs.QuestCockpitV2PassengerDiagnostics='ON'}
+if($Mode -eq 'PASSENGER'){
+    # One QA run checks both the original ROB02 guest and first-stage sky.
+    # Diagnostics are bounded; general per-draw telemetry remains OFF.
+    $launchArgs.QuestCockpitV2PassengerDiagnostics='ON'
+    $launchArgs.QuestCockpitV2SkyProbe='ON'
+}
 if($Mode -eq 'INTERP'){
     $launchArgs.QuestCockpitV2Interpolation='OFF'
     $launchArgs.QuestCockpitV2SkyProbe='ON'

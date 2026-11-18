@@ -138,6 +138,15 @@ def pass_07_nested_draw_and_restore():
           "force draw must own native render and a live paired XR pose")
     check("VR PASSENGER WXC:" in robot,
           "missing read-only passenger raw/corrected matrix trace")
+    check("PassengerModelCorrectionNearNative(work,corrected)" in robot,
+          "Quest3-proven off-cockpit displacement still applied to ROB02")
+    check("VR PASSENGER NATIVE MATRIX:" in robot,
+          "missing bounded original PC matrix fallback evidence")
+    sky=read("src/vr/d3d9/stereo_renderer_r7.inc")
+    check("fixedNativeEyePair=rotationOnly ? nullptr :" in sky,
+          "fixed original sky can still switch between native/fallback bases")
+    check("VR SKY COHERENT BASIS:" in sky,
+          "sky-headset basis diagnostics unavailable")
     scene=hook.split("static void __cdecl PassengerEventSceneDisplay(",1)[1].split(
         "static void __cdecl RobotDisplay(",1)[0]
     check_order(scene,"PassengerSceneHook.ccall<void>(mask,first,last);",
