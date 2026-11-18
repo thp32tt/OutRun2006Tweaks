@@ -56,6 +56,13 @@ MAX_QUEUE_JSON = 512 * 1024
 SEND_STATES = ("AB_SENT", "C1_READY", "C1_SENT")
 IMAGE_TOOL_RETRY_STATUS = "IMAGE_TOOL_RETRY_PENDING"
 IMAGE_TOOL_RETRY_INTERVAL_SECONDS = 900
+# Queue polling stays intentionally conservative. Browser liveness is checked
+# independently so a dead/white Chromium tab is repaired without increasing
+# ImageGen request frequency or GitHub queue polling.
+BROWSER_HEARTBEAT_SECONDS = 60
+BROWSER_JS_TIMEOUT_SECONDS = 12
+BROWSER_RELOAD_TIMEOUT_MS = 45000
+BROWSER_NEW_TAB_TIMEOUT_SECONDS = 25
 # The old controller explicitly returned HOLD_IMAGE_TOOL_NOT_VERIFIED BEFORE
 # uploading, typing or pressing Enter. Only that exact old status is safe
 # to resume; other HOLD/AB_CLAIMED/AB_SENT states must never be resent.
@@ -624,6 +631,13 @@ class ChatBridge:
 
     async def ensure_context(self):
         """Attach only to the already-visible VNC Chromium; never spawn a second profile."""
+        # A CDP connection can become stale while the entrypoint-owned Chromium
+        # is restarted. Drop only Playwright references; never close the user's
+        # persistent browser/profile from this worker.
+        if self.browser is not None and not self.browser.is_connected():
+            self.context=None
+            self.browser=None
+            self.pages={}
         if self.context is None:
             # Local-only CDP port is started by entrypoint, never exposed to host.
             browser=await self.playwright.chromium.connect_over_cdp(
@@ -658,6 +672,95 @@ class ChatBridge:
         except Exception as exc:
             # Chromium window is still visible for manual navigation.
             return "HOLD_CHATGPT_PAGE_NAVIGATION_"+type(exc).__name__
+
+    async def _page_responsive(self, pg):
+        """Cheap renderer heartbeat; never reads chat/user content."""
+        if pg is None or pg.is_closed():
+            return False
+        try:
+            ready=await asyncio.wait_for(
+                pg.evaluate("() => document.readyState"),
+                timeout=BROWSER_JS_TIMEOUT_SECONDS)
+            return ready in ("loading","interactive","complete")
+        except Exception:
+            return False
+
+    async def refresh_or_replace_role_page(self, role, target=None):
+        """Repair one stale tab: reload first, then replace it with one fresh tab.
+
+        This is navigation-only. It never types, uploads, presses Enter, or
+        changes a GitHub submission receipt.
+        """
+        if role not in ("A","B","C1"):
+            raise ValueError("INVALID_ROLE")
+        await self.ensure_context()
+        old=self.pages.get(role)
+        if not is_saved_chat_url(target):
+            try:
+                current=old.url if old is not None and not old.is_closed() else ""
+            except Exception:
+                current=""
+            target=current if is_saved_chat_url(current) else PROJECT_URL
+        # First choice: keep the same tab/profile and reload it.
+        if old is not None and not old.is_closed():
+            try:
+                await old.reload(wait_until="domcontentloaded",
+                                 timeout=BROWSER_RELOAD_TIMEOUT_MS)
+                if await self._page_responsive(old):
+                    return "BROWSER_PAGE_RELOADED"
+            except Exception:
+                pass
+        # Second choice: a fresh tab in the SAME authenticated context/profile.
+        try:
+            fresh=await asyncio.wait_for(
+                self.context.new_page(), timeout=BROWSER_NEW_TAB_TIMEOUT_SECONDS)
+            await fresh.goto(target,wait_until="domcontentloaded",
+                             timeout=BROWSER_RELOAD_TIMEOUT_MS)
+            if not await self._page_responsive(fresh):
+                try:
+                    await fresh.close()
+                except Exception:
+                    pass
+                return "HOLD_BROWSER_FRESH_TAB_UNRESPONSIVE"
+            self.pages[role]=fresh
+            # Avoid accumulating dead renderer tabs. Failure to close a hung tab
+            # is harmless; the new healthy tab is already authoritative.
+            if old is not None and old is not fresh and not old.is_closed():
+                try:
+                    await asyncio.wait_for(old.close(),timeout=3)
+                except Exception:
+                    pass
+            return "BROWSER_FRESH_TAB_READY"
+        except Exception as exc:
+            return "HOLD_BROWSER_FRESH_TAB_"+type(exc).__name__
+
+    async def browser_watchdog(self):
+        """60s liveness check independent of the 600s queue/browser work poll."""
+        try:
+            await self.ensure_context()
+        except Exception:
+            self.context=None
+            self.browser=None
+            self.pages={}
+            return "HOLD_BROWSER_CDP_UNAVAILABLE"
+        roles=list(self.pages) or ["A"]
+        recovered=[]
+        for role in roles:
+            pg=self.pages.get(role)
+            if await self._page_responsive(pg):
+                continue
+            target=None
+            try:
+                if pg is not None and is_saved_chat_url(pg.url):
+                    target=pg.url
+            except Exception:
+                pass
+            state=await self.refresh_or_replace_role_page(role,target)
+            if state.startswith("HOLD_"):
+                return state
+            recovered.append(role+":"+state)
+        return ("BROWSER_HEALTHY" if not recovered else
+                "BROWSER_RECOVERED_"+",".join(recovered))
 
     async def page(self,role,url=None,*,read_only=False):
         """Read-only result retrieval never depends on a visible chat composer.
@@ -742,6 +845,14 @@ class ChatBridge:
         # Select first, BEFORE AB_CLAIMED. A missing/renamed Images control
         # is not a terminal HOLD and does not produce any ChatGPT user turn.
         selected=await ensure_image_tool(pg)
+        if selected!="CREATE_IMAGE_TOOL_SELECTED":
+            # A stale/half-rendered ChatGPT tab often exposes the More button
+            # but not the Images choice. Before parking for another 15 minutes,
+            # reload once; if that renderer is hung, replace only this tab.
+            repaired=await self.refresh_or_replace_role_page(task["role"])
+            if not repaired.startswith("HOLD_"):
+                pg=self.pages.get(task["role"])
+                selected=await ensure_image_tool(pg)
         if selected!="CREATE_IMAGE_TOOL_SELECTED":
             attempts=(prior or {}).get("image_tool_retry_count",0)
             if not isinstance(attempts,int) or attempts<0:
@@ -1152,7 +1263,23 @@ async def run_forever():
                     result={"status":"HOLD_RETRY","error_type":type(exc).__name__}
                 result["checked_utc"]=utc()
                 print(json.dumps(result,ensure_ascii=False,sort_keys=True),flush=True)
-                await asyncio.sleep(POLL)
+                # Keep queue/ImageGen cadence at POLL (600s default), but check
+                # renderer/CDP liveness every minute. This does not submit work.
+                remaining=POLL
+                while remaining>0:
+                    step=min(BROWSER_HEARTBEAT_SECONDS,remaining)
+                    await asyncio.sleep(step)
+                    remaining-=step
+                    health=await bridge.browser_watchdog()
+                    if health=="HOLD_BROWSER_CDP_UNAVAILABLE":
+                        print(json.dumps({"status":health,"checked_utc":utc()},
+                                         sort_keys=True),flush=True)
+                        # Let the entrypoint relaunch Chromium if its process/CDP
+                        # died. The persistent profile/login volume is preserved.
+                        return
+                    if health!="BROWSER_HEALTHY":
+                        print(json.dumps({"status":health,"checked_utc":utc()},
+                                         ensure_ascii=False,sort_keys=True),flush=True)
         finally:
             await bridge.close()
 
