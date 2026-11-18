@@ -95,6 +95,29 @@ recover_stale_chrome_singletons() {
 # Start a genuine visible Chromium window independently of the task queue.
 # The Python A/B/C1 worker connects to THIS SAME browser over local-only CDP,
 # so manually authenticated ChatGPT sessions remain in the correct profile.
+chrome_cdp_ready() {
+  python - <<'PY' >/dev/null 2>&1
+import json, urllib.request
+with urllib.request.urlopen("http://127.0.0.1:9222/json/version",timeout=2) as r:
+    v=json.load(r)
+assert "webSocketDebuggerUrl" in v
+PY
+}
+
+stop_visible_chrome() {
+  if [[ -n "${chrome_pid:-}" ]] && kill -0 "$chrome_pid" 2>/dev/null; then
+    kill "$chrome_pid" 2>/dev/null || true
+    for _ in $(seq 1 20); do
+      if ! kill -0 "$chrome_pid" 2>/dev/null; then break; fi
+      sleep 0.25
+    done
+    if kill -0 "$chrome_pid" 2>/dev/null; then
+      kill -KILL "$chrome_pid" 2>/dev/null || true
+    fi
+    wait "$chrome_pid" 2>/dev/null || true
+  fi
+}
+
 launch_visible_chrome() {
   local chrome
   if ! recover_stale_chrome_singletons; then
@@ -144,15 +167,21 @@ PY
   return 1
 }
 
-until launch_visible_chrome; do
-  echo "HOLD_VISIBLE_BROWSER_START_FAILED: noVNC remains running; retry in 30 seconds. Review /logs/hd-rework-chromium.log." >&2
-  if [[ -n "${chrome_pid:-}" ]]; then
-    kill "$chrome_pid" 2>/dev/null || true
-    wait "$chrome_pid" 2>/dev/null || true
+ensure_visible_chrome() {
+  if [[ -n "${chrome_pid:-}" ]] && kill -0 "$chrome_pid" 2>/dev/null && chrome_cdp_ready; then
+    return 0
   fi
-  sleep 30 &
-  wait "$!" || true
-done
+  echo "BROWSER_WATCHDOG_RELAUNCH: Chromium process/CDP unavailable; preserving profile and relaunching." >&2
+  stop_visible_chrome
+  until launch_visible_chrome; do
+    echo "HOLD_VISIBLE_BROWSER_START_FAILED: noVNC remains running; retry in 30 seconds. Review /logs/hd-rework-chromium.log." >&2
+    stop_visible_chrome
+    sleep 30 &
+    wait "$!" || true
+  done
+}
+
+ensure_visible_chrome
 
 
 # One-time diagnostics: distinguish Docker connectivity, Chromium's local
@@ -209,6 +238,7 @@ while true; do
     echo "HOLD_NOVNC_PROCESS_STOPPED: Review /logs/hd-rework-novnc.log." >&2
     exit 3
   fi
+  ensure_visible_chrome
   if [[ -z "${OUTRUN_GITHUB_CONTENTS_TOKEN:-}" ]]; then
     echo "HOLD_GITHUB_CONTENTS_TOKEN_MISSING: opening ChatGPT login window anyway; queue stays paused." >&2
   fi
@@ -217,7 +247,17 @@ while true; do
   python -u /opt/outrun/github_chat_rework_controller.py
   rc=$?
   set -e
-  echo "HOLD_CHAT_REWORK_EXITED: exit_code=$rc; VNC remains running, retrying in 60 seconds." >&2
+  if [[ "$rc" -eq 73 ]]; then
+    echo "BROWSER_WATCHDOG_ESCALATION: worker found unrecoverable Chromium/tab health; relaunching browser now." >&2
+    stop_visible_chrome
+    continue
+  fi
+  if ! kill -0 "$chrome_pid" 2>/dev/null || ! chrome_cdp_ready; then
+    echo "BROWSER_WATCHDOG_DETECTED_DEAD_CHROMIUM: relaunching browser now." >&2
+    stop_visible_chrome
+    continue
+  fi
+  echo "HOLD_CHAT_REWORK_EXITED: exit_code=$rc; browser healthy, retrying worker in 60 seconds." >&2
   sleep 60 &
   wait "$!" || true
 done
