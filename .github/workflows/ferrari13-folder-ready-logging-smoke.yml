@@ -1,0 +1,82 @@
+name: Ferrari13 full folder-ready launcher and log collector Windows smoke
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-ferrari16-v4-integrated-20261118
+    paths:
+      - tools/car_importer/ferrari16_hq_batch/tools/folder_ready_20261119/**
+      - .github/workflows/ferrari13-folder-ready-logging-smoke.yml
+permissions:
+  contents: read
+jobs:
+  windows-ps51-logging-smoke:
+    runs-on: windows-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Windows PowerShell 5.1 script syntax and required VR launch policy
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $base = 'tools/car_importer/ferrari16_hq_batch/tools/folder_ready_20261119'
+          foreach($name in @('FERRARI13_RUN.ps1','FERRARI13_COLLECT.ps1')) {
+            $tok=$null; $errs=$null
+            [Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path (Join-Path $base $name)).Path,[ref]$tok,[ref]$errs
+            ) | Out-Null
+            if(@($errs).Count){throw ("Parse errors in "+$name+': '+($errs|Out-String))}
+          }
+          $src=Get-Content -LiteralPath (Join-Path $base 'FERRARI13_RUN.ps1') -Raw
+          foreach($required in @(
+            "OUTRUN_VR_LAUNCH","OUTRUN_VR_FILE_LOG",
+            "'-VR.Enabled=true'","'-VR.Stereo=true'",
+            "'-VR.QuestCockpitV2Enabled=true'","'-VR.ExternalFerrariTest=true'",
+            "'-VR.DirectGpuOnly=false'","'-VR.DisableDesktopDuplication=false'",
+            "'-FileLogging=true'","'-VR.Telemetry=false'",
+            "INSTALL_FERRARI13.ps1","FERRARI13_COLLECT.ps1",
+            "'OR2006C2C.EXE'")) {
+            if(-not $src.Contains($required)){throw ("Missing contract "+$required)}
+          }
+          foreach($name in @('START-FERRARI13-VR.cmd','VERIFY-FERRARI13-VR.cmd','COLLECT-FERRARI13-LOGS.cmd')) {
+            if(-not (Test-Path -LiteralPath (Join-Path $base $name))){throw ("Missing launcher "+$name)}
+          }
+          Write-Host 'PASS Windows PowerShell syntax and full VR diagnostic activation contract.'
+      - name: Real Windows synthetic file logging collection, archive extraction and fail-closed install
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $base = (Resolve-Path 'tools/car_importer/ferrari16_hq_batch/tools/folder_ready_20261119').Path
+          $sandbox = Join-Path $env:RUNNER_TEMP 'Ferrari13DiagnosticSynthetic'
+          New-Item -ItemType Directory -Path $sandbox -Force | Out-Null
+          Copy-Item (Join-Path $base 'FERRARI13_RUN.ps1') (Join-Path $sandbox 'FERRARI13_RUN.ps1')
+          Copy-Item (Join-Path $base 'FERRARI13_COLLECT.ps1') (Join-Path $sandbox 'FERRARI13_COLLECT.ps1')
+          Set-Content -Path (Join-Path $sandbox 'OR2006C2C.EXE') -Value 'TEST PLACEHOLDER. NEVER EXECUTE.' -NoNewline
+          Set-Content -Path (Join-Path $sandbox 'OutRun2006Tweaks.log') -Value 'startup true; expected sdk failure'
+          Set-Content -Path (Join-Path $sandbox 'outrun-vr-host-v3.log') -Value 'shadow_start; directReady=0 frameOk=0'
+          Set-Content -Path (Join-Path $sandbox 'outrun-vr-watchdog.log') -Value 'game_client_missing stereo_frame_missing stereoFrame=0'
+          $diag = Join-Path $sandbox 'FERRARI13_DIAG'
+          New-Item -ItemType Directory -Path $diag -Force | Out-Null
+          Set-Content -Path (Join-Path $diag 'FERRARI13_RUN_test.log') -Value 'START UTC mock; installed=true'
+          & (Join-Path $sandbox 'FERRARI13_COLLECT.ps1')
+          $zip = @(Get-ChildItem -LiteralPath $diag -Filter 'FERRARI13_LOGS_*.zip' -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1)
+          if($zip.Count -ne 1){throw 'Diagnostic ZIP missing'}
+          $zf=[IO.Compression.ZipFile]::OpenRead($zip[0].FullName)
+          try {
+            $names=@($zf.Entries|ForEach-Object FullName)
+            if(-not ($names -match 'SUMMARY.txt')){throw 'Diagnostic summary missing'}
+            foreach($suffix in @('OutRun2006Tweaks.log','outrun-vr-host-v3.log','outrun-vr-watchdog.log','FERRARI13_RUN_test.log')) {
+              if(-not ($names|Where-Object {$_ -like "*$suffix"})){throw ("No captured log "+$suffix)}
+            }
+            Write-Host ('PASS collected '+$names.Count+' real synthetic log entries')
+          } finally {$zf.Dispose()}
+          $failed=$false
+          try {
+            & (Join-Path $sandbox 'FERRARI13_RUN.ps1') -Mode Verify
+          } catch {
+            $failed=$_.Exception.Message -match 'FERRARI13_PAYLOAD missing'
+          }
+          if(-not $failed){throw 'Startup verification should reject missing complete asset bundle'}
+          if((Get-Content -Path (Join-Path $sandbox 'OR2006C2C.EXE') -Raw) -ne 'TEST PLACEHOLDER. NEVER EXECUTE.'){throw 'Original test EXE was modified'}
+          Write-Host 'PASS fail-close without payload, original executable untouched.'
