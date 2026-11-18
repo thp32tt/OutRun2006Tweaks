@@ -1271,12 +1271,13 @@ async def run_forever():
                     await asyncio.sleep(step)
                     remaining-=step
                     health=await bridge.browser_watchdog()
-                    if health=="HOLD_BROWSER_CDP_UNAVAILABLE":
+                    if health.startswith("HOLD_BROWSER_"):
                         print(json.dumps({"status":health,"checked_utc":utc()},
                                          sort_keys=True),flush=True)
-                        # Let the entrypoint relaunch Chromium if its process/CDP
-                        # died. The persistent profile/login volume is preserved.
-                        return
+                        # Exit with a dedicated code so the entrypoint can
+                        # relaunch a dead/wedged Chromium while preserving the
+                        # persistent profile/login volume.
+                        raise SystemExit(73)
                     if health!="BROWSER_HEALTHY":
                         print(json.dumps({"status":health,"checked_utc":utc()},
                                          ensure_ascii=False,sort_keys=True),flush=True)
