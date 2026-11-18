@@ -1,14 +1,17 @@
 {
-  "hold_reason": "HOLD_C1_IMAGE_TOOL_SELECTED",
+  "hold_reason": null,
+  "image_tool_diagnostic": "IMAGE_TOOL_MENU_MISSING",
+  "image_tool_last_attempt_utc": "2026-11-18T07:41:13+00:00",
+  "image_tool_retry_count": 1,
   "old_candidate_sha256": "8550f668e19b3b6432720ae6c10bbba87e2fcfb3ff7ed1ac79700297242479a0",
-  "pre_send_no_message": false,
+  "pre_send_no_message": true,
   "release_approved": false,
   "roi_id": "Q227_20e6dcfbb3f28c8c",
   "role": "B",
   "runtime_validation": "UNTESTED",
   "schema": "outrun-hd-qa-chat-status-v1",
   "source_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
-  "status": "HOLD",
+  "status": "IMAGE_TOOL_RETRY_PENDING",
   "task": {
     "english": "ANCIENT RUINS",
     "generation_mode": "ONLY_KOREAN_TEXT_RGBA_USE_ORIGINAL_HD_STYLE_NO_BACKGROUND",
@@ -60,5 +63,5 @@
     "task_id": "HDRW-B-c1d8b4697e3db20041e1"
   },
   "task_id": "HDRW-B-c1d8b4697e3db20041e1",
-  "updated_utc": "2026-11-15T21:58:53+00:00"
+  "updated_utc": "2026-11-18T07:41:13+00:00"
 }
