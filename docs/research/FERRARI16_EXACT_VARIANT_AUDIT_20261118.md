@@ -51,3 +51,7 @@ Read [FERRARI13_PRIVATE_QA_AND_DEPLOY_20261118.md](FERRARI13_PRIVATE_QA_AND_DEPL
 ## Operational status 2026-11-19 — 13-car one-click diagnostic repackage
 
 **Current Ferrari13 test link and white-screen triage:** [FERRARI13_WHITESCREEN_FOLDER_READY_DIAGNOSTIC_20261119.md](FERRARI13_WHITESCREEN_FOLDER_READY_DIAGNOSTIC_20261119.md). Game-root extract + `START-FERRARI13-VR.cmd`, logging ON, normal fallback allowed, and separate `COLLECT-FERRARI13-LOGS.cmd`. Real uploaded later-session watchdog and host logs have **0 stereo frames** / directReady=0 / game-client-missing; do not call 13/13 Quest 3 gameplay complete until physical re-test. This is a retry of launcher correctness, **no duplicate AI2 score**.
+
+## 2026-11-19 physical white-screen BLOCKER (new uploaded real game logs)
+
+Before any Ferrari13 Quest3 QA claims, see [FERRARI13_WHITESCREEN_MENU_RECOVERY_MATCHEDHOST_20261119.md](FERRARI13_WHITESCREEN_MENU_RECOVERY_MATCHEDHOST_20261119.md). Original user log proved DLL loaded and menu Present >1024, camera 9/playerCar=0, stereo game frames=0, directReady=0, old host built against older revision. New fully bundled private D3D9-classic recovery test and optional 461 KB matched-host-only patch supplied, **not yet verified on the actual Quest 3**. The 13 exact-source model bytes have not changed and all prior 13/13 static QA remains, but *hardware VR completed=0* until physical proof. Do not score the same corrective work twice.
