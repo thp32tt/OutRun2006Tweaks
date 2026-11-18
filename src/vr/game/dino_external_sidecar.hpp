@@ -287,8 +287,15 @@ struct Gate {
     bool allowOtherFerrari=false;
     unsigned char carId=255,expectedCarId=255;
 };
+constexpr bool IsF50RetailCarId(unsigned char carId) noexcept {
+    return carId==2u || carId==17u;
+}
+static_assert(IsF50RetailCarId(2u) && IsF50RetailCarId(17u) &&
+              !IsF50RetailCarId(0u) && !IsF50RetailCarId(15u),
+              "F50 retail ID contract");
 inline bool Eligible(const Gate& g) noexcept {
-    const bool matchF50=!g.allowOtherFerrari&&g.carKind==0;
+    const bool matchF50=!g.allowOtherFerrari&&
+        IsF50RetailCarId(g.carId)&&g.carId==g.expectedCarId;
     // PC retail player-car IDs are bounded by the 30-row native seat/car
     // table. Every extra external model still uses a fixed per-ID filename,
     // verified player identity and the same fail-closed parser/GPU gates.
