@@ -960,7 +960,13 @@ namespace OutRunVRStereo
 					!MatrixFinite(state.fixedOriginalProjection))
 					return EyeBuildResult::FatalError;
 
-				const auto* fixedNativeEyePair=
+				// Original 4521C0 shader sky already uses a fixed head/eye
+                // fallback; fixed-function rotation-only sky must use the
+                // SAME basis for both original layers. Previously this
+                // branch switched to Quest native eye pairs at race start,
+                // making sky layers appear doubled/counter-rotated.
+                // Non-sky world still uses native Quest eye pairs.
+                const auto* fixedNativeEyePair=rotationOnly ? nullptr :
                     GetQuestNativeEyePairForPresent(stereo.poseSequence);
                 D3DMATRIX fallbackHeadRotation{};
                 const D3DMATRIX* appliedHeadInverse=nullptr;
@@ -1038,6 +1044,15 @@ namespace OutRunVRStereo
 				if (rotationOnly)
 				{
 					++FixedFunctionSkyRotationOnlyDraws;
+                    if(Settings::VRQuestCockpitV2SkyProbe &&
+                       (FixedFunctionSkyRotationOnlyDraws<=12u ||
+                        FixedFunctionSkyRotationOnlyDraws%180u==0u))
+                        spdlog::info(
+                            "VR SKY COHERENT BASIS: fixedSkyCount={} "
+                            "exactWorldSky={} nativePairUsed={} "
+                            "poseSequence={} rotationOnly=1",
+                            FixedFunctionSkyRotationOnlyDraws,exactWorldSky,
+                            fixedNativeEyePair!=nullptr,stereo.poseSequence);
 					if (!FirstFixedFunctionSkyRotationLogged)
 					{
 						FirstFixedFunctionSkyRotationLogged = true;
