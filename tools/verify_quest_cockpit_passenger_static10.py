@@ -150,6 +150,13 @@ def pass_07_nested_draw_and_restore():
           "original scene hook must be signature-verified and fail closed")
     check("PassengerSceneRestores.fetch_add(" in hook,
           "missing actual upstream scene restore counter")
+    check("DriverGateThreadCalls" in hook and
+          "afterDriver!=beforeDriver,after!=before" in hook,
+          "restored 0x80 event must prove native ROB01 from the same pass")
+    check("passengerScene==OriginalRobDisplayLayer" in policy,
+          "active original ROB02 0x80 mask may not silently skip recovery")
+    check("VR PASSENGER SCENE PASS:" in hook,
+          "one-session diagnostic does not distinguish layer from wrapper")
     check("if(!correctionOwner.Active())" in robot,
           "nested W*C correction not rejected")
 

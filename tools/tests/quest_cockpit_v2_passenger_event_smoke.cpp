@@ -48,28 +48,53 @@ constexpr bool PassengerSceneRecoveryTruthTable() {
     constexpr auto guestScene=0u, driverScene=0x80u;
     const bool result=ShouldRecoverOriginalPassengerScenePass(
       native,cockpit,follow,race,mode,live,frame,stereo,
-      0x80u,0,409,driverScene,guestScene,false);
+      0x80u,0,409,driverScene,guestScene,false,false);
     if(result!=(bits==255u))return false;
   }
   return true;
 }
 static_assert(PassengerSceneRecoveryTruthTable());
+
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x40u,0,409,0x40u,0u,false));
+  true,true,true,true,true,true,true,true,0x40u,0,409,0x40u,0u,true,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,false,false));
+// Critical test: original 0x80 event remains LIVE but only ROB01 wrapper
+// executes. No other layer can draw ROB02, so restore exactly once.
+static_assert(ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,true,false));
+// Never duplicate a native event whose wrapper already executed.
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x40u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,true,true));
+// Never invent an actor if both native ROB01/ROB02 wrappers are missing
+// but the original passenger has a nonzero active scene.
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x100u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,false,false));
+// Native scene disabled: existing conservative restore stays available.
+static_assert(ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0u,false,false));
+// Combined/cross-layer masks must never force another draw.
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0u,true));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x180u,true,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,362,0x80u,0u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x40u,true,false));
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,364,409,0x80u,0u,false));
+  true,true,true,true,true,true,true,true,0x80u,0,409,0x80u,0x100u,true,false));
+// Remove mode/camera0/GOAL/invalid eye are always fail-closed.
 static_assert(!ShouldRecoverOriginalPassengerScenePass(
-  true,true,true,true,true,true,true,true,0x80u,0,409,0u,0u,false));
+  true,true,false,true,true,true,true,true,0x80u,0,409,0x80u,0x80u,true,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,false,true,true,true,0x80u,0,409,0x80u,0x80u,true,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,false,true,true,true,true,0x80u,0,409,0x80u,0x80u,true,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,false,0x80u,0,409,0x80u,0x80u,true,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,362,0x80u,0x80u,true,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,364,409,0x80u,0x80u,true,false));
+static_assert(!ShouldRecoverOriginalPassengerScenePass(
+  true,true,true,true,true,true,true,true,0x80u,0,409,0u,0x80u,true,false));
 int main() {
     // Original PC: 440110 event byte flags live separately from sEventWork.
     static_assert(OriginalEventFlagsRva==0x39FB48u);

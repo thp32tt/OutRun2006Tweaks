@@ -49,3 +49,12 @@ No v0.03 public release should be published from this experimental branch.
 - A missing `0x80` bit does not by itself mean the passenger has no other valid render scene. The scene recovery gate therefore requires `passengerScene==0` (completely disabled), rather than simply `(passengerScene&0x80)==0`; alternate `0x40` and `0x100` masks are negative regression cases.
 - The pre/post original wrapper comparison uses a **thread-local** counter instead of the aggregate cross-thread diagnostic counter. This prevents eye/renderer thread traffic from suppressing a genuinely missing original event in the current scene pass.
 - The regular original `0x4879B0` car display gate recovery still applies to any scene where the native event callback actually executes. No cross-layer re-render is attempted when event scenes differ from original `0x80`.
+
+## Final test-debug lane 2026-11-18: missed native guest callback with intact 0x80 scene
+
+- The last uploaded user runtime log predates all subsequent scene-hook builds. It shows a live original `ROB02` (`pFlag=0x02`, callback installed), but no further ROB02 native draw callbacks during a sustained camera-1 interval after the first ~45. That is evidence of a callback gap, not proof of its root cause or Quest 3 pixels.
+- The earlier 0x80 scene fallback only admitted `passengerScene==0`. The original EXE descriptor for ROB02 is `0x80`, so a live event with unchanged original `0x80` and a missing callback would never be recovered.
+- New narrowly scoped fallback admits the native `0x80` scene with `passengerScene==0x80` **only if** the exact native ROB01/362 `0x4879B0` wrapper was reached on the *same thread* in this same original `0x43FB40` display invocation but the original ROB02/363 wrapper was not. Thus a skipped passenger alone can be replayed exactly once while the original scene's state is live. The previous guestScene==0 recovery remains for a disabled native layer. Other masks, shared-layer masks, missing driver proof, zero XR pose, GOAL/menu, 3rd-person and Remove remain rejected.
+- Added bounded `VR PASSENGER SCENE PASS` counters (driver/guest wrapper pair, source scene masks, current native epoch, stereo), useful if Quest3 still fails; does not claim GPU proof.
+- The one-shot `RUN-QUEST-APK-PASSENGER-DIAG.cmd` keeps Follow Camera 0 forced on this diagnostic launch and collects logs automatically.
+- Scope boundary: no new event, original game files untouched, no public v0.03, no live HMD result yet.

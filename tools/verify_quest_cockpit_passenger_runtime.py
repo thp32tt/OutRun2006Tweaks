@@ -39,6 +39,12 @@ assert "ShouldRecoverOriginalPassengerScenePass(" in policy
 assert "OriginalEventSceneDisplaySignature()" in hook
 assert "PassengerSceneHook.ccall<void>(mask,first,last);" in hook
 assert "PassengerGateThreadCalls" in hook
+assert "DriverGateThreadCalls" in hook
+assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
+assert "VR PASSENGER SCENE PASS:" in hook
+assert "afterDriver!=beforeDriver,after!=before" in hook
+assert "passengerScene==OriginalRobDisplayLayer" in policy
+assert "driverWrapperReached" in policy
 assert "const auto before=PassengerGateThreadCalls;" in hook
 assert "const auto after=PassengerGateThreadCalls;" in hook
 assert "PassengerDriverDisplay(work);" in hook

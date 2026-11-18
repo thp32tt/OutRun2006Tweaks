@@ -74,17 +74,24 @@ inline constexpr bool ShouldRecoverOriginalPassengerScenePass(
     bool modeOne,bool liveOriginalGuest,bool validFrame,bool validStereo,
     std::uint32_t renderMask,std::int32_t first,std::int32_t last,
     std::uint32_t driverScene,std::uint32_t passengerScene,
-    bool guestWrapperReached) noexcept {
+    bool driverWrapperReached,bool guestWrapperReached) noexcept {
     return vr && cockpit && follow && racing && modeOne &&
         liveOriginalGuest && validFrame && validStereo &&
         renderMask==OriginalRobDisplayLayer &&
         first<=static_cast<std::int32_t>(OriginalPassengerEventId) &&
         last>=static_cast<std::int32_t>(OriginalPassengerEventId) &&
         (driverScene&renderMask)!=0u &&
-        // Only a fully disabled original scene is safe to recover.
-        // If another bit (e.g. 0x40/0x100) is set, the game may draw
-        // the character in that other pass, and forcing 0x80 can duplicate.
-        passengerScene==0u && !guestWrapperReached;
+        // First allow an entirely disabled passenger layer (native
+        // event still live): no other layer could duplicate this draw.
+        // Also repair a missed ROB02 wrapper when its original single
+        // 0x80 layer is still set AND the original ROB01 wrapper really
+        // executed in THIS VERY SAME thread-local event-display pass.
+        // Any other layer, including 0x40, 0x100 or a combined mask,
+        // remains fail-closed: it may draw elsewhere.
+        !guestWrapperReached &&
+        (passengerScene==0u ||
+         (passengerScene==OriginalRobDisplayLayer &&
+          driverWrapperReached));
 }
 inline constexpr bool ShouldSuppressOriginalPassenger(
     bool vrEnabled,bool cockpitEnabled,bool followCamera0,

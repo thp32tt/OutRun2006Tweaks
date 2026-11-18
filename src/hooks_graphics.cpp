@@ -1144,6 +1144,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     // The per-native-scene duplicate guard must not consume another
     // renderer thread's passenger callback (atomics remain telemetry).
     inline static thread_local std::uint64_t PassengerGateThreadCalls=0;
+    // Separate original ROB01 pass evidence. Total nonpassenger counts are
+    // not identity proof because the native 4879B0 wrapper is shared.
+    inline static thread_local std::uint64_t DriverGateThreadCalls=0;
     inline static std::atomic<std::uint64_t> PassengerGateRestores{0};
     inline static thread_local bool PassengerGateBypassInFlight=false;
     inline static std::uint64_t TraceCount=0;
@@ -1331,9 +1334,11 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
               Game::game_start_progress_code &&
               *Game::game_start_progress_code==65));
         const bool cockpit=QuestCockpitV2Active(cam);
-        const bool owner=ExactOriginalCockpitOccupant(work)==
-            OriginalOccupantSlot::Passenger363;
+        const auto originalOwner=ExactOriginalCockpitOccupant(work);
+        const bool owner=originalOwner==OriginalOccupantSlot::Passenger363;
         if(!owner){
+            if(originalOwner==OriginalOccupantSlot::Driver362)
+                ++DriverGateThreadCalls;
             PassengerGateNonPassenger.fetch_add(1,std::memory_order_relaxed);
             original();return;
         }
@@ -1409,6 +1414,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         std::uint32_t mask,std::int32_t first,std::int32_t last) {
         using namespace OutRunVR::QuestCockpitV2;
         const auto before=PassengerGateThreadCalls;
+        const auto beforeDriver=DriverGateThreadCalls;
         // Always dispatch unmodified original scene first. The fallback is
         // never allowed to replace the native event display loop.
         PassengerSceneHook.ccall<void>(mask,first,last);
@@ -1436,14 +1442,26 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const bool live=work && ExactOriginalCockpitOccupant(work)==
             OriginalOccupantSlot::Passenger363;
         const auto after=PassengerGateThreadCalls;
-        PassengerScenePasses.fetch_add(1,std::memory_order_relaxed);
+        const auto afterDriver=DriverGateThreadCalls;
+        const auto passCount=PassengerScenePasses.fetch_add(
+            1,std::memory_order_relaxed)+1;
+        if(PassengerTraceOn() && (passCount<=16u || passCount%180u==0u))
+            spdlog::info(
+                "VR PASSENGER SCENE PASS: count={} epoch={} "
+                "mask=0x{:X} driverScene=0x{:X} guestScene=0x{:X} "
+                "driverWrapperReached={} guestWrapperReached={} "
+                "guestLive={} stereoReady={}",
+                passCount,NativeFrameTrace().ActiveEpoch(),mask,
+                driver->field_C,passenger->field_C,
+                afterDriver!=beforeDriver,after!=before,live,stereoReady);
         const bool recover=ShouldRecoverOriginalPassengerScenePass(
             Settings::VREnabled.get(),
             Settings::VRQuestCockpitV2Enabled.get(),
             Settings::VRQuestCockpitV2PassengerVisible.get(),
             QuestCockpitV2Active(cam) && race,cam->cam_mode_34A==1,
             live,NativeFrameTrace().Active(),stereoReady,
-            mask,first,last,driver->field_C,passenger->field_C,after!=before);
+            mask,first,last,driver->field_C,passenger->field_C,
+            afterDriver!=beforeDriver,after!=before);
         if(!recover)return;
         const auto count=PassengerSceneRestores.fetch_add(
             1,std::memory_order_relaxed)+1;
@@ -1451,9 +1469,11 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             spdlog::info(
                 "VR PASSENGER SCENE RESTORE: count={} epoch={} "
                 "mask=0x{:X} driverScene=0x{:X} guestScene=0x{:X} "
-                "nativeWrapperCallsBefore={} after={} (not GPU proof)",
+                "guestWrapperCallsBefore={} after={} "
+                "driverWrapperReached={} (not GPU proof)",
                 count,NativeFrameTrace().ActiveEpoch(),mask,
-                driver->field_C,passenger->field_C,before,after);
+                driver->field_C,passenger->field_C,before,after,
+                afterDriver!=beforeDriver);
         // A genuine live ROB02 native work pointer, same frame, same
         // verified 0x80 actor pass. No event allocation/flag/scene mutation.
         // This function calls the existing car-gate-aware original renderer.
