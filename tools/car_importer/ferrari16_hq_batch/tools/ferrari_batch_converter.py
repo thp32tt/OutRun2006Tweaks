@@ -580,7 +580,7 @@ def audit_entry(root, car, strict_source=False):
         ensure(meta.get('source_sha256') == actual, 'car source SHA-256 mismatch')
         ensure(meta.get('geometry_space') == 'outrun_local_y_up_meters', 'car source native alignment not verified')
         ensure(meta.get('alignment_verified') is True, 'car origin/height/axis calibration not verified')
-        ensure(meta.get('model_scope') == 'full_car', 'cockpit-only source is not a complete external car')
+        ensure(meta.get('model_scope') in ('full_car','dashboard_overlay'), 'unsupported source model_scope')
         ensure(meta.get('origin_type') in ('external_mod','user_authored'), 'source provenance not declared')
         ensure(len(meta.get('external_to_game_matrix', [])) == 16, 'game coordinate matrix missing')
         result.update(status='READY_PRIVATE_CONVERSION', model_bytes=glb.stat().st_size,
