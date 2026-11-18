@@ -381,6 +381,18 @@ public:
         if(!loaded_)loadAttempted_=false;
     }
     bool Loaded() const noexcept {return loaded_;}
+    // A V4 full-car sidecar may already carry its real speed and RPM needles.
+    // The separate dashboard overlay then provides gear only, avoiding two
+    // competing needles overlaid on the same original instrument cluster.
+    bool HasEmbeddedSpeedAndRpm() const noexcept {
+        if(role_!=SidecarRole::Vehicle || !loaded_)return false;
+        bool speed=false,rpm=false;
+        for(const auto& b:cpu_.dashboardBindings) {
+            if(b.kind==DashboardKind::SpeedNeedle)speed=true;
+            if(b.kind==DashboardKind::RpmNeedle)rpm=true;
+        }
+        return speed && rpm;
+    }
     // Only a real installed sidecar with a resolvable fixed filename may
     // become a render candidate. Parse/CRC/PBR/ground QA still guard draw.
     bool Installed() const noexcept {
@@ -410,12 +422,17 @@ public:
     GpuDrawResult DrawNativeScene(IDirect3DDevice9* device,
                     const D3DMATRIX& world,const D3DMATRIX& view,
                     const D3DMATRIX& projection,
-                    const DashboardTelemetry& dashboard) noexcept {
+                    const DashboardTelemetry& dashboard,
+                     bool gearOnly=false) noexcept {
         GpuDrawResult result{};
         if(!EnsureResources(device))return result;
-        for(const auto& mesh:meshes_)
-            if(DashboardMeshVisible(DashboardFor(mesh),dashboard))
+        for(const auto& mesh:meshes_) {
+            const auto* binding=DashboardFor(mesh);
+            if(gearOnly && (!binding || binding->kind!=DashboardKind::GearVisible))
+                continue;
+            if(DashboardMeshVisible(binding,dashboard))
                 ++result.receipt.expectedMeshes;
+        }
         IDirect3DStateBlock9* saved=nullptr;
         if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&saved))||!saved)
             return result;
@@ -494,6 +511,8 @@ public:
             -(view._41*view._31+view._42*view._32+view._43*view._33)};
         if(SUCCEEDED(hr))for(const auto& m:meshes_) {
             const DashboardBinding* binding=DashboardFor(m);
+            if(gearOnly && (!binding || binding->kind!=DashboardKind::GearVisible))
+                continue;
             if(!DashboardMeshVisible(binding,dashboard))continue;
             const D3DMATRIX meshWorld=AnimatedWorld(world,binding,dashboard);
             // Opaque first, then tagged translucent glass. Transparent glass
