@@ -1,0 +1,63 @@
+name: Ferrari13 D3D9 classic recovery launcher smoke
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-ferrari16-v4-integrated-20261118
+    paths:
+      - tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/FERRARI13_RUN.ps1
+      - .github/workflows/ferrari13-classic-recovery-smoke.yml
+permissions:
+  contents: read
+jobs:
+  windows-ps51:
+    runs-on: windows-2022
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate bounded classic recovery configuration and syntax
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $path='tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/FERRARI13_RUN.ps1'
+          $tok=$null; $errs=$null
+          [Management.Automation.Language.Parser]::ParseFile((Resolve-Path $path).Path,[ref]$tok,[ref]$errs)|Out-Null
+          if(@($errs).Count){throw ($errs|Out-String)}
+          $s=Get-Content $path -Raw
+          foreach($v in @(
+            "'-VR.Enabled=true'",
+            "'-VR.Stereo=true'",
+            "'-VR.QuestCockpitV2Enabled=true'",
+            "'-VR.F50ExternalModel=true'",
+            "'-VR.ExternalFerrariTest=true'",
+            "'-VR.PreferD3D9Ex=false'",
+            "'-VR.DirectGpuOnly=false'",
+            "'-VR.AutoRenderResolution=false'",
+            "'-VR.FollowGameResolution=true'",
+            "'-VR.FrameCadenceMode=0'",
+            "'-VR.DisableDesktopDuplication=false'",
+            "'-FileLogging=true'",
+            "'-VR.Telemetry=false'",
+            "OUTRUN_VR_R23_PIXEL_PROBE",
+            "OUTRUN_VR_LAUNCH",
+            "OUTRUN_VR_FILE_LOG",
+            "FERRARI13_PAYLOAD",
+            "FERRARI13_COLLECT.ps1"
+          )) {if(-not $s.Contains($v)){throw "Missing recovery contract: $v"}}
+          if($s.Contains("'-VR.PreferD3D9Ex=true'")){throw 'Old Ex promotion survived'}
+          Write-Host 'PASS: classic 1080p recovery + bounded diagnostics contract valid'
+      - name: Fail-closed no payload
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $file=(Resolve-Path 'tools/car_importer/ferrari16_hq_batch/tools/ferrari13_recovery/FERRARI13_RUN.ps1').Path
+          $p=Join-Path $env:RUNNER_TEMP 'FERRARI13_RECOVERY'
+          New-Item -ItemType Directory $p -Force | Out-Null
+          Copy-Item $file (Join-Path $p 'FERRARI13_RUN.ps1')
+          Set-Content (Join-Path $p 'OR2006C2C.EXE') 'DUMMY'
+          $failed=$false
+          try{& (Join-Path $p 'FERRARI13_RUN.ps1') -Mode Verify}
+          catch{$failed=$_.Exception.Message -match 'FERRARI13_PAYLOAD missing'}
+          if(-not $failed){throw 'A missing private payload did not fail closed'}
+          if((Get-Content (Join-Path $p 'OR2006C2C.EXE') -Raw).Trim() -ne 'DUMMY'){throw 'Dummy exe was modified'}
+          Write-Host 'PASS: no unexpected startup or game EXE modification'
