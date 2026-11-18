@@ -1063,7 +1063,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete)
             dashboardDraw=OutRunVR::DinoSidecar::GlobalDashboardGpu().DrawNativeScene(
                 ticket.device,ticket.world,ticket.view,ticket.projection,
-                ticket.dashboard);
+                ticket.dashboard,
+                OutRunVR::DinoSidecar::GlobalGpu().HasEmbeddedSpeedAndRpm());
         if(Settings::VRTelemetry) {
             static std::uint64_t attempts=0;
             const auto sample=++attempts;
