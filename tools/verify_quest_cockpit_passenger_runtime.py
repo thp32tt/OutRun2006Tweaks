@@ -47,8 +47,12 @@ assert "fixedNativeEyePair=rotationOnly ? nullptr :" in sky
 assert "exactWorldSky ? nullptr :" in sky
 assert "VR SKY COHERENT BASIS:" in sky
 copyrun = Path("QuestCockpit-CopyRun.ps1").read_text(encoding="utf-8")
-assert "$Mode -eq 'PASSENGER'" in copyrun
-assert "QuestCockpitV2SkyProbe='ON'" in copyrun
+# PASSENGER explicitly enables both bounded traces in the SAME mode.
+passenger_block = copyrun.split("if($Mode -eq 'PASSENGER'){",1)[1].split(
+    "if($Mode -eq 'INTERP')",1
+)[0]
+assert "QuestCockpitV2PassengerDiagnostics='ON'" in passenger_block
+assert "QuestCockpitV2SkyProbe='ON'" in passenger_block
 assert "DriverGateThreadCalls" in hook
 assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
 assert "VR PASSENGER SCENE PASS:" in hook
