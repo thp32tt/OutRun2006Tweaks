@@ -1637,6 +1637,29 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                                     work[12],work[13],work[14],
                                     corrected[12],corrected[13],corrected[14]);
                         }
+                        // 2026-11-19: real Quest3 trace showed 6413
+                        // original passenger draws, but W*C shifted native
+                        // ROB02 Y tens of world units away from its model.
+                        // For that exact guest ONLY, retain the stock Windows
+                        // model matrix and the already-active passenger LOD0
+                        // visibility scope instead of moving it out of view.
+                        if(slot==OriginalOccupantSlot::Passenger363 &&
+                           !PassengerModelCorrectionNearNative(work,corrected)) {
+                            static thread_local std::uint64_t rejected=0;
+                            const auto count=++rejected;
+                            if(PassengerTraceOn() &&
+                               (count<=12u||count%180u==0u))
+                                spdlog::info(
+                                    "VR PASSENGER NATIVE MATRIX: count={} "
+                                    "epoch={} native=({:.3f},{:.3f},{:.3f}) "
+                                    "rejectedWXC=({:.3f},{:.3f},{:.3f}) "
+                                    "reason=out_of_cockpit nativeWorkUnchanged=1",
+                                    count,frameEpoch,work[12],work[13],
+                                    work[14],corrected[12],corrected[13],
+                                    corrected[14]);
+                            RobotHook.ccall<void>(robot);
+                            return;
+                        }
                         // Keep the recursion gate until AFTER scoped work
                         // restoration (reverse destructor order).
                         ScopedOriginalRobotCorrectionOwner correctionOwner(true);
