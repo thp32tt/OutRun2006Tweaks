@@ -77,7 +77,9 @@ services:
     ports:
       - "${OUTRUN_REWORK_VNC_BIND:-6084}:6080"
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:6080/vnc.html', timeout=4).read(16)"]
+      # VNC alone can stay green after Chromium dies. Check both the visible
+      # desktop endpoint and Chromium's loopback-only CDP endpoint.
+      test: ["CMD", "python", "-c", "import json,urllib.request; urllib.request.urlopen('http://127.0.0.1:6080/vnc.html',timeout=4).read(16); v=json.load(urllib.request.urlopen('http://127.0.0.1:9222/json/version',timeout=4)); assert v.get('webSocketDebuggerUrl')"]
       interval: 30s
       timeout: 6s
       retries: 3
