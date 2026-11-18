@@ -39,3 +39,7 @@ All sixteen cars should ultimately use **the actual named Ferrari body variant**
 - Next material work: acquire legitimate exact high-detail 328 GTS first; verify Testarossa open-top identity; then prioritize higher-quality exact Superamerica and F430 Spider. Only after source verification should static OVC4 and dashboard needle-bind tests run.
 
 **Score handling:** previously scored F355/512/F430 Spider static conversions are never counted again; optional 575 exact source patch+new OVC4 verification is a distinct new achievement, subject to the scoreboard SSOT write.
+
+## Additional source discovery (2026-11-18, no new conversion)
+
+See [`FERRARI16_MODEL_SOURCE_DEEP_SWEEP_20261118.md`](FERRARI16_MODEL_SOURCE_DEEP_SWEEP_20261118.md) for the expanded Ferrari 328 GTS / Test Drive Unlimited-based GTR2 F430 Spider / 575 Superamerica / classic Testarossa Spider source audit, copyright gates, and actual quality limitations. Discovery alone is **not** a new tested car or AI2 scoring event; all previous 16-car and Quest3 QA counts are unchanged.
