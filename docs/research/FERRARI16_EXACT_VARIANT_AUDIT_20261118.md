@@ -47,3 +47,7 @@ See [`FERRARI16_MODEL_SOURCE_DEEP_SWEEP_20261118.md`](FERRARI16_MODEL_SOURCE_DEE
 ## 13 exact-source private test package (2026-11-18)
 
 Read [FERRARI13_PRIVATE_QA_AND_DEPLOY_20261118.md](FERRARI13_PRIVATE_QA_AND_DEPLOY_20261118.md) first for the current 13/13 real OVC+overlay SHA/CRC/DDS/PBR static QA PASS, the 600,257,798-byte private standalone test ZIP and Windows PowerShell install/backup/rollback CI run 44302240641 SUCCESS. This is **not** a Quest 3 in-game visual PASS; F40/288 GTO normal maps missing and Testarossa Spider body variant unconfirmed. Only 13 sources are included; donor models remain untouched. The score for this one package is to be counted once.
+
+## Operational status 2026-11-19 — 13-car one-click diagnostic repackage
+
+**Current Ferrari13 test link and white-screen triage:** [FERRARI13_WHITESCREEN_FOLDER_READY_DIAGNOSTIC_20261119.md](FERRARI13_WHITESCREEN_FOLDER_READY_DIAGNOSTIC_20261119.md). Game-root extract + `START-FERRARI13-VR.cmd`, logging ON, normal fallback allowed, and separate `COLLECT-FERRARI13-LOGS.cmd`. Real uploaded later-session watchdog and host logs have **0 stereo frames** / directReady=0 / game-client-missing; do not call 13/13 Quest 3 gameplay complete until physical re-test. This is a retry of launcher correctness, **no duplicate AI2 score**.
