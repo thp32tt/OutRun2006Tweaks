@@ -1038,24 +1038,18 @@ class VrOriginalRaceSkyOwner final : public Hook
     static constexpr int RaceSkyDisplayRva = 0x521C0;
     inline static SafetyHookInline RaceSkyDisplayHook{};
 
-    // The original renderer deliberately overlaps two 0x90-byte sky
-    // records while race_sky_step_451e90 cross-fades course skies. On a
-    // flat monitor that overlap is harmless, but Quest3 field logs show the
-    // second sphere as a counter-moving duplicate during the first-stage
-    // low-speed transition. Keep the game's state machine untouched: only
-    // during the synchronous cockpit draw, suppress the old transition layer
-    // once the destination layer is live, then restore both flags immediately.
-    // Original 4521C0 cross-fades two 0x90-byte sky records. The user's
-    // 9a0fbde3 field log shows exact programmable sky starting while the game
-    // camera is still mode 30/2, before cockpit mode 1 becomes active. A
-    // camera==1-only workaround therefore misses the reported low-speed start.
+    // Original 4521C0 deliberately overlaps two 0x90-byte sky records
+    // while race_sky_step_451e90 cross-fades course skies. The 9a0fbde3
+    // Quest3 field log starts this path while the game camera is still 30/2,
+    // so a camera-1-only repair misses the reported first-stage/low-speed
+    // window. Keep the original flags, object IDs and alpha transition intact.
     //
-    // Preserve the original alpha/object transition. When BOTH layers are
-    // actually drawable and their saved rotation matrices differ, temporarily
-    // give the fading old layer the destination layer's rotation for this one
-    // synchronous VR draw, then restore all 64 bytes. This removes relative
-    // counter-motion without deleting a legitimate cross-fade or mutating the
-    // race sky state machine.
+    // Only when BOTH records are actually drawable and their 3x3 rotations
+    // differ, temporarily give the fading old record the destination record's
+    // nine orientation words for the synchronous 4521C0 draw. Exact 40A190
+    // consumes only those nine words; restore them immediately afterwards.
+    // This targets relative counter-motion without deleting a sky layer or
+    // mutating the race-sky state machine.
     class ScopedQuestSkyTransitionRotationLock final
     {
         std::uint8_t* base_=nullptr;
