@@ -286,3 +286,15 @@ authorize recovery; when the hook itself is absent, the older
 `NativeFrameTrace + paired XR pose` proof is allowed as the fallback owner.
 Thus a weaker proof can never override an installed exact scene hook, while
 optional-hook failure does not create a new passenger regression.
+
+
+### Optional 4056D0 provenance hook audit
+
+A further installation-order audit found the first provenance implementation
+made the shared 4056D0 hook a prerequisite for the already-proven 4521C0 sky
+owner. That would regress the core rotation-only/transition fixes whenever
+another plugin owns 4056D0 or its bytes differ. The install order is now
+strictly layered: exact 4521C0 must install first; 4056D0 signature/hook is
+best-effort. If the optional leaf cannot be owned, only deferred provenance is
+disabled and queued entries retain the pre-existing generic fallback. The
+core sky owner is never rolled back by an optional shared-leaf conflict.

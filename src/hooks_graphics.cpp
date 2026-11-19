@@ -1395,42 +1395,54 @@ public:
             spdlog::warn("VR WORLD SKY: canonical original 4521C0 signature mismatch; exact sky owner disabled");
             return false;
         }
-        auto* objectQueueEntry=
-            Module::exe_ptr<std::uint8_t>(RaceSkyObjectQueueRva);
-        MEMORY_BASIC_INFORMATION queueInfo{};
-        if(!objectQueueEntry ||
-           VirtualQuery(objectQueueEntry,&queueInfo,sizeof(queueInfo))!=
-                sizeof(queueInfo) ||
-           queueInfo.State!=MEM_COMMIT || (queueInfo.Protect&PAGE_GUARD) ||
-           (queueInfo.Protect&PAGE_NOACCESS) ||
-           reinterpret_cast<std::uintptr_t>(objectQueueEntry)+
-                objectQueueSignature.size() >
-             reinterpret_cast<std::uintptr_t>(queueInfo.BaseAddress)+
-                queueInfo.RegionSize ||
-           !std::equal(objectQueueSignature.begin(),
-                       objectQueueSignature.end(),objectQueueEntry)) {
-            spdlog::warn(
-                "VR WORLD SKY: canonical 4056D0 signature mismatch; "
-                "deferred sky provenance disabled");
-            return false;
-        }
         RaceSkyDisplayHook=safetyhook::create_inline(entry,RaceSkyDisplayDest);
         if(!RaceSkyDisplayHook) {
             spdlog::warn("VR WORLD SKY: failed to hook original 4521C0");
             return false;
         }
-        RaceSkyObjectQueueHook=safetyhook::create_inline(
-            objectQueueEntry,RaceSkyObjectQueueDest);
-        if(!RaceSkyObjectQueueHook) {
-            RaceSkyDisplayHook={};
+
+        // Deferred 4056D0 provenance is an enhancement, not permission to
+        // disable the already-proven 4521C0 owner. Another mod may legally
+        // occupy this shared renderer leaf. In that case retain exact sky
+        // source ownership/rotation repair and fail closed only for deferred
+        // provenance: queued nodes fall back to the existing generic route.
+        bool deferredProvenance=false;
+        auto* objectQueueEntry=
+            Module::exe_ptr<std::uint8_t>(RaceSkyObjectQueueRva);
+        MEMORY_BASIC_INFORMATION queueInfo{};
+        const bool queueSignatureOk=
+            objectQueueEntry &&
+            VirtualQuery(objectQueueEntry,&queueInfo,sizeof(queueInfo))==
+                sizeof(queueInfo) &&
+            queueInfo.State==MEM_COMMIT &&
+            !(queueInfo.Protect&PAGE_GUARD) &&
+            !(queueInfo.Protect&PAGE_NOACCESS) &&
+            reinterpret_cast<std::uintptr_t>(objectQueueEntry)+
+                objectQueueSignature.size() <=
+             reinterpret_cast<std::uintptr_t>(queueInfo.BaseAddress)+
+                queueInfo.RegionSize &&
+            std::equal(objectQueueSignature.begin(),
+                       objectQueueSignature.end(),objectQueueEntry);
+        if(queueSignatureOk) {
+            auto objectQueue=safetyhook::create_inline(
+                objectQueueEntry,RaceSkyObjectQueueDest);
+            if(objectQueue) {
+                RaceSkyObjectQueueHook=std::move(objectQueue);
+                deferredProvenance=true;
+            } else {
+                spdlog::warn(
+                    "VR WORLD SKY: 4056D0 hook unavailable; keeping "
+                    "4521C0 owner, deferred sky provenance disabled");
+            }
+        } else {
             spdlog::warn(
-                "VR WORLD SKY: failed to hook original 4056D0; "
-                "rolled back 4521C0 owner");
-            return false;
+                "VR WORLD SKY: canonical 4056D0 signature mismatch; keeping "
+                "4521C0 owner, deferred sky provenance disabled");
         }
         spdlog::info(
-            "VR WORLD SKY: exact 4521C0 owner + 4056D0 deferred opaque "
-            "provenance installed; two sky layers use rotation-only stereo");
+            "VR WORLD SKY: exact 4521C0 owner installed; "
+            "deferredOpaqueProvenance={} two sky layers use rotation-only stereo",
+            deferredProvenance);
         return true;
     }
 

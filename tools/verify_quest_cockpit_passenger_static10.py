@@ -200,6 +200,14 @@ def pass_07_nested_draw_and_restore():
           "WorldSkyOpaqueQueue::RecordDeferred" in hook and
           "WorldSkyOpaqueQueue::Find(entry)" in hook,
           "exact 4056D0 -> 405890 provenance join missing")
+    sky_apply=hook.split("bool apply() override",1)[1].split(
+        "static VrOriginalRaceSkyOwner instance",1
+    )[0]
+    check(sky_apply.index("RaceSkyDisplayHook=safetyhook::create_inline") <
+          sky_apply.index("const bool queueSignatureOk="),
+          "optional 4056D0 validation can still disable core 4521C0 owner")
+    check("keeping 4521C0 owner, deferred sky provenance disabled" in sky_apply,
+          "4056D0 conflict is not fail-closed to the proven core sky path")
     check("if(exactSky && queueSnapshotValid)" in hook and
           "Missing pre-count is not" in hook,
           "sky queue provenance can fail open from an unknown pre-count")
