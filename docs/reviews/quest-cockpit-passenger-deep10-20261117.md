@@ -183,3 +183,20 @@ recovery and 43FB40 scene recovery had duplicated manual START/GAME predicates;
 both now use the same `IsCockpitRacePhase()` helper. This removes three
 independent definitions of the cockpit race boundary and prevents later
 GOAL/START drift.
+
+
+## 2026-11-19 non-exact programmable depth-off sky discriminator
+
+The 9a0fbde3 field log consistently shows programmable depth-off world draws
+exceeding exact 4521C0 sky draws by roughly one draw per Present (for example
+358 vs 268, 362 vs 272). Aggregate counts alone cannot tell whether that extra
+draw is a sun/lens world producer or another untagged sky-like layer.
+
+SkyProbe now records a bounded `VR SKY NONEXACT DEPTH-OFF` receipt for only
+those non-4521C0 programmable depth-off world draws: semantic scope, producer,
+queue ownership, shader identity/serial, corrected world-view translation and
+projection signature. The 90-Present summary also reports
+`shaderNonSkyDepthOffDraws`. This is diagnostic-only and does not broaden or
+change stereo routing. A next HMD log can therefore distinguish native two-sky
+overlap from an independent depth-off producer without another instrumentation
+build.

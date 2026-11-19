@@ -52,6 +52,8 @@ sky = Path("src/vr/d3d9/stereo_renderer_r7.inc").read_text(encoding="utf-8")
 assert "fixedNativeEyePair=rotationOnly ? nullptr :" in sky
 assert "exactWorldSky ? nullptr :" in sky
 assert "VR SKY COHERENT BASIS:" in sky
+assert "VR SKY NONEXACT DEPTH-OFF:" in sky
+assert "shaderNonSkyDepthOffDraws={}" in sky
 copyrun = Path("QuestCockpit-CopyRun.ps1").read_text(encoding="utf-8")
 # PASSENGER explicitly enables both bounded traces in the SAME mode.
 passenger_block = copyrun.split("if($Mode -eq 'PASSENGER'){",1)[1].split(

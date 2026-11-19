@@ -244,6 +244,7 @@ namespace OutRunVRStereo
         // programmable c64 WVP rather than fixed-function XYZ.
         // This is NOT exact sky source ownership.
         std::uint64_t ProgrammableDepthOffWorldDraws = 0;
+        std::uint64_t ProgrammableNonSkyDepthOffWorldDraws = 0;
         std::uint64_t ProgrammableExactWorldSkyDraws = 0;
         // Per-sky-draw mode coherence, not a generic depth-off heuristic.
         std::uint64_t ProgrammableSkyNativeViewDraws = 0;
@@ -1090,8 +1091,10 @@ namespace OutRunVRStereo
 			const D3DMATRIX currentWvp = TransposeMatrix(uploadedT);
 			const D3DMATRIX correctedWorldView = MultiplyMatrix(currentWvp, invProjection);
 			if (!MatrixFinite(correctedWorldView)) return EyeBuildResult::FatalError;
+            const auto physicalDraw =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
 			const bool exactWorldSky =
-				OutRunVR::GameSemantic::CapturePhysicalDrawCommand().scope ==
+                physicalDraw.scope ==
 				OutRunVR::GameSemantic::RenderScope::WorldSky;
             bool exactSkyNativeEye[2]{false,false};
             // Exact original 0x4521C0 sky must use one deterministic
@@ -1191,8 +1194,28 @@ namespace OutRunVRStereo
                 }
                 DWORD depth=D3DZB_TRUE;
                 if(ReadTrackedRenderState(device,D3DRS_ZENABLE,depth) &&
-                   depth==D3DZB_FALSE)
+                   depth==D3DZB_FALSE) {
                     ++ProgrammableDepthOffWorldDraws;
+                    if(!exactWorldSky) {
+                        const auto count=++ProgrammableNonSkyDepthOffWorldDraws;
+                        if(count<=24u || count%180u==0u)
+                            spdlog::info(
+                                "VR SKY NONEXACT DEPTH-OFF: count={} "
+                                "scope={} producer={} queued={} "
+                                "shader=0x{:X} shaderSerial={} "
+                                "worldViewT={:.4f},{:.4f},{:.4f} "
+                                "projection34={:.4f} projection44={:.4f}",
+                                count,
+                                static_cast<unsigned>(physicalDraw.scope),
+                                static_cast<unsigned>(physicalDraw.producer),
+                                physicalDraw.queued,
+                                shaderIdentity,shaderSerial,
+                                correctedWorldView._41,
+                                correctedWorldView._42,
+                                correctedWorldView._43,
+                                projection._34,projection._44);
+                    }
+                }
             }
             state.worldStereo = true; state.poseSequence = stereo.poseSequence; return EyeBuildResult::WorldStereo;
 		}
@@ -2299,6 +2322,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
             static std::uint32_t frames=0,skyFrames=0,badFrames=0;
             static std::uint32_t rightFailures=0,poisoned=0,depthMissing=0;
             static std::uint64_t lastSky=0,windowSky=0,windowWorld=0,windowShaderDepthOff=0;
+            static std::uint64_t windowShaderNonSkyDepthOff=0;
             static std::uint64_t windowExact=0,windowNative=0,
                 windowFallback=0,windowMixed=0,windowSwitches=0;
             static std::uint64_t totalPresent=0;
@@ -2318,7 +2342,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 spdlog::info(
                     "VR SKY PROBE: present={} samples={} skyLikeFrames={} "
                     "skyLikeDraws={} otherFixedWorldDraws={} shaderDepthOffWorldDraws={} "
-                    "shaderExactSkyDraws={} shaderSkyNative={} "
+                    "shaderNonSkyDepthOffDraws={} shaderExactSkyDraws={} shaderSkyNative={} "
                     "shaderSkyFallback={} shaderSkyMixedEyes={} "
                     "shaderSkyModeSwitches={} incomplete={} "
                     "rightFailed={} poisoned={} depthUnsynced={} "
@@ -2327,6 +2351,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                     FixedFunctionSkyRotationOnlyDraws-windowSky,
                     FixedFunctionWorldStereoDraws-windowWorld,
                     ProgrammableDepthOffWorldDraws-windowShaderDepthOff,
+                    ProgrammableNonSkyDepthOffWorldDraws-windowShaderNonSkyDepthOff,
                     ProgrammableExactWorldSkyDraws-windowExact,
                     ProgrammableSkyNativeViewDraws-windowNative,
                     ProgrammableSkyFallbackViewDraws-windowFallback,
@@ -2342,6 +2367,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 windowSky=FixedFunctionSkyRotationOnlyDraws;
                 windowWorld=FixedFunctionWorldStereoDraws;
                 windowShaderDepthOff=ProgrammableDepthOffWorldDraws;
+                windowShaderNonSkyDepthOff=ProgrammableNonSkyDepthOffWorldDraws;
                 windowExact=ProgrammableExactWorldSkyDraws;
                 windowNative=ProgrammableSkyNativeViewDraws;
                 windowFallback=ProgrammableSkyFallbackViewDraws;
