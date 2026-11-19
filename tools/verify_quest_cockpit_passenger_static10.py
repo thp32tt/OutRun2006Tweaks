@@ -203,6 +203,10 @@ def pass_07_nested_draw_and_restore():
           "queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None" in hook and
           "nullptr,true" in hook,
           "deferred sky physical draw can inherit stale queue/pending semantic")
+    check("VR SKY SOURCE OWNER:" in hook and
+          "RenderScope::WorldSky,nullptr,true" in hook and
+          "pendingIsolated=1" in hook,
+          "exact 4521C0 source can consume an unrelated pending one-shot")
     check("RaceSkyObjectQueueRva = 0x56D0" in hook and
           "WorldSkyOpaqueQueue::RecordDeferred" in hook and
           "WorldSkyOpaqueQueue::Find(entry)" in hook,
@@ -249,19 +253,23 @@ def pass_07_nested_draw_and_restore():
           "nested W*C correction not rejected")
     check("VR PASSENGER NATIVE LOCK:" in hook and "nativeWorkLocked=1" in hook,
           "passenger can still switch between corrected and native matrices")
-    check("ScopedQuestSkyTransitionRotationLock" in hook and
-          "VR SKY TRANSITION ROTATION LOCK:" in hook and
+    check("ScopedQuestSkyTransitionProbe" in hook and
           "VR SKY TRANSITION PHASE:" in hook,
-          "sky transition phase/rotation ownership is not observable")
-    check("orientationWords=9" in hook and "RotationIndices" in hook,
-          "sky repair still overwrites more than the 3x3 orientation consumed by 40A190")
+          "original sky transition phase/rotation diagnostics unavailable")
+    check("mutation=0 originalCrossfadePreserved=1" in hook and
+          "RotationIndices" in hook,
+          "sky transition probe does not explicitly preserve original crossfade")
+    check("VR SKY TRANSITION ROTATION LOCK:" not in hook and
+          "base+0xe0+byte,&" not in hook,
+          "unverified old/new sky rotation mutation is still active")
     check("constexpr std::uint32_t None=0xffffffffu;" in hook and
           "(n0!=None || n1!=None)" in hook and "(o0!=None || o1!=None)" in hook,
           "sky overlap phase can still be armed by an all-None non-drawing layer")
     check("state!=STATE_START && state!=STATE_GAME" in hook,
           "first-stage camera 30/2 sky window is still excluded")
-    check("base_+0x50" in hook and "base_+0xe0" in hook,
-          "proven 4521C0 two-layer rotation records are not paired")
+    check("base+0x50+byte" in hook and "base+0xe0+byte" in hook and
+          "const auto* base=reinterpret_cast<const std::uint8_t*>(work);" in hook,
+          "proven 4521C0 two-layer rotations are not observed read-only")
 
 def pass_08_f11_exclusive_and_search():
     for phrase in ("Passenger: Follow Camera 0", "Passenger: Remove"):
