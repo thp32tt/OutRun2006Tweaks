@@ -1030,57 +1030,99 @@ class VrOriginalRaceSkyOwner final : public Hook
     // low-speed transition. Keep the game's state machine untouched: only
     // during the synchronous cockpit draw, suppress the old transition layer
     // once the destination layer is live, then restore both flags immediately.
-    class ScopedCockpitSkySingleLayer final
+    // Original 4521C0 cross-fades two 0x90-byte sky records. The user's
+    // 9a0fbde3 field log shows exact programmable sky starting while the game
+    // camera is still mode 30/2, before cockpit mode 1 becomes active. A
+    // camera==1-only workaround therefore misses the reported low-speed start.
+    //
+    // Preserve the original alpha/object transition. When BOTH layers are
+    // actually drawable and their saved rotation matrices differ, temporarily
+    // give the fading old layer the destination layer's rotation for this one
+    // synchronous VR draw, then restore all 64 bytes. This removes relative
+    // counter-motion without deleting a legitimate cross-fade or mutating the
+    // race sky state machine.
+    class ScopedQuestSkyTransitionRotationLock final
     {
         std::uint8_t* base_=nullptr;
-        std::uint32_t oldC8_=0, oldCC_=0;
+        std::array<float,16> oldLayerRotation_{};
         bool active_=false;
     public:
-        explicit ScopedCockpitSkySingleLayer(void* work) noexcept
+        explicit ScopedQuestSkyTransitionRotationLock(void* work) noexcept
         {
             if(!work || !Settings::VREnabled ||
-               !Settings::VRQuestCockpitV2Enabled ||
-               !IsPlayableCarGameplay() ||
-               OutRunVR::QuestCockpitV2::InSceneEffect())
+               !Settings::VRQuestCockpitV2Enabled || !Game::current_mode)
                 return;
-            const auto* cam=Game::camera();
-            if(!cam || cam->cam_mode_34A!=1)return;
+            const auto state=*Game::current_mode;
+            if(state!=STATE_START && state!=STATE_GAME)return;
+
             base_=reinterpret_cast<std::uint8_t*>(work);
-            std::uint32_t layer0A=0,layer0B=0,layer1A=0,layer1B=0;
-            std::memcpy(&layer0A,base_+0x38,sizeof(layer0A));
-            std::memcpy(&layer0B,base_+0x3c,sizeof(layer0B));
-            std::memcpy(&layer1A,base_+0xc8,sizeof(layer1A));
-            std::memcpy(&layer1B,base_+0xcc,sizeof(layer1B));
-            if((layer0A|layer0B)==0u || (layer1A|layer1B)==0u)return;
-            oldC8_=layer1A;oldCC_=layer1B;
-            const std::uint32_t zero=0;
-            std::memcpy(base_+0xc8,&zero,sizeof(zero));
-            std::memcpy(base_+0xcc,&zero,sizeof(zero));
+            std::uint32_t f38=0,f3c=0,fc8=0,fcc=0;
+            float a30=0.f,a34=0.f,ac0=0.f,ac4=0.f;
+            std::memcpy(&f38,base_+0x38,sizeof(f38));
+            std::memcpy(&f3c,base_+0x3c,sizeof(f3c));
+            std::memcpy(&fc8,base_+0xc8,sizeof(fc8));
+            std::memcpy(&fcc,base_+0xcc,sizeof(fcc));
+            std::memcpy(&a30,base_+0x30,sizeof(a30));
+            std::memcpy(&a34,base_+0x34,sizeof(a34));
+            std::memcpy(&ac0,base_+0xc0,sizeof(ac0));
+            std::memcpy(&ac4,base_+0xc4,sizeof(ac4));
+            if(!std::isfinite(a30)||!std::isfinite(a34)||
+               !std::isfinite(ac0)||!std::isfinite(ac4))return;
+            const bool newLayerDraw=
+                (f38!=0u && a30>0.100000001f) ||
+                (f3c!=0u && a34>0.100000001f);
+            const bool oldLayerDraw=
+                (fc8!=0u && ac0>0.100000001f) ||
+                (fcc!=0u && ac4>0.100000001f);
+            if(!newLayerDraw || !oldLayerDraw)return;
+
+            std::array<float,16> newLayerRotation{};
+            std::memcpy(newLayerRotation.data(),base_+0x50,sizeof(newLayerRotation));
+            std::memcpy(oldLayerRotation_.data(),base_+0xe0,sizeof(oldLayerRotation_));
+            float maxDelta=0.f;
+            for(std::size_t i=0;i<newLayerRotation.size();++i) {
+                if(!std::isfinite(newLayerRotation[i])||
+                   !std::isfinite(oldLayerRotation_[i]))return;
+                maxDelta=(std::max)(
+                    maxDelta,std::fabs(newLayerRotation[i]-oldLayerRotation_[i]));
+            }
+            if(maxDelta<=1.0e-5f)return;
+
+            std::memcpy(base_+0xe0,newLayerRotation.data(),sizeof(newLayerRotation));
             active_=true;
-            static std::atomic<std::uint64_t> collapsed{0};
-            const auto count=collapsed.fetch_add(1,std::memory_order_relaxed)+1;
+            static std::atomic<std::uint64_t> locks{0};
+            const auto count=locks.fetch_add(1,std::memory_order_relaxed)+1;
             if(Settings::VRQuestCockpitV2SkyProbe &&
-               (count<=16u || count%180u==0u))
+               (count<=24u || count%180u==0u)) {
+                const auto* cam=Game::camera();
                 spdlog::info(
-                    "VR SKY SINGLE LAYER: count={} destinationFlags=0x{:X}/0x{:X} "
-                    "suppressedOldFlags=0x{:X}/0x{:X} renderOnly=1",
-                    count,layer0A,layer0B,layer1A,layer1B);
+                    "VR SKY TRANSITION ROTATION LOCK: count={} gameState={} "
+                    "camera={} maxRotationDelta={:.6f} "
+                    "newFlags=0x{:X}/0x{:X} oldFlags=0x{:X}/0x{:X} "
+                    "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f} "
+                    "renderOnly=1",
+                    count,static_cast<int>(state),
+                    cam?static_cast<int>(cam->cam_mode_34A):-1,maxDelta,
+                    f38,f3c,fc8,fcc,a30,a34,ac0,ac4);
+            }
         }
-        ~ScopedCockpitSkySingleLayer() noexcept
+        ~ScopedQuestSkyTransitionRotationLock() noexcept
         {
-            if(!active_ || !base_)return;
-            std::memcpy(base_+0xc8,&oldC8_,sizeof(oldC8_));
-            std::memcpy(base_+0xcc,&oldCC_,sizeof(oldCC_));
+            if(active_ && base_)
+                std::memcpy(base_+0xe0,oldLayerRotation_.data(),
+                            sizeof(oldLayerRotation_));
         }
-        ScopedCockpitSkySingleLayer(const ScopedCockpitSkySingleLayer&)=delete;
-        ScopedCockpitSkySingleLayer& operator=(const ScopedCockpitSkySingleLayer&)=delete;
+        ScopedQuestSkyTransitionRotationLock(
+            const ScopedQuestSkyTransitionRotationLock&)=delete;
+        ScopedQuestSkyTransitionRotationLock& operator=(
+            const ScopedQuestSkyTransitionRotationLock&)=delete;
     };
 
     static void __cdecl RaceSkyDisplayDest(void* work)
     {
         OutRunVR::GameSemantic::ScopedExactProducerSemantic sky(
             OutRunVR::GameSemantic::RenderScope::WorldSky);
-        ScopedCockpitSkySingleLayer singleLayer(work);
+        ScopedQuestSkyTransitionRotationLock transitionRotation(work);
         RaceSkyDisplayHook.ccall<void>(work);
     }
 
@@ -1575,13 +1617,42 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             return;
         }
         // A nested original robot display may be ROB02 while another
-        // occupant owns the scoped W*C matrix. Apply the render-only hide
-        // decision BEFORE recursion bypass, but never apply W*C twice.
+        // occupant owns the scoped W*C matrix. The old ordering bypassed
+        // before passenger visible/LOD0 ownership was entered, so a nested
+        // ROB02 could fall back to its nativeVisible=0 state. The 9a0fbde3
+        // log shows nativeVisible flips to 0 after PMT sample 180 and remains
+        // there, making this omission a real flicker risk.
         if(OriginalRobotCorrectionActive()) {
+            const bool nestedPassengerVisible=
+                slot==OriginalOccupantSlot::Passenger363 &&
+                Settings::VRQuestCockpitV2PassengerVisible &&
+                cockpitActive && racing;
+            ScopedOriginalOccupantLod0 nestedVisible(nestedPassengerVisible);
+            if(nestedPassengerVisible && PassengerTraceOn()) {
+                static thread_local std::uint64_t nestedVisibleCount=0;
+                const auto count=++nestedVisibleCount;
+                if(count<=16u || count%180u==0u)
+                    spdlog::info(
+                        "VR PASSENGER NESTED VISIBLE: count={} epoch={} "
+                        "visibleScope={} correctionOwnerAlreadyActive=1",
+                        count,NativeFrameTrace().ActiveEpoch(),
+                        OriginalOccupantLod0Active());
+            }
             RobotHook.ccall<void>(robot);
             return;
         }
         if(!NativeFrameTrace().Active() || InSceneEffect()) {
+            if(slot==OriginalOccupantSlot::Passenger363 &&
+               cockpitActive && racing && PassengerTraceOn()) {
+                static thread_local std::uint64_t earlyNativeCount=0;
+                const auto count=++earlyNativeCount;
+                if(count<=16u || count%180u==0u)
+                    spdlog::info(
+                        "VR PASSENGER EARLY NATIVE: count={} frameActive={} "
+                        "sceneEffect={} stereoValid={} (diagnostic only)",
+                        count,NativeFrameTrace().Active(),InSceneEffect(),
+                        OutRunVRRenderer::GetLatchedStereoFrameView()!=nullptr);
+            }
             RobotHook.ccall<void>(robot);
             return;
         }
@@ -1605,11 +1676,9 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                     camera->cam_mode_34A==1,
                     Settings::VRQuestCockpitV2PassengerVisible.get(),observed);
         }
-        // Quest event 363 is a full occupant: it needs the SAME scoped W*C
-        // correction as event 362, not an early exit to an uncorrected
-        // passenger matrix. Keep the passenger visible/LOD0 scope alive
-        // through both the corrected path and every fail-closed original
-        // fallback; never force this scope on NPCs, driver, or GOAL.
+        // Passenger 363 is kept on its proven native Windows model matrix;
+        // the visible/LOD0 scope is the only cockpit override. Driver 362
+        // retains the Quest W*C correction path below.
         const bool passengerLod0=
             action==CockpitOccupantRender::OriginalPassengerForceVisible;
         ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);
@@ -1698,43 +1767,6 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                     static_assert(sizeof(robot->d3dmatrix10)==sizeof(Matrix));
                     std::memcpy(work.data(),&robot->d3dmatrix10,sizeof(Matrix));
                     if(own&&ComposeOccupantModel(work,own->occupantCorrection,corrected)) {
-                        if(slot==OriginalOccupantSlot::Passenger363 &&
-                           PassengerTraceOn()) {
-                            static thread_local std::uint64_t wxcSamples=0;
-                            const auto count=++wxcSamples;
-                            if(count<=12u || count%180u==0u)
-                                spdlog::info(
-                                    "VR PASSENGER WXC: sample={} nativeEpoch={} "
-                                    "raw=({:.3f},{:.3f},{:.3f}) "
-                                    "corrected=({:.3f},{:.3f},{:.3f}) "
-                                    "(matrix only, not GPU proof)",
-                                    count,frameEpoch,
-                                    work[12],work[13],work[14],
-                                    corrected[12],corrected[13],corrected[14]);
-                        }
-                        // 2026-11-19: real Quest3 trace showed 6413
-                        // original passenger draws, but W*C shifted native
-                        // ROB02 Y tens of world units away from its model.
-                        // For that exact guest ONLY, retain the stock Windows
-                        // model matrix and the already-active passenger LOD0
-                        // visibility scope instead of moving it out of view.
-                        if(slot==OriginalOccupantSlot::Passenger363 &&
-                           !PassengerModelCorrectionNearNative(work,corrected)) {
-                            static thread_local std::uint64_t rejected=0;
-                            const auto count=++rejected;
-                            if(PassengerTraceOn() &&
-                               (count<=12u||count%180u==0u))
-                                spdlog::info(
-                                    "VR PASSENGER NATIVE MATRIX: count={} "
-                                    "epoch={} native=({:.3f},{:.3f},{:.3f}) "
-                                    "rejectedWXC=({:.3f},{:.3f},{:.3f}) "
-                                    "reason=out_of_cockpit nativeWorkUnchanged=1",
-                                    count,frameEpoch,work[12],work[13],
-                                    work[14],corrected[12],corrected[13],
-                                    corrected[14]);
-                            RobotHook.ccall<void>(robot);
-                            return;
-                        }
                         // Keep the recursion gate until AFTER scoped work
                         // restoration (reverse destructor order).
                         ScopedOriginalRobotCorrectionOwner correctionOwner(true);

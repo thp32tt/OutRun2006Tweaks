@@ -25,21 +25,6 @@ inline bool ComposeOccupantModel(const Matrix& work,
     destination=candidate;
     return true;
 }
-// PC ROB02 matrix safety: a valid Quest correction can move the original
-// Windows character outside the cabin. Field samples moved raw Y -2.379 to
-// -44.230 and raw Y -7.100 to +49.760 while the native draw was active.
-inline bool PassengerModelCorrectionNearNative(
-    const Matrix& nativeModel,const Matrix& correctedModel) noexcept {
-    if(!FiniteAffine(nativeModel)||!FiniteAffine(correctedModel))return false;
-    constexpr double maxCockpitDisplacement=4.0;
-    double displacementSquared=0.0;
-    for(int axis=12;axis<=14;++axis) {
-        const double delta=double(correctedModel[axis])-
-            double(nativeModel[axis]);
-        displacementSquared+=delta*delta;
-    }
-    return displacementSquared<=maxCockpitDisplacement*maxCockpitDisplacement;
-}
 // Quest render_frame original matrix_F0 16-float identity staging.
  // On Windows the validated player callback can own a synchronous
  // guest-view alias only for the original player car display. This is

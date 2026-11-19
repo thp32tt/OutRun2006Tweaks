@@ -39,35 +39,8 @@ int main() {
       assert(OriginalOccupantLod0Active());
     }
     assert(!OriginalOccupantLod0Active());
-    // Actual 2026-11-19 Quest3 ROB02 W*C displacement regression.
-    Matrix passengerNative=Identity, passengerCorrected=Identity;
-    passengerNative[12]=3.620f;passengerNative[13]=-2.379f;
-    passengerNative[14]=-254.995f;
-    passengerCorrected[12]=2.931f;passengerCorrected[13]=-44.230f;
-    passengerCorrected[14]=-250.776f;
-    assert(!PassengerModelCorrectionNearNative(
-        passengerNative,passengerCorrected));
-    passengerNative[12]=821.016f;passengerNative[13]=-7.100f;
-    passengerNative[14]=-354.080f;
-    passengerCorrected[12]=819.698f;passengerCorrected[13]=49.760f;
-    passengerCorrected[14]=-354.715f;
-    assert(!PassengerModelCorrectionNearNative(
-        passengerNative,passengerCorrected));
-    passengerCorrected=passengerNative;
-    assert(PassengerModelCorrectionNearNative(
-        passengerNative,passengerCorrected));
-    passengerCorrected[12]+=3.999f;
-    assert(PassengerModelCorrectionNearNative(
-        passengerNative,passengerCorrected));
-    passengerCorrected[12]+=0.01f;
-    assert(!PassengerModelCorrectionNearNative(
-        passengerNative,passengerCorrected));
-    passengerCorrected=passengerNative;
-    passengerCorrected[13]=std::numeric_limits<float>::quiet_NaN();
-    assert(!PassengerModelCorrectionNearNative(
-        passengerNative,passengerCorrected));
-    // Passenger slot 363 keeps LOD0 active THROUGH the corrected W*C
-    // renderer and preserves it if correction falls back to original.
+    // Passenger slot 363 keeps visible/LOD0 active through the native
+    // original renderer. Nested scopes must preserve the outer owner.
     { ScopedOriginalOccupantLod0 passengerVisible(true);
       assert(passengerVisible.Active() && OriginalOccupantLod0Active());
       { ScopedOriginalRobotCorrectionOwner correction(true);

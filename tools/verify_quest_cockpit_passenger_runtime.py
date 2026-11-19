@@ -39,9 +39,14 @@ assert "ShouldRecoverOriginalPassengerScenePass(" in policy
 assert "OriginalEventSceneDisplaySignature()" in hook
 assert "PassengerSceneHook.ccall<void>(mask,first,last);" in hook
 assert "PassengerGateThreadCalls" in hook
-assert "PassengerModelCorrectionNearNative(work,corrected)" in hook
-assert "VR PASSENGER NATIVE MATRIX:" in hook
-assert "reason=out_of_cockpit" in hook
+assert "PassengerModelCorrectionNearNative" not in hook
+assert "VR PASSENGER NATIVE MATRIX:" not in hook
+assert "VR PASSENGER NESTED VISIBLE:" in hook
+assert "VR PASSENGER EARLY NATIVE:" in hook
+analyzer = Path("tools/Analyze-OutRunVRSession.ps1").read_text(encoding="utf-8")
+assert "gameExitCode=(-?\\d+)" in analyzer
+assert "\\b(crash|" not in analyzer
+assert "unhandled exception" in analyzer.lower()
 sky = Path("src/vr/d3d9/stereo_renderer_r7.inc").read_text(encoding="utf-8")
 assert "fixedNativeEyePair=rotationOnly ? nullptr :" in sky
 assert "exactWorldSky ? nullptr :" in sky
@@ -58,8 +63,10 @@ assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
 assert "VR PASSENGER SCENE PASS:" in hook
 assert "VR PASSENGER NATIVE LOCK:" in hook
 assert "nativeWorkLocked=1" in hook
-assert "ScopedCockpitSkySingleLayer" in hook
-assert "VR SKY SINGLE LAYER:" in hook
+assert "ScopedQuestSkyTransitionRotationLock" in hook
+assert "VR SKY TRANSITION ROTATION LOCK:" in hook
+assert "state!=STATE_START && state!=STATE_GAME" in hook
+assert "base_+0x50" in hook and "base_+0xe0" in hook
 assert "afterDriver!=beforeDriver,after!=before" in hook
 assert "passengerScene==OriginalRobDisplayLayer" in policy
 assert "driverWrapperReached" in policy

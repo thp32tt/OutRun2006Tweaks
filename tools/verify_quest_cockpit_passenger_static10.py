@@ -121,6 +121,7 @@ def pass_06_goal_start_scene_boundaries():
 def pass_07_nested_draw_and_restore():
     check_order(robot, "ShouldSuppressOriginalPassenger(",
                 "if(OriginalRobotCorrectionActive())",
+                "ScopedOriginalOccupantLod0 nestedVisible(nestedPassengerVisible);",
                 "if(!NativeFrameTrace().Active() || InSceneEffect())",
                 "ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);")
     check("ScopedOriginalRobotCorrectionOwner correctionOwner(true);" in robot,
@@ -136,12 +137,12 @@ def pass_07_nested_draw_and_restore():
                 "OriginalCommonRobotDisplayRva)(work);")
     check("cockpit && race && frameReady && stereoReady" in gate,
           "force draw must own native render and a live paired XR pose")
-    check("VR PASSENGER WXC:" in robot,
-          "missing read-only passenger raw/corrected matrix trace")
-    check("PassengerModelCorrectionNearNative(work,corrected)" in robot,
-          "Quest3-proven off-cockpit displacement still applied to ROB02")
-    check("VR PASSENGER NATIVE MATRIX:" in robot,
-          "missing bounded original PC matrix fallback evidence")
+    check("PassengerModelCorrectionNearNative" not in robot,
+          "dead 4-unit passenger threshold still exists below native lock")
+    check("VR PASSENGER NESTED VISIBLE:" in robot,
+          "nested passenger draw can still bypass forced visibility")
+    check("VR PASSENGER EARLY NATIVE:" in robot,
+          "missing bounded evidence for frame/effect fail-closed path")
     sky=read("src/vr/d3d9/stereo_renderer_r7.inc")
     check("fixedNativeEyePair=rotationOnly ? nullptr :" in sky,
           "fixed original sky can still switch between native/fallback bases")
@@ -170,8 +171,13 @@ def pass_07_nested_draw_and_restore():
           "nested W*C correction not rejected")
     check("VR PASSENGER NATIVE LOCK:" in hook and "nativeWorkLocked=1" in hook,
           "passenger can still switch between corrected and native matrices")
-    check("ScopedCockpitSkySingleLayer" in hook and "VR SKY SINGLE LAYER:" in hook,
-          "overlapping original sky transition layers are not collapsed in cockpit")
+    check("ScopedQuestSkyTransitionRotationLock" in hook and
+          "VR SKY TRANSITION ROTATION LOCK:" in hook,
+          "sky transition does not preserve alpha while locking old/new rotation")
+    check("state!=STATE_START && state!=STATE_GAME" in hook,
+          "first-stage camera 30/2 sky window is still excluded")
+    check("base_+0x50" in hook and "base_+0xe0" in hook,
+          "proven 4521C0 two-layer rotation records are not paired")
 
 def pass_08_f11_exclusive_and_search():
     for phrase in ("Passenger: Follow Camera 0", "Passenger: Remove"):

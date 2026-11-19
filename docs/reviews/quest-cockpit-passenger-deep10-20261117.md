@@ -66,3 +66,44 @@ No v0.03 public release should be published from this experimental branch.
 - The model-space correction was applied on every observed ROB02 draw but yielded huge off-cockpit translation: native (3.620,-2.379,-254.995) -> W*C (2.931,-44.230,-250.776); later native (821.016,-7.100,-354.080) -> W*C (819.698,+49.760,-354.715). PMT forced-visible=1 LOD0=0 observed, not proof of GPU pixels. New guard rejects only ROB02 W*C displacements over 4 game units and forwards unmodified native work within existing scoped PMT visibility.
 - Original `0x4521C0` naturally contains two sky layers. Programmable exact-sky drew using rotation-only head fallback; fixed-function rotationOnly could use the native Quest eye pair or fallback depending on pose readiness, so layers could disagree. Fixed rotation-only sky now ALWAYS uses the same head fallback as programmable sky; non-sky world native pair unchanged. No pixel-level low-speed cause is proven before HMD retest.
 - PASSENGER-DIAG one-run enables bounded SKY probe, `VR SKY COHERENT BASIS`, `VR PASSENGER NATIVE MATRIX`, original PMT and game/host evidence. Release v0.03 remains rejected until live confirmation.
+
+
+## 2026-11-19 pre-HMD deep re-debug of exact 9a0fbde3 session
+
+Source reread: `20261118T171824402Z-38492e49`, build
+`9a0fbde30697c8ab85a2ed50e742261a9242deb6`. This pass deliberately
+reused the already-captured session; no new Quest 3 visual claim is made.
+
+- **Sky window missed by bb62ff1b:** exact programmable 4521C0 sky is already
+  active at 02:19:10.926 while the game camera is still mode 30/2. Mode 1 does
+  not begin until 02:19:21.754. Therefore a camera==1-only sky workaround
+  cannot cover the user's reported first-stage low-speed/start interval.
+- **Layer/object transition evidence:** first-stage exact-sky draw counts move
+  from about 268-272 per 90 Presents to 320 and then 360 while
+  mixedEyes/modeSwitches/incomplete/rightFailed/poisoned remain zero. This
+  supports an original two-layer/object transition issue more strongly than a
+  stereo-eye failure. The safer render-only repair preserves original flags
+  and alpha, but temporarily copies the destination layer rotation at
+  work+0x50 to the fading old layer rotation at work+0xE0 only while both
+  original layers are actually drawable. It applies in STATE_START/STATE_GAME,
+  including camera 30/2, and restores all 64 bytes immediately after 4521C0.
+- **Nested passenger visibility gap:** PMT diagnostics show nativeVisible=1 only
+  for the first sampled nodes, then nativeVisible=0 from sample 180 onward.
+  The old recursion bypass ran before ScopedOriginalOccupantLod0, so a nested
+  genuine ROB02 could escape the forced visible scope. Nested ROB02 now enters
+  the same scoped visible/LOD0 owner before forwarding the original renderer.
+- **Dead threshold removed:** after the native passenger matrix lock, the old
+  PassengerModelCorrectionNearNative 4-unit threshold and its tests were
+  unreachable. They are removed; CI now checks that passenger 363 cannot
+  re-enter the W*C threshold path.
+- **Analyzer false positive fixed:** the session has gameExitCode=0 and a normal
+  watchdog stop. CRASH_TEXT_PRESENT was caused solely by the informational
+  phrase "VR P0 RESULT CRASH GUARD ... minidump EIPs". Crash detection now
+  keys on non-zero game exit or concrete unhandled/access-violation/dump
+  creation markers, not the generic word "crash".
+- Other inspected transport evidence is healthy for the reported interval:
+  shaderSkyNative=0/fallback-only is stable, mixedEyes=0, modeSwitches=0,
+  incomplete=0, rightFailed=0, poisoned=0, and direct projection is active
+  during gameplay. v3 poseLag/ackLag counters are shadow-parity diagnostics;
+  the logged bridge explicitly states v2 remains render authority and
+  poseMismatch=0.
