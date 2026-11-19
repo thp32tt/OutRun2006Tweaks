@@ -22,6 +22,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
+#include "vr/state/game_reset_events.hpp"
 #include "vr/game/quest_cockpit_v2_apk_xr_pose.hpp"
 #include "vr/game/lens_centre_partial_wvp.hpp"
 #include "vr/game/lens_centre_upload_transaction.hpp"
@@ -2641,6 +2642,7 @@ namespace OutRunVRRenderer
 
 	void NotifyGameReset()
 	{
+		OutRunVR::GameResetEvents::NotifyBeforeReset();
 		OutRunVR::QuestCockpitV2::ThreadProbe().Clear();
         OutRunVR::QuestCockpitV2::NativeFrameTrace().Clear();
 		ActiveCadenceRequestId.store(0, std::memory_order_release);
