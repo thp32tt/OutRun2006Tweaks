@@ -203,6 +203,10 @@ def pass_07_nested_draw_and_restore():
           "queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None" in hook and
           "nullptr,true" in hook,
           "deferred sky physical draw can inherit stale queue/pending semantic")
+    check("VR SKY SOURCE OWNER:" in hook and
+          "RenderScope::WorldSky,nullptr,true" in hook and
+          "pendingIsolated=1" in hook,
+          "exact 4521C0 source can consume an unrelated pending one-shot")
     check("RaceSkyObjectQueueRva = 0x56D0" in hook and
           "WorldSkyOpaqueQueue::RecordDeferred" in hook and
           "WorldSkyOpaqueQueue::Find(entry)" in hook,
@@ -239,8 +243,11 @@ def pass_07_nested_draw_and_restore():
     check("PassengerSceneRestores.fetch_add(" in hook,
           "missing actual upstream scene restore counter")
     check("DriverGateThreadCalls" in hook and
-          "afterDriver!=beforeDriver,after!=before" in hook,
-          "restored 0x80 event must prove native ROB01 from the same pass")
+          "struct PassengerSceneEvidence final" in hook and
+          "NotePassengerSceneWrapper(originalOwner);" in hook,
+          "restored 0x80 event lacks per-scene ROB01/ROB02 evidence")
+    check("sceneEvidence.driverReached,sceneEvidence.guestReached" in hook,
+          "scene recovery still derives identity from cross-scene counters")
     check("passengerScene==OriginalRobDisplayLayer" in policy,
           "active original ROB02 0x80 mask may not silently skip recovery")
     check("VR PASSENGER SCENE PASS:" in hook,
@@ -249,6 +256,13 @@ def pass_07_nested_draw_and_restore():
           "nested W*C correction not rejected")
     check("VR PASSENGER NATIVE LOCK:" in hook and "nativeWorkLocked=1" in hook,
           "passenger can still switch between corrected and native matrices")
+    check("workFlags=0x{:08X} robDisplayGateOpen={}" in hook and
+          "OriginalRobotDisplayGateOpen(robot->dword4)" in hook,
+          "pre-PMT ROB02 display gate is not observable")
+    check("VR PASSENGER PHYSICAL PMT:" in hook and
+          "authority=405890_404700" in hook and
+          "OriginalOccupantLod0Active()" in hook,
+          "passenger diagnostics stop before exact 405890->404700 PMT draw")
     check("ScopedQuestSkyTransitionProbe" in hook and
           "VR SKY TRANSITION PHASE:" in hook,
           "original sky transition phase/rotation diagnostics unavailable")
