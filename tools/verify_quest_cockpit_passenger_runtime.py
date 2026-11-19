@@ -76,11 +76,12 @@ assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
 assert "VR PASSENGER SCENE PASS:" in hook
 assert "VR PASSENGER NATIVE LOCK:" in hook
 assert "nativeWorkLocked=1" in hook
-assert "ScopedQuestSkyTransitionRotationLock" in hook
-assert "VR SKY TRANSITION ROTATION LOCK:" in hook
+assert "ScopedQuestSkyTransitionProbe" in hook
 assert "VR SKY TRANSITION PHASE:" in hook
-assert "orientationWords=9" in hook
+assert "VR SKY TRANSITION PHASE:" in hook
 assert "RotationIndices" in hook
+assert "mutation=0 originalCrossfadePreserved=1" in hook
+assert "base+0xe0+byte,&" not in hook
 assert "constexpr std::uint32_t None=0xffffffffu;" in hook
 assert "(n0!=None || n1!=None)" in hook
 assert "(o0!=None || o1!=None)" in hook

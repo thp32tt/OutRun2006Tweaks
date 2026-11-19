@@ -217,6 +217,8 @@ jobs:
           assert "'-FramerateInterpolation=false'" in launcher
           assert 'MaybeLogCockpitSkyProbe(stereoRequested,composedStereo,' in r7
           assert 'VRQuestCockpitV2SkyProbe' in settings
+          assert 'mutation=0 originalCrossfadePreserved=1' in hook
+          assert 'VR SKY TRANSITION ROTATION LOCK:' not in hook
           assert 'VR SKY OPAQUE QUEUE TAG:' in hook
           assert 'VR SKY OPAQUE QUEUE DRAW:' in hook
           assert 'RaceSkyObjectQueueRva = 0x56D0' in hook

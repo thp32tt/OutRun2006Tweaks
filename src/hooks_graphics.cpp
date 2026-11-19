@@ -1225,47 +1225,44 @@ class VrOriginalRaceSkyOwner final : public Hook
     // consumes only those nine words; restore them immediately afterwards.
     // This targets relative counter-motion without deleting a sky layer or
     // mutating the race-sky state machine.
-    class ScopedQuestSkyTransitionRotationLock final
+    class ScopedQuestSkyTransitionProbe final
     {
-        std::uint8_t* base_=nullptr;
-        std::array<float,9> oldLayerRotation_{};
-        bool active_=false;
         inline static constexpr std::array<std::size_t,9> RotationIndices{{
             0u,1u,2u,4u,5u,6u,8u,9u,10u
         }};
     public:
-        explicit ScopedQuestSkyTransitionRotationLock(void* work) noexcept
+        explicit ScopedQuestSkyTransitionProbe(void* work) noexcept
         {
             if(!work || !Settings::VREnabled ||
-               !Settings::VRQuestCockpitV2Enabled || !Game::current_mode)
+               !Settings::VRQuestCockpitV2Enabled ||
+               !Settings::VRQuestCockpitV2SkyProbe ||
+               !Game::current_mode)
                 return;
             const auto state=*Game::current_mode;
             if(state!=STATE_START && state!=STATE_GAME)return;
 
-            base_=reinterpret_cast<std::uint8_t*>(work);
+            const auto* base=reinterpret_cast<const std::uint8_t*>(work);
             std::uint32_t f38=0,f3c=0,fc8=0,fcc=0;
             float a30=0.f,a34=0.f,ac0=0.f,ac4=0.f;
-            std::memcpy(&f38,base_+0x38,sizeof(f38));
-            std::memcpy(&f3c,base_+0x3c,sizeof(f3c));
-            std::memcpy(&fc8,base_+0xc8,sizeof(fc8));
-            std::memcpy(&fcc,base_+0xcc,sizeof(fcc));
-            std::memcpy(&a30,base_+0x30,sizeof(a30));
-            std::memcpy(&a34,base_+0x34,sizeof(a34));
-            std::memcpy(&ac0,base_+0xc0,sizeof(ac0));
-            std::memcpy(&ac4,base_+0xc4,sizeof(ac4));
+            std::memcpy(&f38,base+0x38,sizeof(f38));
+            std::memcpy(&f3c,base+0x3c,sizeof(f3c));
+            std::memcpy(&fc8,base+0xc8,sizeof(fc8));
+            std::memcpy(&fcc,base+0xcc,sizeof(fcc));
+            std::memcpy(&a30,base+0x30,sizeof(a30));
+            std::memcpy(&a34,base+0x34,sizeof(a34));
+            std::memcpy(&ac0,base+0xc0,sizeof(ac0));
+            std::memcpy(&ac4,base+0xc4,sizeof(ac4));
             if(!std::isfinite(a30)||!std::isfinite(a34)||
                !std::isfinite(ac0)||!std::isfinite(ac4))return;
+
             constexpr std::uint32_t None=0xffffffffu;
             std::uint32_t n0=0,n1=0,n2=0,o0=0,o1=0,o2=0;
-            std::memcpy(&n0,base_+0x00,sizeof(n0));
-            std::memcpy(&n1,base_+0x04,sizeof(n1));
-            std::memcpy(&n2,base_+0x08,sizeof(n2));
-            std::memcpy(&o0,base_+0x90,sizeof(o0));
-            std::memcpy(&o1,base_+0x94,sizeof(o1));
-            std::memcpy(&o2,base_+0x98,sizeof(o2));
-            // Mirror 4521C0 exactly: step0 can draw object[0]/[1], step1
-            // object[2]. A flag+alpha record with all IDs=None is not an
-            // actual visible sky layer and must not trigger a rotation lock.
+            std::memcpy(&n0,base+0x00,sizeof(n0));
+            std::memcpy(&n1,base+0x04,sizeof(n1));
+            std::memcpy(&n2,base+0x08,sizeof(n2));
+            std::memcpy(&o0,base+0x90,sizeof(o0));
+            std::memcpy(&o1,base+0x94,sizeof(o1));
+            std::memcpy(&o2,base+0x98,sizeof(o2));
             const bool newLayerDraw=
                 (f38!=0u && a30>0.100000001f &&
                     (n0!=None || n1!=None)) ||
@@ -1275,80 +1272,41 @@ class VrOriginalRaceSkyOwner final : public Hook
                     (o0!=None || o1!=None)) ||
                 (fcc!=0u && ac4>0.100000001f && o2!=None);
 
-            std::array<float,9> newLayerRotation{};
             float maxDelta=0.f;
-            for(std::size_t n=0;n<RotationIndices.size();++n) {
-                const auto byte=RotationIndices[n]*sizeof(float);
-                std::memcpy(&newLayerRotation[n],base_+0x50+byte,sizeof(float));
-                std::memcpy(&oldLayerRotation_[n],base_+0xe0+byte,sizeof(float));
-                if(!std::isfinite(newLayerRotation[n])||
-                   !std::isfinite(oldLayerRotation_[n]))return;
+            for(const auto index:RotationIndices) {
+                const auto byte=index*sizeof(float);
+                float newer=0.f,older=0.f;
+                std::memcpy(&newer,base+0x50+byte,sizeof(newer));
+                std::memcpy(&older,base+0xe0+byte,sizeof(older));
+                if(!std::isfinite(newer)||!std::isfinite(older))return;
                 maxDelta=(std::max)(
-                    maxDelta,std::fabs(newLayerRotation[n]-oldLayerRotation_[n]));
+                    maxDelta,std::fabs(newer-older));
             }
-
-            // Exact PC 40A190 consumes only the 3x3 orientation from +0x50.
-            // Do not overwrite the other seven matrix words just to fix a
-            // sky cross-fade. This keeps the render-only mutation as narrow
-            // as the original consumer's actual ABI.
             const int phase=(newLayerDraw?1:0)|(oldLayerDraw?2:0);
-            if(Settings::VRQuestCockpitV2SkyProbe) {
-                static thread_local int lastPhase=-1;
-                static thread_local std::uint64_t phaseChanges=0;
-                if(phase!=lastPhase) {
-                    lastPhase=phase;
-                    const auto change=++phaseChanges;
-                    if(change<=64u)
-                        spdlog::info(
-                            "VR SKY TRANSITION PHASE: change={} phase={} "
-                            "gameState={} camera={} rotationDelta={:.6f} "
-                            "newFlags=0x{:X}/0x{:X} oldFlags=0x{:X}/0x{:X} "
-                            "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f} "
-                            "newObj={:08X}/{:08X}/{:08X} oldObj={:08X}/{:08X}/{:08X}",
-                            change,phase,static_cast<int>(state),
-                            Game::camera()?static_cast<int>(
-                                Game::camera()->cam_mode_34A):-1,maxDelta,
-                            f38,f3c,fc8,fcc,a30,a34,ac0,ac4,
-                            n0,n1,n2,o0,o1,o2);
-                }
-            }
-            if(phase!=3 || maxDelta<=1.0e-5f)return;
-
-            for(std::size_t n=0;n<RotationIndices.size();++n) {
-                const auto byte=RotationIndices[n]*sizeof(float);
-                std::memcpy(base_+0xe0+byte,&newLayerRotation[n],sizeof(float));
-            }
-            active_=true;
-            static std::atomic<std::uint64_t> locks{0};
-            const auto count=locks.fetch_add(1,std::memory_order_relaxed)+1;
-            if(Settings::VRQuestCockpitV2SkyProbe &&
-               (count<=24u || count%180u==0u)) {
-                const auto* cam=Game::camera();
+            static thread_local int lastPhase=-1;
+            static thread_local std::uint64_t phaseChanges=0;
+            if(phase==lastPhase)return;
+            lastPhase=phase;
+            const auto change=++phaseChanges;
+            if(change<=64u)
                 spdlog::info(
-                    "VR SKY TRANSITION ROTATION LOCK: count={} gameState={} "
-                    "camera={} maxRotationDelta={:.6f} "
+                    "VR SKY TRANSITION PHASE: change={} phase={} "
+                    "gameState={} camera={} rotationDelta={:.6f} "
                     "newFlags=0x{:X}/0x{:X} oldFlags=0x{:X}/0x{:X} "
                     "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f} "
-                    "newObj={:08X}/{:08X}/{:08X} oldObj={:08X}/{:08X}/{:08X} "
-                    "orientationWords=9 renderOnly=1",
-                    count,static_cast<int>(state),
-                    cam?static_cast<int>(cam->cam_mode_34A):-1,maxDelta,
+                    "newObj={:08X}/{:08X}/{:08X} "
+                    "oldObj={:08X}/{:08X}/{:08X} "
+                    "mutation=0 originalCrossfadePreserved=1",
+                    change,phase,static_cast<int>(state),
+                    Game::camera()?static_cast<int>(
+                        Game::camera()->cam_mode_34A):-1,maxDelta,
                     f38,f3c,fc8,fcc,a30,a34,ac0,ac4,
                     n0,n1,n2,o0,o1,o2);
-            }
         }
-        ~ScopedQuestSkyTransitionRotationLock() noexcept
-        {
-            if(!active_ || !base_)return;
-            for(std::size_t n=0;n<RotationIndices.size();++n) {
-                const auto byte=RotationIndices[n]*sizeof(float);
-                std::memcpy(base_+0xe0+byte,&oldLayerRotation_[n],sizeof(float));
-            }
-        }
-        ScopedQuestSkyTransitionRotationLock(
-            const ScopedQuestSkyTransitionRotationLock&)=delete;
-        ScopedQuestSkyTransitionRotationLock& operator=(
-            const ScopedQuestSkyTransitionRotationLock&)=delete;
+        ScopedQuestSkyTransitionProbe(
+            const ScopedQuestSkyTransitionProbe&)=delete;
+        ScopedQuestSkyTransitionProbe& operator=(
+            const ScopedQuestSkyTransitionProbe&)=delete;
     };
 
     static void __cdecl RaceSkyObjectQueueDest(
@@ -1381,7 +1339,7 @@ class VrOriginalRaceSkyOwner final : public Hook
     {
         OutRunVR::GameSemantic::ScopedExactProducerSemantic sky(
             OutRunVR::GameSemantic::RenderScope::WorldSky);
-        ScopedQuestSkyTransitionRotationLock transitionRotation(work);
+        ScopedQuestSkyTransitionProbe transitionProbe(work);
         RaceSkyDisplayHook.ccall<void>(work);
     }
 
