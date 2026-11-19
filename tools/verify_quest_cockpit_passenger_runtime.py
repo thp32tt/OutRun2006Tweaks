@@ -113,6 +113,9 @@ assert "!PassengerSceneHook && frameReady && stereoReady" in hook
 assert "const bool renderOwner=sceneOwner || legacyFrameOwner;" in hook
 assert "ScopedPassengerSceneOwner sceneOwner(exactRobScene);" in hook
 assert "ExactPassengerSceneOwnerActive()" in hook
+assert "struct PassengerSceneEvidence final" in hook
+assert "NotePassengerSceneWrapper(originalOwner);" in hook
+assert "sceneEvidence.driverReached,sceneEvidence.guestReached" in hook
 assert "OriginalPassengerDisplayGateSignature()" in hook
 assert "PassengerGateHook=std::move(guest);" in hook
 assert "Module::fn_ptr<NativeRobotDisplay>(" in hook

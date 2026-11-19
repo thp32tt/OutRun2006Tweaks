@@ -420,3 +420,19 @@ three cases in one HMD run: native actor gate rejected the draw, PMT traversal
 failed to reach the physical entry, or physical PMT submission occurred and
 the remaining problem lies below that boundary. No passenger coordinate,
 event lifecycle, scene mask or render flag is mutated by this instrumentation.
+
+
+### Per-43FB40 wrapper evidence instead of thread counters
+
+The original post-pass recovery compared thread-local ROB01/ROB02 call counts
+before and after 43FB40. That is normally sufficient, but it is not exact under
+recursive/nested event-display calls: a nested scene could increment the same
+thread counter and make the outer 0x80 pass look as if its own ROB02 wrapper
+had already run.
+
+Each `ScopedPassengerSceneOwner` stack frame now stores its own
+`driverReached` and `guestReached` bits. The shared 4879B0 hook records the
+resolved exact ROB01/ROB02 identity only into the current exact 0x80 frame.
+Post-pass recovery consumes those frame-local bits; thread counters remain
+telemetry only. A nested scene therefore cannot suppress or duplicate recovery
+for its parent pass.

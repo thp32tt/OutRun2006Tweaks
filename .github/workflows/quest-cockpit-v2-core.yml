@@ -237,6 +237,9 @@ jobs:
           assert 'LastStorage!=storage' in hook
           assert 'p>=begin && p<storageEnd && p>=activeEnd' in hook
           assert 'ScopedPassengerSceneOwner sceneOwner(exactRobScene);' in hook
+          assert 'struct PassengerSceneEvidence final' in hook
+          assert 'NotePassengerSceneWrapper(originalOwner);' in hook
+          assert 'sceneEvidence.driverReached,sceneEvidence.guestReached' in hook
           assert 'ExactPassengerSceneOwnerActive()' in hook
           assert 'cockpit && race && renderOwner' in hook
           assert '!PassengerSceneHook && frameReady && stereoReady' in hook

@@ -1529,7 +1529,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     // 43FB40 is the original synchronous event-scene dispatcher. Keep only
     // top-of-stack ownership: a nested non-ROB scene must not inherit an
     // outer 0x80 proof. Overflow fails closed.
-    inline static thread_local std::array<bool,8> PassengerSceneOwnerStack{};
+    struct PassengerSceneEvidence final {
+        bool exact=false;
+        bool driverReached=false;
+        bool guestReached=false;
+    };
+    inline static thread_local std::array<PassengerSceneEvidence,8>
+        PassengerSceneOwnerStack{};
     inline static thread_local unsigned PassengerSceneOwnerDepth=0;
     inline static thread_local unsigned PassengerSceneOwnerOverflow=0;
     class ScopedPassengerSceneOwner final {
@@ -1537,7 +1543,8 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     public:
         explicit ScopedPassengerSceneOwner(bool exact) noexcept {
             if(PassengerSceneOwnerDepth<PassengerSceneOwnerStack.size()) {
-                PassengerSceneOwnerStack[PassengerSceneOwnerDepth++]=exact;
+                PassengerSceneOwnerStack[PassengerSceneOwnerDepth++]=
+                    PassengerSceneEvidence{exact,false,false};
                 pushed_=true;
             } else {
                 ++PassengerSceneOwnerOverflow;
@@ -1556,7 +1563,24 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static bool ExactPassengerSceneOwnerActive() noexcept {
         return PassengerSceneOwnerOverflow==0 &&
             PassengerSceneOwnerDepth!=0 &&
-            PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1];
+            PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1].exact;
+    }
+    static PassengerSceneEvidence CurrentPassengerSceneEvidence() noexcept {
+        if(PassengerSceneOwnerOverflow!=0 || PassengerSceneOwnerDepth==0)
+            return {};
+        return PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1];
+    }
+    static void NotePassengerSceneWrapper(
+        OutRunVR::QuestCockpitV2::OriginalOccupantSlot slot) noexcept {
+        if(PassengerSceneOwnerOverflow!=0 || PassengerSceneOwnerDepth==0)
+            return;
+        auto& evidence=PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1];
+        if(!evidence.exact)return;
+        if(slot==OutRunVR::QuestCockpitV2::OriginalOccupantSlot::Driver362)
+            evidence.driverReached=true;
+        else if(slot==
+            OutRunVR::QuestCockpitV2::OriginalOccupantSlot::Passenger363)
+            evidence.guestReached=true;
     }
 
     inline static std::uint64_t TraceCount=0;
@@ -1741,6 +1765,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const bool race=IsCockpitRacePhase();
         const bool cockpit=QuestCockpitV2Active(cam);
         const auto originalOwner=ExactOriginalCockpitOccupant(work);
+        NotePassengerSceneWrapper(originalOwner);
         const bool owner=originalOwner==OriginalOccupantSlot::Passenger363;
         if(!owner){
             if(originalOwner==OriginalOccupantSlot::Driver362)
@@ -1864,6 +1889,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             OriginalOccupantSlot::Passenger363;
         const auto after=PassengerGateThreadCalls;
         const auto afterDriver=DriverGateThreadCalls;
+        const auto sceneEvidence=CurrentPassengerSceneEvidence();
         const auto passCount=PassengerScenePasses.fetch_add(
             1,std::memory_order_relaxed)+1;
         if(PassengerTraceOn() && (passCount<=16u || passCount%180u==0u))
@@ -1874,7 +1900,8 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 "guestLive={} stereoReady={}",
                 passCount,NativeFrameTrace().ActiveEpoch(),mask,
                 driver->field_C,passenger->field_C,
-                afterDriver!=beforeDriver,after!=before,live,stereoReady);
+                sceneEvidence.driverReached,sceneEvidence.guestReached,
+                live,stereoReady);
         const bool recover=ShouldRecoverOriginalPassengerScenePass(
             Settings::VREnabled.get(),
             Settings::VRQuestCockpitV2Enabled.get(),
@@ -1882,7 +1909,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             QuestCockpitV2Active(cam) && race,cam->cam_mode_34A==1,
             live,ExactPassengerSceneOwnerActive(),
             mask,first,last,driver->field_C,passenger->field_C,
-            afterDriver!=beforeDriver,after!=before);
+            sceneEvidence.driverReached,sceneEvidence.guestReached);
         if(!recover)return;
         const auto count=PassengerSceneRestores.fetch_add(
             1,std::memory_order_relaxed)+1;
@@ -1894,7 +1921,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 "driverWrapperReached={} (not GPU proof)",
                 count,NativeFrameTrace().ActiveEpoch(),mask,
                 driver->field_C,passenger->field_C,before,after,
-                afterDriver!=beforeDriver);
+                sceneEvidence.driverReached);
         // A genuine live ROB02 native work pointer, same frame, same
         // verified 0x80 actor pass. No event allocation/flag/scene mutation.
         // This function calls the existing car-gate-aware original renderer.

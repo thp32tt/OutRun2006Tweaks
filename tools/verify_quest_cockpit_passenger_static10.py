@@ -243,8 +243,11 @@ def pass_07_nested_draw_and_restore():
     check("PassengerSceneRestores.fetch_add(" in hook,
           "missing actual upstream scene restore counter")
     check("DriverGateThreadCalls" in hook and
-          "afterDriver!=beforeDriver,after!=before" in hook,
-          "restored 0x80 event must prove native ROB01 from the same pass")
+          "struct PassengerSceneEvidence final" in hook and
+          "NotePassengerSceneWrapper(originalOwner);" in hook,
+          "restored 0x80 event lacks per-scene ROB01/ROB02 evidence")
+    check("sceneEvidence.driverReached,sceneEvidence.guestReached" in hook,
+          "scene recovery still derives identity from cross-scene counters")
     check("passengerScene==OriginalRobDisplayLayer" in policy,
           "active original ROB02 0x80 mask may not silently skip recovery")
     check("VR PASSENGER SCENE PASS:" in hook,
