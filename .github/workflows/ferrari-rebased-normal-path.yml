@@ -127,6 +127,10 @@ jobs:
           assert 'row_major float4x4 projection : register(c8);' in pbr
           stereo = Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text(encoding='utf-8')
           assert 'constexpr UINT OutRunWvpRegister = 64;' in stereo
+          reset_body = stereo.split('HRESULT __stdcall ResetDest(',1)[1].split(
+              'constexpr std::uint32_t StereoInstallPending',1)[0]
+          assert reset_body.index('OutRunVRRenderer::NotifyGameReset();') < reset_body.index(
+              'ResetCompatDevice(device,params,hr)')
 
           print('FERRARI_REBASED_NORMAL_PATH_CONTRACT_PASS')
           PY
