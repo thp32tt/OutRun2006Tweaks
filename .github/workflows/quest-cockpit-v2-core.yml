@@ -224,7 +224,11 @@ jobs:
           assert 'WorldSkyOpaqueQueue::Find(entry)' in hook
           sky_owner=hook.split('class VrOriginalRaceSkyOwner final',1)[1].split('VrOriginalRaceSkyOwner VrOriginalRaceSkyOwner::instance',1)[0]
           assert sky_owner.index('RaceSkyDisplayHook=safetyhook::create_inline') < sky_owner.index('const bool queueSignatureOk=')
-          assert 'keeping 4521C0 owner, deferred sky provenance disabled' in sky_owner
+          assert '"VR WORLD SKY: 4056D0 hook unavailable; keeping "' in sky_owner
+          assert '"4521C0 owner, deferred sky provenance disabled"' in sky_owner
+          assert '"VR WORLD SKY: canonical 4056D0 signature mismatch; keeping "' in sky_owner
+          assert 'LastStorage!=storage' in hook
+          assert 'p>=begin && p<storageEnd && p>=activeEnd' in hook
           assert 'ScopedPassengerSceneOwner sceneOwner(exactRobScene);' in hook
           assert 'ExactPassengerSceneOwnerActive()' in hook
           assert 'cockpit && race && renderOwner' in hook
