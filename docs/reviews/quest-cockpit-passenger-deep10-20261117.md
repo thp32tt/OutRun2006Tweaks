@@ -367,3 +367,72 @@ alpha/flag/object transition byte-for-byte. `ScopedQuestSkyTransitionProbe`
 is diagnostic only and reports `mutation=0 originalCrossfadePreserved=1`.
 The active behavior fix is exact deferred WorldSky provenance, not a modified
 course-sky crossfade.
+
+
+### 4521C0 pending one-shot isolation
+
+The same semantic-priority audit was extended to the source owner. The previous
+4521C0 `ScopedExactProducerSemantic(WorldSky)` cleared selected queue scope
+but left an unrelated `NextDrawScope` one-shot armed. A pending HUD/marker
+token could therefore be consumed by an immediate sky GPU draw before the
+deferred provenance logic is even involved.
+
+The exact sky owner now uses
+`ScopedExactProducerSemantic(WorldSky, nullptr, true)`, shielding and
+restoring the pending one-shot for the complete original 4521C0 call.
+`VR SKY SOURCE OWNER` reports the actual EffectiveScope, producer, queue
+state, render thread and whether exact WorldSky ownership is visible at runtime.
+This keeps both immediate and deferred sky submissions on source-proven
+semantics without broad depth-state heuristics.
+
+
+## 2026-11-19 release-launcher eye-resolution parity audit
+
+The pre-HMD log proved the old release-parity launch drifted to VDXR's
+2248x2432 recommendation when `AutoRenderResolution=true`. The diagnostic
+runner was already corrected to the user-fixed Quest 3 eye target 2496x2688,
+but the public `Start-OutRun.cmd` still carried the stale auto-resolution
+flag. That would have reintroduced the same drift in a future v0.03 package.
+
+The release launcher now explicitly uses `AutoRenderResolution=false`,
+`RenderWidth=2496`, and `RenderHeight=2688`. Launcher verification,
+isolated-core CI and the v0.03 packaging gate all reject a return to auto
+resolution. This is release parity only; it does not claim HMD passenger/sky
+validation.
+
+
+## 2026-11-19 passenger pre-PMT gate and physical-entry proof
+
+A further exact-original trace found one diagnostic blind spot between the
+already-proven ROB02 callback and the PMT culling override. Canonical 514C30
+reads `EvWorkRobot+4` before it queues any body mesh: bit 0x8000 must be set,
+and a 0x08 state is rejected unless 0x04 is also set. The replacement EXE
+prefix is now checked byte-for-byte in CI and the PASSENGER diagnostic reports
+`workFlags` plus `robDisplayGateOpen`. This pass does **not** force those
+native actor flags.
+
+The original robot renderer then queues rigid/skinned meshes through 405360/
+405580 and synchronously flushes through 405890->404700 before 514E60 returns.
+While the exact ROB02 visibility scope is still active, the existing exact
+404700 wrapper now emits bounded `VR PASSENGER PHYSICAL PMT` receipts
+(object, pass, palette count, matrix/node/mesh pointers). This distinguishes
+three cases in one HMD run: native actor gate rejected the draw, PMT traversal
+failed to reach the physical entry, or physical PMT submission occurred and
+the remaining problem lies below that boundary. No passenger coordinate,
+event lifecycle, scene mask or render flag is mutated by this instrumentation.
+
+
+### Per-43FB40 wrapper evidence instead of thread counters
+
+The original post-pass recovery compared thread-local ROB01/ROB02 call counts
+before and after 43FB40. That is normally sufficient, but it is not exact under
+recursive/nested event-display calls: a nested scene could increment the same
+thread counter and make the outer 0x80 pass look as if its own ROB02 wrapper
+had already run.
+
+Each `ScopedPassengerSceneOwner` stack frame now stores its own
+`driverReached` and `guestReached` bits. The shared 4879B0 hook records the
+resolved exact ROB01/ROB02 identity only into the current exact 0x80 frame.
+Post-pass recovery consumes those frame-local bits; thread counters remain
+telemetry only. A nested scene therefore cannot suppress or duplicate recovery
+for its parent pass.
