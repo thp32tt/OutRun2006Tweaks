@@ -384,3 +384,18 @@ restoring the pending one-shot for the complete original 4521C0 call.
 state, render thread and whether exact WorldSky ownership is visible at runtime.
 This keeps both immediate and deferred sky submissions on source-proven
 semantics without broad depth-state heuristics.
+
+
+## 2026-11-19 release-launcher eye-resolution parity audit
+
+The pre-HMD log proved the old release-parity launch drifted to VDXR's
+2248x2432 recommendation when `AutoRenderResolution=true`. The diagnostic
+runner was already corrected to the user-fixed Quest 3 eye target 2496x2688,
+but the public `Start-OutRun.cmd` still carried the stale auto-resolution
+flag. That would have reintroduced the same drift in a future v0.03 package.
+
+The release launcher now explicitly uses `AutoRenderResolution=false`,
+`RenderWidth=2496`, and `RenderHeight=2688`. Launcher verification,
+isolated-core CI and the v0.03 packaging gate all reject a return to auto
+resolution. This is release parity only; it does not claim HMD passenger/sky
+validation.

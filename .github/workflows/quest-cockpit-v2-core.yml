@@ -16,6 +16,7 @@ on:
       - 'RUN-QUEST-COCKPIT-V2-TURN-DIAG.cmd'
       - 'RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd'
       - 'tools/verify_quest_cockpit_launchers.py'
+      - 'Start-OutRun.cmd'
       - 'src/vr/d3d9/direct_gpu_hold_policy.hpp'
       - 'tools/tests/direct_gpu_hold_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
@@ -389,5 +390,9 @@ jobs:
           assert '-VR.QuestCockpitV2SeatBack=' not in release_launcher
           assert '-VR.QuestCockpitV2SeatDown=' not in release_launcher
           assert '-VR.QuestCockpitV2SeatRight=' not in release_launcher
+          assert '-VR.AutoRenderResolution=false' in release_launcher
+          assert '-VR.RenderWidth=2496' in release_launcher
+          assert '-VR.RenderHeight=2688' in release_launcher
+          assert '-VR.AutoRenderResolution=true' not in release_launcher
           print('QuestCockpitV2 isolated-core contract PASS')
           PY

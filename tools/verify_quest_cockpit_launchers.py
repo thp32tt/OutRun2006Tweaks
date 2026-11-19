@@ -51,9 +51,24 @@ else:
     if "'-VR.AutoRenderResolution=true'" in runner:
         errors.append("release-parity still forces OpenXR auto eye resolution")
 
+release_path = ROOT / "Start-OutRun.cmd"
+if not release_path.is_file():
+    errors.append("missing release launcher: Start-OutRun.cmd")
+else:
+    release = release_path.read_text(encoding="utf-8")
+    for required in (
+        "-VR.AutoRenderResolution=false",
+        "-VR.RenderWidth=2496",
+        "-VR.RenderHeight=2688",
+    ):
+        if required not in release:
+            errors.append(f"release launcher fixed Quest3 eye resolution missing: {required}")
+    if "-VR.AutoRenderResolution=true" in release:
+        errors.append("release launcher still forces OpenXR auto eye resolution")
+
 if errors:
     for error in errors:
         print(f"FAIL: {error}")
     sys.exit(1)
 
-print("PASS: Quest cockpit launchers keep F0 ON, valid line breaks, and runner fallback.")
+print("PASS: Quest cockpit launchers keep F0 ON, fixed 2496x2688 release eyes, valid line breaks, and runner fallback.")
