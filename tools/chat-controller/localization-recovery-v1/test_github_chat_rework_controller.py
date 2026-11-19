@@ -291,6 +291,7 @@ class FallbackQueueResumeAndPixelTests(unittest.TestCase):
 # to test a live authenticated ChatGPT session.
 import base64
 import hashlib
+import datetime as dt
 import chat_image_result_rescue as rescue
 
 
