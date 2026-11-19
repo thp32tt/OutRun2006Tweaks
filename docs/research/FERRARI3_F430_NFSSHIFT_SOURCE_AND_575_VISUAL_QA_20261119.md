@@ -48,4 +48,4 @@ Reports: `download_probe.json`, `asset_inspect.json`, `geometry_structure_report
 - 16/16 private optional-inclusive exact variant candidates (unchanged).
 - 13/16 high-quality exact default models (unchanged).
 - No runtime code changes, no extra new installed car or game success claim.
-- Latest verified AI2 SSOT cumulative **2871** at commit `df479e420c27ea4222a168941b810315fb17db0c`. This source-only acquisition and recheck is **+0**: 2871 + 0 = 2871. No duplicate points for previous Superamerica/328 conversions, rebase, or QA.
+- Latest verified AI2 SSOT cumulative **2872** at commit `054b80114055147dd8434f336aec91cd5b5135ba` (separate reset lifecycle fix). This source-only acquisition and recheck is **+0**: 2872 + 0 = 2872. No duplicate points for previous Superamerica/328 conversions, rebase, or QA.
