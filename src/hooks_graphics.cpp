@@ -19,6 +19,7 @@
 #include "vr/game/dino_external_d3d9.hpp"
 #include "vr/game/dino_external_original_car_gate.hpp"
 #include "vr/game/f50_external_pose_filter.hpp"
+#include "vr/state/state_block_tracker.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
