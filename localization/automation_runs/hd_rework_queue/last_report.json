@@ -3,8 +3,8 @@
   "c1_preliminary_new_png_count": 0,
   "clean_plate_qa": "MECHANICAL_ALPHA_ONLY_C1_C3_VISUAL_REVIEW_REQUIRED",
   "cosmetic_alpha_tolerance_max": 15,
-  "cosmetic_bc3_color_channel_error_max": 64,
-  "deterministic_salvaged_roi": 132,
+  "cosmetic_bc3_color_channel_error_max": 72,
+  "deterministic_salvaged_roi": 135,
   "generated": [
     {
       "dds_sha256": "c7603a68a2783ff7817b38e58adac665791cdb4dac328b264ebcbad2a1bdf9ff",
@@ -4221,7 +4221,7 @@
             "bc3_blocks_patched": 1895,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -4268,6 +4268,68 @@
       "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
     },
     {
+      "dds_sha256": "4ab3ae7f34e4a79c22876c5ab4c9d7e4fffd6c3a9b09f1991efb9c59b705cf3f",
+      "holds": [],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+      "painted": [
+        {
+          "auto_salvage": [
+            "SOURCE_NATIVE_ATLAS_LEFT_EDGE_INSET_REQUIRED",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 8746,
+            "cosmetic_alpha_max_error": 40,
+            "cosmetic_residue_alpha_max": 16,
+            "cosmetic_rgb_max_error": 72,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 1,
+          "candidate_sha256": "37aeae784aae07566d00806465c6acda993b71cd39c233a57192ebe193c15f7f",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "NEXT ROUND",
+          "korean": "다음 라운드",
+          "manual_original_bbox": null,
+          "manual_source_child_text": null,
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              1,
+              105,
+              1089,
+              248
+            ]
+          ],
+          "qa_gate": "COSMETIC_ALPHA_LE_15_TOLERATED_C1_C3_GAME_UNTESTED",
+          "roi": [
+            0,
+            0,
+            1448,
+            256
+          ],
+          "roi_id": "Q055_dd5213d64f53d429",
+          "source_alpha_occupancy": 0.30576,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              149,
+              105,
+              940,
+              248
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    },
+    {
       "dds_sha256": "2f93fd15e43deaaf5381df817e95073b8b315e9fc629f0eb597714e58631c427",
       "holds": [
         {
@@ -4295,7 +4357,7 @@
             "bc3_blocks_patched": 2527,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -4811,7 +4873,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -4860,7 +4922,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -4910,7 +4972,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -4960,7 +5022,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -5009,7 +5071,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -5059,7 +5121,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -5108,7 +5170,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -5157,7 +5219,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -5206,7 +5268,7 @@
             "bc3_blocks_patched": 6354,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -5325,7 +5387,7 @@
             "bc3_blocks_patched": 13908,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -5665,6 +5727,69 @@
       "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
     },
     {
+      "dds_sha256": "e259c9a4ffd4a3629c99aca88a28899b1c70026225daa64b592b3a78676a024d",
+      "holds": [],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+      "painted": [
+        {
+          "auto_salvage": [
+            "SOURCE_EDGE_CLEAR_NEIGHBOR_PROOF",
+            "SOURCE_EDGE_CLEAR_NEIGHBOR_PROOF",
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 9483,
+            "cosmetic_alpha_max_error": 40,
+            "cosmetic_residue_alpha_max": 16,
+            "cosmetic_rgb_max_error": 72,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 1,
+          "candidate_sha256": "76614d3c7de5ff4f69dccf38a75d1bbf8ce00e425cd589b187967470199081b3",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "Drive against the Ghost Car and challenge for the course record!!",
+          "korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+          "manual_original_bbox": null,
+          "manual_source_child_text": null,
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              516,
+              40,
+              1611,
+              214
+            ]
+          ],
+          "qa_gate": "COSMETIC_ALPHA_LE_15_TOLERATED_C1_C3_GAME_UNTESTED",
+          "roi": [
+            515,
+            38,
+            1612,
+            216
+          ],
+          "roi_id": "Q099_861e16d020961ed5",
+          "source_alpha_occupancy": 0.58349,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              667,
+              40,
+              1459,
+              214
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    },
+    {
       "dds_sha256": "c2af412c3e873c50ac211ee674b1e61b0177e915ab3e62cd3c38e018f3e29711",
       "holds": [
         {
@@ -5979,7 +6104,7 @@
             "bc3_blocks_patched": 15380,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -6023,6 +6148,67 @@
       ],
       "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
       "target": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
+    },
+    {
+      "dds_sha256": "e40fd5ff0e44604f48a76826dae4ae04d7327e2bf0f17460f498b7ef47e791a0",
+      "holds": [],
+      "orientation": "FLIPY",
+      "orientation_evidence": "DDS_SHA_PINNED_SOURCE_PLAN_NOT_VISUAL_QA",
+      "origin_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+      "painted": [
+        {
+          "auto_salvage": [
+            "DXT5_CHANGED_BLOCKS_REENCODE_VISUAL_QA_REQUIRED"
+          ],
+          "bc3_saved_format_receipt": {
+            "bc3_blocks_patched": 7927,
+            "cosmetic_alpha_max_error": 40,
+            "cosmetic_residue_alpha_max": 16,
+            "cosmetic_rgb_max_error": 72,
+            "mip_count": 1,
+            "original_format": "DXT5"
+          },
+          "candidate_detected_line_count": 1,
+          "candidate_sha256": "adb42264e5efca13af5ec9429eb9f1de5c5250e01f58a0398a6f224863c97898",
+          "candidate_source": "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS",
+          "clean_type": "ISOLATED_SOURCE_ALPHA_TO_TRANSPARENT",
+          "dds_format": "DXT5_BC3_CHANGED_BLOCKS_PROTECTED_REENCODE_TEST_ONLY",
+          "english": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "manual_original_bbox": null,
+          "manual_source_child_text": null,
+          "original_line_count": 1,
+          "original_native_lines": [
+            [
+              394,
+              54,
+              1354,
+              199
+            ]
+          ],
+          "qa_gate": "COSMETIC_ALPHA_LE_15_TOLERATED_C1_C3_GAME_UNTESTED",
+          "roi": [
+            348,
+            0,
+            1462,
+            256
+          ],
+          "roi_id": "Q104_01e25aa25a681d26",
+          "source_alpha_occupancy": 0.3918,
+          "translated_line_count": 1,
+          "translated_native_lines": [
+            [
+              560,
+              54,
+              1187,
+              199
+            ]
+          ]
+        }
+      ],
+      "plate_evidence": "SOURCE_CLEAN_FINAL_PREVIEWS_REVIEW_REQUIRED",
+      "target": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
       "text_scale_gate": "NO_NEW_GLYPH_LINE_LARGER_THAN_ORIGINAL_NATIVE_HD_EFFECT_BBOX"
     },
     {
@@ -6153,7 +6339,7 @@
             "bc3_blocks_patched": 10401,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -9040,7 +9226,7 @@
             "bc3_blocks_patched": 4877,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -9089,7 +9275,7 @@
             "bc3_blocks_patched": 4877,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -9138,7 +9324,7 @@
             "bc3_blocks_patched": 4877,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -9187,7 +9373,7 @@
             "bc3_blocks_patched": 4877,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -9238,7 +9424,7 @@
             "bc3_blocks_patched": 4877,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -9287,7 +9473,7 @@
             "bc3_blocks_patched": 4877,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -13124,7 +13310,7 @@
             "bc3_blocks_patched": 1496,
             "cosmetic_alpha_max_error": 40,
             "cosmetic_residue_alpha_max": 16,
-            "cosmetic_rgb_max_error": 64,
+            "cosmetic_rgb_max_error": 72,
             "mip_count": 1,
             "original_format": "DXT5"
           },
@@ -15587,7 +15773,7 @@
     "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD": 36,
     "QA_BC3_MIP_CHAIN_REQUIRES_ORIGINAL_FORMAT_REBUILD": 13,
     "QA_BC3_SAVED_PROTECTED_ATLAS_PIXEL_CHANGED": 1,
-    "QA_BC3_TRANSLATED_COLOR_LOSS": 4,
+    "QA_BC3_TRANSLATED_COLOR_LOSS": 1,
     "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED": 3,
     "QA_SOURCE_NOT_ISOLATED_ALPHA_TEXT": 45,
     "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE": 92,
@@ -16114,20 +16300,6 @@
     {
       "details": [
         {
-          "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
-          "roi_id": "Q055_dd5213d64f53d429"
-        }
-      ],
-      "reason": "IMPORTED_ROI_ALL_HELD",
-      "roi_ids": [
-        "Q055_dd5213d64f53d429"
-      ],
-      "rows": 1,
-      "target": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds"
-    },
-    {
-      "details": [
-        {
           "reason": "COARSE_ROI_CONTAINS_OTHER_TEXT_HOLD",
           "roi_id": "Q057_42028aa13c5e8924"
         },
@@ -16308,20 +16480,6 @@
     {
       "details": [
         {
-          "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
-          "roi_id": "Q099_861e16d020961ed5"
-        }
-      ],
-      "reason": "IMPORTED_ROI_ALL_HELD",
-      "roi_ids": [
-        "Q099_861e16d020961ed5"
-      ],
-      "rows": 1,
-      "target": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds"
-    },
-    {
-      "details": [
-        {
           "reason": "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE",
           "roi_id": "Q103_ee07feec4dca375c"
         }
@@ -16332,20 +16490,6 @@
       ],
       "rows": 1,
       "target": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
-    },
-    {
-      "details": [
-        {
-          "reason": "QA_BC3_TRANSLATED_COLOR_LOSS",
-          "roi_id": "Q104_01e25aa25a681d26"
-        }
-      ],
-      "reason": "IMPORTED_ROI_ALL_HELD",
-      "roi_ids": [
-        "Q104_01e25aa25a681d26"
-      ],
-      "rows": 1,
-      "target": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds"
     },
     {
       "details": [
@@ -16670,7 +16814,7 @@
   "legacy_oversize_outputs_rejected": true,
   "manual_stage_child_roi_test_only": true,
   "manual_user_test_only_roi_count": 6,
-  "native_dds_generated": 69,
+  "native_dds_generated": 72,
   "native_source_owner_pixel_edits_test_only": 8,
   "pending_import": 0,
   "pending_import_holds": [],
@@ -16682,7 +16826,7 @@
   "source": "Existing A/B PNG reused exclusively; native HD bounded pad/reflow/downscale; no new ImageGen or fonts",
   "source_dds_missing_rows": 0,
   "source_sha_conflict_rows": 0,
-  "translated_roi_generated": 322,
+  "translated_roi_generated": 325,
   "visual_qa": "REVIEW_REQUIRED",
-  "zip_sha256": "5f80543bc602a7924cfbd0273093874a83bd030efca16bf52d3f794a0298c91b"
+  "zip_sha256": "13b83d84501321ba020872a628a19143e68eb2490e7a58b1e0e95171d3a25134"
 }
