@@ -727,14 +727,19 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // pair removes that ambiguity when diagnosing "camera turns first".
         const float b0ForwardX=player->matrix_B0._31;
         const float b0ForwardZ=player->matrix_B0._33;
-        const float cameraForwardX=camera->look_pos_104.x-camera->cam_pos_F8.x;
-        const float cameraForwardZ=camera->look_pos_104.z-camera->cam_pos_F8.z;
-        const float b0ForwardNorm=std::hypot(b0ForwardX,b0ForwardZ);
-        const float cameraForwardNorm=std::hypot(cameraForwardX,cameraForwardZ);
-        if(!(b0ForwardNorm>1.0e-5f) || !(cameraForwardNorm>1.0e-5f))
+        // Exact PC 484DF0 defines camera yaw from EYE minus TARGET.
+        // The previous probe used target-eye, flipping only its diagnostic
+        // visualCameraYaw by 180 degrees and producing bogus 170-180 degree
+        // car/camera gaps. This never affected the rendered camera itself.
+        const float visualCarYaw=
+            OutRunVR::QuestCockpitV2::BasisZYawRadians(
+                b0ForwardX,b0ForwardZ);
+        const float visualCameraYaw=
+            OutRunVR::QuestCockpitV2::CameraEyeTargetYawRadians(
+                camera->cam_pos_F8.x,camera->cam_pos_F8.z,
+                camera->look_pos_104.x,camera->look_pos_104.z);
+        if(!std::isfinite(visualCarYaw)||!std::isfinite(visualCameraYaw))
             return;
-        const float visualCarYaw=std::atan2(b0ForwardX,b0ForwardZ);
-        const float visualCameraYaw=std::atan2(cameraForwardX,cameraForwardZ);
         const float visualCarCameraGapDeg=
             OutRunVR::QuestCockpitV2::YawRadiansStepDegrees(
                 visualCameraYaw,visualCarYaw);
@@ -758,6 +763,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         static float maxBodyYawStep=0.f,maxAuxYawStep=0.f;
         static float maxCameraYawStep=0.f,maxAuxBodyGap=0.f;
         static float maxVisualCarCameraGap=0.f;
+        static float maxCameraConventionGap=0.f;
         static float maxSteering=0.f;
         static unsigned observations=0;
         if(lastPlayer!=player) {
@@ -772,7 +778,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             turnTracePositive=turnTraceNegative=0;
             turnTracePositiveQualified=turnTraceNegativeQualified=0;
             maxBodyYawStep=maxAuxYawStep=maxCameraYawStep=0.f;
-            maxAuxBodyGap=maxVisualCarCameraGap=maxSteering=0.f;
+            maxAuxBodyGap=maxVisualCarCameraGap=maxCameraConventionGap=
+                maxSteering=0.f;
         }
         const float bodyStepDeg=
             OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(bodyWord,prevBody);
@@ -793,6 +800,11 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         maxAuxBodyGap=(std::max)(maxAuxBodyGap,std::fabs(auxBodyDeg));
         maxVisualCarCameraGap=(std::max)(
             maxVisualCarCameraGap,std::fabs(visualCarCameraGapDeg));
+        const float cameraConventionGapDeg=
+            OutRunVR::QuestCockpitV2::YawRadiansStepDegrees(
+                visualCameraYaw,cameraLookYaw);
+        maxCameraConventionGap=(std::max)(
+            maxCameraConventionGap,std::fabs(cameraConventionGapDeg));
         maxSteering=(std::max)(maxSteering,std::fabs(
             OutRunVR::QuestCockpitV2::YawWordDeltaDegrees(steerWord,0)));
         const float steeringDeg=
@@ -853,16 +865,19 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 "maxCameraYawStepDeg={:.3f} "
                 "maxAuxBodyGapDeg={:.3f} auxMinusBodyDeg={:.3f} "
                 "maxVisualCarCameraGapDeg={:.3f} "
-                "visualCarCameraGapDeg={:.3f} interpAlpha={:.4f} "
+                "visualCarCameraGapDeg={:.3f} "
+                "maxCameraConventionGapDeg={:.3f} interpAlpha={:.4f} "
                 "maxSteerDeg={:.3f} speed={:.6f} f0RenderScope={}",
                 maxBodyYawStep,maxAuxYawStep,maxCameraYawStep,
                 maxAuxBodyGap,auxBodyDeg,maxVisualCarCameraGap,
-                visualCarCameraGapDeg,interpAlpha,maxSteering,speed,
+                visualCarCameraGapDeg,maxCameraConventionGap,
+                interpAlpha,maxSteering,speed,
                 Settings::VRQuestCockpitV2F0RenderScope.get());
             observations=0;
             maxB0Delta=maxF0Delta=maxCameraDelta=maxRelativeDelta=0.f;
             maxBodyYawStep=maxAuxYawStep=maxCameraYawStep=0.f;
-            maxAuxBodyGap=maxVisualCarCameraGap=maxSteering=0.f;
+            maxAuxBodyGap=maxVisualCarCameraGap=maxCameraConventionGap=
+                maxSteering=0.f;
         }
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)

@@ -126,7 +126,13 @@ assert "only in cockpit mode 1" in settings
 assert "ONLY in cockpit view" in overlay
 assert "RobotHook.ccall<void>(robot);" in render
 assert "SelectCockpitOccupantRender(" in render
-assert "ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);" in render
+assert "ScopedOriginalOccupantLod0 passengerVisible(true);" in render
+assert render.index("ScopedOriginalOccupantLod0 passengerVisible(true);") < render.index(
+    "if(OriginalRobotCorrectionActive())"
+)
+assert render.index("ScopedOriginalOccupantLod0 passengerVisible(true);") < render.index(
+    "if(!NativeFrameTrace().Active() || InSceneEffect())"
+)
 
 # One persistent bool drives two checkboxes; complement guarantees exactly
 # one selected even when an existing user INI supplies the older key.

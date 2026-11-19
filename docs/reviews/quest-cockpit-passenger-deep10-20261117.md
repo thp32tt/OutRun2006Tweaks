@@ -130,3 +130,19 @@ reused the already-captured session; no new Quest 3 visual claim is made.
   recovery still requires valid native frame + paired XR pose.
 - Driver W*C remains strict: nested, frame-uncertain or pose-uncertain driver
   paths continue to fail closed to original rendering.
+
+
+## 2026-11-19 camera-yaw diagnostic correction
+
+- Exact decomp `race_camera_angles_484df0` computes yaw as
+  `atan2(eye.x-target.x, eye.z-target.z)`. The existing probe used
+  `target-eye`, which is exactly 180 degrees opposite. This explains the
+  old log's impossible ~170-180 degree `maxVisualCarCameraGapDeg` values;
+  it was a diagnostic bug, not a rendered-camera transform.
+- Exact `pc_matrix_rotate_y` stores the car Z basis as
+  `{sin(theta), *, cos(theta)}`, so `atan2(B0._31,B0._33)` is retained.
+  New tested helpers encode both conventions and the probe also reports
+  `maxCameraConventionGapDeg` against the game's native +0x12C yaw.
+- No camera behavior was changed from this finding. The user's earlier
+  “camera turns first” report must be re-evaluated with corrected diagnostics
+  before altering the original mode-1 yaw producer.
