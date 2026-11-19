@@ -173,10 +173,10 @@ class DXT5OriginalProtection(unittest.TestCase):
             for original, actual in zip(source, decoded) for ch in range(3)
         ), 55)
 
-    def test_measured_72_error_korean_block_is_accepted(self):
-        # Exact failing Q055 block measured from the 2026-11-16 full HD run.
-        # Its saved BC3 color error peaks at 72/channel, with no protected
-        # source pixel outside the translated block.
+    def test_measured_above_old_64_error_korean_block_is_accepted(self):
+        # Exact first-failing Q055 block from the 2026-11-16 full HD run.
+        # In isolation its saved BC3 color error is 66/channel (> old 64);
+        # the full ROI probe peaks at 72. No protected source pixel is relaxed.
         desired = [
             (237, 249, 235, 253), (244, 253, 238, 253),
             (168, 217, 225, 253), (67, 166, 213, 253),
@@ -200,7 +200,8 @@ class DXT5OriginalProtection(unittest.TestCase):
             for ch in range(3)
         )
         self.assertEqual(bc.TRANSLATED_RGB_MAX_ERROR, 72)
-        self.assertEqual(max_error, 72)
+        self.assertGreater(max_error, 64)
+        self.assertLessEqual(max_error, 72)
         self.assertEqual(receipt['cosmetic_rgb_max_error'], 72)
 
     def test_measured_127_error_korean_block_still_holds(self):
