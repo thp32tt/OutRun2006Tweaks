@@ -1577,8 +1577,24 @@ class VrOriginalRaceSkyOwner final : public Hook
 
     static void __cdecl RaceSkyDisplayDest(void* work)
     {
-        OutRunVR::GameSemantic::ScopedExactProducerSemantic sky(
-            OutRunVR::GameSemantic::RenderScope::WorldSky);
+        using namespace OutRunVR::GameSemantic;
+        // An exact 4521C0 source must not consume a pending HUD/marker
+        // one-shot armed by an unrelated producer before this call.
+        ScopedExactProducerSemantic sky(
+            RenderScope::WorldSky,nullptr,true);
+        if(Settings::VRQuestCockpitV2SkyProbe) {
+            static std::atomic<std::uint64_t> sourceSamples{0};
+            const auto count=sourceSamples.fetch_add(
+                1,std::memory_order_relaxed)+1;
+            if(count<=24u || count%180u==0u)
+                spdlog::info(
+                    "VR SKY SOURCE OWNER: count={} thread={} "
+                    "effectiveScope={} producer={} queueActive={} "
+                    "exact={} pendingIsolated=1",
+                    count,GetCurrentThreadId(),Name(EffectiveScope()),
+                    Name(CurrentRenderProducerToken()),QueueRenderActive(),
+                    EffectiveScope()==RenderScope::WorldSky);
+        }
         ScopedQuestSkyTransitionProbe transitionProbe(work);
         RaceSkyDisplayHook.ccall<void>(work);
     }
@@ -1753,7 +1769,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     // 43FB40 is the original synchronous event-scene dispatcher. Keep only
     // top-of-stack ownership: a nested non-ROB scene must not inherit an
     // outer 0x80 proof. Overflow fails closed.
-    inline static thread_local std::array<bool,8> PassengerSceneOwnerStack{};
+    struct PassengerSceneEvidence final {
+        bool exact=false;
+        bool driverReached=false;
+        bool guestReached=false;
+    };
+    inline static thread_local std::array<PassengerSceneEvidence,8>
+        PassengerSceneOwnerStack{};
     inline static thread_local unsigned PassengerSceneOwnerDepth=0;
     inline static thread_local unsigned PassengerSceneOwnerOverflow=0;
     class ScopedPassengerSceneOwner final {
@@ -1761,7 +1783,8 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     public:
         explicit ScopedPassengerSceneOwner(bool exact) noexcept {
             if(PassengerSceneOwnerDepth<PassengerSceneOwnerStack.size()) {
-                PassengerSceneOwnerStack[PassengerSceneOwnerDepth++]=exact;
+                PassengerSceneOwnerStack[PassengerSceneOwnerDepth++]=
+                    PassengerSceneEvidence{exact,false,false};
                 pushed_=true;
             } else {
                 ++PassengerSceneOwnerOverflow;
@@ -1780,7 +1803,24 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static bool ExactPassengerSceneOwnerActive() noexcept {
         return PassengerSceneOwnerOverflow==0 &&
             PassengerSceneOwnerDepth!=0 &&
-            PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1];
+            PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1].exact;
+    }
+    static PassengerSceneEvidence CurrentPassengerSceneEvidence() noexcept {
+        if(PassengerSceneOwnerOverflow!=0 || PassengerSceneOwnerDepth==0)
+            return {};
+        return PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1];
+    }
+    static void NotePassengerSceneWrapper(
+        OutRunVR::QuestCockpitV2::OriginalOccupantSlot slot) noexcept {
+        if(PassengerSceneOwnerOverflow!=0 || PassengerSceneOwnerDepth==0)
+            return;
+        auto& evidence=PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1];
+        if(!evidence.exact)return;
+        if(slot==OutRunVR::QuestCockpitV2::OriginalOccupantSlot::Driver362)
+            evidence.driverReached=true;
+        else if(slot==
+            OutRunVR::QuestCockpitV2::OriginalOccupantSlot::Passenger363)
+            evidence.guestReached=true;
     }
 
     inline static std::uint64_t TraceCount=0;
@@ -1965,6 +2005,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const bool race=IsCockpitRacePhase();
         const bool cockpit=QuestCockpitV2Active(cam);
         const auto originalOwner=ExactOriginalCockpitOccupant(work);
+        NotePassengerSceneWrapper(originalOwner);
         const bool owner=originalOwner==OriginalOccupantSlot::Passenger363;
         if(!owner){
             if(originalOwner==OriginalOccupantSlot::Driver362)
@@ -2088,6 +2129,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             OriginalOccupantSlot::Passenger363;
         const auto after=PassengerGateThreadCalls;
         const auto afterDriver=DriverGateThreadCalls;
+        const auto sceneEvidence=CurrentPassengerSceneEvidence();
         const auto passCount=PassengerScenePasses.fetch_add(
             1,std::memory_order_relaxed)+1;
         if(PassengerTraceOn() && (passCount<=16u || passCount%180u==0u))
@@ -2098,7 +2140,8 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 "guestLive={} stereoReady={}",
                 passCount,NativeFrameTrace().ActiveEpoch(),mask,
                 driver->field_C,passenger->field_C,
-                afterDriver!=beforeDriver,after!=before,live,stereoReady);
+                sceneEvidence.driverReached,sceneEvidence.guestReached,
+                live,stereoReady);
         const bool recover=ShouldRecoverOriginalPassengerScenePass(
             Settings::VREnabled.get(),
             Settings::VRQuestCockpitV2Enabled.get(),
@@ -2106,7 +2149,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             QuestCockpitV2Active(cam) && race,cam->cam_mode_34A==1,
             live,ExactPassengerSceneOwnerActive(),
             mask,first,last,driver->field_C,passenger->field_C,
-            afterDriver!=beforeDriver,after!=before);
+            sceneEvidence.driverReached,sceneEvidence.guestReached);
         if(!recover)return;
         const auto count=PassengerSceneRestores.fetch_add(
             1,std::memory_order_relaxed)+1;
@@ -2118,7 +2161,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 "driverWrapperReached={} (not GPU proof)",
                 count,NativeFrameTrace().ActiveEpoch(),mask,
                 driver->field_C,passenger->field_C,before,after,
-                afterDriver!=beforeDriver);
+                sceneEvidence.driverReached);
         // A genuine live ROB02 native work pointer, same frame, same
         // verified 0x80 actor pass. No event allocation/flag/scene mutation.
         // This function calls the existing car-gate-aware original renderer.
@@ -2181,11 +2224,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 spdlog::info(
                     "VR PASSENGER NATIVE LOCK: count={} epoch={} "
                     "nativeWorkLocked=1 visibleScope={} frameActive={} "
-                    "stereoValid={} correctionOwnerActive={}",
+                    "stereoValid={} correctionOwnerActive={} "
+                    "workFlags=0x{:08X} robDisplayGateOpen={}",
                     count,frameEpochNow,OriginalOccupantLod0Active(),
                     NativeFrameTrace().Active(),
                     stereoNow&&stereoNow->valid&&stereoNow->poseSequence!=0,
-                    OriginalRobotCorrectionActive());
+                    OriginalRobotCorrectionActive(),robot->dword4,
+                    OriginalRobotDisplayGateOpen(robot->dword4));
             RobotHook.ccall<void>(robot);
             return;
         }
@@ -2547,6 +2592,31 @@ class VRLensFlareProjected2D : public Hook
         ScopedExactProducerSemantic queuedSkyScope(
             queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None,
             nullptr,true);
+
+        // The original ROB display queues rigid/skinned body nodes, then
+        // synchronously reaches 405890 -> 404700 before 514E60 returns.
+        // During exact ROB02 Follow mode, ScopedOriginalOccupantLod0 remains
+        // active across this call. This receipt is therefore the first proof
+        // that a passenger PMT entry reached the native physical-entry draw,
+        // rather than merely reaching event/cull callbacks.
+        const bool passengerPhysicalPmt=
+            entry && Settings::VRQuestCockpitV2PassengerVisible &&
+            OutRunVR::QuestCockpitV2::OriginalOccupantLod0Active();
+        if(passengerPhysicalPmt) {
+            static std::atomic<std::uint64_t> passengerPmtDraws{0};
+            const auto count=passengerPmtDraws.fetch_add(
+                1,std::memory_order_relaxed)+1;
+            if(count<=32u || count%180u==0u)
+                spdlog::info(
+                    "VR PASSENGER PHYSICAL PMT: count={} thread={} "
+                    "entry=0x{:X} object=0x{:08X} pass={} paletteCount={} "
+                    "matrix=0x{:X} node=0x{:X} mesh=0x{:X} "
+                    "scope={} queueActive={} authority=405890_404700",
+                    count,GetCurrentThreadId(),
+                    reinterpret_cast<std::uintptr_t>(entry),
+                    entry[14],entry[8],entry[2],entry[1],entry[6],entry[7],
+                    Name(EffectiveScope()),QueueRenderActive());
+        }
         const auto callOriginal=[&]() {
             if(queuedSkyIndex>=0 && entry) {
                 static std::atomic<std::uint64_t> skyDraws{0};
