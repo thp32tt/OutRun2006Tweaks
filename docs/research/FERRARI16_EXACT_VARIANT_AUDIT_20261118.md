@@ -65,3 +65,8 @@ Read [FERRARI13_PRIVATE_QA_AND_DEPLOY_20261118.md](FERRARI13_PRIVATE_QA_AND_DEPL
 ## 2026-11-19 physical white-screen BLOCKER (new uploaded real game logs)
 
 Before any Ferrari13 Quest3 QA claims, see [FERRARI13_WHITESCREEN_MENU_RECOVERY_MATCHEDHOST_20261119.md](FERRARI13_WHITESCREEN_MENU_RECOVERY_MATCHEDHOST_20261119.md). Original user log proved DLL loaded and menu Present >1024, camera 9/playerCar=0, stereo game frames=0, directReady=0, old host built against older revision. New fully bundled private D3D9-classic recovery test and optional 461 KB matched-host-only patch supplied, **not yet verified on the actual Quest 3**. The 13 exact-source model bytes have not changed and all prior 13/13 static QA remains, but *hardware VR completed=0* until physical proof. Do not score the same corrective work twice.
+
+
+## 2026-11-19 later cross-check — CadNav F430 MAX source quality gate
+
+See [FERRARI3_CADNAV_F430_MAX_IMPORT_QA_20261119.md](FERRARI3_CADNAV_F430_MAX_IMPORT_QA_20261119.md). An additional actual Ferrari F430 F1 Spider-labelled 3ds Max source was privately downloaded, imported with Blender 5.2.4 and exported as GLB; imported geometry contained 127 meshes / 115,091 mesh polygons, only one material and **zero texture images**, and the independent Blender render showed misaligned wheel/body components and elongated stray meshes. An alternate matrix import did not correct the misfit. The 527,622 advertised polygon count was not recovered by the importer. **Conversion technically succeeded, visual quality gate FAILED; no OVC4/default replacement, no Quest 3 PASS.** Keep 16/16 optional-inclusive exact-source candidates and 13/16 default high-quality exact slots unchanged. Source-only follow-up adds **0 AI2 points**.
