@@ -82,6 +82,8 @@ assert "workFlags=0x{:08X} robDisplayGateOpen={}" in hook
 assert "OriginalRobotDisplayGateOpen(robot->dword4)" in hook
 assert "VR PASSENGER PHYSICAL PMT:" in hook
 assert "authority=405890_404700" in hook
+assert "ScopedExactPassengerRender exactPassenger(true);" in hook
+assert "ExactPassengerRenderActive()" in hook
 assert "ScopedQuestSkyTransitionProbe" in hook
 assert "VR SKY TRANSITION PHASE:" in hook
 assert "RotationIndices" in hook

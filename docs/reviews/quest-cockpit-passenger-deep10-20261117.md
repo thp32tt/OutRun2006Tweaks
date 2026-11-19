@@ -459,3 +459,17 @@ runtime source verifier still required the retired expression
 `afterDriver!=beforeDriver,after!=before`. The verifier now requires the
 actual `sceneEvidence.driverReached/guestReached` handoff while retaining the
 old counters only as telemetry-presence checks.
+
+
+## 2026-11-19 exact ROB02 physical-PMT diagnostic scope
+
+The new 405890 passenger receipt originally keyed on
+`OriginalOccupantLod0Active()`. That scope is also used by the optional
+generic OccupantLod0 driver diagnostic, so an explicitly enabled LOD0 test
+could falsely label driver PMT entries as passenger evidence.
+
+A separate recursion-safe `ScopedExactPassengerRender` depth now brackets
+only the genuine live ROB02 Follow call. Passenger PMT-node logging and the
+405890->404700 physical-entry receipt require this exact scope in addition to
+the visibility scope. Rendering behavior is unchanged; this only prevents
+false-positive passenger evidence in future diagnostic logs.

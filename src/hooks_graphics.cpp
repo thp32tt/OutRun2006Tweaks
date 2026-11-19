@@ -1977,6 +1977,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         if(action==CockpitOccupantRender::OriginalPassengerForceVisible) {
             const auto* stereoNow=OutRunVRRenderer::GetLatchedStereoFrameView();
             const auto frameEpochNow=NativeFrameTrace().ActiveEpoch();
+            ScopedExactPassengerRender exactPassenger(true);
             ScopedOriginalOccupantLod0 passengerVisible(true);
             static thread_local std::uint64_t nativeLocks=0;
             const auto count=++nativeLocks;
@@ -2361,6 +2362,7 @@ class VRLensFlareProjected2D : public Hook
         // rather than merely reaching event/cull callbacks.
         const bool passengerPhysicalPmt=
             entry && Settings::VRQuestCockpitV2PassengerVisible &&
+            OutRunVR::QuestCockpitV2::ExactPassengerRenderActive() &&
             OutRunVR::QuestCockpitV2::OriginalOccupantLod0Active();
         if(passengerPhysicalPmt) {
             static std::atomic<std::uint64_t> passengerPmtDraws{0};
@@ -4171,7 +4173,8 @@ class DisableStageCulling : public Hook
             const DWORD passengerDiagLen=GetEnvironmentVariableA(
                 "OUTRUN_VR_PASSENGER_DIAG",passengerDiag,
                 static_cast<DWORD>(sizeof(passengerDiag)));
-            if(passengerDiagLen==1u && passengerDiag[0]=='1') {
+            if(passengerDiagLen==1u && passengerDiag[0]=='1' &&
+               OutRunVR::QuestCockpitV2::ExactPassengerRenderActive()) {
                 static thread_local std::uint64_t nodeSamples=0;
                 ++nodeSamples;
                 if(nodeSamples<=12u || nodeSamples%180u==0u) {
