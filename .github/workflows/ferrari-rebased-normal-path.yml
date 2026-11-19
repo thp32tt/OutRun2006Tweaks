@@ -64,6 +64,15 @@ jobs:
               'OriginalFallback'):
               assert marker in hook, marker
 
+          prep = hook.split('static F50ExternalDrawTicket PrepareF50External',1)[1].split(
+              'static bool DrawPreparedF50External',1)[0]
+          # Regression guard from the working single-F50 path: menu/loading
+          # callbacks must return before reading any player vehicle field.
+          assert prep.index('*Game::current_mode != STATE_GAME') < prep.index(
+              'const unsigned char carId=player->car_id_10')
+          assert prep.index('player != Game::pl_car()') < prep.index(
+              'const unsigned char carId=player->car_id_10')
+
           # The normal runner owns VR policy; modeling only adds its opt-in switches.
           for marker in (
               "QuestCockpitV2ReleaseParity",
