@@ -25,10 +25,20 @@ All sixteen cars should ultimately use **the actual named Ferrari body variant**
 
 | Car | Status | Concrete source candidates or blockers |
 |---|---|---|
-| Ferrari 328 GTS | **EXACT HQ SOURCE NOT ACQUIRED** | Existing 308/QV donor is NOT a 328. 88Cars3D offers a specifically named 328 GTS with modeled cabin/textures/.blend/.glb but lists **€10**, and actual downloaded mesh/license are not independently validated: https://88cars3d.com/product/ferrari-328-gts-3d-model/ . CGTrader SQUIR high-poly model appears paid: https://www.cgtrader.com/3d-models/car/sport-car/ferrari-328-gtb-gts-1985-1989 . 3D CAD Browser exact 328 GTS source requires a paid or qualifying uploads account: https://www.3dcadbrowser.com/3d-model/ferrari-328-gts-1985 . Old 2009 GTA SA ModDB 1.5MB model is not HQ and its original conversion lacked permission: https://www.moddb.com/downloads/ferrari-328gts . Sketchfab 328 GTB WIP model `cd5f7556028848e7b5d572134286a8e4` now explicitly disabled, also GTB rather than GTS. No exact free downloadable HQ full-cockpit model has been verified; do not fabricate one. |
+| Ferrari 328 GTS | **EXACT V4 OPTIONAL, HQ DEFAULT GAP** | 2026-11-19: the old ModDB exact 328 GTS GTA SA source was privately acquired and fully inspected rather than assumed unusable. After DFF/TXD import, damage/VLO/collision cleanup, four-wheel restoration, exact 2.350 m wheelbase alignment and ground fit, OVRCABH4 conversion independently PASSed at 66,391 triangles / 55,533 vertices / 44 groups / 12 materials, SHA256 `a4608bd0d9c8a4743cddd17a0306276fb10aa24628c5817ce0e2bced67058dd1`. It remains optional/private because redistribution permission is unverified and it is lower-detail than the 139,216-triangle 308/QV donor. Paid HQ candidates (88Cars3D, SQUIR/CGTrader, 3D CAD Browser) are still not automatically purchased. |
 | Ferrari 575 Superamerica | **EXACT V4 OPTIONAL, HQ DEFAULT GAP** | Exact Assetto Garage conversion technically PASS, only 51k triangles vs existing 575M donor 200k; not an automatic upgrade. Examine modern full 575/Superamerica source packs with provenance; no speculative promotion. |
 | Ferrari F430 Spider | **EXACT V4 OPTIONAL, HQ DEFAULT GAP** | The 2005 Spider exact personal OVC4 is 77,979 triangles vs 16M donor 565,172; keep donor as default until better exact-body source. Nexus 2007 F430 Spider Enhanced model explicitly prohibits conversion to other games (https://www.nexusmods.com/gta5enhanced/mods/820); exclude even if superior. |
 | Ferrari Testarossa Spider | **VARIANT AUDIT PENDING** | Existing GTA5 source lists generic 1987 Testarossa; original OutRun car is open Testarossa Spider. Need verify roof/door/seat geometry before marking exact. Avoid substituting a modern 2026 849 Testarossa or a roofed coupe. |
+
+## 2026-11-19 remaining-three source sweep and 328 exact OVC4
+
+- New detailed report: [FERRARI3_REMAINING_EXACT_SWEEP_20261119.md](FERRARI3_REMAINING_EXACT_SWEEP_20261119.md).
+- Machine evidence: `tools/car_importer/ferrari16_hq_batch/remaining3_exact_sweep_20261119.json`.
+- 328 GTS now has a verified exact private OVC4 candidate: 66,391 triangles, output SHA256 `a4608bd0d9c8a4743cddd17a0306276fb10aa24628c5817ce0e2bced67058dd1`. It is **not** promoted over the 139,216-triangle donor until an exact source also clears the no-quality-regression and Quest3 visual gates.
+- A newly downloaded NFS Shift-origin 575 Superamerica was parsed with Carbon-specific 144-byte mesh entries after rejecting an incorrect generic-parser overcount. The exact candidate does not exceed the already retained 51,444-triangle Assetto Garage exact OVC4 and therefore is not adopted.
+- A TDU-origin GTR2 F430 Spider source imported 29 GMT meshes successfully but remains below the already retained 77,979-triangle exact OVC4 and far below the 565,172-triangle 16M donor; no replacement.
+- Current accounting: **14/16 exact external private candidates exist if optional exact sources are counted, but the default high-quality exact package remains 13/16**. This distinction prevents a lower-detail exact model from silently replacing a stronger donor.
+- No new third-party model binary was committed to GitHub and no new Quest3 runtime PASS is claimed.
 
 ## Quality and permission policy
 
