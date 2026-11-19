@@ -222,6 +222,8 @@ jobs:
           assert 'RaceSkyObjectQueueRva = 0x56D0' in hook
           assert 'WorldSkyOpaqueQueue::RecordDeferred' in hook
           assert 'WorldSkyOpaqueQueue::Find(entry)' in hook
+          assert 'ScopedExactProducerSemantic queuedSkyScope(' in hook
+          assert 'queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None' in hook
           sky_owner=hook.split('class VrOriginalRaceSkyOwner final',1)[1].split('VrOriginalRaceSkyOwner VrOriginalRaceSkyOwner::instance',1)[0]
           assert sky_owner.index('RaceSkyDisplayHook=safetyhook::create_inline') < sky_owner.index('const bool queueSignatureOk=')
           assert '"VR WORLD SKY: 4056D0 hook unavailable; keeping "' in sky_owner
