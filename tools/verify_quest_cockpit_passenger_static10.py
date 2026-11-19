@@ -284,6 +284,14 @@ def pass_07_nested_draw_and_restore():
     check("base+0x50+byte" in hook and "base+0xe0+byte" in hook and
           "const auto* base=reinterpret_cast<const std::uint8_t*>(work);" in hook,
           "proven 4521C0 two-layer rotations are not observed read-only")
+    check("PhysicalEntryEdgesCanonical()" in hook and
+          "constexpr std::array<int,2> callRvas{{0x5A41,0x5C44}}" in hook and
+          "call[0]!=0xE8u" in hook and "target!=expectedTarget" in hook,
+          "deferred sky PMT ownership can hook unverified 405890 call edges")
+    check("queueSignatureOk && physicalEntryEdgesOk" in hook,
+          "4056D0 source tags can outlive an unverified physical PMT consumer")
+    check("physical PMT diagnostics/deferred WorldSky join disabled" in hook,
+          "PMT call-edge mismatch does not fail closed")
 
 def pass_08_f11_exclusive_and_search():
     for phrase in ("Passenger: Follow Camera 0", "Passenger: Remove"):
