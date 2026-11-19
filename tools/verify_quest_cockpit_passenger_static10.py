@@ -113,12 +113,14 @@ def pass_05_remove_scope_and_non_passenger():
         check(negative in source_test, "missing non-passenger/off negative case "+negative)
 
 def pass_06_goal_start_scene_boundaries():
-    racing = robot.split("const bool racing=Game::current_mode &&", 1)[1].split(
-        "const bool cockpitActive=", 1
+    race_helper = hook.split("static bool IsCockpitRacePhase() noexcept",1)[1].split(
+        "// Live Quest mode1 player glass hook",1
     )[0]
-    check("STATE_GAME" in racing and "STATE_START" in racing, "race states changed")
-    check("game_start_progress_code==65" in racing, "early START not gated")
-    check("STATE_GOAL" not in racing, "GOAL wrongly treats passenger removal as racing")
+    check("STATE_GAME" in race_helper and "STATE_START" in race_helper,
+          "race states changed")
+    check("game_start_progress_code==65" in race_helper, "early START not gated")
+    check("STATE_GOAL" not in race_helper,
+          "GOAL wrongly admitted by cockpit race helper")
     check("cockpitActive && racing" in robot, "racing+active proof not passed to hide")
     check("InSceneEffect()" in active, "scene effect not excluded from active cockpit")
     check_order(robot, "const bool racing=", "const bool cockpitActive=",
@@ -140,6 +142,13 @@ def pass_06_goal_start_scene_boundaries():
           "F0 identity scope can still admit GOAL")
     check("!IsPlayableCarGameplay()" not in player_cb,
           "F0 scope still uses GOAL-inclusive gameplay helper")
+    check(hook.count("const bool race=IsCockpitRacePhase();")==2,
+          "passenger car-gate/scene recovery race predicates drifted")
+    player_state=hook.split("static void PlayerState(SafetyHookContext& ctx)",1)[1].split(
+        "public:",1
+    )[0]
+    check("if(IsCockpitRacePhase() && QuestCockpitV2Active(cam) &&" in player_state,
+          "FullCar candidate flag can still be forced in GOAL")
 
 def pass_07_nested_draw_and_restore():
     check_order(robot, "ShouldSuppressOriginalPassenger(",
