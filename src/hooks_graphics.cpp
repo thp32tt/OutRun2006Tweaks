@@ -1279,10 +1279,173 @@ QuestCockpitV2NativeFrameProbe QuestCockpitV2NativeFrameProbe::instance;
 // both 0x90-byte sky layers, then Z on. Keep the semantic alive across the
 // original function so fixed-function and programmable sky draws cannot be
 // confused with pause/menu depth-off content or with the SkyGlow postprocess.
+namespace OutRunVR::WorldSkyOpaqueQueue
+{
+    // 4056D0 normally queues PMT nodes. 4521C0's semantic owner can therefore
+    // expire before 405890 -> 404700 physically draws them. Track the exact
+    // 0x3C PC descriptor + its 64-byte matrix and original node pass mask.
+    struct Mark final {
+        const std::uint32_t* entry=nullptr;
+        std::array<std::uint32_t,13> stable{};
+        std::uint64_t matrixHash=0;
+        std::uint8_t expectedPassMask=0;
+        std::uint8_t seenPassMask=0;
+    };
+    inline thread_local std::array<Mark,256> Marks{};
+    inline thread_local std::size_t MarkCount=0;
+    inline thread_local const std::uint8_t* LastStorage=nullptr;
+    inline constexpr std::array<std::size_t,13> StableWords{{
+        0u,1u,2u,3u,4u,5u,6u,7u,9u,10u,11u,13u,14u
+    }};
+
+    static std::uint64_t Hash64(const void* ptr,std::size_t bytes) noexcept {
+        const auto* p=static_cast<const std::uint8_t*>(ptr);
+        std::uint64_t h=1469598103934665603ull;
+        for(std::size_t i=0;i<bytes;++i) {
+            h^=p[i];
+            h*=1099511628211ull;
+        }
+        return h;
+    }
+    static bool Snapshot(const std::uint32_t* entry,Mark& out) noexcept {
+        if(!QuestCockpitGlassLive::Memory(entry,0x3cu))return false;
+        const auto matrix=reinterpret_cast<const void*>(
+            static_cast<std::uintptr_t>(entry[1]));
+        const auto node=reinterpret_cast<const std::uint32_t*>(
+            static_cast<std::uintptr_t>(entry[6]));
+        if(!QuestCockpitGlassLive::Memory(matrix,64u) ||
+           !QuestCockpitGlassLive::Memory(node,sizeof(std::uint32_t)))
+            return false;
+        const auto expected=static_cast<std::uint8_t>(*node&3u);
+        if(expected==0u)return false;
+        out={};
+        out.entry=entry;
+        for(std::size_t i=0;i<StableWords.size();++i)
+            out.stable[i]=entry[StableWords[i]];
+        out.matrixHash=Hash64(matrix,64u);
+        out.expectedPassMask=expected;
+        return true;
+    }
+    static bool SameIdentity(const Mark& mark,
+                             const std::uint32_t* entry) noexcept {
+        Mark now{};
+        if(!Snapshot(entry,now) || now.matrixHash!=mark.matrixHash)
+            return false;
+        for(std::size_t i=0;i<StableWords.size();++i)
+            if(now.stable[i]!=mark.stable[i])return false;
+        return true;
+    }
+    static void Remove(std::size_t index) noexcept {
+        if(index>=MarkCount)return;
+        Marks[index]=Marks[--MarkCount];
+        Marks[MarkCount]={};
+    }
+    static void RecordDeferred(std::uint32_t objectId,
+                               std::uint32_t beforeCount) noexcept {
+        const auto* q=Module::exe_ptr<const std::uint32_t>(0x464ef8);
+        if(!QuestCockpitGlassLive::Memory(q,7u*sizeof(std::uint32_t)))return;
+        const auto afterCount=q[0],capacity=q[1];
+        const auto storage=reinterpret_cast<const std::uint8_t*>(
+            static_cast<std::uintptr_t>(q[5]));
+        if(afterCount<=beforeCount || afterCount>capacity ||
+           capacity>0x100u || afterCount>0x100u || !storage)return;
+        if(!QuestCockpitGlassLive::Memory(
+               storage,static_cast<std::size_t>(afterCount)*0x3cu))return;
+
+        // The opaque queue is one 0x100-entry ring/storage block. A storage
+        // replacement invalidates every saved native pointer. Within the same
+        // block, slots >= the exact pre-call count are inactive before this
+        // 4056D0 and any old marks there are stale. Prune them before tagging
+        // newly appended entries so missed/disabled 405890 passes cannot
+        // accumulate provenance indefinitely.
+        if(LastStorage!=storage) {
+            Marks.fill({});
+            MarkCount=0;
+            LastStorage=storage;
+        } else {
+            const auto begin=reinterpret_cast<std::uintptr_t>(storage);
+            const auto activeEnd=begin+
+                static_cast<std::uintptr_t>(beforeCount)*0x3cu;
+            const auto storageEnd=begin+
+                static_cast<std::uintptr_t>(capacity)*0x3cu;
+            for(std::size_t i=0;i<MarkCount;) {
+                const auto p=reinterpret_cast<std::uintptr_t>(Marks[i].entry);
+                if(p>=begin && p<storageEnd && p>=activeEnd) {
+                    Remove(i);
+                    continue;
+                }
+                ++i;
+            }
+        }
+
+        for(std::uint32_t k=beforeCount;k<afterCount;++k) {
+            const auto* entry=reinterpret_cast<const std::uint32_t*>(
+                storage+static_cast<std::size_t>(k)*0x3cu);
+            if(entry[14]!=objectId)continue;
+            Mark mark{};
+            if(!Snapshot(entry,mark))continue;
+            std::size_t slot=MarkCount;
+            for(std::size_t i=0;i<MarkCount;++i)
+                if(Marks[i].entry==entry) {slot=i;break;}
+            if(slot==MarkCount) {
+                if(MarkCount>=Marks.size()) {
+                    static bool warned=false;
+                    if(!warned) {
+                        warned=true;
+                        spdlog::warn(
+                            "VR SKY OPAQUE QUEUE: provenance table full; "
+                            "failing closed to generic world");
+                    }
+                    continue;
+                }
+                ++MarkCount;
+            }
+            Marks[slot]=mark;
+            static std::atomic<std::uint64_t> tags{0};
+            const auto count=tags.fetch_add(1,std::memory_order_relaxed)+1;
+            if(Settings::VRQuestCockpitV2SkyProbe &&
+               (count<=24u || count%180u==0u))
+                spdlog::info(
+                    "VR SKY OPAQUE QUEUE TAG: count={} thread={} "
+                    "object=0x{:08X} queueIndex={} entry=0x{:X} "
+                    "expectedPassMask=0x{:X} matrixHash=0x{:016X} "
+                    "activeMarks={}",
+                    count,GetCurrentThreadId(),objectId,k,
+                    reinterpret_cast<std::uintptr_t>(entry),
+                    static_cast<unsigned>(mark.expectedPassMask),
+                    static_cast<unsigned long long>(mark.matrixHash),
+                    MarkCount);
+        }
+    }
+    static std::int32_t Find(const std::uint32_t* entry) noexcept {
+        if(!entry)return -1;
+        for(std::size_t i=0;i<MarkCount;) {
+            if(Marks[i].entry!=entry) {++i;continue;}
+            if(!SameIdentity(Marks[i],entry)) {
+                Remove(i);
+                return -1;
+            }
+            return static_cast<std::int32_t>(i);
+        }
+        return -1;
+    }
+    static void Complete(std::int32_t index,std::uint32_t pass) noexcept {
+        if(index<0 || static_cast<std::size_t>(index)>=MarkCount ||
+           pass>1u)return;
+        auto& mark=Marks[static_cast<std::size_t>(index)];
+        mark.seenPassMask=static_cast<std::uint8_t>(
+            mark.seenPassMask | (1u<<pass));
+        if((mark.seenPassMask&mark.expectedPassMask)==mark.expectedPassMask)
+            Remove(static_cast<std::size_t>(index));
+    }
+}
+
 class VrOriginalRaceSkyOwner final : public Hook
 {
     static constexpr int RaceSkyDisplayRva = 0x521C0;
+    static constexpr int RaceSkyObjectQueueRva = 0x56D0;
     inline static SafetyHookInline RaceSkyDisplayHook{};
+    inline static SafetyHookInline RaceSkyObjectQueueHook{};
 
     // Original 4521C0 deliberately overlaps two 0x90-byte sky records
     // while race_sky_step_451e90 cross-fades course skies. The 9a0fbde3
@@ -1422,6 +1585,32 @@ class VrOriginalRaceSkyOwner final : public Hook
             const ScopedQuestSkyTransitionRotationLock&)=delete;
     };
 
+    static void __cdecl RaceSkyObjectQueueDest(
+        std::uint32_t objectId,std::uint32_t value,
+        std::uint32_t colour,std::int32_t colourByte)
+    {
+        const bool exactSky=
+            OutRunVR::GameSemantic::EffectiveScope()==
+            OutRunVR::GameSemantic::RenderScope::WorldSky;
+        std::uint32_t beforeCount=0;
+        bool queueSnapshotValid=false;
+        if(exactSky) {
+            const auto* q=Module::exe_ptr<const std::uint32_t>(0x464ef8);
+            if(QuestCockpitGlassLive::Memory(
+                   q,7u*sizeof(std::uint32_t))) {
+                beforeCount=q[0];
+                queueSnapshotValid=true;
+            }
+        }
+        RaceSkyObjectQueueHook.ccall<void>(
+            objectId,value,colour,colourByte);
+        // Missing pre-count is not "zero". Without the exact before/after
+        // queue boundary, fail closed rather than tagging older opaque nodes.
+        if(exactSky && queueSnapshotValid)
+            OutRunVR::WorldSkyOpaqueQueue::RecordDeferred(
+                objectId,beforeCount);
+    }
+
     static void __cdecl RaceSkyDisplayDest(void* work)
     {
         OutRunVR::GameSemantic::ScopedExactProducerSemantic sky(
@@ -1452,6 +1641,11 @@ public:
             0x54,0xF0,0xFB,0xFF,0x50,0xE8,0xBE,0x7D,
             0xFB,0xFF,0xA1,0x60,0xBD,0x89,0x00,0x8B
         }};
+        constexpr std::array<std::uint8_t,24> objectQueueSignature{{
+            0x51,0x55,0x8B,0x6C,0x24,0x0C,0x83,0xFD,
+            0xFF,0x0F,0x84,0x3F,0x01,0x00,0x00,0x56,
+            0x8B,0xC5,0xC1,0xE8,0x10,0x8B,0xF5,0x50
+        }};
         auto* entry=Module::exe_ptr<std::uint8_t>(RaceSkyDisplayRva);
         MEMORY_BASIC_INFORMATION info{};
         if(!entry ||
@@ -1469,7 +1663,49 @@ public:
             spdlog::warn("VR WORLD SKY: failed to hook original 4521C0");
             return false;
         }
-        spdlog::info("VR WORLD SKY: exact original 4521C0 owner installed; two sky layers use rotation-only stereo");
+
+        // Deferred 4056D0 provenance is an enhancement, not permission to
+        // disable the already-proven 4521C0 owner. Another mod may legally
+        // occupy this shared renderer leaf. In that case retain exact sky
+        // source ownership/rotation repair and fail closed only for deferred
+        // provenance: queued nodes fall back to the existing generic route.
+        bool deferredProvenance=false;
+        auto* objectQueueEntry=
+            Module::exe_ptr<std::uint8_t>(RaceSkyObjectQueueRva);
+        MEMORY_BASIC_INFORMATION queueInfo{};
+        const bool queueSignatureOk=
+            objectQueueEntry &&
+            VirtualQuery(objectQueueEntry,&queueInfo,sizeof(queueInfo))==
+                sizeof(queueInfo) &&
+            queueInfo.State==MEM_COMMIT &&
+            !(queueInfo.Protect&PAGE_GUARD) &&
+            !(queueInfo.Protect&PAGE_NOACCESS) &&
+            reinterpret_cast<std::uintptr_t>(objectQueueEntry)+
+                objectQueueSignature.size() <=
+             reinterpret_cast<std::uintptr_t>(queueInfo.BaseAddress)+
+                queueInfo.RegionSize &&
+            std::equal(objectQueueSignature.begin(),
+                       objectQueueSignature.end(),objectQueueEntry);
+        if(queueSignatureOk) {
+            auto objectQueue=safetyhook::create_inline(
+                objectQueueEntry,RaceSkyObjectQueueDest);
+            if(objectQueue) {
+                RaceSkyObjectQueueHook=std::move(objectQueue);
+                deferredProvenance=true;
+            } else {
+                spdlog::warn(
+                    "VR WORLD SKY: 4056D0 hook unavailable; keeping "
+                    "4521C0 owner, deferred sky provenance disabled");
+            }
+        } else {
+            spdlog::warn(
+                "VR WORLD SKY: canonical 4056D0 signature mismatch; keeping "
+                "4521C0 owner, deferred sky provenance disabled");
+        }
+        spdlog::info(
+            "VR WORLD SKY: exact 4521C0 owner installed; "
+            "deferredOpaqueProvenance={} two sky layers use rotation-only stereo",
+            deferredProvenance);
         return true;
     }
 
@@ -1549,6 +1785,40 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     inline static thread_local std::uint64_t DriverGateThreadCalls=0;
     inline static std::atomic<std::uint64_t> PassengerGateRestores{0};
     inline static thread_local bool PassengerGateBypassInFlight=false;
+
+    // 43FB40 is the original synchronous event-scene dispatcher. Keep only
+    // top-of-stack ownership: a nested non-ROB scene must not inherit an
+    // outer 0x80 proof. Overflow fails closed.
+    inline static thread_local std::array<bool,8> PassengerSceneOwnerStack{};
+    inline static thread_local unsigned PassengerSceneOwnerDepth=0;
+    inline static thread_local unsigned PassengerSceneOwnerOverflow=0;
+    class ScopedPassengerSceneOwner final {
+        bool pushed_=false;
+    public:
+        explicit ScopedPassengerSceneOwner(bool exact) noexcept {
+            if(PassengerSceneOwnerDepth<PassengerSceneOwnerStack.size()) {
+                PassengerSceneOwnerStack[PassengerSceneOwnerDepth++]=exact;
+                pushed_=true;
+            } else {
+                ++PassengerSceneOwnerOverflow;
+            }
+        }
+        ~ScopedPassengerSceneOwner() noexcept {
+            if(!pushed_) {
+                if(PassengerSceneOwnerOverflow) --PassengerSceneOwnerOverflow;
+                return;
+            }
+            if(PassengerSceneOwnerDepth) --PassengerSceneOwnerDepth;
+        }
+        ScopedPassengerSceneOwner(const ScopedPassengerSceneOwner&)=delete;
+        ScopedPassengerSceneOwner& operator=(const ScopedPassengerSceneOwner&)=delete;
+    };
+    static bool ExactPassengerSceneOwnerActive() noexcept {
+        return PassengerSceneOwnerOverflow==0 &&
+            PassengerSceneOwnerDepth!=0 &&
+            PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1];
+    }
+
     inline static std::uint64_t TraceCount=0;
     inline static thread_local OutRunVR::QuestCockpitV2::FrameOwner OccupantOwner{};
 
@@ -1742,26 +2012,39 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const auto calls=PassengerGateCalls.fetch_add(
             1,std::memory_order_relaxed)+1;
         const auto flags=car->flags_4;
-        // The original game's event callback can also run outside a verified
-        // native render frame. Never force an extra 487880 call in that case.
+        // This exact 4879B0 callback is already inside the original 43FB40
+        // scene dispatcher when sceneOwner is true. That synchronous native
+        // ownership is sufficient to forward the existing ROB02 to 487880;
+        // XR frame/pose readiness remains diagnostic only and must not make
+        // the passenger disappear during race startup.
         const bool frameReady=NativeFrameTrace().Active();
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const bool stereoReady=stereo&&stereo->valid&&
             stereo->poseSequence!=0;
+        const bool sceneOwner=ExactPassengerSceneOwnerActive();
+        // The 43FB40 hook is intentionally optional/fail-closed. Do not make
+        // its absence disable the older proven recovery altogether: only when
+        // that hook is NOT installed may the previous frame+paired-XR proof
+        // stand in for scene ownership. When 43FB40 is installed, no weaker
+        // fallback can override its exact top-of-stack result.
+        const bool legacyFrameOwner=
+            !PassengerSceneHook && frameReady && stereoReady;
+        const bool renderOwner=sceneOwner || legacyFrameOwner;
         const bool restore=ShouldBypassPassengerCarDisplayGate(
             Settings::VREnabled.get(),
             Settings::VRQuestCockpitV2Enabled.get(),
             Settings::VRQuestCockpitV2PassengerVisible.get(),
-            cockpit && race && frameReady && stereoReady,
+            cockpit && race && renderOwner,
             cam->cam_mode_34A==1,owner,flags);
         if(PassengerTraceOn() && (calls<=16u || calls%180u==0u))
             spdlog::info(
                 "VR PASSENGER CAR GATE: calls={} carFlags=0x{:08X} "
                 "nativeGate={} restore={} cam={} race={} active={} "
+                "sceneOwner={} legacyFrameOwner={} "
                 "frameReady={} stereoReady={}",
                 calls,flags,(flags&0xc000u)==0x4000u,restore,
                 static_cast<int>(cam->cam_mode_34A),race,cockpit,
-                frameReady,stereoReady);
+                sceneOwner,legacyFrameOwner,frameReady,stereoReady);
         if(!restore){original();return;}
         // Directly invoke the native common ROB renderer (487880), which
         // calls our existing 514E60 original-robot hook for same verified
@@ -1809,10 +2092,16 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static void __cdecl PassengerEventSceneDisplay(
         std::uint32_t mask,std::int32_t first,std::int32_t last) {
         using namespace OutRunVR::QuestCockpitV2;
+        const bool exactRobScene=
+            mask==OriginalRobDisplayLayer &&
+            first<=static_cast<std::int32_t>(OriginalPassengerEventId) &&
+            last>=static_cast<std::int32_t>(OriginalPassengerEventId);
+        ScopedPassengerSceneOwner sceneOwner(exactRobScene);
         const auto before=PassengerGateThreadCalls;
         const auto beforeDriver=DriverGateThreadCalls;
         // Always dispatch unmodified original scene first. The fallback is
-        // never allowed to replace the native event display loop.
+        // never allowed to replace the native event display loop. Keep the
+        // exact 0x80 owner live across both original dispatch and recovery.
         PassengerSceneHook.ccall<void>(mask,first,last);
         if(mask!=OriginalRobDisplayLayer || first>static_cast<std::int32_t>(
                OriginalPassengerEventId) ||
@@ -1820,7 +2109,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
            !Settings::VREnabled || !Settings::VRQuestCockpitV2Enabled ||
            !Settings::VRQuestCockpitV2PassengerVisible ||
            !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
-           !NativeFrameTrace().Active() || InSceneEffect())return;
+           !ExactPassengerSceneOwnerActive() || InSceneEffect())return;
         const auto* cam=Game::camera();
         if(!cam || cam->cam_mode_34A!=1 || !Game::pl_car())return;
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
@@ -1851,7 +2140,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             Settings::VRQuestCockpitV2Enabled.get(),
             Settings::VRQuestCockpitV2PassengerVisible.get(),
             QuestCockpitV2Active(cam) && race,cam->cam_mode_34A==1,
-            live,NativeFrameTrace().Active(),stereoReady,
+            live,ExactPassengerSceneOwnerActive(),
             mask,first,last,driver->field_C,passenger->field_C,
             afterDriver!=beforeDriver,after!=before);
         if(!recover)return;
@@ -2282,6 +2571,33 @@ class VRLensFlareProjected2D : public Hook
         const std::uint32_t* entry)
     {
         using namespace OutRunVR::GameSemantic;
+        const auto queuedSkyIndex=
+            OutRunVR::WorldSkyOpaqueQueue::Find(entry);
+        ScopedRenderSemantic queuedSkyScope(
+            queuedSkyIndex>=0 ? RenderScope::WorldSky : CurrentScope);
+        const auto callOriginal=[&]() {
+            if(queuedSkyIndex>=0 && entry) {
+                static std::atomic<std::uint64_t> skyDraws{0};
+                const auto count=skyDraws.fetch_add(
+                    1,std::memory_order_relaxed)+1;
+                if(Settings::VRQuestCockpitV2SkyProbe &&
+                   (count<=24u || count%180u==0u))
+                    spdlog::info(
+                        "VR SKY OPAQUE QUEUE DRAW: count={} thread={} "
+                        "entry=0x{:X} object=0x{:08X} pass={} "
+                        "effectiveScope={} producer={} queueActive={} "
+                        "scope=WORLD_SKY_4521C0",
+                        count,GetCurrentThreadId(),
+                        reinterpret_cast<std::uintptr_t>(entry),
+                        entry[14],entry[8],Name(EffectiveScope()),
+                        Name(CurrentRenderProducerToken()),
+                        QueueRenderActive());
+            }
+            Module::fn_ptr<LensOpaquePmtEntryFn>(0x4700)(entry);
+            if(queuedSkyIndex>=0 && entry)
+                OutRunVR::WorldSkyOpaqueQueue::Complete(
+                    queuedSkyIndex,entry[8]);
+        };
         const auto projectedFlush =
             OutRunVR::ProjectedLens::CurrentInlineFlush;
         OutRunVR::ProjectedLens::InlinePmtReceipt projectedPmt{};
@@ -2322,7 +2638,7 @@ class VRLensFlareProjected2D : public Hook
         if (!entry || flush.serial == 0 ||
             !Settings::VREnabled || !Settings::VRTelemetry)
         {
-            Module::fn_ptr<LensOpaquePmtEntryFn>(0x4700)(entry);
+            callOriginal();
             return;
         }
 
@@ -2374,7 +2690,7 @@ class VRLensFlareProjected2D : public Hook
             flush.sourceSerial, flush.sequence, flush.objectId,
             static_cast<unsigned>(flush.ordinal));
 
-        Module::fn_ptr<LensOpaquePmtEntryFn>(0x4700)(entry);
+        callOriginal();
 
         LARGE_INTEGER postQpc{};
         QueryPerformanceCounter(&postQpc);
