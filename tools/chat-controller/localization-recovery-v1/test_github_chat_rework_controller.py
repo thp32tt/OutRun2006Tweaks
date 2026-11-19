@@ -757,3 +757,38 @@ class SlowChatUiRecoveryTests(unittest.IsolatedAsyncioTestCase):
   self.assertIn("data-radix-popper-content-wrapper",source)
   self.assertIn('"create an image"',source)
   self.assertIn('button[aria-pressed="true"]',source)
+
+
+class ForcedFreshTabRecoveryTests(unittest.IsolatedAsyncioTestCase):
+ async def test_force_fresh_role_page_replaces_responsive_bad_ui_tab(self):
+  bridge=c.ChatBridge(MagicMock(),MagicMock())
+  bridge.ensure_context=AsyncMock()
+  old=MagicMock()
+  old.is_closed.return_value=False
+  old.close=AsyncMock()
+  fresh=MagicMock()
+  fresh.is_closed.return_value=False
+  fresh.goto=AsyncMock()
+  fresh.evaluate=AsyncMock(return_value="complete")
+  textbox=MagicMock()
+  textbox.wait_for=AsyncMock()
+  locator=MagicMock()
+  locator.first=textbox
+  fresh.locator.return_value=locator
+  context=MagicMock()
+  context.new_page=AsyncMock(return_value=fresh)
+  bridge.context=context
+  bridge.pages["A"]=old
+  result=await bridge.force_fresh_role_page("A",c.PROJECT_URL)
+  self.assertEqual(result,"BROWSER_FORCED_FRESH_TAB_READY")
+  self.assertIs(bridge.pages["A"],fresh)
+  fresh.goto.assert_awaited_once()
+  textbox.wait_for.assert_awaited_once()
+  old.close.assert_awaited_once()
+
+ def test_submit_escalates_to_forced_fresh_tab_before_retry_state(self):
+  import inspect
+  source=inspect.getsource(c.ChatBridge.submit_producer)
+  self.assertIn("force_fresh_role_page",source)
+  self.assertLess(source.index("force_fresh_role_page"),
+                  source.index("image_tool_retry_count"))
