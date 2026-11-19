@@ -184,6 +184,9 @@ def pass_07_nested_draw_and_restore():
           "fixed original sky can still switch between native/fallback bases")
     check("VR SKY COHERENT BASIS:" in sky,
           "sky-headset basis diagnostics unavailable")
+    check("VR SKY NONEXACT DEPTH-OFF:" in sky and
+          "shaderNonSkyDepthOffDraws={}" in sky,
+          "one-per-present non-exact depth-off world draw remains unidentified")
     scene=hook.split("static void __cdecl PassengerEventSceneDisplay(",1)[1].split(
         "static void __cdecl RobotDisplay(",1)[0]
     check_order(scene,"PassengerSceneHook.ccall<void>(mask,first,last);",
