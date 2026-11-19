@@ -436,3 +436,17 @@ resolved exact ROB01/ROB02 identity only into the current exact 0x80 frame.
 Post-pass recovery consumes those frame-local bits; thread counters remain
 telemetry only. A nested scene therefore cannot suppress or duplicate recovery
 for its parent pass.
+
+
+## 2026-11-19 v0.03 packaging version-gate audit
+
+A static release-path audit found the public v0.03 packaging step still tested
+`VR_RELEASE_VERSION.txt` against `v0.02` even though the version file is
+already `OutRun 2006 VR v0.03 Beta`. On the dedicated release branch this
+would make packaging fail deterministically before publication.
+
+The packaging regex now requires `v0.03`. The launcher/release verifier also
+checks both the version file and workflow text, and explicitly rejects the
+stale `v0.02` predicate. This only repairs the dormant release gate; the
+current debug branch still does not publish v0.03 and HMD passenger/sky
+confirmation remains required first.

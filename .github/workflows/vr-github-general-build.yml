@@ -616,7 +616,7 @@ jobs:
           foreach($requiredDefault in @('QuestCockpitV2SeatBack = -0.08','QuestCockpitV2SeatDown = 0.08','QuestCockpitV2SeatRight = 0.0')) {
             if(!$releaseIni.Contains($requiredDefault)){throw "v0.03 cockpit default missing: $requiredDefault"}
           }
-          if((Get-Content -LiteralPath (Join-Path $release 'VR_RELEASE_VERSION.txt') -Raw) -notmatch 'v0\.02'){throw 'VR_RELEASE_VERSION.txt is not v0.03'}
+          if((Get-Content -LiteralPath (Join-Path $release 'VR_RELEASE_VERSION.txt') -Raw) -notmatch 'v0\.03'){throw 'VR_RELEASE_VERSION.txt is not v0.03'}
           foreach($pe in @('dinput8.dll','outrun-vr-host.exe','OR2006C2C.EXE')) {
             $bytes=[IO.File]::ReadAllBytes((Join-Path $release $pe))
             if($bytes.Length -lt 256 -or $bytes[0] -ne 0x4d -or $bytes[1] -ne 0x5a){throw "invalid PE payload in v0.03: $pe"}
