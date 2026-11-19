@@ -50,6 +50,27 @@ inline constexpr bool OriginalRobotDisplayGateOpen(
     return (workFlags&0x8000u)!=0u &&
         !((workFlags&0x08u)!=0u && (workFlags&0x04u)==0u);
 }
+// Exact physical passenger provenance is narrower than the shared occupant
+// LOD0/visibility scope: a user can enable generic OccupantLod0 for driver
+// diagnostics too. Keep a recursion-safe depth only around the genuine live
+// ROB02 Follow call so 405890 receipts cannot be mislabeled as passenger.
+inline thread_local unsigned ExactPassengerRenderDepth=0;
+class ScopedExactPassengerRender final {
+    bool active_=false;
+public:
+    explicit ScopedExactPassengerRender(bool exactPassenger) noexcept
+        :active_(exactPassenger) {
+        if(active_)++ExactPassengerRenderDepth;
+    }
+    ~ScopedExactPassengerRender() noexcept {
+        if(active_ && ExactPassengerRenderDepth!=0)--ExactPassengerRenderDepth;
+    }
+    ScopedExactPassengerRender(const ScopedExactPassengerRender&)=delete;
+    ScopedExactPassengerRender& operator=(const ScopedExactPassengerRender&)=delete;
+};
+inline bool ExactPassengerRenderActive() noexcept {
+    return ExactPassengerRenderDepth!=0;
+}
 inline constexpr std::uint32_t OriginalStartAfterPassengerEventId=0x16cu;
 inline constexpr std::uint32_t OriginalStartAfterPassengerFunctionId=0x3bu;
 // The caller must pass an exact LIVE original ROB02 owner, established
