@@ -62,6 +62,8 @@ assert "RaceSkyObjectQueueRva = 0x56D0" in hook
 assert "WorldSkyOpaqueQueue::RecordDeferred" in hook
 assert "WorldSkyOpaqueQueue::Find(entry)" in hook
 assert "ScopedExactProducerSemantic queuedSkyScope(" in hook
+assert "VR SKY SOURCE OWNER:" in hook
+assert "RenderScope::WorldSky,nullptr,true" in hook
 assert "queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None" in hook
 assert "nullptr,true" in hook
 copyrun = Path("QuestCockpit-CopyRun.ps1").read_text(encoding="utf-8")

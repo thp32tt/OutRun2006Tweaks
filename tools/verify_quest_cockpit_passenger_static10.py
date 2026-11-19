@@ -203,6 +203,10 @@ def pass_07_nested_draw_and_restore():
           "queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None" in hook and
           "nullptr,true" in hook,
           "deferred sky physical draw can inherit stale queue/pending semantic")
+    check("VR SKY SOURCE OWNER:" in hook and
+          "RenderScope::WorldSky,nullptr,true" in hook and
+          "pendingIsolated=1" in hook,
+          "exact 4521C0 source can consume an unrelated pending one-shot")
     check("RaceSkyObjectQueueRva = 0x56D0" in hook and
           "WorldSkyOpaqueQueue::RecordDeferred" in hook and
           "WorldSkyOpaqueQueue::Find(entry)" in hook,
