@@ -1204,7 +1204,6 @@ namespace OutRunVR::WorldSkyOpaqueQueue
         if((mark.seenPassMask&mark.expectedPassMask)==mark.expectedPassMask)
             Remove(static_cast<std::size_t>(index));
     }
-}
 
     // Exact retail 405890 -> 404700 call edges. Deferred WorldSky
     // provenance is useful only if the physical PMT consumer is the canonical
@@ -1243,12 +1242,10 @@ class VrOriginalRaceSkyOwner final : public Hook
     // so a camera-1-only repair misses the reported first-stage/low-speed
     // window. Keep the original flags, object IDs and alpha transition intact.
     //
-    // Only when BOTH records are actually drawable and their 3x3 rotations
-    // differ, temporarily give the fading old record the destination record's
-    // nine orientation words for the synchronous 4521C0 draw. Exact 40A190
-    // consumes only those nine words; restore them immediately afterwards.
-    // This targets relative counter-motion without deleting a sky layer or
-    // mutating the race-sky state machine.
+    // Observe both records exactly as authored. Different old/new 3x3
+    // rotations are part of the game's native course-sky cross-fade and are
+    // not modified. The probe only reports phase/rotation evidence so the HMD
+    // log can be correlated with the deferred WorldSky PMT ownership fix.
     class ScopedQuestSkyTransitionProbe final
     {
         inline static constexpr std::array<std::size_t,9> RotationIndices{{
