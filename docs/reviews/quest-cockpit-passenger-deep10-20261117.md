@@ -200,3 +200,129 @@ projection signature. The 90-Present summary also reports
 change stereo routing. A next HMD log can therefore distinguish native two-sky
 overlap from an independent depth-off producer without another instrumentation
 build.
+
+
+## 2026-11-19 exact 43FB40 scene owner replaces XR startup gate
+
+A deeper call-order audit found one remaining passenger-startup gap. Original
+PC `event_display_43fb40` synchronously invokes each live event callback for
+the requested layer; canonical ROB01/ROB02 both use layer `0x80`. Therefore
+when the hooked native `4879B0` ROB02 callback is reached inside that exact
+43FB40 invocation, the game has already proven the frame-scene owner.
+
+The previous car-gate recovery still additionally required
+`NativeFrameTrace().Active()` and a published XR pose before forwarding the
+existing live passenger to `487880`. During startup that can make the real
+ROB02 callback return without ever reaching `514E60`, so the later native
+matrix + visible/LOD0 lock cannot help.
+
+A bounded thread-local top-of-stack RAII owner now tracks only the exact
+43FB40 `0x80` pass whose range contains ROB02. A nested non-ROB scene does not
+inherit the proof and stack overflow fails closed. The existing live-event,
+callback pointer, native work pointer, mode-1, racing cockpit, Follow and
+scene-effect checks remain. Frame/XR readiness is retained as diagnostics but
+no longer grants or denies this already-native draw. The post-43FB40 scene
+recovery uses the same exact owner. Camera 0, Remove, GOAL and non-ROB layers
+remain original/fail-closed.
+
+This specifically closes a path that could explain "passenger absent for the
+first few seconds" even after the later 514E60 native-lock fix. HMD pixels are
+still unverified.
+
+
+## 2026-11-19 exact deferred 4521C0 sky provenance
+
+The previous non-exact depth-off discriminator led to a stronger static
+finding. Exact PC decomp shows `race_sky_object_452080` calls `4056D0`.
+`4056D0` calls `405360`, which normally appends PMT node descriptors to
+opaque queue `0x864EF8`; only when `8999B0` immediate mode is armed does
+the queue flush before `4056D0` returns. Ordinary physical rendering occurs
+later in `405890 -> 404700`.
+
+Therefore a simple semantic scope around `4521C0` cannot cover every sky
+GPU draw: the deferred queue outlives the scope and those nodes were necessarily
+classified as generic world. This is a concrete lifetime bug independent of
+the HMD hypothesis and is consistent with the prior session's roughly one
+extra non-exact programmable depth-off world draw per Present.
+
+The canonical replacement EXE SHA `68ceb386...` was re-read from the exact
+successful build artifact. Original `4056D0` begins
+`51 55 8B 6C 24 0C 83 FD FF 0F 84 3F 01 00 00 56 8B C5 C1 E8 10 8B F5 50`.
+That signature is now checked before installing the source hook.
+
+While and only while exact 4521C0 owns `WorldSky`, 4056D0 records newly
+retained opaque entries by their real 0x3C descriptor identity, 64-byte matrix
+hash, object id and original node pass mask. The already exact retail
+405890->404700 call-edge wrapper then rejoins that identity and restores
+`WorldSky` around the physical PMT draw. A mark retires after every pass
+declared by the original node flags has been observed. Immediate 4056D0 draws
+need no mark because they execute while the source scope is still live.
+
+No queue descriptor, object flag, matrix or game state is modified. The repair
+only preserves source provenance across the game's own deferred queue. Bounded
+markers: `VR SKY OPAQUE QUEUE TAG` and `VR SKY OPAQUE QUEUE DRAW`.
+Visual success remains UNTESTED pending Quest 3 confirmation.
+
+
+### Fail-closed queue boundary follow-up
+
+A post-commit self-audit caught one unsafe fallback in the first provenance
+implementation: if the opaque queue header could not be read before 4056D0,
+`beforeCount` remained zero, and a later successful read could have treated
+older entries as newly appended. The source wrapper now carries an explicit
+`queueSnapshotValid` bit and records deferred sky entries only when the exact
+pre-call queue count was obtained. Unknown pre-state is never interpreted as
+an empty queue.
+
+
+### Optional 43FB40 hook fallback audit
+
+The scene hook is deliberately optional because another plugin may already own
+43FB40 or its signature may differ. A self-audit found that making
+`ExactPassengerSceneOwnerActive()` the only car-gate owner would then silently
+disable the previous 4879B0 recovery. The admission is now two-tiered:
+when `PassengerSceneHook` exists, ONLY the exact top-of-stack 0x80 owner can
+authorize recovery; when the hook itself is absent, the older
+`NativeFrameTrace + paired XR pose` proof is allowed as the fallback owner.
+Thus a weaker proof can never override an installed exact scene hook, while
+optional-hook failure does not create a new passenger regression.
+
+
+### Optional 4056D0 provenance hook audit
+
+A further installation-order audit found the first provenance implementation
+made the shared 4056D0 hook a prerequisite for the already-proven 4521C0 sky
+owner. That would regress the core rotation-only/transition fixes whenever
+another plugin owns 4056D0 or its bytes differ. The install order is now
+strictly layered: exact 4521C0 must install first; 4056D0 signature/hook is
+best-effort. If the optional leaf cannot be owned, only deferred provenance is
+disabled and queued entries retain the pre-existing generic fallback. The
+core sky owner is never rolled back by an optional shared-leaf conflict.
+
+
+### Opaque provenance lifetime cleanup
+
+Another self-audit covered queue entries whose expected PMT pass is globally
+disabled and therefore never reaches the 404700 wrapper. Marks are now tied to
+the current native opaque storage pointer. A storage replacement clears all
+saved identities. Before each exact 4056D0 source call, every mark in the same
+storage at a slot >= the exact pre-call queue count is removed because that
+slot is inactive by definition. Active lower slots are preserved. This keeps
+the provenance table bounded without guessing a frame lifetime or touching
+game queue contents.
+
+The earlier CI failure at this stage was also traced to a static verifier bug:
+it parsed the first `bool apply()` in hooks_graphics.cpp rather than the
+VrOriginalRaceSkyOwner class. The verifier is now class-scoped.
+
+
+### Deferred-sky physical ownership diagnostics
+
+The source/physical join now logs the render thread on both TAG and DRAW.
+The DRAW receipt also records the actual `EffectiveScope()`, current producer
+token and whether a SpriteNode queue is active after the WorldSky scope is
+installed; TAG records the bounded active-mark count. These are diagnostic
+only. They make the next HMD session sufficient to distinguish:
+(1) source and physical draw on different renderer threads,
+(2) a matched PMT entry whose WorldSky scope is overridden by a higher-priority
+semantic, and (3) a successful exact WorldSky physical draw.
