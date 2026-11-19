@@ -42,7 +42,18 @@ $sharedProbeFailed=($combined -match 'shared verification texture creation/uploa
 $driverSeatCount=([regex]::Matches($gameLog,'VR DRIVER SEAT CAMERA:')).Count
 $launchHealth=Read-AllText 'DX9EX_LAUNCH_HEALTH.txt'
 $nonZeroGameExit=$false
-$exitMatch=Get-LastRegexMatch $launchHealth '(?m)^gameExitCode=(-?\d+)\s*
+$exitMatch=Get-LastRegexMatch $launchHealth '(?m)^gameExitCode=(-?\d+)\s*$'
+if($exitMatch){
+    $exitCode=0
+    if([int]::TryParse($exitMatch.Groups[1].Value,[ref]$exitCode)){
+        $nonZeroGameExit=($exitCode -ne 0)
+    }
+}
+# Do not treat historical diagnostics such as "CRASH GUARD" or
+# "minidump EIPs ..." as a crash. The 2026-11-19 clean user session exited
+# with gameExitCode=0 but the old generic word match raised CRASH_TEXT_PRESENT.
+$crashEvidence=$nonZeroGameExit -or ($combined -match
+    '(?im)(unhandled exception|exception[_ ]access[_ ]violation|access violation|fatal error|crash dump (?:written|saved|created)|minidump (?:written|saved|created)|exception code\s*[:=]\s*0xC0000005)')
 $whiteScreenEvidence=($combined -match '(?im)white screen|white-screen|startup white')
 
 $directFrames=0
