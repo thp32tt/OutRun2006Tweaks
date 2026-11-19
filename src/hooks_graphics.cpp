@@ -1494,11 +1494,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         if(!cam || !car || cam->cam_mode_34A!=1 ||
            InSceneEffect()) {original();return;}
         PassengerGateCamera1Entries.fetch_add(1,std::memory_order_relaxed);
-        const bool race=Game::current_mode &&
-            (*Game::current_mode==STATE_GAME ||
-             (*Game::current_mode==STATE_START &&
-              Game::game_start_progress_code &&
-              *Game::game_start_progress_code==65));
+        const bool race=IsCockpitRacePhase();
         const bool cockpit=QuestCockpitV2Active(cam);
         const auto originalOwner=ExactOriginalCockpitOccupant(work);
         const bool owner=originalOwner==OriginalOccupantSlot::Passenger363;
@@ -1595,11 +1591,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         if(!cam || cam->cam_mode_34A!=1 || !Game::pl_car())return;
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const bool stereoReady=stereo&&stereo->valid&&stereo->poseSequence!=0;
-        const bool race=Game::current_mode &&
-            (*Game::current_mode==STATE_GAME ||
-             (*Game::current_mode==STATE_START &&
-              Game::game_start_progress_code &&
-              *Game::game_start_progress_code==65));
+        const bool race=IsCockpitRacePhase();
         if(!race)return;
         auto* driver=Game::event(EVENT_ROB01);
         auto* passenger=Game::event(EVENT_ROB02);
@@ -1844,7 +1836,8 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(mode);
             OutRunVR::QuestCockpitV2::NativeFrameTrace().OnPlayerCar();
         }
-        if(QuestCockpitV2Active(cam) && Settings::VRQuestCockpitV2FullCar)
+        if(IsCockpitRacePhase() && QuestCockpitV2Active(cam) &&
+           Settings::VRQuestCockpitV2FullCar)
             ctx.eax=(ctx.eax & ~0x0000C000u)|0x00004000u;
         if(Settings::VRCockpitFrameProbe && Settings::VRTelemetry &&
            ++TraceCount<=32u){

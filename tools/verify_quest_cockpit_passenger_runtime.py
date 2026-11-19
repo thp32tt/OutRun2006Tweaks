@@ -145,6 +145,12 @@ player_cb = hook.split("static void __cdecl OnPlayerCallback(EVWORK_CAR* player)
 )[0]
 assert "!IsCockpitRacePhase()" in player_cb
 assert "!IsPlayableCarGameplay()" not in player_cb
+player_state = hook.split("static void PlayerState(SafetyHookContext& ctx)",1)[1].split(
+    "public:",1
+)[0]
+assert "if(IsCockpitRacePhase() && QuestCockpitV2Active(cam) &&" in player_state
+assert "const bool race=IsCockpitRacePhase();" in hook
+assert hook.count("const bool race=IsCockpitRacePhase();") == 2
 
 # One persistent bool drives two checkboxes; complement guarantees exactly
 # one selected even when an existing user INI supplies the older key.

@@ -140,6 +140,13 @@ def pass_06_goal_start_scene_boundaries():
           "F0 identity scope can still admit GOAL")
     check("!IsPlayableCarGameplay()" not in player_cb,
           "F0 scope still uses GOAL-inclusive gameplay helper")
+    check(hook.count("const bool race=IsCockpitRacePhase();")==2,
+          "passenger car-gate/scene recovery race predicates drifted")
+    player_state=hook.split("static void PlayerState(SafetyHookContext& ctx)",1)[1].split(
+        "public:",1
+    )[0]
+    check("if(IsCockpitRacePhase() && QuestCockpitV2Active(cam) &&" in player_state,
+          "FullCar candidate flag can still be forced in GOAL")
 
 def pass_07_nested_draw_and_restore():
     check_order(robot, "ShouldSuppressOriginalPassenger(",
