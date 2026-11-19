@@ -51,6 +51,24 @@ else:
     if "'-VR.AutoRenderResolution=true'" in runner:
         errors.append("release-parity still forces OpenXR auto eye resolution")
 
+release_version_path = ROOT / "VR_RELEASE_VERSION.txt"
+if not release_version_path.is_file():
+    errors.append("missing release version file: VR_RELEASE_VERSION.txt")
+else:
+    release_version = release_version_path.read_text(encoding="utf-8")
+    if "v0.03" not in release_version:
+        errors.append("VR_RELEASE_VERSION.txt is not v0.03")
+
+release_workflow_path = ROOT / ".github" / "workflows" / "vr-github-general-build.yml"
+if not release_workflow_path.is_file():
+    errors.append("missing release workflow: vr-github-general-build.yml")
+else:
+    release_workflow = release_workflow_path.read_text(encoding="utf-8")
+    if "-notmatch 'v0\\.03'" not in release_workflow:
+        errors.append("v0.03 packaging gate does not require v0.03 release version")
+    if "-notmatch 'v0\\.02'" in release_workflow:
+        errors.append("v0.03 packaging gate still checks stale v0.02 version")
+
 release_path = ROOT / "Start-OutRun.cmd"
 if not release_path.is_file():
     errors.append("missing release launcher: Start-OutRun.cmd")
