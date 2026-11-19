@@ -199,6 +199,10 @@ def pass_07_nested_draw_and_restore():
     check("effectiveScope={} producer={} queueActive={}" in hook and
           "activeMarks={}" in hook and "thread={}" in hook,
           "deferred sky provenance cannot prove actual physical semantic/thread")
+    check("ScopedExactProducerSemantic queuedSkyScope(" in hook and
+          "queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None" in hook and
+          "nullptr,true" in hook,
+          "deferred sky physical draw can inherit stale queue/pending semantic")
     check("RaceSkyObjectQueueRva = 0x56D0" in hook and
           "WorldSkyOpaqueQueue::RecordDeferred" in hook and
           "WorldSkyOpaqueQueue::Find(entry)" in hook,
