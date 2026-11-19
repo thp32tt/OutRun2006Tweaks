@@ -88,7 +88,7 @@ jobs:
         run: |
           set -euo pipefail
           git fetch origin vr-quest-cockpit-v2-guest-sky-lock-20261119 --depth=1
-          changed="$(git diff --name-only origin/vr-quest-cockpit-v2-guest-sky-lock-20261119...HEAD --             vrhost src/vr/d3d9/stereo_renderer_r7.inc src/vr/d3d9/stereo_renderer.cpp             src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp)"
+          changed="$(git diff --name-only origin/vr-quest-cockpit-v2-guest-sky-lock-20261119 HEAD --             vrhost src/vr/d3d9/stereo_renderer_r7.inc src/vr/d3d9/stereo_renderer.cpp             src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp)"
           if [ -n "$changed" ]; then
             echo "Forbidden normal-path drift:"
             echo "$changed"
