@@ -753,6 +753,52 @@ class ChatBridge:
         except Exception as exc:
             return "HOLD_BROWSER_FRESH_TAB_"+type(exc).__name__
 
+    async def force_fresh_role_page(self, role, target=None):
+        """Replace one responsive-but-bad UI tab with a fresh same-profile tab.
+
+        Used only before an A/B send or for read-only recovery. It never types,
+        uploads or submits. The previous tab is closed only after the new tab
+        has loaded and passed a cheap responsiveness check.
+        """
+        if role not in ("A","B","C1"):
+            raise ValueError("INVALID_ROLE")
+        await self.ensure_context()
+        old=self.pages.get(role)
+        if not (is_saved_chat_url(target) or
+                (isinstance(target,str) and target.rstrip("/")==PROJECT_URL.rstrip("/"))):
+            target=PROJECT_URL
+        try:
+            fresh=await asyncio.wait_for(
+                self.context.new_page(), timeout=BROWSER_NEW_TAB_TIMEOUT_SECONDS)
+            await fresh.goto(target,wait_until="domcontentloaded",
+                             timeout=BROWSER_RELOAD_TIMEOUT_MS)
+            if not await self._page_responsive(fresh):
+                try:
+                    await fresh.close()
+                except Exception:
+                    pass
+                return "HOLD_BROWSER_FORCED_FRESH_TAB_UNRESPONSIVE"
+            if not is_saved_chat_url(target):
+                try:
+                    await fresh.locator(
+                        '[role="textbox"][contenteditable="true"]').first.wait_for(
+                            state="visible",timeout=15000)
+                except Exception:
+                    try:
+                        await fresh.close()
+                    except Exception:
+                        pass
+                    return "HOLD_BROWSER_FORCED_FRESH_COMPOSER_MISSING"
+            self.pages[role]=fresh
+            if old is not None and old is not fresh and not old.is_closed():
+                try:
+                    await asyncio.wait_for(old.close(),timeout=3)
+                except Exception:
+                    pass
+            return "BROWSER_FORCED_FRESH_TAB_READY"
+        except Exception as exc:
+            return "HOLD_BROWSER_FORCED_FRESH_TAB_"+type(exc).__name__
+
     async def browser_watchdog(self):
         """60s liveness check independent of the 600s queue/browser work poll."""
         try:
@@ -910,6 +956,14 @@ class ChatBridge:
             # reload once; if that renderer is hung, replace only this tab.
             repaired=await self.refresh_or_replace_role_page(task["role"])
             if not repaired.startswith("HOLD_"):
+                pg=self.pages.get(task["role"])
+                selected=await ensure_image_tool(pg)
+        if selected!="CREATE_IMAGE_TOOL_SELECTED":
+            # Reload can leave a logically wedged but JS-responsive ChatGPT
+            # surface. One final pre-send recovery uses a completely fresh tab
+            # in the same authenticated profile, then re-runs tool discovery.
+            fresh=await self.force_fresh_role_page(task["role"],PROJECT_URL)
+            if not fresh.startswith("HOLD_"):
                 pg=self.pages.get(task["role"])
                 selected=await ensure_image_tool(pg)
         if selected!="CREATE_IMAGE_TOOL_SELECTED":
