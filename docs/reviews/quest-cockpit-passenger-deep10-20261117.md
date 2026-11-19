@@ -367,20 +367,3 @@ alpha/flag/object transition byte-for-byte. `ScopedQuestSkyTransitionProbe`
 is diagnostic only and reports `mutation=0 originalCrossfadePreserved=1`.
 The active behavior fix is exact deferred WorldSky provenance, not a modified
 course-sky crossfade.
-
-
-### 4521C0 pending one-shot isolation
-
-The same semantic-priority audit was extended to the source owner. The previous
-4521C0 `ScopedExactProducerSemantic(WorldSky)` cleared selected queue scope
-but left an unrelated `NextDrawScope` one-shot armed. A pending HUD/marker
-token could therefore be consumed by an immediate sky GPU draw before the
-deferred provenance logic is even involved.
-
-The exact sky owner now uses
-`ScopedExactProducerSemantic(WorldSky, nullptr, true)`, shielding and
-restoring the pending one-shot for the complete original 4521C0 call.
-`VR SKY SOURCE OWNER` reports the actual EffectiveScope, producer, queue
-state, render thread and whether exact WorldSky ownership is visible at runtime.
-This keeps both immediate and deferred sky submissions on source-proven
-semantics without broad depth-state heuristics.
