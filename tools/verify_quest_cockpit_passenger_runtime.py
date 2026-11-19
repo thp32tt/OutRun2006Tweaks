@@ -69,6 +69,9 @@ assert "VR SKY TRANSITION ROTATION LOCK:" in hook
 assert "VR SKY TRANSITION PHASE:" in hook
 assert "orientationWords=9" in hook
 assert "RotationIndices" in hook
+assert "constexpr std::uint32_t None=0xffffffffu;" in hook
+assert "(n0!=None || n1!=None)" in hook
+assert "(o0!=None || o1!=None)" in hook
 assert "state!=STATE_START && state!=STATE_GAME" in hook
 assert "base_+0x50" in hook and "base_+0xe0" in hook
 assert "afterDriver!=beforeDriver,after!=before" in hook

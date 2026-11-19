@@ -146,3 +146,13 @@ reused the already-captured session; no new Quest 3 visual claim is made.
 - No camera behavior was changed from this finding. The user's earlier
   “camera turns first” report must be re-evaluated with corrected diagnostics
   before altering the original mode-1 yaw producer.
+
+
+## 2026-11-19 exact drawable sky overlap gate
+
+The native 4521C0 display does not draw merely because a layer flag and alpha
+are active: step0 also requires object 0 or 1 != 0xFFFFFFFF, and step1 requires
+object 2 != 0xFFFFFFFF. race_sky_control_451b40 deliberately clears duplicate
+old-layer IDs to None. The VR transition lock and phase diagnostics now mirror
+those exact object-ID gates, preventing a non-drawing transition record from
+being misclassified as a visible duplicate sky layer.

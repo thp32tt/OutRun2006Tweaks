@@ -1086,12 +1086,25 @@ class VrOriginalRaceSkyOwner final : public Hook
             std::memcpy(&ac4,base_+0xc4,sizeof(ac4));
             if(!std::isfinite(a30)||!std::isfinite(a34)||
                !std::isfinite(ac0)||!std::isfinite(ac4))return;
+            constexpr std::uint32_t None=0xffffffffu;
+            std::uint32_t n0=0,n1=0,n2=0,o0=0,o1=0,o2=0;
+            std::memcpy(&n0,base_+0x00,sizeof(n0));
+            std::memcpy(&n1,base_+0x04,sizeof(n1));
+            std::memcpy(&n2,base_+0x08,sizeof(n2));
+            std::memcpy(&o0,base_+0x90,sizeof(o0));
+            std::memcpy(&o1,base_+0x94,sizeof(o1));
+            std::memcpy(&o2,base_+0x98,sizeof(o2));
+            // Mirror 4521C0 exactly: step0 can draw object[0]/[1], step1
+            // object[2]. A flag+alpha record with all IDs=None is not an
+            // actual visible sky layer and must not trigger a rotation lock.
             const bool newLayerDraw=
-                (f38!=0u && a30>0.100000001f) ||
-                (f3c!=0u && a34>0.100000001f);
+                (f38!=0u && a30>0.100000001f &&
+                    (n0!=None || n1!=None)) ||
+                (f3c!=0u && a34>0.100000001f && n2!=None);
             const bool oldLayerDraw=
-                (fc8!=0u && ac0>0.100000001f) ||
-                (fcc!=0u && ac4>0.100000001f);
+                (fc8!=0u && ac0>0.100000001f &&
+                    (o0!=None || o1!=None)) ||
+                (fcc!=0u && ac4>0.100000001f && o2!=None);
 
             std::array<float,9> newLayerRotation{};
             float maxDelta=0.f;
@@ -1121,11 +1134,13 @@ class VrOriginalRaceSkyOwner final : public Hook
                             "VR SKY TRANSITION PHASE: change={} phase={} "
                             "gameState={} camera={} rotationDelta={:.6f} "
                             "newFlags=0x{:X}/0x{:X} oldFlags=0x{:X}/0x{:X} "
-                            "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f}",
+                            "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f} "
+                            "newObj={:08X}/{:08X}/{:08X} oldObj={:08X}/{:08X}/{:08X}",
                             change,phase,static_cast<int>(state),
                             Game::camera()?static_cast<int>(
                                 Game::camera()->cam_mode_34A):-1,maxDelta,
-                            f38,f3c,fc8,fcc,a30,a34,ac0,ac4);
+                            f38,f3c,fc8,fcc,a30,a34,ac0,ac4,
+                            n0,n1,n2,o0,o1,o2);
                 }
             }
             if(phase!=3 || maxDelta<=1.0e-5f)return;
@@ -1145,10 +1160,12 @@ class VrOriginalRaceSkyOwner final : public Hook
                     "camera={} maxRotationDelta={:.6f} "
                     "newFlags=0x{:X}/0x{:X} oldFlags=0x{:X}/0x{:X} "
                     "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f} "
+                    "newObj={:08X}/{:08X}/{:08X} oldObj={:08X}/{:08X}/{:08X} "
                     "orientationWords=9 renderOnly=1",
                     count,static_cast<int>(state),
                     cam?static_cast<int>(cam->cam_mode_34A):-1,maxDelta,
-                    f38,f3c,fc8,fcc,a30,a34,ac0,ac4);
+                    f38,f3c,fc8,fcc,a30,a34,ac0,ac4,
+                    n0,n1,n2,o0,o1,o2);
             }
         }
         ~ScopedQuestSkyTransitionRotationLock() noexcept

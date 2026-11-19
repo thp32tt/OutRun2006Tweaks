@@ -87,9 +87,17 @@ def pass_04_follow_requires_real_guest():
     check("slot==OriginalOccupantSlot::Passenger363&&keepPassenger" in occupant,
           "follow no longer gated to native passenger")
     check("OriginalPassengerForceVisible" in occupant, "scoped LOD0 mode lost")
-    check_order(robot, "const bool passengerLod0=",
-                "ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);",
+    check_order(robot,
+                "if(action==CockpitOccupantRender::OriginalPassengerForceVisible)",
+                "ScopedOriginalOccupantLod0 passengerVisible(true);",
+                "VR PASSENGER NATIVE LOCK:",
                 "RobotHook.ccall<void>(robot);")
+    check(robot.index("ScopedOriginalOccupantLod0 passengerVisible(true);") <
+          robot.index("if(OriginalRobotCorrectionActive())"),
+          "passenger visibility still waits for driver W*C recursion gate")
+    check(robot.index("ScopedOriginalOccupantLod0 passengerVisible(true);") <
+          robot.index("if(!NativeFrameTrace().Active() || InSceneEffect())"),
+          "passenger visibility still waits for native-frame/XR gate")
     check("if(!Settings::VRQuestCockpitV2OccupantCorrection)" in robot,
           "native fallback path missing")
 
@@ -181,6 +189,9 @@ def pass_07_nested_draw_and_restore():
           "sky transition phase/rotation ownership is not observable")
     check("orientationWords=9" in hook and "RotationIndices" in hook,
           "sky repair still overwrites more than the 3x3 orientation consumed by 40A190")
+    check("constexpr std::uint32_t None=0xffffffffu;" in hook and
+          "(n0!=None || n1!=None)" in hook and "(o0!=None || o1!=None)" in hook,
+          "sky overlap phase can still be armed by an all-None non-drawing layer")
     check("state!=STATE_START && state!=STATE_GAME" in hook,
           "first-stage camera 30/2 sky window is still excluded")
     check("base_+0x50" in hook and "base_+0xe0" in hook,
