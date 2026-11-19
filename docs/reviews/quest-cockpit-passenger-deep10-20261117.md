@@ -345,3 +345,42 @@ then restores all prior semantic state. Unmatched PMT entries instantiate the
 scope with None and remain unchanged. The existing DRAW diagnostic still
 reports the resulting actual EffectiveScope so HMD evidence can catch any
 unexpected higher-priority owner.
+
+
+## 2026-11-19 transition-rotation hypothesis retired
+
+The earlier render-only old/new 3x3 rotation lock was intentionally removed
+before HMD testing. Exact race-area/sky decomp shows the two 0x90-byte records
+carry previous-course and destination-course rotations during the native
+451E90 cross-fade. Different layer rotations are therefore original game
+state, not evidence of the reported VR bug by themselves.
+
+A stronger and source-proven defect was found later: ordinary 4521C0
+`4056D0` PMT nodes can outlive the WorldSky semantic through the opaque
+queue and reach 405890->404700 as generic world. That route receives the full
+world head/eye transform instead of the exact rotation-only sky path and
+matches the field-log pattern of roughly one extra non-exact depth-off draw per
+Present.
+
+Accordingly the build now preserves the game's old/new rotation matrices and
+alpha/flag/object transition byte-for-byte. `ScopedQuestSkyTransitionProbe`
+is diagnostic only and reports `mutation=0 originalCrossfadePreserved=1`.
+The active behavior fix is exact deferred WorldSky provenance, not a modified
+course-sky crossfade.
+
+
+### 4521C0 pending one-shot isolation
+
+The same semantic-priority audit was extended to the source owner. The previous
+4521C0 `ScopedExactProducerSemantic(WorldSky)` cleared selected queue scope
+but left an unrelated `NextDrawScope` one-shot armed. A pending HUD/marker
+token could therefore be consumed by an immediate sky GPU draw before the
+deferred provenance logic is even involved.
+
+The exact sky owner now uses
+`ScopedExactProducerSemantic(WorldSky, nullptr, true)`, shielding and
+restoring the pending one-shot for the complete original 4521C0 call.
+`VR SKY SOURCE OWNER` reports the actual EffectiveScope, producer, queue
+state, render thread and whether exact WorldSky ownership is visible at runtime.
+This keeps both immediate and deferred sky submissions on source-proven
+semantics without broad depth-state heuristics.
