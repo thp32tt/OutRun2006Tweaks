@@ -67,16 +67,18 @@ inline constexpr bool ShouldBypassPassengerCarDisplayGate(
 // If a LIVE guest's render scene has been masked away while the driver is
 // still admitted to the SAME ORIGINAL 0x80 pass, recover the draw only
 // after that pass has completed and proved it did not call the ROB02 wrapper.
+// Exact synchronous 43FB40 ownership, not OpenXR pose publication, is the
+// render-frame admission proof for this native event draw.
 // No fallback to another layer, no event creation or persistent scene edit.
 inline constexpr std::uint32_t OriginalRobDisplayLayer=0x80u;
 inline constexpr bool ShouldRecoverOriginalPassengerScenePass(
     bool vr,bool cockpit,bool follow,bool racing,
-    bool modeOne,bool liveOriginalGuest,bool validFrame,bool validStereo,
+    bool modeOne,bool liveOriginalGuest,bool exactNativeScenePass,
     std::uint32_t renderMask,std::int32_t first,std::int32_t last,
     std::uint32_t driverScene,std::uint32_t passengerScene,
     bool driverWrapperReached,bool guestWrapperReached) noexcept {
     return vr && cockpit && follow && racing && modeOne &&
-        liveOriginalGuest && validFrame && validStereo &&
+        liveOriginalGuest && exactNativeScenePass &&
         renderMask==OriginalRobDisplayLayer &&
         first<=static_cast<std::int32_t>(OriginalPassengerEventId) &&
         last>=static_cast<std::int32_t>(OriginalPassengerEventId) &&
