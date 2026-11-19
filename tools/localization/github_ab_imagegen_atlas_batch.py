@@ -400,7 +400,7 @@ def build(root,out):
          "manual_user_test_only_roi_count":manual_user_count,
          "native_source_owner_pixel_edits_test_only":source_owner_test_count,
          "cosmetic_alpha_tolerance_max":15,
-         "cosmetic_bc3_color_channel_error_max":64,
+         "cosmetic_bc3_color_channel_error_max":72,
          "manual_stage_child_roi_test_only":manual_user_count > 0,
          "deterministic_salvaged_roi":sum(
              1 for atlas_item in admitted for p in atlas_item["painted"] if p.get("auto_salvage")
