@@ -948,22 +948,28 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         using namespace OutRunVR::QuestCockpitV2;
         F50ExternalDrawTicket ticket{};
-        const unsigned char carId=player ? player->car_id_10 : 255u;
-        // Retail guest vehicle selection IDs are bounded by the native 30-row
-        // player car/seat table. Existing aliases remain compatible:
-        // 7/22=288 GTO, 11/26=F40. Every other ID uses a fixed car_id_XX.ovc.
-        // Keep every user-supplied OVC confined to player cockpit view 1.
-        const bool f50Car=Settings::VRF50ExternalModel && player &&
-            OutRunVR::DinoSidecar::IsF50RetailCarId(carId);
-        const bool extraCar=Settings::VRExternalFerrariTest && player &&
-            !f50Car && carId<30u;
-        if ((!extraCar && !f50Car) || !Settings::VREnabled ||
+        // Preserve the known-working single-F50 isolation order: do not read
+        // any player vehicle field from menu/loading callbacks. External model
+        // inspection begins only after the normal VR/game/player-owner gates.
+        if ((!Settings::VRF50ExternalModel &&
+             !Settings::VRExternalFerrariTest) ||
+            !Settings::VREnabled ||
             !Settings::VRQuestCockpitV2Enabled || !Settings::VRStereo ||
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
             !NativeFrameTrace().Active() || InSceneEffect() ||
             !Game::current_mode || *Game::current_mode != STATE_GAME ||
             !player || player != Game::pl_car())
             return ticket;
+        const unsigned char carId=player->car_id_10;
+        // Retail guest vehicle selection IDs are bounded by the native 30-row
+        // player car/seat table. Existing aliases remain compatible:
+        // 7/22=288 GTO, 11/26=F40. Every other ID uses a fixed car_id_XX.ovc.
+        // Keep every user-supplied OVC confined to player cockpit view 1.
+        const bool f50Car=Settings::VRF50ExternalModel &&
+            OutRunVR::DinoSidecar::IsF50RetailCarId(carId);
+        const bool extraCar=Settings::VRExternalFerrariTest &&
+            !f50Car && carId<30u;
+        if(!extraCar && !f50Car)return ticket;
         const auto* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
         IDirect3DDevice9* device=Game::D3DDevice();
