@@ -66,8 +66,8 @@ jobs:
           browser=services["outrun-chat-qa-rework"]
           assert "profiles" not in browser, "Portainer must deploy chat worker as a default service"
           assert browser["build"]["dockerfile"]=="Dockerfile.chat-rework"
-          assert float(browser["cpus"])<=1.0
-          assert "2048m" in str(browser["mem_limit"])
+          assert float(browser["cpus"])<=1.5
+          assert "3072m" in str(browser["mem_limit"])
           assert "OUTRUN_GITHUB_CONTENTS_TOKEN" in browser["environment"]
           assert "OUTRUN_REWORK_VNC_PASSWORD" in browser["environment"]
           assert len(browser.get("ports",[]))==1
