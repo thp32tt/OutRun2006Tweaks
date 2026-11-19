@@ -1,0 +1,97 @@
+name: Ferrari Rebased Normal-Path CI
+
+on:
+  push:
+    branches:
+      - 'vr-ferrari16-v4-rebased-*'
+    paths:
+      - '.github/workflows/ferrari-rebased-normal-path.yml'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/game/dino_external_*.hpp'
+      - 'src/vr/game/external_car_*.hpp'
+      - 'src/vr/game/f50_external_pose_filter.hpp'
+      - 'tests/external_car_*.cpp'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'RUN-QUEST-COCKPIT-V2-FERRARI16.cmd'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  external-runtime-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build portable external-car regressions
+        run: |
+          set -euo pipefail
+          for test in             external_car_ground_test             external_car_gate_test             external_car_dashboard_test             external_car_sidecar_v4_test; do
+            g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic               "tests/${test}.cpp" -o "/tmp/${test}"
+            "/tmp/${test}"
+          done
+
+      - name: Prove modeling is only an opt-in gameplay layer
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          hook = Path('src/hooks_graphics.cpp').read_text(encoding='utf-8')
+          runner = Path('tools/Run-OutRunVRTest.ps1').read_text(encoding='utf-8')
+          launcher = Path('RUN-QUEST-COCKPIT-V2-FERRARI16.cmd').read_text(encoding='utf-8')
+
+          # Latest known-good cockpit semantics must survive the rebase.
+          for marker in (
+              'static bool IsCockpitRacePhase() noexcept',
+              'maxCameraConventionGap',
+              'ScopedExactProducerSemantic sky',
+              'QuestCockpitV2NativeFrameProbe'):
+              assert marker in hook, marker
+
+          # External rendering must be gated to an actual gameplay/player/cockpit frame.
+          for marker in (
+              'struct F50ExternalDrawTicket final',
+              '*Game::current_mode != STATE_GAME',
+              'player != Game::pl_car()',
+              'camera && camera->cam_mode_34A==1',
+              'CanReplaceOriginalCar(gate)',
+              'OriginalFallback'):
+              assert marker in hook, marker
+
+          # The normal runner owns VR policy; modeling only adds its opt-in switches.
+          for marker in (
+              "QuestCockpitV2ReleaseParity",
+              "'-VR.DirectGpuOnly=true'",
+              "'-VR.AutoRenderResolution=false'",
+              "'-VR.RenderWidth=2496'",
+              "'-VR.RenderHeight=2688'",
+              "'-VR.FollowGameResolution=false'",
+              "ExternalFerrariTest",
+              "F50ExternalModel"):
+              assert marker in runner, marker
+
+          for marker in (
+              '-TestProfile CORRECTNESS',
+              '-QuestCockpitV2ReleaseParity ON',
+              '-QuestCockpitV2 ON',
+              '-QuestCockpitV2F0 ON',
+              '-ExternalFerrariTest ON',
+              '-F50ExternalModel ON'):
+              assert marker in launcher, marker
+
+          print('FERRARI_REBASED_NORMAL_PATH_CONTRACT_PASS')
+          PY
+
+      - name: Reject accidental VR-host or stereo-core fork
+        run: |
+          set -euo pipefail
+          git fetch origin vr-quest-cockpit-v2-guest-sky-lock-20261119 --depth=1
+          changed="$(git diff --name-only origin/vr-quest-cockpit-v2-guest-sky-lock-20261119...HEAD --             vrhost src/vr/d3d9/stereo_renderer_r7.inc src/vr/d3d9/stereo_renderer.cpp             src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp)"
+          if [ -n "$changed" ]; then
+            echo "Forbidden normal-path drift:"
+            echo "$changed"
+            exit 1
+          fi
+          echo "NORMAL_VR_CORE_UNCHANGED_PASS"
