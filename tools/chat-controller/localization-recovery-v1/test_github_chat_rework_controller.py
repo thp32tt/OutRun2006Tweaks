@@ -712,3 +712,47 @@ class BrowserLivenessWatchdogTests(unittest.IsolatedAsyncioTestCase):
   entrypoint=Path(__file__).with_name("entrypoint.chat-rework.sh").read_text(encoding="utf-8")
   self.assertIn("BROWSER_WATCHDOG_ESCALATION",entrypoint)
   self.assertIn("chrome_cdp_ready",entrypoint)
+
+
+class SlowChatUiRecoveryTests(unittest.IsolatedAsyncioTestCase):
+ async def test_missing_user_turn_gets_one_immediate_exact_url_refresh(self):
+  now=dt.datetime(2026,11,19,8,30,tzinfo=dt.timezone.utc)
+  state={"status":"AB_SENT",
+         "ab_chat_url":"https://chatgpt.com/c/6aebd722-0f74-83e8-8126-f723dca3a685"}
+  self.assertTrue(c.verified_assistant_refresh_due(
+      state,"CHAT_USER_TURNS_NOT_RENDERED",now))
+  state["last_assistant_page_refresh_utc"]=now.isoformat()
+  self.assertFalse(c.verified_assistant_refresh_due(
+      state,"CHAT_USER_TURNS_NOT_RENDERED",now+dt.timedelta(minutes=10)))
+  self.assertTrue(c.verified_assistant_refresh_due(
+      state,"CHAT_USER_TURNS_NOT_RENDERED",now+dt.timedelta(minutes=31)))
+
+ async def test_hydration_wait_scrolls_only_after_user_turn_rendered(self):
+  bridge=c.ChatBridge(MagicMock(),MagicMock())
+  page=MagicMock()
+  page.wait_for_function=AsyncMock()
+  page.evaluate=AsyncMock()
+  page.wait_for_timeout=AsyncMock()
+  ok=await bridge.wait_chat_user_turns_rendered(page)
+  self.assertTrue(ok)
+  page.wait_for_function.assert_awaited_once()
+  page.evaluate.assert_awaited_once()
+  page.wait_for_timeout.assert_awaited_once_with(800)
+
+ async def test_hydration_timeout_fails_closed_without_send(self):
+  bridge=c.ChatBridge(MagicMock(),MagicMock())
+  page=MagicMock()
+  page.wait_for_function=AsyncMock(side_effect=TimeoutError("lazy ui"))
+  page.evaluate=AsyncMock()
+  page.wait_for_timeout=AsyncMock()
+  ok=await bridge.wait_chat_user_turns_rendered(page)
+  self.assertFalse(ok)
+  page.evaluate.assert_not_awaited()
+  page.wait_for_timeout.assert_not_awaited()
+
+ def test_image_tool_has_bounded_slow_popover_discovery(self):
+  source=Path(__file__).with_name("controller_png_attach.py").read_text(encoding="utf-8")
+  self.assertIn("for _ in range(12)",source)
+  self.assertIn("data-radix-popper-content-wrapper",source)
+  self.assertIn('"create an image"',source)
+  self.assertIn('button[aria-pressed="true"]',source)
