@@ -82,6 +82,8 @@ assert "workFlags=0x{:08X} robDisplayGateOpen={}" in hook
 assert "OriginalRobotDisplayGateOpen(robot->dword4)" in hook
 assert "VR PASSENGER PHYSICAL PMT:" in hook
 assert "authority=405890_404700" in hook
+assert "ScopedExactPassengerRender exactPassenger(true);" in hook
+assert "ExactPassengerRenderActive()" in hook
 assert "ScopedQuestSkyTransitionProbe" in hook
 assert "VR SKY TRANSITION PHASE:" in hook
 assert "RotationIndices" in hook
@@ -93,14 +95,15 @@ assert "(o0!=None || o1!=None)" in hook
 assert "state!=STATE_START && state!=STATE_GAME" in hook
 assert "base+0x50+byte" in hook and "base+0xe0+byte" in hook
 assert "const auto* base=reinterpret_cast<const std::uint8_t*>(work);" in hook
-assert "afterDriver!=beforeDriver,after!=before" in hook
+assert "sceneEvidence.driverReached,sceneEvidence.guestReached" in hook
 assert "passengerScene==OriginalRobDisplayLayer" in policy
 assert "driverWrapperReached" in policy
 assert "const auto before=PassengerGateThreadCalls;" in hook
 assert "const auto after=PassengerGateThreadCalls;" in hook
+assert "const auto sceneEvidence=CurrentPassengerSceneEvidence();" in hook
 assert "PassengerDriverDisplay(work);" in hook
 assert "driver->field_C,passenger->field_C," in hook
-assert "afterDriver!=beforeDriver,after!=before);" in hook
+assert "sceneEvidence.driverReached,sceneEvidence.guestReached);" in hook
 assert "live,ExactPassengerSceneOwnerActive()," in hook
 assert "0x83,0xEC,0x10,0x83,0x3D,0x58,0x02,0x78,0x00,0x02" in hook
 assert "(flags & (OriginalEventPendingInit|OriginalEventInitialized)) ==" in policy
