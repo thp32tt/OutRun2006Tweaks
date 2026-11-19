@@ -200,9 +200,10 @@ def pass_07_nested_draw_and_restore():
           "WorldSkyOpaqueQueue::RecordDeferred" in hook and
           "WorldSkyOpaqueQueue::Find(entry)" in hook,
           "exact 4056D0 -> 405890 provenance join missing")
-    sky_apply=hook.split("bool apply() override",1)[1].split(
-        "static VrOriginalRaceSkyOwner instance",1
+    sky_owner=hook.split("class VrOriginalRaceSkyOwner final",1)[1].split(
+        "VrOriginalRaceSkyOwner VrOriginalRaceSkyOwner::instance",1
     )[0]
+    sky_apply=sky_owner.split("bool apply() override",1)[1]
     check(sky_apply.index("RaceSkyDisplayHook=safetyhook::create_inline") <
           sky_apply.index("const bool queueSignatureOk="),
           "optional 4056D0 validation can still disable core 4521C0 owner")
@@ -211,6 +212,9 @@ def pass_07_nested_draw_and_restore():
     check("if(exactSky && queueSnapshotValid)" in hook and
           "Missing pre-count is not" in hook,
           "sky queue provenance can fail open from an unknown pre-count")
+    check("LastStorage!=storage" in hook and
+          "p>=begin && p<storageEnd && p>=activeEnd" in hook,
+          "stale deferred sky queue marks are not pruned on reuse/reset")
     scene=hook.split("static void __cdecl PassengerEventSceneDisplay(",1)[1].split(
         "static void __cdecl RobotDisplay(",1)[0]
     check_order(scene,"ScopedPassengerSceneOwner sceneOwner(exactRobScene);",

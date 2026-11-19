@@ -298,3 +298,19 @@ strictly layered: exact 4521C0 must install first; 4056D0 signature/hook is
 best-effort. If the optional leaf cannot be owned, only deferred provenance is
 disabled and queued entries retain the pre-existing generic fallback. The
 core sky owner is never rolled back by an optional shared-leaf conflict.
+
+
+### Opaque provenance lifetime cleanup
+
+Another self-audit covered queue entries whose expected PMT pass is globally
+disabled and therefore never reaches the 404700 wrapper. Marks are now tied to
+the current native opaque storage pointer. A storage replacement clears all
+saved identities. Before each exact 4056D0 source call, every mark in the same
+storage at a slot >= the exact pre-call queue count is removed because that
+slot is inactive by definition. Active lower slots are preserved. This keeps
+the provenance table bounded without guessing a frame lifetime or touching
+game queue contents.
+
+The earlier CI failure at this stage was also traced to a static verifier bug:
+it parsed the first `bool apply()` in hooks_graphics.cpp rather than the
+VrOriginalRaceSkyOwner class. The verifier is now class-scoped.

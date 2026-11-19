@@ -1059,6 +1059,7 @@ namespace OutRunVR::WorldSkyOpaqueQueue
     };
     inline thread_local std::array<Mark,256> Marks{};
     inline thread_local std::size_t MarkCount=0;
+    inline thread_local const std::uint8_t* LastStorage=nullptr;
     inline constexpr std::array<std::size_t,13> StableWords{{
         0u,1u,2u,3u,4u,5u,6u,7u,9u,10u,11u,13u,14u
     }};
@@ -1113,9 +1114,35 @@ namespace OutRunVR::WorldSkyOpaqueQueue
         const auto storage=reinterpret_cast<const std::uint8_t*>(
             static_cast<std::uintptr_t>(q[5]));
         if(afterCount<=beforeCount || afterCount>capacity ||
-           afterCount>0x100u || !storage)return;
+           capacity>0x100u || afterCount>0x100u || !storage)return;
         if(!QuestCockpitGlassLive::Memory(
                storage,static_cast<std::size_t>(afterCount)*0x3cu))return;
+
+        // The opaque queue is one 0x100-entry ring/storage block. A storage
+        // replacement invalidates every saved native pointer. Within the same
+        // block, slots >= the exact pre-call count are inactive before this
+        // 4056D0 and any old marks there are stale. Prune them before tagging
+        // newly appended entries so missed/disabled 405890 passes cannot
+        // accumulate provenance indefinitely.
+        if(LastStorage!=storage) {
+            Marks.fill({});
+            MarkCount=0;
+            LastStorage=storage;
+        } else {
+            const auto begin=reinterpret_cast<std::uintptr_t>(storage);
+            const auto activeEnd=begin+
+                static_cast<std::uintptr_t>(beforeCount)*0x3cu;
+            const auto storageEnd=begin+
+                static_cast<std::uintptr_t>(capacity)*0x3cu;
+            for(std::size_t i=0;i<MarkCount;) {
+                const auto p=reinterpret_cast<std::uintptr_t>(Marks[i].entry);
+                if(p>=begin && p<storageEnd && p>=activeEnd) {
+                    Remove(i);
+                    continue;
+                }
+                ++i;
+            }
+        }
 
         for(std::uint32_t k=beforeCount;k<afterCount;++k) {
             const auto* entry=reinterpret_cast<const std::uint32_t*>(
