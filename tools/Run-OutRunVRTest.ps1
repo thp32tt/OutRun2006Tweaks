@@ -265,7 +265,12 @@ if($QuestCockpitV2ReleaseParity -eq 'ON'){
         '-VR.DirectGpuOnly=true',
         '-VR.CullingUnionFov=true',
         '-VR.CullingUnionMarginDegrees=8.0',
-        '-VR.AutoRenderResolution=true',
+        # Keep the user-validated Quest3 eye source independent from current
+        # VDXR recommendation changes. The 2026-11-19 diagnostic run drifted
+        # to 2248x2432 because ReleaseParity forced AutoRenderResolution=true.
+        '-VR.AutoRenderResolution=false',
+        '-VR.RenderWidth=2496',
+        '-VR.RenderHeight=2688',
         '-VR.FollowGameResolution=false',
         '-VR.MirrorFitDesktop=true',
         '-VR.MirrorPreserveAspect=true',

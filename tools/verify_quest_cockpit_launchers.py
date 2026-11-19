@@ -41,6 +41,16 @@ else:
         if not re.search(r"\$" + re.escape(parameter) + r"\b", runner):
             errors.append(f"runner parameter missing: {parameter}")
 
+    for required in (
+        "'-VR.AutoRenderResolution=false'",
+        "'-VR.RenderWidth=2496'",
+        "'-VR.RenderHeight=2688'",
+    ):
+        if required not in runner:
+            errors.append(f"release-parity fixed Quest3 eye resolution missing: {required}")
+    if "'-VR.AutoRenderResolution=true'" in runner:
+        errors.append("release-parity still forces OpenXR auto eye resolution")
+
 if errors:
     for error in errors:
         print(f"FAIL: {error}")
