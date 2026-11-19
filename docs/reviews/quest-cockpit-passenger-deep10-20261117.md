@@ -326,3 +326,22 @@ only. They make the next HMD session sufficient to distinguish:
 (1) source and physical draw on different renderer threads,
 (2) a matched PMT entry whose WorldSky scope is overridden by a higher-priority
 semantic, and (3) a successful exact WorldSky physical draw.
+
+
+### Deferred physical semantic priority audit
+
+A further renderer-level audit found that `EffectiveScope()` deliberately
+prioritizes `CurrentQueueExactScope` (ScreenHud / WorldBillboard / projected
+marker) over a plain `CurrentScope`. Therefore restoring deferred PMT sky
+ownership with only `ScopedRenderSemantic(WorldSky)` could still be defeated
+by stale selected SpriteNode provenance.
+
+Matched 405890->404700 sky draws now use
+`ScopedExactProducerSemantic(WorldSky, nullptr, true)`. This is the same
+bounded pattern already used by exact nonqueued world producers: while
+SpriteQueueDepth is zero it clears queue-exact scope, pending one-shot and
+projected-marker state, installs WorldSky for exactly the physical PMT call,
+then restores all prior semantic state. Unmatched PMT entries instantiate the
+scope with None and remain unchanged. The existing DRAW diagnostic still
+reports the resulting actual EffectiveScope so HMD evidence can catch any
+unexpected higher-priority owner.

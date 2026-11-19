@@ -2339,8 +2339,16 @@ class VRLensFlareProjected2D : public Hook
         using namespace OutRunVR::GameSemantic;
         const auto queuedSkyIndex=
             OutRunVR::WorldSkyOpaqueQueue::Find(entry);
-        ScopedRenderSemantic queuedSkyScope(
-            queuedSkyIndex>=0 ? RenderScope::WorldSky : CurrentScope);
+        // EffectiveScope() intentionally lets a selected SpriteNode semantic
+        // outrank plain CurrentScope. A deferred PMT sky draw is not a
+        // SpriteNode consumer, so a stale ScreenHud/WorldBillboard token must
+        // not rebrand exact 4521C0 provenance. Use the same bounded direct
+        // producer shield as other source-proven nonqueued world draws:
+        // clear queue/pending marker state only for the matched physical draw,
+        // then restore it unconditionally.
+        ScopedExactProducerSemantic queuedSkyScope(
+            queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None,
+            nullptr,true);
         const auto callOriginal=[&]() {
             if(queuedSkyIndex>=0 && entry) {
                 static std::atomic<std::uint64_t> skyDraws{0};
