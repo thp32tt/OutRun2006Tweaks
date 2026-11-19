@@ -1044,8 +1044,11 @@ class VrOriginalRaceSkyOwner final : public Hook
     class ScopedQuestSkyTransitionRotationLock final
     {
         std::uint8_t* base_=nullptr;
-        std::array<float,16> oldLayerRotation_{};
+        std::array<float,9> oldLayerRotation_{};
         bool active_=false;
+        inline static constexpr std::array<std::size_t,9> RotationIndices{{
+            0u,1u,2u,4u,5u,6u,8u,9u,10u
+        }};
     public:
         explicit ScopedQuestSkyTransitionRotationLock(void* work) noexcept
         {
@@ -1074,21 +1077,48 @@ class VrOriginalRaceSkyOwner final : public Hook
             const bool oldLayerDraw=
                 (fc8!=0u && ac0>0.100000001f) ||
                 (fcc!=0u && ac4>0.100000001f);
-            if(!newLayerDraw || !oldLayerDraw)return;
 
-            std::array<float,16> newLayerRotation{};
-            std::memcpy(newLayerRotation.data(),base_+0x50,sizeof(newLayerRotation));
-            std::memcpy(oldLayerRotation_.data(),base_+0xe0,sizeof(oldLayerRotation_));
+            std::array<float,9> newLayerRotation{};
             float maxDelta=0.f;
-            for(std::size_t i=0;i<newLayerRotation.size();++i) {
-                if(!std::isfinite(newLayerRotation[i])||
-                   !std::isfinite(oldLayerRotation_[i]))return;
+            for(std::size_t n=0;n<RotationIndices.size();++n) {
+                const auto byte=RotationIndices[n]*sizeof(float);
+                std::memcpy(&newLayerRotation[n],base_+0x50+byte,sizeof(float));
+                std::memcpy(&oldLayerRotation_[n],base_+0xe0+byte,sizeof(float));
+                if(!std::isfinite(newLayerRotation[n])||
+                   !std::isfinite(oldLayerRotation_[n]))return;
                 maxDelta=(std::max)(
-                    maxDelta,std::fabs(newLayerRotation[i]-oldLayerRotation_[i]));
+                    maxDelta,std::fabs(newLayerRotation[n]-oldLayerRotation_[n]));
             }
-            if(maxDelta<=1.0e-5f)return;
 
-            std::memcpy(base_+0xe0,newLayerRotation.data(),sizeof(newLayerRotation));
+            // Exact PC 40A190 consumes only the 3x3 orientation from +0x50.
+            // Do not overwrite the other seven matrix words just to fix a
+            // sky cross-fade. This keeps the render-only mutation as narrow
+            // as the original consumer's actual ABI.
+            const int phase=(newLayerDraw?1:0)|(oldLayerDraw?2:0);
+            if(Settings::VRQuestCockpitV2SkyProbe) {
+                static thread_local int lastPhase=-1;
+                static thread_local std::uint64_t phaseChanges=0;
+                if(phase!=lastPhase) {
+                    lastPhase=phase;
+                    const auto change=++phaseChanges;
+                    if(change<=64u)
+                        spdlog::info(
+                            "VR SKY TRANSITION PHASE: change={} phase={} "
+                            "gameState={} camera={} rotationDelta={:.6f} "
+                            "newFlags=0x{:X}/0x{:X} oldFlags=0x{:X}/0x{:X} "
+                            "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f}",
+                            change,phase,static_cast<int>(state),
+                            Game::camera()?static_cast<int>(
+                                Game::camera()->cam_mode_34A):-1,maxDelta,
+                            f38,f3c,fc8,fcc,a30,a34,ac0,ac4);
+                }
+            }
+            if(phase!=3 || maxDelta<=1.0e-5f)return;
+
+            for(std::size_t n=0;n<RotationIndices.size();++n) {
+                const auto byte=RotationIndices[n]*sizeof(float);
+                std::memcpy(base_+0xe0+byte,&newLayerRotation[n],sizeof(float));
+            }
             active_=true;
             static std::atomic<std::uint64_t> locks{0};
             const auto count=locks.fetch_add(1,std::memory_order_relaxed)+1;
@@ -1100,7 +1130,7 @@ class VrOriginalRaceSkyOwner final : public Hook
                     "camera={} maxRotationDelta={:.6f} "
                     "newFlags=0x{:X}/0x{:X} oldFlags=0x{:X}/0x{:X} "
                     "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f} "
-                    "renderOnly=1",
+                    "orientationWords=9 renderOnly=1",
                     count,static_cast<int>(state),
                     cam?static_cast<int>(cam->cam_mode_34A):-1,maxDelta,
                     f38,f3c,fc8,fcc,a30,a34,ac0,ac4);
@@ -1108,9 +1138,11 @@ class VrOriginalRaceSkyOwner final : public Hook
         }
         ~ScopedQuestSkyTransitionRotationLock() noexcept
         {
-            if(active_ && base_)
-                std::memcpy(base_+0xe0,oldLayerRotation_.data(),
-                            sizeof(oldLayerRotation_));
+            if(!active_ || !base_)return;
+            for(std::size_t n=0;n<RotationIndices.size();++n) {
+                const auto byte=RotationIndices[n]*sizeof(float);
+                std::memcpy(base_+0xe0+byte,&oldLayerRotation_[n],sizeof(float));
+            }
         }
         ScopedQuestSkyTransitionRotationLock(
             const ScopedQuestSkyTransitionRotationLock&)=delete;
@@ -1616,93 +1648,47 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 slot==OriginalOccupantSlot::Passenger363)) {
             return;
         }
-        // A nested original robot display may be ROB02 while another
-        // occupant owns the scoped W*C matrix. The old ordering bypassed
-        // before passenger visible/LOD0 ownership was entered, so a nested
-        // ROB02 could fall back to its nativeVisible=0 state. The 9a0fbde3
-        // log shows nativeVisible flips to 0 after PMT sample 180 and remains
-        // there, making this omission a real flicker risk.
-        if(OriginalRobotCorrectionActive()) {
-            const bool nestedPassengerVisible=
-                slot==OriginalOccupantSlot::Passenger363 &&
-                Settings::VRQuestCockpitV2PassengerVisible &&
-                cockpitActive && racing;
-            ScopedOriginalOccupantLod0 nestedVisible(nestedPassengerVisible);
-            if(nestedPassengerVisible && PassengerTraceOn()) {
-                static thread_local std::uint64_t nestedVisibleCount=0;
-                const auto count=++nestedVisibleCount;
-                if(count<=16u || count%180u==0u)
-                    spdlog::info(
-                        "VR PASSENGER NESTED VISIBLE: count={} epoch={} "
-                        "visibleScope={} correctionOwnerAlreadyActive=1",
-                        count,NativeFrameTrace().ActiveEpoch(),
-                        OriginalOccupantLod0Active());
-            }
-            RobotHook.ccall<void>(robot);
-            return;
-        }
-        if(!NativeFrameTrace().Active() || InSceneEffect()) {
-            if(slot==OriginalOccupantSlot::Passenger363 &&
-               cockpitActive && racing && PassengerTraceOn()) {
-                static thread_local std::uint64_t earlyNativeCount=0;
-                const auto count=++earlyNativeCount;
-                if(count<=16u || count%180u==0u)
-                    spdlog::info(
-                        "VR PASSENGER EARLY NATIVE: count={} frameActive={} "
-                        "sceneEffect={} stereoValid={} (diagnostic only)",
-                        count,NativeFrameTrace().Active(),InSceneEffect(),
-                        OutRunVRRenderer::GetLatchedStereoFrameView()!=nullptr);
-            }
-            RobotHook.ccall<void>(robot);
-            return;
-        }
-        const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
-        const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
+        // Render-only occupant decisions do not need the W*C/frame owner.
+        // In particular, an already-running exact ROB02 callback must not
+        // blink merely because NativeFrameTracker or XR pose publication has
+        // a transient gap. We never fabricate a draw here: this only scopes
+        // visibility around the native ROB02 call that already reached us.
         const auto action=SelectCockpitOccupantRender(
             slot,cockpitActive,racing,
             Settings::VRQuestCockpitV2HideDriver,
             Settings::VRQuestCockpitV2PassengerVisible);
         if(action==CockpitOccupantRender::SuppressDriver)return;
-        // This proves that original PC 514E60 was reached for the real
-        // passenger work. It is NOT proof of a visible GPU submission:
-        // PMT existence, LOD, culling and stereo must still succeed.
-        if(slot==OriginalOccupantSlot::Passenger363) {
-            static thread_local unsigned observed=0;
-            if(++observed<=12)
-                spdlog::info("VR COCKPIT PASSENGER: native ROB02 "
-                    "display callback observed epoch={} stereoValid={} "
-                    "mode1={} followCamera0={} sample={}",
-                    frameEpoch,stereo&&stereo->valid,
-                    camera->cam_mode_34A==1,
-                    Settings::VRQuestCockpitV2PassengerVisible.get(),observed);
-        }
-        // Passenger 363 is kept on its proven native Windows model matrix;
-        // the visible/LOD0 scope is the only cockpit override. Driver 362
-        // retains the Quest W*C correction path below.
-        const bool passengerLod0=
-            action==CockpitOccupantRender::OriginalPassengerForceVisible;
-        ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);
-        // Field run 2026-11-19: the visible ROB02 position is correct when
-        // the stock Windows work matrix is used. The previous 4-unit W*C
-        // guard caused a temporal path switch: early frames used corrected
-        // W*C, then larger body/camera deltas fell back to native, and later
-        // crossings could toggle again. That matches "missing at start,
-        // appears later, occasional flicker". Passenger 363 therefore keeps
-        // its native model matrix for the entire cockpit draw; only the
-        // verified visible/LOD0 scope is retained. Driver 362 still uses the
-        // Quest occupant correction path below.
-        if(slot==OriginalOccupantSlot::Passenger363) {
+        if(action==CockpitOccupantRender::OriginalPassengerForceVisible) {
+            const auto* stereoNow=OutRunVRRenderer::GetLatchedStereoFrameView();
+            const auto frameEpochNow=NativeFrameTrace().ActiveEpoch();
+            ScopedOriginalOccupantLod0 passengerVisible(true);
             static thread_local std::uint64_t nativeLocks=0;
             const auto count=++nativeLocks;
             if(PassengerTraceOn() && (count<=16u || count%180u==0u))
                 spdlog::info(
                     "VR PASSENGER NATIVE LOCK: count={} epoch={} "
-                    "nativeWorkLocked=1 visibleScope={} stereoValid={}",
-                    count,frameEpoch,OriginalOccupantLod0Active(),
-                    stereo&&stereo->valid);
+                    "nativeWorkLocked=1 visibleScope={} frameActive={} "
+                    "stereoValid={} correctionOwnerActive={}",
+                    count,frameEpochNow,OriginalOccupantLod0Active(),
+                    NativeFrameTrace().Active(),
+                    stereoNow&&stereoNow->valid&&stereoNow->poseSequence!=0,
+                    OriginalRobotCorrectionActive());
             RobotHook.ccall<void>(robot);
             return;
         }
+
+        // Driver W*C correction still requires an exact native frame and
+        // paired XR pose. Any nested/uncertain non-passenger draw stays stock.
+        if(OriginalRobotCorrectionActive()) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
+        if(!NativeFrameTrace().Active() || InSceneEffect()) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
+        const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
+        const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
         if(!Settings::VRQuestCockpitV2OccupantCorrection) {
             RobotHook.ccall<void>(robot);
             return;

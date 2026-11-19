@@ -41,8 +41,9 @@ assert "PassengerSceneHook.ccall<void>(mask,first,last);" in hook
 assert "PassengerGateThreadCalls" in hook
 assert "PassengerModelCorrectionNearNative" not in hook
 assert "VR PASSENGER NATIVE MATRIX:" not in hook
-assert "VR PASSENGER NESTED VISIBLE:" in hook
-assert "VR PASSENGER EARLY NATIVE:" in hook
+assert "VR PASSENGER NESTED VISIBLE:" not in hook
+assert "VR PASSENGER EARLY NATIVE:" not in hook
+assert "correctionOwnerActive={}" in hook
 analyzer = Path("tools/Analyze-OutRunVRSession.ps1").read_text(encoding="utf-8")
 assert "gameExitCode=(-?\\d+)" in analyzer
 assert "\\b(crash|" not in analyzer
@@ -65,6 +66,9 @@ assert "VR PASSENGER NATIVE LOCK:" in hook
 assert "nativeWorkLocked=1" in hook
 assert "ScopedQuestSkyTransitionRotationLock" in hook
 assert "VR SKY TRANSITION ROTATION LOCK:" in hook
+assert "VR SKY TRANSITION PHASE:" in hook
+assert "orientationWords=9" in hook
+assert "RotationIndices" in hook
 assert "state!=STATE_START && state!=STATE_GAME" in hook
 assert "base_+0x50" in hook and "base_+0xe0" in hook
 assert "afterDriver!=beforeDriver,after!=before" in hook

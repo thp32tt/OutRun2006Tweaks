@@ -120,10 +120,12 @@ def pass_06_goal_start_scene_boundaries():
 
 def pass_07_nested_draw_and_restore():
     check_order(robot, "ShouldSuppressOriginalPassenger(",
+                "const auto action=SelectCockpitOccupantRender(",
+                "if(action==CockpitOccupantRender::OriginalPassengerForceVisible)",
+                "ScopedOriginalOccupantLod0 passengerVisible(true);",
+                "VR PASSENGER NATIVE LOCK:",
                 "if(OriginalRobotCorrectionActive())",
-                "ScopedOriginalOccupantLod0 nestedVisible(nestedPassengerVisible);",
-                "if(!NativeFrameTrace().Active() || InSceneEffect())",
-                "ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);")
+                "if(!NativeFrameTrace().Active() || InSceneEffect())")
     check("ScopedOriginalRobotCorrectionOwner correctionOwner(true);" in robot,
           "W*C recursion owner lost")
     check("ScopedOriginalRobotWorkMatrix scoped(" in robot,
@@ -139,10 +141,12 @@ def pass_07_nested_draw_and_restore():
           "force draw must own native render and a live paired XR pose")
     check("PassengerModelCorrectionNearNative" not in robot,
           "dead 4-unit passenger threshold still exists below native lock")
-    check("VR PASSENGER NESTED VISIBLE:" in robot,
-          "nested passenger draw can still bypass forced visibility")
-    check("VR PASSENGER EARLY NATIVE:" in robot,
-          "missing bounded evidence for frame/effect fail-closed path")
+    check("VR PASSENGER NESTED VISIBLE:" not in robot,
+          "passenger still has a separate recursion-dependent visibility route")
+    check("VR PASSENGER EARLY NATIVE:" not in robot,
+          "passenger visibility still depends on frame readiness")
+    check("correctionOwnerActive={}" in robot,
+          "native-lock diagnostics do not expose nested driver ownership")
     sky=read("src/vr/d3d9/stereo_renderer_r7.inc")
     check("fixedNativeEyePair=rotationOnly ? nullptr :" in sky,
           "fixed original sky can still switch between native/fallback bases")
@@ -172,8 +176,11 @@ def pass_07_nested_draw_and_restore():
     check("VR PASSENGER NATIVE LOCK:" in hook and "nativeWorkLocked=1" in hook,
           "passenger can still switch between corrected and native matrices")
     check("ScopedQuestSkyTransitionRotationLock" in hook and
-          "VR SKY TRANSITION ROTATION LOCK:" in hook,
-          "sky transition does not preserve alpha while locking old/new rotation")
+          "VR SKY TRANSITION ROTATION LOCK:" in hook and
+          "VR SKY TRANSITION PHASE:" in hook,
+          "sky transition phase/rotation ownership is not observable")
+    check("orientationWords=9" in hook and "RotationIndices" in hook,
+          "sky repair still overwrites more than the 3x3 orientation consumed by 40A190")
     check("state!=STATE_START && state!=STATE_GAME" in hook,
           "first-stage camera 30/2 sky window is still excluded")
     check("base_+0x50" in hook and "base_+0xe0" in hook,

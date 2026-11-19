@@ -107,3 +107,26 @@ reused the already-captured session; no new Quest 3 visual claim is made.
   during gameplay. v3 poseLag/ackLag counters are shadow-parity diagnostics;
   the logged bridge explicitly states v2 remains render authority and
   poseMismatch=0.
+
+
+## 2026-11-19 continued pre-HMD debug after 7f84cd4e
+
+- The exact decomp implementation of PC `40A190 pc_matrix_load_rotation`
+  consumes only the 3x3 orientation from each sky record's `+0x50` matrix.
+  The previous render-only transition lock copied/restored all 16 floats.
+  The lock is now narrowed to exactly nine orientation words; alpha, flags,
+  translation-row words and all other sky work remain untouched.
+- Added bounded `VR SKY TRANSITION PHASE` logging on phase changes
+  (new-only / old-only / overlap) with flags, alpha and 3x3 rotation delta.
+  This gives one-run proof of whether the reported blink coincides with the
+  native 451E90 overlap rather than inferring it from aggregate draw counts.
+- Re-read the 9a0fbde3 user session: sampled camera-1 ROB02 car-gate entries
+  all had frameReady=true and stereoReady=true, but those logs are sampled
+  and cannot prove every callback. Passenger visibility is therefore removed
+  from NativeFrameTracker/XR readiness entirely: when an exact live ROB02
+  callback already reaches 514E60 in active racing camera-1, its stock Windows
+  matrix + scoped visible/LOD0 path executes before recursion or frame gates.
+  This cannot create an extra passenger draw; the separate 4879B0 car-gate
+  recovery still requires valid native frame + paired XR pose.
+- Driver W*C remains strict: nested, frame-uncertain or pose-uncertain driver
+  paths continue to fail closed to original rendering.
