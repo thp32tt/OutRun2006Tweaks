@@ -1577,24 +1577,8 @@ class VrOriginalRaceSkyOwner final : public Hook
 
     static void __cdecl RaceSkyDisplayDest(void* work)
     {
-        using namespace OutRunVR::GameSemantic;
-        // An exact 4521C0 source must not consume a pending HUD/marker
-        // one-shot armed by an unrelated producer before this call.
-        ScopedExactProducerSemantic sky(
-            RenderScope::WorldSky,nullptr,true);
-        if(Settings::VRQuestCockpitV2SkyProbe) {
-            static std::atomic<std::uint64_t> sourceSamples{0};
-            const auto count=sourceSamples.fetch_add(
-                1,std::memory_order_relaxed)+1;
-            if(count<=24u || count%180u==0u)
-                spdlog::info(
-                    "VR SKY SOURCE OWNER: count={} thread={} "
-                    "effectiveScope={} producer={} queueActive={} "
-                    "exact={} pendingIsolated=1",
-                    count,GetCurrentThreadId(),Name(EffectiveScope()),
-                    Name(CurrentRenderProducerToken()),QueueRenderActive(),
-                    EffectiveScope()==RenderScope::WorldSky);
-        }
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic sky(
+            OutRunVR::GameSemantic::RenderScope::WorldSky);
         ScopedQuestSkyTransitionProbe transitionProbe(work);
         RaceSkyDisplayHook.ccall<void>(work);
     }
