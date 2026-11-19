@@ -295,9 +295,22 @@ jobs:
           assert 'RemoveGlassReflectionFlags(' in hook
           assert 'RemoveGlassReflectionLayer(' in hook
           assert 'OriginalPassengerForceVisible' in hook
-          assert 'ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);' in hook
-          assert 'const bool passengerLod0=' in hook
-          assert 'if(action==CockpitOccupantRender::OriginalPassengerForceVisible){' not in hook
+          # A genuine live ROB02 callback is now the strongest passenger owner:
+          # keep stock work matrix + forced-visible before driver W*C/frame gates.
+          # This does NOT create a draw; 4879B0 recovery remains separately gated.
+          native_lock='if(action==CockpitOccupantRender::OriginalPassengerForceVisible) {'
+          assert native_lock in hook
+          assert 'ScopedOriginalOccupantLod0 passengerVisible(true);' in hook
+          native_lock_at=hook.index(native_lock)
+          visible_at=hook.index('ScopedOriginalOccupantLod0 passengerVisible(true);',native_lock_at)
+          recurse_at=hook.index('if(OriginalRobotCorrectionActive())',visible_at)
+          frame_gate_at=hook.index('if(!NativeFrameTrace().Active() || InSceneEffect())',recurse_at)
+          assert native_lock_at < visible_at < recurse_at < frame_gate_at
+          native_block=hook[native_lock_at:recurse_at]
+          assert 'nativeWorkLocked=1' in native_block
+          assert 'RobotHook.ccall<void>(robot);' in native_block
+          assert 'return;' in native_block
+          assert 'ComposeOccupantModel(' not in native_block
           assert 'NativeSeatOffset(' in hook
           assert 'QuestCockpitV2RawB0Camera = false' in ini
           assert 'QuestCockpitV2OccupantCorrection = false' in ini
