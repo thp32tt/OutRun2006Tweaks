@@ -52,7 +52,7 @@ services:
     # Live cgroup evidence (2026-11-19): 2 GiB caused 35k+ memory.max
     # events, ~0.76 GiB swap use, while a 1-CPU quota accumulated heavy
     # throttling. Give Chromium modest headroom without consuming the whole N100.
-    cpus: 1.50
+    cpus: 2.00
     mem_limit: ${OUTRUN_REWORK_MEM_LIMIT:-3072m}
     pids_limit: 384
     shm_size: ${OUTRUN_REWORK_SHM_SIZE:-512m}
