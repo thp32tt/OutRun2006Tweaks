@@ -8,7 +8,12 @@ ui = (root / "src/overlay/settings_ui.cpp").read_text(encoding="utf-8")
 plugin = (root / "src/plugin.hpp").read_text(encoding="utf-8")
 vr = (root / "src/vr/settings.cpp").read_text(encoding="utf-8")
 
-for forced in ("-VR.QuestCockpitV2SeatBack=", "-VR.QuestCockpitV2SeatDown=", "-VR.QuestCockpitV2SeatRight="):
+for forced in (
+    "-VR.QuestCockpitV2SeatBack=",
+    "-VR.QuestCockpitV2SeatDown=",
+    "-VR.QuestCockpitV2SeatRight=",
+    "-VR.QuestCockpitV2PassengerVisible=",
+):
     assert forced not in launcher, forced
 
 for default in ("QuestCockpitV2SeatBack = -0.08", "QuestCockpitV2SeatDown = 0.08", "QuestCockpitV2SeatRight = 0.0"):
@@ -26,4 +31,4 @@ assert "Settings::write(Module::UserIniPath)" in ui
 assert "VRQuestCockpitV2SeatBack = Settings::VRQuestCockpitV2ReleaseSeatBackDefault" in ui
 assert "VRQuestCockpitV2SeatDown = Settings::VRQuestCockpitV2ReleaseSeatDownDefault" in ui
 assert "VRQuestCockpitV2SeatRight = Settings::VRQuestCockpitV2ReleaseSeatRightDefault" in ui
-print("PASS: v0.02 cockpit seat defaults persist and F11 save/reset controls are wired")
+print("PASS: v0.03 cockpit seat/passenger persistence and F11 save/reset controls are wired")

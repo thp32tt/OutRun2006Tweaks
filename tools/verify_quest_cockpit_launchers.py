@@ -83,6 +83,8 @@ else:
             errors.append(f"release launcher fixed Quest3 eye resolution missing: {required}")
     if "-VR.AutoRenderResolution=true" in release:
         errors.append("release launcher still forces OpenXR auto eye resolution")
+    if "-VR.QuestCockpitV2PassengerVisible=" in release:
+        errors.append("release launcher overrides persisted passenger Follow/Remove setting")
 
 if errors:
     for error in errors:

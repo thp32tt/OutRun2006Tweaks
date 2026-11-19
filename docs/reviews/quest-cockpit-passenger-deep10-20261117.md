@@ -473,3 +473,19 @@ only the genuine live ROB02 Follow call. Passenger PMT-node logging and the
 405890->404700 physical-entry receipt require this exact scope in addition to
 the visibility scope. Rendering behavior is unchanged; this only prevents
 false-positive passenger evidence in future diagnostic logs.
+
+
+## 2026-11-19 persisted passenger option vs release CLI override
+
+The public `Start-OutRun.cmd` still passed
+`-VR.QuestCockpitV2PassengerVisible=true` on every VR launch. That conflicts
+with the F11 contract: `Passenger: Remove` is saved through the normal user
+INI path, but a command-line value can override the saved choice again on the
+next launch.
+
+The release launcher no longer supplies any PassengerVisible command-line
+value. The shipped INI remains `QuestCockpitV2PassengerVisible = true`, so a
+fresh install still defaults to Follow Camera 0, while a user's saved Remove
+choice can persist. The dedicated PASSENGER diagnostic runner still forces
+Follow only for that one diagnostic run. Persistence/launcher/release-package
+CI now rejects reintroducing the public CLI override.

@@ -609,7 +609,7 @@ jobs:
           foreach($required in @('-VR.QuestCockpitV2Enabled=true','-VR.QuestCockpitV2F0RenderScope=true','-VR.QuestCockpitV2NativeSeatProfile=true','-VR.QuestCockpitV2ApkNativeCamera=true','-VR.QuestCockpitV2OccupantCorrection=true','-VR.AutoRenderResolution=false','-VR.RenderWidth=2496','-VR.RenderHeight=2688','-HudInspector=false')) {
             if(!$launcher.Contains($required)){throw "v0.03 launcher missing $required"}
           }
-          foreach($forbidden in @('-VR.QuestCockpitV2SeatBack=','-VR.QuestCockpitV2SeatDown=','-VR.QuestCockpitV2SeatRight=','-VR.AutoRenderResolution=true')) {
+          foreach($forbidden in @('-VR.QuestCockpitV2SeatBack=','-VR.QuestCockpitV2SeatDown=','-VR.QuestCockpitV2SeatRight=','-VR.QuestCockpitV2PassengerVisible=','-VR.AutoRenderResolution=true')) {
             if($launcher.Contains($forbidden)){throw "v0.03 persistent cockpit setting is still command-line forced: $forbidden"}
           }
           $releaseIni=Get-Content -LiteralPath (Join-Path $release 'OutRun2006Tweaks.ini') -Raw
