@@ -1172,13 +1172,15 @@ namespace OutRunVR::WorldSkyOpaqueQueue
             if(Settings::VRQuestCockpitV2SkyProbe &&
                (count<=24u || count%180u==0u))
                 spdlog::info(
-                    "VR SKY OPAQUE QUEUE TAG: count={} object=0x{:08X} "
-                    "queueIndex={} entry=0x{:X} expectedPassMask=0x{:X} "
-                    "matrixHash=0x{:016X}",
-                    count,objectId,k,
+                    "VR SKY OPAQUE QUEUE TAG: count={} thread={} "
+                    "object=0x{:08X} queueIndex={} entry=0x{:X} "
+                    "expectedPassMask=0x{:X} matrixHash=0x{:016X} "
+                    "activeMarks={}",
+                    count,GetCurrentThreadId(),objectId,k,
                     reinterpret_cast<std::uintptr_t>(entry),
                     static_cast<unsigned>(mark.expectedPassMask),
-                    static_cast<unsigned long long>(mark.matrixHash));
+                    static_cast<unsigned long long>(mark.matrixHash),
+                    MarkCount);
         }
     }
     static std::int32_t Find(const std::uint32_t* entry) noexcept {
@@ -2347,10 +2349,15 @@ class VRLensFlareProjected2D : public Hook
                 if(Settings::VRQuestCockpitV2SkyProbe &&
                    (count<=24u || count%180u==0u))
                     spdlog::info(
-                        "VR SKY OPAQUE QUEUE DRAW: count={} entry=0x{:X} "
-                        "object=0x{:08X} pass={} scope=WORLD_SKY_4521C0",
-                        count,reinterpret_cast<std::uintptr_t>(entry),
-                        entry[14],entry[8]);
+                        "VR SKY OPAQUE QUEUE DRAW: count={} thread={} "
+                        "entry=0x{:X} object=0x{:08X} pass={} "
+                        "effectiveScope={} producer={} queueActive={} "
+                        "scope=WORLD_SKY_4521C0",
+                        count,GetCurrentThreadId(),
+                        reinterpret_cast<std::uintptr_t>(entry),
+                        entry[14],entry[8],Name(EffectiveScope()),
+                        Name(CurrentRenderProducerToken()),
+                        QueueRenderActive());
             }
             Module::fn_ptr<LensOpaquePmtEntryFn>(0x4700)(entry);
             if(queuedSkyIndex>=0 && entry)

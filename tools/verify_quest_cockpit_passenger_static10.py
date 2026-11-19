@@ -196,6 +196,9 @@ def pass_07_nested_draw_and_restore():
     check("VR SKY OPAQUE QUEUE TAG:" in hook and
           "VR SKY OPAQUE QUEUE DRAW:" in hook,
           "deferred 4056D0 sky PMT draw loses exact WorldSky provenance")
+    check("effectiveScope={} producer={} queueActive={}" in hook and
+          "activeMarks={}" in hook and "thread={}" in hook,
+          "deferred sky provenance cannot prove actual physical semantic/thread")
     check("RaceSkyObjectQueueRva = 0x56D0" in hook and
           "WorldSkyOpaqueQueue::RecordDeferred" in hook and
           "WorldSkyOpaqueQueue::Find(entry)" in hook,

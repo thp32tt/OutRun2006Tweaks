@@ -314,3 +314,15 @@ game queue contents.
 The earlier CI failure at this stage was also traced to a static verifier bug:
 it parsed the first `bool apply()` in hooks_graphics.cpp rather than the
 VrOriginalRaceSkyOwner class. The verifier is now class-scoped.
+
+
+### Deferred-sky physical ownership diagnostics
+
+The source/physical join now logs the render thread on both TAG and DRAW.
+The DRAW receipt also records the actual `EffectiveScope()`, current producer
+token and whether a SpriteNode queue is active after the WorldSky scope is
+installed; TAG records the bounded active-mark count. These are diagnostic
+only. They make the next HMD session sufficient to distinguish:
+(1) source and physical draw on different renderer threads,
+(2) a matched PMT entry whose WorldSky scope is overridden by a higher-priority
+semantic, and (3) a successful exact WorldSky physical draw.

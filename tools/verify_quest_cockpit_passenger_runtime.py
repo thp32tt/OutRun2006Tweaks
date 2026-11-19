@@ -56,6 +56,8 @@ assert "VR SKY NONEXACT DEPTH-OFF:" in sky
 assert "shaderNonSkyDepthOffDraws={}" in sky
 assert "VR SKY OPAQUE QUEUE TAG:" in hook
 assert "VR SKY OPAQUE QUEUE DRAW:" in hook
+assert "effectiveScope={} producer={} queueActive={}" in hook
+assert "thread={}" in hook
 assert "RaceSkyObjectQueueRva = 0x56D0" in hook
 assert "WorldSkyOpaqueQueue::RecordDeferred" in hook
 assert "WorldSkyOpaqueQueue::Find(entry)" in hook
