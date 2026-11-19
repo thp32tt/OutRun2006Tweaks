@@ -450,3 +450,12 @@ checks both the version file and workflow text, and explicitly rejects the
 stale `v0.02` predicate. This only repairs the dormant release gate; the
 current debug branch still does not publish v0.03 and HMD passenger/sky
 confirmation remains required first.
+
+
+### Runtime verifier follow-up
+
+The first frame-local scene-evidence CI run failed before packaging because the
+runtime source verifier still required the retired expression
+`afterDriver!=beforeDriver,after!=before`. The verifier now requires the
+actual `sceneEvidence.driverReached/guestReached` handoff while retaining the
+old counters only as telemetry-presence checks.
