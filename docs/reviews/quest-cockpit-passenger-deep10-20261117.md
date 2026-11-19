@@ -399,3 +399,24 @@ The release launcher now explicitly uses `AutoRenderResolution=false`,
 isolated-core CI and the v0.03 packaging gate all reject a return to auto
 resolution. This is release parity only; it does not claim HMD passenger/sky
 validation.
+
+
+## 2026-11-19 passenger pre-PMT gate and physical-entry proof
+
+A further exact-original trace found one diagnostic blind spot between the
+already-proven ROB02 callback and the PMT culling override. Canonical 514C30
+reads `EvWorkRobot+4` before it queues any body mesh: bit 0x8000 must be set,
+and a 0x08 state is rejected unless 0x04 is also set. The replacement EXE
+prefix is now checked byte-for-byte in CI and the PASSENGER diagnostic reports
+`workFlags` plus `robDisplayGateOpen`. This pass does **not** force those
+native actor flags.
+
+The original robot renderer then queues rigid/skinned meshes through 405360/
+405580 and synchronously flushes through 405890->404700 before 514E60 returns.
+While the exact ROB02 visibility scope is still active, the existing exact
+404700 wrapper now emits bounded `VR PASSENGER PHYSICAL PMT` receipts
+(object, pass, palette count, matrix/node/mesh pointers). This distinguishes
+three cases in one HMD run: native actor gate rejected the draw, PMT traversal
+failed to reach the physical entry, or physical PMT submission occurred and
+the remaining problem lies below that boundary. No passenger coordinate,
+event lifecycle, scene mask or render flag is mutated by this instrumentation.

@@ -1957,11 +1957,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 spdlog::info(
                     "VR PASSENGER NATIVE LOCK: count={} epoch={} "
                     "nativeWorkLocked=1 visibleScope={} frameActive={} "
-                    "stereoValid={} correctionOwnerActive={}",
+                    "stereoValid={} correctionOwnerActive={} "
+                    "workFlags=0x{:08X} robDisplayGateOpen={}",
                     count,frameEpochNow,OriginalOccupantLod0Active(),
                     NativeFrameTrace().Active(),
                     stereoNow&&stereoNow->valid&&stereoNow->poseSequence!=0,
-                    OriginalRobotCorrectionActive());
+                    OriginalRobotCorrectionActive(),robot->dword4,
+                    OriginalRobotDisplayGateOpen(robot->dword4));
             RobotHook.ccall<void>(robot);
             return;
         }
@@ -2323,6 +2325,31 @@ class VRLensFlareProjected2D : public Hook
         ScopedExactProducerSemantic queuedSkyScope(
             queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None,
             nullptr,true);
+
+        // The original ROB display queues rigid/skinned body nodes, then
+        // synchronously reaches 405890 -> 404700 before 514E60 returns.
+        // During exact ROB02 Follow mode, ScopedOriginalOccupantLod0 remains
+        // active across this call. This receipt is therefore the first proof
+        // that a passenger PMT entry reached the native physical-entry draw,
+        // rather than merely reaching event/cull callbacks.
+        const bool passengerPhysicalPmt=
+            entry && Settings::VRQuestCockpitV2PassengerVisible &&
+            OutRunVR::QuestCockpitV2::OriginalOccupantLod0Active();
+        if(passengerPhysicalPmt) {
+            static std::atomic<std::uint64_t> passengerPmtDraws{0};
+            const auto count=passengerPmtDraws.fetch_add(
+                1,std::memory_order_relaxed)+1;
+            if(count<=32u || count%180u==0u)
+                spdlog::info(
+                    "VR PASSENGER PHYSICAL PMT: count={} thread={} "
+                    "entry=0x{:X} object=0x{:08X} pass={} paletteCount={} "
+                    "matrix=0x{:X} node=0x{:X} mesh=0x{:X} "
+                    "scope={} queueActive={} authority=405890_404700",
+                    count,GetCurrentThreadId(),
+                    reinterpret_cast<std::uintptr_t>(entry),
+                    entry[14],entry[8],entry[2],entry[1],entry[6],entry[7],
+                    Name(EffectiveScope()),QueueRenderActive());
+        }
         const auto callOriginal=[&]() {
             if(queuedSkyIndex>=0 && entry) {
                 static std::atomic<std::uint64_t> skyDraws{0};
