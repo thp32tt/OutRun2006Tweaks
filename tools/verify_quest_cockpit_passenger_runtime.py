@@ -54,6 +54,13 @@ assert "exactWorldSky ? nullptr :" in sky
 assert "VR SKY COHERENT BASIS:" in sky
 assert "VR SKY NONEXACT DEPTH-OFF:" in sky
 assert "shaderNonSkyDepthOffDraws={}" in sky
+assert "VR SKY OPAQUE QUEUE TAG:" in hook
+assert "VR SKY OPAQUE QUEUE DRAW:" in hook
+assert "effectiveScope={} producer={} queueActive={}" in hook
+assert "thread={}" in hook
+assert "RaceSkyObjectQueueRva = 0x56D0" in hook
+assert "WorldSkyOpaqueQueue::RecordDeferred" in hook
+assert "WorldSkyOpaqueQueue::Find(entry)" in hook
 copyrun = Path("QuestCockpit-CopyRun.ps1").read_text(encoding="utf-8")
 # PASSENGER explicitly enables both bounded traces in the SAME mode.
 passenger_block = copyrun.split("if($Mode -eq 'PASSENGER'){",1)[1].split(
@@ -84,12 +91,18 @@ assert "const auto after=PassengerGateThreadCalls;" in hook
 assert "PassengerDriverDisplay(work);" in hook
 assert "driver->field_C,passenger->field_C," in hook
 assert "afterDriver!=beforeDriver,after!=before);" in hook
+assert "live,ExactPassengerSceneOwnerActive()," in hook
 assert "0x83,0xEC,0x10,0x83,0x3D,0x58,0x02,0x78,0x00,0x02" in hook
 assert "(flags & (OriginalEventPendingInit|OriginalEventInitialized)) ==" in policy
 assert "PassengerOtherCameraDraws.fetch_add(" in hook
 assert "PassengerGateCamera1Entries.fetch_add(" in hook
 assert "PassengerGateNonPassenger.fetch_add(" in hook
-assert "cockpit && race && frameReady && stereoReady" in hook
+assert "cockpit && race && renderOwner" in hook
+assert "const bool legacyFrameOwner=" in hook
+assert "!PassengerSceneHook && frameReady && stereoReady" in hook
+assert "const bool renderOwner=sceneOwner || legacyFrameOwner;" in hook
+assert "ScopedPassengerSceneOwner sceneOwner(exactRobScene);" in hook
+assert "ExactPassengerSceneOwnerActive()" in hook
 assert "OriginalPassengerDisplayGateSignature()" in hook
 assert "PassengerGateHook=std::move(guest);" in hook
 assert "Module::fn_ptr<NativeRobotDisplay>(" in hook
@@ -231,6 +244,9 @@ if __name__ == "__main__":
         assert at_va(0x440110 + 4, 6) == bytes.fromhex("8a8a48fb7900")
         assert at_va(0x440110 + 21, 6) == bytes.fromhex("888a48fb7900")
         assert at_va(0x4879B0, 4) == bytes.fromhex("a1189d79")
+        assert at_va(0x4056D0, 24) == bytes.fromhex(
+            "51558b6c240c83fdff0f843f010000568bc5c1e8108bf550"
+        )
         def original_callbacks(function_id):
             return struct.unpack("<5I", at_va(0x59BE78 + function_id * 20, 20))
         assert original_callbacks(0x37) == (
