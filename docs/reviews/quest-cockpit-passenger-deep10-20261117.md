@@ -228,3 +228,37 @@ remain original/fail-closed.
 This specifically closes a path that could explain "passenger absent for the
 first few seconds" even after the later 514E60 native-lock fix. HMD pixels are
 still unverified.
+
+
+## 2026-11-19 exact deferred 4521C0 sky provenance
+
+The previous non-exact depth-off discriminator led to a stronger static
+finding. Exact PC decomp shows `race_sky_object_452080` calls `4056D0`.
+`4056D0` calls `405360`, which normally appends PMT node descriptors to
+opaque queue `0x864EF8`; only when `8999B0` immediate mode is armed does
+the queue flush before `4056D0` returns. Ordinary physical rendering occurs
+later in `405890 -> 404700`.
+
+Therefore a simple semantic scope around `4521C0` cannot cover every sky
+GPU draw: the deferred queue outlives the scope and those nodes were necessarily
+classified as generic world. This is a concrete lifetime bug independent of
+the HMD hypothesis and is consistent with the prior session's roughly one
+extra non-exact programmable depth-off world draw per Present.
+
+The canonical replacement EXE SHA `68ceb386...` was re-read from the exact
+successful build artifact. Original `4056D0` begins
+`51 55 8B 6C 24 0C 83 FD FF 0F 84 3F 01 00 00 56 8B C5 C1 E8 10 8B F5 50`.
+That signature is now checked before installing the source hook.
+
+While and only while exact 4521C0 owns `WorldSky`, 4056D0 records newly
+retained opaque entries by their real 0x3C descriptor identity, 64-byte matrix
+hash, object id and original node pass mask. The already exact retail
+405890->404700 call-edge wrapper then rejoins that identity and restores
+`WorldSky` around the physical PMT draw. A mark retires after every pass
+declared by the original node flags has been observed. Immediate 4056D0 draws
+need no mark because they execute while the source scope is still live.
+
+No queue descriptor, object flag, matrix or game state is modified. The repair
+only preserves source provenance across the game's own deferred queue. Bounded
+markers: `VR SKY OPAQUE QUEUE TAG` and `VR SKY OPAQUE QUEUE DRAW`.
+Visual success remains UNTESTED pending Quest 3 confirmation.

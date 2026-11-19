@@ -217,6 +217,11 @@ jobs:
           assert "'-FramerateInterpolation=false'" in launcher
           assert 'MaybeLogCockpitSkyProbe(stereoRequested,composedStereo,' in r7
           assert 'VRQuestCockpitV2SkyProbe' in settings
+          assert 'VR SKY OPAQUE QUEUE TAG:' in hook
+          assert 'VR SKY OPAQUE QUEUE DRAW:' in hook
+          assert 'RaceSkyObjectQueueRva = 0x56D0' in hook
+          assert 'WorldSkyOpaqueQueue::RecordDeferred' in hook
+          assert 'WorldSkyOpaqueQueue::Find(entry)' in hook
           assert 'ScopedPassengerSceneOwner sceneOwner(exactRobScene);' in hook
           assert 'ExactPassengerSceneOwnerActive()' in hook
           assert 'cockpit && race && sceneOwner' in hook

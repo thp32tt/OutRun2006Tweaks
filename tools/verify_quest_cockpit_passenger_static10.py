@@ -189,7 +189,14 @@ def pass_07_nested_draw_and_restore():
           "sky-headset basis diagnostics unavailable")
     check("VR SKY NONEXACT DEPTH-OFF:" in sky and
           "shaderNonSkyDepthOffDraws={}" in sky,
-          "one-per-present non-exact depth-off world draw remains unidentified")
+          "non-exact depth-off discriminator unavailable")
+    check("VR SKY OPAQUE QUEUE TAG:" in hook and
+          "VR SKY OPAQUE QUEUE DRAW:" in hook,
+          "deferred 4056D0 sky PMT draw loses exact WorldSky provenance")
+    check("RaceSkyObjectQueueRva = 0x56D0" in hook and
+          "WorldSkyOpaqueQueue::RecordDeferred" in hook and
+          "WorldSkyOpaqueQueue::Find(entry)" in hook,
+          "exact 4056D0 -> 405890 provenance join missing")
     scene=hook.split("static void __cdecl PassengerEventSceneDisplay(",1)[1].split(
         "static void __cdecl RobotDisplay(",1)[0]
     check_order(scene,"ScopedPassengerSceneOwner sceneOwner(exactRobScene);",
