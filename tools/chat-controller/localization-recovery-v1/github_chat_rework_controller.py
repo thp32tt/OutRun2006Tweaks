@@ -63,6 +63,7 @@ BROWSER_HEARTBEAT_SECONDS = 60
 BROWSER_JS_TIMEOUT_SECONDS = 12
 BROWSER_RELOAD_TIMEOUT_MS = 45000
 BROWSER_NEW_TAB_TIMEOUT_SECONDS = 25
+CHAT_USER_HYDRATION_TIMEOUT_MS = 12000
 # The old controller explicitly returned HOLD_IMAGE_TOOL_NOT_VERIFIED BEFORE
 # uploading, typing or pressing Enter. Only that exact old status is safe
 # to resume; other HOLD/AB_CLAIMED/AB_SENT states must never be resent.
@@ -437,31 +438,49 @@ def image_tool_pre_send_retry_due(prior, now=None):
 def verified_assistant_refresh_due(state, reason, now=None):
     """Allow a bounded read-only refresh of a stale exact-source chat URL.
 
-    This never submits a user message, never changes the source TASK_ID and
-    never treats a reference thumbnail as a generated assistant image.
+    Missing/lazy user turns are safe to refresh immediately once because the
+    persisted AB_SENT URL is already independently verified. Subsequent refresh
+    attempts remain limited to once per 30 minutes. No user message is sent.
     """
     if (not isinstance(state,dict) or state.get("status") != "AB_SENT"
-            or not is_saved_chat_url(state.get("ab_chat_url"))
-            or not str(reason).startswith(
-                "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0")
-            or state.get("last_result_poll_reason") != reason):
+            or not is_saved_chat_url(state.get("ab_chat_url"))):
+        return False
+    reason=str(reason)
+    missing_turn=(reason.startswith("CHAT_USER_TURNS_NOT_RENDERED") or
+                  reason.startswith("SOURCE_BOUND_USER_TURN_MISSING"))
+    stalled_image=reason.startswith(
+        "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0")
+    if not (missing_turn or stalled_image):
         return False
     now=now or dt.datetime.now(dt.timezone.utc)
-    for name, interval in (("last_result_poll_utc",1800),
-                           ("last_assistant_page_refresh_utc",1800)):
-        stamp=state.get(name)
-        if not isinstance(stamp,str):
-            if name=="last_result_poll_utc":
-                return False
-            continue
+
+    refresh_stamp=state.get("last_assistant_page_refresh_utc")
+    if isinstance(refresh_stamp,str):
         try:
             age=(now-dt.datetime.fromisoformat(
-                stamp.replace("Z","+00:00"))).total_seconds()
-            if age < interval or age < 0:
+                refresh_stamp.replace("Z","+00:00"))).total_seconds()
+            if age < 1800 or age < 0:
                 return False
         except (ValueError,TypeError,OverflowError):
             return False
-    return True
+
+    if missing_turn:
+        # First observed lazy/missing render gets one safe exact-URL refresh.
+        return True
+
+    # Image-only stalls are less disruptive: require the same diagnostic to
+    # have persisted for at least 30 minutes before refreshing.
+    if state.get("last_result_poll_reason") != reason:
+        return False
+    stamp=state.get("last_result_poll_utc")
+    if not isinstance(stamp,str):
+        return False
+    try:
+        age=(now-dt.datetime.fromisoformat(
+            stamp.replace("Z","+00:00"))).total_seconds()
+        return age >= 1800
+    except (ValueError,TypeError,OverflowError):
+        return False
 
 
 def result_poll_diagnostic(gh, state, reason):
@@ -762,6 +781,46 @@ class ChatBridge:
         return ("BROWSER_HEALTHY" if not recovered else
                 "BROWSER_RECOVERED_"+",".join(recovered))
 
+    async def wait_chat_user_turns_rendered(self, pg):
+        """Wait for ChatGPT's lazily hydrated user-turn DOM after navigation.
+
+        domcontentloaded is not enough on the N100 renderer. This only waits
+        and scrolls; it never types, uploads or sends anything.
+        """
+        try:
+            await pg.wait_for_function(
+                r"""() => {
+                  const selectors=[
+                    '[data-markdown-text-tone="user-message"]',
+                    '[data-message-author-role="user"]',
+                    '[data-testid="conversation-turn-user"]',
+                    '[data-testid*="user-message"]'
+                  ].join(',');
+                  return document.querySelector(selectors)!==null;
+                }""",
+                timeout=CHAT_USER_HYDRATION_TIMEOUT_MS,
+            )
+            # Generated media can be lazy-mounted near the end of the reply.
+            try:
+                await pg.evaluate(
+                    r"""() => {
+                      const all=[document.scrollingElement,...document.querySelectorAll('*')];
+                      let best=null,span=0;
+                      for(const e of all){
+                        if(!e||!e.scrollHeight||!e.clientHeight)continue;
+                        const d=e.scrollHeight-e.clientHeight;
+                        if(d>span){span=d;best=e;}
+                      }
+                      if(best)best.scrollTop=best.scrollHeight;
+                    }"""
+                )
+                await pg.wait_for_timeout(800)
+            except Exception:
+                pass
+            return True
+        except Exception:
+            return False
+
     async def page(self,role,url=None,*,read_only=False):
         """Read-only result retrieval never depends on a visible chat composer.
 
@@ -935,13 +994,14 @@ class ChatBridge:
                 if again in ("LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
                              "EXISTING_CANDIDATES_VERIFIED"):
                     saved=again
-        # Old AB_SENT requests may remain stuck with A0_G0_U1_L0 for hours.
-        # Refresh ONLY their exact, persisted conversation, at most each 30m,
-        # and resume the assistant-only SHA-bound DOM probe. Never re-send.
+        # Missing/lazy turns get one immediate safe refresh of the exact
+        # persisted AB_SENT URL. Repeated refreshes stay bounded to 30m.
+        read_only_refreshed=False
         if saved is None and verified_assistant_refresh_due(state,why):
             expected=state["ab_chat_url"].rstrip("/")
             try:
                 await pg.reload(wait_until="domcontentloaded",timeout=45000)
+                read_only_refreshed=True
                 if pg.url.rstrip("/") != expected:
                     reason="WAIT_CHATGPT_SOURCE_CHAT_REDIRECT"
                     await asyncio.to_thread(
@@ -949,7 +1009,7 @@ class ChatBridge:
                     return reason
                 await asyncio.to_thread(stage_state,self.gh,task,"AB_SENT",{
                     "last_assistant_page_refresh_utc":utc()})
-                await pg.wait_for_timeout(1200)
+                await self.wait_chat_user_turns_rendered(pg)
                 refreshed,detail=await rescue_single_image_candidate(
                     pg,task["task_id"],task["role"],str(ROOT),binding=task)
                 why=detail
@@ -968,8 +1028,11 @@ class ChatBridge:
             if (why.startswith("CHAT_USER_TURNS_NOT_RENDERED") or
                     why.startswith("SOURCE_BOUND_USER_TURN_MISSING")):
                 recovered=await old._recover_task_turn(pg,task["task_id"])
+                # _recover_task_turn performs a read-only reload even when its
+                # legacy marker still cannot be found. Always rerun the modern
+                # source-triple assistant probe after that attempt.
+                page_reloaded=True
                 if recovered:
-                    page_reloaded=True
                     probe=await old._probe_imagegen_result(pg,task["task_id"],1)
         legacy_status="WAIT_IMAGEGEN_"+str(
             probe.get("error") or (
@@ -996,7 +1059,7 @@ class ChatBridge:
             # attachment, unrelated cards, CSS screenshots and generic images.
             # Recheck after the legacy path only; never mistake a reference
             # image, loading placeholder or unrelated turn for generated PNG.
-            if page_reloaded or legacy_export_attempted:
+            if page_reloaded or read_only_refreshed or legacy_export_attempted:
                 rescued,detail=await rescue_single_image_candidate(
                     pg,task["task_id"],task["role"],str(ROOT),binding=task
                 )
