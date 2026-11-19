@@ -18,12 +18,21 @@ static Gate Base() {
 }
 
 int main() {
-    {
+    for(unsigned id: {2u,17u}) {
         auto g=Base();
         g.allowOtherFerrari=false;
         g.carKind=0;
-        g.carId=255;
+        g.carId=static_cast<unsigned char>(id);
+        g.expectedCarId=static_cast<unsigned char>(id);
         assert(Eligible(g));
+    }
+    for(unsigned id: {0u,1u,15u,29u,255u}) {
+        auto g=Base();
+        g.allowOtherFerrari=false;
+        g.carKind=0;
+        g.carId=static_cast<unsigned char>(id);
+        g.expectedCarId=static_cast<unsigned char>(id);
+        assert(!Eligible(g));
     }
     for(unsigned id: {0u,1u,6u,7u,11u,22u,26u,29u}) {
         auto g=Base();
