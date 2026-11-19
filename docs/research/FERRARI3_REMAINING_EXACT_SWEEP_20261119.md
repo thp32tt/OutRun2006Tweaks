@@ -85,7 +85,7 @@ Newly acquired source:
 
 ## SSOT status after this pass
 
-- Exact external private candidates available: 14/16 if counting optional exact sources, because 328 GTS now has a verified exact private OVC4 candidate in addition to the prior 13.
+- Exact external private candidates available: 16/16 if counting optional exact sources: the prior 13-car exact package plus the already verified optional exact 575 Superamerica and F430 Spider, and now the new exact 328 GTS OVC4 candidate.
 - **Default high-quality exact package remains 13/16.** 328 GTS, 575 Superamerica and F430 Spider stay on the higher-detail donors by default until an exact model passes the no-quality-regression gate.
 - 575 Superamerica and F430 Spider already have exact optional OVC4 candidates; this pass does not score their re-verification again.
 - No Quest 3 runtime success is claimed for the new 328 exact candidate.
