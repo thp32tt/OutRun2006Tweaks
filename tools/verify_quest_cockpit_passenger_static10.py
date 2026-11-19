@@ -170,10 +170,13 @@ def pass_07_nested_draw_and_restore():
                 "ShouldBypassPassengerCarDisplayGate(",
                 "if(!restore){original();return;}",
                 "OriginalCommonRobotDisplayRva)(work);")
-    check("cockpit && race && sceneOwner" in gate,
-          "force draw must own exact native 43FB40 ROB scene")
-    check("frameReady" in gate and "stereoReady" in gate,
-          "XR readiness diagnostics unexpectedly removed")
+    check("cockpit && race && renderOwner" in gate,
+          "force draw lacks bounded native render ownership")
+    check("const bool legacyFrameOwner=" in gate and
+          "!PassengerSceneHook && frameReady && stereoReady" in gate,
+          "optional 43FB40 failure has no safe legacy frame-owner fallback")
+    check("const bool renderOwner=sceneOwner || legacyFrameOwner;" in gate,
+          "exact scene owner and optional-hook fallback are not mutually bounded")
     check("PassengerModelCorrectionNearNative" not in robot,
           "dead 4-unit passenger threshold still exists below native lock")
     check("VR PASSENGER NESTED VISIBLE:" not in robot,

@@ -95,7 +95,10 @@ assert "(flags & (OriginalEventPendingInit|OriginalEventInitialized)) ==" in pol
 assert "PassengerOtherCameraDraws.fetch_add(" in hook
 assert "PassengerGateCamera1Entries.fetch_add(" in hook
 assert "PassengerGateNonPassenger.fetch_add(" in hook
-assert "cockpit && race && sceneOwner" in hook
+assert "cockpit && race && renderOwner" in hook
+assert "const bool legacyFrameOwner=" in hook
+assert "!PassengerSceneHook && frameReady && stereoReady" in hook
+assert "const bool renderOwner=sceneOwner || legacyFrameOwner;" in hook
 assert "ScopedPassengerSceneOwner sceneOwner(exactRobScene);" in hook
 assert "ExactPassengerSceneOwnerActive()" in hook
 assert "OriginalPassengerDisplayGateSignature()" in hook

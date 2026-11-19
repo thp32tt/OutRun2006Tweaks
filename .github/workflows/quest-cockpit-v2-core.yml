@@ -224,7 +224,9 @@ jobs:
           assert 'WorldSkyOpaqueQueue::Find(entry)' in hook
           assert 'ScopedPassengerSceneOwner sceneOwner(exactRobScene);' in hook
           assert 'ExactPassengerSceneOwnerActive()' in hook
-          assert 'cockpit && race && sceneOwner' in hook
+          assert 'cockpit && race && renderOwner' in hook
+          assert '!PassengerSceneHook && frameReady && stereoReady' in hook
+          assert 'const bool renderOwner=sceneOwner || legacyFrameOwner;' in hook
           assert 'live,ExactPassengerSceneOwnerActive(),' in hook
           assert "if($QuestCockpitV2SkyProbe -eq 'ON')" in launcher
           # HMD regression 2026-11-04: Quest profile XYZ must be consumed as

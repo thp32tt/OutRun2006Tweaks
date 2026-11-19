@@ -1747,20 +1747,29 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const bool stereoReady=stereo&&stereo->valid&&
             stereo->poseSequence!=0;
         const bool sceneOwner=ExactPassengerSceneOwnerActive();
+        // The 43FB40 hook is intentionally optional/fail-closed. Do not make
+        // its absence disable the older proven recovery altogether: only when
+        // that hook is NOT installed may the previous frame+paired-XR proof
+        // stand in for scene ownership. When 43FB40 is installed, no weaker
+        // fallback can override its exact top-of-stack result.
+        const bool legacyFrameOwner=
+            !PassengerSceneHook && frameReady && stereoReady;
+        const bool renderOwner=sceneOwner || legacyFrameOwner;
         const bool restore=ShouldBypassPassengerCarDisplayGate(
             Settings::VREnabled.get(),
             Settings::VRQuestCockpitV2Enabled.get(),
             Settings::VRQuestCockpitV2PassengerVisible.get(),
-            cockpit && race && sceneOwner,
+            cockpit && race && renderOwner,
             cam->cam_mode_34A==1,owner,flags);
         if(PassengerTraceOn() && (calls<=16u || calls%180u==0u))
             spdlog::info(
                 "VR PASSENGER CAR GATE: calls={} carFlags=0x{:08X} "
                 "nativeGate={} restore={} cam={} race={} active={} "
-                "sceneOwner={} frameReady={} stereoReady={}",
+                "sceneOwner={} legacyFrameOwner={} "
+                "frameReady={} stereoReady={}",
                 calls,flags,(flags&0xc000u)==0x4000u,restore,
                 static_cast<int>(cam->cam_mode_34A),race,cockpit,
-                sceneOwner,frameReady,stereoReady);
+                sceneOwner,legacyFrameOwner,frameReady,stereoReady);
         if(!restore){original();return;}
         // Directly invoke the native common ROB renderer (487880), which
         // calls our existing 514E60 original-robot hook for same verified

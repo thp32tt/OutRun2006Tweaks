@@ -273,3 +273,16 @@ older entries as newly appended. The source wrapper now carries an explicit
 `queueSnapshotValid` bit and records deferred sky entries only when the exact
 pre-call queue count was obtained. Unknown pre-state is never interpreted as
 an empty queue.
+
+
+### Optional 43FB40 hook fallback audit
+
+The scene hook is deliberately optional because another plugin may already own
+43FB40 or its signature may differ. A self-audit found that making
+`ExactPassengerSceneOwnerActive()` the only car-gate owner would then silently
+disable the previous 4879B0 recovery. The admission is now two-tiered:
+when `PassengerSceneHook` exists, ONLY the exact top-of-stack 0x80 owner can
+authorize recovery; when the hook itself is absent, the older
+`NativeFrameTrace + paired XR pose` proof is allowed as the fallback owner.
+Thus a weaker proof can never override an installed exact scene hook, while
+optional-hook failure does not create a new passenger regression.
