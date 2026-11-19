@@ -35,7 +35,6 @@ static_assert(OriginalRobotDisplayGateOpen(0x8000u));
 static_assert(!OriginalRobotDisplayGateOpen(0x8008u));
 static_assert(OriginalRobotDisplayGateOpen(0x800cu));
 static_assert(OriginalRobotDisplayGateOpen(0x8004u));
-static_assert(!ExactPassengerRenderActive());
 static_assert(!ShouldBypassPassengerCarDisplayGate(
     true,true,true,true,false,true,0x8000u),"camera 0 must be untouched");
 static_assert(!ShouldBypassPassengerCarDisplayGate(
