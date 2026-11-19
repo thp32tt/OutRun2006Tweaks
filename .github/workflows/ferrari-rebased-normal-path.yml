@@ -7,6 +7,10 @@ on:
     paths:
       - '.github/workflows/ferrari-rebased-normal-path.yml'
       - 'src/hooks_graphics.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r7.inc'
+      - 'src/vr/d3d9/stereo_renderer.cpp'
+      - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
+      - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
       - 'src/vr/game/dino_external_*.hpp'
       - 'src/vr/game/external_car_*.hpp'
       - 'src/vr/game/f50_external_pose_filter.hpp'
