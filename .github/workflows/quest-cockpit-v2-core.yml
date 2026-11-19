@@ -16,6 +16,7 @@ on:
       - 'RUN-QUEST-COCKPIT-V2-TURN-DIAG.cmd'
       - 'RUN-QUEST-COCKPIT-V2-INTERP-OFF.cmd'
       - 'tools/verify_quest_cockpit_launchers.py'
+      - 'Start-OutRun.cmd'
       - 'src/vr/d3d9/direct_gpu_hold_policy.hpp'
       - 'tools/tests/direct_gpu_hold_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
@@ -225,6 +226,8 @@ jobs:
           assert 'WorldSkyOpaqueQueue::RecordDeferred' in hook
           assert 'WorldSkyOpaqueQueue::Find(entry)' in hook
           assert 'ScopedExactProducerSemantic queuedSkyScope(' in hook
+          assert 'VR SKY SOURCE OWNER:' in hook
+          assert 'RenderScope::WorldSky,nullptr,true' in hook
           assert 'queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None' in hook
           sky_owner=hook.split('class VrOriginalRaceSkyOwner final',1)[1].split('VrOriginalRaceSkyOwner VrOriginalRaceSkyOwner::instance',1)[0]
           assert sky_owner.index('RaceSkyDisplayHook=safetyhook::create_inline') < sky_owner.index('const bool queueSignatureOk=')
@@ -234,6 +237,9 @@ jobs:
           assert 'LastStorage!=storage' in hook
           assert 'p>=begin && p<storageEnd && p>=activeEnd' in hook
           assert 'ScopedPassengerSceneOwner sceneOwner(exactRobScene);' in hook
+          assert 'struct PassengerSceneEvidence final' in hook
+          assert 'NotePassengerSceneWrapper(originalOwner);' in hook
+          assert 'sceneEvidence.driverReached,sceneEvidence.guestReached' in hook
           assert 'ExactPassengerSceneOwnerActive()' in hook
           assert 'cockpit && race && renderOwner' in hook
           assert '!PassengerSceneHook && frameReady && stereoReady' in hook
@@ -387,5 +393,9 @@ jobs:
           assert '-VR.QuestCockpitV2SeatBack=' not in release_launcher
           assert '-VR.QuestCockpitV2SeatDown=' not in release_launcher
           assert '-VR.QuestCockpitV2SeatRight=' not in release_launcher
+          assert '-VR.AutoRenderResolution=false' in release_launcher
+          assert '-VR.RenderWidth=2496' in release_launcher
+          assert '-VR.RenderHeight=2688' in release_launcher
+          assert '-VR.AutoRenderResolution=true' not in release_launcher
           print('QuestCockpitV2 isolated-core contract PASS')
           PY
