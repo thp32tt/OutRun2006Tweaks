@@ -286,6 +286,36 @@ async def selected_image_tool(page):
                     return True
             except Exception:
                 continue
+    # Current UI revisions can render the active tool as a pressed/stateful
+    # composer button instead of a dedicated selection pill. Restrict this
+    # fallback to the active composer form and exact image-tool labels.
+    try:
+        active = await page.evaluate(
+            r"""labels => {
+              const visible=e=>!!(e&&e.getClientRects&&e.getClientRects().length);
+              const box=[...document.querySelectorAll(
+                '[role="textbox"][contenteditable="true"]')].find(visible);
+              if(!box)return false;
+              const scope=box.closest('form')||box.parentElement?.parentElement;
+              if(!scope)return false;
+              const normalized=x=>(x||'').replace(/\s+/g,' ').trim().toLowerCase();
+              return [...scope.querySelectorAll(
+                'button[aria-pressed="true"],button[data-state="on"],'+
+                'button[data-state="active"],[aria-selected="true"]'
+              )].some(e=>{
+                if(!visible(e))return false;
+                const text=normalized(
+                  e.getAttribute('aria-label')||e.getAttribute('title')||
+                  e.innerText||e.textContent);
+                return labels.includes(text);
+              });
+            }""",
+            ["create image","images","이미지 만들기","이미지 생성","이미지"],
+        )
+        if active:
+            return True
+    except Exception:
+        pass
     return False
 
 
@@ -340,26 +370,65 @@ async def ensure_image_tool(page):
                 opened=True
             except Exception:
                 continue
-            # ImageGen labels have changed from Create image to Images.
-            # Require an actual interactive menu choice, not a sidebar link.
-            options=[
-                page.get_by_role("menuitem",name="Images",exact=True),
-                page.get_by_role("menuitem",name="이미지",exact=True),
-                page.get_by_role("menuitem",name="Create image",exact=True),
-                page.get_by_role("menuitem",name="이미지 만들기",exact=True),
-                page.get_by_role("menuitem",name="이미지 생성",exact=True),
-                page.get_by_role("menuitemradio",name="Images",exact=True),
-                page.get_by_role("menuitemradio",name="이미지",exact=True),
-                page.get_by_role("menuitemradio",name="Create image",exact=True),
-                page.locator('[role="menu"] button').filter(has_text="Images"),
-                page.locator('[role="menu"] button').filter(has_text="이미지"),
-                page.locator('[data-testid*="create-image"]'),
-            ]
+            # On a loaded N100 renderer the tool popover can hydrate well after
+            # the button click. Do not diagnose a missing Images option from the
+            # same event-loop tick. Poll bounded visible interactive controls.
             option=None
-            for loc in options:
-                option=await first_visible(loc)
+            for _ in range(12):  # <= 3.6s, no extra queue/ImageGen polling
+                options=[
+                    page.get_by_role("menuitem",name="Images",exact=True),
+                    page.get_by_role("menuitem",name="이미지",exact=True),
+                    page.get_by_role("menuitem",name="Create image",exact=True),
+                    page.get_by_role("menuitem",name="Create an image",exact=True),
+                    page.get_by_role("menuitem",name="이미지 만들기",exact=True),
+                    page.get_by_role("menuitem",name="이미지 생성",exact=True),
+                    page.get_by_role("menuitemradio",name="Images",exact=True),
+                    page.get_by_role("menuitemradio",name="이미지",exact=True),
+                    page.get_by_role("menuitemradio",name="Create image",exact=True),
+                    page.locator('[role="menu"] button').filter(has_text="Images"),
+                    page.locator('[role="menu"] button').filter(has_text="이미지"),
+                    page.locator('[data-testid*="create-image"]'),
+                ]
+                for loc in options:
+                    option=await first_visible(loc)
+                    if option is not None:
+                        break
+                if option is None:
+                    # UI labels/testids move frequently. Search only visible
+                    # interactive controls inside an open menu/popover/dialog,
+                    # using an exact allow-list; never click arbitrary text.
+                    try:
+                        handle=await page.evaluate_handle(
+                            r"""labels => {
+                              const visible=e=>!!(e&&e.getClientRects&&e.getClientRects().length);
+                              const norm=x=>(x||'').replace(/\s+/g,' ').trim().toLowerCase();
+                              const roots=[...document.querySelectorAll(
+                                '[role="menu"],[role="listbox"],[role="dialog"],'+
+                                '[data-radix-menu-content],[data-radix-popper-content-wrapper]'
+                              )].filter(visible);
+                              for(const root of roots){
+                                for(const e of root.querySelectorAll(
+                                  'button,[role="menuitem"],[role="menuitemradio"],'+
+                                  '[role="option"],[tabindex="0"]')){
+                                  if(!visible(e))continue;
+                                  const label=norm(e.getAttribute('aria-label')||
+                                    e.getAttribute('title')||e.innerText||e.textContent);
+                                  if(labels.includes(label))return e;
+                                }
+                              }
+                              return null;
+                            }""",
+                            ["images","create image","create an image",
+                             "이미지","이미지 만들기","이미지 생성"],
+                        )
+                        element=handle.as_element()
+                        if element is not None:
+                            option=element
+                    except Exception:
+                        option=None
                 if option is not None:
                     break
+                await page.wait_for_timeout(300)
             if option is None:
                 try:
                     await page.keyboard.press("Escape")
