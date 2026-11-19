@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "task_id": "FERRARI3-REMAINING-EXACT-SWEEP-20261119",
+  "date_kst": "2026-11-19",
+  "branch": "vr-ferrari16-v4-integrated-20261118",
+  "result": "NEW_328_EXACT_PRIVATE_OVC4_PASS_575_F430_NEW_CANDIDATES_REJECTED_NO_DEFAULT_REGRESSION",
+  "cars": {
+    "328gts": {
+      "source_archive_sha256": "86bd3f8444638ab6135853a88a90409b8b6b43c704bc474ab9978fbd8d11e491",
+      "dff_sha256": "c62702405f4fcac84f833c7a18eea083fc8b70fab05a8dce23e2a8fdf8a17951",
+      "txd_sha256": "65d4897471609aea7c21e9525de0d2082aba95cc9a6a78e82ce7e2e31bc14b26",
+      "rights": "PRIVATE_PERSONAL_CONVERSION_ONLY_NO_REDISTRIBUTION; redistribution/conversion grant not independently verified",
+      "alignment": {
+        "source_wheelbase_m": 2.670107424259186,
+        "target_wheelbase_m": 2.35,
+        "uniform_scale": 0.8801144023828934,
+        "grounded": true
+      },
+      "aligned_glb": {
+        "bytes": 3409652,
+        "sha256": "f3f4b19ec9750f85ac1a46fc0a9b950c9bb65521028b53d4ab052954ab07d9c8"
+      },
+      "blender_checkpoint_sha256": "83c705c0ec7e8d821ae30d21df31dcdd1ac4b04a9aef001ba40a098e43c7b127",
+      "ovc4": {
+        "triangles": 66391,
+        "vertices": 55533,
+        "groups": 44,
+        "materials": 12,
+        "source_images": 3,
+        "glass_triangles": 234,
+        "bytes": 4153332,
+        "sha256": "a4608bd0d9c8a4743cddd17a0306276fb10aa24628c5817ce0e2bced67058dd1",
+        "independent_verify": "PASS"
+      },
+      "default_donor_triangles": 139216,
+      "status": "EXACT_OPTIONAL_PRIVATE_PASS_NOT_DEFAULT_NOT_QUEST3_TESTED"
+    },
+    "575superamerica": {
+      "new_candidate": "NFS Shift origin -> NFS Carbon",
+      "archive_sha256": "dd365ca30770cc07fbf4663054743a5be37fcb57edd2902c8b9cda03a7e7d49a",
+      "carbon_lod_a_sum_including_mutually_exclusive_roof_states": 48919,
+      "recovered_textures": 12,
+      "existing_exact_optional_triangles": 51444,
+      "default_donor_triangles": 200071,
+      "status": "NEW_CANDIDATE_REJECTED_EXISTING_EXACT_OPTIONAL_AND_DONOR_PRESERVED"
+    },
+    "f430spider": {
+      "new_candidate": "TDU origin -> GTR2 scca1981 addon",
+      "archive_sha256": "bb09e1c8d8935b2bd2634052074cedb486d3c82f0b4c2c296815389af18b9f33",
+      "imported_gmt_count": 29,
+      "importer": "Blender GTR2 GMT Importer v0.8.4",
+      "imported_scene_triangles_approx": 65600,
+      "existing_exact_optional_triangles": 77979,
+      "default_donor_triangles": 565172,
+      "status": "NEW_CANDIDATE_REJECTED_EXISTING_EXACT_OPTIONAL_AND_DONOR_PRESERVED"
+    }
+  },
+  "package_gate": {
+    "optional_exact_candidates": 14,
+    "default_high_quality_exact": 13,
+    "quest3_new_328_tested": false
+  },
+  "no_binary_commit": true
+}
