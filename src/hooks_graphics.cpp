@@ -1330,15 +1330,20 @@ class VrOriginalRaceSkyOwner final : public Hook
             OutRunVR::GameSemantic::EffectiveScope()==
             OutRunVR::GameSemantic::RenderScope::WorldSky;
         std::uint32_t beforeCount=0;
+        bool queueSnapshotValid=false;
         if(exactSky) {
             const auto* q=Module::exe_ptr<const std::uint32_t>(0x464ef8);
             if(QuestCockpitGlassLive::Memory(
-                   q,7u*sizeof(std::uint32_t)))
+                   q,7u*sizeof(std::uint32_t))) {
                 beforeCount=q[0];
+                queueSnapshotValid=true;
+            }
         }
         RaceSkyObjectQueueHook.ccall<void>(
             objectId,value,colour,colourByte);
-        if(exactSky)
+        // Missing pre-count is not "zero". Without the exact before/after
+        // queue boundary, fail closed rather than tagging older opaque nodes.
+        if(exactSky && queueSnapshotValid)
             OutRunVR::WorldSkyOpaqueQueue::RecordDeferred(
                 objectId,beforeCount);
     }

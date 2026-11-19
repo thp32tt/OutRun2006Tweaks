@@ -197,6 +197,9 @@ def pass_07_nested_draw_and_restore():
           "WorldSkyOpaqueQueue::RecordDeferred" in hook and
           "WorldSkyOpaqueQueue::Find(entry)" in hook,
           "exact 4056D0 -> 405890 provenance join missing")
+    check("if(exactSky && queueSnapshotValid)" in hook and
+          "Missing pre-count is not" in hook,
+          "sky queue provenance can fail open from an unknown pre-count")
     scene=hook.split("static void __cdecl PassengerEventSceneDisplay(",1)[1].split(
         "static void __cdecl RobotDisplay(",1)[0]
     check_order(scene,"ScopedPassengerSceneOwner sceneOwner(exactRobScene);",

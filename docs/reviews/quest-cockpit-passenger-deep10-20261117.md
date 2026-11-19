@@ -262,3 +262,14 @@ No queue descriptor, object flag, matrix or game state is modified. The repair
 only preserves source provenance across the game's own deferred queue. Bounded
 markers: `VR SKY OPAQUE QUEUE TAG` and `VR SKY OPAQUE QUEUE DRAW`.
 Visual success remains UNTESTED pending Quest 3 confirmation.
+
+
+### Fail-closed queue boundary follow-up
+
+A post-commit self-audit caught one unsafe fallback in the first provenance
+implementation: if the opaque queue header could not be read before 4056D0,
+`beforeCount` remained zero, and a later successful read could have treated
+older entries as newly appended. The source wrapper now carries an explicit
+`queueSnapshotValid` bit and records deferred sky entries only when the exact
+pre-call queue count was obtained. Unknown pre-state is never interpreted as
+an empty queue.
