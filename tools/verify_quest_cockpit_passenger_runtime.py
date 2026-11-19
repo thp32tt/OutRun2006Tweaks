@@ -268,6 +268,15 @@ if __name__ == "__main__":
         assert at_va(0x4056D0, 24) == bytes.fromhex(
             "51558b6c240c83fdff0f843f010000568bc5c1e8108bf550"
         )
+        # Deferred 4521C0 sky provenance rejoins the real opaque PMT consumer
+        # only at these two retail 405890 -> 404700 call edges.
+        for call_va in (0x405A41, 0x405C44):
+            call = at_va(call_va, 5)
+            assert call[0] == 0xE8, f"expected CALL at {call_va:#x}"
+            rel = struct.unpack_from("<i", call, 1)[0]
+            assert call_va + 5 + rel == 0x404700, (
+                f"unexpected PMT consumer target at {call_va:#x}"
+            )
         def original_callbacks(function_id):
             return struct.unpack("<5I", at_va(0x59BE78 + function_id * 20, 20))
         assert original_callbacks(0x37) == (
@@ -279,4 +288,4 @@ if __name__ == "__main__":
         assert original_callbacks(0x3B) == (
             0x488710, 0x488820, 0x4879D0, 0, 0x487A00
         )
-        print("PASS: canonical PE32 machine-code event flags, cdecl, callbacks, SHA")
+        print("PASS: canonical PE32 event/ROB/sky queue + 405890 PMT edges, callbacks, SHA")
