@@ -78,7 +78,6 @@ assert "VR PASSENGER NATIVE LOCK:" in hook
 assert "nativeWorkLocked=1" in hook
 assert "ScopedQuestSkyTransitionProbe" in hook
 assert "VR SKY TRANSITION PHASE:" in hook
-assert "VR SKY TRANSITION PHASE:" in hook
 assert "RotationIndices" in hook
 assert "mutation=0 originalCrossfadePreserved=1" in hook
 assert "base+0xe0+byte,&" not in hook
@@ -86,7 +85,8 @@ assert "constexpr std::uint32_t None=0xffffffffu;" in hook
 assert "(n0!=None || n1!=None)" in hook
 assert "(o0!=None || o1!=None)" in hook
 assert "state!=STATE_START && state!=STATE_GAME" in hook
-assert "base_+0x50" in hook and "base_+0xe0" in hook
+assert "base+0x50+byte" in hook and "base+0xe0+byte" in hook
+assert "const auto* base=reinterpret_cast<const std::uint8_t*>(work);" in hook
 assert "afterDriver!=beforeDriver,after!=before" in hook
 assert "passengerScene==OriginalRobDisplayLayer" in policy
 assert "driverWrapperReached" in policy

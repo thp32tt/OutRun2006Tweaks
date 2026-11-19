@@ -263,8 +263,9 @@ def pass_07_nested_draw_and_restore():
           "sky overlap phase can still be armed by an all-None non-drawing layer")
     check("state!=STATE_START && state!=STATE_GAME" in hook,
           "first-stage camera 30/2 sky window is still excluded")
-    check("base_+0x50" in hook and "base_+0xe0" in hook,
-          "proven 4521C0 two-layer rotation records are not paired")
+    check("base+0x50+byte" in hook and "base+0xe0+byte" in hook and
+          "const auto* base=reinterpret_cast<const std::uint8_t*>(work);" in hook,
+          "proven 4521C0 two-layer rotations are not observed read-only")
 
 def pass_08_f11_exclusive_and_search():
     for phrase in ("Passenger: Follow Camera 0", "Passenger: Remove"):
