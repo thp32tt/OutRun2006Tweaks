@@ -217,6 +217,10 @@ jobs:
           assert "'-FramerateInterpolation=false'" in launcher
           assert 'MaybeLogCockpitSkyProbe(stereoRequested,composedStereo,' in r7
           assert 'VRQuestCockpitV2SkyProbe' in settings
+          assert 'ScopedPassengerSceneOwner sceneOwner(exactRobScene);' in hook
+          assert 'ExactPassengerSceneOwnerActive()' in hook
+          assert 'cockpit && race && sceneOwner' in hook
+          assert 'live,ExactPassengerSceneOwnerActive(),' in hook
           assert "if($QuestCockpitV2SkyProbe -eq 'ON')" in launcher
           # HMD regression 2026-11-04: Quest profile XYZ must be consumed as
           # the original mode-1 camera input. A post-CalcCameraMatrix delta

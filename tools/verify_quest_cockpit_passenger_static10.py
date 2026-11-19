@@ -166,11 +166,14 @@ def pass_07_nested_draw_and_restore():
         "static void __cdecl RobotDisplay(EvWorkRobot* robot)",1)[0]
     check_order(gate, "PassengerGateEntries.fetch_add(", "if(!owner){",
                 "PassengerGateNonPassenger.fetch_add(", "const bool frameReady=",
-                "const bool stereoReady=", "ShouldBypassPassengerCarDisplayGate(",
+                "const bool stereoReady=", "const bool sceneOwner=",
+                "ShouldBypassPassengerCarDisplayGate(",
                 "if(!restore){original();return;}",
                 "OriginalCommonRobotDisplayRva)(work);")
-    check("cockpit && race && frameReady && stereoReady" in gate,
-          "force draw must own native render and a live paired XR pose")
+    check("cockpit && race && sceneOwner" in gate,
+          "force draw must own exact native 43FB40 ROB scene")
+    check("frameReady" in gate and "stereoReady" in gate,
+          "XR readiness diagnostics unexpectedly removed")
     check("PassengerModelCorrectionNearNative" not in robot,
           "dead 4-unit passenger threshold still exists below native lock")
     check("VR PASSENGER NESTED VISIBLE:" not in robot,
@@ -189,7 +192,9 @@ def pass_07_nested_draw_and_restore():
           "one-per-present non-exact depth-off world draw remains unidentified")
     scene=hook.split("static void __cdecl PassengerEventSceneDisplay(",1)[1].split(
         "static void __cdecl RobotDisplay(",1)[0]
-    check_order(scene,"PassengerSceneHook.ccall<void>(mask,first,last);",
+    check_order(scene,"ScopedPassengerSceneOwner sceneOwner(exactRobScene);",
+                "PassengerSceneHook.ccall<void>(mask,first,last);",
+                "ExactPassengerSceneOwnerActive()",
                 "ShouldRecoverOriginalPassengerScenePass(",
                 "if(!recover)return;",
                 "PassengerDriverDisplay(work);")

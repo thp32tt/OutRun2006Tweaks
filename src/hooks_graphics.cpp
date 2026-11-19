@@ -1315,6 +1315,40 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     inline static thread_local std::uint64_t DriverGateThreadCalls=0;
     inline static std::atomic<std::uint64_t> PassengerGateRestores{0};
     inline static thread_local bool PassengerGateBypassInFlight=false;
+
+    // 43FB40 is the original synchronous event-scene dispatcher. Keep only
+    // top-of-stack ownership: a nested non-ROB scene must not inherit an
+    // outer 0x80 proof. Overflow fails closed.
+    inline static thread_local std::array<bool,8> PassengerSceneOwnerStack{};
+    inline static thread_local unsigned PassengerSceneOwnerDepth=0;
+    inline static thread_local unsigned PassengerSceneOwnerOverflow=0;
+    class ScopedPassengerSceneOwner final {
+        bool pushed_=false;
+    public:
+        explicit ScopedPassengerSceneOwner(bool exact) noexcept {
+            if(PassengerSceneOwnerDepth<PassengerSceneOwnerStack.size()) {
+                PassengerSceneOwnerStack[PassengerSceneOwnerDepth++]=exact;
+                pushed_=true;
+            } else {
+                ++PassengerSceneOwnerOverflow;
+            }
+        }
+        ~ScopedPassengerSceneOwner() noexcept {
+            if(!pushed_) {
+                if(PassengerSceneOwnerOverflow) --PassengerSceneOwnerOverflow;
+                return;
+            }
+            if(PassengerSceneOwnerDepth) --PassengerSceneOwnerDepth;
+        }
+        ScopedPassengerSceneOwner(const ScopedPassengerSceneOwner&)=delete;
+        ScopedPassengerSceneOwner& operator=(const ScopedPassengerSceneOwner&)=delete;
+    };
+    static bool ExactPassengerSceneOwnerActive() noexcept {
+        return PassengerSceneOwnerOverflow==0 &&
+            PassengerSceneOwnerDepth!=0 &&
+            PassengerSceneOwnerStack[PassengerSceneOwnerDepth-1];
+    }
+
     inline static std::uint64_t TraceCount=0;
     inline static thread_local OutRunVR::QuestCockpitV2::FrameOwner OccupantOwner{};
 
@@ -1508,26 +1542,30 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const auto calls=PassengerGateCalls.fetch_add(
             1,std::memory_order_relaxed)+1;
         const auto flags=car->flags_4;
-        // The original game's event callback can also run outside a verified
-        // native render frame. Never force an extra 487880 call in that case.
+        // This exact 4879B0 callback is already inside the original 43FB40
+        // scene dispatcher when sceneOwner is true. That synchronous native
+        // ownership is sufficient to forward the existing ROB02 to 487880;
+        // XR frame/pose readiness remains diagnostic only and must not make
+        // the passenger disappear during race startup.
         const bool frameReady=NativeFrameTrace().Active();
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const bool stereoReady=stereo&&stereo->valid&&
             stereo->poseSequence!=0;
+        const bool sceneOwner=ExactPassengerSceneOwnerActive();
         const bool restore=ShouldBypassPassengerCarDisplayGate(
             Settings::VREnabled.get(),
             Settings::VRQuestCockpitV2Enabled.get(),
             Settings::VRQuestCockpitV2PassengerVisible.get(),
-            cockpit && race && frameReady && stereoReady,
+            cockpit && race && sceneOwner,
             cam->cam_mode_34A==1,owner,flags);
         if(PassengerTraceOn() && (calls<=16u || calls%180u==0u))
             spdlog::info(
                 "VR PASSENGER CAR GATE: calls={} carFlags=0x{:08X} "
                 "nativeGate={} restore={} cam={} race={} active={} "
-                "frameReady={} stereoReady={}",
+                "sceneOwner={} frameReady={} stereoReady={}",
                 calls,flags,(flags&0xc000u)==0x4000u,restore,
                 static_cast<int>(cam->cam_mode_34A),race,cockpit,
-                frameReady,stereoReady);
+                sceneOwner,frameReady,stereoReady);
         if(!restore){original();return;}
         // Directly invoke the native common ROB renderer (487880), which
         // calls our existing 514E60 original-robot hook for same verified
@@ -1575,10 +1613,16 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static void __cdecl PassengerEventSceneDisplay(
         std::uint32_t mask,std::int32_t first,std::int32_t last) {
         using namespace OutRunVR::QuestCockpitV2;
+        const bool exactRobScene=
+            mask==OriginalRobDisplayLayer &&
+            first<=static_cast<std::int32_t>(OriginalPassengerEventId) &&
+            last>=static_cast<std::int32_t>(OriginalPassengerEventId);
+        ScopedPassengerSceneOwner sceneOwner(exactRobScene);
         const auto before=PassengerGateThreadCalls;
         const auto beforeDriver=DriverGateThreadCalls;
         // Always dispatch unmodified original scene first. The fallback is
-        // never allowed to replace the native event display loop.
+        // never allowed to replace the native event display loop. Keep the
+        // exact 0x80 owner live across both original dispatch and recovery.
         PassengerSceneHook.ccall<void>(mask,first,last);
         if(mask!=OriginalRobDisplayLayer || first>static_cast<std::int32_t>(
                OriginalPassengerEventId) ||
@@ -1586,7 +1630,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
            !Settings::VREnabled || !Settings::VRQuestCockpitV2Enabled ||
            !Settings::VRQuestCockpitV2PassengerVisible ||
            !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
-           !NativeFrameTrace().Active() || InSceneEffect())return;
+           !ExactPassengerSceneOwnerActive() || InSceneEffect())return;
         const auto* cam=Game::camera();
         if(!cam || cam->cam_mode_34A!=1 || !Game::pl_car())return;
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
@@ -1617,7 +1661,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             Settings::VRQuestCockpitV2Enabled.get(),
             Settings::VRQuestCockpitV2PassengerVisible.get(),
             QuestCockpitV2Active(cam) && race,cam->cam_mode_34A==1,
-            live,NativeFrameTrace().Active(),stereoReady,
+            live,ExactPassengerSceneOwnerActive(),
             mask,first,last,driver->field_C,passenger->field_C,
             afterDriver!=beforeDriver,after!=before);
         if(!recover)return;

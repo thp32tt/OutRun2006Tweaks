@@ -200,3 +200,31 @@ projection signature. The 90-Present summary also reports
 change stereo routing. A next HMD log can therefore distinguish native two-sky
 overlap from an independent depth-off producer without another instrumentation
 build.
+
+
+## 2026-11-19 exact 43FB40 scene owner replaces XR startup gate
+
+A deeper call-order audit found one remaining passenger-startup gap. Original
+PC `event_display_43fb40` synchronously invokes each live event callback for
+the requested layer; canonical ROB01/ROB02 both use layer `0x80`. Therefore
+when the hooked native `4879B0` ROB02 callback is reached inside that exact
+43FB40 invocation, the game has already proven the frame-scene owner.
+
+The previous car-gate recovery still additionally required
+`NativeFrameTrace().Active()` and a published XR pose before forwarding the
+existing live passenger to `487880`. During startup that can make the real
+ROB02 callback return without ever reaching `514E60`, so the later native
+matrix + visible/LOD0 lock cannot help.
+
+A bounded thread-local top-of-stack RAII owner now tracks only the exact
+43FB40 `0x80` pass whose range contains ROB02. A nested non-ROB scene does not
+inherit the proof and stack overflow fails closed. The existing live-event,
+callback pointer, native work pointer, mode-1, racing cockpit, Follow and
+scene-effect checks remain. Frame/XR readiness is retained as diagnostics but
+no longer grants or denies this already-native draw. The post-43FB40 scene
+recovery uses the same exact owner. Camera 0, Remove, GOAL and non-ROB layers
+remain original/fail-closed.
+
+This specifically closes a path that could explain "passenger absent for the
+first few seconds" even after the later 514E60 native-lock fix. HMD pixels are
+still unverified.
