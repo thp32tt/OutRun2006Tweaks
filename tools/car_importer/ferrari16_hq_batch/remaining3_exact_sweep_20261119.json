@@ -56,9 +56,10 @@
     }
   },
   "package_gate": {
-    "optional_exact_candidates": 14,
+    "optional_exact_candidates": 16,
     "default_high_quality_exact": 13,
-    "quest3_new_328_tested": false
+    "quest3_new_328_tested": false,
+    "note": "16/16 exact private candidates exist when the three lower-detail optional exact variants are counted; default high-quality exact package remains 13/16."
   },
   "no_binary_commit": true
 }
