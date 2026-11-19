@@ -172,3 +172,14 @@ gate during the active racing phase; GOAL and results forward original ROB
 rendering unchanged. Driver W*C and player F0 identity staging both explicitly
 reject GOAL. Glass/original render ownership that intentionally uses the broader
 gameplay helper is unchanged.
+
+
+## 2026-11-19 GOAL FullCar/passenger-gate predicate cleanup
+
+The same audit found `PlayerState` could still force the cockpit FullCar
+candidate bits in GOAL because it used the GOAL-inclusive active helper.
+That flag mutation is now race-only as well. The 4879B0 passenger car-gate
+recovery and 43FB40 scene recovery had duplicated manual START/GAME predicates;
+both now use the same `IsCockpitRacePhase()` helper. This removes three
+independent definitions of the cockpit race boundary and prevents later
+GOAL/START drift.
