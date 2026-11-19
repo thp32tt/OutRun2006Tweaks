@@ -1206,6 +1206,30 @@ namespace OutRunVR::WorldSkyOpaqueQueue
     }
 }
 
+    // Exact retail 405890 -> 404700 call edges. Deferred WorldSky
+    // provenance is useful only if the physical PMT consumer is the canonical
+    // one we verified from OR2006C2C.exe SHA 68ceb386... . Never attach a
+    // source-side 4056D0 tag when these call edges have been patched by an
+    // unknown executable/mod: otherwise a tag could survive without a proven
+    // physical consumer.
+    static bool PhysicalEntryEdgesCanonical() noexcept {
+        constexpr std::array<int,2> callRvas{{0x5A41,0x5C44}};
+        const auto expectedTarget=reinterpret_cast<std::uintptr_t>(
+            Module::exe_ptr<const std::uint8_t>(0x4700));
+        for(const int rva:callRvas) {
+            const auto* call=Module::exe_ptr<const std::uint8_t>(rva);
+            if(!QuestCockpitGlassLive::Memory(call,5u) || call[0]!=0xE8u)
+                return false;
+            std::int32_t rel=0;
+            std::memcpy(&rel,call+1,sizeof(rel));
+            const auto target=reinterpret_cast<std::uintptr_t>(call)+5u+
+                static_cast<std::intptr_t>(rel);
+            if(target!=expectedTarget)return false;
+        }
+        return true;
+    }
+}
+
 class VrOriginalRaceSkyOwner final : public Hook
 {
     static constexpr int RaceSkyDisplayRva = 0x521C0;
@@ -1426,7 +1450,9 @@ public:
                 queueInfo.RegionSize &&
             std::equal(objectQueueSignature.begin(),
                        objectQueueSignature.end(),objectQueueEntry);
-        if(queueSignatureOk) {
+        const bool physicalEntryEdgesOk=
+            OutRunVR::WorldSkyOpaqueQueue::PhysicalEntryEdgesCanonical();
+        if(queueSignatureOk && physicalEntryEdgesOk) {
             auto objectQueue=safetyhook::create_inline(
                 objectQueueEntry,RaceSkyObjectQueueDest);
             if(objectQueue) {
@@ -1437,10 +1463,14 @@ public:
                     "VR WORLD SKY: 4056D0 hook unavailable; keeping "
                     "4521C0 owner, deferred sky provenance disabled");
             }
-        } else {
+        } else if(!queueSignatureOk) {
             spdlog::warn(
                 "VR WORLD SKY: canonical 4056D0 signature mismatch; keeping "
                 "4521C0 owner, deferred sky provenance disabled");
+        } else {
+            spdlog::warn(
+                "VR WORLD SKY: canonical 405890->404700 call edges mismatch; "
+                "keeping 4521C0 owner, deferred sky provenance disabled");
         }
         spdlog::info(
             "VR WORLD SKY: exact 4521C0 owner installed; "
@@ -3097,12 +3127,18 @@ public:
         // Exact retail 405890 call edges into 404700: pass 0 and pass 1.
         // The wrapper calls the original exactly once and is inert outside a
         // verified lens-related opaque flush transaction.
-        Memory::VP::InjectHook(
-            Module::exe_ptr(0x5A41), TraceLensOpaquePmtEntry,
-            Memory::HookType::Call);
-        Memory::VP::InjectHook(
-            Module::exe_ptr(0x5C44), TraceLensOpaquePmtEntry,
-            Memory::HookType::Call);
+        if(OutRunVR::WorldSkyOpaqueQueue::PhysicalEntryEdgesCanonical()) {
+            Memory::VP::InjectHook(
+                Module::exe_ptr(0x5A41), TraceLensOpaquePmtEntry,
+                Memory::HookType::Call);
+            Memory::VP::InjectHook(
+                Module::exe_ptr(0x5C44), TraceLensOpaquePmtEntry,
+                Memory::HookType::Call);
+        } else {
+            spdlog::warn(
+                "VR PMT ENTRY: canonical 405890->404700 call edges mismatch; "
+                "physical PMT diagnostics/deferred WorldSky join disabled");
+        }
         // Separate verified E8 into the same DrawObjectAlpha_Internal ABI,
         // invoked only by the primary sun's sub_40C980 producer.
         Memory::VP::InjectHook(
