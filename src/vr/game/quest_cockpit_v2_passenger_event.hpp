@@ -41,6 +41,15 @@ inline constexpr bool OriginalPassengerVacant(std::uint8_t flags) noexcept {
 }
 inline constexpr std::uint32_t OriginalPassengerEventId=0x16bu;
 inline constexpr std::uint32_t OriginalPassengerFunctionId=0x39u;
+// Canonical PC 514C30 reads EvWorkRobot+4 before any PMT submission:
+// bit 0x8000 must be set; if bit 0x08 is set, bit 0x04 must also be set.
+// Keep this as a read-only diagnostic predicate until an HMD log proves the
+// native actor gate is the remaining cockpit passenger visibility failure.
+inline constexpr bool OriginalRobotDisplayGateOpen(
+    std::uint32_t workFlags) noexcept {
+    return (workFlags&0x8000u)!=0u &&
+        !((workFlags&0x08u)!=0u && (workFlags&0x04u)==0u);
+}
 inline constexpr std::uint32_t OriginalStartAfterPassengerEventId=0x16cu;
 inline constexpr std::uint32_t OriginalStartAfterPassengerFunctionId=0x3bu;
 // The caller must pass an exact LIVE original ROB02 owner, established
