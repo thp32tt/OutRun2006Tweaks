@@ -263,6 +263,10 @@ def pass_07_nested_draw_and_restore():
           "authority=405890_404700" in hook and
           "OriginalOccupantLod0Active()" in hook,
           "passenger diagnostics stop before exact 405890->404700 PMT draw")
+    check("ScopedExactPassengerRender exactPassenger(true);" in hook and
+          "ExactPassengerRenderActive()" in hook and
+          "ExactPassengerRenderDepth" in policy,
+          "physical PMT passenger proof can alias generic occupant LOD0 draws")
     check("ScopedQuestSkyTransitionProbe" in hook and
           "VR SKY TRANSITION PHASE:" in hook,
           "original sky transition phase/rotation diagnostics unavailable")
