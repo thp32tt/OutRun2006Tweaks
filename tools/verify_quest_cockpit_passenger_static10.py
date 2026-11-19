@@ -207,7 +207,9 @@ def pass_07_nested_draw_and_restore():
     check(sky_apply.index("RaceSkyDisplayHook=safetyhook::create_inline") <
           sky_apply.index("const bool queueSignatureOk="),
           "optional 4056D0 validation can still disable core 4521C0 owner")
-    check("keeping 4521C0 owner, deferred sky provenance disabled" in sky_apply,
+    check('"VR WORLD SKY: 4056D0 hook unavailable; keeping "' in sky_apply and
+          '"4521C0 owner, deferred sky provenance disabled"' in sky_apply and
+          '"VR WORLD SKY: canonical 4056D0 signature mismatch; keeping "' in sky_apply,
           "4056D0 conflict is not fail-closed to the proven core sky path")
     check("if(exactSky && queueSnapshotValid)" in hook and
           "Missing pre-count is not" in hook,
