@@ -1,6 +1,8 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2 = 'OFF',
+    [ValidateSet('OFF','ON')][string]$ExternalFerrariTest = 'OFF',
+    [ValidateSet('OFF','ON')][string]$F50ExternalModel = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2F0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Lod0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
@@ -346,6 +348,9 @@ if($QuestCockpitV2Lod0 -eq 'ON' -and $QuestCockpitV2 -ne 'ON') {
 if($QuestCockpitV2F0 -eq 'ON' -and $QuestCockpitV2 -ne 'ON') {
     throw 'F0 render scope requires QuestCockpitV2 ON'
 }
+if(($ExternalFerrariTest -eq 'ON' -or $F50ExternalModel -eq 'ON') -and $QuestCockpitV2 -ne 'ON') {
+    throw 'External Ferrari models require QuestCockpitV2 ON.'
+}
 if($QuestCockpitV2 -eq 'ON'){
     if($backend -ne 'd3d9') {throw 'QuestCockpitV2 needs the original DX9Ex backend'}
     $gameArgs += @(
@@ -366,7 +371,13 @@ if($QuestCockpitV2 -eq 'ON'){
         # The explicit crash DIAG launcher still requests these logs.
         ('-VR.CockpitFrameProbe=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'})),
         ('-VR.Telemetry=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'})),
-        ('-FileLogging=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'}))
+        ('-FileLogging=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'})),
+        # External models are an opt-in layer over the known-good cockpit path.
+        # Explicit false values keep stale user.ini from contaminating A/B runs.
+        ('-VR.ExternalFerrariTest=' + $(if($ExternalFerrariTest -eq 'ON'){'true'}else{'false'})),
+        ('-VR.F50ExternalModel=' + $(if($F50ExternalModel -eq 'ON'){'true'}else{'false'})),
+        '-VR.F50ExternalLift=0.22',
+        '-VR.F50ExternalStabilize=true'
     )
     if($QuestCockpitV2ReleaseParity -eq 'ON') {
         # Physical Quest3 feedback: negative Back is forward, negative Down
