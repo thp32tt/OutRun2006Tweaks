@@ -15,6 +15,9 @@ on:
       - 'src/vr/game/external_car_*.hpp'
       - 'src/vr/game/f50_external_pose_filter.hpp'
       - 'tests/external_car_*.cpp'
+      - 'tests/game_reset_events_test.cpp'
+      - 'src/vr/state/game_reset_events.hpp'
+      - 'src/vr/game/outrun_renderer.cpp'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'RUN-QUEST-COCKPIT-V2-FERRARI16.cmd'
       - 'RUN-QUEST-COCKPIT-V2-FERRARI16-FIXED.cmd'
@@ -48,6 +51,9 @@ jobs:
           launcher = Path('RUN-QUEST-COCKPIT-V2-FERRARI16.cmd').read_text(encoding='utf-8')
           fixed_launcher = Path('RUN-QUEST-COCKPIT-V2-FERRARI16-FIXED.cmd').read_text(encoding='utf-8')
           external = Path('src/vr/game/dino_external_d3d9.hpp').read_text(encoding='utf-8')
+          pbr = Path('src/vr/game/dino_external_pbr_shader.hpp').read_text(encoding='utf-8')
+          renderer = Path('src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')
+          reset_events = Path('src/vr/state/game_reset_events.hpp').read_text(encoding='utf-8')
 
           # Latest known-good cockpit semantics must survive the rebase.
           for marker in (
@@ -103,6 +109,24 @@ jobs:
           assert 'RUN-QUEST-COCKPIT-V2-FERRARI16.cmd' in fixed_launcher
           assert 'ForceFixedFunctionStereoProbe' in external
           assert 'cpu_.pbrEnabled && !fixedFunctionStereoProbe' in external
+
+          # D3DPOOL_DEFAULT external buffers/textures must be released before
+          # the underlying D3D9 Reset/ResetEx. NotifyGameReset is invoked from
+          # the stereo Reset owner before the actual reset call.
+          assert 'GameResetEvents::NotifyBeforeReset();' in renderer
+          assert 'using BeforeResetFn = void (*)() noexcept;' in reset_events
+          assert 'GameResetEvents::Configure(&ReleaseExternalBeforeDeviceReset)' in hook
+          assert 'GlobalGpu().OnDeviceReset();' in hook
+          assert 'GlobalDashboardGpu().OnDeviceReset();' in hook
+
+          # PBR is not yet a proven true-stereo route. Its custom VS owns
+          # c0/c4/c8, while the generic programmable stereo path is built
+          # around the game's verified c64 WVP lineage. Keep fixed-function
+          # A/B available and do not claim PBR stereo parity.
+          assert 'row_major float4x4 view : register(c4);' in pbr
+          assert 'row_major float4x4 projection : register(c8);' in pbr
+          stereo = Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text(encoding='utf-8')
+          assert 'constexpr UINT OutRunWvpRegister = 64;' in stereo
 
           print('FERRARI_REBASED_NORMAL_PATH_CONTRACT_PASS')
           PY
