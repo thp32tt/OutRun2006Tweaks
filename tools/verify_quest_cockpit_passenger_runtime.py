@@ -62,6 +62,8 @@ assert "RaceSkyObjectQueueRva = 0x56D0" in hook
 assert "WorldSkyOpaqueQueue::RecordDeferred" in hook
 assert "WorldSkyOpaqueQueue::Find(entry)" in hook
 assert "ScopedExactProducerSemantic queuedSkyScope(" in hook
+assert "VR SKY SOURCE OWNER:" in hook
+assert "RenderScope::WorldSky,nullptr,true" in hook
 assert "queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None" in hook
 assert "nullptr,true" in hook
 copyrun = Path("QuestCockpit-CopyRun.ps1").read_text(encoding="utf-8")
@@ -76,16 +78,17 @@ assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
 assert "VR PASSENGER SCENE PASS:" in hook
 assert "VR PASSENGER NATIVE LOCK:" in hook
 assert "nativeWorkLocked=1" in hook
-assert "ScopedQuestSkyTransitionRotationLock" in hook
-assert "VR SKY TRANSITION ROTATION LOCK:" in hook
+assert "ScopedQuestSkyTransitionProbe" in hook
 assert "VR SKY TRANSITION PHASE:" in hook
-assert "orientationWords=9" in hook
 assert "RotationIndices" in hook
+assert "mutation=0 originalCrossfadePreserved=1" in hook
+assert "base+0xe0+byte,&" not in hook
 assert "constexpr std::uint32_t None=0xffffffffu;" in hook
 assert "(n0!=None || n1!=None)" in hook
 assert "(o0!=None || o1!=None)" in hook
 assert "state!=STATE_START && state!=STATE_GAME" in hook
-assert "base_+0x50" in hook and "base_+0xe0" in hook
+assert "base+0x50+byte" in hook and "base+0xe0+byte" in hook
+assert "const auto* base=reinterpret_cast<const std::uint8_t*>(work);" in hook
 assert "afterDriver!=beforeDriver,after!=before" in hook
 assert "passengerScene==OriginalRobDisplayLayer" in policy
 assert "driverWrapperReached" in policy
