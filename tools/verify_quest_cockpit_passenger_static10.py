@@ -125,6 +125,21 @@ def pass_06_goal_start_scene_boundaries():
                 "ShouldSuppressOriginalPassenger(")
     check("!suppress(true,true,false,false,true,true)" in source_test,
           "GOAL/early START negative case missing")
+    check("const bool racing=IsCockpitRacePhase();" in robot,
+          "robot race phase no longer uses shared GOAL-excluding gate")
+    check_order(robot,
+                "if(action==CockpitOccupantRender::OriginalPassengerForceVisible)",
+                "if(!racing)",
+                "if(!NativeFrameTrace().Active() || InSceneEffect())")
+    check("QuestCockpitV2Active(camera)&&racing" in robot,
+          "driver W*C owner can still admit GOAL")
+    player_cb=hook.split("static void __cdecl OnPlayerCallback(EVWORK_CAR* player)",1)[1].split(
+        "template<std::size_t N>",1
+    )[0]
+    check("!IsCockpitRacePhase()" in player_cb,
+          "F0 identity scope can still admit GOAL")
+    check("!IsPlayableCarGameplay()" not in player_cb,
+          "F0 scope still uses GOAL-inclusive gameplay helper")
 
 def pass_07_nested_draw_and_restore():
     check_order(robot, "ShouldSuppressOriginalPassenger(",

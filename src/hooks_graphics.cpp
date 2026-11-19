@@ -171,6 +171,18 @@ static bool IsPlayableCarGameplay() noexcept
         Game::game_start_progress_code && *Game::game_start_progress_code == 65;
 }
 
+// Render-only cockpit experiments that alter the live player/occupant matrices
+// are race-only. GOAL is intentionally excluded even though several original
+// game render owners remain live there.
+static bool IsCockpitRacePhase() noexcept
+{
+    if(!Game::current_mode)return false;
+    if(*Game::current_mode==STATE_GAME)return true;
+    return *Game::current_mode==STATE_START &&
+        Game::game_start_progress_code &&
+        *Game::game_start_progress_code==65;
+}
+
 // Live Quest mode1 player glass hook, no PMT file writes. The player
 // producer runs inside 49F3E0, whereas 404901 is an ordinary flush material
 // consumer that can run later. Capturing only the current thread-local scope
@@ -900,7 +912,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if (!Settings::VREnabled || !Settings::VRQuestCockpitV2Enabled ||
             !Settings::VRQuestCockpitV2F0RenderScope ||
             !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
-            !NativeFrameTrace().Active() || !IsPlayableCarGameplay() ||
+            !NativeFrameTrace().Active() || !IsCockpitRacePhase() ||
             !player) {
             CallOriginalPlayerWithGlassScope(player);
             return;
@@ -1657,11 +1669,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         // IsPlayableCarGameplay() also includes STATE_GOAL. Passenger removal
         // must NOT hide the original guest in GOAL/results, and must not
         // change original draws during scene effects or inactive camera work.
-        const bool racing=Game::current_mode &&
-            (*Game::current_mode==STATE_GAME ||
-             (*Game::current_mode==STATE_START &&
-              Game::game_start_progress_code &&
-              *Game::game_start_progress_code==65));
+        const bool racing=IsCockpitRacePhase();
         const bool cockpitActive=QuestCockpitV2Active(camera);
         // Only the real active mode-1 cockpit during a racing frame may
         // suppress its exact original ROB02. Camera 0 was forwarded above.
@@ -1702,6 +1710,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             RobotHook.ccall<void>(robot);
             return;
         }
+        // GOAL/result camera-1 can still dispatch ROB01/ROB02 and the player
+        // callback. Do not let the experimental driver W*C path alter either
+        // actor outside the active race phase.
+        if(!racing) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
 
         // Driver W*C correction still requires an exact native frame and
         // paired XR pose. Any nested/uncertain non-passenger draw stays stock.
@@ -1734,7 +1749,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             NativeOriginalHooksReady.load(std::memory_order_acquire),
             frameEpoch!=0,exact,exact,
             camera && camera->cam_mode_34A==1,
-            QuestCockpitV2Active(camera),stereo&&stereo->valid &&
+            QuestCockpitV2Active(camera)&&racing,stereo&&stereo->valid &&
                 stereo->poseSequence!=0,InSceneEffect());
         if(eligible) {
             const EVWORK_CAR* car=Game::pl_car();

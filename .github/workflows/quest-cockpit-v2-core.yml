@@ -202,6 +202,14 @@ jobs:
           assert 'MaybeLogCockpitSkyProbe(stereoRequested, composedStereo,' in r9
           assert 'ProbeCockpitCarMotion(player);' in hook
           assert 'VR CAR MOTION PROBE:' in hook
+          assert 'static bool IsCockpitRacePhase() noexcept' in hook
+          assert 'const bool racing=IsCockpitRacePhase();' in hook
+          player_cb=hook.split('static void __cdecl OnPlayerCallback(EVWORK_CAR* player)',1)[1].split('template<std::size_t N>',1)[0]
+          assert '!IsCockpitRacePhase()' in player_cb
+          assert '!IsPlayableCarGameplay()' not in player_cb
+          robot=hook.split('static void __cdecl RobotDisplay(EvWorkRobot* robot)',1)[1].split('static void PlayerState',1)[0]
+          assert robot.index('if(!racing)') < robot.index('if(!NativeFrameTrace().Active() || InSceneEffect())')
+          assert 'QuestCockpitV2Active(camera)&&racing' in robot
           assert "QuestCockpitV2Interpolation -eq 'OFF'" in launcher
           assert "'-FramerateInterpolation=false'" in launcher
           assert 'MaybeLogCockpitSkyProbe(stereoRequested,composedStereo,' in r7

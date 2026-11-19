@@ -134,8 +134,17 @@ assert render.index("ScopedOriginalOccupantLod0 passengerVisible(true);") < rend
     "if(OriginalRobotCorrectionActive())"
 )
 assert render.index("ScopedOriginalOccupantLod0 passengerVisible(true);") < render.index(
+    "if(!racing)"
+)
+assert render.index("if(!racing)") < render.index(
     "if(!NativeFrameTrace().Active() || InSceneEffect())"
 )
+assert "QuestCockpitV2Active(camera)&&racing" in render
+player_cb = hook.split("static void __cdecl OnPlayerCallback(EVWORK_CAR* player)",1)[1].split(
+    "template<std::size_t N>",1
+)[0]
+assert "!IsCockpitRacePhase()" in player_cb
+assert "!IsPlayableCarGameplay()" not in player_cb
 
 # One persistent bool drives two checkboxes; complement guarantees exactly
 # one selected even when an existing user INI supplies the older key.

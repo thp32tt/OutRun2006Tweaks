@@ -156,3 +156,19 @@ object 2 != 0xFFFFFFFF. race_sky_control_451b40 deliberately clears duplicate
 old-layer IDs to None. The VR transition lock and phase diagnostics now mirror
 those exact object-ID gates, preventing a non-drawing transition record from
 being misclassified as a visible duplicate sky layer.
+
+
+## 2026-11-19 GOAL matrix-scope audit
+
+A further control-flow audit found a real scope mismatch. `IsPlayableCarGameplay`
+includes `STATE_GOAL` for original game/render owners, but the cockpit matrix
+experiments must not. The passenger Remove/Follow policy already used a
+race-only boolean, yet a GOAL camera-1 callback could fall through and admit
+driver/passenger W*C; the player callback could also stage F0=identity in GOAL.
+
+A dedicated `IsCockpitRacePhase()` now admits only `STATE_GAME` or
+`STATE_START` at progress 65. Exact ROB02 Follow remains handled before this
+gate during the active racing phase; GOAL and results forward original ROB
+rendering unchanged. Driver W*C and player F0 identity staging both explicitly
+reject GOAL. Glass/original render ownership that intentionally uses the broader
+gameplay helper is unchanged.
