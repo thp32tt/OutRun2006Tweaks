@@ -155,6 +155,16 @@ class GpuOwner final {
         gpuRetry_.NoteFailure(device);
         return false;
     }
+    // Diagnostic A/B only: reproduce the known-working single-F50
+    // fixed-function stereo route while keeping the exact same V4 OVC body,
+    // transforms and normal VR runner. This deliberately ignores normal/ORM
+    // maps for the current process; default production behavior stays PBR.
+    static bool ForceFixedFunctionStereoProbe() noexcept {
+        wchar_t flag[4]{};
+        return GetEnvironmentVariableW(
+                   L"OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST",flag,4)==1 &&
+               flag[0]==L'1' && flag[1]==L'\0';
+    }
     // A partial draw is not recoverable by issuing the original vehicle draw
     // in the same eye: those external pixels are already on the target.
     // Stop retries until the real D3D9 Reset, preventing another partial
@@ -259,7 +269,9 @@ class GpuOwner final {
         // Optional PBR allocations must never prevent a working legacy draw.
         // On any map/shader failure fall back to textured fixed-function once
         // per device generation, not once per eye/frame.
-        if(cpu_.pbrEnabled) {
+        const bool fixedFunctionStereoProbe=
+            ForceFixedFunctionStereoProbe();
+        if(cpu_.pbrEnabled && !fixedFunctionStereoProbe) {
             normals_.resize(cpu_.pbrMaterials.size(),nullptr);
             orms_.resize(cpu_.pbrMaterials.size(),nullptr);
             bool mapsReady=true;
