@@ -166,11 +166,17 @@ def pass_07_nested_draw_and_restore():
         "static void __cdecl RobotDisplay(EvWorkRobot* robot)",1)[0]
     check_order(gate, "PassengerGateEntries.fetch_add(", "if(!owner){",
                 "PassengerGateNonPassenger.fetch_add(", "const bool frameReady=",
-                "const bool stereoReady=", "ShouldBypassPassengerCarDisplayGate(",
+                "const bool stereoReady=", "const bool sceneOwner=",
+                "ShouldBypassPassengerCarDisplayGate(",
                 "if(!restore){original();return;}",
                 "OriginalCommonRobotDisplayRva)(work);")
-    check("cockpit && race && frameReady && stereoReady" in gate,
-          "force draw must own native render and a live paired XR pose")
+    check("cockpit && race && renderOwner" in gate,
+          "force draw lacks bounded native render ownership")
+    check("const bool legacyFrameOwner=" in gate and
+          "!PassengerSceneHook && frameReady && stereoReady" in gate,
+          "optional 43FB40 failure has no safe legacy frame-owner fallback")
+    check("const bool renderOwner=sceneOwner || legacyFrameOwner;" in gate,
+          "exact scene owner and optional-hook fallback are not mutually bounded")
     check("PassengerModelCorrectionNearNative" not in robot,
           "dead 4-unit passenger threshold still exists below native lock")
     check("VR PASSENGER NESTED VISIBLE:" not in robot,
@@ -186,10 +192,39 @@ def pass_07_nested_draw_and_restore():
           "sky-headset basis diagnostics unavailable")
     check("VR SKY NONEXACT DEPTH-OFF:" in sky and
           "shaderNonSkyDepthOffDraws={}" in sky,
-          "one-per-present non-exact depth-off world draw remains unidentified")
+          "non-exact depth-off discriminator unavailable")
+    check("VR SKY OPAQUE QUEUE TAG:" in hook and
+          "VR SKY OPAQUE QUEUE DRAW:" in hook,
+          "deferred 4056D0 sky PMT draw loses exact WorldSky provenance")
+    check("effectiveScope={} producer={} queueActive={}" in hook and
+          "activeMarks={}" in hook and "thread={}" in hook,
+          "deferred sky provenance cannot prove actual physical semantic/thread")
+    check("RaceSkyObjectQueueRva = 0x56D0" in hook and
+          "WorldSkyOpaqueQueue::RecordDeferred" in hook and
+          "WorldSkyOpaqueQueue::Find(entry)" in hook,
+          "exact 4056D0 -> 405890 provenance join missing")
+    sky_owner=hook.split("class VrOriginalRaceSkyOwner final",1)[1].split(
+        "VrOriginalRaceSkyOwner VrOriginalRaceSkyOwner::instance",1
+    )[0]
+    sky_apply=sky_owner.split("bool apply() override",1)[1]
+    check(sky_apply.index("RaceSkyDisplayHook=safetyhook::create_inline") <
+          sky_apply.index("const bool queueSignatureOk="),
+          "optional 4056D0 validation can still disable core 4521C0 owner")
+    check('"VR WORLD SKY: 4056D0 hook unavailable; keeping "' in sky_apply and
+          '"4521C0 owner, deferred sky provenance disabled"' in sky_apply and
+          '"VR WORLD SKY: canonical 4056D0 signature mismatch; keeping "' in sky_apply,
+          "4056D0 conflict is not fail-closed to the proven core sky path")
+    check("if(exactSky && queueSnapshotValid)" in hook and
+          "Missing pre-count is not" in hook,
+          "sky queue provenance can fail open from an unknown pre-count")
+    check("LastStorage!=storage" in hook and
+          "p>=begin && p<storageEnd && p>=activeEnd" in hook,
+          "stale deferred sky queue marks are not pruned on reuse/reset")
     scene=hook.split("static void __cdecl PassengerEventSceneDisplay(",1)[1].split(
         "static void __cdecl RobotDisplay(",1)[0]
-    check_order(scene,"PassengerSceneHook.ccall<void>(mask,first,last);",
+    check_order(scene,"ScopedPassengerSceneOwner sceneOwner(exactRobScene);",
+                "PassengerSceneHook.ccall<void>(mask,first,last);",
+                "ExactPassengerSceneOwnerActive()",
                 "ShouldRecoverOriginalPassengerScenePass(",
                 "if(!recover)return;",
                 "PassengerDriverDisplay(work);")
