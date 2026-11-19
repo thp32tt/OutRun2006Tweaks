@@ -26,6 +26,18 @@ def fake_dxt5(width=32, height=32, boxes=((8, 8, 15, 15),)):
     return bytes(raw), source
 
 
+def single_block_dxt5(source_pixels=None):
+    """4x4 one-block DXT5 source for exact translated-color budget tests."""
+    source_pixels = source_pixels or [(0, 0, 0, 0)] * 16
+    head = bytearray(128)
+    head[:4] = b'DDS '
+    for at, n in ((4, 124), (12, 4), (16, 4),
+                  (28, 1), (76, 32), (80, 4), (108, 0x1000)):
+        struct.pack_into('<I', head, at, n)
+    head[84:88] = b'DXT5'
+    return bytes(head) + bc.encode_bc3_block(source_pixels)
+
+
 class DXT5OriginalProtection(unittest.TestCase):
     def test_full_text_blocks_patched_other_blocks_exact_source_bytes(self):
         raw, original = fake_dxt5()
@@ -160,6 +172,56 @@ class DXT5OriginalProtection(unittest.TestCase):
             abs(original[ch] - actual[ch])
             for original, actual in zip(source, decoded) for ch in range(3)
         ), 55)
+
+    def test_measured_72_error_korean_block_is_accepted(self):
+        # Exact failing Q055 block measured from the 2026-11-16 full HD run.
+        # Its saved BC3 color error peaks at 72/channel, with no protected
+        # source pixel outside the translated block.
+        desired = [
+            (237, 249, 235, 253), (244, 253, 238, 253),
+            (168, 217, 225, 253), (67, 166, 213, 253),
+            (251, 255, 246, 253), (239, 244, 235, 253),
+            (255, 253, 237, 253), (229, 245, 234, 253),
+            (186, 192, 207, 253), (255, 255, 255, 253),
+            (245, 252, 243, 253), (235, 246, 234, 253),
+            (1, 14, 72, 253), (97, 107, 141, 253),
+            (210, 220, 226, 253), (240, 255, 251, 253),
+        ]
+        raw = single_block_dxt5()
+        source = Image.open(io.BytesIO(raw)).convert('RGBA')
+        result = Image.new('RGBA', (4, 4))
+        result.putdata(desired)
+        patched, receipt = bc.patch_bc3_native(
+            raw, result, source, [(0, 0, 4, 4)])
+        actual = Image.open(io.BytesIO(patched)).convert('RGBA')
+        max_error = max(
+            abs(want[ch] - got[ch])
+            for want, got in zip(desired, list(actual.getdata()))
+            for ch in range(3)
+        )
+        self.assertEqual(bc.TRANSLATED_RGB_MAX_ERROR, 72)
+        self.assertEqual(max_error, 72)
+        self.assertEqual(receipt['cosmetic_rgb_max_error'], 72)
+
+    def test_measured_127_error_korean_block_still_holds(self):
+        # Exact Q086 problem block: visibly larger color collapse. The relaxed
+        # fast-finish budget must NOT turn this 127/channel error into a pass.
+        desired = [
+            (0, 0, 26, 253), (0, 0, 27, 253),
+            (0, 0, 26, 253), (0, 0, 25, 253),
+            (130, 103, 29, 253), (134, 102, 29, 253),
+            (128, 101, 28, 253), (121, 98, 28, 253),
+            (255, 214, 42, 253), (255, 205, 28, 253),
+            (255, 205, 33, 253), (255, 204, 30, 253),
+            (244, 231, 130, 254), (245, 201, 45, 253),
+            (245, 200, 56, 253), (248, 200, 55, 253),
+        ]
+        raw = single_block_dxt5()
+        source = Image.open(io.BytesIO(raw)).convert('RGBA')
+        result = Image.new('RGBA', (4, 4))
+        result.putdata(desired)
+        with self.assertRaisesRegex(bc.BC3Hold, 'TRANSLATED_COLOR_LOSS'):
+            bc.patch_bc3_native(raw, result, source, [(0, 0, 4, 4)])
 
     def test_pillow_and_manual_dxt5_decoding_agree(self):
         raw, source = fake_dxt5()
