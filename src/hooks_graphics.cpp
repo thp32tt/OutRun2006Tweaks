@@ -20,6 +20,7 @@
 #include "vr/game/dino_external_original_car_gate.hpp"
 #include "vr/game/f50_external_pose_filter.hpp"
 #include "vr/state/state_block_tracker.hpp"
+#include "vr/state/game_reset_events.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -529,6 +530,13 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     inline static SafetyHookInline PlayerCallbackHook{};
     inline static thread_local bool F0CallbackActive=false;
     inline static thread_local bool F50GameplayResourceArmed=false;
+    static void ReleaseExternalBeforeDeviceReset() noexcept
+    {
+        OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
+        OutRunVR::DinoSidecar::GlobalDashboardGpu().OnDeviceReset();
+        OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
+        F50GameplayResourceArmed=false;
+    }
     static constexpr std::size_t SeatTableCount=30u;
     inline static bool SeatTableCaptured=false;
     inline static bool SeatTablePatched=false;
@@ -1270,6 +1278,7 @@ public:
         FrameEndHook=std::move(last);
         PlayerCallbackHook=std::move(actor);
         OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.store(true,std::memory_order_release);
+        OutRunVR::GameResetEvents::Configure(&ReleaseExternalBeforeDeviceReset);
         if(!SyncNativeSeatProfile(false) &&
            Settings::VRQuestCockpitV2NativeSeatProfile)
             spdlog::info("VR COCKPIT: initial seat table sync deferred; "
