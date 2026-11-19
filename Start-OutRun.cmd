@@ -53,7 +53,9 @@ start "" "%~dp0OR2006C2C.exe" ^
  -VR.TransparencySupersampling=false ^
  -VR.Telemetry=false ^
  -VR.RivalDx11NativeRoute=false ^
- -VR.AutoRenderResolution=true ^
+ -VR.AutoRenderResolution=false ^
+ -VR.RenderWidth=2496 ^
+ -VR.RenderHeight=2688 ^
  -VR.FollowGameResolution=false ^
  -VR.MirrorFitDesktop=true ^
  -VR.MirrorPreserveAspect=true ^
