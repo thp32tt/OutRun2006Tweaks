@@ -113,7 +113,7 @@ jobs:
           # Pinned reviewed normal baseline. Do not compare to the moving
           # normal branch tip: later diagnostics there must not invalidate a
           # reproducible Ferrari test build.
-          baseline=b1bcbcdcb6e41698bf5d279d4a4def1a618b565c
+          baseline=e0167393c164779895e4b34c43ccd618fe635fad
           git fetch origin "$baseline" --depth=1
           changed="$(git diff --name-only "$baseline" HEAD --             vrhost src/vr/d3d9/stereo_renderer_r7.inc src/vr/d3d9/stereo_renderer.cpp             src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp)"
           if [ -n "$changed" ]; then
