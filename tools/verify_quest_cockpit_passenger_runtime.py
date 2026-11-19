@@ -62,6 +62,8 @@ assert "RaceSkyObjectQueueRva = 0x56D0" in hook
 assert "WorldSkyOpaqueQueue::RecordDeferred" in hook
 assert "WorldSkyOpaqueQueue::Find(entry)" in hook
 assert "ScopedExactProducerSemantic queuedSkyScope(" in hook
+assert "VR SKY SOURCE OWNER:" in hook
+assert "RenderScope::WorldSky,nullptr,true" in hook
 assert "queuedSkyIndex>=0 ? RenderScope::WorldSky : RenderScope::None" in hook
 assert "nullptr,true" in hook
 copyrun = Path("QuestCockpit-CopyRun.ps1").read_text(encoding="utf-8")
@@ -76,6 +78,10 @@ assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
 assert "VR PASSENGER SCENE PASS:" in hook
 assert "VR PASSENGER NATIVE LOCK:" in hook
 assert "nativeWorkLocked=1" in hook
+assert "workFlags=0x{:08X} robDisplayGateOpen={}" in hook
+assert "OriginalRobotDisplayGateOpen(robot->dword4)" in hook
+assert "VR PASSENGER PHYSICAL PMT:" in hook
+assert "authority=405890_404700" in hook
 assert "ScopedQuestSkyTransitionProbe" in hook
 assert "VR SKY TRANSITION PHASE:" in hook
 assert "RotationIndices" in hook
@@ -107,6 +113,9 @@ assert "!PassengerSceneHook && frameReady && stereoReady" in hook
 assert "const bool renderOwner=sceneOwner || legacyFrameOwner;" in hook
 assert "ScopedPassengerSceneOwner sceneOwner(exactRobScene);" in hook
 assert "ExactPassengerSceneOwnerActive()" in hook
+assert "struct PassengerSceneEvidence final" in hook
+assert "NotePassengerSceneWrapper(originalOwner);" in hook
+assert "sceneEvidence.driverReached,sceneEvidence.guestReached" in hook
 assert "OriginalPassengerDisplayGateSignature()" in hook
 assert "PassengerGateHook=std::move(guest);" in hook
 assert "Module::fn_ptr<NativeRobotDisplay>(" in hook
@@ -248,6 +257,11 @@ if __name__ == "__main__":
         assert at_va(0x440110 + 4, 6) == bytes.fromhex("8a8a48fb7900")
         assert at_va(0x440110 + 21, 6) == bytes.fromhex("888a48fb7900")
         assert at_va(0x4879B0, 4) == bytes.fromhex("a1189d79")
+        # rob_disp 514C30: [work+4] bit15 display enable, then 0x08/0x04 gate.
+        assert at_va(0x514C30, 48) == bytes.fromhex(
+            "83ec0c5356578b7c241c8b378b470469f6a400000081c6f0f58200"
+            "84e48bd90f89f3010000a8087408a8040f84e70100"
+        )
         assert at_va(0x4056D0, 24) == bytes.fromhex(
             "51558b6c240c83fdff0f843f010000568bc5c1e8108bf550"
         )
