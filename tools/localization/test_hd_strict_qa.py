@@ -372,16 +372,29 @@ class StrictHDQualityTests(unittest.TestCase):
         self.assertFalse(holds)
         self.assertIn("SOURCE_EDGE_CLEAR_NEIGHBOR_PROOF", painted[0]["auto_salvage"])
 
-    def test_source_border_touch_with_alpha_outside_roi_remains_hold(self):
+    def test_source_border_touch_with_alpha_outside_roi_auto_rebinds_when_isolated(self):
         src = source_dds()
         b = bytearray(src)
         im = native.native_image(src)
         ImageDraw.Draw(im).rectangle((3, 18, 14, 37), fill=(255, 255, 255, 255))
         b[128:] = im.tobytes("raw", "BGRA")
         data, _, _, painted, holds = self.run_case(bytes(b))
-        self.assertIsNone(data)
-        self.assertFalse(painted)
-        self.assertEqual(holds[0]["reason"], "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+        self.assertIsNotNone(data)
+        self.assertFalse(holds)
+        self.assertEqual(len(painted), 1)
+        self.assertEqual(painted[0]["auto_source_bbox_original"], [4, 6, 116, 100])
+        self.assertIn("SOURCE_EDGE_CONNECTED_COMPONENT_AUTO_REBIND_TEST_ONLY",
+                      painted[0]["auto_salvage"])
+        self.assertLess(painted[0]["roi"][0], 4)
+
+    def test_auto_edge_rebind_never_enters_neighbor_roi(self):
+        im = native.native_image(source_dds())
+        draw = ImageDraw.Draw(im)
+        draw.rectangle((3, 18, 14, 37), fill=(255, 255, 255, 255))
+        got = strict.auto_expand_source_box(
+            im, (4, 6, 116, 100), other_boxes=[(0, 10, 4, 60)]
+        )
+        self.assertIsNone(got)
 
     def test_source_edge_unrelated_neighbor_is_not_false_hold(self):
         # The source text ends at x=4. Another word's native alpha lies
@@ -404,9 +417,10 @@ class StrictHDQualityTests(unittest.TestCase):
         self.assertEqual(data[:128], src[:128])
         self.assertEqual(len(data), len(src))
 
-    def test_source_edge_diagonal_native_continuation_is_still_hold(self):
-        # Visible native AA must stay HOLD if it crosses the source boundary.
-        # Only alpha <=15 is user-approved cosmetic fringe.
+    def test_source_edge_diagonal_native_continuation_is_auto_rebound_when_isolated(self):
+        # A visible connected continuation is no longer a permanent HOLD when
+        # its complete source component fits a bounded child box with no
+        # neighboring ROI. The normal CLEAN/line/size gates still run.
         im = native.native_image(source_dds())
         draw = ImageDraw.Draw(im)
         draw.rectangle((4, 18, 14, 37), fill=(255, 255, 255, 255))
@@ -414,10 +428,11 @@ class StrictHDQualityTests(unittest.TestCase):
         draw.point((4, 37), fill=(255, 255, 255, 24))
         src = source_dds()[:128] + im.tobytes("raw", "BGRA")
         data, final, clean, painted, holds = self.run_case(src)
-        self.assertIsNone(data)
-        self.assertFalse(painted)
-        self.assertEqual(holds[0]["reason"],
-                         "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+        self.assertIsNotNone(data)
+        self.assertFalse(holds)
+        self.assertEqual(len(painted), 1)
+        self.assertIn("SOURCE_EDGE_CONNECTED_COMPONENT_AUTO_REBIND_TEST_ONLY",
+                      painted[0]["auto_salvage"])
 
     def test_diagonal_corner_external_alpha_is_not_missed_by_side_strips(self):
         # (3,5) is outside BOTH legacy strips (left uses y>=6,
@@ -429,8 +444,9 @@ class StrictHDQualityTests(unittest.TestCase):
         data, final, clean, painted, holds = self.run_case(src)
         self.assertIsNone(data)
         self.assertFalse(painted)
-        self.assertEqual(holds[0]["reason"],
-                         "QA_SOURCE_TEXT_BBOX_TOUCHES_ROI_EDGE")
+        # The auto child expansion sees the diagonal continuation, but the
+        # isolated 1px island still fails the downstream glyph geometry gate.
+        self.assertEqual(holds[0]["reason"], "QA_SOURCE_GLYPH_TOO_SMALL")
 
     def test_invisible_native_diagonal_fringe_is_allowed_but_preserved(self):
         # User explicitly allows native anti-alias alpha<=15 to be ignored;
