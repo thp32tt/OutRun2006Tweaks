@@ -6,6 +6,7 @@ Opaque backgrounds, mixed cells, ambiguous glyph masks and unreadable source lay
 require a separately reviewed CLEAN/PSD mask, not automatic rectangular erasure.
 """
 from __future__ import annotations
+from collections import deque
 import io
 import json
 import hashlib
@@ -35,6 +36,85 @@ class QualityHold(ValueError):
 
 def intersects(a, b):
     return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
+
+
+AUTO_EDGE_REBIND_PAD = 96
+
+
+def auto_expand_source_box(source: Image.Image, box, other_boxes=(),
+                           pad=AUTO_EDGE_REBIND_PAD):
+    """Return a bounded connected-alpha expansion or None.
+
+    This promotes the existing source-edge *proposal* into a runtime geometry
+    repair only when the escaping native alpha component is SHA-pinned source
+    data, stays within a 96px search window, and never enters another ROI.
+    It does not classify pixels as English; the normal occupancy/line/CLEAN
+    gates still run on the expanded box before any DDS write.
+    """
+    if not 1 <= pad <= AUTO_EDGE_REBIND_PAD:
+        return None
+    x0, y0, x1, y1 = box
+    if not (0 <= x0 < x1 <= source.width and
+            0 <= y0 < y1 <= source.height):
+        return None
+    sx0, sy0 = max(0, x0-pad), max(0, y0-pad)
+    sx1, sy1 = min(source.width, x1+pad), min(source.height, y1+pad)
+    width, height = sx1-sx0, sy1-sy0
+    raw = source.getchannel("A").crop((sx0, sy0, sx1, sy1)).tobytes()
+    seen = bytearray(width*height)
+
+    seeds = set()
+    for x in range(x0, x1):
+        seeds.add((y0-sy0)*width + (x-sx0))
+        seeds.add((y1-1-sy0)*width + (x-sx0))
+    for y in range(y0, y1):
+        seeds.add((y-sy0)*width + (x0-sx0))
+        seeds.add((y-sy0)*width + (x1-1-sx0))
+
+    escaped = []
+    hit_neighbor = False
+    hit_window = False
+    for first in seeds:
+        if seen[first] or raw[first] <= COSMETIC_FRINGE_ALPHA:
+            continue
+        pending = deque([first])
+        seen[first] = 1
+        while pending:
+            key = pending.popleft()
+            lx, ly = key % width, key // width
+            gx, gy = sx0+lx, sy0+ly
+            outside = not (x0 <= gx < x1 and y0 <= gy < y1)
+            if outside:
+                escaped.append((gx, gy))
+                if any(a <= gx < c and b <= gy < d
+                       for a, b, c, d in other_boxes):
+                    hit_neighbor = True
+            # A connected component reaching the artificial search edge might
+            # continue farther; do not auto-apply an incomplete child box.
+            if ((lx == 0 and sx0 > 0) or
+                (ly == 0 and sy0 > 0) or
+                (lx == width-1 and sx1 < source.width) or
+                (ly == height-1 and sy1 < source.height)):
+                hit_window = True
+            for ny in range(max(0, ly-1), min(height, ly+2)):
+                for nx in range(max(0, lx-1), min(width, lx+2)):
+                    next_key = ny*width+nx
+                    if (not seen[next_key] and
+                            raw[next_key] > COSMETIC_FRINGE_ALPHA):
+                        seen[next_key] = 1
+                        pending.append(next_key)
+
+    if not escaped or hit_neighbor or hit_window:
+        return None
+    proposed = (
+        min(x0, min(x for x, _ in escaped)),
+        min(y0, min(y for _, y in escaped)),
+        max(x1, max(x for x, _ in escaped)+1),
+        max(y1, max(y for _, y in escaped)+1),
+    )
+    if any(intersects(proposed, other) for other in other_boxes):
+        return None
+    return proposed if proposed != tuple(box) else None
 
 
 def source_ink_bounds(source, box):
@@ -374,7 +454,10 @@ def place_one_source_text(source, clean, result, row, repo, used, import_check,
                                    "EXISTING_AB_PNG_DETERMINISTIC_SALVAGE_NO_NEW_GLYPHS"),
         "manual_original_bbox": row.get("_manual_source_bbox_original"),
         "manual_source_child_text": row.get("_manual_source_child_text"),
+        "auto_source_bbox_original": row.get("_auto_source_bbox_original"),
         "auto_salvage": source_salvage + candidate_salvage + line_salvage + edge_insets + (
+            ["SOURCE_EDGE_CONNECTED_COMPONENT_AUTO_REBIND_TEST_ONLY"]
+            if row.get("_auto_source_bbox_original") is not None else []) + (
             ["SOURCE_ALPHA_CONNECTED_COMPONENT_EXCLUSIVE_OWNER_TEST_ONLY"]
             if owner_mask is not None else []) + (
             ["OVERLAPPING_ROI_REUSED_ONLY_AFTER_DISJOINT_SOURCE_ALPHA_BBOX_PROOF"]
@@ -420,6 +503,19 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
             continue
         try:
             owner_mask = ownership_masks.get(rid)
+            effective_row = row
+            # Edge rebind is only for non-overlap rows. Source-owner masks are
+            # tied to the original ROI geometry and must not be silently grown.
+            raw_other_boxes = [r["_bbox"] for r in noncoarse
+                               if r["roi_id"] != rid]
+            if owner_mask is None:
+                expanded = auto_expand_source_box(
+                    source, row["_bbox"], raw_other_boxes
+                )
+                if expanded is not None:
+                    effective_row = dict(row)
+                    effective_row["_auto_source_bbox_original"] = list(row["_bbox"])
+                    effective_row["_bbox"] = list(expanded)
             other_boxes = [r["_bbox"] for r in noncoarse
                            if r["roi_id"] != rid and
                            not (owner_mask is not None and
@@ -432,7 +528,7 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
                                  lambda n: n if n > SOFT_BRIDGE_ALPHA else 0)
                              if owner_mask is not None else None)
             evidence = place_one_source_text(
-                source, clean, result, row, repo, used, import_check, other_boxes,
+                source, clean, result, effective_row, repo, used, import_check, other_boxes,
                 owner_mask=owner_mask, protected_alpha=foreign_alpha,
                 placed_alpha=placed_alpha
             )
