@@ -85,6 +85,10 @@ assert "OriginalRobotDisplayGateOpen(nativeWorkFlags)" in hook
 assert "ScopedPassengerRobotDisplayGate" in hook
 assert "VR PASSENGER PHYSICAL PMT:" in hook
 assert "authority=405890_404700" in hook
+assert '#include "vr/game/quest_cockpit_v2_passenger_event.hpp"' in sky
+assert "VR PASSENGER NATIVE DIP:" in sky
+assert "ExactPassengerRenderActive()" in sky
+assert "authority=D3D9_DIP_VTABLE_82" in sky
 assert "ScopedExactPassengerRender exactPassenger(true);" in hook
 assert "ExactPassengerRenderActive()" in hook
 assert "ScopedQuestSkyTransitionProbe" in hook

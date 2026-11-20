@@ -18,6 +18,7 @@
 #include "game_addrs.hpp"
 #include "vr_shared.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/quest_cockpit_v2_passenger_event.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 #include "vr/ipc/xr_eye_extent.hpp"
 #include "vr/ui/vr_mirror_aspect_fit.hpp"
@@ -2233,10 +2234,41 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					static_cast<unsigned>(type),baseVertexIndex,minVertexIndex,
 					numVertices,startIndex,primitiveCount);
 			}
+			const bool passengerDip=
+				OutRunVR::QuestCockpitV2::ExactPassengerRenderActive();
 			auto call=[&](){return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
 				device,type,baseVertexIndex,minVertexIndex,numVertices,startIndex,
 				primitiveCount);};
-			return ExecuteStereoDraw(device,call);
+			const HRESULT result=ExecuteStereoDraw(device,call);
+			if(passengerDip)
+			{
+				static const bool diagEnabled=[]() noexcept {
+					char value[8]{};
+					const DWORD n=GetEnvironmentVariableA(
+						"OUTRUN_VR_PASSENGER_DIAG",value,
+						static_cast<DWORD>(sizeof(value)));
+					return n==1u&&value[0]=='1';
+				}();
+				if(diagEnabled)
+				{
+					static thread_local std::uint64_t passengerDipSerial=0;
+					const auto serial=++passengerDipSerial;
+					if(serial<=32u||serial%180u==0u)
+						spdlog::info(
+							"VR PASSENGER NATIVE DIP: count={} hr=0x{:08X} "
+							"type={} baseVertex={} minVertex={} numVertices={} "
+							"startIndex={} primitiveCount={} scope={} "
+							"producer={} authority=D3D9_DIP_VTABLE_82",
+							serial,static_cast<std::uint32_t>(result),
+							static_cast<unsigned>(type),baseVertexIndex,
+							minVertexIndex,numVertices,startIndex,primitiveCount,
+							OutRunVR::GameSemantic::Name(
+								OutRunVR::GameSemantic::EffectiveScope()),
+							OutRunVR::GameSemantic::Name(
+								OutRunVR::GameSemantic::CurrentRenderProducerToken()));
+				}
+			}
+			return result;
 		}
 		HRESULT __stdcall DrawPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT primitiveCount,const void*data,UINT stride){if(InternalStereoPass)return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);auto call=[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);};return ExecuteStereoDraw(device,call);}
 		HRESULT __stdcall DrawIndexedPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT minVertexIndex,UINT numVertices,UINT primitiveCount,const void*indexData,D3DFORMAT indexFormat,const void*vertexData,UINT stride){auto call=[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device,type,minVertexIndex,numVertices,primitiveCount,indexData,indexFormat,vertexData,stride);};return ExecuteStereoDraw(device,call);}
