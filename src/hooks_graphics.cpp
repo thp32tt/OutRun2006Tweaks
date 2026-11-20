@@ -1108,8 +1108,30 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             ticket.xrPose,currentEye?currentEye->poseSequence:0
         };
         ticket.valid=false;
-        if(!OutRunVR::DinoSidecar::CanReplaceOriginalCar(gate))
+        if(!OutRunVR::DinoSidecar::CanReplaceOriginalCar(gate)) {
+            // Prior logs did not capture a rejected render ticket because
+            // the normal route telemetry only executes AFTER a successful gate.
+            // Log at most six selected-car failures in the opt-in trace path.
+            if(Settings::VRExternalFerrariDiag && livePlayer &&
+               Settings::VRExternalFerrariTest &&
+               OutRunVR::DinoSidecar::MatchesFerrariSelection(
+                   livePlayer->car_id_10,
+                   Settings::VRExternalFerrariTestCarId.get())) {
+                static thread_local unsigned gateRejectSamples=0;
+                if(gateRejectSamples++<6u)
+                    spdlog::warn("VR FERRARI DRAW GATE REJECTED: "
+                        "carId={} optedIn={} ownedPlayer={} "
+                        "gameplay={} cockpit={} stereo={} nativeFrame={} "
+                        "deviceReady={} epoch={}/{} pose={}/{}",
+                        static_cast<unsigned>(livePlayer->car_id_10),
+                        gate.optedIn,gate.ownedPlayer,gate.gameplay,
+                        gate.cockpitModeOne,gate.validStereo,
+                        gate.nativeFrameActive,gate.deviceReady,
+                        gate.ticketEpoch,gate.liveEpoch,
+                        gate.ticketPose,gate.livePose);
+            }
             return false;
+        }
         const auto draw=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
             ticket.device,ticket.world,ticket.view,ticket.projection,
             ticket.dashboard);
