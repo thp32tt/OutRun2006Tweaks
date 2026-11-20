@@ -672,67 +672,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $notes='build-general/v0.03-release-notes.md'
-          @'
-          # OutRun 2006 VR v0.03 Beta - Cockpit Passenger Update
-
-          ## English
-
-          v0.03 keeps the validated v0.02 cockpit baseline and updates passenger handling.
-
-          ### Passenger controls
-          - F11 > Settings > VR now exposes two exclusive passenger choices:
-            - **Passenger: Follow Camera 0** (default): the cockpit follows the game's native camera-0 passenger state.
-            - **Passenger: Remove**: hides the passenger only in cockpit camera mode 1.
-          - Camera 0 is never suppressed or modified by the Remove option.
-          - The mod never creates a missing ROB02 passenger event and does not rewrite/close the native passenger lifecycle.
-          - Goal/finish-scene passenger rendering is preserved.
-          - Passenger mode changes apply live and persist through the normal user settings path.
-
-          ### Existing cockpit baseline retained
-          - F0 Render Scope remains enabled by the VR launcher.
-          - SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0 defaults are unchanged.
-          - Driver remains hidden in cockpit while the original full car is retained.
-          - Cockpit glass reflection suppression remains enabled.
-          - Crash hardening and fail-safe dump generation from v0.02 are retained.
-
-          ### Verification
-          - The release CI runs the native passenger runtime verifier and 10 independent passenger-path static audits before packaging.
-          - The normal build also validates the original ROB02 passenger-hook ABI against the replacement OR2006C2C.EXE.
-
-          ### Run
-          Extract the ZIP into the folder containing OR2006C2C.EXE and run **Start-OutRun-VR.cmd**.
-          Press **F12** while looking forward to recenter. Direct OR2006C2C.EXE launch remains **2D + FFB**.
-
-          ## 한국어
-
-          v0.03은 검증된 v0.02 운전석 기준을 그대로 유지하면서 동승자 표시 동작을 수정한 버전입니다.
-
-          ### 동승자 옵션
-          - F11 > Settings > VR에 서로 배타적인 두 옵션을 제공합니다.
-            - **Passenger: Follow Camera 0** (기본값): 게임의 0번 3인칭 시점에 원래 존재하는 동승자 상태를 운전석에서도 따라갑니다.
-            - **Passenger: Remove**: 동승자를 운전석 카메라(mode 1)에서만 숨깁니다.
-          - Remove를 선택해도 0번 3인칭 시점의 원본 동승자는 절대 제거하거나 변경하지 않습니다.
-          - 원본 ROB02 동승자 이벤트가 없을 때 모드가 임의로 새 이벤트를 만들지 않으며, 원본 이벤트 생명주기도 변경하거나 종료하지 않습니다.
-          - 골/피니시 장면의 원본 동승자 렌더링을 보존합니다.
-          - 동승자 옵션은 즉시 적용되며 기존 사용자 설정 저장 경로를 통해 유지됩니다.
-
-          ### 기존 운전석 기준 유지
-          - VR 런처의 F0 Render Scope 기본 ON을 유지합니다.
-          - SeatBack=-0.08, SeatDown=+0.08, SeatRight=0.0 기본값은 그대로입니다.
-          - 운전석에서는 운전자만 숨기고 원본 차량 전체 모델은 유지합니다.
-          - 유리 반사 억제 설정을 유지합니다.
-          - v0.02의 시작 크래시 방지 및 크래시 덤프 안전화 변경을 그대로 포함합니다.
-
-          ### 검증
-          - 릴리즈 패키징 전에 native passenger runtime 검증과 10개의 독립 동승자 경로 정적 검증을 모두 실행합니다.
-          - 일반 빌드에서도 교체 OR2006C2C.EXE를 대상으로 원본 ROB02 동승자 훅 ABI를 확인합니다.
-
-          ### 실행 방법
-          ZIP을 OR2006C2C.EXE가 있는 게임 폴더에 압축 해제한 뒤 **Start-OutRun-VR.cmd**를 실행합니다.
-          원하는 정면을 바라본 상태에서 **F12**를 누르면 VR 시점이 재정렬됩니다.
-          OR2006C2C.EXE를 직접 실행하면 기존처럼 **2D + FFB**로 실행됩니다.
-
-          '@ | Set-Content -LiteralPath $notes -Encoding utf8
+          Copy-Item -LiteralPath 'README_VR_v0.03.txt' -Destination $notes -Force
           gh release view v0.03 --repo $env:GITHUB_REPOSITORY *> $null
           if($LASTEXITCODE -eq 0){
             gh api --method PATCH "repos/$env:GITHUB_REPOSITORY/git/refs/tags/v0.03" -f sha="$env:GITHUB_SHA" -F force=true *> $null
