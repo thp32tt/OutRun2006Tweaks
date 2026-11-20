@@ -76,7 +76,6 @@ start "" "%~dp0OR2006C2C.exe" ^
  -VR.QuestCockpitV2GlassEnabled=false ^
  -VR.QuestCockpitV2GlassHidden=false ^
  -VR.QuestCockpitV2GlassReflectionOff=true ^
-
  -VR.QuestCockpitV2SkyProbe=false ^
  -VR.QuestCockpitV2OccupantCorrection=true ^
  -VR.QuestCockpitV2OccupantLod0=false ^

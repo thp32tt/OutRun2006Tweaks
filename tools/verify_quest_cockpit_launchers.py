@@ -14,12 +14,29 @@ LAUNCHERS = (
 )
 
 errors = []
+
+def check_cmd_continuations(name: str, text: str) -> None:
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        # In cmd.exe the caret must be the final physical character.
+        # A trailing space after ^ cancels line continuation.
+        if re.search(r"\^\s+$", line) and not line.endswith("^"):
+            errors.append(
+                f"caret has trailing whitespace: {name}:{index + 1}"
+            )
+        if line.endswith("^"):
+            if index + 1 >= len(lines) or not lines[index + 1].strip():
+                errors.append(
+                    f"caret continuation followed by blank/EOF: "
+                    f"{name}:{index + 1}"
+                )
 for name in LAUNCHERS:
     path = ROOT / name
     if not path.is_file():
         errors.append(f"missing launcher: {name}")
         continue
     text = path.read_text(encoding="utf-8")
+    check_cmd_continuations(name, text)
     if r"\n" in text:
         errors.append(f"literal backslash-n found: {name}")
     if "-QuestCockpitV2F0 ON" not in text:
@@ -74,6 +91,7 @@ if not release_path.is_file():
     errors.append("missing release launcher: Start-OutRun.cmd")
 else:
     release = release_path.read_text(encoding="utf-8")
+    check_cmd_continuations("Start-OutRun.cmd", release)
     for required in (
         "-VR.AutoRenderResolution=false",
         "-VR.RenderWidth=2496",
@@ -85,6 +103,18 @@ else:
         errors.append("release launcher still forces OpenXR auto eye resolution")
     if "-VR.QuestCockpitV2PassengerVisible=" in release:
         errors.append("release launcher overrides persisted passenger Follow/Remove setting")
+
+for extra_name in (
+    "Start-OutRun-VR.cmd",
+    "RUN-QUEST-APK-PASSENGER-DIAG.cmd",
+):
+    extra_path = ROOT / extra_name
+    if not extra_path.is_file():
+        errors.append(f"missing launcher: {extra_name}")
+    else:
+        check_cmd_continuations(
+            extra_name, extra_path.read_text(encoding="utf-8")
+        )
 
 if errors:
     for error in errors:

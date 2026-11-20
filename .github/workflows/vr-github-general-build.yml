@@ -584,7 +584,7 @@ jobs:
           retention-days: 7
 
       - name: Prepare v0.03 public cockpit release ZIP
-        if: github.ref_name == 'vr-quest-cockpit-v2-v0.03-release'
+        if: github.ref_name == 'vr-quest-cockpit-v2-v0.03-release' || github.ref_name == 'vr-quest-cockpit-v2-final-test-20261120'
         shell: pwsh
         run: |
           $release='build-general/v003-release'
@@ -652,6 +652,15 @@ jobs:
           path: ${{ env.V003_RELEASE_ZIP }}
           if-no-files-found: error
           retention-days: 30
+
+      - name: Upload v0.03 FINAL-TEST release-candidate ZIP artifact
+        if: github.ref_name == 'vr-quest-cockpit-v2-final-test-20261120'
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-v0.03-FINAL-TEST-${{ github.sha }}
+          path: ${{ env.V003_RELEASE_ZIP }}
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Publish GitHub prerelease v0.03
         if: github.ref_name == 'vr-quest-cockpit-v2-v0.03-release'
