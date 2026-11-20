@@ -15,7 +15,7 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageOps, UnidentifiedImageError
 from hd_bc3_index_patch import BC3Hold as PaletteHold, patch_mip1
 from hd_bc3_native_codec import patch_bc3_native
-from hd_overlap_ownership import prove_overlap_ownership
+from hd_overlap_ownership import prove_overlap_ownership, SOFT_BRIDGE_ALPHA
 from hd_existing_candidate_salvage import (
     candidate_lines as salvage_candidate_lines,
     pad_candidate_edge,
@@ -202,7 +202,15 @@ def source_text_evidence(source: Image.Image, box, owner_mask=None):
     if not extent:
         raise QualityHold("QA_NO_SOURCE_TEXT_ALPHA")
     try:
-        salvage_actions = prove_source_edge_clear(source, box, extent, MARGIN)
+        # A source-owner mask is itself the proof that shared low-alpha pixels
+        # were partitioned away from this row. Edge continuation must therefore
+        # be evaluated on the owned alpha, not on foreign neighboring text that
+        # intentionally remains outside the mask.
+        edge_source = source
+        if owner_mask is not None:
+            edge_source = source.copy()
+            edge_source.putalpha(ImageChops.multiply(source.getchannel("A"), owner_mask))
+        salvage_actions = prove_source_edge_clear(edge_source, box, extent, MARGIN)
     except ValueError as exc:
         raise QualityHold(str(exc)) from exc
     # Any completely opaque/painted panel is NOT an isolated glyph layer.
@@ -417,8 +425,11 @@ def process_strict_atlas(raw, rows, repo, orientation, decode, import_check,
                            not (owner_mask is not None and
                                 shared_native_alpha(source.getchannel("A"),
                                     row["_bbox"], r["_bbox"]))]
+            # Owner masks may be split from labels connected only by low-alpha
+            # shadow/AA. Preserve every solid foreign pixel, but do not let the
+            # cosmetic bridge itself keep an otherwise safe translation on HOLD.
             foreign_alpha = (ImageChops.subtract(source.getchannel("A"), owner_mask).point(
-                                 lambda n: n if n > COSMETIC_FRINGE_ALPHA else 0)
+                                 lambda n: n if n > SOFT_BRIDGE_ALPHA else 0)
                              if owner_mask is not None else None)
             evidence = place_one_source_text(
                 source, clean, result, row, repo, used, import_check, other_boxes,
