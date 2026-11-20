@@ -1,0 +1,26 @@
+# Ferrari14 575-only runtime and source-paint second-pass findings (2026-11-21 KST)
+
+## Runtime regression reproduction
+The user's earlier Ferrari14 screenshot has oversized/close dark bodywork, possible per-eye vehicle transform mismatch, headset performance around 25FPS. The old run used a Ferrari13 V4 DLL and a 2026-11-19 matched host forced to plain D3D9 + SBS/Desktop Duplication, which is not the 2026-11-20 pinned normal VR path.
+
+## New isolated runtime code (current source)
+Branch `vr-ferrari14-stereo-recovery-normal-20261121`, source commit `e74345e4874fff0f4058d0ddfcc5935d57bedb6a`. Pure canonical car selector `external_car_selection.hpp` admits **car ID 5 and alias 20** only when the opt-in `ExternalFerrariTestCarId=5` setting is passed, disables special F50, and preserves the normal GPU/eye render core. Bounded diagnostics now capture failed sidecar parse/lift, failed per-eye admission, first external mesh-submission receipts and original native B0/View/Projection matrix values without full-frame logging. `RUN-FERRARI14-NORMAL-STEREO-AB.cmd` sets dedicated fixed-function external stereo A/B, while `RUN-FERRARI14-575-TRACE.cmd` enables the limited diagnostic.
+- Latest GitHub CI runs on exact source: **Ferrari14 Normal-Core Stereo Recovery Gate 44829382586 SUCCESS**, **OutRun EXE HUD Inspector 44829382485 SUCCESS**, **Windows Win32 Release Build 44829382469 SUCCESS**.
+- Normal host remains the verified 2026-11-20 5eb41778 Quest cockpit x64. No user HMD run has yet accepted this source.
+
+## Actual OVC4 / GLB material and geometry investigation
+The user's optional *hybrid* 575 Superamerica private OVC SHA256 `16c15b9bd05bc69b581fa1fddda73bb7c6461ab59ff121109ae29ff30fa87e71` has 57,786 triangles, 78 groups. Its actual bounds are **X -1.045525..+1.045528 m, Y about 0..1.200004 m, Z -2.270146..+2.270146 m** (2.091×1.200×4.540m). Thus it is not globally 10×/100× oversized. Dynamic seat-relative overlap remains unverified.
+- The *original exact 575* GLB, independent of the hybrid, already contains `ferrari_sa_paint` 256×256 full RGB `(0,0,0)` alpha 255. The hybrid retains the same completely opaque black paint. This is a proven material-data fact; it does not alone establish the cause of foreground occlusion.
+- The hybrid donor gauge-material surface `Material_32` uses 6,074 triangles but a flat **16×16 single gray** image. The original exact Superamerica already contained a proper **256×256 original gauge image** and two independent V4 speed/RPM needle bindings. This hybrid gauge substitution is **not a quality improvement** for HMD and should not be promoted.
+- Relevant glass DDS textures use partial alpha (e.g. mean 49, 51 or 151), so not all vehicle glass is fully opaque.
+
+## New real private source-backed diagnostic OVC
+The original exact Superamerica V4 optional OVC SHA256 `222eca041b07623f7d489c5cb675464f43859939d865ff63e3f26b08df49683b` (51,444 triangles, 56,323 vertices, 78 groups) was modified strictly at the **paint material DDS index 1**: 10,875 paint triangles, 256×256, BC3/DXT5 texture with **nine mip levels**. Only 5,463 BC3 color blocks were recolored to highly visible red, preserving alpha (255 everywhere), all original vertex/index bytes, original gauge texture and speed/RPM bindings, all other textures and native PBR parameters. Header/CRC32 recomputed and independent full OVC4 parser PASS (both native speed/RPM bindings present, no trailing payload).
+- New owner-private diagnostic OVC SHA256: `275e6eb55819c0a89c39e23e13fadb4616f3b496792260f59970634167021acc`, **7,157,147 bytes**. This is a deliberate visibility A/B, NOT a finished Rosso Corsa color calibration.
+- Private ZIP `FERRARI575_ROSSO_ORIGINAL_GAUGES_A_B_PRIVATE_20261121.zip` SHA256 `0ee4e5e4295eeb83a85563f2931dc5356547228d44b22873d73284cbbd45ed3f`, four items, 2,209,434 bytes, ZIP CRC verified. Uploaded **owner-only** to the existing Drive private folder (file ID `1u9k9JoiScOKtZOGksZ7f9QKEEdPSaTMl`), Drive readback size and `shared=false` verified. Third-party model bytes are NOT committed to public GitHub.
+
+## Test paths / nonclaims
+- Small runtime patch `Ferrari14_575_Only_Stereo_Diagnostic_v2_20261121.zip` compiled from e74345 source Windows CI binary, matched normal host, three launchers (model OFF, 575 fixed-function ON, short trace), opt-in backup/restore installer, no model assets. Can be installed only on a separate previously assembled licensed Ferrari14 TEST copy whose optional car_id_05.ovc is the prior hybrid SHA; do not replace known-good normal VR folder.
+- Compare baseline normal VR FPS and stereo first; then 575 fixed-function; if failed collect bounded trace; optional red original-gauges OVC **only after backing up the test copy's sidecar and installing the runtime patch**. The runtime installer SHA guard specifically expects the hybrid. Do not launch old Ferrari13 recovery scripts after patch installation, as they may reinstall the broken runtime.
+- Windows PowerShell install/rollback execution and real Quest3 headset stereoscopy/vehicle location/FPS remain untested. Static source/CRC/CI successes do **not** prove HMD fix.
+- No previous AI2 source work re-verification scores; further score adjustments require unique demonstrated new outcome and current `ai-dev-lab@main/AI_SCOREBOARD.md` SSOT.
