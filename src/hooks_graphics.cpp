@@ -1155,6 +1155,25 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial ?
                         "EXTERNAL_PARTIAL_QUARANTINED" : "ORIGINAL_FALLBACK");
         }
+        if(Settings::VRExternalFerrariDiag) {
+            static thread_local unsigned transformSamples=0;
+            if(transformSamples++<4u)
+                spdlog::info(
+                    "VR FERRARI INPUT TRANSFORM: carId={} cameraMode={} "
+                    "nativeFrame={} pose={} "
+                    "worldPosition=({:.5f},{:.5f},{:.5f}) "
+                    "worldForward=({:.5f},{:.5f},{:.5f}) "
+                    "nativeViewTranslation=({:.5f},{:.5f},{:.5f}) "
+                    "nativeProjection=({:.5f},{:.5f},{:.5f},{:.5f})",
+                    static_cast<unsigned>(ticket.carId),
+                    camera?static_cast<int>(camera->cam_mode_34A):-1,
+                    ticket.nativeFrame,ticket.xrPose,
+                    ticket.world._41,ticket.world._42,ticket.world._43,
+                    ticket.world._31,ticket.world._32,ticket.world._33,
+                    ticket.view._41,ticket.view._42,ticket.view._43,
+                    ticket.projection._11,ticket.projection._22,
+                    ticket.projection._34,ticket.projection._44);
+        }
         return suppressOriginal;
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
