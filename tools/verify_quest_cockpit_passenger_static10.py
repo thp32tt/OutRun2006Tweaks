@@ -98,6 +98,18 @@ def pass_04_follow_requires_real_guest():
     check(robot.index("ScopedOriginalOccupantLod0 passengerVisible(true);") <
           robot.index("if(!NativeFrameTrace().Active() || InSceneEffect())"),
           "passenger visibility still waits for native-frame/XR gate")
+    force_visible=robot.split(
+        "if(action==CockpitOccupantRender::OriginalPassengerForceVisible)",1
+    )[1].split("// GOAL/result camera-1",1)[0]
+    check("NeutralizePassengerVehicleF0(" in force_visible,
+          "exact ROB02 does not remove the vehicle F0 term")
+    check("VRQuestCockpitV2F0RenderScope" in force_visible and
+          "VRQuestCockpitV2OccupantCorrection" in force_visible,
+          "passenger F0 neutralization is not tied to the vehicle stabilization options")
+    check("ScopedOriginalRobotWorkMatrix passengerMatrixScope(" in force_visible,
+          "passenger stabilized work matrix lacks synchronous restore scope")
+    check("ComposeOccupantModel(" not in force_visible,
+          "unsafe Quest W*C reflection correction re-entered force-visible ROB02")
     check("if(!Settings::VRQuestCockpitV2OccupantCorrection)" in robot,
           "native fallback path missing")
 
@@ -254,8 +266,9 @@ def pass_07_nested_draw_and_restore():
           "one-session diagnostic does not distinguish layer from wrapper")
     check("if(!correctionOwner.Active())" in robot,
           "nested W*C correction not rejected")
-    check("VR PASSENGER NATIVE LOCK:" in hook and "nativeWorkLocked=1" in hook,
-          "passenger can still switch between corrected and native matrices")
+    check("VR PASSENGER NATIVE LOCK:" in hook and "nativeWorkLocked=1" in hook and
+          "f0Neutralized={}" in hook and "matrixScope={}" in hook,
+          "passenger native lock lacks explicit F0-neutralized matrix evidence")
     check("workFlagsNative=0x{:08X} workFlagsRender=0x{:08X}" in hook and
           "OriginalRobotDisplayGateRenderFlags(nativeWorkFlags)" in hook and
           "OriginalRobotDisplayGateOpen(nativeWorkFlags)" in hook,
@@ -274,9 +287,16 @@ def pass_07_nested_draw_and_restore():
     check("ScopedQuestSkyTransitionProbe" in hook and
           "VR SKY TRANSITION PHASE:" in hook,
           "original sky transition phase/rotation diagnostics unavailable")
-    check("mutation=0 originalCrossfadePreserved=1" in hook and
+    check("mutation=0 probePreStartSuppression=1" in hook and
           "RotationIndices" in hook,
-          "sky transition probe does not explicitly preserve original crossfade")
+          "sky transition probe no longer observes the pre-suppression phase")
+    check("ScopedQuestStartSkySingleLayer" in hook and
+          "*Game::current_mode!=STATE_START" in hook and
+          "std::memcpy(base_+0xc8,&zero,sizeof(zero));" in hook and
+          "std::memcpy(base_+0xcc,&zero,sizeof(zero));" in hook and
+          "std::memcpy(base_+0xc8,&oldC8_,sizeof(oldC8_));" in hook and
+          "std::memcpy(base_+0xcc,&oldCC_,sizeof(oldCC_));" in hook,
+          "START-only outgoing sky suppression/restore scope is missing")
     check("VR SKY TRANSITION ROTATION LOCK:" not in hook and
           "base+0xe0+byte,&" not in hook,
           "unverified old/new sky rotation mutation is still active")

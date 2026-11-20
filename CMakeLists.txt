@@ -735,6 +735,8 @@ target_link_libraries(outrun2006tweaks PUBLIC
 	Setupapi.lib
 	Crypt32.lib
 	d3dcompiler.lib
+	Ole32.lib
+	Uuid.lib
 )
 
 target_link_options(outrun2006tweaks PUBLIC

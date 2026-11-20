@@ -27,6 +27,7 @@
 #include <cstdint>
 #include <cstring>
 #include <utility>
+#include <Shobjidl.h>
 
 namespace Settings
 {
@@ -1317,7 +1318,7 @@ class VrOriginalRaceSkyOwner final : public Hook
                     "newAlpha={:.4f}/{:.4f} oldAlpha={:.4f}/{:.4f} "
                     "newObj={:08X}/{:08X}/{:08X} "
                     "oldObj={:08X}/{:08X}/{:08X} "
-                    "mutation=0 originalCrossfadePreserved=1",
+                    "mutation=0 probePreStartSuppression=1",
                     change,phase,static_cast<int>(state),
                     Game::camera()?static_cast<int>(
                         Game::camera()->cam_mode_34A):-1,maxDelta,
@@ -1328,6 +1329,84 @@ class VrOriginalRaceSkyOwner final : public Hook
             const ScopedQuestSkyTransitionProbe&)=delete;
         ScopedQuestSkyTransitionProbe& operator=(
             const ScopedQuestSkyTransitionProbe&)=delete;
+    };
+
+    // Field validation on 2026-11-20 narrowed the remaining flicker to
+    // STATE_START only. The original 4521C0 intentionally draws old+new sky
+    // records during its cross-fade. Mid/slow STATE_GAME is now correct and
+    // must remain untouched. In START only, once the destination layer is
+    // genuinely drawable, suppress the outgoing layer for this synchronous
+    // display call and restore both flag words byte-for-byte afterwards.
+    class ScopedQuestStartSkySingleLayer final
+    {
+        std::uint8_t* base_=nullptr;
+        std::uint32_t oldC8_=0,oldCC_=0;
+        bool active_=false;
+    public:
+        explicit ScopedQuestStartSkySingleLayer(void* work) noexcept
+        {
+            if(!work || !Settings::VREnabled ||
+               !Settings::VRQuestCockpitV2Enabled ||
+               !Game::current_mode || *Game::current_mode!=STATE_START)
+                return;
+            auto* base=reinterpret_cast<std::uint8_t*>(work);
+            std::uint32_t f38=0,f3c=0,fc8=0,fcc=0;
+            std::uint32_t n0=0,n1=0,n2=0,o0=0,o1=0,o2=0;
+            float a30=0.f,a34=0.f,ac0=0.f,ac4=0.f;
+            std::memcpy(&f38,base+0x38,sizeof(f38));
+            std::memcpy(&f3c,base+0x3c,sizeof(f3c));
+            std::memcpy(&fc8,base+0xc8,sizeof(fc8));
+            std::memcpy(&fcc,base+0xcc,sizeof(fcc));
+            std::memcpy(&a30,base+0x30,sizeof(a30));
+            std::memcpy(&a34,base+0x34,sizeof(a34));
+            std::memcpy(&ac0,base+0xc0,sizeof(ac0));
+            std::memcpy(&ac4,base+0xc4,sizeof(ac4));
+            std::memcpy(&n0,base+0x00,sizeof(n0));
+            std::memcpy(&n1,base+0x04,sizeof(n1));
+            std::memcpy(&n2,base+0x08,sizeof(n2));
+            std::memcpy(&o0,base+0x90,sizeof(o0));
+            std::memcpy(&o1,base+0x94,sizeof(o1));
+            std::memcpy(&o2,base+0x98,sizeof(o2));
+            if(!std::isfinite(a30)||!std::isfinite(a34)||
+               !std::isfinite(ac0)||!std::isfinite(ac4))return;
+            constexpr std::uint32_t None=0xffffffffu;
+            const bool newLayerDraw=
+                (f38!=0u && a30>0.100000001f &&
+                    (n0!=None || n1!=None)) ||
+                (f3c!=0u && a34>0.100000001f && n2!=None);
+            const bool oldLayerDraw=
+                (fc8!=0u && ac0>0.100000001f &&
+                    (o0!=None || o1!=None)) ||
+                (fcc!=0u && ac4>0.100000001f && o2!=None);
+            if(!newLayerDraw || !oldLayerDraw)return;
+            base_=base;
+            oldC8_=fc8;
+            oldCC_=fcc;
+            const std::uint32_t zero=0;
+            std::memcpy(base_+0xc8,&zero,sizeof(zero));
+            std::memcpy(base_+0xcc,&zero,sizeof(zero));
+            active_=true;
+            if(Settings::VRQuestCockpitV2SkyProbe) {
+                static thread_local std::uint64_t samples=0;
+                const auto count=++samples;
+                if(count<=24u || count%180u==0u)
+                    spdlog::info(
+                        "VR SKY START SINGLE LAYER: count={} "
+                        "oldFlags=0x{:X}/0x{:X} restoredAfterCall=1 "
+                        "state=START scope=4521C0",
+                        count,oldC8_,oldCC_);
+            }
+        }
+        ~ScopedQuestStartSkySingleLayer() noexcept
+        {
+            if(!active_||!base_)return;
+            std::memcpy(base_+0xc8,&oldC8_,sizeof(oldC8_));
+            std::memcpy(base_+0xcc,&oldCC_,sizeof(oldCC_));
+        }
+        ScopedQuestStartSkySingleLayer(
+            const ScopedQuestStartSkySingleLayer&)=delete;
+        ScopedQuestStartSkySingleLayer& operator=(
+            const ScopedQuestStartSkySingleLayer&)=delete;
     };
 
     static void __cdecl RaceSkyObjectQueueDest(
@@ -1377,6 +1456,7 @@ class VrOriginalRaceSkyOwner final : public Hook
                     EffectiveScope()==RenderScope::WorldSky);
         }
         ScopedQuestSkyTransitionProbe transitionProbe(work);
+        ScopedQuestStartSkySingleLayer startSingleLayer(work);
         RaceSkyDisplayHook.ccall<void>(work);
     }
 
@@ -2034,6 +2114,57 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             } displayGate(robot,renderWorkFlags);
             ScopedExactPassengerRender exactPassenger(true);
             ScopedOriginalOccupantLod0 passengerVisible(true);
+
+            // Windows ROB02 work+0x10 was authored by 488AF0 as
+            // T*F0*B0 before this display. The vehicle cockpit path already
+            // neutralizes F0 while drawing the car, so remove only that same
+            // term from the exact passenger work matrix. Do NOT reuse the
+            // Quest W*C reflection correction here: previous HMD evidence
+            // showed that substituting it for this PC work basis can displace
+            // ROB02 by tens of world units.
+            Matrix passengerWork{},passengerB0{},passengerF0{},passengerStable{};
+            bool passengerF0Neutralized=false;
+            const bool passengerStabilizationRequested=
+                Settings::VRQuestCockpitV2OccupantCorrection &&
+                Settings::VRQuestCockpitV2F0RenderScope &&
+                !OriginalRobotCorrectionActive();
+            ScopedOriginalRobotCorrectionOwner passengerCorrectionOwner(
+                passengerStabilizationRequested);
+            if(passengerCorrectionOwner.Active()) {
+                const EVWORK_CAR* passengerCar=Game::pl_car();
+                if(passengerCar) {
+                    static_assert(sizeof(robot->d3dmatrix10)==sizeof(Matrix));
+                    std::memcpy(passengerWork.data(),
+                        &robot->d3dmatrix10,sizeof(Matrix));
+                    std::memcpy(passengerB0.data(),
+                        &passengerCar->matrix_B0,sizeof(Matrix));
+                    std::memcpy(passengerF0.data(),
+                        &passengerCar->matrix_F0,sizeof(Matrix));
+                    bool matrixOwnerCoherent=true;
+                    if(ActivePreF0Snapshot) {
+                        const auto* preF0=
+                            (stereoNow && stereoNow->valid &&
+                             stereoNow->poseSequence!=0 && frameEpochNow!=0)
+                            ?MatchOriginalPreF0(
+                                reinterpret_cast<std::uintptr_t>(passengerCar),
+                                frameEpochNow,stereoNow->poseSequence)
+                            :nullptr;
+                        if(preF0) {
+                            passengerB0=preF0->matrixB0;
+                            passengerF0=preF0->matrixF0;
+                        } else {
+                            matrixOwnerCoherent=false;
+                        }
+                    }
+                    if(matrixOwnerCoherent)
+                        passengerF0Neutralized=NeutralizePassengerVehicleF0(
+                            passengerWork,passengerB0,passengerF0,
+                            passengerStable);
+                }
+            }
+            ScopedOriginalRobotWorkMatrix passengerMatrixScope(
+                reinterpret_cast<float*>(&robot->d3dmatrix10),
+                passengerStable,passengerF0Neutralized);
             static thread_local std::uint64_t nativeLocks=0;
             const auto count=++nativeLocks;
             if(PassengerTraceOn() && (count<=16u || count%180u==0u))
@@ -2042,14 +2173,18 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                     "nativeWorkLocked=1 visibleScope={} frameActive={} "
                     "stereoValid={} correctionOwnerActive={} "
                     "workFlagsNative=0x{:08X} workFlagsRender=0x{:08X} "
-                    "nativeGateOpen={} renderGateBypass={}",
+                    "nativeGateOpen={} renderGateBypass={} "
+                    "f0Neutralized={} matrixScope={} matrixHash={:016X}",
                     count,frameEpochNow,OriginalOccupantLod0Active(),
                     NativeFrameTrace().Active(),
                     stereoNow&&stereoNow->valid&&stereoNow->poseSequence!=0,
                     OriginalRobotCorrectionActive(),nativeWorkFlags,
                     renderWorkFlags,
                     OriginalRobotDisplayGateOpen(nativeWorkFlags),
-                    renderGateBypass);
+                    renderGateBypass,passengerF0Neutralized,
+                    passengerMatrixScope.Active(),
+                    passengerF0Neutralized
+                        ?MatrixFingerprint(passengerWork,passengerStable):0ull);
             RobotHook.ccall<void>(robot);
             return;
         }
@@ -4716,6 +4851,44 @@ class WindowedBorderless : public Hook
         UpdateWindow(mirror_backdrop_window);
     }
 
+    // Aspect-preserving VR mirrors deliberately use a centered HWND smaller
+    // than an ultrawide monitor. Windows no longer auto-detects that HWND as
+    // fullscreen, so the taskbar can remain above the game's client pixels.
+    // Desktop Duplication then faithfully captures those taskbar pixels into
+    // the HMD theater/menu source. Tell the Shell that the *active game HWND*
+    // is fullscreen instead of making either window TOPMOST. Microsoft
+    // documents MarkFullscreenWindow(TRUE) as moving the taskbar to the
+    // bottom of the z-order while this window is active.
+    static void update_taskbar_fullscreen_mark(
+        HWND window,bool fullscreen) noexcept
+    {
+        if(!window)return;
+        const HRESULT apartment=CoInitializeEx(
+            nullptr,COINIT_APARTMENTTHREADED);
+        const bool uninitialize=SUCCEEDED(apartment);
+        ITaskbarList2* taskbar=nullptr;
+        HRESULT status=CoCreateInstance(
+            CLSID_TaskbarList,nullptr,CLSCTX_INPROC_SERVER,
+            IID_PPV_ARGS(&taskbar));
+        if(SUCCEEDED(status)&&taskbar) {
+            status=taskbar->HrInit();
+            if(SUCCEEDED(status))
+                status=taskbar->MarkFullscreenWindow(
+                    window,fullscreen?TRUE:FALSE);
+            taskbar->Release();
+        }
+        if(uninitialize)CoUninitialize();
+        if(FAILED(status))
+            spdlog::warn(
+                "VR PC MIRROR: shell fullscreen mark failed enabled={} hr=0x{:08X}",
+                fullscreen?1:0,static_cast<unsigned long>(status));
+        else
+            spdlog::info(
+                "VR PC MIRROR: shell fullscreen mark enabled={} "
+                "taskbarBelowActiveGame=1",
+                fullscreen?1:0);
+    }
+
 	static void destination(safetyhook::Context& ctx)
 	{
 		HWND window = HWND(ctx.ebp);
@@ -4725,6 +4898,7 @@ class WindowedBorderless : public Hook
 		int height = Game::screen_resolution->y;
         int mirrorSourceWidth = width;
         int mirrorSourceHeight = height;
+        bool mirrorTaskbarFullscreen = false;
         if (Settings::VREnabled && Game::D3DPresentParams)
         {
             const auto backbufferWidth =
@@ -4788,6 +4962,7 @@ class WindowedBorderless : public Hook
                     }
                 }
                 update_mirror_backdrop(monitorInfo, mirrorBackdropNeeded);
+                mirrorTaskbarFullscreen = mirrorBackdropNeeded;
                 spdlog::info(
                     "VR PC MIRROR: monitor={}x{} logical={}x{} backbufferSource={}x{} fittedWindow={}x{} origin={},{} preserveAspect={} backdrop={} (OpenXR eyes unchanged)",
                     monitorWidth, monitorHeight,
@@ -4800,6 +4975,7 @@ class WindowedBorderless : public Hook
 		}
 
 		SetWindowPos(window, 0, x, y, width, height, 0x40);
+        update_taskbar_fullscreen_mark(window,mirrorTaskbarFullscreen);
 	}
 
 public:

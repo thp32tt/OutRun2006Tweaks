@@ -25,6 +25,74 @@ inline bool ComposeOccupantModel(const Matrix& work,
     destination=candidate;
     return true;
 }
+// The original PC passenger work matrix is rebuilt as T * F0 * B0
+// (race_robot_driver_matrix_488af0: push B0, pre-multiply F0, then
+// pre-multiply the seat translation). Quest cockpit vehicle rendering
+// neutralizes F0 for the car itself. Remove that exact F0 contribution from
+// an already-authored passenger W without replacing its seat/animation T.
+//
+// W' = W * inverse(F0 * B0) * B0
+// For W = T * F0 * B0 this reduces exactly to T * B0.
+// This is intentionally NOT the Quest W*C reflection correction, which is a
+// separate native occupant transform and was proven unsafe as a substitute
+// for the Windows passenger's pre-authored work matrix.
+inline bool MultiplyAffineMatrices(const Matrix& left,const Matrix& right,
+                                   Matrix& output) noexcept {
+    if(!FiniteAffine(left)||!FiniteAffine(right))return false;
+    Matrix candidate{};
+    for(std::size_t row=0;row<4;++row) {
+        for(std::size_t col=0;col<4;++col) {
+            double acc=0.;
+            for(std::size_t k=0;k<4;++k)
+                acc+=double(left[row*4+k])*double(right[k*4+col]);
+            candidate[row*4+col]=static_cast<float>(acc);
+        }
+    }
+    if(!FiniteAffine(candidate))return false;
+    output=candidate;
+    return true;
+}
+inline bool InvertAffineMatrix(const Matrix& input,Matrix& output) noexcept {
+    if(!FiniteAffine(input))return false;
+    const double a=input[0], b=input[1], c=input[2];
+    const double d=input[4], e=input[5], f=input[6];
+    const double g=input[8], h=input[9], i=input[10];
+    const double det=a*(e*i-f*h)-b*(d*i-f*g)+c*(d*h-e*g);
+    if(!std::isfinite(det)||std::fabs(det)<=1.e-12)return false;
+    const double invDet=1.0/det;
+    Matrix inv=Identity;
+    inv[0]=static_cast<float>((e*i-f*h)*invDet);
+    inv[1]=static_cast<float>((c*h-b*i)*invDet);
+    inv[2]=static_cast<float>((b*f-c*e)*invDet);
+    inv[4]=static_cast<float>((f*g-d*i)*invDet);
+    inv[5]=static_cast<float>((a*i-c*g)*invDet);
+    inv[6]=static_cast<float>((c*d-a*f)*invDet);
+    inv[8]=static_cast<float>((d*h-e*g)*invDet);
+    inv[9]=static_cast<float>((b*g-a*h)*invDet);
+    inv[10]=static_cast<float>((a*e-b*d)*invDet);
+    for(std::size_t col=0;col<3;++col)
+        inv[12+col]=-(input[12]*inv[col]+
+                      input[13]*inv[4+col]+
+                      input[14]*inv[8+col]);
+    if(!FiniteAffine(inv))return false;
+    output=inv;
+    return true;
+}
+inline bool NeutralizePassengerVehicleF0(
+    const Matrix& work,const Matrix& matrixB0,const Matrix& matrixF0,
+    Matrix& output) noexcept {
+    if(!FiniteAffine(work)||!FiniteAffine(matrixB0)||
+       !FiniteAffine(matrixF0))return false;
+    Matrix f0b0{},inverseF0B0{},withoutVehicleLocal{},candidate{};
+    if(!MultiplyAffineMatrices(matrixF0,matrixB0,f0b0) ||
+       !InvertAffineMatrix(f0b0,inverseF0B0) ||
+       !MultiplyAffineMatrices(work,inverseF0B0,withoutVehicleLocal) ||
+       !MultiplyAffineMatrices(withoutVehicleLocal,matrixB0,candidate))
+        return false;
+    output=candidate;
+    return true;
+}
+
 // Quest render_frame original matrix_F0 16-float identity staging.
  // On Windows the validated player callback can own a synchronous
  // guest-view alias only for the original player car display. This is

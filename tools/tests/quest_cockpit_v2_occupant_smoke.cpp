@@ -79,6 +79,51 @@ int main() {
     { ScopedOriginalPlayerF0 scope(f0.data(),false);
       assert(!scope.Active());assert(f0==f0Original);
     }
+    // Windows passenger control authors work as T*F0*B0. When the player
+    // car render scope removes F0, the passenger must remove only that same
+    // local term while preserving native seat/animation T and vehicle B0.
+    auto mul=[](const Matrix& a,const Matrix& b) {
+        Matrix out{};
+        for(int r=0;r<4;++r)for(int c=0;c<4;++c) {
+            double acc=0.;
+            for(int k=0;k<4;++k)acc+=double(a[r*4+k])*double(b[k*4+c]);
+            out[r*4+c]=static_cast<float>(acc);
+        }
+        return out;
+    };
+    Matrix passengerB0=Identity;
+    passengerB0[0]=0.f; passengerB0[1]=1.f;
+    passengerB0[4]=-1.f; passengerB0[5]=0.f;
+    passengerB0[12]=4.f; passengerB0[13]=-2.f; passengerB0[14]=8.f;
+    Matrix passengerF0=Identity;
+    passengerF0[0]=0.8f; passengerF0[2]=-0.6f;
+    passengerF0[8]=0.6f; passengerF0[10]=0.8f;
+    passengerF0[12]=0.35f; passengerF0[13]=1.25f; passengerF0[14]=-0.5f;
+    Matrix passengerSeat=Identity;
+    passengerSeat[12]=-0.7f; passengerSeat[13]=0.9f; passengerSeat[14]=1.6f;
+    const Matrix passengerWork=mul(passengerSeat,mul(passengerF0,passengerB0));
+    const Matrix passengerExpected=mul(passengerSeat,passengerB0);
+    Matrix passengerStable{};
+    assert(NeutralizePassengerVehicleF0(
+        passengerWork,passengerB0,passengerF0,passengerStable));
+    for(int k=0;k<16;++k)
+        assert(std::fabs(passengerStable[k]-passengerExpected[k])<2.e-5f);
+    Matrix identityWork=mul(passengerSeat,passengerB0),identityStable{};
+    assert(NeutralizePassengerVehicleF0(
+        identityWork,passengerB0,Identity,identityStable));
+    for(int k=0;k<16;++k)
+        assert(std::fabs(identityStable[k]-identityWork[k])<2.e-5f);
+    Matrix singularF0=Identity;singularF0[0]=0.f;
+    const auto stableBefore=passengerStable;
+    assert(!NeutralizePassengerVehicleF0(
+        passengerWork,passengerB0,singularF0,passengerStable));
+    assert(passengerStable==stableBefore);
+    Matrix invalidWork=passengerWork;
+    invalidWork[13]=std::numeric_limits<float>::quiet_NaN();
+    assert(!NeutralizePassengerVehicleF0(
+        invalidWork,passengerB0,passengerF0,passengerStable));
+    assert(passengerStable==stableBefore);
+
     // Re-derive occupant correction using the original B0/F0 while the
     // PC player's F0 is staged to identity, as in Quest's renderer TLS.
     Matrix origB0=Identity;origB0[12]=2.5f;origB0[1]=0.15f;

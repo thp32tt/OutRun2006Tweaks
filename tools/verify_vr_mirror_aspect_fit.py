@@ -27,6 +27,11 @@ def check(c,h,s):
     assert 'fit.height < monitorHeight;' in owner
     assert 'SetWindowPos(mirror_backdrop_window, HWND_TOP,' in owner
     assert 'backdrop={}' in owner
+    assert 'ITaskbarList2* taskbar=nullptr;' in owner
+    assert 'MarkFullscreenWindow(' in owner
+    assert 'mirrorTaskbarFullscreen = mirrorBackdropNeeded;' in owner
+    assert 'update_taskbar_fullscreen_mark(window,mirrorTaskbarFullscreen);' in owner
+    assert 'HWND_TOPMOST' not in owner
     assert 'Game::screen_resolution->x =' not in owner
     assert 'Game::screen_resolution->y =' not in owner
     assert 'GetMonitorInfoW(monitor, &monitorInfo)' in owner
@@ -75,4 +80,4 @@ for monitor in [(3440,1440),(1920,1080),(2560,1440)]:
         assert x>=0 and y>=0 and w<=monitor[0] and h<=monitor[1]
         assert abs(w/h-source[0]/source[1])<=max(1/h,1/w)*2
 assert fit(3440,1440,2496,2688)==(1051,0,1337,1440)
-print('PASS portrait XRender -> aspect-preserved mirror + black desktop-strip backdrop; source/eye unchanged; five destructive controls')
+print('PASS aspect-preserved VR mirror + black backdrop + Shell fullscreen taskbar suppression; source/eye unchanged; five destructive controls')
