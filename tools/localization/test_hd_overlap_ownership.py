@@ -35,7 +35,7 @@ def native_dds(image):
     return bytes(header) + image.tobytes("raw", "BGRA")
 
 
-def fixture(ambiguous=False, connected=False):
+def fixture(ambiguous=False, connected=False, soft_connected=False):
     original = Image.new("RGBA", (192, 128), (0, 0, 0, 0))
     draw = ImageDraw.Draw(original)
     draw.rectangle((20, 30, 72, 42), fill=(255, 255, 255, 255))
@@ -45,6 +45,9 @@ def fixture(ambiguous=False, connected=False):
         draw.rectangle((75, 25, 79, 27), fill=(255, 255, 255, 255))
     if connected:
         draw.line((72, 42, 90, 54), fill=(255, 255, 255, 255), width=2)
+    if soft_connected:
+        # Real glyph cores remain separate; only translucent shadow/AA bridges.
+        draw.line((72, 42, 90, 54), fill=(255, 255, 255, 40), width=2)
     return original
 
 
@@ -129,6 +132,30 @@ class NativeOverlapProofTests(unittest.TestCase):
         )
         self.assertFalse(masks)
         self.assertEqual(set(audit["ambiguous"]), {A["roi_id"], B["roi_id"]})
+
+    def test_soft_shadow_bridge_is_partitioned_by_solid_glyph_cores(self):
+        src = fixture(soft_connected=True)
+        masks, audit = prove_overlap_ownership(
+            src, [A, B], {A["roi_id"], B["roi_id"]}
+        )
+        self.assertEqual(set(masks), {A["roi_id"], B["roi_id"]})
+        self.assertEqual(audit["ambiguous"], [])
+        self.assertGreaterEqual(audit["core_partitioned_components"], 1)
+        self.assertGreaterEqual(audit["cosmetic_residual_pixels"], 0)
+        # Solid English cores stay assigned to their own rows.
+        self.assertTrue(masks[A["roi_id"]].getpixel((30, 35)))
+        self.assertTrue(masks[B["roi_id"]].getpixel((100, 60)))
+
+    def test_soft_shadow_bridge_assembles_but_solid_bridge_still_holds(self):
+        data, _, _, painted, holds = run_assembly(fixture(soft_connected=True))
+        self.assertIsNotNone(data)
+        self.assertEqual(len(painted), 2)
+        self.assertFalse(holds)
+        data, _, _, painted, holds = run_assembly(fixture(connected=True))
+        self.assertIsNone(data)
+        self.assertFalse(painted)
+        self.assertTrue(all(x["reason"] == "ROI_OVERLAP_NEEDS_MANUAL_QA"
+                            for x in holds))
 
     def test_identical_roi_boxes_never_invent_an_owner(self):
         src = fixture()
