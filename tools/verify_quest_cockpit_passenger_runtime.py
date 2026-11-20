@@ -2,6 +2,8 @@
 """Native camera-0 parity and removal static proof for cockpit passenger.
 
 The game decides whether its original ROB02 exists, independently of camera.
+2026-11-20 physical regressions additionally require exact ROB02 F0-only
+stabilization and STATE_START-only outgoing sky suppression with RAII restore.
 No code may fabricate ROB02 or claim a GPU screenshot without HMD evidence.
 Run without args for source checks or --exe PATH for canonical PC ABI proof.
 """
