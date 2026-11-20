@@ -218,7 +218,13 @@ jobs:
           assert "'-FramerateInterpolation=false'" in launcher
           assert 'MaybeLogCockpitSkyProbe(stereoRequested,composedStereo,' in r7
           assert 'VRQuestCockpitV2SkyProbe' in settings
-          assert 'mutation=0 originalCrossfadePreserved=1' in hook
+          assert 'mutation=0 probePreStartSuppression=1' in hook
+          assert 'ScopedQuestStartSkySingleLayer' in hook
+          assert '*Game::current_mode!=STATE_START' in hook
+          assert 'std::memcpy(base_+0xc8,&zero,sizeof(zero));' in hook
+          assert 'std::memcpy(base_+0xcc,&zero,sizeof(zero));' in hook
+          assert 'std::memcpy(base_+0xc8,&oldC8_,sizeof(oldC8_));' in hook
+          assert 'std::memcpy(base_+0xcc,&oldCC_,sizeof(oldCC_));' in hook
           assert 'VR SKY TRANSITION ROTATION LOCK:' not in hook
           assert 'VR SKY OPAQUE QUEUE TAG:' in hook
           assert 'VR SKY OPAQUE QUEUE DRAW:' in hook
@@ -335,7 +341,8 @@ jobs:
           assert 'RemoveGlassReflectionLayer(' in hook
           assert 'OriginalPassengerForceVisible' in hook
           # A genuine live ROB02 callback is now the strongest passenger owner:
-          # keep stock work matrix + forced-visible before driver W*C/frame gates.
+          # keep forced-visible admission before driver W*C/frame gates, while
+          # removing only the same vehicle F0 term already neutralized for the car.
           # This does NOT create a draw; 4879B0 recovery remains separately gated.
           native_lock='if(action==CockpitOccupantRender::OriginalPassengerForceVisible) {'
           assert native_lock in hook
@@ -347,6 +354,9 @@ jobs:
           assert native_lock_at < visible_at < recurse_at < frame_gate_at
           native_block=hook[native_lock_at:recurse_at]
           assert 'nativeWorkLocked=1' in native_block
+          assert 'NeutralizePassengerVehicleF0(' in native_block
+          assert 'ScopedOriginalRobotWorkMatrix passengerMatrixScope(' in native_block
+          assert 'f0Neutralized={}' in native_block and 'matrixScope={}' in native_block
           assert 'RobotHook.ccall<void>(robot);' in native_block
           assert 'return;' in native_block
           assert 'ComposeOccupantModel(' not in native_block
