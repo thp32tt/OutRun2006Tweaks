@@ -605,8 +605,11 @@ jobs:
           $exe=Join-Path $release 'OR2006C2C.EXE'
           Invoke-WebRequest -Uri 'https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE' -OutFile $exe
           if(!(Test-Path -LiteralPath $exe) -or (Get-Item -LiteralPath $exe).Length -lt 1000000){throw 'replacement OR2006C2C.EXE download is missing or too small'}
+          $expectedExeSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+          $actualExeSha=(Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($actualExeSha -ne $expectedExeSha){throw "v0.03 canonical OR2006C2C.EXE SHA mismatch: $actualExeSha"}
           $launcher=Get-Content -LiteralPath (Join-Path $release 'Start-OutRun.cmd') -Raw
-          foreach($required in @('-VR.QuestCockpitV2Enabled=true','-VR.QuestCockpitV2F0RenderScope=true','-VR.QuestCockpitV2NativeSeatProfile=true','-VR.QuestCockpitV2ApkNativeCamera=true','-VR.QuestCockpitV2OccupantCorrection=true','-VR.AutoRenderResolution=false','-VR.RenderWidth=2496','-VR.RenderHeight=2688','-HudInspector=false')) {
+          foreach($required in @('-VR.QuestCockpitV2Enabled=true','-VR.QuestCockpitV2F0RenderScope=true','-VR.QuestCockpitV2NativeSeatProfile=true','-VR.QuestCockpitV2ApkNativeCamera=true','-VR.QuestCockpitV2OccupantCorrection=true','-VR.AutoRenderResolution=false','-VR.RenderWidth=2496','-VR.RenderHeight=2688','-HudInspector=false','OUTRUN_VR_DIRECT_TRANSPORT=1','Start-Process -FilePath $env:OUTRUN_VR_HOST','-WindowStyle Hidden')) {
             if(!$launcher.Contains($required)){throw "v0.03 launcher missing $required"}
           }
           foreach($forbidden in @('-VR.QuestCockpitV2SeatBack=','-VR.QuestCockpitV2SeatDown=','-VR.QuestCockpitV2SeatRight=','-VR.QuestCockpitV2PassengerVisible=','-VR.AutoRenderResolution=true')) {

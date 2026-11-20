@@ -103,6 +103,26 @@ else:
         errors.append("release launcher still forces OpenXR auto eye resolution")
     if "-VR.QuestCockpitV2PassengerVisible=" in release:
         errors.append("release launcher overrides persisted passenger Follow/Remove setting")
+    for required in (
+        'set "OUTRUN_VR_DIRECT_TRANSPORT=1"',
+        'set "OUTRUN_VR_DIRECT_ONLY=1"',
+        'set "OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION=0"',
+        'Start-Process -FilePath $env:OUTRUN_VR_HOST',
+        '-WindowStyle Hidden',
+    ):
+        if required not in release:
+            errors.append(f"release diagnostic-parity host prewarm missing: {required}")
+
+settings_source_path = ROOT / "src" / "vr" / "settings.cpp"
+if not settings_source_path.is_file():
+    errors.append("missing VR settings source: src/vr/settings.cpp")
+else:
+    settings_source = settings_source_path.read_text(encoding="utf-8")
+    for required in ("CREATE_NO_WINDOW", "STARTF_USESHOWWINDOW", "SW_HIDE"):
+        if required not in settings_source:
+            errors.append(f"hidden AutoLaunchHost fallback missing: {required}")
+    if "CREATE_NEW_CONSOLE" in settings_source:
+        errors.append("AutoLaunchHost can still create a focus-stealing console")
 
 for extra_name in (
     "Start-OutRun-VR.cmd",
@@ -121,4 +141,4 @@ if errors:
         print(f"FAIL: {error}")
     sys.exit(1)
 
-print("PASS: Quest cockpit launchers keep F0 ON, fixed 2496x2688 release eyes, valid line breaks, and runner fallback.")
+print("PASS: Quest cockpit launchers keep F0 ON, fixed 2496x2688 release eyes, diagnostic-parity hidden host prewarm, valid line breaks, and runner fallback.")

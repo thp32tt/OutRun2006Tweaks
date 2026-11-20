@@ -34,6 +34,24 @@ set "OUTRUN_VR_FORCE_DISABLED=0"
 set "OUTRUN_VR_R23_PIXEL_PROBE=0"
 set "OUTRUN_VR_FILE_LOG=0"
 
+rem Match the proven diagnostic startup order: prepare the OpenXR host before the
+rem game process, and keep the host hidden so it cannot steal foreground focus.
+rem If PowerShell host prewarm is unavailable, the DLL AutoLaunchHost path below
+rem remains a fallback and uses the same transport policy.
+set "OUTRUN_VR_DIRECT_TRANSPORT=1"
+set "OUTRUN_VR_DIRECT_ONLY=1"
+set "OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION=0"
+set "OUTRUN_VR_TARGET_REFRESH_HZ=0"
+set "OUTRUN_VR_CADENCE_MODE=1"
+set "OUTRUN_VR_CADENCE_TARGET_HZ=0"
+set "OUTRUN_VR_CADENCE_MAX_HZ=120"
+set "OUTRUN_VR_CADENCE_TIMEOUT_MS=35"
+set "OUTRUN_VR_HOST=%~dp0outrun-vr-host.exe"
+set "OUTRUN_VR_ROOT=%~dp0"
+if exist "%OUTRUN_VR_HOST%" (
+ powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -Command "Start-Process -FilePath $env:OUTRUN_VR_HOST -WorkingDirectory $env:OUTRUN_VR_ROOT -WindowStyle Hidden" >nul 2>&1
+)
+
 start "" "%~dp0OR2006C2C.exe" ^
  -VR.Enabled=true ^
  -VR.AutoLaunchHost=true ^

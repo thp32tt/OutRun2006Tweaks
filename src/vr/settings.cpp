@@ -260,9 +260,14 @@ namespace OutRunVR
 				std::wstring workingDir = gameDir.wstring();
 				STARTUPINFOW si{};
 				si.cb = sizeof(si);
+				// AutoLaunchHost is a renderer helper, not an interactive app.
+				// A new console can become the foreground window after the game
+				// starts, leaving OutRun unfocused until the user clicks it.
+				si.dwFlags = STARTF_USESHOWWINDOW;
+				si.wShowWindow = SW_HIDE;
 				PROCESS_INFORMATION pi{};
 				if (!CreateProcessW(nullptr, command.data(), nullptr, nullptr, FALSE,
-					CREATE_NEW_CONSOLE, nullptr, workingDir.c_str(), &si, &pi))
+					CREATE_NO_WINDOW, nullptr, workingDir.c_str(), &si, &pi))
 				{
 					spdlog::warn("VR AUTO HOST: CreateProcess failed error={}", GetLastError());
 					return false;
