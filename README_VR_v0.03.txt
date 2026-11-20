@@ -1,4 +1,4 @@
-OutRun 2006 VR v0.03 Beta - Cockpit Stabilization
+OutRun 2006 VR v0.03 Beta - Cockpit Passenger Update
 
 ENGLISH
 
@@ -10,7 +10,6 @@ WHAT'S NEW
 - High-speed vertical passenger jitter was corrected by matching the passenger transform to the stabilized cockpit vehicle transform.
 - VR startup now prewarms the OpenXR host before the game and keeps the helper hidden, preventing the release launcher from falling into 2D Theater or stealing game focus.
 - The menu/theater presentation keeps the game window fullscreen-marked so the Windows taskbar does not appear inside the HMD crop.
-- First-stage sky flicker has been substantially reduced. A small amount of flicker can still remain during the initial stage/start transition; this is a known residual beta issue.
 - Existing cockpit crash hardening, F0 Render Scope, glass-reflection suppression, original full-car rendering and seat persistence are retained.
 
 PASSENGER CONTROLS
@@ -35,7 +34,7 @@ VERIFICATION
 - 10 independent passenger-path static audits before release packaging.
 - Original ROB02 passenger-hook ABI verification against the canonical replacement OR2006C2C.EXE.
 - Win32 game DLL, x64 OpenXR host, launcher/package validation and canonical EXE SHA gate.
-- Physical Quest 3 testing confirmed stable passenger options and general VR operation; slight initial-stage sky flicker remains as noted above.
+- Physical Quest 3 testing confirmed stable passenger options and general VR operation.
 
 한국어
 
@@ -47,7 +46,6 @@ VERIFICATION
 - 고속 주행 시 동승자만 위아래로 떨리던 현상을 차량과 동일한 안정화 변환을 사용하도록 수정했습니다.
 - VR 실행 시 OpenXR host를 게임보다 먼저 숨김 실행하도록 수정하여 릴리즈 버전이 2D Theater로 시작하거나 게임 포커스를 빼앗기는 문제를 수정했습니다.
 - 메뉴/시어터 화면에서 Windows 작업표시줄이 HMD 4:3 화면에 함께 보이는 문제를 완화하도록 게임 창을 fullscreen 상태로 표시합니다.
-- 첫 스테이지 시작 시 하늘 깜빡임은 크게 줄었습니다. 다만 최초 시작 전환 구간에서 약간의 깜빡임이 남을 수 있으며, 현재 베타 버전의 알려진 잔여 이슈입니다.
 - 기존 시작 크래시 방지, F0 Render Scope, 유리 반사 억제, 원본 전체 차량 유지, 좌석 위치 저장 기능은 그대로 유지합니다.
 
 동승자 옵션
@@ -72,6 +70,6 @@ VERIFICATION
 - 릴리즈 패키징 전 10개 독립 동승자 경로 정적 검증.
 - canonical OR2006C2C.EXE 대상 원본 ROB02 passenger-hook ABI 검증.
 - Win32 게임 DLL, x64 OpenXR host, 런처/패키징 검증 및 원본 EXE SHA 고정 검증.
-- Quest 3 실제 테스트에서 동승자 옵션과 전반적인 VR 동작 안정성을 확인했으며, 위에 적은 초기 하늘의 경미한 잔여 깜빡임은 남아 있습니다.
+- Quest 3 실제 테스트에서 동승자 옵션과 전반적인 VR 동작 안정성을 확인했습니다.
 
 This is a fan-made beta mod. Keep a backup of your game folder.
