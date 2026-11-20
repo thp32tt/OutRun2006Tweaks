@@ -48,6 +48,10 @@ analyzer = Path("tools/Analyze-OutRunVRSession.ps1").read_text(encoding="utf-8")
 assert "gameExitCode=(-?\\d+)" in analyzer
 assert "\\b(crash|" not in analyzer
 assert "unhandled exception" in analyzer.lower()
+assert "PassengerPipelineStatus" in analyzer
+assert "D3D9_DIP_CONFIRMED_HMD_VISUAL_REQUIRED" in analyzer
+assert "passengerNativeDipSuccessCount" in analyzer
+assert "skyOpaqueQueueDrawCount" in analyzer
 sky = Path("src/vr/d3d9/stereo_renderer_r7.inc").read_text(encoding="utf-8")
 assert "fixedNativeEyePair=rotationOnly ? nullptr :" in sky
 assert "exactWorldSky ? nullptr :" in sky
