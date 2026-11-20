@@ -125,13 +125,14 @@ class NativeOverlapProofTests(unittest.TestCase):
         self.assertEqual({item["reason"] for item in holds},
                          {"ROI_OVERLAP_NEEDS_MANUAL_QA"})
 
-    def test_connected_shared_ink_with_two_exclusive_anchors_remains_hold(self):
+    def test_connected_shared_ink_with_two_solid_owner_seeds_is_partitioned(self):
         src = fixture(connected=True)
         masks, audit = prove_overlap_ownership(
             src, [A, B], {A["roi_id"], B["roi_id"]}
         )
-        self.assertFalse(masks)
-        self.assertEqual(set(audit["ambiguous"]), {A["roi_id"], B["roi_id"]})
+        self.assertEqual(set(masks), {A["roi_id"], B["roi_id"]})
+        self.assertEqual(audit["ambiguous"], [])
+        self.assertGreaterEqual(audit["core_partitioned_components"], 1)
 
     def test_soft_shadow_bridge_is_partitioned_by_solid_glyph_cores(self):
         src = fixture(soft_connected=True)
@@ -146,16 +147,12 @@ class NativeOverlapProofTests(unittest.TestCase):
         self.assertTrue(masks[A["roi_id"]].getpixel((30, 35)))
         self.assertTrue(masks[B["roi_id"]].getpixel((100, 60)))
 
-    def test_soft_shadow_bridge_assembles_but_solid_bridge_still_holds(self):
-        data, _, _, painted, holds = run_assembly(fixture(soft_connected=True))
-        self.assertIsNotNone(data)
-        self.assertEqual(len(painted), 2)
-        self.assertFalse(holds)
-        data, _, _, painted, holds = run_assembly(fixture(connected=True))
-        self.assertIsNone(data)
-        self.assertFalse(painted)
-        self.assertTrue(all(x["reason"] == "ROI_OVERLAP_NEEDS_MANUAL_QA"
-                            for x in holds))
+    def test_soft_and_solid_bridges_assemble_when_both_rows_have_core_seeds(self):
+        for src in (fixture(soft_connected=True), fixture(connected=True)):
+            data, _, _, painted, holds = run_assembly(src)
+            self.assertIsNotNone(data)
+            self.assertEqual(len(painted), 2)
+            self.assertFalse(holds)
 
     def test_identical_roi_boxes_never_invent_an_owner(self):
         src = fixture()
