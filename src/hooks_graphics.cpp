@@ -16,6 +16,11 @@
 #include "vr/game/quest_cockpit_v2_visibility.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
 #include "vr/game/quest_cockpit_v2_glass_hook.hpp"
+#include "vr/game/dino_external_d3d9.hpp"
+#include "vr/game/dino_external_original_car_gate.hpp"
+#include "vr/game/f50_external_pose_filter.hpp"
+#include "vr/state/state_block_tracker.hpp"
+#include "vr/state/game_reset_events.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -58,6 +63,14 @@ namespace Settings
     extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff,VRQuestCockpitV2SkyProbe,VRQuestCockpitV2ApkNativeCamera;
     extern Setting<float> VRQuestCockpitV2SeatBack,VRQuestCockpitV2SeatDown,VRQuestCockpitV2SeatRight;
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
+    Setting<bool> VRF50ExternalModel{ "VR", "F50ExternalModel", false,
+        "QuestCockpitV2-only external Ferrari F50 test model. Replaces only the player F50 (car kind 0) after a complete sidecar draw; original PMT remains unchanged." };
+    Setting<bool> VRExternalFerrariTest{ "VR", "ExternalFerrariTest", false,
+        "EXPERIMENTAL: render installed external Ferrari OVC sidecars for validated player car IDs 0..29 in cockpit view only. Existing 288 GTO/F40 filenames stay compatible; other cars use ExternalCars/car_id_XX.ovc. Missing/invalid files fall back to original game models." };
+    Setting<float> VRF50ExternalLift{ "VR", "F50ExternalLift", 0.22f,
+        "External F50 local vertical offset in metres for wheel/track alignment. No gameplay physics or camera changes.", Range<float>{ -0.25f, 1.0f } };
+    Setting<bool> VRF50ExternalStabilize{ "VR", "F50ExternalStabilize", true,
+        "Light visual-only F50 vertical suspension jitter damping, once per native stereo-frame pair. Snaps on larger terrain changes." };
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -517,6 +530,14 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     inline static SafetyHookMid FrameEnterHook{},FrameEndHook{};
     inline static SafetyHookInline PlayerCallbackHook{};
     inline static thread_local bool F0CallbackActive=false;
+    inline static thread_local bool F50GameplayResourceArmed=false;
+    static void ReleaseExternalBeforeDeviceReset() noexcept
+    {
+        OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
+        OutRunVR::DinoSidecar::GlobalDashboardGpu().OnDeviceReset();
+        OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
+        F50GameplayResourceArmed=false;
+    }
     static constexpr std::size_t SeatTableCount=30u;
     inline static bool SeatTableCaptured=false;
     inline static bool SeatTablePatched=false;
@@ -679,6 +700,16 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     }
     static void OnFrameEnter(SafetyHookContext&)
     {
+        // External models are gameplay-only; the normal menu/host path stays untouched.
+        const bool externalGameplayNow=
+            (Settings::VRF50ExternalModel || Settings::VRExternalFerrariTest) &&
+            Game::current_mode && *Game::current_mode==STATE_GAME;
+        if(F50GameplayResourceArmed && !externalGameplayNow) {
+            OutRunVR::DinoSidecar::GlobalGpu().OnDeviceReset();
+            OutRunVR::DinoSidecar::GlobalDashboardGpu().OnDeviceReset();
+            OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
+        }
+        F50GameplayResourceArmed=externalGameplayNow;
         // Camera control for the next tick reads this persistent live table.
         // Re-sync here only for live F11/tuning changes; startup apply below
         // installs the profile before the first playable camera tick.
@@ -893,8 +924,225 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 maxSteering=0.f;
         }
     }
+    struct F50ExternalDrawTicket final
+    {
+        IDirect3DDevice9* device=nullptr;
+        D3DMATRIX world{},view{},projection{};
+        std::uintptr_t originalPlayer=0;
+        std::uint64_t nativeFrame=0,xrPose=0;
+        unsigned char carId=255;
+        float appliedLift=0.f; // native car-local visual floor correction
+        OutRunVR::DinoSidecar::DashboardTelemetry dashboard{};
+        OutRunVR::DinoSidecar::FerrariModelSlot slot=
+            OutRunVR::DinoSidecar::FerrariModelSlot::F50;
+        bool valid=false;
+        F50ExternalDrawTicket()=default;
+        F50ExternalDrawTicket(const F50ExternalDrawTicket&)=delete;
+        F50ExternalDrawTicket& operator=(const F50ExternalDrawTicket&)=delete;
+        F50ExternalDrawTicket(F50ExternalDrawTicket&& other) noexcept
+            :device(other.device),world(other.world),view(other.view),
+             projection(other.projection),originalPlayer(other.originalPlayer),
+             nativeFrame(other.nativeFrame),xrPose(other.xrPose),
+             carId(other.carId),appliedLift(other.appliedLift),
+             dashboard(other.dashboard),slot(other.slot),valid(other.valid)
+        {
+            other.device=nullptr;other.valid=false;
+        }
+        ~F50ExternalDrawTicket() noexcept
+        {
+            if(device)device->Release();
+        }
+    };
+    static F50ExternalDrawTicket PrepareF50External(EVWORK_CAR* player) noexcept
+    {
+        using namespace OutRunVR::QuestCockpitV2;
+        F50ExternalDrawTicket ticket{};
+        // Preserve the known-working single-F50 isolation order: do not read
+        // any player vehicle field from menu/loading callbacks. External model
+        // inspection begins only after the normal VR/game/player-owner gates.
+        if ((!Settings::VRF50ExternalModel &&
+             !Settings::VRExternalFerrariTest) ||
+            !Settings::VREnabled ||
+            !Settings::VRQuestCockpitV2Enabled || !Settings::VRStereo ||
+            !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
+            !NativeFrameTrace().Active() || InSceneEffect() ||
+            !Game::current_mode || *Game::current_mode != STATE_GAME ||
+            !player || player != Game::pl_car())
+            return ticket;
+        const unsigned char carId=player->car_id_10;
+        // Retail guest vehicle selection IDs are bounded by the native 30-row
+        // player car/seat table. Existing aliases remain compatible:
+        // 7/22=288 GTO, 11/26=F40. Every other ID uses a fixed car_id_XX.ovc.
+        // Keep every user-supplied OVC confined to player cockpit view 1.
+        const bool f50Car=Settings::VRF50ExternalModel &&
+            OutRunVR::DinoSidecar::IsF50RetailCarId(carId);
+        const bool extraCar=Settings::VRExternalFerrariTest &&
+            !f50Car && carId<30u;
+        if(!extraCar && !f50Car)return ticket;
+        const auto* camera=Game::camera();
+        const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
+        IDirect3DDevice9* device=Game::D3DDevice();
+        OutRunVR::DinoSidecar::Gate gate{};
+        gate.optIn=extraCar || f50Car;
+        gate.allowOtherFerrari=extraCar;
+        gate.carId=carId;
+        gate.expectedCarId=carId;
+        gate.vr=Settings::VREnabled.get();
+        gate.seat=camera && camera->cam_mode_34A==1 &&
+            NativeFrameTrace().Active();
+        gate.gameplay=true;
+        gate.stereo=xr && xr->valid && xr->poseSequence!=0 &&
+            OutRunVR::RuntimeEligibility::MayInjectStereo();
+        gate.playerDraw=true;
+        gate.deviceReady=device!=nullptr;
+        gate.stateRecording=OutRunVR::State::StateBlockTracker::Recording();
+        gate.carKind=static_cast<unsigned char>(player->car_kind_11);
+        if(!OutRunVR::DinoSidecar::Eligible(gate))return ticket;
+        const auto* nativeView=Module::exe_ptr<const D3DMATRIX>(0x55D860);
+        const auto* nativeProjection=Module::exe_ptr<const D3DMATRIX>(0x55D8A0);
+        if(!QuestCockpitGlassLive::Memory(nativeView,sizeof(D3DMATRIX)) ||
+           !QuestCockpitGlassLive::Memory(nativeProjection,sizeof(D3DMATRIX)))
+            return ticket;
+        ticket.slot=!extraCar ?
+            OutRunVR::DinoSidecar::FerrariModelSlot::F50 :
+            (carId==7u || carId==22u) ?
+                OutRunVR::DinoSidecar::FerrariModelSlot::Gto288 :
+            (carId==11u || carId==26u) ?
+                OutRunVR::DinoSidecar::FerrariModelSlot::F40 :
+                OutRunVR::DinoSidecar::FerrariModelSlot::GenericId;
+        ticket.carId=carId;
+        auto& external=OutRunVR::DinoSidecar::GlobalGpu();
+        if(external.SelectSidecar(ticket.slot,carId))
+            OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
+        // Dashboard overlays are independent sidecars so an already-verified
+        // high-detail external body never has to be rebuilt merely to animate
+        // speed/RPM/gear. Aliased retail IDs resolve to fixed per-ID files.
+        OutRunVR::DinoSidecar::GlobalDashboardGpu().SelectSidecar(
+            OutRunVR::DinoSidecar::FerrariModelSlot::GenericId,carId);
+        // Only installed, CRC-validated model assets can enter the stereo
+        // player callback. Parse includes PBR map and mesh-envelope QA.
+        // Missing/corrupt models retain the untouched original vehicle.
+        float localLift=0.f;
+        // Preserve the measured legacy package offsets for the three already
+        // converted models. New source-ready IDs start from zero requested
+        // lift so the validated model's actual lowest vertex determines the
+        // minimum 3.5 cm static clearance instead of inheriting F50's 0.22 m.
+        const bool legacyExternal=
+            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F50 ||
+            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::Gto288 ||
+            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F40;
+        const float requestedLift=legacyExternal ?
+            Settings::VRF50ExternalLift.get() : 0.f;
+        if(!external.SafeFloorLift(requestedLift,localLift))
+            return ticket;
+        ticket.appliedLift=localLift;
+        ticket.world=player->matrix_B0;
+        OutRunVR::DinoSidecar::GlobalF50PoseFilter().Apply(
+            ticket.world,NativeFrameTrace().ActiveEpoch(),
+            reinterpret_cast<std::uintptr_t>(player),
+            localLift,
+            Settings::VRF50ExternalStabilize.get());
+        ticket.originalPlayer=reinterpret_cast<std::uintptr_t>(player);
+        ticket.view=*nativeView;
+        ticket.projection=*nativeProjection;
+        ticket.nativeFrame=NativeFrameTrace().ActiveEpoch();
+        ticket.xrPose=xr->poseSequence;
+        // The retail HUD reads speed from +0x1F8, current gear from +0x208
+        // and tachometer RPM from +0x20C. Latch exactly once per native frame
+        // so replayed stereo eyes cannot observe different dashboard values.
+        static thread_local OutRunVR::DinoSidecar::DashboardFrameLatch dashboardLatch;
+        ticket.dashboard=dashboardLatch.Capture(
+            ticket.nativeFrame,ticket.originalPlayer,player->field_1F8,
+            player->dword20C,player->cur_gear_208);
+        device->AddRef();
+        ticket.device=device;
+        ticket.valid=true;
+        return ticket;
+    }
+    static bool DrawPreparedF50External(F50ExternalDrawTicket& ticket) noexcept
+    {
+        using namespace OutRunVR::QuestCockpitV2;
+        const bool liveRace=Game::current_mode &&
+            *Game::current_mode==STATE_GAME;
+        const auto* currentEye=liveRace ?
+            OutRunVRRenderer::GetLatchedStereoFrameView():nullptr;
+        const auto* camera=liveRace?Game::camera():nullptr;
+        const auto* livePlayer=liveRace?Game::pl_car():nullptr;
+        const bool f50Slot=ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F50;
+        const bool sameCar=livePlayer && livePlayer->car_id_10==ticket.carId &&
+            (f50Slot ? (Settings::VRF50ExternalModel &&
+                         OutRunVR::DinoSidecar::IsF50RetailCarId(livePlayer->car_id_10)) :
+             (Settings::VRExternalFerrariTest && ticket.carId<30u));
+        const OutRunVR::DinoSidecar::OriginalCarGate gate{
+            sameCar && Settings::VREnabled &&
+                Settings::VRQuestCockpitV2Enabled && Settings::VRStereo,
+            ticket.originalPlayer!=0 && liveRace && sameCar &&
+                reinterpret_cast<std::uintptr_t>(livePlayer)==
+                    ticket.originalPlayer,
+            liveRace,
+            camera && camera->cam_mode_34A==1,
+            currentEye && currentEye->valid,
+            NativeFrameTrace().Active(),
+            ticket.valid && ticket.device!=nullptr,
+            ticket.nativeFrame,NativeFrameTrace().ActiveEpoch(),
+            ticket.xrPose,currentEye?currentEye->poseSequence:0
+        };
+        ticket.valid=false;
+        if(!OutRunVR::DinoSidecar::CanReplaceOriginalCar(gate))
+            return false;
+        const auto draw=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
+            ticket.device,ticket.world,ticket.view,ticket.projection,
+            ticket.dashboard);
+        const auto route=OutRunVR::DinoSidecar::ChooseOriginalCarRoute(
+            gate,draw.receipt);
+        const bool suppressOriginal=
+            route!=OutRunVR::DinoSidecar::OriginalCarRoute::OriginalFallback;
+        // Overlay failure never causes the stock body to be composited on top
+        // of a successfully submitted external body. The overlay has its own
+        // CRC/parser/GPU quarantine and can recover after a device reset.
+        OutRunVR::DinoSidecar::GpuDrawResult dashboardDraw{};
+        if(route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete)
+            dashboardDraw=OutRunVR::DinoSidecar::GlobalDashboardGpu().DrawNativeScene(
+                ticket.device,ticket.world,ticket.view,ticket.projection,
+                ticket.dashboard,
+                OutRunVR::DinoSidecar::GlobalGpu().HasEmbeddedSpeedAndRpm());
+        if(Settings::VRTelemetry) {
+            static std::uint64_t attempts=0;
+            const auto sample=++attempts;
+            if(sample<=8u || (sample&(sample-1u))==0u ||
+               route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial)
+                spdlog::info(
+                    "VR QUEST FERRARI EXTERNAL: sample={} nativeFrame={} xrPose={} "
+                    "carId={} slot={} localFloorLift={:.4f} "
+                    "dash[speedKph={:.1f},rpm={:.0f},gear={}] "
+                    "drawHr=0x{:08X} submitted={}/{} stateRestored={} "
+                    "dashOverlayHr=0x{:08X} dashOverlay={}/{} route={} "
+                    "originalPMT=UNCHANGED",
+                    sample,ticket.nativeFrame,ticket.xrPose,
+                    static_cast<unsigned>(ticket.carId),
+                    static_cast<unsigned>(ticket.slot),ticket.appliedLift,
+                    ticket.dashboard.speedKph,ticket.dashboard.rpm,
+                    ticket.dashboard.gear,
+                    static_cast<unsigned int>(draw.hr),
+                    draw.receipt.submittedMeshes,draw.receipt.expectedMeshes,
+                    draw.receipt.stateRestored,
+                    static_cast<unsigned int>(dashboardDraw.hr),
+                    dashboardDraw.receipt.submittedMeshes,
+                    dashboardDraw.receipt.expectedMeshes,
+                    route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete ?
+                        "EXTERNAL_COMPLETE" :
+                    route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial ?
+                        "EXTERNAL_PARTIAL_QUARANTINED" : "ORIGINAL_FALLBACK");
+        }
+        return suppressOriginal;
+    }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
+        auto f50=PrepareF50External(player);
+        // Suppress the matching stock vehicle only after a complete/matching
+        // external submission. Missing/corrupt sidecar falls back to stock.
+        if(DrawPreparedF50External(f50))
+            return;
         QuestCockpitGlassLive::PlayerCallback scope(player);
         PlayerCallbackHook.ccall<void>(player);
     }
@@ -1031,6 +1279,7 @@ public:
         FrameEndHook=std::move(last);
         PlayerCallbackHook=std::move(actor);
         OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.store(true,std::memory_order_release);
+        OutRunVR::GameResetEvents::Configure(&ReleaseExternalBeforeDeviceReset);
         if(!SyncNativeSeatProfile(false) &&
            Settings::VRQuestCockpitV2NativeSeatProfile)
             spdlog::info("VR COCKPIT: initial seat table sync deferred; "

@@ -1,0 +1,52 @@
+name: Ferrari14 Normal-Core Stereo Recovery Gate
+on:
+  push:
+    branches:
+      - vr-ferrari14-stereo-recovery-normal-20261121
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 1}
+      - name: Build and run portable sidecar regression tests
+        run: |
+          set -euo pipefail
+          for t in external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test; do
+            g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
+            "/tmp/${t}"
+          done
+      - name: Protect normal VR launch and fixed-function stereo A/B
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          launch=Path('RUN-FERRARI14-NORMAL-STEREO-AB.cmd').read_text()
+          hook=Path('src/hooks_graphics.cpp').read_text()
+          gpu=Path('src/vr/game/dino_external_d3d9.hpp').read_text()
+          for marker in ('-VR.PreferD3D9Ex=true','-VR.DirectGpuOnly=true',
+                         '-VR.RenderWidth=2496','-VR.RenderHeight=2688',
+                         '-VR.FollowGameResolution=false','-VR.FrameCadenceMode=1',
+                         '-VR.ExternalFerrariTest=true','OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=1'):
+              assert marker in launch, marker
+          for marker in ('-VR.PreferD3D9Ex=false','-VR.DirectGpuOnly=false',
+                         '-VR.FollowGameResolution=true','-VR.FrameCadenceMode=0',
+                         '-VR.CockpitFrameProbe=true'):
+              assert marker not in launch, marker
+          assert 'ForceFixedFunctionStereoProbe' in gpu
+          assert 'NativeOriginalHooksReady.load' in hook
+          assert 'player != Game::pl_car()' in hook
+          assert '*Game::current_mode != STATE_GAME' in hook
+          assert 'OriginalFallback' in hook
+          assert 'GameResetEvents::Configure(&ReleaseExternalBeforeDeviceReset)' in hook
+          print('FERRARI14_NORMAL_VR_TRANSPORT_STEREO_AB_STATIC_PASS')
+          PY
+      - name: Keep normal VR renderer core unchanged
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin 5eb417782179c0c944ac2c28fc04a223b0b130fa
+          unexpected="$(git diff --name-only 5eb417782179c0c944ac2c28fc04a223b0b130fa HEAD -- vrhost src/vr/d3d9 src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp Start-OutRun.cmd)"
+          if [ -n "$unexpected" ]; then echo "$unexpected"; exit 1; fi
+          echo NORMAL_VR_CORE_UNCHANGED_PASS
