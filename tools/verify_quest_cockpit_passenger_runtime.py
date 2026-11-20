@@ -84,6 +84,9 @@ assert "VR PASSENGER NATIVE LOCK:" in hook
 assert "nativeWorkLocked=1" in hook
 assert "workFlagsNative=0x{:08X} workFlagsRender=0x{:08X}" in hook
 assert "nativeGateOpen={} renderGateBypass={}" in hook
+assert "f0Neutralized={}" in hook
+assert "matrixScope={}" in hook
+assert "NeutralizePassengerVehicleF0(" in render
 assert "OriginalRobotDisplayGateRenderFlags(nativeWorkFlags)" in hook
 assert "OriginalRobotDisplayGateOpen(nativeWorkFlags)" in hook
 assert "ScopedPassengerRobotDisplayGate" in hook
@@ -98,7 +101,13 @@ assert "ExactPassengerRenderActive()" in hook
 assert "ScopedQuestSkyTransitionProbe" in hook
 assert "VR SKY TRANSITION PHASE:" in hook
 assert "RotationIndices" in hook
-assert "mutation=0 originalCrossfadePreserved=1" in hook
+assert "mutation=0 probePreStartSuppression=1" in hook
+assert "ScopedQuestStartSkySingleLayer" in hook
+assert "*Game::current_mode!=STATE_START" in hook
+assert "std::memcpy(base_+0xc8,&zero,sizeof(zero));" in hook
+assert "std::memcpy(base_+0xcc,&zero,sizeof(zero));" in hook
+assert "std::memcpy(base_+0xc8,&oldC8_,sizeof(oldC8_));" in hook
+assert "std::memcpy(base_+0xcc,&oldCC_,sizeof(oldCC_));" in hook
 assert "base+0xe0+byte,&" not in hook
 assert "constexpr std::uint32_t None=0xffffffffu;" in hook
 assert "(n0!=None || n1!=None)" in hook
