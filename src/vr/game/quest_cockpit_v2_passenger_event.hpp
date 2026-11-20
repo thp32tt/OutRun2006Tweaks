@@ -43,12 +43,20 @@ inline constexpr std::uint32_t OriginalPassengerEventId=0x16bu;
 inline constexpr std::uint32_t OriginalPassengerFunctionId=0x39u;
 // Canonical PC 514C30 reads EvWorkRobot+4 before any PMT submission:
 // bit 0x8000 must be set; if bit 0x08 is set, bit 0x04 must also be set.
-// Keep this as a read-only diagnostic predicate until an HMD log proves the
-// native actor gate is the remaining cockpit passenger visibility failure.
+// r4dius/outrun2-decomp's disp_514c30 reads this word once for exactly those
+// two early returns, then proceeds into the native body/face/hands PMT path.
+// Follow mode may therefore open only this render gate for the exact live
+// ROB02 synchronous call and restore the original word immediately afterward.
 inline constexpr bool OriginalRobotDisplayGateOpen(
     std::uint32_t workFlags) noexcept {
     return (workFlags&0x8000u)!=0u &&
         !((workFlags&0x08u)!=0u && (workFlags&0x04u)==0u);
+}
+inline constexpr std::uint32_t OriginalRobotDisplayGateRenderFlags(
+    std::uint32_t workFlags) noexcept {
+    workFlags|=0x8000u;
+    if((workFlags&0x08u)!=0u)workFlags|=0x04u;
+    return workFlags;
 }
 // Exact physical passenger provenance is narrower than the shared occupant
 // LOD0/visibility scope: a user can enable generic OccupantLod0 for driver

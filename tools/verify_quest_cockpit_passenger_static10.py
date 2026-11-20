@@ -256,9 +256,13 @@ def pass_07_nested_draw_and_restore():
           "nested W*C correction not rejected")
     check("VR PASSENGER NATIVE LOCK:" in hook and "nativeWorkLocked=1" in hook,
           "passenger can still switch between corrected and native matrices")
-    check("workFlags=0x{:08X} robDisplayGateOpen={}" in hook and
-          "OriginalRobotDisplayGateOpen(robot->dword4)" in hook,
-          "pre-PMT ROB02 display gate is not observable")
+    check("workFlagsNative=0x{:08X} workFlagsRender=0x{:08X}" in hook and
+          "OriginalRobotDisplayGateRenderFlags(nativeWorkFlags)" in hook and
+          "OriginalRobotDisplayGateOpen(nativeWorkFlags)" in hook,
+          "pre-PMT ROB02 display gate bypass is not exact/readable")
+    check("ScopedPassengerRobotDisplayGate" in hook and
+          "renderGateBypass" in hook,
+          "exact ROB02 render gate is not scoped/restored")
     check("VR PASSENGER PHYSICAL PMT:" in hook and
           "authority=405890_404700" in hook and
           "OriginalOccupantLod0Active()" in hook,

@@ -35,6 +35,22 @@ static_assert(OriginalRobotDisplayGateOpen(0x8000u));
 static_assert(!OriginalRobotDisplayGateOpen(0x8008u));
 static_assert(OriginalRobotDisplayGateOpen(0x800cu));
 static_assert(OriginalRobotDisplayGateOpen(0x8004u));
+constexpr bool PassengerRobotDisplayGateRenderTruthTable() {
+    for(std::uint32_t low=0;low<16u;++low) {
+        const std::uint32_t native=0xa5a50000u|low;
+        const auto render=OriginalRobotDisplayGateRenderFlags(native);
+        if(!OriginalRobotDisplayGateOpen(render))return false;
+        // Only display-enable 0x8000 and the 0x04 companion for an existing
+        // 0x08 state may be added. Every other native work bit is preserved.
+        if((render&~0x8004u)!=(native&~0x8004u))return false;
+        if((render&0x08u)!=(native&0x08u))return false;
+    }
+    return true;
+}
+static_assert(PassengerRobotDisplayGateRenderTruthTable());
+static_assert(OriginalRobotDisplayGateRenderFlags(0x0000u)==0x8000u);
+static_assert(OriginalRobotDisplayGateRenderFlags(0x8008u)==0x800cu);
+static_assert(OriginalRobotDisplayGateRenderFlags(0x8000u)==0x8000u);
 static_assert(!ShouldBypassPassengerCarDisplayGate(
     true,true,true,true,false,true,0x8000u),"camera 0 must be untouched");
 static_assert(!ShouldBypassPassengerCarDisplayGate(

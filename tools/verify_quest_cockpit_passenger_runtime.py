@@ -78,8 +78,11 @@ assert "originalOwner==OriginalOccupantSlot::Driver362" in hook
 assert "VR PASSENGER SCENE PASS:" in hook
 assert "VR PASSENGER NATIVE LOCK:" in hook
 assert "nativeWorkLocked=1" in hook
-assert "workFlags=0x{:08X} robDisplayGateOpen={}" in hook
-assert "OriginalRobotDisplayGateOpen(robot->dword4)" in hook
+assert "workFlagsNative=0x{:08X} workFlagsRender=0x{:08X}" in hook
+assert "nativeGateOpen={} renderGateBypass={}" in hook
+assert "OriginalRobotDisplayGateRenderFlags(nativeWorkFlags)" in hook
+assert "OriginalRobotDisplayGateOpen(nativeWorkFlags)" in hook
+assert "ScopedPassengerRobotDisplayGate" in hook
 assert "VR PASSENGER PHYSICAL PMT:" in hook
 assert "authority=405890_404700" in hook
 assert "ScopedExactPassengerRender exactPassenger(true);" in hook

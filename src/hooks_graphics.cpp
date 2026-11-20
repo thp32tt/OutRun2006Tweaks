@@ -2004,6 +2004,34 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         if(action==CockpitOccupantRender::OriginalPassengerForceVisible) {
             const auto* stereoNow=OutRunVRRenderer::GetLatchedStereoFrameView();
             const auto frameEpochNow=NativeFrameTrace().ActiveEpoch();
+            const auto nativeWorkFlags=robot->dword4;
+            const auto renderWorkFlags=
+                OriginalRobotDisplayGateRenderFlags(nativeWorkFlags);
+            const bool renderGateBypass=renderWorkFlags!=nativeWorkFlags;
+            // 514C30 consumes work+4 only as its two early render-admission
+            // tests. Open those bits only around this exact live ROB02 call;
+            // restore byte-for-byte even on every normal early return from the
+            // original renderer. Camera 0, ROB01, NPC and event state never
+            // enter this scope.
+            class ScopedPassengerRobotDisplayGate final {
+                EvWorkRobot* work_=nullptr;
+                std::uint32_t original_=0;
+                bool changed_=false;
+            public:
+                ScopedPassengerRobotDisplayGate(
+                    EvWorkRobot* work,std::uint32_t replacement) noexcept
+                    :work_(work),original_(work?work->dword4:0u),
+                     changed_(work && original_!=replacement) {
+                    if(changed_)work_->dword4=replacement;
+                }
+                ~ScopedPassengerRobotDisplayGate() noexcept {
+                    if(changed_)work_->dword4=original_;
+                }
+                ScopedPassengerRobotDisplayGate(
+                    const ScopedPassengerRobotDisplayGate&)=delete;
+                ScopedPassengerRobotDisplayGate& operator=(
+                    const ScopedPassengerRobotDisplayGate&)=delete;
+            } displayGate(robot,renderWorkFlags);
             ScopedExactPassengerRender exactPassenger(true);
             ScopedOriginalOccupantLod0 passengerVisible(true);
             static thread_local std::uint64_t nativeLocks=0;
@@ -2013,12 +2041,15 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                     "VR PASSENGER NATIVE LOCK: count={} epoch={} "
                     "nativeWorkLocked=1 visibleScope={} frameActive={} "
                     "stereoValid={} correctionOwnerActive={} "
-                    "workFlags=0x{:08X} robDisplayGateOpen={}",
+                    "workFlagsNative=0x{:08X} workFlagsRender=0x{:08X} "
+                    "nativeGateOpen={} renderGateBypass={}",
                     count,frameEpochNow,OriginalOccupantLod0Active(),
                     NativeFrameTrace().Active(),
                     stereoNow&&stereoNow->valid&&stereoNow->poseSequence!=0,
-                    OriginalRobotCorrectionActive(),robot->dword4,
-                    OriginalRobotDisplayGateOpen(robot->dword4));
+                    OriginalRobotCorrectionActive(),nativeWorkFlags,
+                    renderWorkFlags,
+                    OriginalRobotDisplayGateOpen(nativeWorkFlags),
+                    renderGateBypass);
             RobotHook.ccall<void>(robot);
             return;
         }
