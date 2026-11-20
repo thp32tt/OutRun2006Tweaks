@@ -38,13 +38,16 @@ def _adjacent(key, width, height):
 
 
 def _core_partition(alpha, membership, pixels, rows, pixels_owned, width, height):
-    """Partition one visible-alpha component by disconnected high-alpha cores.
+    """Partition one visible-alpha component from exclusive solid-core seeds.
 
-    Returns (assigned, residual) on a bounded cosmetic rescue, else None.
+    The seed for an owner is alpha>=CORE_ALPHA source ink that belongs to only
+    that ROI. Shared solid pixels are then assigned by multi-source geodesic
+    distance while propagation is constrained to the candidate owner's ROI.
+    This permits two outlined labels that physically touch to be separated
+    without allowing a nested/identical ROI (which has no exclusive seed) to
+    invent ownership.
 
-    Every high-alpha core island must have exactly one exclusive ROI anchor and
-    must fit completely inside that owner's ROI. Low-alpha bridge pixels are
-    assigned by nearest-core geodesic distance. Equal-distance or out-of-owner
+    Returns (assigned, residual) on a bounded rescue, else None. Residual
     pixels may remain only when alpha <= SOFT_BRIDGE_ALPHA.
     """
     pixel_set = set(pixels)
@@ -55,50 +58,35 @@ def _core_partition(alpha, membership, pixels, rows, pixels_owned, width, height
     if not core:
         return None
 
-    core_seen = set()
+    # Solid exclusive source pixels are the only ownership seeds. Require more
+    # than a single accidental pixel before an ROI can participate.
+    seed_counts = {}
     seeds = {}
-    owners_seen = set()
-    for first in core:
-        if first in core_seen:
+    for key in core:
+        members = membership[key]
+        if len(members) != 1:
             continue
-        pending = deque([first])
-        core_seen.add(first)
-        component = []
-        exclusive = set()
-        while pending:
-            key = pending.popleft()
-            component.append(key)
-            members = membership[key]
-            if len(members) == 1:
-                exclusive.update(members)
-            for next_key in _adjacent(key, width, height):
-                if next_key in core and next_key not in core_seen:
-                    core_seen.add(next_key)
-                    pending.append(next_key)
-        if len(exclusive) != 1:
-            return None
-        owner = next(iter(exclusive))
+        owner = next(iter(members))
         if owner not in pixels_owned:
-            return None
-        # A core island may overlap another metadata ROI, but the chosen owner
-        # must contain the complete solid glyph core.
-        if any(owner not in membership[key] for key in component):
-            return None
-        owners_seen.add(owner)
-        for key in component:
-            seeds.setdefault(key, set()).add(owner)
+            continue
+        seed_counts[owner] = seed_counts.get(owner, 0) + 1
+        seeds[key] = owner
+    valid_owners = {owner for owner, count in seed_counts.items() if count >= 4}
+    seeds = {key: owner for key, owner in seeds.items() if owner in valid_owners}
+    if not seeds:
+        return None
 
-    # If two owners share the exact same core seed pixel, ownership is not
-    # provable; do not invent a split.
-    if any(len(v) != 1 for v in seeds.values()):
+    # Every solid core pixel must be claimable by at least one seeded owner.
+    # A core island visible only to unseeded/identical ROIs remains ambiguous.
+    if any(not (membership[key] & valid_owners) for key in core):
         return None
 
     distance = {}
     labels = {}
     pending = deque()
-    for key, owner_set in seeds.items():
+    for key, owner in seeds.items():
         distance[key] = 0
-        labels[key] = set(owner_set)
+        labels[key] = {owner}
         pending.append(key)
 
     while pending:
@@ -107,37 +95,49 @@ def _core_partition(alpha, membership, pixels, rows, pixels_owned, width, height
         for next_key in _adjacent(key, width, height):
             if next_key not in pixel_set:
                 continue
+            allowed = {owner for owner in labels[key]
+                       if owner in membership[next_key]}
+            if not allowed:
+                continue
             if next_key not in distance:
                 distance[next_key] = next_distance
-                labels[next_key] = set(labels[key])
+                labels[next_key] = set(allowed)
                 pending.append(next_key)
             elif distance[next_key] == next_distance:
-                merged = labels[next_key] | labels[key]
+                merged = labels[next_key] | allowed
                 if merged != labels[next_key]:
                     labels[next_key] = merged
                     pending.append(next_key)
 
-    assigned = {owner: [] for owner in owners_seen}
+    centers = {
+        owner: ((rows[owner]["_bbox"][0] + rows[owner]["_bbox"][2]) / 2.0,
+                (rows[owner]["_bbox"][1] + rows[owner]["_bbox"][3]) / 2.0)
+        for owner in valid_owners
+    }
+    assigned = {owner: [] for owner in valid_owners}
     residual = []
     for key in pixels:
-        owner_set = labels.get(key, set())
-        if len(owner_set) == 1:
-            owner = next(iter(owner_set))
-            # Never erase outside the chosen row's actual metadata ROI.
-            if owner in membership[key]:
-                assigned[owner].append(key)
-                continue
-        residual.append(key)
+        candidates = labels.get(key, set()) & membership[key]
+        if candidates:
+            x, y = key % width, key // width
+            # Equal geodesic distance is resolved by distance to ROI center;
+            # stable owner index is a deterministic final tie-break.
+            owner = min(
+                candidates,
+                key=lambda item: ((x-centers[item][0])**2 +
+                                  (y-centers[item][1])**2, item)
+            )
+            assigned[owner].append(key)
+        else:
+            residual.append(key)
 
-    # Cosmetic bridge/tie leftovers are allowed to remain in the source.
-    # Any stronger unassigned pixel means this is a real ambiguous collision.
     if any(alpha.getpixel((key % width, key // width)) > SOFT_BRIDGE_ALPHA
            for key in residual):
         return None
-    if any(not owned for owned in assigned.values()):
+    assigned = {owner: owned for owner, owned in assigned.items() if owned}
+    if not assigned:
         return None
     return assigned, residual
-
 
 def prove_overlap_ownership(source, rows, conflicting_ids, diagnostics=None):
     """Return (verified per-ROI source-alpha masks, audit).
