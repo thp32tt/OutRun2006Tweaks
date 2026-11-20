@@ -1,4 +1,5 @@
 #include <cassert>
+#include <initializer_list>
 #include "../src/vr/game/external_car_selection.hpp"
 using namespace OutRunVR::DinoSidecar;
 int main() {
