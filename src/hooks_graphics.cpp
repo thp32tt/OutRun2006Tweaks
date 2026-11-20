@@ -67,6 +67,10 @@ namespace Settings
         "QuestCockpitV2-only external Ferrari F50 test model. Replaces only the player F50 (car kind 0) after a complete sidecar draw; original PMT remains unchanged." };
     Setting<bool> VRExternalFerrariTest{ "VR", "ExternalFerrariTest", false,
         "EXPERIMENTAL: render installed external Ferrari OVC sidecars for validated player car IDs 0..29 in cockpit view only. Existing 288 GTO/F40 filenames stay compatible; other cars use ExternalCars/car_id_XX.ovc. Missing/invalid files fall back to original game models." };
+    Setting<int> VRExternalFerrariTestCarId{ "VR", "ExternalFerrariTestCarId", -1,
+        "Optional external Ferrari selector: -1 permits all; 0..29 limits the sidecar to one canonical retail model (base/tuned alias).", Range<int>{-1,29} };
+    Setting<bool> VRExternalFerrariDiag{ "VR", "ExternalFerrariDiag", false,
+        "Emit up to eight external body route receipts and four pre-draw rejection diagnostics; OFF during FPS comparison." };
     Setting<float> VRF50ExternalLift{ "VR", "F50ExternalLift", 0.22f,
         "External F50 local vertical offset in metres for wheel/track alignment. No gameplay physics or camera changes.", Range<float>{ -0.25f, 1.0f } };
     Setting<bool> VRF50ExternalStabilize{ "VR", "F50ExternalStabilize", true,
@@ -977,7 +981,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const bool f50Car=Settings::VRF50ExternalModel &&
             OutRunVR::DinoSidecar::IsF50RetailCarId(carId);
         const bool extraCar=Settings::VRExternalFerrariTest &&
-            !f50Car && carId<30u;
+            !f50Car && OutRunVR::DinoSidecar::MatchesFerrariSelection(
+                carId, Settings::VRExternalFerrariTestCarId.get());
         if(!extraCar && !f50Car)return ticket;
         const auto* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
@@ -1033,8 +1038,21 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F40;
         const float requestedLift=legacyExternal ?
             Settings::VRF50ExternalLift.get() : 0.f;
-        if(!external.SafeFloorLift(requestedLift,localLift))
+        if(!external.SafeFloorLift(requestedLift,localLift)) {
+            if(Settings::VRExternalFerrariDiag) {
+                static thread_local unsigned rejected=0;
+                if(rejected++<4u)
+                    spdlog::warn("VR EXTERNAL SELECTED SIDECAR REJECTED: "
+                        "carId={} canonical={} selected={} "
+                        "slot={} requestedLift={:.4f} originalPMT=FALLBACK",
+                        static_cast<unsigned>(carId),
+                        static_cast<unsigned>(OutRunVR::DinoSidecar::
+                            CanonicalFerrariExternalCarId(carId)),
+                        Settings::VRExternalFerrariTestCarId.get(),
+                        static_cast<unsigned>(ticket.slot),requestedLift);
+            }
             return ticket;
+        }
         ticket.appliedLift=localLift;
         ticket.world=player->matrix_B0;
         OutRunVR::DinoSidecar::GlobalF50PoseFilter().Apply(
@@ -1072,7 +1090,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const bool sameCar=livePlayer && livePlayer->car_id_10==ticket.carId &&
             (f50Slot ? (Settings::VRF50ExternalModel &&
                          OutRunVR::DinoSidecar::IsF50RetailCarId(livePlayer->car_id_10)) :
-             (Settings::VRExternalFerrariTest && ticket.carId<30u));
+             (Settings::VRExternalFerrariTest &&
+              OutRunVR::DinoSidecar::MatchesFerrariSelection(
+                  ticket.carId, Settings::VRExternalFerrariTestCarId.get())));
         const OutRunVR::DinoSidecar::OriginalCarGate gate{
             sameCar && Settings::VREnabled &&
                 Settings::VRQuestCockpitV2Enabled && Settings::VRStereo,
@@ -1106,11 +1126,12 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 ticket.device,ticket.world,ticket.view,ticket.projection,
                 ticket.dashboard,
                 OutRunVR::DinoSidecar::GlobalGpu().HasEmbeddedSpeedAndRpm());
-        if(Settings::VRTelemetry) {
+        if(Settings::VRTelemetry || Settings::VRExternalFerrariDiag) {
             static std::uint64_t attempts=0;
             const auto sample=++attempts;
-            if(sample<=8u || (sample&(sample-1u))==0u ||
-               route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial)
+            if(sample<=8u || (Settings::VRTelemetry &&
+                ((sample&(sample-1u))==0u ||
+                 route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial)))
                 spdlog::info(
                     "VR QUEST FERRARI EXTERNAL: sample={} nativeFrame={} xrPose={} "
                     "carId={} slot={} localFloorLift={:.4f} "

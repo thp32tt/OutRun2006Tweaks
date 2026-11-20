@@ -18,26 +18,13 @@
 #include <vector>
 #include "dino_external_sidecar.hpp"
 #include "external_car_ground.hpp"
+#include "external_car_selection.hpp"
 #include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
 
 namespace OutRunVR::DinoSidecar {
 enum class FerrariModelSlot : unsigned char { F50, Gto288, F40, GenericId };
 enum class SidecarRole : unsigned char { Vehicle, DashboardOverlay };
-constexpr unsigned char CanonicalFerrariExternalCarId(unsigned char carId) noexcept {
-    // Retail alternate entries 15..27 reuse base models 0..12.
-    // ID 29 is Enzo/FX alternate -> 14. ID 28 is the distinct F430 Spider.
-    if(carId>=15u && carId<=27u)return static_cast<unsigned char>(carId-15u);
-    if(carId==29u)return 14u;
-    return carId;
-}
-static_assert(CanonicalFerrariExternalCarId(0u)==0u &&
-              CanonicalFerrariExternalCarId(14u)==14u &&
-              CanonicalFerrariExternalCarId(15u)==0u &&
-              CanonicalFerrariExternalCarId(27u)==12u &&
-              CanonicalFerrariExternalCarId(28u)==28u &&
-              CanonicalFerrariExternalCarId(29u)==14u,
-              "Ferrari external-car alias routing contract");
 struct GpuDrawResult final {
     HRESULT hr=E_FAIL;
     MeshDrawReceipt receipt{};

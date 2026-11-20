@@ -15,7 +15,7 @@ jobs:
       - name: Build and run portable sidecar regression tests
         run: |
           set -euo pipefail
-          for t in external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test; do
+          for t in external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -29,13 +29,16 @@ jobs:
           for marker in ('-VR.PreferD3D9Ex=true','-VR.DirectGpuOnly=true',
                          '-VR.RenderWidth=2496','-VR.RenderHeight=2688',
                          '-VR.FollowGameResolution=false','-VR.FrameCadenceMode=1',
-                         '-VR.ExternalFerrariTest=true','OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=1'):
+                         '-VR.ExternalFerrariTest=true','-VR.ExternalFerrariTestCarId=5',
+                         '-VR.F50ExternalModel=false','OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=1'):
               assert marker in launch, marker
           for marker in ('-VR.PreferD3D9Ex=false','-VR.DirectGpuOnly=false',
                          '-VR.FollowGameResolution=true','-VR.FrameCadenceMode=0',
                          '-VR.CockpitFrameProbe=true'):
               assert marker not in launch, marker
           assert 'ForceFixedFunctionStereoProbe' in gpu
+          assert 'MatchesFerrariSelection' in hook
+          assert 'ExternalFerrariDiag' in hook
           assert 'NativeOriginalHooksReady.load' in hook
           assert 'player != Game::pl_car()' in hook
           assert '*Game::current_mode != STATE_GAME' in hook

@@ -104,5 +104,7 @@ start "" "%~dp0OR2006C2C.exe" ^
  -HudInspector=false ^
  -VR.FileLogging=false ^
  -VR.ExternalFerrariTest=true ^
- -VR.F50ExternalModel=true
+ -VR.F50ExternalModel=false ^
+ -VR.ExternalFerrariTestCarId=5 ^
+ -VR.ExternalFerrariDiag=false
 exit /b 0
