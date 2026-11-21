@@ -12,6 +12,14 @@
 
 namespace OutRunVR::DinoSidecar {
 
+// Shared contract: the world-space pose consumer must not silently discard
+// an already accepted lift in (1.0, 1.25] metres.
+constexpr float kMaximumExternalFloorLift=1.25f;
+inline float SanitizeExternalFloorLift(float lift) noexcept {
+    return std::isfinite(lift) && lift>=-0.25f &&
+           lift<=kMaximumExternalFloorLift ? lift : 0.f;
+}
+
 inline bool ComputeExternalFloorLift(float requestedLift,
                                      float modelMinY,
                                      float& appliedLift) noexcept {
@@ -24,10 +32,9 @@ inline bool ComputeExternalFloorLift(float requestedLift,
         modelMinY < -1.20f || modelMinY > 0.25f)
         return false;
     constexpr float kMinimumStaticClearance=0.035f; // 3.5 cm
-    constexpr float kMaximumLift=1.25f;
     const float lift=(std::max)(requestedLift,
         kMinimumStaticClearance-modelMinY);
-    if(!std::isfinite(lift) || lift>kMaximumLift)
+    if(!std::isfinite(lift) || lift>kMaximumExternalFloorLift)
         return false;
     appliedLift=lift;
     return true;
