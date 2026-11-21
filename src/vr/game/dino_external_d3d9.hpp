@@ -18,6 +18,7 @@
 #include <vector>
 #include "dino_external_sidecar.hpp"
 #include "external_car_ground.hpp"
+#include "external_car_draw_order.hpp"
 #include "external_car_selection.hpp"
 #include "external_car_runtime_policy.hpp"
 #include "dino_external_original_car_gate.hpp"
@@ -514,7 +515,12 @@ public:
             -(view._41*view._11+view._42*view._12+view._43*view._13),
             -(view._41*view._21+view._42*view._22+view._43*view._23),
             -(view._41*view._31+view._42*view._32+view._43*view._33)};
-        if(SUCCEEDED(hr))for(const auto& m:meshes_) {
+        // Preserve input order within each class, but render opaque geometry
+        // before glass even when OVC mesh groups are interleaved. Depth writes
+        // remain disabled only for the transparent pass. No allocation/sort.
+        if(SUCCEEDED(hr))for(unsigned pass=0;pass<2u && SUCCEEDED(hr);++pass)
+          for(const auto& m:meshes_) {
+            if(!MeshInDrawPass(m.glass,pass))continue;
             const DashboardBinding* binding=DashboardFor(m);
             if(gearOnly && (!binding || binding->kind!=DashboardKind::GearVisible))
                 continue;
