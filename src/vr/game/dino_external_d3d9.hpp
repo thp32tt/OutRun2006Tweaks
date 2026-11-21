@@ -454,7 +454,15 @@ public:
            FAILED(device->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE)) ||
            FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,TRUE)) ||
            FAILED(device->SetRenderState(D3DRS_ZFUNC,D3DCMP_LESSEQUAL)) ||
+           // Native shadow/sky passes may leave a nonzero depth bias.
+           // External car must use actual game depth; D3D9 FLOAT-as-DWORD zero.
+           FAILED(device->SetRenderState(D3DRS_DEPTHBIAS,0u)) ||
+           FAILED(device->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,0u)) ||
            FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE)) ||
+           // Transparent glass uses source-over ADD, independent of the
+           // preceding flare/sky pass blend equation.
+           FAILED(device->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_ADD)) ||
+           FAILED(device->SetRenderState(D3DRS_SRGBWRITEENABLE,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_ALPHATESTENABLE,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_STENCILENABLE,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_FOGENABLE,FALSE)) ||
