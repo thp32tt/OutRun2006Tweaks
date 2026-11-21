@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdint>
 #include <d3d9.h>
+#include "external_car_ground.hpp"
 
 namespace OutRunVR::DinoSidecar {
 class F50VisualPoseFilter final {
@@ -18,8 +19,9 @@ public:
     }
     void Apply(D3DMATRIX& world,std::uint64_t epoch,std::uintptr_t car,
                float localUp,bool stabilize) noexcept {
-        if (!std::isfinite(localUp) || localUp < -0.25f || localUp > 1.f)
-            localUp=0.f;
+        // Use the SAME bounds as the verified OVC floor placement helper.
+        // The old hardcoded 1.0m rejected legitimate 1.0..1.25m lifts.
+        localUp=SanitizeExternalFloorLift(localUp);
         const float rawY=world._42;
         if(stabilize && epoch && car && std::isfinite(rawY)) {
             if(!initialized_ || car_!=car) {
