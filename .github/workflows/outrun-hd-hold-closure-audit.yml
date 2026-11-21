@@ -1,8 +1,8 @@
 name: OutRun HD Source-Owner HOLD Closure Audit (GitHub CPU)
 
-# 2026-11-16: re-evaluate real collision safety before BC3 mip codec gate.
-# Verify whether the 12 fully source-owned overlapping HOLDs have reusable
-# real Korean A/B pixels; do NOT reduce official HOLD without a native C1/C3 gate.
+# Always audit the latest successful 954-ROI native build and ITS OWN edit
+# evidence. Prior fixed 640-HOLD receipts are historical and cannot count as
+# a fresh closure audit. Never synthesize C1/C3 or release approval.
 on:
   workflow_dispatch:
   push:
@@ -34,22 +34,42 @@ jobs:
           sparse-checkout: |
             tools/localization/hd_hold_closure_audit.py
             tools/localization/test_hd_hold_closure_audit.py
-      - name: Read exactly SHA-pinned source-native alpha masks
-        uses: actions/download-artifact@v4
-        with:
-          name: outrun-ab-multi-atlas-43169137555
-          run-id: 43169137555
-          repository: thp32tt/OutRun2006Tweaks
-          github-token: ${{ github.token }}
-          path: ${{ runner.temp }}/source-evidence
-      - name: Read prior real A/B pixel-only corrected PNGs
-        uses: actions/download-artifact@v4
-        with:
-          name: outrun-source-bound-auto-edited-pngs-43185778845
-          run-id: 43185778845
-          repository: thp32tt/OutRun2006Tweaks
-          github-token: ${{ github.token }}
-          path: ${{ runner.temp }}/real-ab-edits
+      - name: Download latest successful same-run DDS QA, native masks, and edited candidates
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          repo="thp32tt/OutRun2006Tweaks"
+          run_id="$(gh run list --repo "$repo" --workflow outrun-ab-multi-atlas.yml \
+            --branch korean-localization-recovery-20260928 --status success \
+            --limit 1 --json databaseId --jq '.[0].databaseId')"
+          if ! [[ "$run_id" =~ ^[0-9]{8,}$ ]]; then
+            echo "LATEST_NATIVE_QA_RUN_MISSING"; exit 1
+          fi
+          gh run download "$run_id" --repo "$repo" \
+            --name "outrun-ab-multi-atlas-$run_id" \
+            --dir "$RUNNER_TEMP/source-evidence"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])/"source-evidence"
+          qa=json.loads((base/"qa_report.json").read_text(encoding="utf-8"))
+          ev=json.loads((base/"source_protection"/"source_protection_evidence.json").read_text(encoding="utf-8"))
+          edits=json.loads((base/"auto_edits"/"auto_edit_report.json").read_text(encoding="utf-8"))
+          if not (qa.get("schema")=="outrun.ab-imagegen-hd-strict.v2"
+              and qa.get("active_roi_total")==954
+              and qa.get("release_approved") is False
+              and qa.get("translated_roi_generated")+sum(qa.get("hold_roi_reason_counts",{}).values())==954
+              and ev.get("source_report_zip_sha256")==edits.get("source_report_zip_sha256")==qa.get("zip_sha256")
+              and ev.get("source_holds")==edits.get("original_hold_count_unchanged")==
+                  954-qa.get("translated_roi_generated")):
+            raise SystemExit("NATIVE_QA_AND_EDIT_SOURCE_SHA_MISMATCH")
+          print(json.dumps({"native_hold_count":ev["source_holds"],
+                            "painted_test_only":qa["translated_roi_generated"],
+                            "source_sha_verified":True,"release_approved":False}))
+          PY
+          echo "SOURCE_NATIVE_RUN_ID=$run_id" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -63,7 +83,7 @@ jobs:
           set -euo pipefail
           python tools/localization/hd_hold_closure_audit.py \
             --proof-dir "$RUNNER_TEMP/source-evidence/source_protection" \
-            --edited-dir "$RUNNER_TEMP/real-ab-edits" \
+            --edited-dir "$RUNNER_TEMP/source-evidence/auto_edits" \
             --out "$RUNNER_TEMP/full-owner-closure-audit"
           python - <<'PY'
           import json,os
@@ -71,11 +91,14 @@ jobs:
           p=Path(os.environ["RUNNER_TEMP"])/"full-owner-closure-audit"/"hold_closure_audit.json"
           d=json.loads(p.read_text(encoding="utf-8"))
           with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
-              f.write("## OutRun HD native owner overlap HOLD diagnosis\n")
+              f.write("## OutRun HD live native owner overlap HOLD diagnosis\n")
+              f.write(f"- Native evidence run: {os.environ['SOURCE_NATIVE_RUN_ID']}\n")
+              f.write(f"- Current source-native HOLDs: {d['original_holds_unchanged']} / {d['original_roi_total']}\n")
+              f.write(f"- Current source-native overlap HOLDs: {d['source_overlap_holds']}\n")
               f.write(f"- Native source-owned original HOLDs: {d['full_native_owner_source_rows']}\n")
               f.write(f"- Already pixel-edited A/B candidates among them: {d['source_owned_rows_with_pixel_edits']}\n")
               f.write(f"- Source-protected, non-BC3, no-ambiguous C1 workorders: {d['next_c1_static_candidate_count']}\n")
-              f.write("- Official HOLD=640 until independent image+CLEAN/native DDS QA.\n")
+              f.write("- Official HOLDs remain unchanged until independent image+CLEAN/native DDS QA.\n")
           PY
       - name: Publish exact source-bound report, no fake HOLD unlock
         uses: actions/upload-artifact@v4
