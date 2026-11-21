@@ -1,0 +1,45 @@
+name: Ferrari14 Source Trace and Floor Pose Safety
+on:
+  push:
+    branches:
+      - vr-ferrari14-v003-source-trace-fixes-20261122
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  trace:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run all Ferrari14 portable source contracts
+        run: |
+          set -euo pipefail
+          for t in ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_runtime_policy_test ferrari14_trace_50_test; do
+            g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
+            "/tmp/${t}"
+          done
+      - name: Verify production call graph and source-link guard
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          h=Path("src/hooks_graphics.cpp").read_text()
+          ground=Path("src/vr/game/external_car_ground.hpp").read_text()
+          pose=Path("src/vr/game/f50_external_pose_filter.hpp").read_text()
+          gpu=Path("src/vr/game/dino_external_d3d9.hpp").read_text()
+          assert "localUp=SanitizeExternalFloorLift(localUp);" in pose
+          assert '#include "external_car_ground.hpp"' in pose
+          assert "kMaximumExternalFloorLift=1.25f" in ground
+          assert "lift>kMaximumExternalFloorLift" in ground
+          assert "if(f50.valid && DrawPreparedF50External(f50))" in h
+          assert "if(!MeshInDrawPass(m.glass,pass))continue;" in gpu
+          assert "ForceFixedFunctionStereoProbe()" in gpu
+          assert "UseExternalSuspensionSmoothing(" in h
+          assert "PermitGenericSidecar(" in h
+          assert "GlobalGpu().OnDeviceReset()" in h or "OnDeviceReset()" in h
+          print("FERRARI14_SOURCE_TRACE_CALLPATH_PASS")
+          PY
+      - name: Confirm normal v0.03 runtime untouched
+        run: |
+          git fetch --depth=1 origin 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7
+          test -z "$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- vrhost src/vr/d3d9 src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp Start-OutRun.cmd)"
