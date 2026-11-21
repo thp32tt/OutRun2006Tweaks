@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 # Real Windows PowerShell installer/restore control flow tested against an official
 # v0.03 release copy and a NONEXECUTABLE MOCK DLL (not a VR driver runtime test).
-param([Parameter(Mandatory=$true)][string]$RepoRoot,[Parameter(Mandatory=$true)][string]$ScratchRoot)
+param([Parameter(Mandatory=$true)][string]$RepoRoot,[Parameter(Mandatory=$true)][string]$ScratchRoot,[string]$PatchedDll='')
 $ErrorActionPreference='Stop'
 function Sha([string]$p) {(Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()}
 function Check([bool]$v,[string]$why) { if(!$v) {throw $why} }
@@ -45,7 +45,13 @@ Check (Test-Path -LiteralPath (Join-Path $target '.ferrari14-v003-testcopy.json'
 $package=Join-Path $ScratchRoot 'Mock-Package'
 New-Item -ItemType Directory -Path (Join-Path $package 'PAYLOAD') -Force | Out-Null
 $mock=Join-Path $package 'PAYLOAD\dinput8.dll'
-[System.IO.File]::WriteAllBytes($mock,[System.Text.Encoding]::ASCII.GetBytes('MOCK_NOT_EXECUTABLE_TEST_BACKUP_ONLY'))
+if($PatchedDll) {
+ Check (Test-Path -LiteralPath $PatchedDll -PathType Leaf) 'Actual Win32 artifact missing'
+ Copy-Item -LiteralPath $PatchedDll -Destination $mock -ErrorAction Stop
+ Write-Host 'Installing/reverting actual compiled x86 DLL (no game process started)'
+} else {
+ [System.IO.File]::WriteAllBytes($mock,[System.Text.Encoding]::ASCII.GetBytes('MOCK_NOT_EXECUTABLE_TEST_BACKUP_ONLY'))
+}
 $patched=Sha $mock
 foreach($name in @('APPLY-FERRARI14-V003-CLEAN.ps1','RESTORE-FERRARI14-V003-CLEAN.ps1','RUN-FERRARI14-V003-MODEL-OFF.cmd','RUN-FERRARI14-V003-575-ON.cmd','RUN-FERRARI14-V003-575-TRACE.cmd')) {
  Copy-Item -LiteralPath (Join-Path $tools $name) -Destination $package
