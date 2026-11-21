@@ -112,6 +112,12 @@ class FallbackQueueTests(unittest.TestCase):
             self.assertEqual(result["superseded_previous_source_sha256"], "b" * 64)
             self.assertEqual(result["source_asset_sha256"], "a" * 64)
             self.assertFalse(result["release_approved"])
+            published = json.loads((root / "out" / "queue.json").read_text(encoding="utf-8"))
+            self.assertEqual(published["superseded_unclaimed_previous_tasks"][0]["task_id"],
+                             task["task_id"])
+            self.assertEqual(published["superseded_previous_source_sha256"], "b" * 64)
+            self.assertEqual(published["hold_count"], 654)
+            self.assertFalse(published["release_approved"])
 
     def test_do_not_overwrite_stale_but_still_relevant_imagegen_task(self):
         with tempfile.TemporaryDirectory() as d:
