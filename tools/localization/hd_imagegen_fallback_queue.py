@@ -97,6 +97,7 @@ def stage(repo_root, queue_root, output, *, token=None, publish_remote=False):
         # build_queue writes queue.json before its return. Persist the exact
         # amended work order or the publisher would silently drop the
         # supersession receipts from the active GitHub queue.
+        out.mkdir(parents=True, exist_ok=True)
         (out / "queue.json").write_text(
             json.dumps(work, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
             encoding="utf-8"
