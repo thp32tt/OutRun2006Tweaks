@@ -45,7 +45,7 @@ User Ferrari13 run on 2026-11-20 reported DLL SHA `313d9925...` and host SHA `9e
 - Exact Win32 binary build is mandatory before any updated DLL ZIP is called testable. Do not reuse the previous `816ed1d` DLL or manifest for the new source.
 - **STOP / NOT SOLVED:** Successful sidecar drawing replaces the entire original native player callback; original sub-draw effects, passengers, glass and 575 pose equivalence are unproven in hardware. The generic PBR VS uses `c0/c4/c8`, not the verified game stereo `c64` path, and remains disabled in 575 ON fixed-function A/B. Per-call stateblock capture and 78+ mesh submissions are potential CPU/GPU overhead, not a proven FPS root cause. Original model's black paint, gray gauges and missing 13-car full compatibility cannot be corrected by C++ guard tests.
 - Required Quest3 A/B: official v0.03 original -> exact patched model OFF -> 575 ON fixed-function -> short TRACE on failure, comparing left/right depth, native player visibility, FPS, frame cadence and release host identity. Normal release is not to be overwritten or promoted without physical PASS.
-- Score: a new task achievement is **not** confirmed until the exact-source Windows build and regression gates both pass. A single source-debug repair earns at most +1, not one per changed file, workflow, test or rerun.
+- Score: both source contract and Windows Win32 build are now successful at the SAME exact functional SHA; one independent source-debug achievement only, no duplicate score per changed file/workflow/test/retry.
 
 ## Stereo ownership expansion: actual default compiled path, no speculative core change
 
@@ -53,3 +53,11 @@ User Ferrari13 run on 2026-11-20 reported DLL SHA `313d9925...` and host SHA `9e
 - The base fixed-function world classifier explicitly requires live VS=null, a native XYZ-family FVF, perspective projection, gameplay, and a Z-enabled non-screen semantic. The experimental body sets VS=null, XYZ|NORMAL|TEX1, perspective game transforms and depth enabled. Those source eligibility conditions are necessary but **not** proof that the physical HMD issued independent L+R eye draws.
 - R30 calls `GameSemantic::ConsumeForDraw()` for each submitted DIP. A pending game-authored screen one-shot/queue semantic could in principle change the classification of an externally injected mesh. There is **no physical evidence** of this happening with the user's 575; do not override or fake global game semantics until a bounded exact-producer diagnostic captures the actual draw, screen-scope, left/right RT/depth, and HRESULT.
 - Unverified generic PBR vertex constants `c0/c4/c8` remain disabled; do not reinterpret fixed-function source eligibility as a completed PBR stereo repair. Existing full-native-callback replacement remains a separately acknowledged opt-in hazard.
+
+## Final exact-source validation and isolated test artifact (2026-11-22)
+
+- Functional source SHA `f166b31f0637f91f0e5f65ac57a04f26d33ee89b`; GitHub source/guard workflow **SUCCESS** `44960156310`. Windows Win32 Release `dinput8.dll` build **SUCCESS** `44960156317` at the *same SHA*.
+- Built real PE32/x86 DLL SHA256: `cbb652b443b55afd95923006ec0421ddce940c3999d2d8aeb159045b7f99478b`.
+- Clean standalone test-only ZIP: `Ferrari14_v003_Source_Debug_Safe_Test_20261122.zip`. SHA256 `f5b00267f43e7243aec8c35fd8345e90fdd588a1056d2078de1c0fc8148795a2`, 2,555,907 bytes; exactly 13 entries, full ZIP CRC PASS, PE32/x86 check PASS, internal SHA-manifest readback PASS.
+- ZIP keeps the pre-existing isolated v0.03 test-copy/verify-only installer, hash-checked rollback and OFF/575-ON/TRACE runners. Replaced only the patch DLL and updated QA.json; includes no official game EXE, official VR host, INI, or third-party OVC. Prior installer/rollback safety was Windows-CI-proven on the parent parity package. **This newly repackaged ZIP has not been run through a full Windows install/rollback or real game test.**
+- Source PASS is not Quest3 depth/FPS/asset quality PASS. Do not promote to release, or change normal official v0.03 install folder. 
