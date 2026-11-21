@@ -6,6 +6,7 @@ name: OutRun HD ImageGen HOLD Rework Queue (source-bound, GitHub)
 # geometry-only HOLDs are archived in the new queue manifest, not resent.
 # Persist SHA-bound supersession receipts in published latest.json; do not
 # disturb valid live ImageGen tasks on repeated scheduling.
+# Queue metadata staging must create the output directory before writing receipts.
 on:
   workflow_dispatch:
   push:
