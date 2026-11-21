@@ -1201,9 +1201,11 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
         auto f50=PrepareF50External(player);
-        // Suppress the matching stock vehicle only after a complete/matching
-        // external submission. Missing/corrupt sidecar falls back to stock.
-        if(DrawPreparedF50External(f50))
+        // Preserve v0.03 startup/menu/2D fallback semantics: if the experimental
+        // sidecar was not admitted, NEVER query camera, XR or player state in
+        // DrawPreparedF50External. The retail callback alone owns this path.
+        // Suppress stock only after a valid, matching external submission.
+        if(f50.valid && DrawPreparedF50External(f50))
             return;
         QuestCockpitGlassLive::PlayerCallback scope(player);
         PlayerCallbackHook.ccall<void>(player);
