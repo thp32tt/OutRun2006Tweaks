@@ -81,3 +81,7 @@ Prior `ChooseOriginalCarRoute` returned `OriginalFallback` when an anomalous rec
 Source build exact SHA → GitHub Ferrrari 50-path CI and Win32 Release → verify new DLL binary SHA against that exact build → private optional game-copy test model OFF vs 575 ON with matching normal host → headset left/right, FPS and bounded `VR FERRARI INPUT TRANSFORM` log → promote only on user's acceptance.
 
 **AI2 scoring:** Do not score the previous 50/50 test result as an independent model/VR runtime success; a distinct code fix may qualify only after accepted CI and scoreboard SSOT audit.
+
+## Repeated 50 full executions (additional validation)
+
+The **exact compiled executable** for the corrected 50-path source was re-executed **50 separate times**, each time asserting ordered case IDs 01..50, zero abnormal termination and a final PASS banner. Result: **50/50 whole-program iterations**, **2,500/2,500 individual logical path assertions**, **0 failures**. Total actual execution time was 0.278 s on the low-power isolated validation host. Recorded source SHA256 `f979b2fe37717e2cc325ada9d50a3f050da4665ee3df530f150dab2d679e4a6f`, executable SHA256 `63954df34df00bf4db9618371ea170f4ff8077e9a59714d327611ddf962a49a1`. This adds determinism evidence only: does not extend testing to real Windows PowerShell, D3D9, stereo projection or HMD frame pacing.
