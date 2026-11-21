@@ -1,0 +1,62 @@
+name: Ferrari14 v0.03 Release Parity Integration
+on:
+  push:
+    branches:
+      - vr-ferrari14-v003-release-parity-20261121
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  portable:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: C++ sidecar and release compatibility tests
+        run: |
+          set -euo pipefail
+          for t in external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_runtime_policy_test ferrari14_trace_50_test; do
+            g++ -std=c++17 -O0 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
+            "/tmp/${t}"
+          done
+      - name: Check release startup policy and unchanged core
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          def flags(s):
+              return dict(re.findall(r'(?m)^\s*(-[A-Za-z][A-Za-z0-9.]+)=([^\s^]+)',s))
+          base=flags(Path('Start-OutRun.cmd').read_text())
+          assert base.get('-VR.PreferD3D9Ex')=='true'
+          assert base.get('-VR.DirectGpuOnly')=='true'
+          assert base.get('-VR.RenderWidth')=='2496'
+          assert base.get('-VR.RenderHeight')=='2688'
+          assert base.get('-VR.FrameCadenceMode')=='1'
+          for suffix in ('MODEL-OFF','575-ON','575-TRACE'):
+              s=Path('tools/ferrari14/RUN-FERRARI14-V003-'+suffix+'.cmd').read_text()
+              f=flags(s)
+              assert all(f.get(k)==v for k,v in base.items()),suffix
+              assert '-VR.F50ExternalModel=false' in s
+              if suffix=='MODEL-OFF':
+                  assert '-VR.ExternalFerrariTest=false' in s
+                  assert '-VR.ExternalFerrariNativeCallbackReplacement=false' in s
+              else:
+                  assert '-VR.ExternalFerrariTestCarId=5' in s
+                  assert '-VR.ExternalFerrariNativeCallbackReplacement=true' in s
+                  assert '-VR.F50ExternalStabilize=false' in s
+                  assert 'OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=1' in s
+          h=Path('src/hooks_graphics.cpp').read_text()
+          assert 'if(f50.valid && DrawPreparedF50External(f50))' in h
+          assert 'UseExternalSuspensionSmoothing(' in h
+          assert 'PermitGenericSidecar(' in h
+          print('RELEASE_FLAGS_AND_FERRARI_POLICY_PASS')
+          PY
+          git fetch --depth=1 origin 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7
+          test -z "$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- src/vr/d3d9 src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp vrhost Start-OutRun.cmd)"
+  windows-installer:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute PowerShell official-release mock install and rollback
+        shell: pwsh
+        run: |
+          & "./tools/ferrari14/tests/verify_installer_windows.ps1" -RepoRoot "$PWD" -ScratchRoot "$env:RUNNER_TEMP/Ferrari14-V003-InstallQA"
