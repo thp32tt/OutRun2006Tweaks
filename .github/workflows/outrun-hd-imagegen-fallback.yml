@@ -2,6 +2,8 @@ name: OutRun HD ImageGen HOLD Rework Queue (source-bound, GitHub)
 
 # Queue prep + evidence only. GitHub Actions cannot invoke the free ChatGPT
 # image generator. A/B browser production and independent C1 must process tasks.
+# When native QA SHA changes, obsolete prior ImageGen tickets that are now
+# geometry-only HOLDs are archived in the new queue manifest, not resent.
 on:
   workflow_dispatch:
   push:
@@ -72,7 +74,7 @@ jobs:
           python -m unittest discover -s tools/localization -p test_hd_rework_queue.py -v
           python -m unittest discover -s tools/localization -p test_hd_imagegen_fallback_queue.py -v
 
-      - name: Prepare at most eight verified HD ROI tasks and publish separate queue
+      - name: Reconcile stale 640-HOLD tickets with latest native 611-HOLD reasons and publish up to eight eligible tasks
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
