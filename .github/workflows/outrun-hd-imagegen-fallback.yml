@@ -4,6 +4,8 @@ name: OutRun HD ImageGen HOLD Rework Queue (source-bound, GitHub)
 # image generator. A/B browser production and independent C1 must process tasks.
 # When native QA SHA changes, obsolete prior ImageGen tickets that are now
 # geometry-only HOLDs are archived in the new queue manifest, not resent.
+# Persist SHA-bound supersession receipts in published latest.json; do not
+# disturb valid live ImageGen tasks on repeated scheduling.
 on:
   workflow_dispatch:
   push:
