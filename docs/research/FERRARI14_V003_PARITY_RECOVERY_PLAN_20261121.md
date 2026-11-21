@@ -22,3 +22,14 @@ Baseline: official v0.03 tag / branch `2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7`
 ## Strict status
 
 The stable normal v0.03 behavior remains the fallback. Test-only/source-only success must not be reported as physically repaired 3D/FPS. Never mix a 2026-11-19 Ferrari13 recovery host/launcher with this release-based build.
+
+## Corrected official RELEASE ASSET SHA (verified by Windows GitHub Actions 2026-11-21)
+
+Do not mistake the older `normal-v003-final-5eb41778-artifact.zip` workflow artifact for the exact published `v0.03` GitHub Release asset. The **actually published** `OutRun2_VR_v0.03_Beta_Cockpit.zip`, freshly downloaded in Windows runner 44908510911, contains:
+
+- `OR2006C2C.EXE`: SHA256 `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`
+- `OutRun2006Tweaks.ini`: SHA256 `630fc782a7b99666bc6f62ee0c791f160bddb6b1a879ef97f39f38763ac77358`
+- `dinput8.dll`: SHA256 `5d3c4fa550f3589323d1bddf65f475915f97b1bcdd3904ba50df865e002b7443`
+- `outrun-vr-host.exe`: SHA256 `8c7e574214eb39a11db906e97465da77e69402bc7aeaeb835bc8e732ad3d661f`
+
+**Critical compatibility rule:** do not distribute the older `bbeb46ea...` host in this new Ferrari test package. The installer verifies and preserves the official actual `8c7e5742...` host; only the experimental x86 DLL changes. Earlier patches using a different host are no longer accepted as the clean v0.03 baseline. This is a release artifact vs prior CI artifact discrepancy, not a newly confirmed host ABI defect.

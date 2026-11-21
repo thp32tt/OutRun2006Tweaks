@@ -8,8 +8,8 @@ function Check([bool]$v,[string]$why) { if(!$v) {throw $why} }
 $hashes=@{
  'OR2006C2C.EXE'='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
  'OutRun2006Tweaks.ini'='630fc782a7b99666bc6f62ee0c791f160bddb6b1a879ef97f39f38763ac77358'
- 'dinput8.dll'='b4fc8d100c8716c12829f1defe76a959fc9953119ba792a8e72ca56ccec5cbe1'
- 'outrun-vr-host.exe'='bbeb46ea441513f2eeb89dc60291b75854df0b55a75155e9ffef5027ff886fb8'
+ 'dinput8.dll'='5d3c4fa550f3589323d1bddf65f475915f97b1bcdd3904ba50df865e002b7443'
+ 'outrun-vr-host.exe'='8c7e574214eb39a11db906e97465da77e69402bc7aeaeb835bc8e732ad3d661f'
 }
 $tools=Join-Path $RepoRoot 'tools\ferrari14'
 foreach($name in @('PREPARE-FERRARI14-V003-TEST-COPY.ps1','APPLY-FERRARI14-V003-CLEAN.ps1','RESTORE-FERRARI14-V003-CLEAN.ps1')) {
