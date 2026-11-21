@@ -12,7 +12,7 @@
 | P3 | Preserve fixed native player pose; F50 vertical filter used only for actual F50, not 575 | Pure policy tests + source PASS; no physical 575 position/HMD verdict |
 | P4 | Prevent alpha glass before opaque body from blending against missing scene depth | **NEW:** `src/vr/game/external_car_draw_order.hpp` and `dino_external_d3d9.hpp` now submit opaque meshes before glass, preserving order *within* each class and using no per-frame extra GPU allocation; portable regression plus source-link CI `44951789293` PASS. No claim of headset fix yet |
 | P5 | Glass and body material quality, dashboard clearance, black paint, passenger/native effects | Not complete. Existing hybrid 575 OVC has black paint and low-information gauge texture; source-only change cannot repair third-party vehicle art. Separate owner-private OVC inspection and Quest3 evaluation required |
-| P6 | Windows Win32 Release DLL and clean safe test ZIP, model OFF / 575 ON / short TRACE launchers | Parent parity clean ZIP & Windows installer CI PASS. New glass-order source must be rebuilt at exact SHA `816ed1d` before generating a **new** DLL manifest; do not reuse parent DLL for this source |
+| P6 | Windows Win32 Release DLL and clean safe test ZIP, model OFF / 575 ON / short TRACE launchers | Parent parity clean ZIP & Windows installer CI PASS. New glass-order source `816ed1d` Windows Win32 Release Build **SUCCESS**, GitHub Actions run `44951789314`; experimental x86 DLL SHA256 `d8938ab5168db23abb78732017d9743b4c549935f27ecdb2a5a4f84eda4fdb2f`. Clean local ZIP `Ferrari14_v003_Glass_Order_Safe_Test_20261122.zip` SHA256 `49308155127e40efd46e197a2a8cd49adf6d637a20071016143397280678a58e`, 13 entries, CRC PASS, official EXE/INI/host excluded. Derived from the previously Windows-validated isolated copy installer and replaced only DLL/QA/readme |
 | P7 | Physical HMD baseline vs model OFF vs 575 ON, per-eye stereo, FPS, mirror, focus, menu, first stage, HUD, reset, passenger | **UNTESTED**. User hardware and game license required. Never promote to normal v0.03 release without this pass |
 
 ## New source correction (not a performance claim)
@@ -30,4 +30,11 @@ Previously, `GpuOwner::DrawNativeScene` iterated model groups once in OVC order,
 
 ## Score and release policy
 
-This new glass drawing-order correction is an independent **source change** from the already-scored v0.03 SHA/installer fix. Do not award any new points before independent Windows Build passes for the new source; no extra points for retries, A/B repetitions or documentation. Official release branch and user game untouched.
+This new glass drawing-order correction is an independent **source change** from the already-scored v0.03 SHA/installer fix. Independent Windows Build SUCCESS at `816ed1d` confirms one distinct source/CI glass-order correction. Award a single +1 at most under unique RUN_KEY `FERRARI14-V003-GLASS-OPAQUE-FIRST-20261122-816ED1D`; no extra points for retries, A/B repetitions, packaging or documentation. Scoreboard update is tracked separately. Official release branch and user game untouched.
+
+## Final independent validation
+
+- Portable GCC/C++ test + source-link isolation and normal release unchanged gate: `44951789293` **SUCCESS** at source SHA `816ed1d`.
+- Windows Win32 Release Build: `44951789314` **SUCCESS** at the same SHA.
+- Offline exhaustive ordering model: 511 mixed opaque/glass patterns, exact-once draw count and stable per-class ordering PASS. This validates ordering logic only, not GPU frame time or live HMD appearance.
+- New patch ZIP embeds only the exact compiled x86 DLL, hash-pinned manifest and pre-existing isolated installer scripts. The package was reopened and ZIP CRC PASS. Its native Windows install/rollback flow was previously verified in the parent parity CI; the new ZIP itself has not been run on the user's Windows game.
