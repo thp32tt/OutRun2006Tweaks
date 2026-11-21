@@ -1,0 +1,66 @@
+{
+  "hold_reason": null,
+  "image_tool_diagnostic": "IMAGE_TOOL_MENU_MISSING",
+  "image_tool_last_attempt_utc": "2026-11-21T12:36:17+00:00",
+  "image_tool_retry_count": 1,
+  "old_candidate_sha256": "df1718bcc9fe2e7abd5e13ffb3d9c2a18b2158116e7d67f3e6cfea9725f3ea30",
+  "pre_send_no_message": true,
+  "release_approved": false,
+  "roi_id": "Q047_67f2b358a8d3b480",
+  "role": "A",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+  "status": "IMAGE_TOOL_RETRY_PENDING",
+  "task": {
+    "english": "Space",
+    "korean": "공백",
+    "old_candidate_sha256": "df1718bcc9fe2e7abd5e13ffb3d9c2a18b2158116e7d67f3e6cfea9725f3ea30",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 280,
+      "name": "HDRW-A-99aae60c80489c41dad4_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        489,
+        272
+      ],
+      "sha256": "9e2109324b2fb42f863a7e97965cdc885a51aba227a8cc78e0c4da49ca7a74d5",
+      "source_box_xyxy": [
+        82,
+        360,
+        579,
+        640
+      ],
+      "source_native_size": [
+        4096,
+        1024
+      ],
+      "width": 497
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q047_67f2b358a8d3b480",
+    "role": "A",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+    "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+    "source_native_bbox_xyxy": [
+      90,
+      368,
+      571,
+      632
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-A-99aae60c80489c41dad4"
+  },
+  "task_id": "HDRW-A-99aae60c80489c41dad4",
+  "updated_utc": "2026-11-21T12:36:18+00:00"
+}
