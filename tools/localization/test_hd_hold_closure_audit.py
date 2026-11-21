@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from PIL import Image,ImageDraw
-from hd_hold_closure_audit import verify_pixel_ownership
+from hd_hold_closure_audit import verify_pixel_ownership, audit
 
 RID="Q044_0123456789abcdef"
 
@@ -60,6 +60,66 @@ class NativeFullOwnerPixelAuditTests(unittest.TestCase):
         self.record["edited_transparent_sha256"]="f"*64
         with self.assertRaisesRegex(ValueError,"SHA_CONFLICT"):
             verify_pixel_ownership(self.ticket,self.record,self.p,self.p)
+
+
+class LiveEvidenceAccountingTests(unittest.TestCase):
+    def fixture(self, base, holds=611, overlap=402):
+        p=Path(base)
+        proof=p/"source_protection"
+        edited=p/"auto_edits"
+        proof.mkdir()
+        edited.mkdir()
+        digest="a"*64
+        ev={
+            "schema":"outrun-hd-source-protected-component-evidence-v1",
+            "source_report_zip_sha256":digest, "source_total_roi":954,
+            "source_holds":holds, "overlap_hold_roi":overlap,
+            "full_owner_rows_diagnostic_only":0,
+            "release_approved":False,"tickets":[]
+        }
+        edits={
+            "schema":"outrun-hd-existing-pixel-auto-editor-v1",
+            "source_report_zip_sha256":digest,
+            "original_hold_count_unchanged":holds,
+            "release_approved":False,"records":[]
+        }
+        # No-overlap fixture is valid; a live source overlap must have
+        # exactly that many distinct source tickets.
+        ev["overlap_hold_roi"]=0
+        (proof/"source_protection_evidence.json").write_text(json.dumps(ev))
+        (edited/"auto_edit_report.json").write_text(json.dumps(edits))
+        return proof,edited,ev,edits
+
+    def test_current_611_hold_report_not_pinned_to_old_640(self):
+        with tempfile.TemporaryDirectory() as d:
+            proof,edited,_,_=self.fixture(d,611)
+            report=audit(proof,edited,Path(d)/"out")
+            self.assertEqual(report["original_holds_unchanged"],611)
+            self.assertEqual(report["source_overlap_holds"],0)
+            self.assertEqual(report["next_c1_static_candidate_count"],0)
+            self.assertFalse(report["release_approved"])
+
+    def test_old_640_hold_run_is_supported_when_it_is_self_consistent(self):
+        with tempfile.TemporaryDirectory() as d:
+            proof,edited,_,_=self.fixture(d,640)
+            report=audit(proof,edited,Path(d)/"out")
+            self.assertEqual(report["original_holds_unchanged"],640)
+
+    def test_conflicting_source_count_fails_closed(self):
+        with tempfile.TemporaryDirectory() as d:
+            proof,edited,_,edits=self.fixture(d)
+            edits["original_hold_count_unchanged"]=640
+            (edited/"auto_edit_report.json").write_text(json.dumps(edits))
+            with self.assertRaisesRegex(ValueError,"MISMATCHED_CURRENT_NATIVE_SOURCE"):
+                audit(proof,edited,Path(d)/"out")
+
+    def test_missing_overlap_tickets_cannot_pass(self):
+        with tempfile.TemporaryDirectory() as d:
+            proof,edited,ev,_=self.fixture(d)
+            ev["overlap_hold_roi"]=402
+            (proof/"source_protection_evidence.json").write_text(json.dumps(ev))
+            with self.assertRaisesRegex(ValueError,"OVERLAP_EDIT_COVERAGE_INVALID"):
+                audit(proof,edited,Path(d)/"out")
 
 if __name__=="__main__":
     unittest.main()
