@@ -94,6 +94,13 @@ def stage(repo_root, queue_root, output, *, token=None, publish_remote=False):
         work["supersession_policy"] = (
             "SOURCE_SHA_CHANGED_AND_ALL_OLD_OPEN_TASKS_NO_LONGER_IMAGEGEN_ELIGIBLE"
         )
+        # build_queue writes queue.json before its return. Persist the exact
+        # amended work order or the publisher would silently drop the
+        # supersession receipts from the active GitHub queue.
+        (out / "queue.json").write_text(
+            json.dumps(work, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+            encoding="utf-8"
+        )
     if (work.get("new_imagegen_disabled") is not False
             or work.get("release_approved") is not False
             or work.get("runtime_validation") != "UNTESTED"
