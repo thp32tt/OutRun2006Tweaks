@@ -108,14 +108,19 @@ def audit(proof_dir,edited_dir,out):
     edits=json.loads((edited_dir/"auto_edit_report.json").read_text())
     if (ev.get("schema")!=MASK_SCHEMA or edits.get("schema")!=EDIT_SCHEMA
             or ev.get("source_report_zip_sha256")!=edits.get("source_report_zip_sha256")
-            or ev.get("source_total_roi")!=954 or ev.get("source_holds")!=640
-            or edits.get("original_hold_count_unchanged")!=640
+            or ev.get("source_total_roi")!=954
+            or type(ev.get("source_holds")) is not int
+            or not 0 <= ev["source_holds"] <= 954
+            or type(ev.get("overlap_hold_roi")) is not int
+            or not 0 <= ev["overlap_hold_roi"] <= ev["source_holds"]
+            or edits.get("original_hold_count_unchanged")!=ev["source_holds"]
             or ev.get("release_approved") is not False
             or edits.get("release_approved") is not False):
-        raise ValueError("MISMATCHED_PINNED_20261112_SOURCE_EVIDENCE")
+        raise ValueError("MISMATCHED_CURRENT_NATIVE_SOURCE_EVIDENCE")
     tickets={t["roi_id"]:t for t in ev["tickets"]}
     edit_records={x["roi_id"]:x for x in edits["records"]}
-    if len(tickets)!=450 or len(edit_records)!=len(edits["records"]):
+    if (len(tickets)!=ev["overlap_hold_roi"]
+            or len(edit_records)!=len(edits["records"])):
         raise ValueError("OVERLAP_EDIT_COVERAGE_INVALID")
     full=[t for t in tickets.values() if t.get("full_component_owner_proven") is True]
     if len(full)!=ev["full_owner_rows_diagnostic_only"]:
@@ -148,7 +153,8 @@ def audit(proof_dir,edited_dir,out):
     result={
         "schema":VERSION,
         "source_report_zip_sha256":ev["source_report_zip_sha256"],
-        "original_holds_unchanged":640,"original_roi_total":954,
+        "original_holds_unchanged":ev["source_holds"],"original_roi_total":954,
+        "source_overlap_holds":ev["overlap_hold_roi"],
         "full_native_owner_source_rows":len(full),
         "source_owned_rows_with_pixel_edits":sum(r.get("edited_candidate_sha256") is not None for r in rows),
         "next_c1_static_candidate_count":counts["READY_FOR_C1_STATIC_SOURCE_OWNER_TEST_ONLY"],
