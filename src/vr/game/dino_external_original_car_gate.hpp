@@ -33,11 +33,16 @@ enum class OriginalCarRoute : unsigned char {
 inline OriginalCarRoute ChooseOriginalCarRoute(
     const OriginalCarGate& gate,const MeshDrawReceipt& receipt) noexcept
 {
-    if(!CanReplaceOriginalCar(gate) ||
-       receipt.expectedMeshes==0 ||
-       receipt.submittedMeshes>receipt.expectedMeshes ||
-       receipt.submittedMeshes==0)
+    if(!CanReplaceOriginalCar(gate) || receipt.submittedMeshes==0)
         return OriginalCarRoute::OriginalFallback;
+    // No-overdraw safety: once any external triangle has been submitted,
+    // its pixels cannot be removed from the current eye. An impossible
+    // receipt count (zero expected or more submitted than expected) must
+    // NEVER cause the stock player body to be drawn on top. Quarantine the
+    // anomalous route for this frame instead of stacking two full vehicles.
+    if(receipt.expectedMeshes==0 ||
+       receipt.submittedMeshes>receipt.expectedMeshes)
+        return OriginalCarRoute::ExternalPartial;
     if(receipt.drawSucceeded && receipt.stateRestored &&
        receipt.submittedMeshes==receipt.expectedMeshes)
         return OriginalCarRoute::ExternalComplete;

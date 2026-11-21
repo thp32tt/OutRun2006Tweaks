@@ -105,7 +105,7 @@ int main(){
     Check("34","partial GPU draw quarantined",ChooseOriginalCarRoute(good,Receipt(78,44,false,true))==OriginalCarRoute::ExternalPartial);
     Check("35","all submitted but D3D failure partial",ChooseOriginalCarRoute(good,Receipt(78,78,false,true))==OriginalCarRoute::ExternalPartial);
     Check("36","state restore failure partial",ChooseOriginalCarRoute(good,Receipt(78,78,true,false))==OriginalCarRoute::ExternalPartial);
-    Check("37","submitted exceeds expected fallback",ChooseOriginalCarRoute(good,Receipt(78,79))==OriginalCarRoute::OriginalFallback);
+    Check("37","over-submitted receipt avoids stock-car double draw",ChooseOriginalCarRoute(good,Receipt(78,79))==OriginalCarRoute::ExternalPartial);
     Check("38","one of many partial",ChooseOriginalCarRoute(good,Receipt(78,1))==OriginalCarRoute::ExternalPartial);
     d=GoodDraw();d.validStereo=false;
     Check("39","draw gate false overrides mesh success",ChooseOriginalCarRoute(d,Receipt(78,78))==OriginalCarRoute::OriginalFallback);
