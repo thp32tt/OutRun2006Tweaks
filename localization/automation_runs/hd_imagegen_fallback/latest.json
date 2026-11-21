@@ -419,5 +419,49 @@
       "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
       "task_id": "HDRW-B-d61140438a6c37e71975"
     }
-  ]
+  ],
+  "superseded_unclaimed_previous_tasks": [
+    {
+      "task_id": "HDRW-A-45e1fe9ac9afd2425ab0",
+      "roi_id": "Q205_49a2a730a5ee085f",
+      "new_hold_reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"
+    },
+    {
+      "task_id": "HDRW-A-fcff3630561579ec1083",
+      "roi_id": "Q205_5de4cbae50683601",
+      "new_hold_reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"
+    },
+    {
+      "task_id": "HDRW-A-9045f8fe67681e9620bd",
+      "roi_id": "Q205_c00f88a7a87e6e19",
+      "new_hold_reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"
+    },
+    {
+      "task_id": "HDRW-B-c1d8b4697e3db20041e1",
+      "roi_id": "Q227_20e6dcfbb3f28c8c",
+      "new_hold_reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"
+    },
+    {
+      "task_id": "HDRW-B-a81d6b1f206c4b5cf8ca",
+      "roi_id": "Q227_50fdfd89e985791b_RB_B",
+      "new_hold_reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"
+    },
+    {
+      "task_id": "HDRW-B-3367118eb35086c98791",
+      "roi_id": "Q227_6f70b1123b730776",
+      "new_hold_reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"
+    },
+    {
+      "task_id": "HDRW-A-50dee8fdb7ec778798ac",
+      "roi_id": "Q231_1912e616e31bc76d",
+      "new_hold_reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"
+    },
+    {
+      "task_id": "HDRW-B-9335687424f5cbc56eca",
+      "roi_id": "Q237_3dd12339c90cbb67",
+      "new_hold_reason": "ROI_OVERLAP_NEEDS_MANUAL_QA"
+    }
+  ],
+  "superseded_previous_source_sha256": "13c30301198c4588b5bc07a4c7194dcad42c94c8c9b453f42c501e9963ff16e2",
+  "supersession_policy": "SOURCE_SHA_CHANGED_AND_ALL_OLD_OPEN_TASKS_NO_LONGER_IMAGEGEN_ELIGIBLE"
 }
