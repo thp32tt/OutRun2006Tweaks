@@ -27,10 +27,14 @@ Expand-Archive -LiteralPath $zip -DestinationPath $expanded -Force
 $exes=@(Get-ChildItem -LiteralPath $expanded -Filter 'OR2006C2C.EXE' -File -Recurse)
 Check ($exes.Count -eq 1) 'Expected one EXE in official release ZIP'
 $release=$exes[0].DirectoryName
+$observed=@{}
 foreach($name in $hashes.Keys) {
  $actual=Sha (Join-Path $release $name)
+ $observed[$name]=$actual
  Write-Host "OFFICIAL_RELEASE_ACTUAL name=$name sha256=$actual expected=$($hashes[$name])"
- Check ($actual -eq $hashes[$name]) "Official fingerprint mismatch $name"
+}
+foreach($name in $hashes.Keys) {
+ Check ($observed[$name] -eq $hashes[$name]) "Official fingerprint mismatch $name"
 }
 $target=Join-Path $ScratchRoot 'OutRun-Ferrari14-Test'
 $prepare=Join-Path $tools 'PREPARE-FERRARI14-V003-TEST-COPY.ps1'
