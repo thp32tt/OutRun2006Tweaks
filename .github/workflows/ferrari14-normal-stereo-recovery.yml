@@ -38,6 +38,7 @@ jobs:
               assert marker not in launch, marker
           assert 'ForceFixedFunctionStereoProbe' in gpu
           assert 'MatchesFerrariSelection' in hook
+          assert 'if(f50.valid && DrawPreparedF50External(f50))' in hook, 'invalid ticket must preserve v0.03 startup/menu fallback'
           assert 'ExternalFerrariDiag' in hook
           assert 'NativeOriginalHooksReady.load' in hook
           assert 'player != Game::pl_car()' in hook
