@@ -1,0 +1,37 @@
+name: Ferrari14 Glass Pass and Release Isolation
+on:
+  push:
+    branches:
+      - vr-ferrari14-v003-glass-order-safe-20261122
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run portable draw order, callback and sidecar tests
+        run: |
+          set -euo pipefail
+          for t in external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_runtime_policy_test ferrari14_trace_50_test; do
+            g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
+            "/tmp/${t}"
+          done
+      - name: Verify opaque-first glass-last source path and exact v0.03 parity
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          text=Path("src/vr/game/dino_external_d3d9.hpp").read_text()
+          assert '#include "external_car_draw_order.hpp"' in text
+          assert 'for(unsigned pass=0;pass<2u && SUCCEEDED(hr);++pass)' in text
+          assert 'if(!MeshInDrawPass(m.glass,pass))continue;' in text
+          assert 'D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE' in text
+          assert 'D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE' in text
+          hook=Path("src/hooks_graphics.cpp").read_text()
+          assert 'if(f50.valid && DrawPreparedF50External(f50))' in hook
+          print('OPAQUE_FIRST_GLASS_LAST_AND_FALLBACK_PASS')
+          PY
+          git fetch --depth=1 origin 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7
+          test -z "$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- vrhost src/vr/d3d9 src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp Start-OutRun.cmd)"
