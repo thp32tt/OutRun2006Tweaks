@@ -90,5 +90,47 @@ class FallbackQueueTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "GITHUB_TOKEN"):
                     work.stage(root, qroot, root / "out", publish_remote=True)
 
+
+    def test_supersede_old_unclaimed_when_native_reason_is_geometry(self):
+        with tempfile.TemporaryDirectory() as d:
+            root, qroot, _ = self.fixtures(d)
+            task = {"task_id": "HDRW-A-" + "a" * 20,
+                    "roi_id": "Q205_49a2a730a5ee085f"}
+            latest = qroot / work.FALLBACK_PREFIX / "latest.json"
+            latest.parent.mkdir(parents=True, exist_ok=True)
+            latest.write_text(json.dumps({
+                "schema": "outrun-hd-qa-chat-workqueue-v1",
+                "tasks": [task], "source_asset_sha256": "b" * 64,
+                "hold_count": 640, "release_approved": False}))
+            with patch.object(work.queue, "flatten_holds",
+                              return_value=({task["roi_id"]: "ROI_OVERLAP_NEEDS_MANUAL_QA"}, set())):
+                with patch.object(work.queue, "build_queue", side_effect=self.fake_build) as build:
+                    result = work.stage(root, qroot, root / "out")
+            build.assert_called_once()
+            self.assertEqual(result["superseded_unclaimed_previous_tasks"][0]["task_id"],
+                             task["task_id"])
+            self.assertEqual(result["superseded_previous_source_sha256"], "b" * 64)
+            self.assertEqual(result["source_asset_sha256"], "a" * 64)
+            self.assertFalse(result["release_approved"])
+
+    def test_do_not_overwrite_stale_but_still_relevant_imagegen_task(self):
+        with tempfile.TemporaryDirectory() as d:
+            root, qroot, _ = self.fixtures(d)
+            task = {"task_id": "HDRW-B-" + "b" * 20,
+                    "roi_id": "Q044_0123456789abcdef"}
+            latest = qroot / work.FALLBACK_PREFIX / "latest.json"
+            latest.parent.mkdir(parents=True, exist_ok=True)
+            latest.write_text(json.dumps({
+                "schema": "outrun-hd-qa-chat-workqueue-v1",
+                "tasks": [task], "source_asset_sha256": "b" * 64,
+                "release_approved": False}))
+            with patch.object(work.queue, "flatten_holds",
+                              return_value=({task["roi_id"]: "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED"}, set())):
+                with patch.object(work.queue, "build_queue") as build:
+                    result = work.stage(root, qroot, root / "out")
+            build.assert_not_called()
+            self.assertEqual(result["status"], "WAIT_STALE_SOURCE_WITH_RELEVANT_TASKS")
+            self.assertEqual(result["still_relevant_tasks"], 1)
+
 if __name__ == "__main__":
     unittest.main()
