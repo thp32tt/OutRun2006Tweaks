@@ -1,0 +1,89 @@
+name: Ferrari14 v003 Safe Patch Package
+on:
+  push:
+    branches: [vr-ferrari14-v003-release-parity-20261121]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve pinned Win32 DLL
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin 3ed4e80d7ad05b3f9807bfbf6e3cef957e1f8083
+          test -z "$(git diff --name-only 3ed4e80d7ad05b3f9807bfbf6e3cef957e1f8083 HEAD -- src vrhost CMakeLists.txt CMakePresets.json)"
+          mkdir -p "$RUNNER_TEMP/pinned"
+          gh run download 44907972612 --repo thp32tt/OutRun2006Tweaks --name outrun2006tweaks-3ed4e80d7ad05b3f9807bfbf6e3cef957e1f8083 --dir "$RUNNER_TEMP/pinned"
+          test "$(sha256sum "$RUNNER_TEMP/pinned/dinput8.dll" | cut -d' ' -f1)" = da7fa04cc2bce17740b0023d094e825904a557f4ca15a1ecbe8ec25f35dcb08c
+      - name: Package release-parity ZIP
+        run: |
+          python3 - <<'PY'
+          import os,zipfile,json,hashlib,struct,pathlib
+          root=pathlib.Path('tools/ferrari14')
+          dll=(pathlib.Path(os.environ['RUNNER_TEMP'])/'pinned/dinput8.dll').read_bytes()
+          sha=hashlib.sha256(dll).hexdigest()
+          assert sha=='da7fa04cc2bce17740b0023d094e825904a557f4ca15a1ecbe8ec25f35dcb08c'
+          pe=struct.unpack_from('<I',dll,0x3c)[0]
+          assert dll[:2]==b'MZ' and dll[pe:pe+4]==b'PE\x00\x00'
+          assert struct.unpack_from('<H',dll,pe+4)[0]==0x14c
+          manifest={'Schema':1,'PackageType':'FERRARI14_V003_RELEASE_PARITY',
+            'PatchedDllSha256':sha,
+            'ReleaseDllSha256':'5d3c4fa550f3589323d1bddf65f475915f97b1bcdd3904ba50df865e002b7443',
+            'ReleaseHostSha256':'8c7e574214eb39a11db906e97465da77e69402bc7aeaeb835bc8e732ad3d661f',
+            'ReleaseExeSha256':'68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3',
+            'ReleaseIniSha256':'630fc782a7b99666bc6f62ee0c791f160bddb6b1a879ef97f39f38763ac77358',
+            'BuildCommit':'3ed4e80d7ad05b3f9807bfbf6e3cef957e1f8083',
+            'IntegrationCommit':os.environ.get('GITHUB_SHA',''),
+            'BuildRunId':44907972612,'Quest3HardwareVerified':False}
+          names=['PREPARE-FERRARI14-V003-TEST-COPY.ps1',
+                 'APPLY-FERRARI14-V003-CLEAN.ps1',
+                 'RESTORE-FERRARI14-V003-CLEAN.ps1',
+                 'RUN-FERRARI14-V003-MODEL-OFF.cmd',
+                 'RUN-FERRARI14-V003-575-ON.cmd',
+                 'RUN-FERRARI14-V003-575-TRACE.cmd',
+                 'README_FIRST_KO.md','README_RELEASE_TEST_COPY.md']
+          dest=pathlib.Path('dist/Ferrari14_v003_Release_Parity_Clean_Test_20261121.zip')
+          dest.parent.mkdir(exist_ok=True)
+          with zipfile.ZipFile(dest,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+            z.writestr('PAYLOAD/dinput8.dll',dll)
+            z.writestr('QA.json',json.dumps(manifest,indent=2,ensure_ascii=False)+'\n')
+            for name in names:z.write(root/name,name)
+            z.write('COPYING.GPL3','COPYING.GPL3')
+            z.write('THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md')
+          with zipfile.ZipFile(dest) as z:
+            assert z.testzip() is None and len(z.namelist())==12
+            assert hashlib.sha256(z.read('PAYLOAD/dinput8.dll')).hexdigest()==sha
+            assert not any(n.lower().endswith(('.ovc','.glb','.exe','.pmt')) for n in z.namelist())
+          print('CLEAN_RELEASE_ZIP_PASS',dest.stat().st_size,hashlib.sha256(dest.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Ferrari14-v003-Clean-Test-ZIP
+          path: dist/Ferrari14_v003_Release_Parity_Clean_Test_20261121.zip
+          if-no-files-found: error
+          retention-days: 14
+  windows-real-installer:
+    needs: package
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Ferrari14-v003-Clean-Test-ZIP
+          path: artifact
+      - name: Real x86 DLL install and rollback on official copied release
+        shell: pwsh
+        run: |
+          $zip='artifact/Ferrari14_v003_Release_Parity_Clean_Test_20261121.zip'
+          $out=Join-Path $env:RUNNER_TEMP 'Ferrari14-Real-Payload'
+          Expand-Archive -LiteralPath $zip -DestinationPath $out -Force
+          $dll=Join-Path $out 'PAYLOAD/dinput8.dll'
+          $sha=(Get-FileHash -LiteralPath $dll -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($sha -ne 'da7fa04cc2bce17740b0023d094e825904a557f4ca15a1ecbe8ec25f35dcb08c') {throw 'Bad DLL SHA'}
+          & "./tools/ferrari14/tests/verify_installer_windows.ps1" -RepoRoot "$PWD" -ScratchRoot "$env:RUNNER_TEMP/Ferrari14-RealDllQA" -PatchedDll $dll
