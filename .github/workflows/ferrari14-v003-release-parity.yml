@@ -34,7 +34,9 @@ jobs:
           for suffix in ('MODEL-OFF','575-ON','575-TRACE'):
               s=Path('tools/ferrari14/RUN-FERRARI14-V003-'+suffix+'.cmd').read_text()
               f=flags(s)
-              assert all(f.get(k)==v for k,v in base.items()),suffix
+              assert all(f.get(k)==v for k,v in base.items() if not (suffix=='575-TRACE' and k=='-VR.FileLogging')),suffix
+              if suffix=='575-TRACE':
+                  assert f.get('-VR.FileLogging')=='true'
               assert '-VR.F50ExternalModel=false' in s
               if suffix=='MODEL-OFF':
                   assert '-VR.ExternalFerrariTest=false' in s
