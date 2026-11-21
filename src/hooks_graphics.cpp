@@ -69,6 +69,8 @@ namespace Settings
         "EXPERIMENTAL: render installed external Ferrari OVC sidecars for validated player car IDs 0..29 in cockpit view only. Existing 288 GTO/F40 filenames stay compatible; other cars use ExternalCars/car_id_XX.ovc. Missing/invalid files fall back to original game models." };
     Setting<int> VRExternalFerrariTestCarId{ "VR", "ExternalFerrariTestCarId", -1,
         "Optional external Ferrari selector: -1 permits all; 0..29 limits the sidecar to one canonical retail model (base/tuned alias).", Range<int>{-1,29} };
+    Setting<bool> VRExternalFerrariNativeCallbackReplacement{ "VR", "ExternalFerrariNativeCallbackReplacement", false,
+        "Expert-only opt in: replacing a player body skips the complete native display callback; never enabled by normal v0.03 or model-OFF mode." };
     Setting<bool> VRExternalFerrariDiag{ "VR", "ExternalFerrariDiag", false,
         "Emit up to eight external body route receipts and four pre-draw rejection diagnostics; OFF during FPS comparison." };
     Setting<float> VRF50ExternalLift{ "VR", "F50ExternalLift", 0.22f,
@@ -984,6 +986,14 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             !f50Car && OutRunVR::DinoSidecar::MatchesFerrariSelection(
                 carId, Settings::VRExternalFerrariTestCarId.get());
         if(!extraCar && !f50Car)return ticket;
+        // The release callback does more than emit car triangles. Generic
+        // experimental replacement must be explicitly acknowledged, and its
+        // shader must use the per-eye fixed-function diagnostic path.
+        // This gate occurs before reading camera/XR or attempting any OVC IO.
+        if(extraCar && !OutRunVR::DinoSidecar::PermitGenericSidecar(
+               true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
+               Settings::VRExternalFerrariNativeCallbackReplacement.get()))
+            return ticket;
         const auto* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
         IDirect3DDevice9* device=Game::D3DDevice();
@@ -1059,7 +1069,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             ticket.world,NativeFrameTrace().ActiveEpoch(),
             reinterpret_cast<std::uintptr_t>(player),
             localLift,
-            Settings::VRF50ExternalStabilize.get());
+            OutRunVR::DinoSidecar::UseExternalSuspensionSmoothing(
+                f50Car,Settings::VRF50ExternalStabilize.get()));
         ticket.originalPlayer=reinterpret_cast<std::uintptr_t>(player);
         ticket.view=*nativeView;
         ticket.projection=*nativeProjection;
@@ -1091,6 +1102,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             (f50Slot ? (Settings::VRF50ExternalModel &&
                          OutRunVR::DinoSidecar::IsF50RetailCarId(livePlayer->car_id_10)) :
              (Settings::VRExternalFerrariTest &&
+              OutRunVR::DinoSidecar::PermitGenericSidecar(
+                  true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
+                  Settings::VRExternalFerrariNativeCallbackReplacement.get()) &&
               OutRunVR::DinoSidecar::MatchesFerrariSelection(
                   ticket.carId, Settings::VRExternalFerrariTestCarId.get())));
         const OutRunVR::DinoSidecar::OriginalCarGate gate{

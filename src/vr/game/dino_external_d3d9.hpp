@@ -19,10 +19,19 @@
 #include "dino_external_sidecar.hpp"
 #include "external_car_ground.hpp"
 #include "external_car_selection.hpp"
+#include "external_car_runtime_policy.hpp"
 #include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
 
 namespace OutRunVR::DinoSidecar {
+// Fixed-function test must be explicitly enabled by the launch process;
+// generic PBR's c0/c4/c8 matrices are not compatible with verified c64 stereo.
+inline bool FixedFunctionExternalStereoProbeActive() noexcept {
+    wchar_t flag[4]{};
+    return GetEnvironmentVariableW(
+        L"OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST",flag,4)==1 &&
+        flag[0]==L'1' && flag[1]==L'\0';
+}
 enum class FerrariModelSlot : unsigned char { F50, Gto288, F40, GenericId };
 enum class SidecarRole : unsigned char { Vehicle, DashboardOverlay };
 struct GpuDrawResult final {
@@ -147,10 +156,7 @@ class GpuOwner final {
     // transforms and normal VR runner. This deliberately ignores normal/ORM
     // maps for the current process; default production behavior stays PBR.
     static bool ForceFixedFunctionStereoProbe() noexcept {
-        wchar_t flag[4]{};
-        return GetEnvironmentVariableW(
-                   L"OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST",flag,4)==1 &&
-               flag[0]==L'1' && flag[1]==L'\0';
+        return FixedFunctionExternalStereoProbeActive();
     }
     // A partial draw is not recoverable by issuing the original vehicle draw
     // in the same eye: those external pixels are already on the target.
