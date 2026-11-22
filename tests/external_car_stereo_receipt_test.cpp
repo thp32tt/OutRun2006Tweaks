@@ -17,16 +17,25 @@ int main() {
     assert(!r.Complete());
     {
         ScopedExternalStereoMeshReceipt scope(r);
-        RecordExternalStereoMeshPair(true,true,true,44);
+        RecordExternalStereoMeshPair(true,true,true,44,true);
         assert(r.Complete());
     }
     assert(ActiveExternalStereoMesh==nullptr);
+    // Two successful DIP executions without separate eye transforms
+    // are NOT proven VR geometry; never replace stock with doubled mono.
+    r={}; r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,true,true,44,false);
+        assert(!r.Complete());
+    }
+
     for(int scenario=0;scenario!=4;++scenario) {
         r={};
         r.expectedPose=44;
         ScopedExternalStereoMeshReceipt scope(r);
         RecordExternalStereoMeshPair(scenario!=0,scenario!=1,
-                                     scenario!=2,scenario==3?45:44);
+                                     scenario!=2,scenario==3?45:44,true);
         assert(!r.Complete());
     }
     r={}; r.expectedPose=44;
