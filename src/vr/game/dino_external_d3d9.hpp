@@ -710,11 +710,14 @@ public:
             OutRunVR::GameSemantic::ScopedExternalVehicleSemantic externalScope;
             result.receipt.possiblySubmitted=true;
             ++result.receipt.attemptedMeshes;
-            hr=device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,0,0,m.vertexCount,
-                                             0,m.indexCount/3);
-            if(SUCCEEDED(hr))++result.receipt.submittedMeshes;
-            if(physical.Complete())++result.receipt.verifiedStereoMeshes;
-            else hr=E_FAIL; // LEFT success alone never proves RIGHT
+            const HRESULT dipHr=device->DrawIndexedPrimitive(
+                D3DPT_TRIANGLELIST,0,0,m.vertexCount,0,m.indexCount/3);
+            if(SUCCEEDED(dipHr))++result.receipt.submittedMeshes;
+            const bool stereoComplete=physical.Complete();
+            if(stereoComplete)++result.receipt.verifiedStereoMeshes;
+            if(SUCCEEDED(dipHr) && !stereoComplete)
+                eyeProofOnlyFailure=true;
+            hr=stereoComplete?dipHr:E_FAIL;
             if(FAILED(hr))break;
         }
         const HRESULT restore=saved->Apply();
