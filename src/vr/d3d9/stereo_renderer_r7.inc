@@ -2129,6 +2129,10 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					failureAtEntry,FrameFailureReason);
 				return hr;
 			}
+			// A programmable PBR DIP must have a proven world eye-pair.
+            // Classification as NonWorld is not an acceptable mono draw.
+            if(OutRunVR::DinoSidecar::ActiveExternalPbrStereo &&
+               !draw.externalPbrWorld)return E_FAIL;
 			D3DVIEWPORT9 savedViewport{};
 			if(FAILED(device->GetViewport(&savedViewport)))
 			{
