@@ -8,6 +8,7 @@
 #include <d3d9.h>
 #include <d3dcompiler.h>
 #include <cstring>
+#include "external_car_pbr_eye_math.hpp"
 
 namespace OutRunVR::DinoSidecar {
 class PbrShaders final {
@@ -175,10 +176,9 @@ public:
     HRESULT Bind(IDirect3DDevice9* device,const D3DMATRIX& world,
                  const D3DMATRIX& view,const D3DMATRIX& projection) noexcept {
         if(!device||!vs_||!ps_)return E_FAIL;
-        float eye[4]{
-            -(view._41*view._11+view._42*view._12+view._43*view._13),
-            -(view._41*view._21+view._42*view._22+view._43*view._23),
-            -(view._41*view._31+view._42*view._32+view._43*view._33),0.f};
+        float eye[4]{};
+        if(!ExternalPbrEyeConstants(&view.m[0][0],0.f,eye))
+            return E_FAIL;
         if(FAILED(device->SetVertexShader(vs_)) ||
            FAILED(device->SetPixelShader(ps_)) ||
            FAILED(device->SetVertexShaderConstantF(4,&view.m[0][0],4)) ||
