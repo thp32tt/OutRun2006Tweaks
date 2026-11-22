@@ -1,8 +1,8 @@
 {
   "hold_reason": null,
   "image_tool_diagnostic": "IMAGE_TOOL_MENU_MISSING",
-  "image_tool_last_attempt_utc": "2026-11-22T02:13:35+00:00",
-  "image_tool_retry_count": 18,
+  "image_tool_last_attempt_utc": "2026-11-22T03:24:23+00:00",
+  "image_tool_retry_count": 19,
   "old_candidate_sha256": "df1718bcc9fe2e7abd5e13ffb3d9c2a18b2158116e7d67f3e6cfea9725f3ea30",
   "pre_send_no_message": true,
   "release_approved": false,
@@ -62,5 +62,5 @@
     "task_id": "HDRW-A-99aae60c80489c41dad4"
   },
   "task_id": "HDRW-A-99aae60c80489c41dad4",
-  "updated_utc": "2026-11-22T02:13:35+00:00"
+  "updated_utc": "2026-11-22T03:24:24+00:00"
 }
