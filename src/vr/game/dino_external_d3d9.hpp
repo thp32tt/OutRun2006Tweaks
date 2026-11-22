@@ -26,6 +26,7 @@
 #include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
 #include "external_car_stereo_receipt.hpp"
+#include "external_car_stereo_retry.hpp"
 #include "render_semantics.hpp"
 
 namespace OutRunVR::DinoSidecar {
@@ -80,6 +81,7 @@ class GpuOwner final {
     // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
     // textures on every eye Draw. Retry only after Reset/device change.
     GpuRetryPolicy gpuRetry_{};
+    ExternalStereoRetryPolicy stereoRetry_{};
     static bool ReadFile(const wchar_t* path,std::vector<std::uint8_t>& out) {
         HANDLE f=CreateFileW(path,GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,
                             FILE_ATTRIBUTE_NORMAL,nullptr);
