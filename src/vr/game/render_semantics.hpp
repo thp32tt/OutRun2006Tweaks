@@ -1564,24 +1564,24 @@ namespace OutRunVR::GameSemantic
 
     inline const void* CurrentQueueNode() noexcept
     {
-        return CurrentSpriteQueueNode;
+        return ExternalVehicleSemanticDepth!=0 ? nullptr : CurrentSpriteQueueNode;
     }
 
     inline std::uint64_t CurrentQueueNodeEpoch() noexcept
     {
-        return SpriteQueueNodeEpoch;
+        return ExternalVehicleSemanticDepth!=0 ? 0 : SpriteQueueNodeEpoch;
     }
 
     inline ProducerToken CurrentQueueProducerToken() noexcept
     {
-        return CurrentSpriteQueueProducer;
+        return ExternalVehicleSemanticDepth!=0 ? ProducerToken::None : CurrentSpriteQueueProducer;
     }
 
     inline bool ExactLensCentreDrawOwnsSemantic() noexcept
     {
         return DirectLensCentreOwnsGpuDraw(
             ExactLensCentreGpuDrawDepth != 0, SpriteQueueDepth != 0,
-            ExternalOverlaySemanticDepth != 0);
+            ExternalOverlaySemanticDepth != 0 || ExternalVehicleSemanticDepth != 0);
     }
 
     inline ProducerToken CurrentRenderProducerToken() noexcept
