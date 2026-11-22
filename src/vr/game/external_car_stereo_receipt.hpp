@@ -12,6 +12,7 @@ struct ExternalStereoMeshReceipt final {
     bool rightSucceeded=false;
     bool stateRestored=false;
     bool geometryStereo=false; // original fixed-function per-eye matrices proved
+    bool rightDrawFailed=false; // real RIGHT DIP HRESULT, not merely missing stereo proof
     bool Complete() const noexcept {
         return expectedPose!=0 && reports==1 &&
             observedPose==expectedPose && leftSucceeded &&
@@ -33,7 +34,8 @@ public:
     ScopedExternalStereoMeshReceipt& operator=(const ScopedExternalStereoMeshReceipt&)=delete;
 };
 inline void RecordExternalStereoMeshPair(bool leftOk,bool rightOk,
-    bool restored,std::uint64_t pose, bool geometryStereo=false) noexcept {
+    bool restored,std::uint64_t pose, bool geometryStereo=false,
+    bool rightGpuFailure=false) noexcept {
     auto* receipt=ActiveExternalStereoMesh;
     if(!receipt)return;
     ++receipt->reports;
@@ -42,5 +44,6 @@ inline void RecordExternalStereoMeshPair(bool leftOk,bool rightOk,
     receipt->rightSucceeded=rightOk;
     receipt->stateRestored=restored;
     receipt->geometryStereo=geometryStereo;
+    receipt->rightDrawFailed=rightGpuFailure;
 }
 } // namespace OutRunVR::DinoSidecar
