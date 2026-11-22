@@ -3,7 +3,7 @@
   "candidate_status": "RESULT_NOT_YET_EXPORTED_OR_QA_APPROVED",
   "last_assistant_page_refresh_utc": "2026-11-22T06:47:49+00:00",
   "last_result_poll_reason": "ASSISTANT_GENERATED_IMAGE_NOT_RENDERED_A0_G0_U1_L0",
-  "last_result_poll_utc": "2026-11-22T04:51:26+00:00",
+  "last_result_poll_utc": "2026-11-22T06:48:17+00:00",
   "old_candidate_sha256": "2e48a34c280983b3f125ee11c38332abbd4034878d6057f29f306db47e787ade",
   "release_approved": false,
   "roi_id": "Q097_fcfb148739388251",
@@ -63,5 +63,5 @@
     "task_id": "HDRW-A-bd2d76dd976dc50c68fa"
   },
   "task_id": "HDRW-A-bd2d76dd976dc50c68fa",
-  "updated_utc": "2026-11-22T06:47:49+00:00"
+  "updated_utc": "2026-11-22T06:48:18+00:00"
 }
