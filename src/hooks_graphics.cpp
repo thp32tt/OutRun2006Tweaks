@@ -7,7 +7,6 @@
 #include "vr/ui/vr_mirror_aspect_fit.hpp"
 #include "vr/game/pmt_node_culling_contract.hpp"
 #include "vr_shared.hpp"
-#include "vr/core/r29_owner_api.hpp"
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/quest_cockpit_v2_runtime.hpp"
 #include "vr/game/quest_cockpit_v2_seat.hpp"
@@ -1013,8 +1012,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // actual stereo MAIN backbuffer, never an offscreen scene target.
         gate.stereo=xr && xr->valid && xr->poseSequence!=0 &&
             OutRunVR::RuntimeEligibility::MayInjectStereo() &&
-            OutRunVRStereo::R29OwnerStereoWanted() &&
-            OutRunVRStereo::R29OwnerTargetIsBackBuffer();
+            OutRunVR::DinoSidecar::MainBackbufferActive(device);
         gate.playerDraw=true;
         gate.deviceReady=device!=nullptr;
         gate.stateRecording=OutRunVR::State::StateBlockTracker::Recording();
