@@ -56,6 +56,14 @@ int main() {
     assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::ExternalPartial);
     mesh={};
     assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::OriginalFallback);
+    // State was changed by external submission setup, then could not be
+    // restored. Even zero DIPs cannot justify calling stock with dirty state.
+    mesh={};
+    mesh.stateMayBeDirty=true;
+    assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::ExternalPartial);
+    auto expiredStateGate=Admitted();
+    ++expiredStateGate.liveEpoch;
+    assert(ChooseOriginalCarRoute(expiredStateGate,mesh)==OriginalCarRoute::ExternalPartial);
     mesh={};
     mesh.expectedMeshes=3;
     mesh.submittedMeshes=3;
