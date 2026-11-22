@@ -38,11 +38,25 @@ jobs:
               "D3DRS_SLOPESCALEDEPTHBIAS,0u",
               "D3DRS_BLENDOP,D3DBLENDOP_ADD",
               "D3DRS_SRGBWRITEENABLE,FALSE",
+              "D3DRS_CLIPPING,TRUE",
+              "D3DRS_CLIPPLANEENABLE,0u",
+              "D3DRS_VERTEXBLEND,D3DVBF_DISABLE",
+              "D3DRS_INDEXEDVERTEXBLENDENABLE,FALSE",
               "D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE",
               "D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE",
           ):
               assert name in gpu, name
-          assert gpu.index("D3DRS_BLENDOP,D3DBLENDOP_ADD") < gpu.index("DrawIndexedPrimitive(")
+          capture=gpu.index("if(FAILED(saved->Capture()))")
+          draw=gpu.index("DrawIndexedPrimitive(")
+          restore=gpu.index("const HRESULT restore=saved->Apply();")
+          for state in (
+              "D3DRS_CLIPPING,TRUE",
+              "D3DRS_CLIPPLANEENABLE,0u",
+              "D3DRS_VERTEXBLEND,D3DVBF_DISABLE",
+              "D3DRS_INDEXEDVERTEXBLENDENABLE,FALSE",
+          ):
+              assert capture < gpu.index(state) < draw < restore, state
+          assert gpu.index("D3DRS_BLENDOP,D3DBLENDOP_ADD") < draw
           assert "ForceFixedFunctionStereoProbe()" in gpu
           assert "UseExternalSuspensionSmoothing(" in h
           assert "PermitGenericSidecar(" in h
