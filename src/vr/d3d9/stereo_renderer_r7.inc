@@ -2087,6 +2087,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			const auto failureAtEntry=FrameFailureReason;
 			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))
 			{
+                if(OutRunVR::DinoSidecar::ActiveExternalPbrStereo)return E_FAIL;
 				const HRESULT hr=drawCall();
 				R7TraceVisualEyes(visualTrace,"BASE_BYPASS_SINGLE",false,false,false,0,
 					true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,true,
@@ -2095,6 +2096,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			}
 			if(StereoWanted()&&!TargetIsBackBuffer())
 			{
+                if(OutRunVR::DinoSidecar::ActiveExternalPbrStereo)return E_FAIL;
 				if(CurrentDrawMatchesVerifiedWorld(device))
 				{
 					++OffscreenVerifiedWorldDraws;
@@ -2117,6 +2119,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			DrawStereoState draw{};
 			if(!PrepareDuplicatedDraw(device,draw))
 			{
+                // A failed PBR classification is NOT permission for a mono
+                // fallback DIP; no pixels have been submitted yet.
+                if(OutRunVR::DinoSidecar::ActiveExternalPbrStereo)return E_FAIL;
 				if(StereoWanted()&&TargetIsBackBuffer())
 					InvalidateRightDepthStencilIfLeftMayWrite(device);
 				const HRESULT hr=drawCall();
@@ -2130,6 +2135,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			{
 				InvalidateRightDepthStencilIfLeftMayWrite(device);
 				PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);
+                if(draw.externalPbrWorld)return E_FAIL;
 				const HRESULT hr=drawCall();
 				R7TraceVisualEyes(visualTrace,"VIEWPORT_REJECT_SINGLE",true,
 					draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
@@ -2164,6 +2170,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					if(!rolledBack)
 						NoteRestoreFailure(draw.fixedFunctionWorld?
 							"left-eye fixed-function rollback":"left-eye c64 rollback");
+					if(draw.externalPbrWorld)return E_FAIL;
 					const HRESULT hr=drawCall();
                     // Partial LEFT-eye transform upload can fail during
                     // original transform rollback. An absent pair report
