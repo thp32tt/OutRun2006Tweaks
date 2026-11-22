@@ -96,21 +96,29 @@ def make_glyph(text: str, width: int, height: int, fontfile: str, reference: np.
     margin = max(2, min(width, height) // 18)
     longest = max(1, max(map(len, lines)))
     maxfont = max(6, int(min(height / max(1, len(lines)) * 0.88, width / longest * 1.7)))
+    # Largest-fitting size is monotone in native HD bbox dimensions.
+    # A descending 100+ font-load loop per ROI made complete 954-ROI runs
+    # disproportionately slow. Binary search is deterministic and selects
+    # the same largest valid font without changing the target bounds.
     best = None
-    for size in range(maxfont, 4, -1):
+    lo, hi = 5, maxfont
+    measurer = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    while lo <= hi:
+        size = (lo + hi) // 2
         face = ImageFont.truetype(fontfile, size=size)
         stroke = max(1, round(size / 18))
-        d = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
         widths, heights = [], []
         for line in lines:
-            box = d.textbbox((0, 0), line, font=face, stroke_width=stroke)
+            box = measurer.textbbox((0, 0), line, font=face, stroke_width=stroke)
             widths.append(box[2] - box[0])
             heights.append(box[3] - box[1])
         line_h = max(heights)
         spacing = max(1, size // 8)
         if max(widths) <= width - 2 * margin and len(lines) * line_h + max(0, len(lines) - 1) * spacing <= height - 2 * margin:
             best = (face, stroke, line_h, widths, spacing)
-            break
+            lo = size + 1
+        else:
+            hi = size - 1
     if best is None:
         raise ValueError("TRANSLATION_CANNOT_FIT")
 
