@@ -12,7 +12,8 @@ struct ExternalStereoMeshReceipt final {
     bool rightSucceeded=false;
     bool stateRestored=false;
     bool geometryStereo=false; // original fixed-function per-eye matrices proved
-    bool rightDrawFailed=false; // real RIGHT DIP HRESULT, not merely missing stereo proof
+    bool rightDrawFailed=false; // physical RIGHT D3D HRESULT
+    bool deviceRestoreFailed=false; // R7/R30/R33 actual right-eye state restore failure
     bool Complete() const noexcept {
         return expectedPose!=0 && reports==1 &&
             observedPose==expectedPose && leftSucceeded &&
@@ -23,7 +24,7 @@ struct ExternalStereoMeshReceipt final {
 // It is never a license to invoke the original callback after a partial DIP.
 enum class ExternalEyeFailure : unsigned char {
     NotAttempted,None,MissingReport,MultipleReports,PoseMismatch,LeftFailed,
-    RightGpuFailed,RightNotVerified,RestoreFailed,IdenticalEyeGeometry
+    RightGpuFailed,DeviceRestoreFailed,RightNotVerified,RestoreFailed,IdenticalEyeGeometry
 };
 inline ExternalEyeFailure ClassifyExternalEyeFailure(
     const ExternalStereoMeshReceipt& r) noexcept
@@ -33,6 +34,7 @@ inline ExternalEyeFailure ClassifyExternalEyeFailure(
     // Keep a physical RIGHT GPU fault visible even when the renderer chain
     // accidentally publishes multiple (invalid) receipts for one DIP.
     if(r.rightDrawFailed)return ExternalEyeFailure::RightGpuFailed;
+    if(r.deviceRestoreFailed)return ExternalEyeFailure::DeviceRestoreFailed;
     if(r.reports!=1)return ExternalEyeFailure::MultipleReports;
     if(r.expectedPose==0 || r.observedPose!=r.expectedPose)
         return ExternalEyeFailure::PoseMismatch;
@@ -52,6 +54,7 @@ inline const char* ExternalEyeFailureName(ExternalEyeFailure failure) noexcept {
     case ExternalEyeFailure::PoseMismatch:return "POSE_MISMATCH";
     case ExternalEyeFailure::LeftFailed:return "LEFT_GPU_FAILED";
     case ExternalEyeFailure::RightGpuFailed:return "RIGHT_GPU_FAILED";
+    case ExternalEyeFailure::DeviceRestoreFailed:return "GPU_STATE_RESTORE_FAILED";
     case ExternalEyeFailure::RightNotVerified:return "RIGHT_NOT_VERIFIED";
     case ExternalEyeFailure::RestoreFailed:return "PHYSICAL_RESTORE_FAILED";
     case ExternalEyeFailure::IdenticalEyeGeometry:return "MONO_EYE_MATRICES";
@@ -74,17 +77,21 @@ public:
 };
 inline void RecordExternalStereoMeshPair(bool leftOk,bool rightOk,
     bool restored,std::uint64_t pose, bool geometryStereo=false,
-    bool rightGpuFailure=false) noexcept {
+    bool rightGpuFailure=false,bool physicalRestoreFailed=false) noexcept {
     auto* receipt=ActiveExternalStereoMesh;
     if(!receipt)return;
+    const bool firstReport=receipt->reports==0;
     ++receipt->reports;
     receipt->observedPose=pose;
-    receipt->leftSucceeded=leftOk;
-    receipt->rightSucceeded=rightOk;
-    receipt->stateRestored=restored;
-    receipt->geometryStereo=geometryStereo;
+    // Never overwrite an earlier failed draw/restore with a later
+    // successful report from a nested or unintended renderer route.
+    receipt->leftSucceeded=firstReport ? leftOk : receipt->leftSucceeded && leftOk;
+    receipt->rightSucceeded=firstReport ? rightOk : receipt->rightSucceeded && rightOk;
+    receipt->stateRestored=firstReport ? restored : receipt->stateRestored && restored;
+    receipt->geometryStereo=firstReport ? geometryStereo : receipt->geometryStereo && geometryStereo;
     // Multiple nested owner reports must never erase an earlier physical
     // RIGHT-eye HRESULT failure and incorrectly downgrade hard quarantine.
     receipt->rightDrawFailed = receipt->rightDrawFailed || rightGpuFailure;
+    receipt->deviceRestoreFailed = receipt->deviceRestoreFailed || physicalRestoreFailed;
 }
 } // namespace OutRunVR::DinoSidecar
