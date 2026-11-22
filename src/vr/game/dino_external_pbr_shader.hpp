@@ -77,9 +77,12 @@ float4 mainPS(PixelIn input) : COLOR0 {
     float2 dtdy = ddy(input.uv);
     float det = dtdx.x*dtdy.y-dtdx.y*dtdy.x;
     if (factors.w > 0.5 && abs(det) > 0.0000001) {
-        float3 T = normalize(dpdx*dtdy.y-dpdy*dtdx.y);
+        // UV mirror parity changes both tangent direction and handedness.
+        float3 T = normalize((dpdx*dtdy.y-dpdy*dtdx.y)/det);
         T = normalize(T-N*dot(N,T));
-        float3 B = normalize(cross(N,T))*(det < 0 ? -1 : 1);
+        float3 derivativeB = (dpdy*dtdx.x-dpdx*dtdy.x)/det;
+        float handedness = dot(cross(N,T),derivativeB) < 0 ? -1.0 : 1.0;
+        float3 B = normalize(cross(N,T))*handedness;
         float3 mapN = tex2D(normalMap,input.uv).xyz*2.0-1.0;
         mapN.xy *= factors.z;
         N = normalize(mapN.x*T+mapN.y*B+mapN.z*N);
