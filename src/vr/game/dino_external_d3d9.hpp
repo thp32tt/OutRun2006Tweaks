@@ -26,6 +26,7 @@
 #include "external_car_runtime_policy.hpp"
 #include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
+#include "external_car_pbr_stereo_scope.hpp"
 #include "external_car_stereo_receipt.hpp"
 #include "external_car_stereo_retry.hpp"
 #include "render_semantics.hpp"
@@ -752,6 +753,11 @@ public:
             ExternalStereoMeshReceipt physical{};
             physical.expectedPose=expectedPose;
             ScopedExternalStereoMeshReceipt eyeScope(physical);
+            // The R7 renderer may re-upload this exact shader's c4/c8 and
+            // pixel c1 for each eye. The identity scope never tags game draws.
+            ScopedExternalPbrStereo pbrEyeScope(
+                pbrReady_?pbrShaders_.VertexShader():nullptr,
+                pbrReady_?pbrShaders_.PixelShader():nullptr);
             // Scope only the physical DIP, never shader/RT/StateBlock setup.
             // A native draw re-entering during preparation retains its owner.
             OutRunVR::GameSemantic::ScopedExternalVehicleSemantic externalScope;
