@@ -471,6 +471,12 @@ public:
             preparation_=Preparation::Cold;
         }
     }
+    // A verified-epoch mismatch after GPU submissions is not recoverable
+    // by drawing the stock body over the already modified eye. Keep the
+    // current frame partial and use original PMT from the next frame.
+    void QuarantineUnsafeFrame(IDirect3DDevice9* device) noexcept {
+        QuarantineFailedSubmission(device);
+    }
     bool Loaded() const noexcept {return loaded_;}
     // A V4 full-car sidecar may already carry its real speed and RPM needles.
     // The separate dashboard overlay then provides gear only, avoiding two
