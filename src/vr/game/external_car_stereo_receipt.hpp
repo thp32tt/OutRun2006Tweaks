@@ -44,6 +44,8 @@ inline void RecordExternalStereoMeshPair(bool leftOk,bool rightOk,
     receipt->rightSucceeded=rightOk;
     receipt->stateRestored=restored;
     receipt->geometryStereo=geometryStereo;
-    receipt->rightDrawFailed=rightGpuFailure;
+    // Multiple nested owner reports must never erase an earlier physical
+    // RIGHT-eye HRESULT failure and incorrectly downgrade hard quarantine.
+    receipt->rightDrawFailed = receipt->rightDrawFailed || rightGpuFailure;
 }
 } // namespace OutRunVR::DinoSidecar
