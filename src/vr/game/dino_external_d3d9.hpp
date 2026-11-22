@@ -247,37 +247,65 @@ class GpuOwner final {
         return wcscat_s(path,MAX_PATH,suffix)==0;
     }
     bool EnsureLoaded() {
-        if(loadAttempted_)return loaded_;
-        loadAttempted_=true;
-        wchar_t path[MAX_PATH]{};
-        if(!BuildSidecarPath(path))return false;
-        std::vector<std::uint8_t> bytes;
-        if(!ReadFile(path,bytes))return false;
-        std::string error;
-        Model next;
-        if(!Parse(bytes.data(),bytes.size(),next,error))return false;
-        // The OVC is an actual native-axis model; its lowest vertex is
-        // used as a conservative LOCAL wheel/ground clearance bound.
-        // Reject wildly misaligned models instead of hiding them in the road.
-        float lowest=10000.f;
-        for(const auto& mesh:next.meshes)
-            for(const auto& vertex:mesh.vertices)
-                lowest=(std::min)(lowest,vertex.y);
+        if(loaded_)return true;
+        if(!loadAttempted_) {
+            loadAttempted_=true;
+            wchar_t path[MAX_PATH]{};
+            if(!BuildSidecarPath(path)) {
+                preparation_=Preparation::Failed;
+                return false;
+            }
+            // Run file IO, CRC and parsing away from the native player Draw.
+            // Worker accesses only local path/model values, never live game
+            // state or D3D9 device resources.
+            const std::wstring pathCopy(path);
+            cpuLoad_=std::async(std::launch::async,[pathCopy]() -> CpuLoad {
+                CpuLoad result{};
+                try {
+                    std::vector<std::uint8_t> bytes;
+                    if(!ReadFile(pathCopy.c_str(),bytes))return result;
+                    std::string error;
+                    if(!Parse(bytes.data(),bytes.size(),result.model,error))
+                        return result;
+                    float lowest=10000.f;
+                    for(const auto& mesh:result.model.meshes)
+                        for(const auto& vertex:mesh.vertices)
+                            lowest=(std::min)(lowest,vertex.y);
+                    result.lowest=lowest;
+                    result.parsed=true;
+                } catch(...) {
+                    result.parsed=false;
+                }
+                return result;
+            });
+            preparation_=Preparation::Reading;
+            return false;
+        }
+        if(!cpuLoad_.valid())return false;
+        if(cpuLoad_.wait_for(std::chrono::seconds(0)) !=
+           std::future_status::ready)
+            return false;
+        CpuLoad result=cpuLoad_.get();
+        if(!result.parsed) {
+            preparation_=Preparation::Failed;
+            return false;
+        }
         if(role_==SidecarRole::Vehicle) {
             float validatedLift=0.f;
-            if(!ComputeExternalFloorLift(0.22f,lowest,validatedLift))
-                return false; // invalid scale/axis: retain original car
-        } else {
-            // Dashboard overlays are authored directly in OutRun car-local
-            // metres and intentionally sit above the road plane. They must not
-            // be rejected by the vehicle floor-clearance contract.
-            if(!std::isfinite(lowest) || lowest < -10.f || lowest > 10.f)
+            if(!ComputeExternalFloorLift(0.22f,result.lowest,validatedLift)) {
+                preparation_=Preparation::Failed;
                 return false;
+            }
+        } else if(!std::isfinite(result.lowest) ||
+                  result.lowest < -10.f || result.lowest > 10.f) {
+            preparation_=Preparation::Failed;
+            return false;
         }
-        modelMinLocalY_=lowest;
+        modelMinLocalY_=result.lowest;
         modelBoundsReady_=true;
-        cpu_=std::move(next);
+        cpu_=std::move(result.model);
         loaded_=true;
+        preparation_=Preparation::CpuReady;
         return true;
     }
     bool EnsureGpu(IDirect3DDevice9* dev) {
