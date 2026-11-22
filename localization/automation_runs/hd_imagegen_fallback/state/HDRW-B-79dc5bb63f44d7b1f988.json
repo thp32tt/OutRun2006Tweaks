@@ -1,0 +1,66 @@
+{
+  "hold_reason": null,
+  "image_tool_diagnostic": "IMAGE_TOOL_MENU_MISSING",
+  "image_tool_last_attempt_utc": "2026-11-22T09:22:50+00:00",
+  "image_tool_retry_count": 1,
+  "old_candidate_sha256": "4df15228191af8f6d3934e811eb21acc60e3e1e7a535f1c23f989b7072eddf99",
+  "pre_send_no_message": true,
+  "release_approved": false,
+  "roi_id": "Q048_44bd5c9f1b33fad4",
+  "role": "B",
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-hd-qa-chat-status-v1",
+  "source_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+  "status": "IMAGE_TOOL_RETRY_PENDING",
+  "task": {
+    "english": "Ghost",
+    "korean": "고스트",
+    "old_candidate_sha256": "4df15228191af8f6d3934e811eb21acc60e3e1e7a535f1c23f989b7072eddf99",
+    "qa_authority": "NOT_C1_APPROVED_NOT_GAME_APPROVED",
+    "reason": "QA_ORIGINAL_LINE_COUNT_NOT_PRESERVED",
+    "reference": {
+      "height": 257,
+      "name": "HDRW-B-79dc5bb63f44d7b1f988_HD_SOURCE.png",
+      "roi_within_reference_xyxy": [
+        8,
+        8,
+        465,
+        249
+      ],
+      "sha256": "f3ce1d2f5ebf9b9c7946b125a4ecec830de7dc60558dd5c1e58b7a01e53145ad",
+      "source_box_xyxy": [
+        1506,
+        810,
+        1979,
+        1067
+      ],
+      "source_native_size": [
+        2048,
+        2048
+      ],
+      "width": 473
+    },
+    "required": [
+      "DETERMINISTIC_EXISTING_AB_SALVAGE_ALREADY_EXHAUSTED",
+      "KOREAN_LETTERING_RGBA_PNG",
+      "SOURCE_ENGLISH_ERASED_CLEAN_PLATE_FOR_NONTRANSPARENT_BG",
+      "EXACT_SOURCE_NATIVE_SIZE_CEILING",
+      "PRESERVE_ORIGINAL_LINE_COUNT",
+      "C1_INDEPENDENT_VISUAL_QA"
+    ],
+    "roi_id": "Q048_44bd5c9f1b33fad4",
+    "role": "B",
+    "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+    "source_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+    "source_native_bbox_xyxy": [
+      1514,
+      818,
+      1971,
+      1059
+    ],
+    "status": "READY_FOR_IMAGEGEN_ONLY_AFTER_DETERMINISTIC_SALVAGE_FAILED",
+    "task_id": "HDRW-B-79dc5bb63f44d7b1f988"
+  },
+  "task_id": "HDRW-B-79dc5bb63f44d7b1f988",
+  "updated_utc": "2026-11-22T09:22:51+00:00"
+}
