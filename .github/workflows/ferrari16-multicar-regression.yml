@@ -32,7 +32,7 @@ jobs:
           assert 'const float requestedLift=!extraCar ?' in between
           assert 'FerrariModelSlot::Gto288 :' not in between
           assert 'FerrariModelSlot::F40 :' not in between
-          assert 'CanonicalFerrariExternalCarId(carId)' in selection
+          assert 'CanonicalFerrariExternalCarId(observedId)' in selection
           assert 'LegacyFerrariCarSuffix(canonicalId)' in gpu
           assert 'GetFileAttributesW(candidate)' in gpu
           assert 'CanonicalFerrariExternalCarId(carId):carId;' in gpu
