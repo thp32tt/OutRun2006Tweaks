@@ -427,6 +427,70 @@ def fallback_compose(source: Image.Image, rows: list[dict], fontfile: str):
             }
         )
 
+    # Completion-first last resort: if the bounded relocation lane cannot
+    # find free space, keep the original approved ROI and explicitly report
+    # lower quality rather than silently omitting Korean text. Never erase
+    # previously placed Korean ink; only remove ORIGINAL alpha outside the
+    # occupied ink shield. This may erase mixed art inside that ROI and is
+    # therefore TEST_ONLY, not an independent visual QA PASS.
+    unresolved = []
+    for failure in still:
+        row = by_id[failure["roi_id"]]
+        box = tuple(row["_bbox"])
+        x0, y0, x1, y1 = box
+        if not (0 <= x0 < x1 <= source.width and 0 <= y0 < y1 <= source.height):
+            unresolved.append(failure)
+            continue
+        try:
+            glyph = make_glyph(
+                row["korean"], x1 - x0, y1 - y0, fontfile,
+                before[y0:y1, x0:x1],
+            )
+            forced_tiny = False
+        except (ValueError, OSError, OverflowError):
+            # Preserve the complete reviewed translation even if it must be
+            # reduced to a tiny version to fit a crowded sprite cell.
+            virtual_w = min(4096, max(x1 - x0, len(row["korean"]) * 28))
+            virtual_h = min(4096, max(y1 - y0, len(korean_lines(row["korean"])) * 45))
+            try:
+                glyph = make_glyph(row["korean"], virtual_w, virtual_h, fontfile)
+                glyph = glyph.resize((x1 - x0, y1 - y0), Image.Resampling.LANCZOS)
+                forced_tiny = True
+            except (ValueError, OSError, OverflowError):
+                unresolved.append(failure)
+                continue
+        if not glyph.getchannel("A").getbbox():
+            unresolved.append(failure)
+            continue
+        source_alpha = source.crop(box).getchannel("A")
+        # Never erase earlier Korean accepted pixels, even if source text
+        # shared the same place. Alpha <= 15 is already cosmetic.
+        source_alpha = source_alpha.point(lambda v: 255 if v > 15 else 0)
+        unoccupied = Image.fromarray(
+            ((~shield[y0:y1, x0:x1]).astype(np.uint8) * 255)
+        )
+        wipe = ImageChops.multiply(source_alpha, unoccupied)
+        if wipe.getbbox():
+            out.paste((0, 0, 0, 0), box, wipe)
+        out.alpha_composite(glyph, (x0, y0))
+        ink = tight_ink_box(box, glyph)
+        a, b, c, d = ink
+        shield[b:d, a:c] = True
+        accepted.append({
+            "roi_id": row["roi_id"],
+            "english": row["english"],
+            "korean": row["korean"],
+            "bbox": list(box),
+            "placement_bbox": list(box),
+            "ink_box": list(ink),
+            "resolution": "FALLBACK_LAST_RESORT_OVERLAP_CLEAN_TEST_ONLY",
+            "original_english_may_remain": True,
+            "protected_art_inside_roi_may_be_erased": True,
+            "forced_tiny": forced_tiny,
+            "_row": row,
+        })
+    still = unresolved
+
     # Strictly prove no change escaped the union of approved source ROI.
     final = np.asarray(out)
     allowed = np.zeros((source.height, source.width), dtype=bool)
