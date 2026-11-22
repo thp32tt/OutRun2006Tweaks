@@ -28,6 +28,9 @@ struct MeshDrawReceipt final {
     std::uint32_t verifiedStereoMeshes=0;
     // A failed API result may follow a successful LEFT-eye rasterization.
     bool possiblySubmitted=false;
+    // StateBlock capture succeeded, but Apply later failed. The original
+    // callback must not run with contaminated world/RT/texture states.
+    bool stateMayBeDirty=false;
     bool drawSucceeded=false;
     bool stateRestored=false;
 };
@@ -41,10 +44,12 @@ inline OriginalCarRoute ChooseOriginalCarRoute(
     // even a potentially rasterized LEFT eye. A late pose/epoch failure is
     // partial for this frame, regardless of the original pre-draw admission.
     if(!CanReplaceOriginalCar(gate))
-        return (receipt.possiblySubmitted || receipt.submittedMeshes!=0)
+        return (receipt.possiblySubmitted || receipt.submittedMeshes!=0 ||
+                receipt.stateMayBeDirty)
             ? OriginalCarRoute::ExternalPartial
             : OriginalCarRoute::OriginalFallback;
-    if(receipt.submittedMeshes==0 && !receipt.possiblySubmitted)
+    if(receipt.submittedMeshes==0 && !receipt.possiblySubmitted &&
+       !receipt.stateMayBeDirty)
         return OriginalCarRoute::OriginalFallback;
     // No-overdraw safety: once any external triangle has been submitted,
     // its pixels cannot be removed from the current eye. An impossible
