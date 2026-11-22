@@ -171,6 +171,7 @@ class GpuOwner final {
     bool RejectGpu(IDirect3DDevice9* device) noexcept {
         ReleaseGpu();
         gpuRetry_.NoteFailure(device);
+        preparation_=Preparation::Failed;
         return false;
     }
     // Diagnostic A/B only: reproduce the known-working single-F50
@@ -187,6 +188,7 @@ class GpuOwner final {
     void QuarantineFailedSubmission(IDirect3DDevice9* device) noexcept {
         ReleaseGpu();
         gpuRetry_.NoteFailure(device);
+        preparation_=Preparation::Failed;
     }
     bool BuildSidecarPath(wchar_t (&path)[MAX_PATH]) const noexcept {
         const DWORD n=GetModuleFileNameW(nullptr,path,MAX_PATH);
@@ -466,6 +468,7 @@ public:
         // corrected OVC can be picked up next race without restarting the EXE.
         // Preserve a successfully parsed CPU model across device-loss resets
         // to avoid re-reading 100+ MiB of DDS from disk during gameplay.
+        if(loaded_)preparation_=Preparation::CpuReady;
         if(!loaded_ && !cpuLoad_.valid()) {
             loadAttempted_=false;
             preparation_=Preparation::Cold;
@@ -476,6 +479,16 @@ public:
     // current frame partial and use original PMT from the next frame.
     void QuarantineUnsafeFrame(IDirect3DDevice9* device) noexcept {
         QuarantineFailedSubmission(device);
+    }
+    const char* PreparationName() const noexcept {
+        switch(preparation_) {
+        case Preparation::Cold:return "COLD";
+        case Preparation::Reading:return "CPU_READING";
+        case Preparation::CpuReady:return "CPU_READY";
+        case Preparation::Uploading:return "GPU_UPLOADING";
+        case Preparation::Ready:return "GPU_READY";
+        default:return "FAILED";
+        }
     }
     bool Loaded() const noexcept {return loaded_;}
     // A V4 full-car sidecar may already carry its real speed and RPM needles.
