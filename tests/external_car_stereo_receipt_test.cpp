@@ -51,6 +51,17 @@ int main() {
     mesh.expectedMeshes=3;
     mesh.submittedMeshes=3;
     mesh.verifiedStereoMeshes=3;
+    mesh.attemptedMeshes=3;
+    mesh.possiblySubmitted=true;
     mesh.drawSucceeded=mesh.stateRestored=true;
     assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::ExternalComplete);
+    mesh.verifiedStereoMeshes=2;
+    assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::ExternalPartial);
+    mesh.verifiedStereoMeshes=3;
+    mesh.attemptedMeshes=2;
+    assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::ExternalPartial);
+    mesh.attemptedMeshes=3;
+    auto staleGate=Admitted();
+    ++staleGate.livePose;
+    assert(ChooseOriginalCarRoute(staleGate,mesh)==OriginalCarRoute::ExternalPartial);
 }
