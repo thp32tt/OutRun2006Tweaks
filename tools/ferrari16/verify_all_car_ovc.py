@@ -70,8 +70,16 @@ def dds_length(data: bytes, offset: int, count: int, legacy: bool) -> int:
         h = max(1, height >> mip)
         used += (max(1, (h + 3) // 4) *
                  max(1, (w + 3) // 4) * block if block else w * h * 4)
-    require(used == count if not legacy else count == 11136,
-            "DDS mip payload")
+    if legacy:
+        # Match the native V1 ParseDds contract exactly. A 11136-byte
+        # container with DXT5/ARGB or the wrong 128x128 mip chain is NOT a
+        # valid V1 DDS even when the outer OVC CRC has been recomputed.
+        require(count == 11136 and width == 128 and height == 128 and
+                mips == 8 and fourcc == 0x31545844 and
+                used == 128 + 10936,
+                "legacy DDS payload/layout")
+    else:
+        require(used == count, "DDS mip payload")
     return count
 
 
@@ -268,6 +276,24 @@ def self_test() -> None:
             assert str(error) == "OVC CRC32", str(error)
         else:
             raise AssertionError("Corrupt CRC was accepted")
+    # Runtime V1 requires 128x128, 8 mips, DXT1 and the known 72-byte
+    # legacy tail; simply checking the 11136-byte container is insufficient.
+    legacy_dds = bytearray(11136)
+    legacy_dds[:4] = b"DDS "
+    for offset, value in {4: 124, 12: 128, 16: 128, 28: 8,
+                          76: 32, 84: 0x31545844}.items():
+        struct.pack_into("<I", legacy_dds, offset, value)
+    assert dds_length(legacy_dds, 0, len(legacy_dds), True) == 11136
+    for offset, corrupt in ((12, 64), (16, 64), (28, 7),
+                            (84, 0x35545844)):
+        changed = bytearray(legacy_dds)
+        struct.pack_into("<I", changed, offset, corrupt)
+        try:
+            dds_length(changed, 0, len(changed), True)
+        except OvcError:
+            pass
+        else:
+            raise AssertionError("Incorrect V1 DDS layout passed preflight")
     assert len(CARS) == 16 and len({i for i, _ in CARS}) == 16
     print("FERRARI16_OVC_READONLY_PREFLIGHT_SELFTEST_PASS")
 
