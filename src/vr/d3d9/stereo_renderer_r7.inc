@@ -1,5 +1,6 @@
 #include "../game/external_car_stereo_receipt.hpp"
 #include "../game/external_car_pbr_stereo_scope.hpp"
+#include "../game/external_car_pbr_eye_math.hpp"
 #include "../game/external_car_eye_transform_proof.hpp"
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -1384,12 +1385,10 @@ namespace OutRunVRStereo
                 return false;
             const auto& view=draw.fixedEyeView[eye];
             const auto& projection=draw.fixedEyeProjection[eye];
-            const float camera[4]{
-                -(view._41*view._11+view._42*view._12+view._43*view._13),
-                -(view._41*view._21+view._42*view._22+view._43*view._23),
-                -(view._41*view._31+view._42*view._32+view._43*view._33),
-                draw.originalPbrEye[3] // preserve this mesh's ORM-present bit
-            };
+            float camera[4]{};
+            if(!OutRunVR::DinoSidecar::ExternalPbrEyeConstants(
+                    &view.m[0][0],draw.originalPbrEye[3],camera))
+                return false;
             return SUCCEEDED(device->SetVertexShaderConstantF(
                     4,&view.m[0][0],4)) &&
                 SUCCEEDED(device->SetVertexShaderConstantF(
