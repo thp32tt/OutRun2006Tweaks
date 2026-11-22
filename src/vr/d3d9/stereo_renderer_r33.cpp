@@ -817,7 +817,8 @@ namespace OutRunVRStereo
             // before BOTH physical eyes and the game render state are valid.
             OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
                 SUCCEEDED(result.hr),SUCCEEDED(rightHr),restoreOk,
-                draw.poseSequence);
+                draw.poseSequence,
+                false,FAILED(rightHr),!restoreOk);
             if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
                     SUCCEEDED(result.hr), SUCCEEDED(rightHr), restoreOk))
             {
@@ -1592,7 +1593,8 @@ namespace OutRunVRStereo
                 SUCCEEDED(result.hr), SUCCEEDED(rightHr), restoreOk);
             OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
                 SUCCEEDED(result.hr),SUCCEEDED(rightHr),restoreOk,
-                stereo->poseSequence);
+                stereo->poseSequence,
+                false,FAILED(rightHr),!restoreOk);
             // Never publish a completed stereo draw or its pose metadata
             // before BOTH physical eyes and the game render state are valid.
             if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
