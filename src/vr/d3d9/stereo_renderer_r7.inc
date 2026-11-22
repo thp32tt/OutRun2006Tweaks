@@ -2096,6 +2096,12 @@ if(WaitForEventQuery(slot.fence,1,0u))
 						NoteRestoreFailure(draw.fixedFunctionWorld?
 							"left-eye fixed-function rollback":"left-eye c64 rollback");
 					const HRESULT hr=drawCall();
+                    // Partial LEFT-eye transform upload can fail during
+                    // original transform rollback. An absent pair report
+                    // would otherwise misclassify this as a safe soft retry.
+                    OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                        SUCCEEDED(hr),false,rolledBack,draw.poseSequence,
+                        false,false,!rolledBack);
 					R7TraceVisualEyes(visualTrace,"LEFT_WVP_REJECT_SINGLE",true,
 						draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 						true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,rolledBack,
@@ -2122,6 +2128,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 						NoteRestoreFailure(draw.fixedFunctionWorld?
 							"left draw fixed-function transforms":"left draw c64");
 				}
+                OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                    false,false,restored,draw.poseSequence,false,false,!restored);
 				R7TraceVisualEyes(visualTrace,"LEFT_DRAW_FAILURE",true,
 					draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 					true,leftHr,false,E_PENDING,OutRunVR::StereoFailureNone,restored,
