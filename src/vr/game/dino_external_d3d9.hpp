@@ -432,9 +432,14 @@ public:
         if(next==FerrariModelSlot::GenericId && nextCarId>=30u)
             return false;
         if(next==selectedSlot_ && nextCarId==selectedCarId_)return false;
+        // Worker's code lives in this DLL: join before destroying its future.
+        // Selection changes are rare; no game-state/D3D access occurs in worker.
+        if(cpuLoad_.valid())cpuLoad_.wait();
+        cpuLoad_=std::future<CpuLoad>{};
         ReleaseGpu();
         cpu_=Model{};
         loaded_=false;
+        preparation_=Preparation::Cold;
         loadAttempted_=false;
         gpuRetry_.OnReset();
         selectedSlot_=next;
@@ -451,7 +456,10 @@ public:
         // corrected OVC can be picked up next race without restarting the EXE.
         // Preserve a successfully parsed CPU model across device-loss resets
         // to avoid re-reading 100+ MiB of DDS from disk during gameplay.
-        if(!loaded_)loadAttempted_=false;
+        if(!loaded_ && !cpuLoad_.valid()) {
+            loadAttempted_=false;
+            preparation_=Preparation::Cold;
+        }
     }
     bool Loaded() const noexcept {return loaded_;}
     // A V4 full-car sidecar may already carry its real speed and RPM needles.
