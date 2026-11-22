@@ -70,7 +70,7 @@ class GpuOwner final {
         Cold, Reading, CpuReady, Uploading, Ready, Failed
     };
     Preparation preparation_=Preparation::Cold;
-    std::size_t nextTexture_=0, nextMesh_=0;
+    std::size_t nextTexture_=0, nextMesh_=0, nextPbrMap_=0;
     bool pbrPrepared_=false;
     SidecarRole role_=SidecarRole::Vehicle;
     FerrariModelSlot selectedSlot_=FerrariModelSlot::F50;
@@ -162,7 +162,7 @@ class GpuOwner final {
         pbrShaders_.Release();
         pbrReady_=false;
         pbrPrepared_=false;
-        nextTexture_=nextMesh_=0;
+        nextTexture_=nextMesh_=nextPbrMap_=0;
         if(preparation_==Preparation::Uploading ||
            preparation_==Preparation::Ready)
             preparation_=loaded_?Preparation::CpuReady:Preparation::Cold;
