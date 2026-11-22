@@ -1,5 +1,7 @@
 name: OutRun HD Korean Reversible Installer Windows Smoke
 
+# Test both canary and all-DDS backup/rollback with isolated fake game resources.
+
 on:
   workflow_dispatch:
   push:
