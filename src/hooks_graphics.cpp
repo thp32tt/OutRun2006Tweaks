@@ -18,6 +18,7 @@
 #include "vr/game/quest_cockpit_v2_glass_hook.hpp"
 #include "vr/game/dino_external_d3d9.hpp"
 #include "vr/game/dino_external_original_car_gate.hpp"
+#include "vr/game/external_car_trace_budget.hpp"
 #include "vr/game/f50_external_pose_filter.hpp"
 #include "vr/state/state_block_tracker.hpp"
 #include "vr/state/game_reset_events.hpp"
@@ -1193,13 +1194,19 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(Settings::VRTelemetry || Settings::VRExternalFerrariDiag) {
             // One globally bounded diagnostic hid every later Ferrari after
             // the first eight 575 frames. Bound receipts per canonical model.
-            static thread_local std::array<std::uint64_t,30> attemptsByCar{};
+            static thread_local std::array<
+                OutRunVR::DinoSidecar::ExternalCarTraceBudget,30>
+                traceBudgetsByCar{};
             const auto id=OutRunVR::DinoSidecar::CanonicalFerrariExternalCarId(
                 ticket.carId);
-            const auto sample=++attemptsByCar[id];
-            if(sample<=8u || (Settings::VRTelemetry &&
-                ((sample&(sample-1u))==0u ||
-                 route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial)))
+            auto& traceBudget=traceBudgetsByCar[id];
+            const bool terminalFailed=std::strcmp(
+                OutRunVR::DinoSidecar::GlobalGpu().PreparationName(),
+                "FAILED")==0;
+            const bool logThis=traceBudget.ShouldLog(
+                route,terminalFailed,Settings::VRTelemetry);
+            const auto sample=traceBudget.attempts;
+            if(logThis)
                 spdlog::info(
                     "VR QUEST FERRARI EXTERNAL: sample={} nativeFrame={} xrPose={} "
                     "carId={} slot={} localFloorLift={:.4f} "
