@@ -1148,9 +1148,24 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             }
             return false;
         }
-        const auto draw=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
+        auto draw=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
             ticket.device,ticket.world,ticket.view,ticket.projection,
             ticket.dashboard,false,ticket.nativeFrame,ticket.xrPose);
+        // Device setters can re-enter native code while external meshes are
+        // submitted. A pre-DIP ticket cannot certify a later frame/pose.
+        const auto* eyeAfter=OutRunVRRenderer::GetLatchedStereoFrameView();
+        const bool sameEpochAfter=NativeFrameTrace().Active() &&
+            NativeFrameTrace().ActiveEpoch()==ticket.nativeFrame &&
+            eyeAfter && eyeAfter->valid &&
+            eyeAfter->poseSequence==ticket.xrPose &&
+            Game::pl_car()==livePlayer &&
+            Game::camera() && Game::camera()->cam_mode_34A==1;
+        if(!sameEpochAfter) {
+            draw.receipt.drawSucceeded=false;
+            if(draw.receipt.possiblySubmitted)
+                OutRunVR::DinoSidecar::GlobalGpu().QuarantineUnsafeFrame(
+                    ticket.device);
+        }
         const auto route=OutRunVR::DinoSidecar::ChooseOriginalCarRoute(
             gate,draw.receipt);
         const bool suppressOriginal=
