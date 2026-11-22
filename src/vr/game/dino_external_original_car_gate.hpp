@@ -27,7 +27,7 @@ struct MeshDrawReceipt final {
     std::uint32_t submittedMeshes=0;
     std::uint32_t attemptedMeshes=0;
     std::uint32_t verifiedStereoMeshes=0;
-    ExternalEyeFailure lastEyeFailure=ExternalEyeFailure::None;
+    ExternalEyeFailure lastEyeFailure=ExternalEyeFailure::NotAttempted;
     unsigned lastEyeReports=0;
     // A failed API result may follow a successful LEFT-eye rasterization.
     bool possiblySubmitted=false;
