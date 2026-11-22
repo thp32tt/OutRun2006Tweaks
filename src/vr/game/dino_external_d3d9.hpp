@@ -529,6 +529,16 @@ public:
         default:return "FAILED";
         }
     }
+    // A validated PBR-format OVC does not imply PBR is actually drawn:
+    // strict native per-eye fixed-function testing deliberately bypasses
+    // normal/ORM uploads and the unverified c0/c4/c8 vertex shader.
+    const char* MaterialModeName() const noexcept {
+        if(preparation_!=Preparation::Ready)return "NOT_READY";
+        if(pbrReady_)return "PBR_SHADER";
+        return cpu_.pbrEnabled ?
+            "FIXED_FN_ALBEDO_ONLY_PBR_MAPS_BYPASSED" :
+            "FIXED_FN_ALBEDO_ONLY";
+    }
     bool Loaded() const noexcept {return loaded_;}
     // A V4 full-car sidecar may already carry its real speed and RPM needles.
     // The separate dashboard overlay then provides gear only, avoiding two
