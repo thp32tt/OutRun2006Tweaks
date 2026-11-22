@@ -30,6 +30,22 @@
 #include "render_semantics.hpp"
 
 namespace OutRunVR::DinoSidecar {
+// Independent of an optional R29 linked renderer TU: release builds can
+// include the R26-safe owner instead. Check actual COM surface identities
+// before any external car CPU/GPU preparation. Fail closed on any D3D error.
+inline bool MainBackbufferActive(IDirect3DDevice9* device) noexcept {
+    if(!device)return false;
+    IDirect3DSurface9* active=nullptr;
+    IDirect3DSurface9* main=nullptr;
+    const HRESULT boundHr=device->GetRenderTarget(0,&active);
+    const HRESULT mainHr=device->GetBackBuffer(
+        0,0,D3DBACKBUFFER_TYPE_MONO,&main);
+    const bool same=SUCCEEDED(boundHr) && SUCCEEDED(mainHr) &&
+        active!=nullptr && main!=nullptr && active==main;
+    if(active)active->Release();
+    if(main)main->Release();
+    return same;
+}
 // Fixed-function test must be explicitly enabled by the launch process;
 // generic PBR's c0/c4/c8 matrices are not compatible with verified c64 stereo.
 inline bool FixedFunctionExternalStereoProbeActive() noexcept {
