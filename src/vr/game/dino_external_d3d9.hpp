@@ -730,6 +730,8 @@ public:
                 D3DPT_TRIANGLELIST,0,0,m.vertexCount,0,m.indexCount/3);
             if(SUCCEEDED(dipHr))++result.receipt.submittedMeshes;
             const bool stereoComplete=physical.Complete();
+            result.receipt.lastEyeFailure=ClassifyExternalEyeFailure(physical);
+            result.receipt.lastEyeReports=physical.reports;
             if(stereoComplete)++result.receipt.verifiedStereoMeshes;
             if(SUCCEEDED(dipHr) && !stereoComplete)
                 eyeProofOnlyFailure=!physical.rightDrawFailed;
