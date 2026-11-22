@@ -466,6 +466,15 @@ public:
            FAILED(device->SetRenderState(D3DRS_ALPHATESTENABLE,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_STENCILENABLE,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_FOGENABLE,FALSE)) ||
+           // The original fixed-function scene may leave a HUD/sky clipping
+           // or matrix-blend state active. Our XYZ|NORMAL|TEX1 sidecar has
+           // neither blend weights nor indices, and must clip at the stereo
+           // frustum rather than rasterize behind-eye geometry.
+           // These states are restored by the D3DSBT_ALL block below.
+           FAILED(device->SetRenderState(D3DRS_CLIPPING,TRUE)) ||
+           FAILED(device->SetRenderState(D3DRS_CLIPPLANEENABLE,0u)) ||
+           FAILED(device->SetRenderState(D3DRS_VERTEXBLEND,D3DVBF_DISABLE)) ||
+           FAILED(device->SetRenderState(D3DRS_INDEXEDVERTEXBLENDENABLE,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE)) ||
            FAILED(device->SetRenderState(D3DRS_LIGHTING,FALSE)) ||
