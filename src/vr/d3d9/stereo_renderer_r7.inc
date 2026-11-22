@@ -1,4 +1,5 @@
 #include "../game/external_car_stereo_receipt.hpp"
+#include "../game/external_car_pbr_stereo_scope.hpp"
 #include "../game/external_car_eye_transform_proof.hpp"
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -838,12 +839,15 @@ namespace OutRunVRStereo
 		{
 			float originalConstants[16]{};
 			float eyeConstants[2][16]{};
+            float originalPbrView[16]{},originalPbrProjection[16]{};
+            float originalPbrEye[4]{};
 			D3DMATRIX fixedOriginalView{};
 			D3DMATRIX fixedOriginalProjection{};
 			D3DMATRIX fixedEyeView[2]{};
 			D3DMATRIX fixedEyeProjection[2]{};
 			bool worldStereo = false;
 			bool fixedFunctionWorld = false;
+            bool externalPbrWorld = false;
 			bool fixedFunctionRotationOnly = false;
 			std::uint32_t poseSequence = 0;
 			OutRunVRRenderer::LatchedStereoFrame stereoFrame{};
@@ -853,7 +857,10 @@ namespace OutRunVRStereo
 		{
 			const std::uintptr_t trackedShader =
 				CurrentVertexShaderIdentity.load(std::memory_order_acquire);
-			if (trackedShader == 0)
+			const auto* externalPbr =
+                OutRunVR::DinoSidecar::ActiveExternalStereoMesh ?
+                OutRunVR::DinoSidecar::ActiveExternalPbrStereo : nullptr;
+			if (trackedShader == 0 || externalPbr)
 			{
 				// R13/R29 intentionally masks the tracked identity to zero for
 				// shader-based zero-disparity effects. Confirm the real D3D9
@@ -865,11 +872,20 @@ namespace OutRunVRStereo
 					++FixedFunctionNonWorldDraws;
 					return EyeBuildResult::NonWorld;
 				}
-				if (boundShader)
-				{
-					boundShader->Release();
-					return EyeBuildResult::NonWorld;
-				}
+				const bool shaderIdentityOk=externalPbr ?
+                    boundShader==externalPbr->vertex : boundShader==nullptr;
+                if(boundShader)boundShader->Release();
+                if(!shaderIdentityOk)
+                    return externalPbr ? EyeBuildResult::FatalError :
+                        EyeBuildResult::NonWorld;
+                if(externalPbr) {
+                    IDirect3DPixelShader9* boundPixel=nullptr;
+                    const HRESULT pixelHr=device->GetPixelShader(&boundPixel);
+                    const bool pixelOk=SUCCEEDED(pixelHr) &&
+                        boundPixel==externalPbr->pixel;
+                    if(boundPixel)boundPixel->Release();
+                    if(!pixelOk)return EyeBuildResult::FatalError;
+                }
 
 				DWORD fvf = 0;
 				if (FAILED(device->GetFVF(&fvf)) || fvf == 0)
@@ -1042,6 +1058,18 @@ namespace OutRunVRStereo
 				}
 
 				state.fixedFunctionWorld = true;
+                if(externalPbr) {
+                    // Save the original c4/c8 and pixel c1 before issuing
+                    // either eye: D3D9's SetTransform never updates custom VS.
+                    if(FAILED(device->GetVertexShaderConstantF(
+                           4,state.originalPbrView,4)) ||
+                       FAILED(device->GetVertexShaderConstantF(
+                           8,state.originalPbrProjection,4)) ||
+                       FAILED(device->GetPixelShaderConstantF(
+                           1,state.originalPbrEye,1)))
+                        return EyeBuildResult::FatalError;
+                    state.externalPbrWorld=true;
+                }
 				state.fixedFunctionRotationOnly = rotationOnly;
 				state.worldStereo = true;
 				state.poseSequence = stereo.poseSequence;
