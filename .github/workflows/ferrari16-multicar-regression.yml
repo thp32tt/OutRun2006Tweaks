@@ -1,0 +1,76 @@
+name: Ferrari16 All-Car Sidecar Regression
+on:
+  push:
+    branches: [vr-ferrari16-v003-multicar-debug-20261122]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  multicar:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test 16 canonical / 30 retail selection and all previous sidecar contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_runtime_policy_test ferrari14_trace_50_test; do
+            g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
+            "/tmp/${t}"
+          done
+      - name: Assert exact sixteen-car routing and per-car diagnostics in production source
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          source=Path('src/hooks_graphics.cpp').read_text()
+          gpu=Path('src/vr/game/dino_external_d3d9.hpp').read_text()
+          selection=Path('src/vr/game/external_car_selection.hpp').read_text()
+          between=source[source.index('static F50ExternalDrawTicket PrepareF50External('):source.index('static bool DrawPreparedF50External(')]
+          assert 'ticket.slot=extraCar ?' in between
+          assert 'FerrariModelSlot::GenericId :' in between
+          assert 'const float requestedLift=!extraCar ?' in between
+          assert 'FerrariModelSlot::Gto288 :' not in between
+          assert 'FerrariModelSlot::F40 :' not in between
+          assert 'CanonicalFerrariExternalCarId(carId)' in selection
+          assert 'LegacyFerrariCarSuffix(canonicalId)' in gpu
+          assert 'GetFileAttributesW(candidate)' in gpu
+          assert 'CanonicalFerrariExternalCarId(carId):carId;' in gpu
+          floor=gpu[gpu.index('bool SafeFloorLift('):gpu.index('bool EnsureResources(')]
+          assert 'EnsureLoaded()' in floor and 'Installed()' not in floor
+          assert 'rejectedByCar[id]++' in source
+          assert 'gateRejectByCar[id]++' in source
+          assert '++attemptsByCar[id]' in source
+          assert 'transformSamplesByCar[id]++' in source
+          assert 'if(f50.valid && DrawPreparedF50External(f50))' in source
+          assert 'D3DRS_CLIPPING,TRUE' in gpu
+          assert 'D3DRS_CLIPPLANEENABLE,0u' in gpu
+          assert 'if(!MeshInDrawPass(m.glass,pass))continue;' in gpu
+          runners=[
+              'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd',
+              'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
+              'tools/ferrari16/RUN-FERRARI16-V003-MODEL-OFF.cmd']
+          for name in runners:
+              s=Path(name).read_text()
+              assert '-VR.PreferD3D9Ex=true' in s, name
+              assert '-VR.DirectGpuOnly=true' in s, name
+              assert '-VR.FrameCadenceMode=1' in s, name
+              assert '-VR.FollowGameResolution=false' in s, name
+          on=Path(runners[0]).read_text()
+          trace=Path(runners[1]).read_text()
+          off=Path(runners[2]).read_text()
+          assert '-VR.ExternalFerrariTest=true' in on
+          assert '-VR.ExternalFerrariTestCarId=-1' in on
+          assert '-VR.F50ExternalModel=false' in on
+          assert '-VR.ExternalFerrariNativeCallbackReplacement=true' in on
+          assert '-VR.ExternalFerrariDiag=true' in trace
+          assert '-VR.FileLogging=true' in trace
+          assert '-VR.ExternalFerrariTest=false' in off
+          print('FERRARI16_PRODUCTION_16_CAR_ROUTE_AND_DIAG_PASS')
+          PY
+      - name: Confirm official v0.03 core and host unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7
+          test -z "$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- vrhost src/vr/d3d9 src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp Start-OutRun.cmd)"
