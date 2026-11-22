@@ -1,3 +1,4 @@
+#include "../game/external_car_stereo_receipt.hpp"
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -2202,7 +2203,12 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				InvalidateRightDepthStencilIfLeftMayWrite(device);
 				NoteRestoreFailure("right-eye draw");
 			}
-			R7TraceVisualEyes(visualTrace,"STEREO_PAIR",true,
+			OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                SUCCEEDED(leftHr),rightDrawAttempted&&SUCCEEDED(rightHr),
+                restoreOk&&!FrameStereoIncomplete&&
+                    FrameFailureReason==OutRunVR::StereoFailureNone,
+                draw.poseSequence);
+            R7TraceVisualEyes(visualTrace,"STEREO_PAIR",true,
 				draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 				true,leftHr,rightDrawAttempted,rightHr,rightFailure,restoreOk,
 				failureAtEntry,FrameFailureReason);
