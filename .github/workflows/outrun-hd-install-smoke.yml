@@ -1,0 +1,27 @@
+name: OutRun HD Korean Reversible Installer Windows Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: [".github/workflows/outrun-hd-install-smoke.yml"]
+permissions:
+  contents: read
+jobs:
+  install-rollback-test:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout original protected Windows test installer
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/Test-OutRunKoreanInstall.ps1
+            tools/localization/Install-OutRunKoreanTest.ps1
+      - name: Verify test-only install, backup, rollback and customized-file refusal
+        shell: pwsh
+        run: |
+          & ./tools/localization/Test-OutRunKoreanInstall.ps1
