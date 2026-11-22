@@ -1586,6 +1586,7 @@ namespace OutRunVR::GameSemantic
 
     inline ProducerToken CurrentRenderProducerToken() noexcept
     {
+        if (ExternalVehicleSemanticDepth!=0) return ProducerToken::None;
         // Queue nodes and external UI never inherit the central sun's
         // provenance. Within this one C993 draw, a nested SceneEffect or
         // temporary direct helper cannot rebrand the source c64 upload.
@@ -1618,13 +1619,14 @@ namespace OutRunVR::GameSemantic
 
     inline const ProjectedMarkerInfo* CurrentProjectedMarker() noexcept
     {
+        if (ExternalVehicleSemanticDepth!=0) return nullptr;
         return CurrentQueueProjectedMarker.valid
             ? &CurrentQueueProjectedMarker : nullptr;
     }
 
     inline bool QueueRenderActive() noexcept
     {
-        return SpriteQueueDepth != 0;
+        return SpriteQueueDepth != 0 && ExternalVehicleSemanticDepth == 0;
     }
 
     // Immutable source-side identity for ONE physical GPU primitive.
