@@ -1,0 +1,56 @@
+#include "../src/vr/game/external_car_stereo_receipt.hpp"
+#include "../src/vr/game/dino_external_original_car_gate.hpp"
+#include <cassert>
+using namespace OutRunVR::DinoSidecar;
+
+static OriginalCarGate Admitted() {
+    OriginalCarGate gate{};
+    gate.optedIn=gate.ownedPlayer=gate.gameplay=gate.cockpitModeOne=true;
+    gate.validStereo=gate.nativeFrameActive=gate.deviceReady=true;
+    gate.ticketEpoch=gate.liveEpoch=23;
+    gate.ticketPose=gate.livePose=44;
+    return gate;
+}
+int main() {
+    ExternalStereoMeshReceipt r{};
+    r.expectedPose=44;
+    assert(!r.Complete());
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,true,true,44);
+        assert(r.Complete());
+    }
+    assert(ActiveExternalStereoMesh==nullptr);
+    for(int scenario=0;scenario!=4;++scenario) {
+        r={};
+        r.expectedPose=44;
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(scenario!=0,scenario!=1,
+                                     scenario!=2,scenario==3?45:44);
+        assert(!r.Complete());
+    }
+    r={}; r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,true,true,44);
+        RecordExternalStereoMeshPair(true,true,true,44);
+    }
+    assert(!r.Complete()); // multiple physical routes must not certify one DIP
+    MeshDrawReceipt mesh{};
+    mesh.expectedMeshes=3;
+    mesh.submittedMeshes=1;
+    mesh.possiblySubmitted=true;
+    assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::ExternalPartial);
+    mesh={};
+    mesh.expectedMeshes=3;
+    mesh.possiblySubmitted=true; // a failed DIP may still have rasterized LEFT
+    assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::ExternalPartial);
+    mesh={};
+    assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::OriginalFallback);
+    mesh={};
+    mesh.expectedMeshes=3;
+    mesh.submittedMeshes=3;
+    mesh.verifiedStereoMeshes=3;
+    mesh.drawSucceeded=mesh.stateRestored=true;
+    assert(ChooseOriginalCarRoute(Admitted(),mesh)==OriginalCarRoute::ExternalComplete);
+}
