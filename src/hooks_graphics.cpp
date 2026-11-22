@@ -1030,6 +1030,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         auto& external=OutRunVR::DinoSidecar::GlobalGpu();
         if(external.SelectSidecar(ticket.slot,carId))
             OutRunVR::DinoSidecar::GlobalF50PoseFilter().Reset();
+        // A pending previous-car CPU parser is never allowed to render its
+        // stale model with the newly selected native vehicle transform.
+        if(!external.SelectionMatches(ticket.slot,carId))
+            return ticket;
         // Dashboard overlays are independent sidecars so an already-verified
         // high-detail external body never has to be rebuilt merely to animate
         // speed/RPM/gear. Aliased retail IDs resolve to fixed per-ID files.
@@ -1174,7 +1178,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // of a successfully submitted external body. The overlay has its own
         // CRC/parser/GPU quarantine and can recover after a device reset.
         OutRunVR::DinoSidecar::GpuDrawResult dashboardDraw{};
-        if(route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete)
+        if(route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete &&
+           OutRunVR::DinoSidecar::GlobalDashboardGpu().SelectionMatches(
+               OutRunVR::DinoSidecar::FerrariModelSlot::GenericId,ticket.carId))
             dashboardDraw=OutRunVR::DinoSidecar::GlobalDashboardGpu().DrawNativeScene(
                 ticket.device,ticket.world,ticket.view,ticket.projection,
                 ticket.dashboard,
