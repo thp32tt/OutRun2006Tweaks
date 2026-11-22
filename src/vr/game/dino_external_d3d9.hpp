@@ -556,7 +556,6 @@ public:
         GpuDrawResult result{};
         if(!EnsureResources(device) || expectedNativeFrame==0 || expectedPose==0)
             return result;
-        OutRunVR::GameSemantic::ScopedExternalVehicleSemantic externalScope;
         for(const auto& mesh:meshes_) {
             const auto* binding=DashboardFor(mesh);
             if(gearOnly && (!binding || binding->kind!=DashboardKind::GearVisible))
@@ -698,6 +697,9 @@ public:
             ExternalStereoMeshReceipt physical{};
             physical.expectedPose=expectedPose;
             ScopedExternalStereoMeshReceipt eyeScope(physical);
+            // Scope only the physical DIP, never shader/RT/StateBlock setup.
+            // A native draw re-entering during preparation retains its owner.
+            OutRunVR::GameSemantic::ScopedExternalVehicleSemantic externalScope;
             result.receipt.possiblySubmitted=true;
             ++result.receipt.attemptedMeshes;
             hr=device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,0,0,m.vertexCount,
