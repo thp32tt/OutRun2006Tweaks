@@ -61,6 +61,24 @@ int main() {
         RecordExternalStereoMeshPair(true,true,true,44);
     }
     assert(!r.Complete()); // multiple physical routes must not certify one DIP
+    // A later success report must never clear an earlier RIGHT GPU failure.
+    r={}; r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,false,true,44,true,true);
+        RecordExternalStereoMeshPair(true,true,true,44,true,false);
+        assert(!r.Complete());
+        assert(r.reports==2 && r.rightDrawFailed);
+    }
+    // Even a later bad report may not claim an earlier verified pair valid.
+    r={}; r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,true,true,44,true,false);
+        RecordExternalStereoMeshPair(true,false,true,44,true,true);
+        assert(!r.Complete());
+        assert(r.rightDrawFailed);
+    }
     MeshDrawReceipt mesh{};
     mesh.expectedMeshes=3;
     mesh.submittedMeshes=1;
