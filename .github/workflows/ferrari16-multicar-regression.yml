@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_eye_transform_proof_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -53,6 +53,8 @@ jobs:
           assert 'if(!MeshInDrawPass(m.glass,pass))continue;' in gpu
           assert 'ScopedExternalStereoMeshReceipt eyeScope(physical)' in gpu
           assert 'physical.Complete()' in gpu
+          assert 'DistinctFiniteExternalEyeTransforms(' in Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
+          assert 'receipt->rightDrawFailed = receipt->rightDrawFailed || rightGpuFailure' in Path('src/vr/game/external_car_stereo_receipt.hpp').read_text()
           assert 'stereoRetry_.OnSoftStereoFailure()' in gpu
           assert 'ScopedExternalVehicleSemantic externalScope' in gpu
           assert 'MainBackbufferActive(device)' in source
