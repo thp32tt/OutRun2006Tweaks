@@ -2208,7 +2208,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 restoreOk&&!FrameStereoIncomplete&&
                     FrameFailureReason==OutRunVR::StereoFailureNone,
                 draw.poseSequence,draw.worldStereo&&draw.fixedFunctionWorld,
-                rightDrawAttempted&&FAILED(rightHr));
+                FAILED(rightHr)); // RT, depth, transform or physical DIP failed
             R7TraceVisualEyes(visualTrace,"STEREO_PAIR",true,
 				draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 				true,leftHr,rightDrawAttempted,rightHr,rightFailure,restoreOk,
