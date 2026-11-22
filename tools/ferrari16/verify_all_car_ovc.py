@@ -75,7 +75,7 @@ def dds_length(data: bytes, offset: int, count: int, legacy: bool) -> int:
     return count
 
 
-def inspect(path: Path) -> dict:
+def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     require(path.is_file(), "missing file")
     require(36 <= path.stat().st_size <= MAX_FILE, "OVC size")
     data = path.read_bytes()
@@ -190,8 +190,14 @@ def inspect(path: Path) -> dict:
                         "dashboard needle calibration")
             at += 56
     require(at == len(data), "OVC trailing bytes")
-    require(-1.20 <= min_y <= 0.25 and max(0., 0.035 - min_y) <= 1.25,
-            "runtime floor placement cannot accept this vehicle")
+    if dashboard_overlay:
+        # Dashboard overlays are deliberately above the vehicle floor and
+        # use the runtime's wider -10..10 meter mesh envelope.
+        require(-10.0 <= min_y <= 10.0, "dashboard overlay bounds")
+    else:
+        require(-1.20 <= min_y <= 0.25 and
+                max(0., 0.035 - min_y) <= 1.25,
+                "runtime floor placement cannot accept this vehicle")
     return {"version": version, "groups": groups, "triangles": tris,
             "vertices": vertices, "materials": materials,
             "normal_maps": normal_maps, "orm_maps": orm_maps,
@@ -217,7 +223,7 @@ def audit(game_root: Path) -> list[dict]:
         overlay = game_root / "ExternalCars" / "Dashboard" / f"car_id_{car_id:02d}.ovc"
         if overlay.exists():
             try:
-                od = inspect(overlay)
+                od = inspect(overlay, dashboard_overlay=True)
                 overlay_status = f"PASS v{od['version']}"
             except (OvcError, OSError, struct.error) as error:
                 overlay_status = f"FAIL: {error}"
