@@ -1,5 +1,6 @@
 #include "../src/vr/game/external_car_legacy_fallback.hpp"
 #include <cassert>
+#include <initializer_list>
 using namespace OutRunVR::DinoSidecar;
 int main() {
     // Canonical OVC absent: exact fixed GTO/F40 legacy route is permitted.
