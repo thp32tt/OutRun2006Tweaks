@@ -1,0 +1,100 @@
+name: OutRun HD Korean Coverage-First 104 DDS TEST_ONLY (GitHub CPU)
+
+# Opt-in completion-first preview only; no release or runtime QA claims.
+# Does not alter browser cadence or use N100 for rendering.
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: [".github/workflows/outrun-hd-coverage-first.yml"]
+permissions:
+  contents: read
+concurrency:
+  group: outrun-hd-coverage-first
+  cancel-in-progress: false
+
+jobs:
+  produce-hd-coverage-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout original 104 HD DDS and 954 existing A/B crops
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/github_hd_hybrid_completion.py
+            tools/localization/test_github_hd_hybrid_completion.py
+            tools/localization/make_hd_korean_coverage_first_package.py
+            tools/localization/test_make_hd_korean_coverage_first_package.py
+            tools/localization/Install-OutRunKoreanTest.ps1
+            localization/automation_inputs/candidate_outputs
+            localization/automation_inputs/hd_original_png_source_plan.json
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+
+      - name: Setup hosted GitHub Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Korean fallback font and Python libraries
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          python -m pip install --disable-pip-version-check "Pillow==11.3.0" "numpy==2.3.4"
+          test -r /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
+
+      - name: Test hybrid DDS geometry and rollback package contracts
+        run: |
+          python -m unittest discover -s tools/localization -p test_github_hd_hybrid_completion.py -v
+          python -m unittest discover -s tools/localization -p test_make_hd_korean_coverage_first_package.py -v
+
+      - name: Build 104 HD DDS for all 954 translated ROI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/github_hd_hybrid_completion.py --repo-root . --out "$RUNNER_TEMP/coverage-hybrid"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d=json.loads((Path(os.environ["RUNNER_TEMP"])/"coverage-hybrid"/"qa_report.json").read_text())
+          assert d["source_dds_verified"]==104
+          assert d["output_dds_count"]==104
+          assert d["translation_coverage_accounted"]==954
+          assert d["translation_coverage_complete"] is True
+          assert d["fallback_hold_count"]==0
+          assert d["release_approved"] is False and d["runtime_validation"]=="UNTESTED"
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as f:
+              f.write("## HD Korean 104 DDS coverage-first TEST_ONLY build\n")
+              f.write(f"- Exact source DDS: {d['source_dds_verified']} / 104\n")
+              f.write(f"- Mechanical ROI coverage: {d['translation_coverage_accounted']} / 954\n")
+              f.write(f"- Existing A/B PNG actually applied: {d['ab_candidate_applied_count']}\n")
+              f.write(f"- Coverage HOLD: {d['fallback_hold_count']}\n")
+              f.write("- Gameplay/visual C1/C3 validation: UNTESTED\n")
+          PY
+
+      - name: Package reversible complete-HD test-only installer
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/make_hd_korean_coverage_first_package.py \
+            --report "$RUNNER_TEMP/coverage-hybrid/qa_report.json" \
+            --source-zip "$RUNNER_TEMP/coverage-hybrid/OUTRUN_HD_KOREAN_HYBRID_TEST_ONLY.zip" \
+            --installer tools/localization/Install-OutRunKoreanTest.ps1 \
+            --out "$RUNNER_TEMP/coverage-final"
+          test -s "$RUNNER_TEMP/coverage-final/OUTRUN_HD_KOREAN_COVERAGE_FIRST_TEST_ONLY.zip"
+          test -s "$RUNNER_TEMP/coverage-final/coverage_package_summary.json"
+
+      - name: Upload tested candidate package and source QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-hd-korean-coverage-first-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/coverage-final/
+            ${{ runner.temp }}/coverage-hybrid/qa_report.json
+          retention-days: 21
+          if-no-files-found: warn
