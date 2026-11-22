@@ -1056,16 +1056,23 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(!external.SafeFloorLift(requestedLift,localLift)) {
             if(Settings::VRExternalFerrariDiag) {
                 static thread_local std::array<unsigned,30> rejectedByCar{};
+                static thread_local std::array<bool,30> firstTerminalRejectionByCar{};
                 const auto id=OutRunVR::DinoSidecar::CanonicalFerrariExternalCarId(carId);
-                if(rejectedByCar[id]++<4u)
+                const char* preparation=external.PreparationName();
+                const bool terminal=std::strcmp(preparation,"FAILED")==0;
+                const bool terminalMilestone=terminal &&
+                    !firstTerminalRejectionByCar[id];
+                if(terminalMilestone)firstTerminalRejectionByCar[id]=true;
+                if(rejectedByCar[id]++<4u || terminalMilestone)
                     spdlog::warn("VR EXTERNAL SELECTED SIDECAR REJECTED: "
                         "carId={} canonical={} selected={} "
-                        "slot={} requestedLift={:.4f} originalPMT=FALLBACK",
+                        "slot={} requestedLift={:.4f} prep={} originalPMT=FALLBACK",
                         static_cast<unsigned>(carId),
                         static_cast<unsigned>(OutRunVR::DinoSidecar::
                             CanonicalFerrariExternalCarId(carId)),
                         Settings::VRExternalFerrariTestCarId.get(),
-                        static_cast<unsigned>(ticket.slot),requestedLift);
+                        static_cast<unsigned>(ticket.slot),requestedLift,
+                        preparation);
             }
             return ticket;
         }
