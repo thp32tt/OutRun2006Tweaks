@@ -1673,7 +1673,11 @@ namespace OutRunVRStereo
             // a raw mono draw when the raster guard is unavailable.
             if (OutRunVR::DinoSidecar::ActiveExternalPbrStereo) {
                 if (!resyncAlreadyFlushed) return E_FAIL;
-                return lowerR29Draw();
+                // Retain the same lower-owner fail-closed fence as regular
+                // R33 fallback. Bypassing this wrapper would risk game-c64
+                // ownership leaking into the external shader's c4/c8 path.
+                return R32ReviewRunLowerFailClosed(
+                    device,std::forward<LowerR29Draw>(lowerR29Draw));
             }
             // Only the early raster-guard bypass reaches this path without an
             // earlier flush; keep StateBlock recovery there, including when
