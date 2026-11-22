@@ -108,6 +108,7 @@ def package(report_file: str, source_zip: str, installer_file: str, output_dir: 
             "held_roi": report["fallback_hold_count"],
             "atlas_count": TOTAL_DDS,
             "ab_candidate_applied_count": report["ab_candidate_applied_count"],
+            "last_resort_overlap_test_only_count": report.get("last_resort_overlap_test_only_count", 0),
             "needs_actual_game_test": True,
             "install_requires_explicit_test_consent": True,
             "files": files,
@@ -144,6 +145,7 @@ def package(report_file: str, source_zip: str, installer_file: str, output_dir: 
         "dds_count": TOTAL_DDS,
         "a_b_applied": manifest["ab_candidate_applied_count"],
         "represented_roi_not_unique_paint": manifest["represented_roi_not_unique_paint"],
+        "last_resort_overlap_test_only_count": manifest["last_resort_overlap_test_only_count"],
         "release_approved": False, "runtime_validation": "UNTESTED",
         "archive": OUTPUT_ZIP, "sha256": digest(result.read_bytes()),
     }
