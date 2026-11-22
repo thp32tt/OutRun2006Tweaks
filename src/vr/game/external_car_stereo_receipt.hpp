@@ -19,6 +19,41 @@ struct ExternalStereoMeshReceipt final {
             rightSucceeded && stateRestored && geometryStereo;
     }
 };
+// Compact failure proof retained for the native per-car diagnostic log.
+// It is never a license to invoke the original callback after a partial DIP.
+enum class ExternalEyeFailure : unsigned char {
+    None,MissingReport,MultipleReports,PoseMismatch,LeftFailed,
+    RightGpuFailed,RightNotVerified,RestoreFailed,IdenticalEyeGeometry
+};
+inline ExternalEyeFailure ClassifyExternalEyeFailure(
+    const ExternalStereoMeshReceipt& r) noexcept
+{
+    if(r.Complete())return ExternalEyeFailure::None;
+    if(r.reports==0)return ExternalEyeFailure::MissingReport;
+    if(r.reports!=1)return ExternalEyeFailure::MultipleReports;
+    if(r.expectedPose==0 || r.observedPose!=r.expectedPose)
+        return ExternalEyeFailure::PoseMismatch;
+    if(!r.leftSucceeded)return ExternalEyeFailure::LeftFailed;
+    if(r.rightDrawFailed)return ExternalEyeFailure::RightGpuFailed;
+    if(!r.rightSucceeded)return ExternalEyeFailure::RightNotVerified;
+    if(!r.stateRestored)return ExternalEyeFailure::RestoreFailed;
+    if(!r.geometryStereo)return ExternalEyeFailure::IdenticalEyeGeometry;
+    return ExternalEyeFailure::RightNotVerified;
+}
+inline const char* ExternalEyeFailureName(ExternalEyeFailure failure) noexcept {
+    switch(failure) {
+    case ExternalEyeFailure::None:return "STEREO_OK";
+    case ExternalEyeFailure::MissingReport:return "NO_PHYSICAL_REPORT";
+    case ExternalEyeFailure::MultipleReports:return "DUPLICATE_PHYSICAL_REPORT";
+    case ExternalEyeFailure::PoseMismatch:return "POSE_MISMATCH";
+    case ExternalEyeFailure::LeftFailed:return "LEFT_GPU_FAILED";
+    case ExternalEyeFailure::RightGpuFailed:return "RIGHT_GPU_FAILED";
+    case ExternalEyeFailure::RightNotVerified:return "RIGHT_NOT_VERIFIED";
+    case ExternalEyeFailure::RestoreFailed:return "PHYSICAL_RESTORE_FAILED";
+    case ExternalEyeFailure::IdenticalEyeGeometry:return "MONO_EYE_MATRICES";
+    }
+    return "UNKNOWN_EYE_FAILURE";
+}
 inline thread_local ExternalStereoMeshReceipt* ActiveExternalStereoMesh=nullptr;
 class ScopedExternalStereoMeshReceipt final {
     ExternalStereoMeshReceipt* previous_;
