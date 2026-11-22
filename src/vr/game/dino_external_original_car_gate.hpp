@@ -3,6 +3,7 @@
 // display callback (PC retail 0x49F3E0). Never suppress a game callback just
 // because an external OVC file exists: a successful physical draw is required.
 #include <cstdint>
+#include "external_car_stereo_receipt.hpp"
 namespace OutRunVR::DinoSidecar {
 struct OriginalCarGate final {
     bool optedIn=false,ownedPlayer=false,gameplay=false,cockpitModeOne=false;
@@ -26,6 +27,8 @@ struct MeshDrawReceipt final {
     std::uint32_t submittedMeshes=0;
     std::uint32_t attemptedMeshes=0;
     std::uint32_t verifiedStereoMeshes=0;
+    ExternalEyeFailure lastEyeFailure=ExternalEyeFailure::None;
+    unsigned lastEyeReports=0;
     // A failed API result may follow a successful LEFT-eye rasterization.
     bool possiblySubmitted=false;
     // StateBlock capture succeeded, but Apply later failed. The original
