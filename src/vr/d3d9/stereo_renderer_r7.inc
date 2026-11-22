@@ -1375,6 +1375,43 @@ namespace OutRunVRStereo
 			return true;
 		}
 
+        // The PBR VS consumes c4/c8 directly (not D3DTS_VIEW/PROJECTION).
+        // Its pixel shader also requires the matching per-eye camera position.
+        bool SetExternalPbrEyeConstants(IDirect3DDevice9* device,
+            const DrawStereoState& draw,int eye)
+        {
+            if(!device || !draw.externalPbrWorld || eye<0 || eye>1)
+                return false;
+            const auto& view=draw.fixedEyeView[eye];
+            const auto& projection=draw.fixedEyeProjection[eye];
+            const float camera[4]{
+                -(view._41*view._11+view._42*view._12+view._43*view._13),
+                -(view._41*view._21+view._42*view._22+view._43*view._23),
+                -(view._41*view._31+view._42*view._32+view._43*view._33),
+                draw.originalPbrEye[3] // preserve this mesh's ORM-present bit
+            };
+            return SUCCEEDED(device->SetVertexShaderConstantF(
+                    4,&view.m[0][0],4)) &&
+                SUCCEEDED(device->SetVertexShaderConstantF(
+                    8,&projection.m[0][0],4)) &&
+                SUCCEEDED(device->SetPixelShaderConstantF(1,camera,1));
+        }
+
+        bool RestoreExternalPbrConstants(IDirect3DDevice9* device,
+            const DrawStereoState& draw)
+        {
+            if(!device || !draw.externalPbrWorld)return false;
+            // Always attempt all three restorations, even if one fails.
+            // A failed restoration quarantines the current external frame.
+            const bool viewOk=SUCCEEDED(device->SetVertexShaderConstantF(
+                4,draw.originalPbrView,4));
+            const bool projOk=SUCCEEDED(device->SetVertexShaderConstantF(
+                8,draw.originalPbrProjection,4));
+            const bool eyeOk=SUCCEEDED(device->SetPixelShaderConstantF(
+                1,draw.originalPbrEye,1));
+            return viewOk && projOk && eyeOk;
+        }
+
 		bool SetFixedFunctionEyeTransforms(IDirect3DDevice9* device,
 			const DrawStereoState& draw, int eye)
 		{
@@ -2105,18 +2142,22 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				bool leftEyeOk=false;
 				{
 					InternalPassScope guard;
-					leftEyeOk=draw.fixedFunctionWorld?
-						SetFixedFunctionEyeTransforms(device,draw,0):
-						SetWvpOneRegisterAtATime(device,draw.eyeConstants[0]);
+					leftEyeOk=draw.externalPbrWorld ?
+                        SetExternalPbrEyeConstants(device,draw,0) :
+                        (draw.fixedFunctionWorld ?
+                        SetFixedFunctionEyeTransforms(device,draw,0) :
+                        SetWvpOneRegisterAtATime(device,draw.eyeConstants[0]));
 				}
 				if(!leftEyeOk)
 				{
 					bool rolledBack=false;
 					{
 						InternalPassScope guard;
-						rolledBack=draw.fixedFunctionWorld?
-							RestoreFixedFunctionTransforms(device,draw):
-							SetWvpOneRegisterAtATime(device,draw.originalConstants);
+						rolledBack=draw.externalPbrWorld ?
+                            RestoreExternalPbrConstants(device,draw) :
+                            (draw.fixedFunctionWorld ?
+                            RestoreFixedFunctionTransforms(device,draw) :
+                            SetWvpOneRegisterAtATime(device,draw.originalConstants));
 					}
 					InvalidateRightDepthStencilIfLeftMayWrite(device);
 					PoisonFrame(OutRunVR::StereoFailureLeftWvpUploadFailed);
@@ -2148,9 +2189,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					restored=false;
 					{
 						InternalPassScope guard;
-						restored=draw.fixedFunctionWorld?
-							RestoreFixedFunctionTransforms(device,draw):
-							SetWvpOneRegisterAtATime(device,draw.originalConstants);
+						restored=draw.externalPbrWorld ?
+                            RestoreExternalPbrConstants(device,draw) :
+                            (draw.fixedFunctionWorld ?
+                            RestoreFixedFunctionTransforms(device,draw) :
+                            SetWvpOneRegisterAtATime(device,draw.originalConstants));
 					}
 					if(!restored)
 						NoteRestoreFailure(draw.fixedFunctionWorld?
@@ -2178,9 +2221,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					rightHr=device->SetViewport(&savedViewport);
 				if(SUCCEEDED(rightHr)&&draw.worldStereo)
 				{
-					const bool eyeOk=draw.fixedFunctionWorld?
-						SetFixedFunctionEyeTransforms(device,draw,1):
-						SetWvpOneRegisterAtATime(device,draw.eyeConstants[1]);
+					const bool eyeOk=draw.externalPbrWorld ?
+                        SetExternalPbrEyeConstants(device,draw,1) :
+                        (draw.fixedFunctionWorld ?
+                        SetFixedFunctionEyeTransforms(device,draw,1) :
+                        SetWvpOneRegisterAtATime(device,draw.eyeConstants[1]));
 					if(!eyeOk)
 					{
 						rightFailure=OutRunVR::StereoFailureRightWvpUploadFailed;
@@ -2196,8 +2241,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				restoreOk=RestoreRightPassState(device,savedRt,savedDepth,
 					savedViewport,draw.originalConstants,
 					draw.worldStereo&&!draw.fixedFunctionWorld);
-				if(draw.fixedFunctionWorld&&!RestoreFixedFunctionTransforms(device,draw))
-					restoreOk=false;
+				if(draw.externalPbrWorld) {
+                    if(!RestoreExternalPbrConstants(device,draw))restoreOk=false;
+                } else if(draw.fixedFunctionWorld &&
+                          !RestoreFixedFunctionTransforms(device,draw))
+                    restoreOk=false;
 			}
 			FrameHadDuplicatedDraw=true;
 			++DuplicatedDraws;
