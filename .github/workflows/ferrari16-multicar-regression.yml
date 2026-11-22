@@ -55,6 +55,10 @@ jobs:
           assert 'physical.Complete()' in gpu
           assert 'stereoRetry_.OnSoftStereoFailure()' in gpu
           assert 'ScopedExternalVehicleSemantic externalScope' in gpu
+          assert 'MainBackbufferActive(device)' in source
+          assert 'OutRunVRStereo::R29OwnerStereoWanted()' not in source
+          assert 'OutRunVRStereo::R29OwnerTargetIsBackBuffer()' not in source
+          assert 'GetBackBuffer(' in gpu and 'GetRenderTarget(0,&active)' in gpu
           runners=[
               'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd',
               'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
