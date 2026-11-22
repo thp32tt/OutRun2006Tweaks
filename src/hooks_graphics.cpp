@@ -1194,7 +1194,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     "VR QUEST FERRARI EXTERNAL: sample={} nativeFrame={} xrPose={} "
                     "carId={} slot={} localFloorLift={:.4f} "
                     "dash[speedKph={:.1f},rpm={:.0f},gear={}] "
-                    "drawHr=0x{:08X} submitted={}/{} stateRestored={} "
+                    "drawHr=0x{:08X} submitted={}/{} attempted={} "
+                    "verifiedEyePairs={} stateRestored={} prep={} "
                     "dashOverlayHr=0x{:08X} dashOverlay={}/{} route={} "
                     "originalPMT=UNCHANGED",
                     sample,ticket.nativeFrame,ticket.xrPose,
@@ -1204,7 +1205,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     ticket.dashboard.gear,
                     static_cast<unsigned int>(draw.hr),
                     draw.receipt.submittedMeshes,draw.receipt.expectedMeshes,
+                    draw.receipt.attemptedMeshes,draw.receipt.verifiedStereoMeshes,
                     draw.receipt.stateRestored,
+                    OutRunVR::DinoSidecar::GlobalGpu().PreparationName(),
                     static_cast<unsigned int>(dashboardDraw.hr),
                     dashboardDraw.receipt.submittedMeshes,
                     dashboardDraw.receipt.expectedMeshes,
