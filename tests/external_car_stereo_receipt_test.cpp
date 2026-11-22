@@ -21,6 +21,22 @@ int main() {
         assert(r.Complete());
     }
     assert(ActiveExternalStereoMesh==nullptr);
+    // RIGHT GPU failure is different from merely unproven stereo. It
+    // requires hard device quarantine instead of just a soft cooldown.
+    r={}; r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,false,true,44,true,true);
+        assert(!r.Complete());
+        assert(r.rightDrawFailed);
+    }
+    r={}; r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,false,true,44,true,false);
+        assert(!r.Complete());
+        assert(!r.rightDrawFailed);
+    }
     // Two successful DIP executions without separate eye transforms
     // are NOT proven VR geometry; never replace stock with doubled mono.
     r={}; r.expectedPose=44;
