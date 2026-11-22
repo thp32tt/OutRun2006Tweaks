@@ -1,3 +1,4 @@
+#include "../game/external_car_stereo_receipt.hpp"
 // R33 final dispatch + post-review hot-path hardening.
 //
 // R32 owns hook-free direct-transport review-2 safety plus Reset/Present helpers
@@ -814,6 +815,10 @@ namespace OutRunVRStereo
 
             // Never publish a completed stereo draw or its pose metadata
             // before BOTH physical eyes and the game render state are valid.
+            OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                SUCCEEDED(result.hr),SUCCEEDED(rightHr),restoreOk,
+                draw.poseSequence,
+                false,FAILED(rightHr),!restoreOk);
             if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
                     SUCCEEDED(result.hr), SUCCEEDED(rightHr), restoreOk))
             {
@@ -1586,6 +1591,10 @@ namespace OutRunVRStereo
             // remain explicitly UNVERIFIED (not mislabelled mono).
             OutRunVR::UniversalTrace::ScopedDraw::RecordR33EyePair(
                 SUCCEEDED(result.hr), SUCCEEDED(rightHr), restoreOk);
+            OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                SUCCEEDED(result.hr),SUCCEEDED(rightHr),restoreOk,
+                stereo->poseSequence,
+                false,FAILED(rightHr),!restoreOk);
             // Never publish a completed stereo draw or its pose metadata
             // before BOTH physical eyes and the game render state are valid.
             if (OutRunVR::StereoCompletion::CanPublishStereoDraw(

@@ -31,6 +31,9 @@ static OriginalCarGate GoodDraw() {
 static MeshDrawReceipt Receipt(std::uint32_t expected,std::uint32_t submitted,
                               bool ok=true,bool restored=true) {
     MeshDrawReceipt r{};r.expectedMeshes=expected;r.submittedMeshes=submitted;
+    r.attemptedMeshes=submitted;
+    r.verifiedStereoMeshes=ok?submitted:0u;
+    r.possiblySubmitted=submitted!=0;
     r.drawSucceeded=ok;r.stateRestored=restored;return r;
 }
 static bool Near(float a,float b,float tol=.0001f) {return std::fabs(a-b)<=tol;}
@@ -108,7 +111,7 @@ int main(){
     Check("37","over-submitted receipt avoids stock-car double draw",ChooseOriginalCarRoute(good,Receipt(78,79))==OriginalCarRoute::ExternalPartial);
     Check("38","one of many partial",ChooseOriginalCarRoute(good,Receipt(78,1))==OriginalCarRoute::ExternalPartial);
     d=GoodDraw();d.validStereo=false;
-    Check("39","draw gate false overrides mesh success",ChooseOriginalCarRoute(d,Receipt(78,78))==OriginalCarRoute::OriginalFallback);
+    Check("39","late draw gate failure avoids original body overdraw",ChooseOriginalCarRoute(d,Receipt(78,78))==OriginalCarRoute::ExternalPartial);
     Check("40","single drawable mesh complete",ChooseOriginalCarRoute(good,Receipt(1,1))==OriginalCarRoute::ExternalComplete);
 
     // 41-50. Geometry ground placement -> dashboard latch -> retry reset.

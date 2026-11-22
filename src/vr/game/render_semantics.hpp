@@ -1163,6 +1163,7 @@ namespace OutRunVR::GameSemantic
     inline thread_local unsigned SpriteQueueDepth = 0;
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
     inline thread_local unsigned ExternalOverlaySemanticDepth = 0;
+    inline thread_local unsigned ExternalVehicleSemanticDepth = 0;
     // Exact C993 draw can nest ordinary SceneEffect helper scopes. Preserve
     // its producer through the actual GPU draw, not merely the parent E8.
     // Queue execution and external F11 overlays retain higher precedence.
@@ -1262,8 +1263,30 @@ namespace OutRunVR::GameSemantic
         ScopedExternalOverlaySemantic& operator=(const ScopedExternalOverlaySemantic&) = delete;
     };
 
+    // External vehicle DIP is not a game SpriteNode: preserve queued one-shot
+    // HUD/lens scopes while routing the vehicle as real world geometry.
+    class ScopedExternalVehicleSemantic final
+    {
+        RenderScope previous_;
+    public:
+        ScopedExternalVehicleSemantic() noexcept : previous_(CurrentScope)
+        {
+            ++ExternalVehicleSemanticDepth;
+            CurrentScope = RenderScope::WorldBillboard;
+        }
+        ~ScopedExternalVehicleSemantic() noexcept
+        {
+            if (ExternalVehicleSemanticDepth) --ExternalVehicleSemanticDepth;
+            CurrentScope = previous_;
+        }
+        ScopedExternalVehicleSemantic(const ScopedExternalVehicleSemantic&)=delete;
+        ScopedExternalVehicleSemantic& operator=(const ScopedExternalVehicleSemantic&)=delete;
+    };
+
     inline RenderScope EffectiveScope() noexcept
     {
+        if (ExternalVehicleSemanticDepth != 0)
+            return CurrentScope;
         // F11 is an external overlay, never a game SpriteNode consumer.
         if (ExternalOverlaySemanticDepth != 0)
             return CurrentScope;
@@ -1288,7 +1311,8 @@ namespace OutRunVR::GameSemantic
     {
         // External UI such as the F11 ImGui overlay is not a game producer.
         // Never let it consume a pending game semantic token.
-        if (ExternalOverlaySemanticDepth != 0)
+        if (ExternalOverlaySemanticDepth != 0 ||
+            ExternalVehicleSemanticDepth != 0)
             return CurrentScope;
         // A nested SceneEffect/one-shot helper must not steal the exact C993
         // centre's physical Draw. ScopedExactProducerSemantic restores its
@@ -1540,28 +1564,29 @@ namespace OutRunVR::GameSemantic
 
     inline const void* CurrentQueueNode() noexcept
     {
-        return CurrentSpriteQueueNode;
+        return ExternalVehicleSemanticDepth!=0 ? nullptr : CurrentSpriteQueueNode;
     }
 
     inline std::uint64_t CurrentQueueNodeEpoch() noexcept
     {
-        return SpriteQueueNodeEpoch;
+        return ExternalVehicleSemanticDepth!=0 ? 0 : SpriteQueueNodeEpoch;
     }
 
     inline ProducerToken CurrentQueueProducerToken() noexcept
     {
-        return CurrentSpriteQueueProducer;
+        return ExternalVehicleSemanticDepth!=0 ? ProducerToken::None : CurrentSpriteQueueProducer;
     }
 
     inline bool ExactLensCentreDrawOwnsSemantic() noexcept
     {
         return DirectLensCentreOwnsGpuDraw(
             ExactLensCentreGpuDrawDepth != 0, SpriteQueueDepth != 0,
-            ExternalOverlaySemanticDepth != 0);
+            ExternalOverlaySemanticDepth != 0 || ExternalVehicleSemanticDepth != 0);
     }
 
     inline ProducerToken CurrentRenderProducerToken() noexcept
     {
+        if (ExternalVehicleSemanticDepth!=0) return ProducerToken::None;
         // Queue nodes and external UI never inherit the central sun's
         // provenance. Within this one C993 draw, a nested SceneEffect or
         // temporary direct helper cannot rebrand the source c64 upload.
@@ -1594,13 +1619,14 @@ namespace OutRunVR::GameSemantic
 
     inline const ProjectedMarkerInfo* CurrentProjectedMarker() noexcept
     {
+        if (ExternalVehicleSemanticDepth!=0) return nullptr;
         return CurrentQueueProjectedMarker.valid
             ? &CurrentQueueProjectedMarker : nullptr;
     }
 
     inline bool QueueRenderActive() noexcept
     {
-        return SpriteQueueDepth != 0;
+        return SpriteQueueDepth != 0 && ExternalVehicleSemanticDepth == 0;
     }
 
     // Immutable source-side identity for ONE physical GPU primitive.

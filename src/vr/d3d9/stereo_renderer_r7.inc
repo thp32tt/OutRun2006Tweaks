@@ -1,3 +1,5 @@
+#include "../game/external_car_stereo_receipt.hpp"
+#include "../game/external_car_eye_transform_proof.hpp"
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -2094,6 +2096,12 @@ if(WaitForEventQuery(slot.fence,1,0u))
 						NoteRestoreFailure(draw.fixedFunctionWorld?
 							"left-eye fixed-function rollback":"left-eye c64 rollback");
 					const HRESULT hr=drawCall();
+                    // Partial LEFT-eye transform upload can fail during
+                    // original transform rollback. An absent pair report
+                    // would otherwise misclassify this as a safe soft retry.
+                    OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                        SUCCEEDED(hr),false,rolledBack,draw.poseSequence,
+                        false,false,!rolledBack);
 					R7TraceVisualEyes(visualTrace,"LEFT_WVP_REJECT_SINGLE",true,
 						draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 						true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,rolledBack,
@@ -2120,6 +2128,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 						NoteRestoreFailure(draw.fixedFunctionWorld?
 							"left draw fixed-function transforms":"left draw c64");
 				}
+                OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                    false,false,restored,draw.poseSequence,false,false,!restored);
 				R7TraceVisualEyes(visualTrace,"LEFT_DRAW_FAILURE",true,
 					draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 					true,leftHr,false,E_PENDING,OutRunVR::StereoFailureNone,restored,
@@ -2202,7 +2212,25 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				InvalidateRightDepthStencilIfLeftMayWrite(device);
 				NoteRestoreFailure("right-eye draw");
 			}
-			R7TraceVisualEyes(visualTrace,"STEREO_PAIR",true,
+            // Stereo routing alone is not evidence of binocular geometry:
+            // identical LEFT/RIGHT view+projection pairs render mono twice.
+            // Evaluate the 16-float matrices only for an active external DIP.
+            const bool externalDistinctEyes=
+                draw.worldStereo && draw.fixedFunctionWorld &&
+                OutRunVR::DinoSidecar::ActiveExternalStereoMesh != nullptr &&
+                sizeof(D3DMATRIX)==16u*sizeof(float) &&
+                OutRunVR::DinoSidecar::DistinctFiniteExternalEyeTransforms(
+                    reinterpret_cast<const float*>(&draw.fixedEyeView[0]),
+                    reinterpret_cast<const float*>(&draw.fixedEyeView[1]),
+                    reinterpret_cast<const float*>(&draw.fixedEyeProjection[0]),
+                    reinterpret_cast<const float*>(&draw.fixedEyeProjection[1]));
+			OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                SUCCEEDED(leftHr),rightDrawAttempted&&SUCCEEDED(rightHr),
+                restoreOk&&!FrameStereoIncomplete&&
+                    FrameFailureReason==OutRunVR::StereoFailureNone,
+                draw.poseSequence,externalDistinctEyes,
+                FAILED(rightHr),!restoreOk); // physical D3D and restore evidence
+            R7TraceVisualEyes(visualTrace,"STEREO_PAIR",true,
 				draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 				true,leftHr,rightDrawAttempted,rightHr,rightFailure,restoreOk,
 				failureAtEntry,FrameFailureReason);

@@ -24,6 +24,7 @@
 #include "r30_shadow_bytes.hpp"
 #include "r30_shadow_scratch.hpp"
 #include "stereo_completion_gate.hpp"
+#include "../game/external_car_stereo_receipt.hpp"
 #include "r30_state_restore_result.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "hud_original_wvp_provenance.hpp"
@@ -6531,6 +6532,10 @@ namespace OutRunVRStereo
             // Left success does not prove the right GPU Draw/restore.
             OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
                 SUCCEEDED(leftHr), SUCCEEDED(rightHr), restoreOk);
+            OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                SUCCEEDED(leftHr),SUCCEEDED(rightHr),restoreOk,
+                state.stereo.poseSequence,
+                false,FAILED(rightHr),!restoreOk);
             // Never publish a completed stereo draw or its pose metadata
             // before BOTH physical eyes and the game render state are valid.
             if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
@@ -8487,6 +8492,10 @@ namespace OutRunVRStereo
 
             // Never publish a completed stereo draw or its pose metadata
             // before BOTH physical eyes and the game render state are valid.
+            OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
+                SUCCEEDED(leftHr),SUCCEEDED(rightHr),restoreOk,
+                stereo.poseSequence,
+                false,FAILED(rightHr),!restoreOk);
             if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
                     SUCCEEDED(leftHr), SUCCEEDED(rightHr), restoreOk))
             {

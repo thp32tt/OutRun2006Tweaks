@@ -14,17 +14,55 @@
 #include <cwchar>
 #include <cmath>
 #include <iterator>
+#include <future>
+#include <chrono>
 #include <string>
 #include <vector>
 #include "dino_external_sidecar.hpp"
 #include "external_car_ground.hpp"
 #include "external_car_draw_order.hpp"
 #include "external_car_selection.hpp"
+#include "external_car_legacy_fallback.hpp"
 #include "external_car_runtime_policy.hpp"
 #include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
+#include "external_car_stereo_receipt.hpp"
+#include "external_car_stereo_retry.hpp"
+#include "render_semantics.hpp"
 
 namespace OutRunVR::DinoSidecar {
+// Independent of an optional R29 linked renderer TU: release builds can
+// include the R26-safe owner instead. Check actual COM surface identities
+// before any external car CPU/GPU preparation. Fail closed on any D3D error.
+inline bool MainBackbufferActive(IDirect3DDevice9* device) noexcept {
+    if(!device)return false;
+    IDirect3DSurface9* active=nullptr;
+    IDirect3DSurface9* main=nullptr;
+    const HRESULT boundHr=device->GetRenderTarget(0,&active);
+    const HRESULT mainHr=device->GetBackBuffer(
+        0,0,D3DBACKBUFFER_TYPE_MONO,&main);
+    const bool same=SUCCEEDED(boundHr) && SUCCEEDED(mainHr) &&
+        active!=nullptr && main!=nullptr && active==main;
+    if(active)active->Release();
+    if(main)main->Release();
+    if(!same)return false;
+    // R7 rejects stereo duplication when MRT1..3 is still bound even
+    // with RT0 pointing at the primary backbuffer. Fail before drawing
+    // any sidecar pixels rather than entering an unrecoverable mono pass.
+    for(DWORD slot=1u;slot<=3u;++slot) {
+        IDirect3DSurface9* auxiliary=nullptr;
+        const HRESULT result=device->GetRenderTarget(slot,&auxiliary);
+        const bool bound=SUCCEEDED(result) && auxiliary!=nullptr;
+        if(auxiliary)auxiliary->Release();
+        if(bound)return false;
+        // Unsupported MRT slots or empty attachments are normal; an
+        // unexpected COM failure must not certify the stereo main pass.
+        if(FAILED(result) && result!=D3DERR_NOTFOUND &&
+           result!=D3DERR_INVALIDCALL)
+            return false;
+    }
+    return true;
+}
 // Fixed-function test must be explicitly enabled by the launch process;
 // generic PBR's c0/c4/c8 matrices are not compatible with verified c64 stereo.
 inline bool FixedFunctionExternalStereoProbeActive() noexcept {
@@ -56,6 +94,18 @@ class GpuOwner final {
     bool pbrReady_=false;
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
+    struct CpuLoad {
+        Model model{};
+        float lowest=0.f;
+        bool parsed=false;
+    };
+    std::future<CpuLoad> cpuLoad_{};
+    enum class Preparation : unsigned char {
+        Cold, Reading, CpuReady, Uploading, Ready, Failed
+    };
+    Preparation preparation_=Preparation::Cold;
+    std::size_t nextTexture_=0, nextMesh_=0, nextPbrMap_=0;
+    bool pbrPrepared_=false;
     SidecarRole role_=SidecarRole::Vehicle;
     FerrariModelSlot selectedSlot_=FerrariModelSlot::F50;
     unsigned char selectedCarId_=255u;
@@ -64,6 +114,7 @@ class GpuOwner final {
     // If D3D9Ex rejects an HQ allocation, do not retry multi-megabyte
     // textures on every eye Draw. Retry only after Reset/device change.
     GpuRetryPolicy gpuRetry_{};
+    ExternalStereoRetryPolicy stereoRetry_{};
     static bool ReadFile(const wchar_t* path,std::vector<std::uint8_t>& out) {
         HANDLE f=CreateFileW(path,GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,
                             FILE_ATTRIBUTE_NORMAL,nullptr);
@@ -145,11 +196,17 @@ class GpuOwner final {
         normals_.clear();orms_.clear();
         pbrShaders_.Release();
         pbrReady_=false;
+        pbrPrepared_=false;
+        nextTexture_=nextMesh_=nextPbrMap_=0;
+        if(preparation_==Preparation::Uploading ||
+           preparation_==Preparation::Ready)
+            preparation_=loaded_?Preparation::CpuReady:Preparation::Cold;
         owner_=nullptr;
     }
     bool RejectGpu(IDirect3DDevice9* device) noexcept {
         ReleaseGpu();
         gpuRetry_.NoteFailure(device);
+        preparation_=Preparation::Failed;
         return false;
     }
     // Diagnostic A/B only: reproduce the known-working single-F50
@@ -166,6 +223,7 @@ class GpuOwner final {
     void QuarantineFailedSubmission(IDirect3DDevice9* device) noexcept {
         ReleaseGpu();
         gpuRetry_.NoteFailure(device);
+        preparation_=Preparation::Failed;
     }
     bool BuildSidecarPath(wchar_t (&path)[MAX_PATH]) const noexcept {
         const DWORD n=GetModuleFileNameW(nullptr,path,MAX_PATH);
@@ -215,8 +273,12 @@ class GpuOwner final {
                        wcscat_s(candidate,MAX_PATH,genericSuffix)!=0)
                         return false;
                     const DWORD attr=GetFileAttributesW(candidate);
-                    if(attr==INVALID_FILE_ATTRIBUTES ||
-                       (attr&FILE_ATTRIBUTE_DIRECTORY)!=0)
+                    // Do not silently replace a canonical model on access
+                    // denied, network/media errors or an existing directory.
+                    const DWORD error=attr==INVALID_FILE_ATTRIBUTES ?
+                        GetLastError():ERROR_SUCCESS;
+                    if(LegacyFallbackForMissingCanonical(
+                        attr!=INVALID_FILE_ATTRIBUTES,error))
                         suffix=legacy;
                 }
             } else
@@ -226,81 +288,117 @@ class GpuOwner final {
         return wcscat_s(path,MAX_PATH,suffix)==0;
     }
     bool EnsureLoaded() {
-        if(loadAttempted_)return loaded_;
-        loadAttempted_=true;
-        wchar_t path[MAX_PATH]{};
-        if(!BuildSidecarPath(path))return false;
-        std::vector<std::uint8_t> bytes;
-        if(!ReadFile(path,bytes))return false;
-        std::string error;
-        Model next;
-        if(!Parse(bytes.data(),bytes.size(),next,error))return false;
-        // The OVC is an actual native-axis model; its lowest vertex is
-        // used as a conservative LOCAL wheel/ground clearance bound.
-        // Reject wildly misaligned models instead of hiding them in the road.
-        float lowest=10000.f;
-        for(const auto& mesh:next.meshes)
-            for(const auto& vertex:mesh.vertices)
-                lowest=(std::min)(lowest,vertex.y);
+        if(loaded_)return true;
+        if(!loadAttempted_) {
+            loadAttempted_=true;
+            wchar_t path[MAX_PATH]{};
+            if(!BuildSidecarPath(path)) {
+                preparation_=Preparation::Failed;
+                return false;
+            }
+            // Run file IO, CRC and parsing away from the native player Draw.
+            // Worker accesses only local path/model values, never live game
+            // state or D3D9 device resources.
+            const std::wstring pathCopy(path);
+            cpuLoad_=std::async(std::launch::async,[pathCopy]() -> CpuLoad {
+                CpuLoad result{};
+                try {
+                    std::vector<std::uint8_t> bytes;
+                    if(!ReadFile(pathCopy.c_str(),bytes))return result;
+                    std::string error;
+                    if(!Parse(bytes.data(),bytes.size(),result.model,error))
+                        return result;
+                    float lowest=10000.f;
+                    for(const auto& mesh:result.model.meshes)
+                        for(const auto& vertex:mesh.vertices)
+                            lowest=(std::min)(lowest,vertex.y);
+                    result.lowest=lowest;
+                    result.parsed=true;
+                } catch(...) {
+                    result.parsed=false;
+                }
+                return result;
+            });
+            preparation_=Preparation::Reading;
+            return false;
+        }
+        if(!cpuLoad_.valid())return false;
+        if(cpuLoad_.wait_for(std::chrono::seconds(0)) !=
+           std::future_status::ready)
+            return false;
+        CpuLoad result=cpuLoad_.get();
+        if(!result.parsed) {
+            preparation_=Preparation::Failed;
+            return false;
+        }
         if(role_==SidecarRole::Vehicle) {
             float validatedLift=0.f;
-            if(!ComputeExternalFloorLift(0.22f,lowest,validatedLift))
-                return false; // invalid scale/axis: retain original car
-        } else {
-            // Dashboard overlays are authored directly in OutRun car-local
-            // metres and intentionally sit above the road plane. They must not
-            // be rejected by the vehicle floor-clearance contract.
-            if(!std::isfinite(lowest) || lowest < -10.f || lowest > 10.f)
+            if(!ComputeExternalFloorLift(0.22f,result.lowest,validatedLift)) {
+                preparation_=Preparation::Failed;
                 return false;
+            }
+        } else if(!std::isfinite(result.lowest) ||
+                  result.lowest < -10.f || result.lowest > 10.f) {
+            preparation_=Preparation::Failed;
+            return false;
         }
-        modelMinLocalY_=lowest;
+        modelMinLocalY_=result.lowest;
         modelBoundsReady_=true;
-        cpu_=std::move(next);
+        cpu_=std::move(result.model);
         loaded_=true;
+        preparation_=Preparation::CpuReady;
         return true;
     }
     bool EnsureGpu(IDirect3DDevice9* dev) {
         if(!dev || !EnsureLoaded())return false;
         if(!gpuRetry_.CanAttempt(dev))return false;
-        if(owner_==dev && meshes_.size()==cpu_.meshes.size() &&
-           textures_.size()==cpu_.textures.size())return true;
-        ReleaseGpu();
-        owner_=dev;
-        // No vector reallocations after COM allocations begin: an allocation
-        // failure must not leak the just-created VB/IB pair of a pending mesh.
-        meshes_.reserve(cpu_.meshes.size());
-        textures_.resize(cpu_.textures.size(),nullptr);
-        for(std::size_t material=0;material<cpu_.textures.size();++material) {
-            if(!UploadDDS(dev,cpu_.textures[material],&textures_[material])) {
+        if(owner_==dev && preparation_==Preparation::Ready)return true;
+        if(owner_!=dev) {
+            ReleaseGpu();
+            owner_=dev;
+            // Preallocate before any COM allocation: no failure may strand a
+            // GPU mesh outside the owned vector.
+            meshes_.reserve(cpu_.meshes.size());
+            textures_.resize(cpu_.textures.size(),nullptr);
+            preparation_=Preparation::Uploading;
+        }
+        // The original car stays active until the LAST upload succeeds.
+        // Keep each frame's preparation to one DDS or one mesh allocation.
+        if(nextTexture_<cpu_.textures.size()) {
+            const auto material=nextTexture_++;
+            if(!UploadDDS(dev,cpu_.textures[material],&textures_[material]))
                 return RejectGpu(dev);
-            }
+            return false;
         }
         // Optional PBR allocations must never prevent a working legacy draw.
         // On any map/shader failure fall back to textured fixed-function once
         // per device generation, not once per eye/frame.
         const bool fixedFunctionStereoProbe=
             ForceFixedFunctionStereoProbe();
-        if(cpu_.pbrEnabled && !fixedFunctionStereoProbe) {
-            normals_.resize(cpu_.pbrMaterials.size(),nullptr);
-            orms_.resize(cpu_.pbrMaterials.size(),nullptr);
-            bool mapsReady=true;
-            for(std::size_t i=0;i<cpu_.pbrMaterials.size();++i) {
-                const auto& p=cpu_.pbrMaterials[i];
-                if((!p.normal.dds.empty() &&
-                    !UploadDDS(dev,p.normal,&normals_[i])) ||
-                   (!p.orm.dds.empty() &&
-                    !UploadDDS(dev,p.orm,&orms_[i]))) {
-                    mapsReady=false;break;
-                }
+        if(!pbrPrepared_ && cpu_.pbrEnabled && !fixedFunctionStereoProbe) {
+            const auto count=cpu_.pbrMaterials.size();
+            if(normals_.size()!=count)normals_.resize(count,nullptr);
+            if(orms_.size()!=count)orms_.resize(count,nullptr);
+            // Only one actual PBR map upload per player callback.
+            while(nextPbrMap_<count*2u) {
+                const std::size_t index=nextPbrMap_++;
+                const auto material=index/2u;
+                const bool normal=(index%2u)==0u;
+                const auto& src=normal ? cpu_.pbrMaterials[material].normal
+                                       : cpu_.pbrMaterials[material].orm;
+                if(src.dds.empty())continue;
+                IDirect3DTexture9** dst=normal ? &normals_[material]
+                                              : &orms_[material];
+                if(!UploadDDS(dev,src,dst))return RejectGpu(dev);
+                return false;
             }
-            if(mapsReady)pbrReady_=pbrShaders_.Ensure(dev);
-            // Normal/ORM maps are material input, never decorative.
-            // If the shader or required source map fails, do not silently
-            // render an unlit/flat "textured" external car: original native
-            // car remains the only safe fallback for this device generation.
+            // Bind only after every normal/ORM allocation succeeded.
+            pbrReady_=pbrShaders_.Ensure(dev);
             if(!pbrReady_)return RejectGpu(dev);
         }
-        for(std::size_t meshIndex=0;meshIndex<cpu_.meshes.size();++meshIndex) {
+        pbrPrepared_=true;
+        if(nextMesh_<cpu_.meshes.size()) {
+            const auto meshIndex=nextMesh_;
             const auto& m=cpu_.meshes[meshIndex];
             GpuMesh next{};
             next.material=m.material;
@@ -345,8 +443,11 @@ class GpuOwner final {
             }
             next.ib->Unlock();
             meshes_.push_back(next);
+            ++nextMesh_;
+            return false;
         }
-        return meshes_.size()==cpu_.meshes.size();
+        preparation_=Preparation::Ready;
+        return true;
     }
     const DashboardBinding* DashboardFor(const GpuMesh& mesh) const noexcept {
         if(mesh.dashboardBinding<0 ||
@@ -383,26 +484,76 @@ public:
         if(next==FerrariModelSlot::GenericId && nextCarId>=30u)
             return false;
         if(next==selectedSlot_ && nextCarId==selectedCarId_)return false;
+        // No blocking wait on the player callback: a large old OVC parse
+        // must finish asynchronously while native PMT is still displayed.
+        // Re-attempt the pending selection on the next native callback.
+        if(cpuLoad_.valid() &&
+           cpuLoad_.wait_for(std::chrono::seconds(0)) !=
+               std::future_status::ready)
+            return false;
+        // A ready future is safe to destroy without waiting; do not let a
+        // stale old-car payload migrate to the new selection.
+        cpuLoad_=std::future<CpuLoad>{};
         ReleaseGpu();
         cpu_=Model{};
         loaded_=false;
+        preparation_=Preparation::Cold;
         loadAttempted_=false;
         gpuRetry_.OnReset();
+        stereoRetry_.OnSelectionOrDeviceReset();
         selectedSlot_=next;
         selectedCarId_=nextCarId;
         modelBoundsReady_=false;
         modelMinLocalY_=0.f;
         return true;
     }
+    bool SelectionMatches(FerrariModelSlot requested,
+                          unsigned char carId=255u) const noexcept {
+        const unsigned char canonical =
+            requested==FerrariModelSlot::GenericId && carId<30u
+            ? CanonicalFerrariExternalCarId(carId):carId;
+        return selectedSlot_==requested && selectedCarId_==canonical;
+    }
     void OnDeviceReset() noexcept {
         ReleaseGpu();
         gpuRetry_.OnReset();
+        stereoRetry_.OnSelectionOrDeviceReset();
         // A missing/corrupt sidecar is not retried on every eye draw.
         // Re-arm only after a real device reset or race->menu boundary so a
         // corrected OVC can be picked up next race without restarting the EXE.
         // Preserve a successfully parsed CPU model across device-loss resets
         // to avoid re-reading 100+ MiB of DDS from disk during gameplay.
-        if(!loaded_)loadAttempted_=false;
+        if(loaded_)preparation_=Preparation::CpuReady;
+        if(!loaded_ && !cpuLoad_.valid()) {
+            loadAttempted_=false;
+            preparation_=Preparation::Cold;
+        }
+    }
+    // A verified-epoch mismatch after GPU submissions is not recoverable
+    // by drawing the stock body over the already modified eye. Keep the
+    // current frame partial and use original PMT from the next frame.
+    void QuarantineUnsafeFrame(IDirect3DDevice9* device) noexcept {
+        QuarantineFailedSubmission(device);
+    }
+    const char* PreparationName() const noexcept {
+        switch(preparation_) {
+        case Preparation::Cold:return "COLD";
+        case Preparation::Reading:return "CPU_READING";
+        case Preparation::CpuReady:return "CPU_READY";
+        case Preparation::Uploading:return "GPU_UPLOADING";
+        case Preparation::Ready:return "GPU_READY";
+        default:return "FAILED";
+        }
+    }
+    // A validated PBR-format OVC does not imply PBR is actually drawn:
+    // strict native per-eye fixed-function testing deliberately bypasses
+    // normal/ORM uploads and the unverified c0/c4/c8 vertex shader.
+    const char* MaterialModeName() const noexcept {
+        if(preparation_!=Preparation::Ready)return "NOT_READY";
+        if(pbrReady_)return "PBR_SHADER";
+        return cpu_.pbrEnabled ?
+            "FIXED_FN_ALBEDO_ONLY_PBR_MAPS_BYPASSED" :
+            "FIXED_FN_ALBEDO_ONLY";
     }
     bool Loaded() const noexcept {return loaded_;}
     // A V4 full-car sidecar may already carry its real speed and RPM needles.
@@ -450,9 +601,13 @@ public:
                     const D3DMATRIX& world,const D3DMATRIX& view,
                     const D3DMATRIX& projection,
                     const DashboardTelemetry& dashboard,
-                     bool gearOnly=false) noexcept {
+                     bool gearOnly=false,
+                     std::uint64_t expectedNativeFrame=0,
+                     std::uint64_t expectedPose=0) noexcept {
         GpuDrawResult result{};
-        if(!EnsureResources(device))return result;
+        if(!stereoRetry_.AllowNativeAttempt())return result;
+        if(!EnsureResources(device) || expectedNativeFrame==0 || expectedPose==0)
+            return result;
         for(const auto& mesh:meshes_) {
             const auto* binding=DashboardFor(mesh);
             if(gearOnly && (!binding || binding->kind!=DashboardKind::GearVisible))
@@ -460,11 +615,14 @@ public:
             if(DashboardMeshVisible(binding,dashboard))
                 ++result.receipt.expectedMeshes;
         }
+        // Nothing drawable: do not mutate render state or quarantine GPU.
+        if(result.receipt.expectedMeshes==0)return result;
         IDirect3DStateBlock9* saved=nullptr;
         if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&saved))||!saved)
             return result;
         if(FAILED(saved->Capture())){saved->Release();return result;}
         HRESULT hr=S_OK;
+        bool eyeProofOnlyFailure=false;
         const DWORD fvf=D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1;
         if(FAILED(device->SetVertexShader(nullptr)) ||
            FAILED(device->SetPixelShader(nullptr)) ||
@@ -591,18 +749,49 @@ public:
                     hr=E_FAIL;break;
                 }
             }
-            hr=device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,0,0,m.vertexCount,
-                                             0,m.indexCount/3);
+            ExternalStereoMeshReceipt physical{};
+            physical.expectedPose=expectedPose;
+            ScopedExternalStereoMeshReceipt eyeScope(physical);
+            // Scope only the physical DIP, never shader/RT/StateBlock setup.
+            // A native draw re-entering during preparation retains its owner.
+            OutRunVR::GameSemantic::ScopedExternalVehicleSemantic externalScope;
+            result.receipt.possiblySubmitted=true;
+            ++result.receipt.attemptedMeshes;
+            const HRESULT dipHr=device->DrawIndexedPrimitive(
+                D3DPT_TRIANGLELIST,0,0,m.vertexCount,0,m.indexCount/3);
+            if(SUCCEEDED(dipHr))++result.receipt.submittedMeshes;
+            const bool stereoComplete=physical.Complete();
+            result.receipt.lastEyeFailure=ClassifyExternalEyeFailure(physical);
+            result.receipt.lastEyeReports=physical.reports;
+            if(stereoComplete)++result.receipt.verifiedStereoMeshes;
+            if(SUCCEEDED(dipHr) && !stereoComplete)
+                eyeProofOnlyFailure=!physical.rightDrawFailed &&
+                    !physical.deviceRestoreFailed;
+            hr=stereoComplete?dipHr:E_FAIL;
             if(FAILED(hr))break;
-            ++result.receipt.submittedMeshes;
         }
         const HRESULT restore=saved->Apply();
         saved->Release();
-        result.receipt.drawSucceeded=SUCCEEDED(hr);
+        result.receipt.drawSucceeded=SUCCEEDED(hr) &&
+            result.receipt.expectedMeshes!=0 &&
+            result.receipt.submittedMeshes==result.receipt.expectedMeshes &&
+            result.receipt.verifiedStereoMeshes==result.receipt.expectedMeshes;
         result.receipt.stateRestored=SUCCEEDED(restore);
-        result.hr=FAILED(hr)?hr:restore;
-        if(FAILED(result.hr))
-            QuarantineFailedSubmission(device);
+        // A failed StateBlock Apply can leave the next original callback
+        // using external-car shaders/textures/depth settings. Keep the current
+        // native callback suppressed even when no DIP was submitted.
+        result.receipt.stateMayBeDirty=FAILED(restore);
+        result.hr=FAILED(hr)?hr:(result.receipt.drawSucceeded?restore:E_FAIL);
+        if(FAILED(result.hr)) {
+            if(eyeProofOnlyFailure && result.receipt.stateRestored) {
+                // Stereo loss is a frame issue, not proof that the OVC
+                // textures/VBs are corrupt. Keep stock visible during
+                // cooldown and retry a bounded interval later.
+                stereoRetry_.OnSoftStereoFailure();
+            } else {
+                QuarantineFailedSubmission(device);
+            }
+        }
         return result;
     }
 };

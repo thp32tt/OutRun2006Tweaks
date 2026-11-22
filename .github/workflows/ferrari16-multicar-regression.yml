@@ -1,7 +1,7 @@
 name: Ferrari16 All-Car Sidecar Regression
 on:
   push:
-    branches: [vr-ferrari16-v003-multicar-debug-20261122]
+    branches: [vr-ferrari16-v003-multicar-debug-20261122, fix/ferrari16-stereo-loader-guard-20261122]
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_runtime_policy_test ferrari14_trace_50_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -40,17 +40,37 @@ jobs:
           assert 'CanonicalFerrariExternalCarId(observedId)' in selection
           assert 'LegacyFerrariCarSuffix(canonicalId)' in gpu
           assert 'GetFileAttributesW(candidate)' in gpu
+          assert 'LegacyFallbackForMissingCanonical(' in gpu
+          assert 'GetLastError()' in gpu
           assert 'CanonicalFerrariExternalCarId(carId):carId;' in gpu
           floor=gpu[gpu.index('bool SafeFloorLift('):gpu.index('bool EnsureResources(')]
           assert 'EnsureLoaded()' in floor and 'Installed()' not in floor
           assert 'rejectedByCar[id]++' in source
           assert 'gateRejectByCar[id]++' in source
-          assert '++attemptsByCar[id]' in source
+          assert 'traceBudget.ShouldLog(' in source
+          assert 'traceBudget.attempts' in source
+          assert 'terminalMilestone' in source
+          assert 'MaterialModeName()' in source
           assert 'transformSamplesByCar[id]++' in source
           assert 'if(f50.valid && DrawPreparedF50External(f50))' in source
           assert 'D3DRS_CLIPPING,TRUE' in gpu
           assert 'D3DRS_CLIPPLANEENABLE,0u' in gpu
           assert 'if(!MeshInDrawPass(m.glass,pass))continue;' in gpu
+          assert 'ScopedExternalStereoMeshReceipt eyeScope(physical)' in gpu
+          assert 'physical.Complete()' in gpu
+          assert 'ExternalEyeFailureName(' in source
+          assert 'ClassifyExternalEyeFailure(physical)' in gpu
+          assert 'DistinctFiniteExternalEyeTransforms(' in Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
+          assert 'receipt->rightDrawFailed = receipt->rightDrawFailed || rightGpuFailure' in Path('src/vr/game/external_car_stereo_receipt.hpp').read_text()
+          assert 'stereoRetry_.OnSoftStereoFailure()' in gpu
+          assert 'ScopedExternalVehicleSemantic externalScope' in gpu
+          assert 'MainBackbufferActive(device)' in source
+          assert 'OutRunVRStereo::R29OwnerStereoWanted()' not in source
+          assert 'OutRunVRStereo::R29OwnerTargetIsBackBuffer()' not in source
+          assert 'GetBackBuffer(' in gpu and 'GetRenderTarget(0,&active)' in gpu
+          assert 'GetRenderTarget(slot,&auxiliary)' in gpu
+          assert 'result!=D3DERR_NOTFOUND' in gpu
+          assert 'if(bound)return false;' in gpu
           runners=[
               'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd',
               'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
@@ -78,4 +98,14 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --depth=1 origin 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7
-          test -z "$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- vrhost src/vr/d3d9 src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp Start-OutRun.cmd)"
+          test -z "$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- vrhost src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp Start-OutRun.cmd)"
+
+      - name: Only specifically reviewed R7 R30 R33 stereo owners may differ from v0.03
+        shell: bash
+        run: |
+          set -euo pipefail
+          changed="$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- src/vr/d3d9)"
+          if grep -Ev '^src/vr/d3d9/stereo_renderer_r(7\.inc|30\.cpp|33\.cpp)$' <<< "$changed" | grep -q .; then
+            echo "$changed"
+            exit 1
+          fi

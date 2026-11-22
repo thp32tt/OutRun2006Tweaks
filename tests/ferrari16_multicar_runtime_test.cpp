@@ -79,6 +79,9 @@ int main() {
         assert(ChooseOriginalCarRoute(draw,receipt)==
                OriginalCarRoute::OriginalFallback);
         receipt.submittedMeshes=receipt.expectedMeshes;
+        receipt.attemptedMeshes=receipt.expectedMeshes;
+        receipt.verifiedStereoMeshes=receipt.expectedMeshes;
+        receipt.possiblySubmitted=true;
         receipt.drawSucceeded=true;receipt.stateRestored=true;
         assert(ChooseOriginalCarRoute(draw,receipt)==
                OriginalCarRoute::ExternalComplete);
