@@ -9,6 +9,7 @@
 #include <d3dcompiler.h>
 #include <cstring>
 #include "external_car_pbr_eye_math.hpp"
+#include "external_car_pbr_normal_math.hpp"
 
 namespace OutRunVR::DinoSidecar {
 class PbrShaders final {
@@ -20,6 +21,7 @@ class PbrShaders final {
 row_major float4x4 world : register(c0);
 row_major float4x4 view : register(c4);
 row_major float4x4 projection : register(c8);
+row_major float3x3 worldNormalMatrix : register(c12);
 struct VertexIn {
     float3 position : POSITION0;
     float3 normal : NORMAL0;
@@ -35,7 +37,7 @@ VertexOut mainVS(VertexIn input) {
     VertexOut o;
     float4 w = mul(float4(input.position,1), world);
     o.worldPosition = w.xyz;
-    o.worldNormal = normalize(mul(input.normal, (float3x3)world));
+    o.worldNormal = normalize(mul(input.normal, worldNormalMatrix));
     o.uv = input.uv;
     o.position = mul(mul(w,view),projection);
     return o;
@@ -170,8 +172,14 @@ public:
     }
     HRESULT SetWorld(IDirect3DDevice9* device,const D3DMATRIX& world) noexcept {
         if(!device||!vs_)return E_FAIL;
-        return FAILED(device->SetVertexShaderConstantF(
-            0,&world.m[0][0],4)) ? E_FAIL:S_OK;
+        float normalRows[12]{};
+        if(!ExternalCarPbrNormalMatrix(&world.m[0][0],normalRows))
+            return E_FAIL;
+        if(FAILED(device->SetVertexShaderConstantF(
+                    0,&world.m[0][0],4)) ||
+           FAILED(device->SetVertexShaderConstantF(12,normalRows,3)))
+            return E_FAIL;
+        return S_OK;
     }
     HRESULT Bind(IDirect3DDevice9* device,const D3DMATRIX& world,
                  const D3DMATRIX& view,const D3DMATRIX& projection) noexcept {

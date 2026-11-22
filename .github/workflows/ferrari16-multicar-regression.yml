@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -92,6 +92,9 @@ jobs:
           assert 'ScopedExternalPbrStereo pbrEyeScope(' in gpu
           assert 'ScopedExternalPbrStereo' in scope
           assert 'ExternalPbrEyeConstants(' in pbr
+          assert 'ExternalCarPbrNormalMatrix(' in pbr
+          assert 'SetVertexShaderConstantF(12,normalRows,3)' in pbr
+          assert 'row_major float3x3 worldNormalMatrix : register(c12)' in pbr
           pbr_trace=Path('tools/ferrari16/RUN-FERRARI16-V003-PBR-TRACE.cmd').read_text()
           assert 'OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=0' in pbr_trace
           assert 'OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=1' in Path('tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd').read_text()
