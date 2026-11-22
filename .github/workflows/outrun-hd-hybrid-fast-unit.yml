@@ -1,4 +1,5 @@
 name: OutRun HD Korean 954-ROI Fast Renderer Unit Tests
+# Validate bounded native-ROI last-resort overlap fallback and explicit risk receipts.
 on:
   workflow_dispatch:
   push:
