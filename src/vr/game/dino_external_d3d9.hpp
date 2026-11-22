@@ -444,9 +444,15 @@ public:
         if(next==FerrariModelSlot::GenericId && nextCarId>=30u)
             return false;
         if(next==selectedSlot_ && nextCarId==selectedCarId_)return false;
-        // Worker's code lives in this DLL: join before destroying its future.
-        // Selection changes are rare; no game-state/D3D access occurs in worker.
-        if(cpuLoad_.valid())cpuLoad_.wait();
+        // No blocking wait on the player callback: a large old OVC parse
+        // must finish asynchronously while native PMT is still displayed.
+        // Re-attempt the pending selection on the next native callback.
+        if(cpuLoad_.valid() &&
+           cpuLoad_.wait_for(std::chrono::seconds(0)) !=
+               std::future_status::ready)
+            return false;
+        // A ready future is safe to destroy without waiting; do not let a
+        // stale old-car payload migrate to the new selection.
         cpuLoad_=std::future<CpuLoad>{};
         ReleaseGpu();
         cpu_=Model{};
@@ -459,6 +465,13 @@ public:
         modelBoundsReady_=false;
         modelMinLocalY_=0.f;
         return true;
+    }
+    bool SelectionMatches(FerrariModelSlot requested,
+                          unsigned char carId=255u) const noexcept {
+        const unsigned char canonical =
+            requested==FerrariModelSlot::GenericId && carId<30u
+            ? CanonicalFerrariExternalCarId(carId):carId;
+        return selectedSlot_==requested && selectedCarId_==canonical;
     }
     void OnDeviceReset() noexcept {
         ReleaseGpu();
