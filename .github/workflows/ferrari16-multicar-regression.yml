@@ -141,3 +141,14 @@ jobs:
             echo "$changed"
             exit 1
           fi
+
+  pbr-hlsl:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile the exact runtime vertex/pixel HLSL with Windows D3DCompiler
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat" || exit /b 1
+          cl /nologo /std:c++17 /EHsc /W4 "tests\external_car_pbr_shader_compile_test.cpp" /Fe:"%RUNNER_TEMP%\ferrari16_pbr_shader_test.exe" /link d3dcompiler.lib || exit /b 1
+          "%RUNNER_TEMP%\ferrari16_pbr_shader_test.exe" || exit /b 1
