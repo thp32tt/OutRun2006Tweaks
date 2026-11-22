@@ -1,4 +1,5 @@
 #include "../game/external_car_stereo_receipt.hpp"
+#include "../game/external_car_eye_transform_proof.hpp"
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -2203,11 +2204,23 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				InvalidateRightDepthStencilIfLeftMayWrite(device);
 				NoteRestoreFailure("right-eye draw");
 			}
+            // Stereo routing alone is not evidence of binocular geometry:
+            // identical LEFT/RIGHT view+projection pairs render mono twice.
+            // Evaluate the 16-float matrices only for an active external DIP.
+            const bool externalDistinctEyes=
+                draw.worldStereo && draw.fixedFunctionWorld &&
+                OutRunVR::DinoSidecar::ActiveExternalStereoMesh != nullptr &&
+                sizeof(D3DMATRIX)==16u*sizeof(float) &&
+                OutRunVR::DinoSidecar::DistinctFiniteExternalEyeTransforms(
+                    reinterpret_cast<const float*>(&draw.fixedEyeView[0]),
+                    reinterpret_cast<const float*>(&draw.fixedEyeView[1]),
+                    reinterpret_cast<const float*>(&draw.fixedEyeProjection[0]),
+                    reinterpret_cast<const float*>(&draw.fixedEyeProjection[1]));
 			OutRunVR::DinoSidecar::RecordExternalStereoMeshPair(
                 SUCCEEDED(leftHr),rightDrawAttempted&&SUCCEEDED(rightHr),
                 restoreOk&&!FrameStereoIncomplete&&
                     FrameFailureReason==OutRunVR::StereoFailureNone,
-                draw.poseSequence,draw.worldStereo&&draw.fixedFunctionWorld,
+                draw.poseSequence,externalDistinctEyes,
                 FAILED(rightHr)); // RT, depth, transform or physical DIP failed
             R7TraceVisualEyes(visualTrace,"STEREO_PAIR",true,
 				draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
