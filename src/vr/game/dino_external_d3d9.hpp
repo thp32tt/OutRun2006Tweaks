@@ -90,6 +90,8 @@ class GpuOwner final {
     };
     Model cpu_{};
     NormalRepairStats normalRepairStats_{};
+    std::string cpuLoadFailure_{};
+    const char* gpuFailure_="NONE";
     std::vector<GpuMesh> meshes_{};
     std::vector<IDirect3DTexture9*> textures_{};
     std::vector<IDirect3DTexture9*> normals_{},orms_{};
@@ -100,6 +102,7 @@ class GpuOwner final {
     struct CpuLoad {
         Model model{};
         NormalRepairStats normalStats{};
+        std::string error{};
         float lowest=0.f;
         bool parsed=false;
     };
@@ -207,8 +210,10 @@ class GpuOwner final {
             preparation_=loaded_?Preparation::CpuReady:Preparation::Cold;
         owner_=nullptr;
     }
-    bool RejectGpu(IDirect3DDevice9* device) noexcept {
+    bool RejectGpu(IDirect3DDevice9* device,
+                   const char* reason="GPU_RESOURCE_FAILURE") noexcept {
         ReleaseGpu();
+        gpuFailure_=reason;
         gpuRetry_.NoteFailure(device);
         preparation_=Preparation::Failed;
         return false;
@@ -227,6 +232,7 @@ class GpuOwner final {
     void QuarantineFailedSubmission(IDirect3DDevice9* device) noexcept {
         ReleaseGpu();
         gpuRetry_.NoteFailure(device);
+        gpuFailure_="GPU_PARTIAL_SUBMISSION";
         preparation_=Preparation::Failed;
     }
     bool BuildSidecarPath(wchar_t (&path)[MAX_PATH]) const noexcept {
@@ -308,9 +314,11 @@ class GpuOwner final {
                 CpuLoad result{};
                 try {
                     std::vector<std::uint8_t> bytes;
-                    if(!ReadFile(pathCopy.c_str(),bytes))return result;
-                    std::string error;
-                    if(!Parse(bytes.data(),bytes.size(),result.model,error))
+                    if(!ReadFile(pathCopy.c_str(),bytes)) {
+                        result.error="OVC_MISSING_OR_READ_FAILED";
+                        return result;
+                    }
+                    if(!Parse(bytes.data(),bytes.size(),result.model,result.error))
                         return result;
                     result.normalStats=RepairExternalModelNormals(result.model);
                     float lowest=10000.f;
@@ -321,6 +329,7 @@ class GpuOwner final {
                     result.parsed=true;
                 } catch(...) {
                     result.parsed=false;
+                    result.error="OVC_PARSE_EXCEPTION";
                 }
                 return result;
             });
@@ -333,23 +342,28 @@ class GpuOwner final {
             return false;
         CpuLoad result=cpuLoad_.get();
         if(!result.parsed) {
+            cpuLoadFailure_=std::move(result.error);
+            if(cpuLoadFailure_.empty())cpuLoadFailure_="OVC_PARSE_UNKNOWN";
             preparation_=Preparation::Failed;
             return false;
         }
         if(role_==SidecarRole::Vehicle) {
             float validatedLift=0.f;
             if(!ComputeExternalFloorLift(0.22f,result.lowest,validatedLift)) {
+                cpuLoadFailure_="OVC_INVALID_FLOOR_ENVELOPE";
                 preparation_=Preparation::Failed;
                 return false;
             }
         } else if(!std::isfinite(result.lowest) ||
                   result.lowest < -10.f || result.lowest > 10.f) {
+            cpuLoadFailure_="OVC_INVALID_DASHBOARD_ENVELOPE";
             preparation_=Preparation::Failed;
             return false;
         }
         modelMinLocalY_=result.lowest;
         modelBoundsReady_=true;
         cpu_=std::move(result.model);
+        cpuLoadFailure_.clear();
         normalRepairStats_=result.normalStats;
         loaded_=true;
         preparation_=Preparation::CpuReady;
@@ -373,7 +387,7 @@ class GpuOwner final {
         if(nextTexture_<cpu_.textures.size()) {
             const auto material=nextTexture_++;
             if(!UploadDDS(dev,cpu_.textures[material],&textures_[material]))
-                return RejectGpu(dev);
+                return RejectGpu(dev,"ALBEDO_DDS_UPLOAD_FAILED");
             return false;
         }
         // Optional PBR allocations must never prevent a working legacy draw.
@@ -395,12 +409,14 @@ class GpuOwner final {
                 if(src.dds.empty())continue;
                 IDirect3DTexture9** dst=normal ? &normals_[material]
                                               : &orms_[material];
-                if(!UploadDDS(dev,src,dst))return RejectGpu(dev);
+                if(!UploadDDS(dev,src,dst))
+                    return RejectGpu(dev,normal ? "NORMAL_DDS_UPLOAD_FAILED"
+                                                : "ORM_DDS_UPLOAD_FAILED");
                 return false;
             }
             // Bind only after every normal/ORM allocation succeeded.
             pbrReady_=pbrShaders_.Ensure(dev);
-            if(!pbrReady_)return RejectGpu(dev);
+            if(!pbrReady_)return RejectGpu(dev,"PBR_SHADER_UNAVAILABLE");
         }
         pbrPrepared_=true;
         if(nextMesh_<cpu_.meshes.size()) {
@@ -503,6 +519,8 @@ public:
         ReleaseGpu();
         cpu_=Model{};
         normalRepairStats_={};
+        cpuLoadFailure_.clear();
+        gpuFailure_="NONE";
         loaded_=false;
         preparation_=Preparation::Cold;
         loadAttempted_=false;
@@ -541,6 +559,10 @@ public:
     // current frame partial and use original PMT from the next frame.
     void QuarantineUnsafeFrame(IDirect3DDevice9* device) noexcept {
         QuarantineFailedSubmission(device);
+    }
+    const char* LastLoadFailureName() const noexcept {
+        if(gpuFailure_ && std::strcmp(gpuFailure_,"NONE")!=0)return gpuFailure_;
+        return cpuLoadFailure_.empty() ? "NONE" : cpuLoadFailure_.c_str();
     }
     const char* PreparationName() const noexcept {
         switch(preparation_) {

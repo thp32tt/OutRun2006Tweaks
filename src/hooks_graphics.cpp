@@ -1066,13 +1066,13 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 if(rejectedByCar[id]++<4u || terminalMilestone)
                     spdlog::warn("VR EXTERNAL SELECTED SIDECAR REJECTED: "
                         "carId={} canonical={} selected={} "
-                        "slot={} requestedLift={:.4f} prep={} originalPMT=FALLBACK",
+                        "slot={} requestedLift={:.4f} prep={} reason={} originalPMT=FALLBACK",
                         static_cast<unsigned>(carId),
                         static_cast<unsigned>(OutRunVR::DinoSidecar::
                             CanonicalFerrariExternalCarId(carId)),
                         Settings::VRExternalFerrariTestCarId.get(),
                         static_cast<unsigned>(ticket.slot),requestedLift,
-                        preparation);
+                        preparation,external.LastLoadFailureName());
             }
             return ticket;
         }

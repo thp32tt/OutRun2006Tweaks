@@ -98,6 +98,13 @@ jobs:
           assert 'normals[repaired={},unresolved={}]' in source
           assert 'RepairExternalModelNormals(result.model)' in gpu
           assert 'NormalRepairStats NormalRecovery()' in gpu
+          assert 'OVC_MISSING_OR_READ_FAILED' in gpu
+          assert 'OVC_INVALID_FLOOR_ENVELOPE' in gpu
+          assert 'NORMAL_DDS_UPLOAD_FAILED' in gpu
+          assert 'ORM_DDS_UPLOAD_FAILED' in gpu
+          assert 'PBR_SHADER_UNAVAILABLE' in gpu
+          assert 'LastLoadFailureName()' in source
+          assert '--require-pbr-maps' in Path('tools/ferrari16/verify_all_car_ovc.py').read_text()
           assert 'float3 faceN = cross(dpdx,dpdy)' in pbr
           assert 'ScopedExternalPbrStereo' in scope
           assert 'ExternalPbrEyeConstants(' in pbr

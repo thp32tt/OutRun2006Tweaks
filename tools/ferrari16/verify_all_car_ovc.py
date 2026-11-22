@@ -102,6 +102,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                 (70, 19, 21100, 38992), "legacy fixed layout")
     at, gpu_bytes, total_v, total_tris = 36, 0, 0, 0
     min_y = math.inf
+    zero_normals = 0
     for _ in range(groups):
         head = 12 if version == 1 else 16
         require(at + head <= len(data), "mesh header")
@@ -125,6 +126,8 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
             require(all(math.isfinite(x) and abs(x) <= 10000 for x in values),
                     "nonfinite vertex/UV/normal")
             min_y = min(min_y, values[1])
+            if sum(n*n for n in values[3:6]) <= 1e-12:
+                zero_normals += 1
         at += vertex_bytes
         fmt = "<H" if width_i == 2 else "<I"
         for i in range(count_i):
@@ -209,10 +212,17 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     return {"version": version, "groups": groups, "triangles": tris,
             "vertices": vertices, "materials": materials,
             "normal_maps": normal_maps, "orm_maps": orm_maps,
+            "zero_normal_vertices": zero_normals,
             "dashboard_bindings": dashboards, "floor_min_y": round(min_y, 4)}
 
 
-def audit(game_root: Path) -> list[dict]:
+def pbr_map_coverage(details: dict) -> bool:
+    return (details.get("version", 0) >= 3 and
+            details.get("normal_maps", 0) > 0 and
+            details.get("orm_maps", 0) > 0)
+
+
+def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
     results = []
     for car_id, name in CARS:
         canonical = game_root / "ExternalCars" / f"car_id_{car_id:02d}.ovc"
@@ -225,7 +235,11 @@ def audit(game_root: Path) -> list[dict]:
         else:
             try:
                 details = inspect(model)
-                status = "PASS"
+                if require_pbr_maps and not pbr_map_coverage(details):
+                    status = "FAIL"
+                    details["reason"] = "required PBR normal/ORM maps missing"
+                else:
+                    status = "PASS"
             except (OvcError, OSError, struct.error) as error:
                 status, details = "FAIL", {"reason": str(error)}
         overlay = game_root / "ExternalCars" / "Dashboard" / f"car_id_{car_id:02d}.ovc"
@@ -267,6 +281,8 @@ def self_test() -> None:
         path = Path(directory) / "car_id_00.ovc"
         path.write_bytes(header + payload)
         assert inspect(path)["triangles"] == 1
+        assert inspect(path)["zero_normal_vertices"] == 0
+        assert not pbr_map_coverage(inspect(path))
         b = bytearray(path.read_bytes())
         b[-1] ^= 1
         path.write_bytes(b)
@@ -303,14 +319,20 @@ def main() -> int:
     parser.add_argument("--game-root", type=Path, default=Path("."))
     parser.add_argument("--json-out", type=Path)
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--require-pbr-maps", action="store_true",
+                        help="fail each installed car lacking PBR normal or ORM maps")
     args = parser.parse_args()
     if args.self_test:
         self_test()
         return 0
-    rows = audit(args.game_root)
+    rows = audit(args.game_root, require_pbr_maps=args.require_pbr_maps)
     for row in rows:
         print(f"{row['id']:02d} {row['car']:<19} {row['status']:<7} "
               f"{row['selected_asset']:<16} overlay={row['dashboard_overlay']}")
+        if row["status"] == "PASS":
+            body = row["body"]
+            print("    PBR maps normal={normal_maps} ORM={orm_maps} "
+                  "zeroNormals={zero_normal_vertices}".format(**body))
         if row["status"] == "FAIL":
             print("   ", row["body"]["reason"])
     counts = {status: sum(row["status"] == status for row in rows)
