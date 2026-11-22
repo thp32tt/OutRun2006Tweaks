@@ -732,8 +732,16 @@ public:
         // native callback suppressed even when no DIP was submitted.
         result.receipt.stateMayBeDirty=FAILED(restore);
         result.hr=FAILED(hr)?hr:(result.receipt.drawSucceeded?restore:E_FAIL);
-        if(FAILED(result.hr))
-            QuarantineFailedSubmission(device);
+        if(FAILED(result.hr)) {
+            if(eyeProofOnlyFailure && result.receipt.stateRestored) {
+                // Stereo loss is a frame issue, not proof that the OVC
+                // textures/VBs are corrupt. Keep stock visible during
+                // cooldown and retry a bounded interval later.
+                stereoRetry_.OnSoftStereoFailure();
+            } else {
+                QuarantineFailedSubmission(device);
+            }
+        }
         return result;
     }
 };
