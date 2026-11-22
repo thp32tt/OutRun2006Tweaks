@@ -337,23 +337,24 @@ class GpuOwner final {
         const bool fixedFunctionStereoProbe=
             ForceFixedFunctionStereoProbe();
         if(!pbrPrepared_ && cpu_.pbrEnabled && !fixedFunctionStereoProbe) {
-            normals_.resize(cpu_.pbrMaterials.size(),nullptr);
-            orms_.resize(cpu_.pbrMaterials.size(),nullptr);
-            bool mapsReady=true;
-            for(std::size_t i=0;i<cpu_.pbrMaterials.size();++i) {
-                const auto& p=cpu_.pbrMaterials[i];
-                if((!p.normal.dds.empty() &&
-                    !UploadDDS(dev,p.normal,&normals_[i])) ||
-                   (!p.orm.dds.empty() &&
-                    !UploadDDS(dev,p.orm,&orms_[i]))) {
-                    mapsReady=false;break;
-                }
+            const auto count=cpu_.pbrMaterials.size();
+            if(normals_.size()!=count)normals_.resize(count,nullptr);
+            if(orms_.size()!=count)orms_.resize(count,nullptr);
+            // Only one actual PBR map upload per player callback.
+            while(nextPbrMap_<count*2u) {
+                const std::size_t index=nextPbrMap_++;
+                const auto material=index/2u;
+                const bool normal=(index%2u)==0u;
+                const auto& src=normal ? cpu_.pbrMaterials[material].normal
+                                       : cpu_.pbrMaterials[material].orm;
+                if(src.dds.empty())continue;
+                IDirect3DTexture9** dst=normal ? &normals_[material]
+                                              : &orms_[material];
+                if(!UploadDDS(dev,src,dst))return RejectGpu(dev);
+                return false;
             }
-            if(mapsReady)pbrReady_=pbrShaders_.Ensure(dev);
-            // Normal/ORM maps are material input, never decorative.
-            // If the shader or required source map fails, do not silently
-            // render an unlit/flat "textured" external car: original native
-            // car remains the only safe fallback for this device generation.
+            // Bind only after every normal/ORM allocation succeeded.
+            pbrReady_=pbrShaders_.Ensure(dev);
             if(!pbrReady_)return RejectGpu(dev);
         }
         pbrPrepared_=true;
