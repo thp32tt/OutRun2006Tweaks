@@ -23,6 +23,8 @@
 #include "external_car_runtime_policy.hpp"
 #include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
+#include "external_car_stereo_receipt.hpp"
+#include "render_semantics.hpp"
 
 namespace OutRunVR::DinoSidecar {
 // Fixed-function test must be explicitly enabled by the launch process;
@@ -450,9 +452,13 @@ public:
                     const D3DMATRIX& world,const D3DMATRIX& view,
                     const D3DMATRIX& projection,
                     const DashboardTelemetry& dashboard,
-                     bool gearOnly=false) noexcept {
+                     bool gearOnly=false,
+                     std::uint64_t expectedNativeFrame=0,
+                     std::uint64_t expectedPose=0) noexcept {
         GpuDrawResult result{};
-        if(!EnsureResources(device))return result;
+        if(!EnsureResources(device) || expectedNativeFrame==0 || expectedPose==0)
+            return result;
+        OutRunVR::GameSemantic::ScopedExternalVehicleSemantic externalScope;
         for(const auto& mesh:meshes_) {
             const auto* binding=DashboardFor(mesh);
             if(gearOnly && (!binding || binding->kind!=DashboardKind::GearVisible))
@@ -591,16 +597,26 @@ public:
                     hr=E_FAIL;break;
                 }
             }
+            ExternalStereoMeshReceipt physical{};
+            physical.expectedPose=expectedPose;
+            ScopedExternalStereoMeshReceipt eyeScope(physical);
+            result.receipt.possiblySubmitted=true;
+            ++result.receipt.attemptedMeshes;
             hr=device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,0,0,m.vertexCount,
                                              0,m.indexCount/3);
+            if(SUCCEEDED(hr))++result.receipt.submittedMeshes;
+            if(physical.Complete())++result.receipt.verifiedStereoMeshes;
+            else hr=E_FAIL; // LEFT success alone never proves RIGHT
             if(FAILED(hr))break;
-            ++result.receipt.submittedMeshes;
         }
         const HRESULT restore=saved->Apply();
         saved->Release();
-        result.receipt.drawSucceeded=SUCCEEDED(hr);
+        result.receipt.drawSucceeded=SUCCEEDED(hr) &&
+            result.receipt.expectedMeshes!=0 &&
+            result.receipt.submittedMeshes==result.receipt.expectedMeshes &&
+            result.receipt.verifiedStereoMeshes==result.receipt.expectedMeshes;
         result.receipt.stateRestored=SUCCEEDED(restore);
-        result.hr=FAILED(hr)?hr:restore;
+        result.hr=FAILED(hr)?hr:(result.receipt.drawSucceeded?restore:E_FAIL);
         if(FAILED(result.hr))
             QuarantineFailedSubmission(device);
         return result;
