@@ -990,8 +990,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // experimental replacement must be explicitly acknowledged, and its
         // shader must use the per-eye fixed-function diagnostic path.
         // This gate occurs before reading camera/XR or attempting any OVC IO.
-        if(extraCar && !OutRunVR::DinoSidecar::PermitGenericSidecar(
-               true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
+        if(!OutRunVR::DinoSidecar::PermitGenericSidecar(
+               extraCar || f50Car,
+               OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
                Settings::VRExternalFerrariNativeCallbackReplacement.get()))
             return ticket;
         const auto* camera=Game::camera();
@@ -1096,7 +1097,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const bool f50Slot=ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F50;
         const bool sameCar=livePlayer && livePlayer->car_id_10==ticket.carId &&
             (f50Slot ? (Settings::VRF50ExternalModel &&
-                         OutRunVR::DinoSidecar::IsF50RetailCarId(livePlayer->car_id_10)) :
+                         OutRunVR::DinoSidecar::IsF50RetailCarId(livePlayer->car_id_10) &&
+                          OutRunVR::DinoSidecar::PermitGenericSidecar(
+                              true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
+                              Settings::VRExternalFerrariNativeCallbackReplacement.get())) :
              (Settings::VRExternalFerrariTest &&
               OutRunVR::DinoSidecar::PermitGenericSidecar(
                   true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
@@ -1146,7 +1150,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         }
         const auto draw=OutRunVR::DinoSidecar::GlobalGpu().DrawNativeScene(
             ticket.device,ticket.world,ticket.view,ticket.projection,
-            ticket.dashboard);
+            ticket.dashboard,false,ticket.nativeFrame,ticket.xrPose);
         const auto route=OutRunVR::DinoSidecar::ChooseOriginalCarRoute(
             gate,draw.receipt);
         const bool suppressOriginal=
@@ -1159,7 +1163,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             dashboardDraw=OutRunVR::DinoSidecar::GlobalDashboardGpu().DrawNativeScene(
                 ticket.device,ticket.world,ticket.view,ticket.projection,
                 ticket.dashboard,
-                OutRunVR::DinoSidecar::GlobalGpu().HasEmbeddedSpeedAndRpm());
+                OutRunVR::DinoSidecar::GlobalGpu().HasEmbeddedSpeedAndRpm(),
+                ticket.nativeFrame,ticket.xrPose);
         if(Settings::VRTelemetry || Settings::VRExternalFerrariDiag) {
             // One globally bounded diagnostic hid every later Ferrari after
             // the first eight 575 frames. Bound receipts per canonical model.
