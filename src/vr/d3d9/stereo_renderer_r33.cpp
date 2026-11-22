@@ -1,4 +1,5 @@
 #include "../game/external_car_stereo_receipt.hpp"
+#include "../game/external_car_pbr_stereo_scope.hpp"
 // R33 final dispatch + post-review hot-path hardening.
 //
 // R32 owns hook-free direct-transport review-2 safety plus Reset/Present helpers
@@ -1666,6 +1667,14 @@ namespace OutRunVRStereo
             const char* site, bool resyncAlreadyFlushed,
             bool telemetry) noexcept
         {
+            // The external PBR shader uses VS c4/c8 and PS c1, not the game's
+            // c64 WVP. Only R7 has the exact per-eye constant bridge and
+            // receipt proof. Never route this DIP into R33's cached c64 or
+            // a raw mono draw when the raster guard is unavailable.
+            if (OutRunVR::DinoSidecar::ActiveExternalPbrStereo) {
+                if (!resyncAlreadyFlushed) return E_FAIL;
+                return lowerR29Draw();
+            }
             // Only the early raster-guard bypass reaches this path without an
             // earlier flush; keep StateBlock recovery there, including when
             // stereo is disabled, without paying for a duplicate active flush.
