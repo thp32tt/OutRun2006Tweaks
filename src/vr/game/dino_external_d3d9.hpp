@@ -354,7 +354,9 @@ class GpuOwner final {
             // car remains the only safe fallback for this device generation.
             if(!pbrReady_)return RejectGpu(dev);
         }
-        for(std::size_t meshIndex=0;meshIndex<cpu_.meshes.size();++meshIndex) {
+        pbrPrepared_=true;
+        if(nextMesh_<cpu_.meshes.size()) {
+            const auto meshIndex=nextMesh_;
             const auto& m=cpu_.meshes[meshIndex];
             GpuMesh next{};
             next.material=m.material;
