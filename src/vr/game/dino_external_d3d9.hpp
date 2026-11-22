@@ -204,6 +204,21 @@ class GpuOwner final {
                               static_cast<unsigned>(canonicalId))<=0)
                     return false;
                 suffix=genericSuffix;
+                // Prefer the exact canonical per-car asset for all 16 models.
+                // Legacy 288gto.ovc/f40.ovc remains a fallback only if that
+                // canonical filename is genuinely absent (not malformed).
+                // This path is resolved at cold load, never scanned on GPU.
+                if(const wchar_t* legacy=LegacyFerrariCarSuffix(canonicalId)) {
+                    wchar_t candidate[MAX_PATH]{};
+                    if(std::wcslen(path)+std::wcslen(genericSuffix)+1>MAX_PATH ||
+                       wcscpy_s(candidate,MAX_PATH,path)!=0 ||
+                       wcscat_s(candidate,MAX_PATH,genericSuffix)!=0)
+                        return false;
+                    const DWORD attr=GetFileAttributesW(candidate);
+                    if(attr==INVALID_FILE_ATTRIBUTES ||
+                       (attr&FILE_ATTRIBUTE_DIRECTORY)!=0)
+                        suffix=legacy;
+                }
             } else
                 suffix=usePbr?pbrSuffix:stableSuffix;
         }
@@ -361,7 +376,10 @@ public:
     bool SelectSidecar(FerrariModelSlot next,
                        unsigned char carId=255u) noexcept {
         const unsigned char nextCarId=
-            next==FerrariModelSlot::GenericId?carId:255u;
+            next==FerrariModelSlot::GenericId && carId<30u ?
+                CanonicalFerrariExternalCarId(carId):carId;
+        // A tuned/non-tuned transition must share one validated CPU and GPU
+        // resource identity, avoiding repeated large DDS uploads per slot.
         if(next==FerrariModelSlot::GenericId && nextCarId>=30u)
             return false;
         if(next==selectedSlot_ && nextCarId==selectedCarId_)return false;
@@ -410,8 +428,11 @@ public:
     }
     bool SafeFloorLift(float requested,float& effective) noexcept {
         try {
+            // EnsureLoaded already opens, bounds-checks and CRC-verifies the
+            // fixed path exactly once per selected canonical car. Repeating
+            // GetFileAttributesW per-eye/per-frame is unnecessary disk work.
             if(role_!=SidecarRole::Vehicle ||
-               !Installed() || !EnsureLoaded() || !modelBoundsReady_)
+               !EnsureLoaded() || !modelBoundsReady_)
                 return false;
             return ComputeExternalFloorLift(
                 requested,modelMinLocalY_,effective);
