@@ -463,6 +463,7 @@ public:
         preparation_=Preparation::Cold;
         loadAttempted_=false;
         gpuRetry_.OnReset();
+        stereoRetry_.OnSelectionOrDeviceReset();
         selectedSlot_=next;
         selectedCarId_=nextCarId;
         modelBoundsReady_=false;
@@ -479,6 +480,7 @@ public:
     void OnDeviceReset() noexcept {
         ReleaseGpu();
         gpuRetry_.OnReset();
+        stereoRetry_.OnSelectionOrDeviceReset();
         // A missing/corrupt sidecar is not retried on every eye draw.
         // Re-arm only after a real device reset or race->menu boundary so a
         // corrected OVC can be picked up next race without restarting the EXE.
@@ -556,6 +558,7 @@ public:
                      std::uint64_t expectedNativeFrame=0,
                      std::uint64_t expectedPose=0) noexcept {
         GpuDrawResult result{};
+        if(!stereoRetry_.AllowNativeAttempt())return result;
         if(!EnsureResources(device) || expectedNativeFrame==0 || expectedPose==0)
             return result;
         for(const auto& mesh:meshes_) {
@@ -565,11 +568,14 @@ public:
             if(DashboardMeshVisible(binding,dashboard))
                 ++result.receipt.expectedMeshes;
         }
+        // Nothing drawable: do not mutate render state or quarantine GPU.
+        if(result.receipt.expectedMeshes==0)return result;
         IDirect3DStateBlock9* saved=nullptr;
         if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&saved))||!saved)
             return result;
         if(FAILED(saved->Capture())){saved->Release();return result;}
         HRESULT hr=S_OK;
+        bool eyeProofOnlyFailure=false;
         const DWORD fvf=D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1;
         if(FAILED(device->SetVertexShader(nullptr)) ||
            FAILED(device->SetPixelShader(nullptr)) ||
