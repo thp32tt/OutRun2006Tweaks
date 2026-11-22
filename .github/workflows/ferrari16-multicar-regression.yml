@@ -1,7 +1,7 @@
 name: Ferrari16 All-Car Sidecar Regression
 on:
   push:
-    branches: [vr-ferrari16-v003-multicar-debug-20261122, fix/ferrari16-stereo-loader-guard-20261122]
+    branches: [vr-ferrari16-v003-multicar-debug-20261122, fix/ferrari16-stereo-loader-guard-20261122, fix/ferrari16-pbr-stereo-20261123]
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -71,6 +71,30 @@ jobs:
           assert 'GetRenderTarget(slot,&auxiliary)' in gpu
           assert 'result!=D3DERR_NOTFOUND' in gpu
           assert 'if(bound)return false;' in gpu
+          # DDS parsing alone cannot certify PBR stereo. Only the exact
+          # bound PBR pair may be duplicated via R7's physical eye path.
+          r7=Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
+          r33=Path('src/vr/d3d9/stereo_renderer_r33.cpp').read_text()
+          pbr=Path('src/vr/game/dino_external_pbr_shader.hpp').read_text()
+          scope=Path('src/vr/game/external_car_pbr_stereo_scope.hpp').read_text()
+          assert 'ActiveExternalStereoMesh ?' in r7
+          assert 'ActiveExternalPbrStereo' in r7 and 'ActiveExternalPbrStereo' in r33
+          assert 'boundShader==externalPbr->vertex' in r7
+          assert 'boundPixel==externalPbr->pixel' in r7
+          assert 'state.externalPbrWorld=true' in r7
+          assert 'SetExternalPbrEyeConstants(device,draw,0)' in r7
+          assert 'SetExternalPbrEyeConstants(device,draw,1)' in r7
+          assert 'RestoreExternalPbrConstants(device,draw)' in r7
+          assert 'GetPixelShaderConstantF(' in r7
+          assert 'SetPixelShaderConstantF(1,camera,1)' in r7
+          assert 'if (!resyncAlreadyFlushed) return E_FAIL;' in r33
+          assert 'return lowerR29Draw();' in r33
+          assert 'ScopedExternalPbrStereo pbrEyeScope(' in gpu
+          assert 'ScopedExternalPbrStereo' in scope
+          assert 'ExternalPbrEyeConstants(' in pbr
+          pbr_trace=Path('tools/ferrari16/RUN-FERRARI16-V003-PBR-TRACE.cmd').read_text()
+          assert 'OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=0' in pbr_trace
+          assert 'OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=1' in Path('tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd').read_text()
           runners=[
               'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd',
               'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
