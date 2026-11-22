@@ -125,7 +125,7 @@ def package(report_file: str, source_zip: str, installer_file: str, output_dir: 
                 "Use an independent COPY of the game with the verified original HD textures.\n"
                 "Unzip this file. Open PowerShell in the extracted folder.\n"
                 "Canary (default 5 DDS): .\\Install-OutRunKoreanTest.ps1 -GameDirectory 'C:\\Path\\To\\Game' -ConfirmTestOnly\n"
-                "After checking startup, all DDS: .\\Install-OutRunKoreanTest.ps1 -GameDirectory 'C:\\Path\\To\\Game' -ConfirmTestOnly -ApplyAll\n"
+                "After canary, rollback using the printed BACKUP path, then all DDS: .\\Install-OutRunKoreanTest.ps1 -GameDirectory 'C:\\Path\\To\\Game' -ConfirmTestOnly -ApplyAll\n"
                 "If original DDS files were missing, consider -AllowMissingSource only after verifying the mod loader.\n"
                 "Backup and rollback journal are created automatically.\n"
                 "Rollback: use -Rollback -BackupDirectory with the printed BACKUP path.\n"
