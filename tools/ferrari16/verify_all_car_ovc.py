@@ -292,6 +292,19 @@ def self_test() -> None:
             assert str(error) == "OVC CRC32", str(error)
         else:
             raise AssertionError("Corrupt CRC was accepted")
+        # A formally valid V4 with zero maps is not PBR-covered; a synthetic
+        # V4 with one normal and ORM DDS must pass the optional strict gate.
+        mapped = group + struct.pack("<I", len(dds)) + dds
+        mapped += b"OVCPBR3!" + struct.pack("<3f", 0.5, 0, 1)
+        mapped += (struct.pack("<I", len(dds)) + dds) * 2
+        mapped += b"OVCDASH4" + struct.pack("<I", 0)
+        mapped_header = b"OVRCABH4" + struct.pack(
+            "<7I", 4, 1, 1, 3, 1, len(mapped),
+            zlib.crc32(mapped) & 0xffffffff)
+        path.write_bytes(mapped_header + mapped)
+        covered = inspect(path)
+        assert covered["normal_maps"] == 1 and covered["orm_maps"] == 1
+        assert pbr_map_coverage(covered)
     # Runtime V1 requires 128x128, 8 mips, DXT1 and the known 72-byte
     # legacy tail; simply checking the 11136-byte container is insufficient.
     legacy_dds = bytearray(11136)
