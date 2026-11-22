@@ -706,6 +706,10 @@ def build(repo_root: str, output: str):
         "source_dds_verified": source_verified,
         "output_dds_count": len(archive),
         "fallback_painted_count": fallback_painted,
+        "last_resort_overlap_test_only_count": sum(
+            1 for atlas in atlas_reports for item in atlas["accepted"]
+            if item.get("resolution") == "FALLBACK_LAST_RESORT_OVERLAP_CLEAN_TEST_ONLY"
+        ),
         "duplicate_translation_represented_count": duplicates,
         "translation_coverage_accounted": coverage,
         "translation_coverage_complete": coverage == ACTIVE_ROI,
