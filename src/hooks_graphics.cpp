@@ -1205,7 +1205,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     "carId={} slot={} localFloorLift={:.4f} "
                     "dash[speedKph={:.1f},rpm={:.0f},gear={}] "
                     "drawHr=0x{:08X} submitted={}/{} attempted={} "
-                    "verifiedEyePairs={} stateRestored={} prep={} "
+                    "verifiedEyePairs={} eyeFailure={} eyeReports={} "
+                    "stateRestored={} prep={} "
                     "dashOverlayHr=0x{:08X} dashOverlay={}/{} route={} "
                     "originalPMT=UNCHANGED",
                     sample,ticket.nativeFrame,ticket.xrPose,
@@ -1216,6 +1217,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     static_cast<unsigned int>(draw.hr),
                     draw.receipt.submittedMeshes,draw.receipt.expectedMeshes,
                     draw.receipt.attemptedMeshes,draw.receipt.verifiedStereoMeshes,
+                    OutRunVR::DinoSidecar::ExternalEyeFailureName(
+                        draw.receipt.lastEyeFailure),
+                    draw.receipt.lastEyeReports,
                     draw.receipt.stateRestored,
                     OutRunVR::DinoSidecar::GlobalGpu().PreparationName(),
                     static_cast<unsigned int>(dashboardDraw.hr),
