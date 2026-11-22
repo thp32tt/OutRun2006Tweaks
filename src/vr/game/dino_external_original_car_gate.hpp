@@ -24,6 +24,10 @@ inline bool CanReplaceOriginalCar(const OriginalCarGate& gate) noexcept {
 struct MeshDrawReceipt final {
     std::uint32_t expectedMeshes=0;
     std::uint32_t submittedMeshes=0;
+    std::uint32_t attemptedMeshes=0;
+    std::uint32_t verifiedStereoMeshes=0;
+    // A failed API result may follow a successful LEFT-eye rasterization.
+    bool possiblySubmitted=false;
     bool drawSucceeded=false;
     bool stateRestored=false;
 };
@@ -33,7 +37,8 @@ enum class OriginalCarRoute : unsigned char {
 inline OriginalCarRoute ChooseOriginalCarRoute(
     const OriginalCarGate& gate,const MeshDrawReceipt& receipt) noexcept
 {
-    if(!CanReplaceOriginalCar(gate) || receipt.submittedMeshes==0)
+    if(!CanReplaceOriginalCar(gate) ||
+       (receipt.submittedMeshes==0 && !receipt.possiblySubmitted))
         return OriginalCarRoute::OriginalFallback;
     // No-overdraw safety: once any external triangle has been submitted,
     // its pixels cannot be removed from the current eye. An impossible
