@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -47,7 +47,10 @@ jobs:
           assert 'EnsureLoaded()' in floor and 'Installed()' not in floor
           assert 'rejectedByCar[id]++' in source
           assert 'gateRejectByCar[id]++' in source
-          assert '++attemptsByCar[id]' in source
+          assert 'traceBudget.ShouldLog(' in source
+          assert 'traceBudget.attempts' in source
+          assert 'terminalMilestone' in source
+          assert 'MaterialModeName()' in source
           assert 'transformSamplesByCar[id]++' in source
           assert 'if(f50.valid && DrawPreparedF50External(f50))' in source
           assert 'D3DRS_CLIPPING,TRUE' in gpu
