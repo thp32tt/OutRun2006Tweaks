@@ -59,3 +59,36 @@ try {
 }
 if (-not $expectedFailure) { throw "CUSTOM_SOURCE_WAS_NOT_HELD" }
 Write-Output "WINDOWS_KOREAN_CANARY_INSTALL_ROLLBACK_PRECHECK_PASS"
+# Verify -ApplyAll handles multiple DDS and reverses every file.
+[IO.File]::WriteAllBytes($origin, $rawOriginal)
+$secondRel = "textures\\load\\spr_demo\\87654321_64x64.dds"
+$source2 = Join-Path $game $secondRel
+$staged2 = Join-Path $package $secondRel
+[IO.File]::WriteAllBytes($source2, [Text.Encoding]::ASCII.GetBytes("DDS second-original-pinned"))
+[IO.File]::WriteAllBytes($staged2, [Text.Encoding]::ASCII.GetBytes("DDS second-korean-preview"))
+$source2Hash = (Get-FileHash -LiteralPath $source2 -Algorithm SHA256).Hash.ToLowerInvariant()
+$staged2Hash = (Get-FileHash -LiteralPath $staged2 -Algorithm SHA256).Hash.ToLowerInvariant()
+$manifest.files += @(@{
+    path = "textures/load/spr_demo/87654321_64x64.dds"
+    original_hd_sha256 = $source2Hash
+    test_only_dds_sha256 = $staged2Hash
+    orientation = "NORMAL"
+})
+$manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $package "TEST_ONLY_INSTALL_MANIFEST.json") -Encoding UTF8
+$backupAll = Join-Path $root "backup-all"
+& $installer -GameDirectory $game -ConfirmTestOnly -ApplyAll -BackupDirectory $backupAll
+if ((Get-FileHash -LiteralPath $origin -Algorithm SHA256).Hash.ToLowerInvariant() -ne $newHash) {
+    throw "APPLY_ALL_FIRST_DDS_MISMATCH"
+}
+if ((Get-FileHash -LiteralPath $source2 -Algorithm SHA256).Hash.ToLowerInvariant() -ne $staged2Hash) {
+    throw "APPLY_ALL_SECOND_DDS_MISMATCH"
+}
+& $installer -GameDirectory $game -ConfirmTestOnly -Rollback -BackupDirectory $backupAll
+if ((Get-FileHash -LiteralPath $origin -Algorithm SHA256).Hash.ToLowerInvariant() -ne $originalHash) {
+    throw "APPLY_ALL_FIRST_ROLLBACK_MISMATCH"
+}
+if ((Get-FileHash -LiteralPath $source2 -Algorithm SHA256).Hash.ToLowerInvariant() -ne $source2Hash) {
+    throw "APPLY_ALL_SECOND_ROLLBACK_MISMATCH"
+}
+Write-Output "WINDOWS_KOREAN_MULTI_DDS_APPLY_ALL_ROLLBACK_PASS"
+
