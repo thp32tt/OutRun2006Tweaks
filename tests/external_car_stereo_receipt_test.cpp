@@ -37,6 +37,28 @@ int main() {
         assert(!r.Complete());
         assert(!r.rightDrawFailed);
     }
+    // RIGHT eye state restore failed despite success HRESULT from both
+    // physical Draw calls. Outer StateBlock success cannot mask this fault.
+    r={}; r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,true,false,44,true,false,true);
+        assert(!r.Complete());
+        assert(r.deviceRestoreFailed);
+        assert(ClassifyExternalEyeFailure(r)==
+               ExternalEyeFailure::DeviceRestoreFailed);
+    }
+    // Duplicate/nested physical reports preserve ALL previous failures.
+    r={}; r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalStereoMeshPair(true,true,false,44,true,false,true);
+        RecordExternalStereoMeshPair(true,true,true,44,true,false,false);
+        assert(r.reports==2 && r.deviceRestoreFailed);
+        assert(!r.stateRestored && !r.Complete());
+        assert(ClassifyExternalEyeFailure(r)==
+               ExternalEyeFailure::DeviceRestoreFailed);
+    }
     // Two successful DIP executions without separate eye transforms
     // are NOT proven VR geometry; never replace stock with doubled mono.
     r={}; r.expectedPose=44;
