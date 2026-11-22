@@ -334,7 +334,7 @@ class GpuOwner final {
         // per device generation, not once per eye/frame.
         const bool fixedFunctionStereoProbe=
             ForceFixedFunctionStereoProbe();
-        if(cpu_.pbrEnabled && !fixedFunctionStereoProbe) {
+        if(!pbrPrepared_ && cpu_.pbrEnabled && !fixedFunctionStereoProbe) {
             normals_.resize(cpu_.pbrMaterials.size(),nullptr);
             orms_.resize(cpu_.pbrMaterials.size(),nullptr);
             bool mapsReady=true;
