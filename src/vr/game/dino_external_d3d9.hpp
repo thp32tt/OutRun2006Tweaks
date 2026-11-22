@@ -22,6 +22,7 @@
 #include "external_car_ground.hpp"
 #include "external_car_draw_order.hpp"
 #include "external_car_selection.hpp"
+#include "external_car_legacy_fallback.hpp"
 #include "external_car_runtime_policy.hpp"
 #include "dino_external_original_car_gate.hpp"
 #include "dino_external_pbr_shader.hpp"
@@ -256,8 +257,12 @@ class GpuOwner final {
                        wcscat_s(candidate,MAX_PATH,genericSuffix)!=0)
                         return false;
                     const DWORD attr=GetFileAttributesW(candidate);
-                    if(attr==INVALID_FILE_ATTRIBUTES ||
-                       (attr&FILE_ATTRIBUTE_DIRECTORY)!=0)
+                    // Do not silently replace a canonical model on access
+                    // denied, network/media errors or an existing directory.
+                    const DWORD error=attr==INVALID_FILE_ATTRIBUTES ?
+                        GetLastError():ERROR_SUCCESS;
+                    if(LegacyFallbackForMissingCanonical(
+                        attr!=INVALID_FILE_ATTRIBUTES,error))
                         suffix=legacy;
                 }
             } else
