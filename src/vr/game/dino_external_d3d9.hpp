@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include "dino_external_sidecar.hpp"
+#include "external_car_normal_repair.hpp"
 #include "external_car_ground.hpp"
 #include "external_car_draw_order.hpp"
 #include "external_car_selection.hpp"
@@ -88,6 +89,7 @@ class GpuOwner final {
         bool glass=false; // sorted transparent sidecar group; never occludes road depth
     };
     Model cpu_{};
+    NormalRepairStats normalRepairStats_{};
     std::vector<GpuMesh> meshes_{};
     std::vector<IDirect3DTexture9*> textures_{};
     std::vector<IDirect3DTexture9*> normals_{},orms_{};
@@ -97,6 +99,7 @@ class GpuOwner final {
     bool loaded_=false,loadAttempted_=false;
     struct CpuLoad {
         Model model{};
+        NormalRepairStats normalStats{};
         float lowest=0.f;
         bool parsed=false;
     };
@@ -309,6 +312,7 @@ class GpuOwner final {
                     std::string error;
                     if(!Parse(bytes.data(),bytes.size(),result.model,error))
                         return result;
+                    result.normalStats=RepairExternalModelNormals(result.model);
                     float lowest=10000.f;
                     for(const auto& mesh:result.model.meshes)
                         for(const auto& vertex:mesh.vertices)
@@ -346,6 +350,7 @@ class GpuOwner final {
         modelMinLocalY_=result.lowest;
         modelBoundsReady_=true;
         cpu_=std::move(result.model);
+        normalRepairStats_=result.normalStats;
         loaded_=true;
         preparation_=Preparation::CpuReady;
         return true;
@@ -497,6 +502,7 @@ public:
         cpuLoad_=std::future<CpuLoad>{};
         ReleaseGpu();
         cpu_=Model{};
+        normalRepairStats_={};
         loaded_=false;
         preparation_=Preparation::Cold;
         loadAttempted_=false;
@@ -556,6 +562,7 @@ public:
             "FIXED_FN_ALBEDO_ONLY_PBR_MAPS_BYPASSED" :
             "FIXED_FN_ALBEDO_ONLY";
     }
+    NormalRepairStats NormalRecovery() const noexcept {return normalRepairStats_;}
     unsigned NormalMapsInAsset() const noexcept {
         unsigned count=0;
         for(const auto& p:cpu_.pbrMaterials)

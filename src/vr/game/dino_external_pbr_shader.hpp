@@ -71,11 +71,19 @@ float4 mainPS(PixelIn input) : COLOR0 {
         roughness = clamp(orm.g * factors.x,0.045,1.0);
         metallic = saturate(orm.b * factors.y);
     }
-    float3 N = normalize(input.worldNormal);
-    // Derivative TBN handles source FVF XYZ/NORMAL/UV without altered vertex stride.
-    // Handedness is preserved for mirrored texture islands (negative UV determinant).
+    // Some imported models have zero-length normals (including genuinely
+    // degenerate topology which the CPU cannot repair). Derive a geometric
+    // face normal before normal-map TBN rather than normalizing float3(0,0,0).
     float3 dpdx = ddx(input.worldPosition);
     float3 dpdy = ddy(input.worldPosition);
+    float3 faceN = cross(dpdx,dpdy);
+    float3 rawN = input.worldNormal;
+    float normalSq = dot(rawN,rawN);
+    float faceSq = dot(faceN,faceN);
+    float3 N = normalSq > 1.e-12 ? normalize(rawN) :
+               (faceSq > 1.e-12 ? normalize(faceN) : float3(0,1,0));
+    // Derivative TBN handles source FVF XYZ/NORMAL/UV without altered vertex stride.
+    // Handedness is preserved for mirrored texture islands (negative UV determinant).
     float2 dtdx = ddx(input.uv);
     float2 dtdy = ddy(input.uv);
     float det = dtdx.x*dtdy.y-dtdx.y*dtdy.x;
