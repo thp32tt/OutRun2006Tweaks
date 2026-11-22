@@ -37,8 +37,14 @@ enum class OriginalCarRoute : unsigned char {
 inline OriginalCarRoute ChooseOriginalCarRoute(
     const OriginalCarGate& gate,const MeshDrawReceipt& receipt) noexcept
 {
-    if(!CanReplaceOriginalCar(gate) ||
-       (receipt.submittedMeshes==0 && !receipt.possiblySubmitted))
+    // Never reintroduce the native body if the eligibility changed after
+    // even a potentially rasterized LEFT eye. A late pose/epoch failure is
+    // partial for this frame, regardless of the original pre-draw admission.
+    if(!CanReplaceOriginalCar(gate))
+        return (receipt.possiblySubmitted || receipt.submittedMeshes!=0)
+            ? OriginalCarRoute::ExternalPartial
+            : OriginalCarRoute::OriginalFallback;
+    if(receipt.submittedMeshes==0 && !receipt.possiblySubmitted)
         return OriginalCarRoute::OriginalFallback;
     // No-overdraw safety: once any external triangle has been submitted,
     // its pixels cannot be removed from the current eye. An impossible
@@ -49,7 +55,10 @@ inline OriginalCarRoute ChooseOriginalCarRoute(
        receipt.submittedMeshes>receipt.expectedMeshes)
         return OriginalCarRoute::ExternalPartial;
     if(receipt.drawSucceeded && receipt.stateRestored &&
-       receipt.submittedMeshes==receipt.expectedMeshes)
+       receipt.possiblySubmitted &&
+       receipt.submittedMeshes==receipt.expectedMeshes &&
+       receipt.attemptedMeshes==receipt.expectedMeshes &&
+       receipt.verifiedStereoMeshes==receipt.expectedMeshes)
         return OriginalCarRoute::ExternalComplete;
     // At least one external mesh has already written to this frame. Suppress
     // the original *for this frame only*. Quarantine failed GPU resources so
