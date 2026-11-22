@@ -1,0 +1,36 @@
+name: OutRun HD Korean 954-ROI Fast Renderer Unit Tests
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: [".github/workflows/outrun-hd-hybrid-fast-unit.yml"]
+permissions:
+  contents: read
+jobs:
+  fallback-renderer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout current fallback renderer and unit tests only
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/github_hd_hybrid_completion.py
+            tools/localization/test_github_hd_hybrid_completion.py
+            tools/localization/make_hd_korean_coverage_first_package.py
+            tools/localization/test_make_hd_korean_coverage_first_package.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pure-Python testing dependencies and Korean font
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          python -m pip install --disable-pip-version-check "Pillow==11.3.0" "numpy==2.3.4"
+      - name: Test source-pinned fast text-fit and reversible packaging
+        run: |
+          python -m unittest discover -s tools/localization -p test_github_hd_hybrid_completion.py -v
+          python -m unittest discover -s tools/localization -p test_make_hd_korean_coverage_first_package.py -v
