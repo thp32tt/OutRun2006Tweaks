@@ -401,8 +401,11 @@ class GpuOwner final {
             }
             next.ib->Unlock();
             meshes_.push_back(next);
+            ++nextMesh_;
+            return false;
         }
-        return meshes_.size()==cpu_.meshes.size();
+        preparation_=Preparation::Ready;
+        return true;
     }
     const DashboardBinding* DashboardFor(const GpuMesh& mesh) const noexcept {
         if(mesh.dashboardBinding<0 ||
