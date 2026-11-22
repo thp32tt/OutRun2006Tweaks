@@ -1018,13 +1018,13 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(!QuestCockpitGlassLive::Memory(nativeView,sizeof(D3DMATRIX)) ||
            !QuestCockpitGlassLive::Memory(nativeProjection,sizeof(D3DMATRIX)))
             return ticket;
-        ticket.slot=!extraCar ?
-            OutRunVR::DinoSidecar::FerrariModelSlot::F50 :
-            (carId==7u || carId==22u) ?
-                OutRunVR::DinoSidecar::FerrariModelSlot::Gto288 :
-            (carId==11u || carId==26u) ?
-                OutRunVR::DinoSidecar::FerrariModelSlot::F40 :
-                OutRunVR::DinoSidecar::FerrariModelSlot::GenericId;
+        // All 16 optional external cars share one canonical, bounded OVC
+        // filename policy. GTO/F40 try their car_id_XX.ovc first, with a
+        // missing-file-only legacy fallback inside BuildSidecarPath.
+        // The separate original F50 experimental mode remains unchanged.
+        ticket.slot=extraCar ?
+            OutRunVR::DinoSidecar::FerrariModelSlot::GenericId :
+            OutRunVR::DinoSidecar::FerrariModelSlot::F50;
         ticket.carId=carId;
         auto& external=OutRunVR::DinoSidecar::GlobalGpu();
         if(external.SelectSidecar(ticket.slot,carId))
@@ -1038,15 +1038,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // player callback. Parse includes PBR map and mesh-envelope QA.
         // Missing/corrupt models retain the untouched original vehicle.
         float localLift=0.f;
-        // Preserve the measured legacy package offsets for the three already
-        // converted models. New source-ready IDs start from zero requested
-        // lift so the validated model's actual lowest vertex determines the
-        // minimum 3.5 cm static clearance instead of inheriting F50's 0.22 m.
-        const bool legacyExternal=
-            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F50 ||
-            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::Gto288 ||
-            ticket.slot==OutRunVR::DinoSidecar::FerrariModelSlot::F40;
-        const float requestedLift=legacyExternal ?
+        // All 16 generic bodies use their own verified local envelope for
+        // wheel/road clearance. Only the separately opted-in legacy F50
+        // experiment retains its historical user-set 0.22 m offset.
+        const float requestedLift=!extraCar ?
             Settings::VRF50ExternalLift.get() : 0.f;
         if(!external.SafeFloorLift(requestedLift,localLift)) {
             if(Settings::VRExternalFerrariDiag) {
