@@ -734,7 +734,8 @@ public:
             result.receipt.lastEyeReports=physical.reports;
             if(stereoComplete)++result.receipt.verifiedStereoMeshes;
             if(SUCCEEDED(dipHr) && !stereoComplete)
-                eyeProofOnlyFailure=!physical.rightDrawFailed;
+                eyeProofOnlyFailure=!physical.rightDrawFailed &&
+                    !physical.deviceRestoreFailed;
             hr=stereoComplete?dipHr:E_FAIL;
             if(FAILED(hr))break;
         }
