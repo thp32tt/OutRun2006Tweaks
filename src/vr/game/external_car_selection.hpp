@@ -17,6 +17,37 @@ constexpr bool MatchesFerrariSelection(unsigned char observedId,
         CanonicalFerrariExternalCarId(
             static_cast<unsigned char>(requestedId));
 }
+// Exactly 16 distinct selectable Ferrari models: stock IDs 0..14 plus
+// the tuned-only F430 Spider (28). Retail variants 15..27 and 29 alias
+// their matching base model, not additional external asset identities.
+constexpr bool IsFerrari16CanonicalCarId(unsigned char carId) noexcept {
+    return carId<=14u || carId==28u;
+}
+// Backwards compatibility for older private 288 GTO/F40 packages. Prefer a
+// canonical car_id_XX.ovc when present; only use these fixed legacy names if
+// the canonical file is missing. Never derive a path from untrusted input.
+constexpr const wchar_t* LegacyFerrariCarSuffix(
+    unsigned char observedId) noexcept
+{
+    switch(CanonicalFerrariExternalCarId(observedId)) {
+    case 7u: return L"ExternalCars\\288gto.ovc";
+    case 11u: return L"ExternalCars\\f40.ovc";
+    default: return nullptr;
+    }
+}
+static_assert(IsFerrari16CanonicalCarId(0u) &&
+              IsFerrari16CanonicalCarId(14u) &&
+              IsFerrari16CanonicalCarId(28u) &&
+              !IsFerrari16CanonicalCarId(15u) &&
+              !IsFerrari16CanonicalCarId(29u) &&
+              !IsFerrari16CanonicalCarId(30u),
+              "16 canonical car model IDs");
+static_assert(LegacyFerrariCarSuffix(7u)!=nullptr &&
+              LegacyFerrariCarSuffix(22u)!=nullptr &&
+              LegacyFerrariCarSuffix(11u)!=nullptr &&
+              LegacyFerrariCarSuffix(26u)!=nullptr &&
+              LegacyFerrariCarSuffix(5u)==nullptr,
+              "legacy GTO/F40 aliases only");
 static_assert(CanonicalFerrariExternalCarId(5u) == 5u &&
               CanonicalFerrariExternalCarId(20u) == 5u &&
               CanonicalFerrariExternalCarId(8u) == 8u &&
