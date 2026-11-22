@@ -45,7 +45,23 @@ inline bool MainBackbufferActive(IDirect3DDevice9* device) noexcept {
         active!=nullptr && main!=nullptr && active==main;
     if(active)active->Release();
     if(main)main->Release();
-    return same;
+    if(!same)return false;
+    // R7 rejects stereo duplication when MRT1..3 is still bound even
+    // with RT0 pointing at the primary backbuffer. Fail before drawing
+    // any sidecar pixels rather than entering an unrecoverable mono pass.
+    for(DWORD slot=1u;slot<=3u;++slot) {
+        IDirect3DSurface9* auxiliary=nullptr;
+        const HRESULT result=device->GetRenderTarget(slot,&auxiliary);
+        const bool bound=SUCCEEDED(result) && auxiliary!=nullptr;
+        if(auxiliary)auxiliary->Release();
+        if(bound)return false;
+        // Unsupported MRT slots or empty attachments are normal; an
+        // unexpected COM failure must not certify the stereo main pass.
+        if(FAILED(result) && result!=D3DERR_NOTFOUND &&
+           result!=D3DERR_INVALIDCALL)
+            return false;
+    }
+    return true;
 }
 // Fixed-function test must be explicitly enabled by the launch process;
 // generic PBR's c0/c4/c8 matrices are not compatible with verified c64 stereo.
