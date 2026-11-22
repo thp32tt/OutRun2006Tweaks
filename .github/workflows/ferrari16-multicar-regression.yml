@@ -68,6 +68,9 @@ jobs:
           assert 'OutRunVRStereo::R29OwnerStereoWanted()' not in source
           assert 'OutRunVRStereo::R29OwnerTargetIsBackBuffer()' not in source
           assert 'GetBackBuffer(' in gpu and 'GetRenderTarget(0,&active)' in gpu
+          assert 'GetRenderTarget(slot,&auxiliary)' in gpu
+          assert 'result!=D3DERR_NOTFOUND' in gpu
+          assert 'if(bound)return false;' in gpu
           runners=[
               'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd',
               'tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
