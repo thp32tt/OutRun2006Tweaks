@@ -311,18 +311,23 @@ class GpuOwner final {
     bool EnsureGpu(IDirect3DDevice9* dev) {
         if(!dev || !EnsureLoaded())return false;
         if(!gpuRetry_.CanAttempt(dev))return false;
-        if(owner_==dev && meshes_.size()==cpu_.meshes.size() &&
-           textures_.size()==cpu_.textures.size())return true;
-        ReleaseGpu();
-        owner_=dev;
-        // No vector reallocations after COM allocations begin: an allocation
-        // failure must not leak the just-created VB/IB pair of a pending mesh.
-        meshes_.reserve(cpu_.meshes.size());
-        textures_.resize(cpu_.textures.size(),nullptr);
-        for(std::size_t material=0;material<cpu_.textures.size();++material) {
-            if(!UploadDDS(dev,cpu_.textures[material],&textures_[material])) {
+        if(owner_==dev && preparation_==Preparation::Ready)return true;
+        if(owner_!=dev) {
+            ReleaseGpu();
+            owner_=dev;
+            // Preallocate before any COM allocation: no failure may strand a
+            // GPU mesh outside the owned vector.
+            meshes_.reserve(cpu_.meshes.size());
+            textures_.resize(cpu_.textures.size(),nullptr);
+            preparation_=Preparation::Uploading;
+        }
+        // The original car stays active until the LAST upload succeeds.
+        // Keep each frame's preparation to one DDS or one mesh allocation.
+        if(nextTexture_<cpu_.textures.size()) {
+            const auto material=nextTexture_++;
+            if(!UploadDDS(dev,cpu_.textures[material],&textures_[material]))
                 return RejectGpu(dev);
-            }
+            return false;
         }
         // Optional PBR allocations must never prevent a working legacy draw.
         // On any map/shader failure fall back to textured fixed-function once
