@@ -66,13 +66,13 @@ namespace Settings
     Setting<bool> VRF50ExternalModel{ "VR", "F50ExternalModel", false,
         "QuestCockpitV2-only external Ferrari F50 test model. Replaces only the player F50 (car kind 0) after a complete sidecar draw; original PMT remains unchanged." };
     Setting<bool> VRExternalFerrariTest{ "VR", "ExternalFerrariTest", false,
-        "EXPERIMENTAL: render installed external Ferrari OVC sidecars for validated player car IDs 0..29 in cockpit view only. Existing 288 GTO/F40 filenames stay compatible; other cars use ExternalCars/car_id_XX.ovc. Missing/invalid files fall back to original game models." };
+        "EXPERIMENTAL: all 16 canonical Ferrari OVC models, plus tuned aliases, in cockpit view only. Prefer ExternalCars/car_id_XX.ovc for every model; fixed legacy 288gto/f40 names only if canonical file is absent. Missing or corrupt assets retain stock models." };
     Setting<int> VRExternalFerrariTestCarId{ "VR", "ExternalFerrariTestCarId", -1,
         "Optional external Ferrari selector: -1 permits all; 0..29 limits the sidecar to one canonical retail model (base/tuned alias).", Range<int>{-1,29} };
     Setting<bool> VRExternalFerrariNativeCallbackReplacement{ "VR", "ExternalFerrariNativeCallbackReplacement", false,
         "Expert-only opt in: replacing a player body skips the complete native display callback; never enabled by normal v0.03 or model-OFF mode." };
     Setting<bool> VRExternalFerrariDiag{ "VR", "ExternalFerrariDiag", false,
-        "Emit up to eight external body route receipts and four pre-draw rejection diagnostics; OFF during FPS comparison." };
+        "Emit bounded per-canonical-car body receipts, draw gate failures and transforms for 16-car triage; OFF during FPS comparisons." };
     Setting<float> VRF50ExternalLift{ "VR", "F50ExternalLift", 0.22f,
         "External F50 local vertical offset in metres for wheel/track alignment. No gameplay physics or camera changes.", Range<float>{ -0.25f, 1.0f } };
     Setting<bool> VRF50ExternalStabilize{ "VR", "F50ExternalStabilize", true,
@@ -1045,8 +1045,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             Settings::VRF50ExternalLift.get() : 0.f;
         if(!external.SafeFloorLift(requestedLift,localLift)) {
             if(Settings::VRExternalFerrariDiag) {
-                static thread_local unsigned rejected=0;
-                if(rejected++<4u)
+                static thread_local std::array<unsigned,30> rejectedByCar{};
+                const auto id=OutRunVR::DinoSidecar::CanonicalFerrariExternalCarId(carId);
+                if(rejectedByCar[id]++<4u)
                     spdlog::warn("VR EXTERNAL SELECTED SIDECAR REJECTED: "
                         "carId={} canonical={} selected={} "
                         "slot={} requestedLift={:.4f} originalPMT=FALLBACK",
@@ -1126,8 +1127,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                OutRunVR::DinoSidecar::MatchesFerrariSelection(
                    livePlayer->car_id_10,
                    Settings::VRExternalFerrariTestCarId.get())) {
-                static thread_local unsigned gateRejectSamples=0;
-                if(gateRejectSamples++<6u)
+                static thread_local std::array<unsigned,30> gateRejectByCar{};
+                const auto id=OutRunVR::DinoSidecar::CanonicalFerrariExternalCarId(
+                    livePlayer->car_id_10);
+                if(gateRejectByCar[id]++<6u)
                     spdlog::warn("VR FERRARI DRAW GATE REJECTED: "
                         "carId={} optedIn={} ownedPlayer={} "
                         "gameplay={} cockpit={} stereo={} nativeFrame={} "
@@ -1158,8 +1161,12 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 ticket.dashboard,
                 OutRunVR::DinoSidecar::GlobalGpu().HasEmbeddedSpeedAndRpm());
         if(Settings::VRTelemetry || Settings::VRExternalFerrariDiag) {
-            static std::uint64_t attempts=0;
-            const auto sample=++attempts;
+            // One globally bounded diagnostic hid every later Ferrari after
+            // the first eight 575 frames. Bound receipts per canonical model.
+            static thread_local std::array<std::uint64_t,30> attemptsByCar{};
+            const auto id=OutRunVR::DinoSidecar::CanonicalFerrariExternalCarId(
+                ticket.carId);
+            const auto sample=++attemptsByCar[id];
             if(sample<=8u || (Settings::VRTelemetry &&
                 ((sample&(sample-1u))==0u ||
                  route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalPartial)))
@@ -1187,8 +1194,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                         "EXTERNAL_PARTIAL_QUARANTINED" : "ORIGINAL_FALLBACK");
         }
         if(Settings::VRExternalFerrariDiag) {
-            static thread_local unsigned transformSamples=0;
-            if(transformSamples++<4u)
+            static thread_local std::array<unsigned,30> transformSamplesByCar{};
+            const auto id=OutRunVR::DinoSidecar::CanonicalFerrariExternalCarId(
+                ticket.carId);
+            if(transformSamplesByCar[id]++<4u)
                 spdlog::info(
                     "VR FERRARI INPUT TRANSFORM: carId={} cameraMode={} "
                     "nativeFrame={} pose={} "
