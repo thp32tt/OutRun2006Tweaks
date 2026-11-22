@@ -732,7 +732,7 @@ public:
             const bool stereoComplete=physical.Complete();
             if(stereoComplete)++result.receipt.verifiedStereoMeshes;
             if(SUCCEEDED(dipHr) && !stereoComplete)
-                eyeProofOnlyFailure=true;
+                eyeProofOnlyFailure=!physical.rightDrawFailed;
             hr=stereoComplete?dipHr:E_FAIL;
             if(FAILED(hr))break;
         }
