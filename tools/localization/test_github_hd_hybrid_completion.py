@@ -56,6 +56,27 @@ class HybridCompletionTest(unittest.TestCase):
         self.assertGreater(changed, 0)
         self.assertIsNotNone(out.getchannel("A").getbbox())
 
+    def test_very_crowded_overlapping_rows_get_explicit_last_resort(self):
+        # Identical source geometry with distinct translations used to HOLD
+        # when no non-colliding area remained. Risk is surfaced, not hidden.
+        source = Image.new("RGBA", (90, 60), (0, 0, 0, 0))
+        rows = [
+            row("Q001_5555555555555555", (8, 10, 82, 48), "첫 번째 글자"),
+            row("Q001_6666666666666666", (8, 10, 82, 48), "두 번째 글자"),
+            row("Q001_7777777777777777", (8, 10, 82, 48), "세 번째 글자"),
+        ]
+        out, accepted, held, represented, changed = m.fallback_compose(source, rows, self.font)
+        self.assertEqual(len(accepted) + len(represented), 3)
+        self.assertEqual(held, [])
+        self.assertGreater(changed, 0)
+        risky = [x for x in accepted if x["resolution"] ==
+                 "FALLBACK_LAST_RESORT_OVERLAP_CLEAN_TEST_ONLY"]
+        self.assertGreaterEqual(len(risky), 1)
+        self.assertTrue(all(x["protected_art_inside_roi_may_be_erased"] for x in risky))
+        # No drawing ever escapes the three explicitly reviewed ROI boxes.
+        self.assertIsNone(out.crop((0, 0, 8, 60)).getchannel("A").getbbox())
+        self.assertIsNone(out.crop((82, 0, 90, 60)).getchannel("A").getbbox())
+
     def test_near_duplicate_is_accounted_once(self):
         source = Image.new("RGBA", (256, 128), (0, 0, 0, 0))
         rows = [
