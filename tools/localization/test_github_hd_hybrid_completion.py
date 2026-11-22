@@ -3,6 +3,7 @@ import io
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw
@@ -26,6 +27,22 @@ def row(rid, box, korean="한글"):
 class HybridCompletionTest(unittest.TestCase):
     def setUp(self):
         self.font = m.font_path()
+
+    def test_fallback_font_search_stays_native_and_logarithmic(self):
+        # 954 ROI must not require hundreds of decreasing font probe opens.
+        for width, height, label in (
+            (640, 120, "스테이지 선택"),
+            (1540, 150, "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다."),
+            (128, 42, "수동"),
+        ):
+            with patch.object(m.ImageFont, "truetype", wraps=m.ImageFont.truetype) as probe:
+                glyph = m.make_glyph(label, width, height, self.font)
+            self.assertEqual(glyph.size, (width, height))
+            alpha = glyph.getchannel("A").getbbox()
+            self.assertIsNotNone(alpha)
+            self.assertLess(alpha[0], alpha[2])
+            self.assertLess(alpha[1], alpha[3])
+            self.assertLessEqual(probe.call_count, 16)
 
     def test_overlap_is_relocated_not_dropped(self):
         source = Image.new("RGBA", (256, 128), (0, 0, 0, 0))
