@@ -42,6 +42,11 @@ int main() {
     assert(ClassifyExternalEyeFailure(r)==ExternalEyeFailure::RightNotVerified);
     r=Receipt(true,true,false,true);
     assert(ClassifyExternalEyeFailure(r)==ExternalEyeFailure::RestoreFailed);
+    r.deviceRestoreFailed=true;
+    assert(ClassifyExternalEyeFailure(r)==
+           ExternalEyeFailure::DeviceRestoreFailed);
+    assert(std::strcmp(ExternalEyeFailureName(ClassifyExternalEyeFailure(r)),
+                       "GPU_STATE_RESTORE_FAILED")==0);
     r=Receipt(true,true,true,false);
     assert(ClassifyExternalEyeFailure(r)==ExternalEyeFailure::IdenticalEyeGeometry);
     assert(std::strcmp(ExternalEyeFailureName(ClassifyExternalEyeFailure(r)),
