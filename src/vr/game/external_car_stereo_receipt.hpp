@@ -22,7 +22,7 @@ struct ExternalStereoMeshReceipt final {
 // Compact failure proof retained for the native per-car diagnostic log.
 // It is never a license to invoke the original callback after a partial DIP.
 enum class ExternalEyeFailure : unsigned char {
-    None,MissingReport,MultipleReports,PoseMismatch,LeftFailed,
+    NotAttempted,None,MissingReport,MultipleReports,PoseMismatch,LeftFailed,
     RightGpuFailed,RightNotVerified,RestoreFailed,IdenticalEyeGeometry
 };
 inline ExternalEyeFailure ClassifyExternalEyeFailure(
@@ -30,6 +30,9 @@ inline ExternalEyeFailure ClassifyExternalEyeFailure(
 {
     if(r.Complete())return ExternalEyeFailure::None;
     if(r.reports==0)return ExternalEyeFailure::MissingReport;
+    // Keep a physical RIGHT GPU fault visible even when the renderer chain
+    // accidentally publishes multiple (invalid) receipts for one DIP.
+    if(r.rightDrawFailed)return ExternalEyeFailure::RightGpuFailed;
     if(r.reports!=1)return ExternalEyeFailure::MultipleReports;
     if(r.expectedPose==0 || r.observedPose!=r.expectedPose)
         return ExternalEyeFailure::PoseMismatch;
@@ -42,6 +45,7 @@ inline ExternalEyeFailure ClassifyExternalEyeFailure(
 }
 inline const char* ExternalEyeFailureName(ExternalEyeFailure failure) noexcept {
     switch(failure) {
+    case ExternalEyeFailure::NotAttempted:return "NOT_ATTEMPTED";
     case ExternalEyeFailure::None:return "STEREO_OK";
     case ExternalEyeFailure::MissingReport:return "NO_PHYSICAL_REPORT";
     case ExternalEyeFailure::MultipleReports:return "DUPLICATE_PHYSICAL_REPORT";
