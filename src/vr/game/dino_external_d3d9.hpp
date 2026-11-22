@@ -14,6 +14,8 @@
 #include <cwchar>
 #include <cmath>
 #include <iterator>
+#include <future>
+#include <chrono>
 #include <string>
 #include <vector>
 #include "dino_external_sidecar.hpp"
@@ -58,6 +60,18 @@ class GpuOwner final {
     bool pbrReady_=false;
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
     bool loaded_=false,loadAttempted_=false;
+    struct CpuLoad {
+        Model model{};
+        float lowest=0.f;
+        bool parsed=false;
+    };
+    std::future<CpuLoad> cpuLoad_{};
+    enum class Preparation : unsigned char {
+        Cold, Reading, CpuReady, Uploading, Ready, Failed
+    };
+    Preparation preparation_=Preparation::Cold;
+    std::size_t nextTexture_=0, nextMesh_=0;
+    bool pbrPrepared_=false;
     SidecarRole role_=SidecarRole::Vehicle;
     FerrariModelSlot selectedSlot_=FerrariModelSlot::F50;
     unsigned char selectedCarId_=255u;
@@ -147,6 +161,11 @@ class GpuOwner final {
         normals_.clear();orms_.clear();
         pbrShaders_.Release();
         pbrReady_=false;
+        pbrPrepared_=false;
+        nextTexture_=nextMesh_=0;
+        if(preparation_==Preparation::Uploading ||
+           preparation_==Preparation::Ready)
+            preparation_=loaded_?Preparation::CpuReady:Preparation::Cold;
         owner_=nullptr;
     }
     bool RejectGpu(IDirect3DDevice9* device) noexcept {
