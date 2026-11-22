@@ -716,6 +716,10 @@ public:
             result.receipt.submittedMeshes==result.receipt.expectedMeshes &&
             result.receipt.verifiedStereoMeshes==result.receipt.expectedMeshes;
         result.receipt.stateRestored=SUCCEEDED(restore);
+        // A failed StateBlock Apply can leave the next original callback
+        // using external-car shaders/textures/depth settings. Keep the current
+        // native callback suppressed even when no DIP was submitted.
+        result.receipt.stateMayBeDirty=FAILED(restore);
         result.hr=FAILED(hr)?hr:(result.receipt.drawSucceeded?restore:E_FAIL);
         if(FAILED(result.hr))
             QuarantineFailedSubmission(device);
