@@ -1,6 +1,8 @@
 name: OutRun HD Korean Coverage-First 104 DDS TEST_ONLY (GitHub CPU)
 
 # Opt-in completion-first preview only; no release or runtime QA claims.
+# v2: SHA-pinned asset branch includes logarithmic font fitting and explicit
+# last-resort overlapping ROI representation, with separate risk counts.
 # Does not alter browser cadence or use N100 for rendering.
 on:
   workflow_dispatch:
