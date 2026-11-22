@@ -2207,7 +2207,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 SUCCEEDED(leftHr),rightDrawAttempted&&SUCCEEDED(rightHr),
                 restoreOk&&!FrameStereoIncomplete&&
                     FrameFailureReason==OutRunVR::StereoFailureNone,
-                draw.poseSequence,draw.worldStereo&&draw.fixedFunctionWorld);
+                draw.poseSequence,draw.worldStereo&&draw.fixedFunctionWorld,
+                rightDrawAttempted&&FAILED(rightHr));
             R7TraceVisualEyes(visualTrace,"STEREO_PAIR",true,
 				draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 				true,leftHr,rightDrawAttempted,rightHr,rightFailure,restoreOk,
