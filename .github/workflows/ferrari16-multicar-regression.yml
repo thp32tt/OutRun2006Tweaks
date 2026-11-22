@@ -90,6 +90,11 @@ jobs:
           assert 'if (!resyncAlreadyFlushed) return E_FAIL;' in r33
           assert 'return R32ReviewRunLowerFailClosed(' in r33
           assert 'ScopedExternalPbrStereo pbrEyeScope(' in gpu
+          assert 'unsigned NormalMapsInAsset() const noexcept' in gpu
+          assert 'unsigned NormalMapsOnGpu() const noexcept' in gpu
+          assert 'unsigned OrmMapsInAsset() const noexcept' in gpu
+          assert 'unsigned OrmMapsOnGpu() const noexcept' in gpu
+          assert 'pbrMaps[normalAsset={},normalGpu={},ormAsset={},ormGpu={}]' in source
           assert 'ScopedExternalPbrStereo' in scope
           assert 'ExternalPbrEyeConstants(' in pbr
           assert 'ExternalCarPbrNormalMatrix(' in pbr

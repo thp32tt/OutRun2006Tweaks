@@ -1221,6 +1221,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     "drawHr=0x{:08X} submitted={}/{} attempted={} "
                     "verifiedEyePairs={} eyeFailure={} eyeReports={} "
                     "stateRestored={} prep={} materialMode={} "
+                    "pbrMaps[normalAsset={},normalGpu={},ormAsset={},ormGpu={}] "
                     "dashOverlayHr=0x{:08X} dashOverlay={}/{} route={} "
                     "originalPMT=UNCHANGED",
                     sample,ticket.nativeFrame,ticket.xrPose,
@@ -1237,6 +1238,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     draw.receipt.stateRestored,
                     OutRunVR::DinoSidecar::GlobalGpu().PreparationName(),
                     OutRunVR::DinoSidecar::GlobalGpu().MaterialModeName(),
+                    OutRunVR::DinoSidecar::GlobalGpu().NormalMapsInAsset(),
+                    OutRunVR::DinoSidecar::GlobalGpu().NormalMapsOnGpu(),
+                    OutRunVR::DinoSidecar::GlobalGpu().OrmMapsInAsset(),
+                    OutRunVR::DinoSidecar::GlobalGpu().OrmMapsOnGpu(),
                     static_cast<unsigned int>(dashboardDraw.hr),
                     dashboardDraw.receipt.submittedMeshes,
                     dashboardDraw.receipt.expectedMeshes,

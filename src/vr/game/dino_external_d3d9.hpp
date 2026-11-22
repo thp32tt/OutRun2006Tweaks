@@ -556,6 +556,30 @@ public:
             "FIXED_FN_ALBEDO_ONLY_PBR_MAPS_BYPASSED" :
             "FIXED_FN_ALBEDO_ONLY";
     }
+    unsigned NormalMapsInAsset() const noexcept {
+        unsigned count=0;
+        for(const auto& p:cpu_.pbrMaterials)
+            if(!p.normal.dds.empty())++count;
+        return count;
+    }
+    unsigned OrmMapsInAsset() const noexcept {
+        unsigned count=0;
+        for(const auto& p:cpu_.pbrMaterials)
+            if(!p.orm.dds.empty())++count;
+        return count;
+    }
+    unsigned NormalMapsOnGpu() const noexcept {
+        if(!pbrReady_)return 0;
+        unsigned count=0;
+        for(const auto* p:normals_)if(p)++count;
+        return count;
+    }
+    unsigned OrmMapsOnGpu() const noexcept {
+        if(!pbrReady_)return 0;
+        unsigned count=0;
+        for(const auto* p:orms_)if(p)++count;
+        return count;
+    }
     bool Loaded() const noexcept {return loaded_;}
     // A V4 full-car sidecar may already carry its real speed and RPM needles.
     // The separate dashboard overlay then provides gear only, avoiding two
