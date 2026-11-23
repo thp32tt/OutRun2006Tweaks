@@ -1,0 +1,51 @@
+#Requires -Version 5.1
+# Restore only the exact file bytes saved by the isolated installer.
+[CmdletBinding()]
+param([Parameter(Mandatory=$true)][string]$GameRoot,
+      [Parameter(Mandatory=$true)][string]$BackupPath)
+$ErrorActionPreference='Stop'
+function Hash([string]$p) {
+    if(!(Test-Path -LiteralPath $p -PathType Leaf)){throw "Missing file: $p"}
+    return (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()
+}
+$root=(Resolve-Path -LiteralPath $GameRoot).Path.TrimEnd('\','/')
+$backup=(Resolve-Path -LiteralPath $BackupPath).Path.TrimEnd('\','/')
+if(!$backup.StartsWith($root+'\FERRARI16_BACKUP_',[StringComparison]::OrdinalIgnoreCase) -or
+   $backup.Substring($root.Length+1).Contains('\')){
+    throw 'Backup must be a direct FERRARI16_BACKUP_* child of isolated test root.'
+}
+$markerPath=Join-Path $root '.ferrari16-isolated.json'
+$m=Get-Content -LiteralPath $markerPath -Raw|ConvertFrom-Json
+$b=Get-Content -LiteralPath (Join-Path $backup 'manifest.json') -Raw|ConvertFrom-Json
+if($m.Schema -ne 1 -or $m.Purpose -ne 'FERRARI16_ISOLATED_V003_TEST_COPY' -or
+   ![string]::Equals([string]$m.TestRoot,$root,[StringComparison]::OrdinalIgnoreCase) -or
+   $b.Schema -ne 1 -or $b.Purpose -ne 'FERRARI16_ISOLATED_ROLLBACK' -or
+   ![string]::Equals([string]$b.TestRoot,$root,[StringComparison]::OrdinalIgnoreCase) -or
+   (Hash $markerPath) -ne $b.MarkerSha256){
+    throw 'Rollback marker/target does not match.'
+}
+if(@(Get-Process -Name 'OR2006C2C','outrun-vr-host' -ErrorAction SilentlyContinue).Count){
+    throw 'Close game and host before restoring.'
+}
+$dll=Join-Path $root 'dinput8.dll'
+$hostExe=Join-Path $root 'outrun-vr-host.exe'
+if((Hash $dll) -ne $b.PatchedDll -or (Hash $hostExe) -ne $b.PatchedHost){
+    throw 'Installed payload modified: refusing overwrite.'
+}
+if((Hash (Join-Path $backup 'dinput8.dll')) -ne $b.OriginalDll -or
+   (Hash (Join-Path $backup 'outrun-vr-host.exe')) -ne $b.OriginalHost){
+    throw 'Rollback backup damaged.'
+}
+foreach($entry in $b.Launchers.PSObject.Properties){
+    $dest=Join-Path $root $entry.Name
+    if((Hash $dest) -ne $entry.Value){throw "Launcher modified: $($entry.Name)"}
+}
+Copy-Item -LiteralPath (Join-Path $backup 'dinput8.dll') -Destination $dll -Force -ErrorAction Stop
+Copy-Item -LiteralPath (Join-Path $backup 'outrun-vr-host.exe') -Destination $hostExe -Force -ErrorAction Stop
+if((Hash $dll) -ne $b.OriginalDll -or (Hash $hostExe) -ne $b.OriginalHost){
+    throw 'Rollback restore hash mismatch.'
+}
+foreach($entry in $b.Launchers.PSObject.Properties){
+    Remove-Item -LiteralPath (Join-Path $root $entry.Name) -ErrorAction Stop
+}
+Write-Host 'PASS: isolated test copy restored. Working v0.03 was never touched.'
