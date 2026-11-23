@@ -145,24 +145,31 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                 zero_normals += 1
         at += vertex_bytes
         fmt = "<H" if width_i == 2 else "<I"
+        has_drawable_triangle = False
         for i in range(count_i):
             idx = struct.unpack_from(fmt, data, at + i * width_i)[0]
             require(idx < count_v, "mesh index out of bounds")
-            if (not is_glass and material not in usable_uv_materials and
-                    i % 3 == 2):
-                # The shader's derivative-based TBN is impossible when all
-                # UV triangle determinants are tiny/zero. Inspect the mesh
-                # material's first usable basis, without retaining all indices.
+            if i % 3 == 2:
                 tri = tuple(struct.unpack_from(
                     fmt, data, at + j * width_i)[0] for j in (i - 2, i - 1, i))
-                uvs = tuple(struct.unpack_from(
-                    "<2f", data, vertex_start + vertex * 32 + 24)
-                    for vertex in tri)
                 positions = tuple(struct.unpack_from(
                     "<3f", data, vertex_start + vertex * 32)
                     for vertex in tri)
-                if triangle_has_pbr_basis(*positions, *uvs):
-                    usable_uv_materials.add(material)
+                a, b, c = positions
+                ux, uy, uz = (b[j] - a[j] for j in range(3))
+                vx, vy, vz = (c[j] - a[j] for j in range(3))
+                if uy * vz - uz * vy or uz * vx - ux * vz or ux * vy - uy * vx:
+                    has_drawable_triangle = True
+                if not is_glass and material not in usable_uv_materials:
+                    # The opaque normal-map TBN needs UV and world geometry.
+                    uvs = tuple(struct.unpack_from(
+                        "<2f", data, vertex_start + vertex * 32 + 24)
+                        for vertex in tri)
+                    if triangle_has_pbr_basis(*positions, *uvs):
+                        usable_uv_materials.add(material)
+        # Match the x86 native parser's fail-closed zero-area mesh policy.
+        # A CRC-valid but invisible group must not suppress the stock car.
+        require(has_drawable_triangle, "mesh degenerate geometry")
         at += index_bytes
         gpu_bytes += vertex_bytes + index_bytes
         total_v += count_v
@@ -335,6 +342,21 @@ def self_test() -> None:
         path.write_bytes(header + payload)
         assert inspect(path)["triangles"] == 1
         assert inspect(path)["zero_normal_vertices"] == 0
+        # Recalculate CRC to prove geometry, not corruption, rejects blank body.
+        repeated = bytearray(header + payload)
+        index_offset = 36 + 16 + len(name) + len(verts)
+        struct.pack_into("<3I", repeated, index_offset, 0, 0, 0)
+        struct.pack_into("<I", repeated, 32,
+                         zlib.crc32(memoryview(repeated)[36:]) & 0xffffffff)
+        path.write_bytes(repeated)
+        try:
+            inspect(path)
+        except OvcError as error:
+            assert str(error) == "mesh degenerate geometry", str(error)
+        else:
+            raise AssertionError("CRC-valid blank mesh was accepted")
+        # Restore a valid container for existing PBR/dashboard corruption tests.
+        path.write_bytes(header + payload)
         assert inspect(path)["opaque_materials"] == [0]
         assert inspect(path)["usable_uv_materials"] == [0]
         assert not pbr_map_coverage(inspect(path))
