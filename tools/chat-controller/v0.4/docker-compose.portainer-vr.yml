@@ -13,11 +13,12 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "conversion"
-      AUTO_SEND: "false"
+      AUTO_SEND: "${AUTO_SEND:-true}"
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
       VR_FEATURE_DEVELOPMENT_ENABLED: "false"
-      # Operator 2026-11-10: Ferrari A/C automatic modeling stopped by user request; preserve workspace/artifacts.
+      # 2026-11-23 operator: re-enable A for isolated external Ferrari16 models only.
+      # Old imsi1 cockpit queues stay stopped; separate SSOT + queue are mandatory.
       VR_CONTINUOUS_30M_ENABLED: "false"
       VR_SCHEDULED_DISPATCH_ENABLED: "false"
       VR_CONTINUOUS_INTERVAL_SECONDS: "3600"
@@ -26,10 +27,11 @@ services:
       VR_FEATURE_C6_REMINDER_SECONDS: "300"
       CONVERSION_ACTIVE_LIMIT: "2"
       CONVERSION_DX11_ENABLED: "false"
-      # Ferrari cockpit modeling stopped (A and C); do not dispatch without explicit user re-enable.
-      CAR_MODEL_AUTODEV_ENABLED: "false"
-      CAR_MODEL_GITHUB_REPO: "thp32tt/imsi1"
-      CAR_MODEL_TARGET_BRANCH: "main"
+      # Ferrari cockpit A/C legacy modeling remains disabled by external-mode guard.
+      CAR_MODEL_AUTODEV_ENABLED: "true"
+      EXTERNAL_MODEL_AUTODEV_ENABLED: "true"
+      CAR_MODEL_GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
+      CAR_MODEL_TARGET_BRANCH: "automation/ferrari16-external-20261123"
       CAR_MODEL_SCHEDULE_MINUTES: "0,30"
       CAR_MODEL_C_AUTODEV_ENABLED: "false"
       CAR_MODEL_C_SCHEDULE_MINUTES: "15,45"
