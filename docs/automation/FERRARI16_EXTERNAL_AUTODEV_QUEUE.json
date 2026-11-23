@@ -19,20 +19,57 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-001",
+  "active_work_id": "EXT16-002",
   "work": [
     {
       "id": "EXT16-001",
       "priority": 0,
       "title": "Restore base game and dual-eye runtime parity; preserve working v0.03",
       "stage": "source_fix",
-      "status": "ACTIVE",
+      "status": "BLOCKED",
       "acceptance": [
         "Baseline vs new build diff on all stereo/loader gates",
         "Both eyes succeed or full original-model fallback; no partial-eye success",
         "No 2D theater/menu focus regression; no unverified performance claims",
         "Modified C++ and targeted positive/negative regression tests committed"
-      ]
+      ],
+      "result_sha": "a714fb69315ebc3d3da136fda7c8d53b19ce1795",
+      "runtime_validation": "UNTESTED",
+      "static_evidence": {
+        "modified_cpp": [
+          "src/hooks_graphics.cpp",
+          "src/vr/game/dino_external_d3d9.hpp",
+          "src/vr/game/external_car_runtime_policy.hpp",
+          "src/vr/game/external_car_stereo_receipt.hpp",
+          "src/vr/d3d9/stereo_renderer_r7.inc"
+        ],
+        "test_sources": [
+          "tests/external_car_runtime_policy_test.cpp",
+          "tests/external_car_stereo_receipt_test.cpp"
+        ],
+        "local_cpp17": [
+          "PASS: 16-way PBR/fixed-function/selection/replacement policy regression; source and test blob SHA match GitHub",
+          "PASS: targeted successful/failed LEFT+RIGHT/report/restore no-false-success regression; header blob SHA matches GitHub"
+        ],
+        "source_blobs": {
+          "external_car_runtime_policy_hpp": "794c0b027e293dce16d1d0a4cdd6fa8341ba5035",
+          "external_car_runtime_policy_test_cpp": "119f4948a3ad81523535d5468887c1448195f1d7",
+          "external_car_stereo_receipt_hpp": "f353178085fcb0d3bd47631b1c85218af13011e5"
+        },
+        "protected_baseline": "2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7",
+        "protected_directories_diff": "No changed paths in vrhost/, src/vr/game/quest_cockpit_v2_*, Start-OutRun.cmd from protected v0.03; R7/R30/R33 and hooks differ and require dedicated runtime/CI parity",
+        "github_actions_exact_sha": "NOT_VERIFIED (no completed CI run evidence accessible for commit)",
+        "windows_x86_game_dll": "NOT_VERIFIED",
+        "windows_x64_host": "NOT_VERIFIED",
+        "pbr_normal_maps_16_cars": "NOT_VERIFIED (private current OVC payloads not checked)",
+        "hmd": "UNTESTED"
+      },
+      "blocking_reasons": [
+        "Exact-SHA CI success and Windows x86 game DLL / x64 host build artifacts not yet verified; do not certify COMPLETE_STATIC from local C++ tests",
+        "Physical RIGHT-eye failure AFTER a successful LEFT-eye raster cannot be rolled back by R7's HRESULT/receipt gate; transactional per-eye scratch/staging or an equivalent all-or-stock precommit strategy is required to guarantee full-model fallback in the SAME frame",
+        "No Quest3/VDXR game run or measured baseline-vs-test frame/focus comparison; runtime and performance remain UNTESTED"
+      ],
+      "recovery_action": "Re-enter EXT16-001 only after an independent all-or-stock stereo staging design and exact-SHA Windows x86 DLL/x64 host CI are available. Keep protected v0.03 and original fallback unmodified; record failing partial-eye GPU injection before release promotion."
     },
     {
       "id": "EXT16-002",
