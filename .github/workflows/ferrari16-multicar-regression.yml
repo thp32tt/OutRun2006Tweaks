@@ -91,7 +91,8 @@ jobs:
           assert 'RestoreExternalPbrConstants(device,draw)' in r7
           assert 'GetPixelShaderConstantF(' in r7
           assert 'SetPixelShaderConstantF(1,camera,1)' in r7
-          assert 'if (!resyncAlreadyFlushed) return E_FAIL;' in r33
+          assert 'if (!resyncAlreadyFlushed) {' in r33
+          assert 'ProveExternalNoPhysicalDraw();' in r33
           assert 'return R32ReviewRunLowerFailClosed(' in r33
           assert 'ScopedExternalPbrStereo pbrEyeScope(' in gpu
           assert 'unsigned NormalMapsInAsset() const noexcept' in gpu
