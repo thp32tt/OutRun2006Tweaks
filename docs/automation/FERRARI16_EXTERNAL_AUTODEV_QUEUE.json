@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-005",
+  "active_work_id": "EXT16-006",
   "work": [
     {
       "id": "EXT16-001",
@@ -297,13 +297,60 @@
       "priority": 4,
       "title": "Repeatable 16-car independent build, static CI and test package",
       "stage": "test_and_package",
-      "status": "QUEUED",
+      "status": "COMPLETE_STATIC",
       "acceptance": [
         "Windows x86 game DLL + x64 host+ OpenXR/package exact SHA gates PASS",
         "All 16 static positive/negative loader/fallback tests PASS",
         "Rollback/backup, sha256 manifests, logs and direct launcher in private package",
         "No Quest3 HMD PASS inferred from CI"
-      ]
+      ],
+      "completed_at_kst": "2026-11-24 01:08 KST",
+      "result_sha": "ce983b6fe4149c28e04cf0f8b56deb3a812e438a",
+      "material_delta": "Native C++ and Python OVC4 fail-closed zero-area mesh rejection; 16 canonical positive/negative parser regressions; isolate all four launchers from normal VR host; SHA-pinned x86 DLL+x64 host package, Windows test-copy installer/backup/rollback, manifest, logs collector.",
+      "runtime_validation": "UNTESTED",
+      "hmd_validation": "WAITING_USER_HMD",
+      "model_asset_qa": "PRIVATE_16_SOURCE_OVC_RIGHTS_AND_VISUAL_QA_NOT_VERIFIED",
+      "material_and_ci_evidence": {
+        "source_validation_sha": "ce983b6fe4149c28e04cf0f8b56deb3a812e438a",
+        "native_ovc_loader_blob_sha": "246ce007b03e5d0a27600768584d3701ed703883",
+        "python_ovc_preflight_blob_sha": "baeb4cd5670ea17172be4b4558b716c949d0300a",
+        "native_positive_negative_test_blob_sha": "2b284c0730151a567db1fac95de7f8b318736779",
+        "isolated_launcher_negative_test_blob_sha": "2f7359526035910ef527b06fa5bf3dd02faad13e",
+        "package_builder_blob_sha": "ce71a05a176f8828ed40c1aae5e46283d6c87c55",
+        "source_changes": [
+          "6c6b0b494e9e2fdbd54d40f85b94d03c5e7808e6",
+          "c0abf7e157816369c1ddbb2cd9d62a1ab0a01abc",
+          "1d32621eedffac2b55830f50da455f1199caef75",
+          "408fae72d9a217837269109277854ea916e153f4",
+          "0edf840f8f5af98636c7383a43dee217a887eb3a",
+          "dfb6e15a087a233d0e39abac822593ea195d35ac",
+          "ce983b6fe4149c28e04cf0f8b56deb3a812e438a"
+        ],
+        "static_regression_and_hlsl": {
+          "workflow_run_id": 45211645347,
+          "conclusion": "SUCCESS",
+          "head_sha": "ce983b6fe4149c28e04cf0f8b56deb3a812e438a",
+          "includes": "16 canonical positive/negative, retail alias/fallback, stereo/PBR/alpha/dashboard and Windows D3DCompiler tests"
+        },
+        "exact_sha_windows_build_package": {
+          "workflow_run_id": 45211645371,
+          "conclusion": "SUCCESS",
+          "head_sha": "ce983b6fe4149c28e04cf0f8b56deb3a812e438a",
+          "x86_game_dll": "PASS_PE32_0x014c",
+          "x64_openxr_host": "PASS_PE64_0x8664",
+          "windows_isolated_install_backup_restore": "PASS_SYNTHETIC",
+          "hmd": "UNTESTED"
+        },
+        "artifact": {
+          "artifact_id": 14835494991,
+          "name": "Ferrari16-EXT16-005-x86-x64-exact-sha-test",
+          "github_artifact_digest": "sha256:2f52df67ab7d77e17ddf41202d1e98115faf321ff758cf23ef1a81e44cb8281d",
+          "inner_zip_sha256": "e768bf86af44228de52d30c42fe8d45d57def84e737ffd2efeb8aad36770443a",
+          "inner_zip_file": "Ferrari16_EXT16-005_Private_Test.zip",
+          "contains": "QA.json + per-file SHA256SUMS.txt + original isolated copy/install/restore/log collector + direct launchers; no copyrighted model/game original"
+        },
+        "limitations": "No 16 licensed real model asset SHA/access in this CI; private quality/normal/ORM source proof and Quest3 live stereo/fps/menu/focus remain user validation, not promoted."
+      }
     },
     {
       "id": "EXT16-006",
@@ -324,5 +371,5 @@
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-23"
+  "last_updated_kst": "2026-11-24 01:08 KST"
 }
