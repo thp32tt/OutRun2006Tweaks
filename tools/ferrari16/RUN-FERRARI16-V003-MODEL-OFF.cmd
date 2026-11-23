@@ -2,6 +2,16 @@
 setlocal
 cd /d "%~dp0"
 
+rem Never launch a global mod test from a working v0.03 install.
+if not exist "%~dp0.ferrari16-isolated.json" (
+ echo [EXT16] Refusing to launch outside a prepared isolated test copy.
+ exit /b 87
+)
+if not exist "%~dp0OR2006C2C.exe" (
+ echo [EXT16] Isolated game EXE missing.
+ exit /b 87
+)
+
 if /I "%~1"=="2d" goto MODE_2D
 if /I "%~1"=="vr" goto MODE_VR
 
@@ -18,7 +28,13 @@ goto MODE_2D
 :MODE_2D
 rem The release dinput8.dll contains both the normal Tweaks/FFB code and VR.
 rem Direct 2D explicitly disables only VR hooks; wheel FFB stays loaded.
-taskkill /IM outrun-vr-host.exe /F >nul 2>&1
+rem A globally named taskkill would terminate even the working v0.03 host.
+rem Fail closed instead; close any existing host manually before testing.
+tasklist /FI "IMAGENAME eq outrun-vr-host.exe" 2>nul | find /I "outrun-vr-host.exe" >nul
+if not errorlevel 1 (
+ echo [EXT16] Another VR host is running. Close it before isolated testing.
+ exit /b 88
+)
 set "OUTRUN_VR_LAUNCH=0"
 set "OUTRUN_VR_FORCE_DISABLED=1"
 set "OUTRUN_VR_FILE_LOG=0"
@@ -28,7 +44,13 @@ exit /b 0
 :MODE_VR
 rem Ferrari16 private diagnostic on unmodified v0.03 VR launch settings.
 rem No PowerShell script is required: all launch-only VR settings are passed here.
-taskkill /IM outrun-vr-host.exe /F >nul 2>&1
+rem A globally named taskkill would terminate even the working v0.03 host.
+rem Fail closed instead; close any existing host manually before testing.
+tasklist /FI "IMAGENAME eq outrun-vr-host.exe" 2>nul | find /I "outrun-vr-host.exe" >nul
+if not errorlevel 1 (
+ echo [EXT16] Another VR host is running. Close it before isolated testing.
+ exit /b 88
+)
 set "OUTRUN_VR_LAUNCH=1"
 set "OUTRUN_VR_FORCE_DISABLED=0"
 set "OUTRUN_VR_R23_PIXEL_PROBE=0"

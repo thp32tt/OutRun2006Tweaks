@@ -20,6 +20,8 @@ jobs:
         run: |
           if((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA){throw 'Wrong checkout SHA'}
           python tests/ferrari16_package_integrity_test.py
+          if($LASTEXITCODE -ne 0){throw 'Package tamper gate failed'}
+          python tests/ferrari16_launcher_isolation_test.py
           if($LASTEXITCODE -ne 0){throw 'Tamper tests failed'}
       - name: Windows PowerShell 5.1 syntax gates
         shell: powershell
