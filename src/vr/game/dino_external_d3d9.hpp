@@ -96,6 +96,7 @@ class GpuOwner final {
         unsigned material=0;
         int dashboardBinding=-1;
         bool glass=false; // sorted transparent sidecar group; never occludes road depth
+        float glassCenter[3]{0.f,0.f,0.f}; // local bbox centre, calculated on upload
     };
     Model cpu_{};
     NormalRepairStats normalRepairStats_{};
@@ -440,6 +441,19 @@ class GpuOwner final {
                 }
             next.glass=m.name.compare(0,10,"F50_GLASS_")==0 ||
                 m.name.compare(0,10,"EXT_GLASS_")==0;
+            if(next.glass && !m.vertices.empty()) {
+                float low[3]{m.vertices[0].x,m.vertices[0].y,m.vertices[0].z};
+                float high[3]{low[0],low[1],low[2]};
+                for(const auto& v:m.vertices) {
+                    const float p[3]{v.x,v.y,v.z};
+                    for(unsigned k=0;k<3;++k) {
+                        low[k]=(std::min)(low[k],p[k]);
+                        high[k]=(std::max)(high[k],p[k]);
+                    }
+                }
+                for(unsigned k=0;k<3;++k)
+                    next.glassCenter[k]=low[k]*0.5f+high[k]*0.5f;
+            }
             next.vertexCount=static_cast<UINT>(m.vertices.size());
             next.indexCount=static_cast<UINT>(m.indices.size());
             const UINT vertexBytes=next.vertexCount*sizeof(Vertex);
@@ -767,11 +781,22 @@ public:
             -(view._41*view._11+view._42*view._12+view._43*view._13),
             -(view._41*view._21+view._42*view._22+view._43*view._23),
             -(view._41*view._31+view._42*view._32+view._43*view._33)};
-        // Preserve input order within each class, but render opaque geometry
-        // before glass even when OVC mesh groups are interleaved. Depth writes
-        // remain disabled only for the transparent pass. No allocation/sort.
+        // Imported OVC mesh order is not depth order. Keep opaque input
+        // order; sort only transparent meshes far-to-near in the latched
+        // center camera. This stack buffer is bounded by the parser's 512
+        // mesh limit, with no per-eye allocations or texture replacement.
+        std::array<GlassDepthItem,MaxGroups> glassOrder{};
+        unsigned glassCount=0u;
+        if(SUCCEEDED(hr))for(unsigned i=0;i<meshes_.size();++i) {
+            const auto& m=meshes_[i];
+            if(m.glass && glassCount<glassOrder.size())
+                glassOrder[glassCount++]={i,ExternalGlassViewDepth(
+                    m.glassCenter,&world.m[0][0],&view.m[0][0])};
+        }
+        SortGlassBackToFront(glassOrder.data(),glassCount);
         if(SUCCEEDED(hr))for(unsigned pass=0;pass<2u && SUCCEEDED(hr);++pass)
-          for(const auto& m:meshes_) {
+          for(unsigned order=0;order<(pass?glassCount:meshes_.size());++order) {
+            const auto& m=meshes_[pass?glassOrder[order].index:order];
             if(!MeshInDrawPass(m.glass,pass))continue;
             const DashboardBinding* binding=DashboardFor(m);
             if(!DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask))

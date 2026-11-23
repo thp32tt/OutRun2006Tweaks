@@ -2,6 +2,7 @@
 #include <array>
 #include <cassert>
 #include <vector>
+#include <limits>
 using OutRunVR::DinoSidecar::MeshInDrawPass;
 int main() {
     // Input order deliberately interleaves transparent and opaque meshes.
@@ -16,6 +17,37 @@ int main() {
         assert(MeshInDrawPass(glass[i],0u) != MeshInDrawPass(glass[i],1u));
         assert(!MeshInDrawPass(glass[i],2u));
     }
+    // Glass may appear in reverse distance order in third-party OVC data.
+    // Same mesh receives identical camera-space ordering for both stereo eyes
+    // when depth order is unambiguous; no sorting of opaque meshes.
+    constexpr float identity[16]{
+        1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
+    constexpr float leftView[16]{
+        1,0,0,0, 0,1,0,0, 0,0,1,0, 0.032,0,0,1};
+    constexpr float rightView[16]{
+        1,0,0,0, 0,1,0,0, 0,0,1,0, -0.032,0,0,1};
+    constexpr float nearGlass[3]{0,0,1};
+    constexpr float farGlass[3]{0,0,5};
+    constexpr float middleGlass[3]{0,0,3};
+    assert(ExternalGlassViewDepth(nearGlass,identity,identity)==1.f);
+    assert(ExternalGlassViewDepth(farGlass,identity,identity)==5.f);
+    for(const float* eye:{leftView,rightView}) {
+        std::array<GlassDepthItem,4> items{{
+            {2,ExternalGlassViewDepth(nearGlass,identity,eye)},
+            {0,ExternalGlassViewDepth(farGlass,identity,eye)},
+            {3,ExternalGlassViewDepth(middleGlass,identity,eye)},
+            {1,ExternalGlassViewDepth(farGlass,identity,eye)}
+        }};
+        SortGlassBackToFront(items.data(),items.size());
+        assert(items[0].index==0 && items[1].index==1);
+        assert(items[2].index==3 && items[3].index==2);
+    }
+    // Deliberately malformed/nonfinite camera matrices produce deterministic
+    // keys rather than NaN comparisons with undefined sort ordering.
+    float badView[16]{};
+    for(unsigned i=0;i<16;++i)badView[i]=identity[i];
+    badView[10]=std::numeric_limits<float>::quiet_NaN();
+    assert(ExternalGlassViewDepth(farGlass,identity,badView)==0.f);
     // All-opaque and all-glass OVCs do not produce spurious extra draws.
     for (bool isGlass:{false,true}) {
         unsigned count=0;
