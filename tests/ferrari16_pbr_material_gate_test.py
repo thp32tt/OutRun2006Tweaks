@@ -5,7 +5,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools" / "ferrari16"))
 from pbr_material_gate import (  # noqa: E402
-    uncovered_pbr_materials, pbr_opaque_coverage_ok, triangle_uv_basis)
+    uncovered_pbr_materials, pbr_opaque_coverage_ok,
+    triangle_has_pbr_basis, triangle_uv_basis)
 
 
 def main() -> None:
@@ -28,6 +29,12 @@ def main() -> None:
     assert triangle_uv_basis((0., 0.), (0., 1.), (1., 0.))  # mirrored UV
     assert not triangle_uv_basis((0., 0.), (0., 0.), (0., 0.))
     assert not triangle_uv_basis((0., 0.), (1e-5, 0.), (0., 1e-5))
+    assert triangle_has_pbr_basis((0, 0, 0), (1, 0, 0), (0, 1, 0),
+                                  (0, 0), (1, 0), (0, 1))
+    assert not triangle_has_pbr_basis((0, 0, 0), (1, 0, 0), (2, 0, 0),
+                                      (0, 0), (1, 0), (0, 1))
+    assert not triangle_has_pbr_basis((0, 0, 0), (1, 0, 0), (0, 1, 0),
+                                      (0, 0), (0, 0), (0, 0))
     print("FERRARI16_PBR_PER_OPAQUE_MATERIAL_POSITIVE_NEGATIVE_PASS")
 
 
