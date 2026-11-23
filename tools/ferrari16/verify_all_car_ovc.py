@@ -294,6 +294,16 @@ def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
                 overlay_status = f"FAIL: {error}"
         else:
             overlay_status = "NOT_INSTALLED"
+        # A corrupt installed dashboard is a vehicle preflight failure, not
+        # a successful body with an unreported sidecar error. In particular,
+        # don't mask an existing body failure or a missing body candidate.
+        if overlay_status.startswith("FAIL: "):
+            overlay_reason = "dashboard overlay: " + overlay_status[6:]
+            if status == "FAIL":
+                details["reason"] = details.get("reason", "body preflight failed") + "; " + overlay_reason
+            else:
+                status = "FAIL"
+                details = {**details, "reason": overlay_reason}
         results.append({"id": car_id, "car": name, "status": status,
                         "selected_asset": model.name, "body": details,
                         "dashboard_overlay": overlay_status})
