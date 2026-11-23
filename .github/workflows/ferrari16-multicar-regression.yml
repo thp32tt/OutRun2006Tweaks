@@ -1,7 +1,7 @@
 name: Ferrari16 All-Car Sidecar Regression
 on:
   push:
-    branches: [vr-ferrari16-v003-multicar-debug-20261122, fix/ferrari16-stereo-loader-guard-20261122, fix/ferrari16-pbr-stereo-20261123]
+    branches: [vr-ferrari16-v003-multicar-debug-20261122, fix/ferrari16-stereo-loader-guard-20261122, fix/ferrari16-pbr-stereo-20261123, automation/ferrari16-external-20261123]
   workflow_dispatch:
 permissions:
   contents: read
@@ -94,6 +94,17 @@ jobs:
           assert 'if (!resyncAlreadyFlushed) {' in r33
           assert 'ProveExternalNoPhysicalDraw();' in r33
           assert 'return R32ReviewRunLowerFailClosed(' in r33
+          # PBR's explicit diagnostic opt-in must survive the admission
+          # policy; previous code rejected PBR when fixed-function A/B was 0.
+          policy=Path('src/vr/game/external_car_runtime_policy.hpp').read_text()
+          test=Path('tests/external_car_runtime_policy_test.cpp').read_text()
+          runner=Path('tools/ferrari16/RUN-FERRARI16-V003-PBR-TRACE.cmd').read_text()
+          assert 'PbrExternalStereoProbeActive()' in gpu
+          assert source.count('PbrExternalStereoProbeActive()')==3
+          assert 'fixedFunctionStereoA_B || pbrStereoDiagnostic' in policy
+          assert 'for(int pbr=0;pbr<2;++pbr)' in test
+          assert 'OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=0' in runner
+          assert 'OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=1' in runner
           assert 'ScopedExternalPbrStereo pbrEyeScope(' in gpu
           assert 'unsigned NormalMapsInAsset() const noexcept' in gpu
           assert 'unsigned NormalMapsOnGpu() const noexcept' in gpu
