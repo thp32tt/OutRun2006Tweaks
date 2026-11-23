@@ -3014,6 +3014,11 @@ def ferrari_workpack_dispatch_decision(slot_name: str, state: dict, now: datetim
 
 
 async def car_model_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime, slot_name: str = "A") -> bool:
+    if EXTERNAL_MODEL_AUTODEV_ENABLED:
+        if slot_name != "A":
+            raise ValueError("external Ferrari modeling may own A only")
+        from app.ferrari_external import external_model_cycle
+        return await external_model_cycle(context, pages, q, now, globals())
     """OutRun A: sequential Ferrari geometry-only modeling, never DX11/Model2.
 
     Uses an independent 60m chat lifetime; repo JSON queue selects active car.
@@ -4300,7 +4305,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     save_queue_state(q)
     write_runtime(
         status="vr_continuous_running",
-        last_action=("A(Ferrari16 geometry-only)" if CAR_MODEL_AUTODEV_ENABLED else "A(DX11 implementation)" if CONVERSION_DX11_ENABLED else "A(DX11 disabled)")+ "+C("+(
+        last_action=("A(Ferrari16 external models)" if EXTERNAL_MODEL_AUTODEV_ENABLED else "A(Ferrari16 geometry-only)" if CAR_MODEL_AUTODEV_ENABLED else "A(DX11 implementation)" if CONVERSION_DX11_ENABLED else "A(DX11 disabled)")+ "+C("+(
             "Model2 VR last sent " + str((q.get("model2_simple") or {}).get("last_sent_at") or "not sent yet")
             if MODEL2_AUTODEV_ENABLED else
             "UW2 last sent " + str((q.get("uw2_simple") or {}).get("last_sent_at") or "not sent yet")
@@ -4455,7 +4460,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         save_queue_state(q)
 
     # Preserve prior A car session state as its own slot after dual-slot migration.
-    if CAR_MODEL_AUTODEV_ENABLED and "car_model_simple_A" not in q and "car_model_simple" in q:
+    if CAR_MODEL_AUTODEV_ENABLED and not EXTERNAL_MODEL_AUTODEV_ENABLED and "car_model_simple_A" not in q and "car_model_simple" in q:
         q["car_model_simple_A"] = dict(q.get("car_model_simple") or {})
         save_queue_state(q)
 
@@ -4489,7 +4494,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
 
     # Convert disabled legacy DX11 A to cockpit modeling without reviving it.
     # deployment, without reviving or overwriting a legacy DX11 TASK_ID.
-    if CAR_MODEL_AUTODEV_ENABLED and not q.get("car_model_simple_initialized"):
+    if CAR_MODEL_AUTODEV_ENABLED and not EXTERNAL_MODEL_AUTODEV_ENABLED and not q.get("car_model_simple_initialized"):
         state = q.setdefault("car_model_simple_A", {})
         state.clear()
         state["fresh_chat_required"] = True
