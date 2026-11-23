@@ -112,6 +112,8 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     # opaque and must own their own PBR maps for strict map certification.
     opaque_materials: set[int] = set()
     usable_uv_materials: set[int] = set()
+    invalid_uv_materials: set[int] = set()
+    incomplete_mips_materials: set[int] = set()
     normal_materials: set[int] = set()
     orm_materials: set[int] = set()
     for _ in range(groups):
@@ -160,13 +162,17 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                 vx, vy, vz = (c[j] - a[j] for j in range(3))
                 if uy * vz - uz * vy or uz * vx - ux * vz or ux * vy - uy * vx:
                     has_drawable_triangle = True
-                if not is_glass and material not in usable_uv_materials:
-                    # The opaque normal-map TBN needs UV and world geometry.
+                if not is_glass:
+                    # Every opaque triangle must have a valid derivative TBN.
+                    # Previously, one valid triangle on this material hid an
+                    # arbitrary number of UV-degenerate triangles/submeshes.
                     uvs = tuple(struct.unpack_from(
                         "<2f", data, vertex_start + vertex * 32 + 24)
                         for vertex in tri)
                     if triangle_has_pbr_basis(*positions, *uvs):
                         usable_uv_materials.add(material)
+                    else:
+                        invalid_uv_materials.add(material)
         # Match the x86 native parser's fail-closed zero-area mesh policy.
         # A CRC-valid but invisible group must not suppress the stock car.
         require(has_drawable_triangle, "mesh degenerate geometry")
@@ -201,6 +207,14 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                 at += 4
                 if length:
                     dds_length(data, at, length, False)
+                    # Valid single-mip DDS is renderable, but cannot certify
+                    # HQ PBR map quality. The optional strict gate requires a
+                    # complete chain for every used normal/ORM material.
+                    dds_height, dds_width, dds_mips = (
+                        u32(data, at + 12), u32(data, at + 16),
+                        u32(data, at + 28))
+                    if dds_mips != max(dds_width, dds_height).bit_length():
+                        incomplete_mips_materials.add(material_id)
                     at += length
                     gpu_bytes += length
                     if index == 0:
@@ -250,13 +264,16 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                 "runtime floor placement cannot accept this vehicle")
     uncovered = uncovered_pbr_materials(
         version, opaque_materials, normal_materials, orm_materials,
-        usable_uv_materials)
+        usable_uv_materials, invalid_uv_materials,
+        incomplete_mips_materials)
     return {"version": version, "groups": groups, "triangles": tris,
             "vertices": vertices, "materials": materials,
             "normal_maps": normal_maps, "orm_maps": orm_maps,
             "zero_normal_vertices": zero_normals,
             "opaque_materials": sorted(opaque_materials),
             "usable_uv_materials": sorted(usable_uv_materials),
+            "invalid_uv_materials": sorted(invalid_uv_materials),
+            "incomplete_mips_materials": sorted(incomplete_mips_materials),
             "pbr_uncovered": uncovered,
             "pbr_all_opaque_covered": not any(uncovered.values()),
             "ovc_sha256": hashlib.sha256(data).hexdigest(),
@@ -286,7 +303,7 @@ def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
                 if require_pbr_maps and not pbr_map_coverage(details):
                     status = "FAIL"
                     details["reason"] = (
-                        "required per-opaque-material normal/ORM/UV coverage: " +
+                        "required per-opaque-material normal/ORM/UV/full-mip coverage: " +
                         json.dumps(details["pbr_uncovered"], sort_keys=True))
                 else:
                     status = "PASS"
@@ -384,6 +401,46 @@ def self_test() -> None:
         assert covered["pbr_uncovered"]["no_normal"] == []
         assert covered["pbr_uncovered"]["no_orm"] == []
         assert pbr_map_coverage(covered)
+        # Two opaque meshes share one PBR material. One mesh is UV-valid
+        # while its sibling has collapsed UV. A file-wide "any UV" gate
+        # incorrectly certified these CRC-valid broken normal maps.
+        bad_verts = bytearray(verts)
+        for vertex in range(3):
+            struct.pack_into("<2f", bad_verts, vertex * 32 + 24, 0., 0.)
+        bad_group = (struct.pack("<HHIII", len(name), 0, 3, 3, 4)
+                     + name + bad_verts + struct.pack("<3I", 0, 1, 2))
+        mixed = group + bad_group + mapped[len(group):]
+        mixed_header = b"OVRCABH4" + struct.pack(
+            "<7I", 4, 2, 1, 6, 2, len(mixed),
+            zlib.crc32(mixed) & 0xffffffff)
+        path.write_bytes(mixed_header + mixed)
+        half_broken = inspect(path)
+        assert half_broken["usable_uv_materials"] == [0]
+        assert half_broken["invalid_uv_materials"] == [0]
+        assert half_broken["pbr_uncovered"]["partially_degenerate_uv"] == [0]
+        assert not pbr_map_coverage(half_broken), (
+            "CRC-valid partially UV-degenerate opaque material passed")
+        # A syntactically valid but single-mip 4x4 normal map cannot pass
+        # the high-quality PBR map gate (even with OVC CRC recomputed).
+        short_mip_dds = bytearray(128 + 4 * 4 * 4)
+        short_mip_dds[:128] = dds[:128]
+        struct.pack_into("<3I", short_mip_dds, 12, 4, 4, 0)
+        struct.pack_into("<I", short_mip_dds, 28, 1)
+        short_mip = (group + struct.pack("<I", len(dds)) + dds
+                     + b"OVCPBR3!" + struct.pack("<3f", 0.5, 0, 1)
+                     + struct.pack("<I", len(short_mip_dds))
+                     + short_mip_dds
+                     + struct.pack("<I", len(dds)) + dds
+                     + b"OVCDASH4" + struct.pack("<I", 0))
+        short_header = b"OVRCABH4" + struct.pack(
+            "<7I", 4, 1, 1, 3, 1, len(short_mip),
+            zlib.crc32(short_mip) & 0xffffffff)
+        path.write_bytes(short_header + short_mip)
+        short_details = inspect(path)
+        assert short_details["incomplete_mips_materials"] == [0]
+        assert short_details["pbr_uncovered"]["incomplete_pbr_mips"] == [0]
+        assert not pbr_map_coverage(short_details), (
+            "CRC-valid truncated normal DDS mip chain passed strict PBR")
         # A valid CRC and two populated PBR DDS maps are insufficient when
         # every triangle's UV determinant is zero: the shader cannot build TBN.
         no_uv = bytearray(mapped)

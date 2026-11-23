@@ -11,7 +11,9 @@ from collections.abc import Iterable
 
 def uncovered_pbr_materials(version: int, opaque: Iterable[int],
                             normal: Iterable[int], orm: Iterable[int],
-                            usable_uv: Iterable[int]) -> dict[str, list[int]]:
+                            usable_uv: Iterable[int],
+                            invalid_uv: Iterable[int] = (),
+                            incomplete_mips: Iterable[int] = ()) -> dict[str, list[int]]:
     """Return failed coverage categories, without claiming visual quality."""
     used = set(opaque)
     n, o, uv = set(normal), set(orm), set(usable_uv)
@@ -19,6 +21,8 @@ def uncovered_pbr_materials(version: int, opaque: Iterable[int],
         "no_normal": sorted(used - n),
         "no_orm": sorted(used - o),
         "degenerate_uv": sorted(used - uv),
+        "partially_degenerate_uv": sorted(used & set(invalid_uv)),
+        "incomplete_pbr_mips": sorted(used & set(incomplete_mips)),
         "unsupported_version": sorted(used) if version < 3 else [],
         "no_opaque_materials": [0] if not used else [],
     }
@@ -26,9 +30,12 @@ def uncovered_pbr_materials(version: int, opaque: Iterable[int],
 
 def pbr_opaque_coverage_ok(version: int, opaque: Iterable[int],
                            normal: Iterable[int], orm: Iterable[int],
-                           usable_uv: Iterable[int]) -> bool:
+                           usable_uv: Iterable[int],
+                           invalid_uv: Iterable[int] = (),
+                           incomplete_mips: Iterable[int] = ()) -> bool:
     return not any(uncovered_pbr_materials(
-        version, opaque, normal, orm, usable_uv).values())
+        version, opaque, normal, orm, usable_uv,
+        invalid_uv, incomplete_mips).values())
 
 
 def triangle_uv_basis(u0: tuple[float, float], u1: tuple[float, float],

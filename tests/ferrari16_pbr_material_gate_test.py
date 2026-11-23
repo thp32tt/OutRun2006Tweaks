@@ -13,6 +13,11 @@ def main() -> None:
     # Two opaque materials, one tagged glass material (not PBR-required).
     assert pbr_opaque_coverage_ok(4, {0, 1}, {0, 1}, {0, 1}, {0, 1})
     assert pbr_opaque_coverage_ok(4, {0}, {0}, {0}, {0})
+    # A valid UV triangle on material 0 must NOT mask bad UV triangles
+    # or stripped DDS mip levels on that same material.
+    assert not pbr_opaque_coverage_ok(4, {0}, {0}, {0}, {0}, {0})
+    assert not pbr_opaque_coverage_ok(4, {0}, {0}, {0}, {0}, (), {0})
+    assert pbr_opaque_coverage_ok(4, {0}, {0}, {0}, {0}, {1}, {1})
     assert pbr_opaque_coverage_ok(4, {0}, {0, 2}, {0, 2}, {0})
     # Previously, file-wide normal_maps>0 and orm_maps>0 both passed even if
     # the only normal/ORM maps were orphaned or on different materials.
@@ -24,6 +29,7 @@ def main() -> None:
     assert not pbr_opaque_coverage_ok(4, set(), {0}, {0}, {0})
     assert uncovered_pbr_materials(4, {0, 1}, {0}, {1}, {1}) == {
         "no_normal": [1], "no_orm": [0], "degenerate_uv": [0],
+        "partially_degenerate_uv": [], "incomplete_pbr_mips": [],
         "unsupported_version": [], "no_opaque_materials": []}
     assert triangle_uv_basis((0., 0.), (1., 0.), (0., 1.))
     assert triangle_uv_basis((0., 0.), (0., 1.), (1., 0.))  # mirrored UV
