@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-006",
+  "active_work_id": "EXT16-007",
   "work": [
     {
       "id": "EXT16-001",
@@ -365,11 +365,109 @@
         "Only promote accepted exact alternatives; any failure rolls back",
         "Set WAITING_USER_HMD rather than claiming automatic hardware pass"
       ]
+    },
+    {
+      "id": "EXT16-007",
+      "priority": 0,
+      "stage": "source_fix",
+      "status": "ACTIVE",
+      "recovery_of": "EXT16-001",
+      "title": "Implement an atomic two-eye external-car frame transaction and prevent left-eye partial raster on right-eye failure",
+      "acceptance": [
+        "Trace actual R7/R30/R33 left/right GPU submission and original-player callback suppression from D3D9 to OpenXR presentation",
+        "Introduce all-or-stock precommit/staging strategy for external-car stereo (both eyes presented or neither; original fallback before any partial raster); never claim post-raster full rollback with HRESULT alone",
+        "Add portable fail-before/pass-after injection for right-eye failure after left-eye success, device reset, GPU state restore, stock-car fallback and partial mesh draw cases",
+        "Keep v0.03 baseline, menus, host, PBR normal-map and cockpit options intact; exact SHA Windows x86 game and x64 OpenXR host CI required"
+      ],
+      "existing_evidence_refs": [
+        "EXT16-001 blocking_reasons",
+        "src/vr/game/external_car_stereo_receipt.hpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc"
+      ],
+      "runtime_validation": "UNTESTED",
+      "distinct_material_only": true
+    },
+    {
+      "id": "EXT16-008",
+      "priority": 1,
+      "stage": "renderer_fix",
+      "status": "QUEUED",
+      "recovery_of": "EXT16-004",
+      "title": "Prove original 2006 x86 player draw leaf ownership and restore dashboard, passenger, shadow and glass on external-model fallback",
+      "acceptance": [
+        "Analyze actual original x86 call graph/ABI of body-vs-dashboard draws; cite concrete offset and bounded proof before suppression",
+        "Fix native original callback gating only for verified external BODY owner; preserve original dashboard, passenger, shadow and both-eye world draws",
+        "Add positive and negative tests covering 16 cars, no external model, missing dashboard, speed/RPM/gear hybrid overlay, alpha/glass and hard failure rollback",
+        "Same-SHA Windows x86 DLL and x64 host/game package tests PASS; separate user Quest3 visual QA remains UNTESTED"
+      ],
+      "existing_evidence_refs": [
+        "EXT16-004 blocking_reasons",
+        "docs/automation/FERRARI16_EXTERNAL_AUTODEV_QUEUE.json"
+      ],
+      "runtime_validation": "UNTESTED",
+      "distinct_material_only": true
+    },
+    {
+      "id": "EXT16-009",
+      "priority": 2,
+      "stage": "source_fix",
+      "status": "QUEUED",
+      "recovery_of": "EXT16-002",
+      "title": "Verify real current 16-slot OVC sidecar and per-material normal/ORM maps with non-destructive per-slot repair/fallback",
+      "acceptance": [
+        "Locate private existing 16-car GLB/OVC/DDS under approved sources without new broad N100 searches or costly builds; verify source SHA and identity per slot",
+        "Run strict per-opaque-material normal/ORM tangent/UV/mip CRC tests on ACTUAL accessible assets, not synthetic PASS as substitute; fail closed on absent source",
+        "Repair proven invalid map/material conversion only when lawful source present; never downscale or overwrite HQ default with lower fidelity optional exact model",
+        "Commit scripts/tests/reports without redistributing unlicensed proprietary asset binaries; if private input unavailable record explicit WAIT_INPUT and advance"
+      ],
+      "existing_evidence_refs": [
+        "EXT16-002 blocking_reasons",
+        "tools/ferrari16/verify_all_car_ovc.py"
+      ],
+      "runtime_validation": "UNTESTED",
+      "distinct_material_only": true
+    },
+    {
+      "id": "EXT16-010",
+      "priority": 3,
+      "stage": "test_and_package",
+      "status": "QUEUED",
+      "recovery_of": "EXT16-001",
+      "title": "Regression-gate v0.03 menu/fullscreen focus and eye-depth parity independently of model package acceptance",
+      "acceptance": [
+        "Compare protected v0.03 DX9Ex active launch/host/renderer source to external model branch for focus, menu theatre, OpenXR init, eye RT and fallback changes",
+        "Add deterministically failing negative cases for wrong eye/view/RT/host and 2D-theater activation; do not infer measured FPS from CI",
+        "Run targeted C++/Python then final Windows x86+x64 exact-SHA sidecar/package workflows once for final source",
+        "Keep actual Quest 3 visual/p95/fps outcome WAITING_USER_HMD until physical test"
+      ],
+      "existing_evidence_refs": [
+        "EXT16-001 blocking_reasons",
+        "EXT16-005 static package result"
+      ],
+      "runtime_validation": "UNTESTED",
+      "distinct_material_only": true
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 01:08 KST"
+  "last_updated_kst": "2026-11-24 01:08 KST",
+  "post_static_hmd_work_id": "EXT16-006",
+  "recovery_policy": {
+    "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
+    "preserve_prior_blocked_results": true,
+    "work_id_not_reset_on_rollover": true,
+    "material_commit_required_for_completion": true,
+    "docs_only_recheck_is_not_completion": true,
+    "never_claim_quest3_pass_from_static_ci": true,
+    "blocked_current_advance_to_next_queued": true,
+    "after_010": "return EXT16-006 only after source work exhausted and leave WAITING_USER_HMD; add new distinct work only if evidence-backed actual defects"
+  },
+  "resume_trigger": {
+    "date_kst": "2026-11-24",
+    "reason": "Operator requests continuous debugging after 01:08 dispatch stopped",
+    "last_observed_live_dispatch": "2026-11-24T01:04:29+09:00",
+    "resume_work_id": "EXT16-007"
+  }
 }
