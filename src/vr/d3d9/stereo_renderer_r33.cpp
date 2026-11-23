@@ -1,4 +1,5 @@
 #include "../game/external_car_stereo_receipt.hpp"
+#include "../game/external_car_atomic_precommit.hpp"
 #include "../game/external_car_pbr_stereo_scope.hpp"
 // R33 final dispatch + post-review hot-path hardening.
 //
@@ -2006,6 +2007,15 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            // R33 is the final D3D9 DIP hook, above R30 and R7. Reject
+            // un-staged external vehicle meshes BEFORE fastpath, raw draw,
+            // StateBlock recording or lower-owner delegation. An R7-only
+            // fence can be bypassed by an R30/R33 direct submission.
+            if (OutRunVR::DinoSidecar::ActiveExternalStereoMesh &&
+                !OutRunVR::DinoSidecar::MaySubmitExternalCarLiveEye()) {
+                OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
+                return E_FAIL;
+            }
             // No cross-TU workload observer call when diagnostics are off.
             const bool telemetry = R33TelemetryEnabled();
             OutRunVR::UniversalTrace::ScopedDraw drawTrace(

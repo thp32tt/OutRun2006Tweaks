@@ -79,6 +79,11 @@ jobs:
           assert 'RuntimeExternalCarAtomicStageReady()' in precommit
           assert 'return false;' in precommit[precommit.index('RuntimeExternalCarAtomicStageReady()'):]
           assert 'MaySubmitExternalCarLiveEye()' in draw
+          final_dispatch=Path('src/vr/d3d9/stereo_renderer_r33.cpp').read_text()
+          final_dip=final_dispatch[final_dispatch.index('HRESULT __stdcall DrawIndexedPrimitiveDestR33('):final_dispatch.index('HRESULT __stdcall DrawPrimitiveUPDestR33(')]
+          assert 'MaySubmitExternalCarLiveEye()' in final_dip
+          assert final_dip.index('MaySubmitExternalCarLiveEye()') < final_dip.index('const bool telemetry = R33TelemetryEnabled();')
+          assert 'ProveExternalNoPhysicalDraw();' in final_dip[final_dip.index('MaySubmitExternalCarLiveEye()'):final_dip.index('const bool telemetry = R33TelemetryEnabled();')]
           assert draw.index('MaySubmitExternalCarLiveEye()') < draw.index('const HRESULT leftHr=drawCall();')
           assert 'ProveExternalNoPhysicalDraw();' in draw[draw.index('MaySubmitExternalCarLiveEye()'):draw.index('DrawStereoState draw{}')]
           assert '(!draw.worldStereo || !draw.fixedFunctionWorld)' in draw
