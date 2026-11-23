@@ -78,10 +78,15 @@ MODEL2_TARGET_BRANCH = os.getenv("MODEL2_TARGET_BRANCH", "main").strip()
 # Ferrari cockpit-only modeling: two separate ChatGPT slots and separate car owners.
 # Do not replace or reactivate previous Model2 C; that project remains disabled.
 CAR_MODEL_AUTODEV_ENABLED = os.getenv("CAR_MODEL_AUTODEV_ENABLED", "false").lower() == "true"
+EXTERNAL_MODEL_AUTODEV_ENABLED = os.getenv("EXTERNAL_MODEL_AUTODEV_ENABLED", "false").lower() == "true"
 CAR_MODEL_C_AUTODEV_ENABLED = os.getenv("CAR_MODEL_C_AUTODEV_ENABLED", "false").lower() == "true"
 CAR_MODEL_GITHUB_REPO = os.getenv("CAR_MODEL_GITHUB_REPO", "thp32tt/imsi1").strip()
 CAR_MODEL_TARGET_BRANCH = os.getenv("CAR_MODEL_TARGET_BRANCH", "main").strip()
 CAR_MODEL_SCOPE_READY = bool(CONFIGURED_PROJECT_ID)
+if EXTERNAL_MODEL_AUTODEV_ENABLED and not CAR_MODEL_AUTODEV_ENABLED:
+    raise ValueError("external Ferrari lane requires car model A enabled")
+if EXTERNAL_MODEL_AUTODEV_ENABLED and CAR_MODEL_C_AUTODEV_ENABLED:
+    raise ValueError("external Ferrari lane cannot coexist with old cockpit C workpack")
 if CAR_MODEL_AUTODEV_ENABLED and CONVERSION_DX11_ENABLED:
     raise ValueError("Car modeling A and legacy DX11 A cannot both be enabled")
 if CAR_MODEL_C_AUTODEV_ENABLED and (MODEL2_AUTODEV_ENABLED or UW2_WEB_PORT_ENABLED):
@@ -381,6 +386,8 @@ runtime = {
     "model2_project_separate": MODEL2_SCOPE_READY,
     "model2_auto_send_ready": bool(AUTO_SEND and MODEL2_SCOPE_READY),
     "car_model_autodev_enabled": CAR_MODEL_AUTODEV_ENABLED,
+    "external_model_autodev_enabled": EXTERNAL_MODEL_AUTODEV_ENABLED,
+    "external_model_mode": "FERRARI16_EXTERNAL" if EXTERNAL_MODEL_AUTODEV_ENABLED else "COCKPIT_LEGACY",
     "car_model_c_autodev_enabled": CAR_MODEL_C_AUTODEV_ENABLED,
     "car_model_c_schedule_minutes": CAR_MODEL_C_SCHEDULE_MINUTES if CAR_MODEL_C_AUTODEV_ENABLED else [],
     "car_model_github_repo": CAR_MODEL_GITHUB_REPO if CAR_MODEL_AUTODEV_ENABLED else None,
