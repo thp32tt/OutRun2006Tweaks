@@ -187,7 +187,9 @@ async def external_model_cycle(context, pages: dict, q: dict, now: datetime, hos
     if outcome != "sent":
         g("write_runtime")(status="external_model_send_retry", last_action=f"send outcome={outcome}")
         return False
-    at = datetime.now(g("TZ"))
+    # Use this dispatch cycle's aware KST instant for durable send accounting.
+    # It makes :00/:30 rollover and dedup tests deterministic.
+    at = now
     if not slot.url:
         new_url = await g("wait_for_chat_url")(page, timeout_sec=8, slot_name=SLOT)
         if new_url:
