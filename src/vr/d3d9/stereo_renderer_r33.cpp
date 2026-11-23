@@ -1672,7 +1672,10 @@ namespace OutRunVRStereo
             // receipt proof. Never route this DIP into R33's cached c64 or
             // a raw mono draw when the raster guard is unavailable.
             if (OutRunVR::DinoSidecar::ActiveExternalPbrStereo) {
-                if (!resyncAlreadyFlushed) return E_FAIL;
+                if (!resyncAlreadyFlushed) {
+                    OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
+                    return E_FAIL;
+                }
                 // Retain the same lower-owner fail-closed fence as regular
                 // R33 fallback. Bypassing this wrapper would risk game-c64
                 // ownership leaking into the external shader's c4/c8 path.

@@ -814,16 +814,22 @@ public:
             // Scope only the physical DIP, never shader/RT/StateBlock setup.
             // A native draw re-entering during preparation retains its owner.
             OutRunVR::GameSemantic::ScopedExternalVehicleSemantic externalScope;
+            const unsigned priorAttempts=result.receipt.attemptedMeshes;
+            const unsigned priorSubmissions=result.receipt.submittedMeshes;
             result.receipt.possiblySubmitted=true;
             ++result.receipt.attemptedMeshes;
             const HRESULT dipHr=device->DrawIndexedPrimitive(
                 D3DPT_TRIANGLELIST,0,0,m.vertexCount,0,m.indexCount/3);
             if(SUCCEEDED(dipHr))++result.receipt.submittedMeshes;
+            const bool provenNoDraw=FAILED(dipHr) &&
+                CanFallbackAfterNoExternalRaster(physical,priorAttempts,
+                                                  priorSubmissions);
+            if(provenNoDraw)result.receipt.possiblySubmitted=false;
             const bool stereoComplete=physical.Complete();
             result.receipt.lastEyeFailure=ClassifyExternalEyeFailure(physical);
             result.receipt.lastEyeReports=physical.reports;
             if(stereoComplete)++result.receipt.verifiedStereoMeshes;
-            if(SUCCEEDED(dipHr) && !stereoComplete)
+            if((SUCCEEDED(dipHr) && !stereoComplete) || provenNoDraw)
                 eyeProofOnlyFailure=!physical.rightDrawFailed &&
                     !physical.deviceRestoreFailed;
             hr=stereoComplete?dipHr:E_FAIL;

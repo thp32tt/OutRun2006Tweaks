@@ -8,6 +8,8 @@ struct ExternalStereoMeshReceipt final {
     std::uint64_t expectedPose=0;
     std::uint64_t observedPose=0;
     unsigned reports=0;
+    // Only set on a verified renderer return BEFORE any physical DIP.
+    bool provedNoPhysicalDraw=false;
     bool leftSucceeded=false;
     bool rightSucceeded=false;
     bool stateRestored=false;
@@ -24,13 +26,15 @@ struct ExternalStereoMeshReceipt final {
 // It is never a license to invoke the original callback after a partial DIP.
 enum class ExternalEyeFailure : unsigned char {
     NotAttempted,None,MissingReport,MultipleReports,PoseMismatch,LeftFailed,
-    RightGpuFailed,DeviceRestoreFailed,RightNotVerified,RestoreFailed,IdenticalEyeGeometry
+    RightGpuFailed,DeviceRestoreFailed,RightNotVerified,RestoreFailed,IdenticalEyeGeometry,
+    ProvenNoPhysicalDraw
 };
 inline ExternalEyeFailure ClassifyExternalEyeFailure(
     const ExternalStereoMeshReceipt& r) noexcept
 {
     if(r.Complete())return ExternalEyeFailure::None;
-    if(r.reports==0)return ExternalEyeFailure::MissingReport;
+    if(r.reports==0)return r.provedNoPhysicalDraw ?
+        ExternalEyeFailure::ProvenNoPhysicalDraw : ExternalEyeFailure::MissingReport;
     // Keep a physical RIGHT GPU fault visible even when the renderer chain
     // accidentally publishes multiple (invalid) receipts for one DIP.
     if(r.rightDrawFailed)return ExternalEyeFailure::RightGpuFailed;
@@ -50,6 +54,7 @@ inline const char* ExternalEyeFailureName(ExternalEyeFailure failure) noexcept {
     case ExternalEyeFailure::NotAttempted:return "NOT_ATTEMPTED";
     case ExternalEyeFailure::None:return "STEREO_OK";
     case ExternalEyeFailure::MissingReport:return "NO_PHYSICAL_REPORT";
+    case ExternalEyeFailure::ProvenNoPhysicalDraw:return "NO_PHYSICAL_DIP_PROVEN";
     case ExternalEyeFailure::MultipleReports:return "DUPLICATE_PHYSICAL_REPORT";
     case ExternalEyeFailure::PoseMismatch:return "POSE_MISMATCH";
     case ExternalEyeFailure::LeftFailed:return "LEFT_GPU_FAILED";
@@ -75,6 +80,18 @@ public:
     ScopedExternalStereoMeshReceipt(const ScopedExternalStereoMeshReceipt&)=delete;
     ScopedExternalStereoMeshReceipt& operator=(const ScopedExternalStereoMeshReceipt&)=delete;
 };
+inline void ProveExternalNoPhysicalDraw() noexcept {
+    auto* r=ActiveExternalStereoMesh;
+    if(r && r->reports==0)r->provedNoPhysicalDraw=true;
+}
+inline bool CanFallbackAfterNoExternalRaster(
+    const ExternalStereoMeshReceipt& r,unsigned attemptedBefore,
+    unsigned submittedBefore) noexcept {
+    // Missing report or E_FAIL alone is not a pixel non-submission proof.
+    return r.expectedPose!=0 && r.provedNoPhysicalDraw &&
+        r.reports==0 && !r.rightDrawFailed && !r.deviceRestoreFailed &&
+        attemptedBefore==0u && submittedBefore==0u;
+}
 inline void RecordExternalStereoMeshPair(bool leftOk,bool rightOk,
     bool restored,std::uint64_t pose, bool geometryStereo=false,
     bool rightGpuFailure=false,bool physicalRestoreFailed=false) noexcept {
@@ -82,6 +99,7 @@ inline void RecordExternalStereoMeshPair(bool leftOk,bool rightOk,
     if(!receipt)return;
     const bool firstReport=receipt->reports==0;
     ++receipt->reports;
+    receipt->provedNoPhysicalDraw=false;
     receipt->observedPose=pose;
     // Never overwrite an earlier failed draw/restore with a later
     // successful report from a nested or unintended renderer route.

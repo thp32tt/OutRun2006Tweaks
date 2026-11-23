@@ -60,6 +60,10 @@ jobs:
           assert 'physical.Complete()' in gpu
           assert 'ExternalEyeFailureName(' in source
           assert 'ClassifyExternalEyeFailure(physical)' in gpu
+          assert 'CanFallbackAfterNoExternalRaster(physical,priorAttempts,' in gpu
+          assert 'result.receipt.possiblySubmitted=false;' in gpu
+          assert 'ProveExternalNoPhysicalDraw()' in r7
+          assert 'ProveExternalNoPhysicalDraw()' in r33
           assert 'DistinctFiniteExternalEyeTransforms(' in Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
           assert 'receipt->rightDrawFailed = receipt->rightDrawFailed || rightGpuFailure' in Path('src/vr/game/external_car_stereo_receipt.hpp').read_text()
           assert 'stereoRetry_.OnSoftStereoFailure()' in gpu

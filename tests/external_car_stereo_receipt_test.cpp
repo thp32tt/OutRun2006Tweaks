@@ -21,6 +21,33 @@ int main() {
         assert(r.Complete());
     }
     assert(ActiveExternalStereoMesh==nullptr);
+    // First-mesh proven no-DIP is safe; missing or late reports are not.
+    r={};r.expectedPose=44;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        ProveExternalNoPhysicalDraw();
+        assert(CanFallbackAfterNoExternalRaster(r,0,0));
+        assert(!CanFallbackAfterNoExternalRaster(r,1,0));
+        assert(!CanFallbackAfterNoExternalRaster(r,0,1));
+        assert(ClassifyExternalEyeFailure(r)==ExternalEyeFailure::ProvenNoPhysicalDraw);
+    }
+    r={};r.expectedPose=44;
+    assert(!CanFallbackAfterNoExternalRaster(r,0,0));
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        ProveExternalNoPhysicalDraw();
+        RecordExternalStereoMeshPair(true,false,true,44,true,true);
+        assert(!CanFallbackAfterNoExternalRaster(r,0,0));
+        assert(r.reports==1 && !r.provedNoPhysicalDraw);
+        ProveExternalNoPhysicalDraw();
+        assert(!CanFallbackAfterNoExternalRaster(r,0,0));
+    }
+    r={};r.expectedPose=0;
+    {
+        ScopedExternalStereoMeshReceipt scope(r);
+        ProveExternalNoPhysicalDraw();
+        assert(!CanFallbackAfterNoExternalRaster(r,0,0));
+    }
     // RIGHT GPU failure is different from merely unproven stereo. It
     // requires hard device quarantine instead of just a soft cooldown.
     r={}; r.expectedPose=44;
