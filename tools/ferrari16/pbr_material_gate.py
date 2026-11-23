@@ -37,3 +37,18 @@ def triangle_uv_basis(u0: tuple[float, float], u1: tuple[float, float],
     a, b = u1[0] - u0[0], u1[1] - u0[1]
     c, d = u2[0] - u0[0], u2[1] - u0[1]
     return abs(a * d - b * c) > 1.0e-7
+
+
+def triangle_has_pbr_basis(p0: tuple[float, float, float],
+                           p1: tuple[float, float, float],
+                           p2: tuple[float, float, float],
+                           u0: tuple[float, float],
+                           u1: tuple[float, float],
+                           u2: tuple[float, float]) -> bool:
+    # PBR derivative TBN also needs non-degenerate world-space geometry.
+    # Match the native geometric normal repair's squared cross threshold.
+    ax, ay, az = (p1[i] - p0[i] for i in range(3))
+    bx, by, bz = (p2[i] - p0[i] for i in range(3))
+    nx, ny, nz = ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx
+    return ((nx * nx + ny * ny + nz * nz) > 1.e-24 and
+            triangle_uv_basis(u0, u1, u2))
