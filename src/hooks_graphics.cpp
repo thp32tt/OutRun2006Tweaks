@@ -1282,10 +1282,11 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
-        // EXT16-008: canonical retail 49F3E0 calls 46BD30 *then* 49A650.
-        // This is NOT a body-only leaf. The old success branch returned
-        // before executing BOTH original calls (including the unknown
-        // follow-up), taking dashboard/glass/shadow/passenger duties with it.
+        // EXT16-008: retail 49F3E0 calls 46BD30 then 49A650 (RET).
+        // 46BD30/469600 owns lighting, multiple model parts AND native
+        // 422550/422740 shadow volumes. It is not a BODY-only raster leaf.
+        // Full-wrapper suppression also risks any stock gauges/glass.
+        // Passenger/scene callbacks remain independently owned and untouched.
         // Keep the entire native callback as the sole owner until a separately
         // proven BODY-only leaf and isolated L/R atomic staging are available.
         // This intentionally avoids PrepareF50External sidecar IO/CPU work

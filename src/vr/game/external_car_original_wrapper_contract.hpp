@@ -1,10 +1,14 @@
 #pragma once
 // EXT16-008: independently checked CALL edges in the canonical PE32 player
 // display wrapper. A 49F3E0 trampoline is NOT a body-only raster leaf:
-// CALL 46BD30 is followed by a second distinct CALL 49A650.
-// Skipping the whole wrapper drops both calls, regardless of a successful
-// external body draw. Their child ownership cannot be inferred from this
-// prologue; do not label 46BD30 "body only" without independent leaf proof.
+// CALL 46BD30 is followed by a second CALL 49A650 (bare RET in the
+// decompiled canonical PC build). Most importantly, 46BD30 owns lighting,
+// matrices and 469600 car rendering, including 422550/422740 shadow-volume
+// leaves, NOT only exterior triangles. Reference:
+// r4dius/outrun2-decomp@e1e1c592, src/platform/pc_vehicle_display.cpp
+// and src/platform/vehicle_model_draw.cpp. The actual canonical PE32
+// wrapper/RET bytes are checked by verify_original_player_callback_abi.py.
+// Do not suppress either parent function as a "body-only" draw leaf.
 #include <array>
 #include <cstddef>
 #include <cstdint>

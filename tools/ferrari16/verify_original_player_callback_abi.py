@@ -34,7 +34,7 @@ def verify(prefix: bytes) -> None:
         raise ValueError("missing push 82E7F0 / push ESI follow-up arguments")
 
 
-def extract_canonical_exe(path: Path) -> bytes:
+def extract_canonical_exe(path: Path, va: int = CALLER, count_bytes: int = len(PREFIX)) -> bytes:
     binary = path.read_bytes()
     digest = hashlib.sha256(binary).hexdigest()
     if digest != EXE_SHA256:
@@ -50,15 +50,15 @@ def extract_canonical_exe(path: Path) -> bytes:
         raise ValueError("unexpected image base")
     count = struct.unpack_from("<H", binary, pe + 6)[0]
     section = pe + 24 + struct.unpack_from("<H", binary, pe + 20)[0]
-    rva = CALLER - IMAGE_BASE
+    rva = va - IMAGE_BASE
     for i in range(count):
         h = section + i * 40
         start, raw_len, offset = struct.unpack_from("<III", binary, h + 12)
-        if start <= rva and rva + len(PREFIX) <= start + raw_len:
+        if start <= rva and rva + count_bytes <= start + raw_len:
             pos = offset + rva - start
-            if pos + len(PREFIX) > len(binary):
+            if pos + count_bytes > len(binary):
                 raise ValueError("truncated section")
-            return binary[pos:pos + len(PREFIX)]
+            return binary[pos:pos + count_bytes]
     raise ValueError("49F3E0 is unmapped in canonical EXE")
 
 
@@ -96,6 +96,10 @@ def main() -> None:
         self_test()
     if options.exe:
         verify(extract_canonical_exe(options.exe))
+        # The decompiled PC x86 build identifies 49A650 as a bare RET.
+        # Its identity does not turn 46BD30/469600 into a body-only leaf.
+        if extract_canonical_exe(options.exe, FOLLOWUP, 1) != bytes.fromhex("c3"):
+            raise ValueError("49A650 is not a bare RET in this canonical EXE")
         print("EXT16_008_EXACT_SHA_PE32_WRAPPER_TWO_CALL_EDGES_PASS",
               hex(CALLER), hex(FIRST), hex(FOLLOWUP))
     if not options.self_test and options.exe is None:
