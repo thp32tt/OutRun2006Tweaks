@@ -48,6 +48,22 @@ int main() {
         ProveExternalNoPhysicalDraw();
         assert(!CanFallbackAfterNoExternalRaster(r,0,0));
     }
+    // The result of the cleared possiblySubmitted flag is actually used by
+    // the original-car gate; after a successful outer StateBlock restoration,
+    // the native model is allowed. Dirty state and any earlier DIP forbid it.
+    MeshDrawReceipt noPixels{};
+    noPixels.expectedMeshes=3;
+    noPixels.attemptedMeshes=1;
+    noPixels.stateRestored=true;
+    assert(ChooseOriginalCarRoute(Admitted(),noPixels)==
+           OriginalCarRoute::OriginalFallback);
+    noPixels.stateMayBeDirty=true;
+    assert(ChooseOriginalCarRoute(Admitted(),noPixels)==
+           OriginalCarRoute::ExternalPartial);
+    noPixels.stateMayBeDirty=false;
+    noPixels.possiblySubmitted=true;
+    assert(ChooseOriginalCarRoute(Admitted(),noPixels)==
+           OriginalCarRoute::ExternalPartial);
     // RIGHT GPU failure is different from merely unproven stereo. It
     // requires hard device quarantine instead of just a soft cooldown.
     r={}; r.expectedPose=44;
