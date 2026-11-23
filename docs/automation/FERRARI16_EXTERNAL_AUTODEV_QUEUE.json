@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-009",
+  "active_work_id": "EXT16-010",
   "work": [
     {
       "id": "EXT16-001",
@@ -522,7 +522,7 @@
       "id": "EXT16-009",
       "priority": 2,
       "stage": "source_fix",
-      "status": "QUEUED",
+      "status": "BLOCKED",
       "recovery_of": "EXT16-002",
       "title": "Verify real current 16-slot OVC sidecar and per-material normal/ORM maps with non-destructive per-slot repair/fallback",
       "acceptance": [
@@ -536,7 +536,53 @@
         "tools/ferrari16/verify_all_car_ovc.py"
       ],
       "runtime_validation": "UNTESTED",
-      "distinct_material_only": true
+      "distinct_material_only": true,
+      "result_sha": "90498aca5dea571ef98a076f3e9799928fe021dd",
+      "material_delta": "Fixed concrete strict PBR source defect: an opaque material with one good UV triangle could conceal bad UV triangles on sister meshes; also required full normal/ORM mip chains under optional strict certification. Positive/CRC-recomputed negative tests added; no external assets modified or default HQ replaced.",
+      "material_and_ci_evidence": {
+        "source_sha": "90498aca5dea571ef98a076f3e9799928fe021dd",
+        "source_blob_sha1": {
+          "tools/ferrari16/pbr_material_gate.py": "6f1111fbe033ae75d1d23e3d46f6285e650e5073",
+          "tools/ferrari16/verify_all_car_ovc.py": "8f4793daf38f13dd72e52ae1d51f8d383827f43a",
+          "tests/ferrari16_pbr_material_gate_test.py": "00b449d506a7e8116459d250827c005f90eca693"
+        },
+        "local_patched_python_selftest": "PASS",
+        "exact_sha_multicar_hlsl": {
+          "run_id": 45290876714,
+          "source_sha": "90498aca5dea571ef98a076f3e9799928fe021dd",
+          "conclusion": "SUCCESS"
+        },
+        "exact_sha_windows_x86_game_dll": {
+          "run_id": 45290876801,
+          "status_at_transition": "IN_PROGRESS"
+        },
+        "exact_sha_windows_x86_x64_host_package": {
+          "run_id": 45290876709,
+          "status_at_transition": "IN_PROGRESS"
+        },
+        "actual_private_historical_20261116_archive": {
+          "manifest_sha256_match": 16,
+          "strict_pbr_pass": 0,
+          "strict_pbr_fail": 16,
+          "physical_ovc_count": 16,
+          "canonical_paths": 15,
+          "f50_legacy_root": 1,
+          "sha_table": "docs/automation/EXT16-009_REAL_ASSET_AUDIT_20261124.md",
+          "classification": "HISTORICAL_ARCHIVE_NOT_CURRENT_PACKAGE"
+        },
+        "actual_historical_575_20261121_sha256": "16c15b9bd05bc69b581fa1fddda73bb7c6461ab59ff121109ae29ff30fa87e71",
+        "current_16_source_glb_and_ovc_sha256": "WAIT_INPUT",
+        "source_and_redistribution_rights": "UNVERIFIED_CURRENT; private archive explicitly NOT authorized for public redistribution",
+        "quest3": "UNTESTED"
+      },
+      "blocking_reasons": [
+        "WAIT_INPUT: no 2026-11-24 current installed/private 16-slot external source GLB->OVC4 manifest, rights, per-material source DDS/normal/ORM SHA and target installation SHA; cannot certify current inputs or repair proprietary texture conversion blindly.",
+        "One actual private dated 2026-11-16 16-OVC archive was verified: all sixteen SHA256 match the private dated manifest, but strict per-opaque-material normal/ORM/UV gate FAIL for every body (15 canonical + F50 separate root). Historical 575 hybrid also fails; archival result is not current package status.",
+        "No lawful source/variant proof allowing automatic HQ replacement, especially 328 GTS/575 Superamerica/F430 Spider donor sources and the 1987 Testarossa vs 1986 open-top Spider.",
+        "EXT16-007/008 atomic two-eye and native body-leaf ABI remain blocked; no Quest3/VDXR runtime visual, menu/focus or FPS measurements. Source CI alone is not runtime certification.",
+        "Separate Windows Win32 x86 game DLL and same-SHA x86/x64 host package workflow results pending at source-fix record; never substitute general HLSL green for both."
+      ],
+      "recovery_action": "Obtain a licensed, current private 16-entry source/conversion manifest with SHA256 and per-material normal/ORM packed-channel records. Re-run strict read-only --require-pbr-maps on current OVCs, repair proven corrupt DDS/UV/mip only where license permits, document fallback per slot and exact model/roof fidelity. Complete same-SHA x86 DLL+x64 OpenXR host/package CI and request Quest3 user validation. Never overwrite v0.03."
     },
     {
       "id": "EXT16-010",
