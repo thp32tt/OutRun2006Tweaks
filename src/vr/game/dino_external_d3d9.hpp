@@ -619,17 +619,12 @@ public:
         return count;
     }
     bool Loaded() const noexcept {return loaded_;}
-    // A V4 full-car sidecar may already carry its real speed and RPM needles.
-    // The separate dashboard overlay then provides gear only, avoiding two
-    // competing needles overlaid on the same original instrument cluster.
-    bool HasEmbeddedSpeedAndRpm() const noexcept {
-        if(role_!=SidecarRole::Vehicle || !loaded_)return false;
-        bool speed=false,rpm=false;
-        for(const auto& b:cpu_.dashboardBindings) {
-            if(b.kind==DashboardKind::SpeedNeedle)speed=true;
-            if(b.kind==DashboardKind::RpmNeedle)rpm=true;
-        }
-        return speed && rpm;
+    // API name retained for the existing large game-hook call site: return
+    // individual bit coverage (1=speed, 2=RPM), NOT a boolean pair flag.
+    unsigned HasEmbeddedSpeedAndRpm() const noexcept {
+        return role_==SidecarRole::Vehicle && loaded_ ?
+            DashboardNeedleMask(cpu_.dashboardBindings.data(),
+                                cpu_.dashboardBindings.size()) : 0u;
     }
     // Only a real installed sidecar with a resolvable fixed filename may
     // become a render candidate. Parse/CRC/PBR/ground QA still guard draw.
@@ -664,7 +659,7 @@ public:
                     const D3DMATRIX& world,const D3DMATRIX& view,
                     const D3DMATRIX& projection,
                     const DashboardTelemetry& dashboard,
-                     bool gearOnly=false,
+                     unsigned embeddedNeedleMask=0u,
                      std::uint64_t expectedNativeFrame=0,
                      std::uint64_t expectedPose=0) noexcept {
         GpuDrawResult result{};
@@ -673,9 +668,7 @@ public:
             return result;
         for(const auto& mesh:meshes_) {
             const auto* binding=DashboardFor(mesh);
-            if(gearOnly && (!binding || binding->kind!=DashboardKind::GearVisible))
-                continue;
-            if(DashboardMeshVisible(binding,dashboard))
+            if(DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask))
                 ++result.receipt.expectedMeshes;
         }
         // Nothing drawable: do not mutate render state or quarantine GPU.
@@ -781,9 +774,8 @@ public:
           for(const auto& m:meshes_) {
             if(!MeshInDrawPass(m.glass,pass))continue;
             const DashboardBinding* binding=DashboardFor(m);
-            if(gearOnly && (!binding || binding->kind!=DashboardKind::GearVisible))
+            if(!DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask))
                 continue;
-            if(!DashboardMeshVisible(binding,dashboard))continue;
             const D3DMATRIX meshWorld=AnimatedWorld(world,binding,dashboard);
             // Opaque first, then tagged translucent glass. Transparent glass
             // must not write the depth buffer or hide the track from cockpit.

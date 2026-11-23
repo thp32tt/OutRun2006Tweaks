@@ -58,6 +58,30 @@ int main() {
     auto next=latch.Capture(78u,0x1234u,200.f,9000u,6u);
     assert(Near(next.speedKph,200.f) && Near(next.rpm,9000.f) && next.gear==6u);
 
+    // Positive and negative coverage: body speed only, RPM only, both, none.
+    const std::array<DashboardBinding,2> embedded{{speed,rpm}};
+    assert(DashboardNeedleMask(embedded.data(),embedded.size())==DashboardBothNeedles);
+    assert(DashboardNeedleMask(&speed,1)==DashboardSpeedNeedleBit);
+    assert(DashboardNeedleMask(&rpm,1)==DashboardRpmNeedleBit);
+    assert(DashboardNeedleMask(nullptr,0)==0u);
+    const auto validGear=SanitizeDashboardTelemetry(60.f,4000u,5u);
+    assert(DashboardOverlayMeshVisible(&speed,validGear,0u));
+    assert(DashboardOverlayMeshVisible(&rpm,validGear,0u));
+    assert(DashboardOverlayMeshVisible(nullptr,validGear,0u));
+    assert(!DashboardOverlayMeshVisible(&speed,validGear,DashboardSpeedNeedleBit));
+    assert(DashboardOverlayMeshVisible(&rpm,validGear,DashboardSpeedNeedleBit));
+    assert(DashboardOverlayMeshVisible(nullptr,validGear,DashboardSpeedNeedleBit));
+    assert(DashboardOverlayMeshVisible(&speed,validGear,DashboardRpmNeedleBit));
+    assert(!DashboardOverlayMeshVisible(&rpm,validGear,DashboardRpmNeedleBit));
+    assert(!DashboardOverlayMeshVisible(&speed,validGear,DashboardBothNeedles));
+    assert(!DashboardOverlayMeshVisible(&rpm,validGear,DashboardBothNeedles));
+    assert(!DashboardOverlayMeshVisible(nullptr,validGear,DashboardBothNeedles));
+    assert(DashboardOverlayMeshVisible(&gear,validGear,DashboardBothNeedles));
+    const auto wrongGear=SanitizeDashboardTelemetry(60.f,4000u,4u);
+    assert(!DashboardOverlayMeshVisible(&gear,wrongGear,DashboardBothNeedles));
+    DashboardTelemetry invalidTelemetry{};
+    assert(!DashboardOverlayMeshVisible(&gear,invalidTelemetry,0u));
+
     speed.axis={{0.f,0.f,0.5f}};
     assert(!ValidDashboardBinding(speed,3));
     std::cout<<"EXTERNAL_DASHBOARD_V4_PASS\n";

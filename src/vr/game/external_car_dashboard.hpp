@@ -3,6 +3,7 @@
 // No D3D headers: parser/converter/runtime tests can share the exact math.
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cmath>
 #include <cstdint>
 
@@ -93,6 +94,40 @@ inline bool DashboardMeshVisible(
 {
     return !binding || binding->kind!=DashboardKind::GearVisible ||
         (telemetry.valid && telemetry.gear==binding->gear);
+}
+
+// Two independently embedded needles, not one all-or-nothing indicator.
+constexpr unsigned DashboardSpeedNeedleBit=1u;
+constexpr unsigned DashboardRpmNeedleBit=2u;
+constexpr unsigned DashboardBothNeedles=DashboardSpeedNeedleBit|DashboardRpmNeedleBit;
+inline unsigned DashboardNeedleMask(
+    const DashboardBinding* bindings,std::size_t count) noexcept
+{
+    unsigned mask=0u;
+    if(!bindings)return mask;
+    for(std::size_t i=0;i<count;++i) {
+        if(bindings[i].kind==DashboardKind::SpeedNeedle)
+            mask|=DashboardSpeedNeedleBit;
+        else if(bindings[i].kind==DashboardKind::RpmNeedle)
+            mask|=DashboardRpmNeedleBit;
+    }
+    return mask;
+}
+inline bool DashboardOverlayMeshVisible(
+    const DashboardBinding* binding,const DashboardTelemetry& telemetry,
+    unsigned embeddedMask) noexcept
+{
+    // Both needles embedded: gear-only, suppress redundant unbound housing.
+    if(embeddedMask==DashboardBothNeedles &&
+       (!binding || binding->kind!=DashboardKind::GearVisible))
+        return false;
+    if(binding) {
+        if(binding->kind==DashboardKind::SpeedNeedle &&
+           (embeddedMask&DashboardSpeedNeedleBit))return false;
+        if(binding->kind==DashboardKind::RpmNeedle &&
+           (embeddedMask&DashboardRpmNeedleBit))return false;
+    }
+    return DashboardMeshVisible(binding,telemetry);
 }
 
 inline float DashboardAngle(
