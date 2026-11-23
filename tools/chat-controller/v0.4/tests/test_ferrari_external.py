@@ -111,6 +111,7 @@ class ExternalModelCycleTests(unittest.IsolatedAsyncioTestCase):
             "hard_replace_slot_page": AsyncMock(return_value=page),
             "slot_page": AsyncMock(return_value=page),
             "detect_busy": AsyncMock(return_value=False),
+            "detect_conversation_limit": AsyncMock(return_value=False),
             "ensure_logged_in": AsyncMock(return_value=True),
             "is_slot_project_url": lambda url, slot: True,
             "detect_rate_limit": AsyncMock(return_value=False),
