@@ -135,7 +135,7 @@ jobs:
           assert 'opaque_materials.add(material)' in preflight
           assert 'normal_materials.add(material_id)' in preflight
           assert 'orm_materials.add(material_id)' in preflight
-          assert 'triangle_uv_basis(*uvs)' in preflight
+          assert 'triangle_has_pbr_basis(*positions, *uvs)' in preflight
           assert 'pbr_all_opaque_covered' in preflight
           assert 'pbr_uncovered' in preflight
           assert 'ovc_sha256' in preflight
