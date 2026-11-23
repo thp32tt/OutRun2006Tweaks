@@ -82,6 +82,11 @@ jobs:
           final_dispatch=Path('src/vr/d3d9/stereo_renderer_r33.cpp').read_text()
           final_dip=final_dispatch[final_dispatch.index('HRESULT __stdcall DrawIndexedPrimitiveDestR33('):final_dispatch.index('HRESULT __stdcall DrawPrimitiveUPDestR33(')]
           assert 'MaySubmitExternalCarLiveEye()' in final_dip
+          mid_dispatch=Path('src/vr/d3d9/stereo_renderer_r30.cpp').read_text()
+          mid_dip=mid_dispatch[mid_dispatch.index('HRESULT __stdcall DrawIndexedPrimitiveDestR30('):mid_dispatch.index('HRESULT __stdcall DrawPrimitiveUPDestR30(')]
+          assert 'MaySubmitExternalCarLiveEye()' in mid_dip
+          assert mid_dip.index('MaySubmitExternalCarLiveEye()') < mid_dip.index('R30TryXyzrhwIndexedPrimitiveVB(')
+          assert 'ProveExternalNoPhysicalDraw();' in mid_dip
           assert final_dip.index('MaySubmitExternalCarLiveEye()') < final_dip.index('const bool telemetry = R33TelemetryEnabled();')
           assert 'ProveExternalNoPhysicalDraw();' in final_dip[final_dip.index('MaySubmitExternalCarLiveEye()'):final_dip.index('const bool telemetry = R33TelemetryEnabled();')]
           assert draw.index('MaySubmitExternalCarLiveEye()') < draw.index('const HRESULT leftHr=drawCall();')

@@ -18,6 +18,8 @@
 #include "stereo_renderer_r29.cpp"
 #endif
 // Needed by independent R30 TU as well as textual R29/R30 owner.
+#include "../game/external_car_atomic_precommit.hpp"
+#include "../game/external_car_stereo_receipt.hpp"
 #include "r30_indexed_up_bounds.hpp"
 #include "r30_particle_dual_eye_ring.hpp"
 #include "r30_projection_inverse_cache.hpp"
@@ -8579,6 +8581,14 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            // The R30 sprite fastpath and raw R29 fallback can bypass R7.
+            // An external vehicle has no atomic L/R color+depth staging
+            // backend yet: preserve stock BEFORE any physical mesh raster.
+            if (OutRunVR::DinoSidecar::ActiveExternalStereoMesh &&
+                !OutRunVR::DinoSidecar::MaySubmitExternalCarLiveEye()) {
+                OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
+                return E_FAIL;
+            }
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
