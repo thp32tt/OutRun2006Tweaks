@@ -988,8 +988,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 carId, Settings::VRExternalFerrariTestCarId.get());
         if(!extraCar && !f50Car)return ticket;
         // The release callback does more than emit car triangles. Generic
-        // experimental replacement must be explicitly acknowledged, and its
-        // shader must use the per-eye fixed-function diagnostic path.
+        // experimental replacement needs explicit acknowledgment and either
+        // fixed-function A/B or PBR physical stereo diagnostic opt-in.
         // This gate occurs before reading camera/XR or attempting any OVC IO.
         if(!OutRunVR::DinoSidecar::PermitGenericSidecar(
                extraCar || f50Car,
@@ -1117,12 +1117,12 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                          OutRunVR::DinoSidecar::IsF50RetailCarId(livePlayer->car_id_10) &&
                           OutRunVR::DinoSidecar::PermitGenericSidecar(
                               true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
-               OutRunVR::DinoSidecar::PbrExternalStereoProbeActive(),
+                              OutRunVR::DinoSidecar::PbrExternalStereoProbeActive(),
                               Settings::VRExternalFerrariNativeCallbackReplacement.get())) :
              (Settings::VRExternalFerrariTest &&
               OutRunVR::DinoSidecar::PermitGenericSidecar(
                   true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
-               OutRunVR::DinoSidecar::PbrExternalStereoProbeActive(),
+                  OutRunVR::DinoSidecar::PbrExternalStereoProbeActive(),
                   Settings::VRExternalFerrariNativeCallbackReplacement.get()) &&
               OutRunVR::DinoSidecar::MatchesFerrariSelection(
                   ticket.carId, Settings::VRExternalFerrariTestCarId.get())));
