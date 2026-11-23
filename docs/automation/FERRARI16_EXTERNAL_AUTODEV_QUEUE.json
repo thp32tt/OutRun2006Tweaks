@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-002",
+  "active_work_id": "EXT16-003",
   "work": [
     {
       "id": "EXT16-001",
@@ -76,13 +76,94 @@
       "priority": 1,
       "title": "Finish all 16 vehicle static OVC4/OVRCABH and texture/PBR normal-map validation",
       "stage": "source_fix",
-      "status": "QUEUED",
+      "status": "BLOCKED",
       "acceptance": [
         "Machine-checked list of 16 slot->vehicle/source identities",
         "UV, indices, normals/tangents, DDS mip, channel packing and texture CRC",
         "All 16: correct 4-wheel/axle/scale/ground/interior checks",
         "Native draw and original-model fallback do not corrupt overlay"
-      ]
+      ],
+      "result_sha": "04915985c2f20a6bc29892e0c862448d95d9cc8b",
+      "runtime_validation": "UNTESTED",
+      "static_evidence": {
+        "source_fix": [
+          "Preflight --require-pbr-maps now checks every opaque mesh's actual material for co-owned normal/ORM DDS and a usable 3D+UV tangent basis, not file-wide map counts",
+          "Python roughness lower bound now matches native binary32 0.04f instead of rejecting valid boundary values"
+        ],
+        "touched_files": [
+          "tools/ferrari16/verify_all_car_ovc.py",
+          "tools/ferrari16/pbr_material_gate.py",
+          "tests/ferrari16_pbr_material_gate_test.py",
+          ".github/workflows/ferrari16-multicar-regression.yml"
+        ],
+        "material_blob_sha": {
+          "verifier": "f10967c494bdb2e49e3b771cdbda17b92366c780",
+          "pbr_material_gate": "454d2b6a378184e76e94468135de3556956d179b",
+          "pbr_quality_test": "cf3b010a294acb4058bf26d5d6c26165c337bbac"
+        },
+        "targeted_test_evidence": [
+          "PASS: exact GitHub verifier --self-test on N100 small isolated Python invocation, includes CRC-valid 0.04f accepted / 0.039f rejected",
+          "PASS: exact GitHub per-opaque-material positive/negative test incl. orphan maps, split normal/ORM, zero-area geometry and degenerate/mirrored UV",
+          "PASS: local ChatGPT Python helper positive/negative test before Github commit"
+        ],
+        "historic_16_source_identity": {
+          "scope": "2026-11-16 N100 metadata ONLY, not currently installed external OVC release evidence",
+          "canonical_ids": "0..14 and 28",
+          "source_obj_sha_format_checked": 16,
+          "glb_sha_format_checked": 16,
+          "current_external_source_sha_revalidated": 0,
+          "all_16_current_ovc_sha_revalidated": false,
+          "original_game_private_remaster_not_equivalent_to_external_variant": true,
+          "testarossa_spider_variant_physical_proof": "UNVERIFIED"
+        },
+        "private_historical_575_ovc_samples": [
+          {
+            "scope": "2026-11-21 old hybrid staging, not release candidate",
+            "sha256": "16c15b9bd05bc69b581fa1fddda73bb7c6461ab59ff121109ae29ff30fa87e71",
+            "ovc_format": "OVRCABH4",
+            "groups": 78,
+            "opaque_materials": 23,
+            "normal_maps": 16,
+            "orm_maps": 4,
+            "missing_normal_materials": 8,
+            "missing_orm_materials": 19,
+            "degenerate_pbr_basis_materials": [
+              2
+            ],
+            "strict_pbr_status": "FAIL",
+            "parser_accepted_after_float32_fix": true
+          },
+          {
+            "scope": "2026-11-19 old exact native test, not release candidate",
+            "sha256": "222eca041b07623f7d489c5cb675464f43859939d865ff63e3f26b08df49683b",
+            "ovc_format": "OVRCABH4",
+            "groups": 78,
+            "opaque_materials": 22,
+            "normal_maps": 16,
+            "orm_maps": 3,
+            "missing_normal_materials": 8,
+            "missing_orm_materials": 19,
+            "degenerate_pbr_basis_materials": [],
+            "strict_pbr_status": "FAIL",
+            "parser_accepted_after_float32_fix": true
+          }
+        ],
+        "private_asset_rights": "No third-party binary, original game asset, or credentials committed",
+        "ci_exact_sha_status": "NOT_VERIFIED: Github connector does not expose completed push workflow evidence for this SHA",
+        "windows_x86_dll_ci": "UNTESTED",
+        "windows_x64_host_ci": "UNTESTED",
+        "pbr_d3dcompiler_ci": "UNVERIFIED",
+        "native_draw_overlay_fallback": "UNTESTED",
+        "four_wheels_axles_scale_ground_interior_all_16": "UNTESTED",
+        "physical_quest3": "UNTESTED"
+      },
+      "blocking_reasons": [
+        "Only historical metadata has 16 model identifiers; exact current GLB/OVC source provenance, variant rights, and private asset SHA linked to the active package are not established for all 16",
+        "Two inspected private historical 575 OVC4 variants fail strict per-opaque-material PBR coverage despite valid container and map counts; do not auto-promote 575/328/F430 Spider or treat Testarossa open-top as proven",
+        "Wheel/axle/scale/ground/interior geometry and PBR channel packing/mipmap/UV quality remain unproven across current sixteen-model package; per-material normal map existence is not physical shader correctness",
+        "No same-SHA completed Windows x86 game DLL + x64 host CI, no in-game native-overlay/fallback parity or Quest3 physical stereo/performance evidence"
+      ],
+      "recovery_action": "Produce licensed exact-variant per-slot private external GLB/OVC package and an exact SHA manifest; use --require-pbr-maps to repair each opaque material or document intentionally untextured surfaces, add wheel/axle/interior/ORM channel QA and targeted corruption regressions, then Windows x86 DLL+x64 host exact-SHA CI. Quest3 remains user-only. Do not replace protected v0.03."
     },
     {
       "id": "EXT16-003",
