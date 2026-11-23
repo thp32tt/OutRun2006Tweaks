@@ -1,0 +1,96 @@
+name: Ferrari16 EXT16-005 Exact SHA Isolated Test Package
+on:
+  push:
+    branches: [automation/ferrari16-external-20261123]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-sha-x86-x64-package:
+    runs-on: windows-2022
+    timeout-minutes: 55
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          clean: true
+      - name: Exact SHA and Python positive/negative package tests
+        shell: pwsh
+        run: |
+          if((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA){throw 'Wrong checkout SHA'}
+          python tests/ferrari16_package_integrity_test.py
+          if($LASTEXITCODE -ne 0){throw 'Tamper tests failed'}
+      - name: Windows PowerShell 5.1 syntax gates
+        shell: powershell
+        run: |
+          foreach($name in @(
+            'PREPARE-FERRARI16-ISOLATED.ps1',
+            'INSTALL-FERRARI16-ISOLATED.ps1',
+            'RESTORE-FERRARI16-ISOLATED.ps1',
+            'COLLECT-FERRARI16-LOGS.ps1')) {
+            $path=(Resolve-Path -LiteralPath ("tools/ferrari16/"+$name)).Path
+            $tokens=$null
+            $errors=$null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors)
+            if($errors.Count -ne 0){throw "$name parse failure: $(($errors|ForEach-Object Message)-join '; ')"}
+          }
+          Write-Host 'WINDOWS_PS51_INSTALL_RESTORE_LOGS_PARSE_PASS'
+      - name: Configure Win32 x86 game DLL
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-ferrari16/game -G "Visual Studio 17 2022" -A Win32
+          if($LASTEXITCODE -ne 0){throw 'Game configure failed'}
+          foreach($p in @(
+            'build-ferrari16/game/_deps/safetyhook-build/src/safetyhook.vcxproj',
+            'build-ferrari16/game/_deps/zydis-build/Zydis.vcxproj',
+            'build-ferrari16/game/_deps/zydis-build/zycore/Zycore.vcxproj')){
+            if(!(Test-Path $p)){throw "Missing dependency: $p"}
+            $t=Get-Content -LiteralPath $p -Raw
+            if($t -notmatch '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR'){
+              $t=$t -replace 'ZYCORE_STATIC_BUILD','_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD'
+              Set-Content -LiteralPath $p -Value $t
+            }
+          }
+          $sdl=@(
+            'build-ferrari16/game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c',
+            'build-ferrari16/game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.cpp') |
+            Where-Object {Test-Path $_} | Select-Object -First 1
+          if(!$sdl){throw 'SDL GameInput source missing'}
+          Set-Content -LiteralPath $sdl -Value ''
+          $cfg='build-ferrari16/game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h'
+          if(!(Test-Path $cfg)){throw 'SDL GameInput config missing'}
+          (Get-Content -LiteralPath $cfg -Raw) -replace '#define SDL_JOYSTICK_GAMEINPUT 1','/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content -LiteralPath $cfg
+      - name: Build exact-SHA x86 DLL
+        shell: pwsh
+        run: |
+          cmake --build build-ferrari16/game --config Release --target outrun2006tweaks --parallel 4
+          if($LASTEXITCODE -ne 0){throw 'Game x86 build failed'}
+          if(!(Test-Path build-ferrari16/game/bin/dinput8.dll)){throw 'Missing game x86 DLL'}
+      - name: Build exact-SHA x64 OpenXR host
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S vrhost -B build-ferrari16/host -G "Visual Studio 17 2022" -A x64
+          if($LASTEXITCODE -ne 0){throw 'Host x64 configure failed'}
+          cmake --build build-ferrari16/host --config Release --target outrun-vr-host --parallel 4
+          if($LASTEXITCODE -ne 0){throw 'Host x64 build failed'}
+          if(!(Test-Path build-ferrari16/host/bin/outrun-vr-host.exe)){throw 'Missing OpenXR host'}
+      - name: Generate and read back exact-SHA test ZIP
+        shell: pwsh
+        run: |
+          python tools/ferrari16/private_test_package.py build --root . --dll build-ferrari16/game/bin/dinput8.dll --host build-ferrari16/host/bin/outrun-vr-host.exe --source-sha $env:GITHUB_SHA --output dist/Ferrari16_EXT16-005_Private_Test.zip
+          if($LASTEXITCODE -ne 0){throw 'Package generation failed'}
+          python tools/ferrari16/private_test_package.py verify --package dist/Ferrari16_EXT16-005_Private_Test.zip --source-sha $env:GITHUB_SHA
+          if($LASTEXITCODE -ne 0){throw 'Package verification failed'}
+          Get-Content dist/Ferrari16_EXT16-005_Private_Test.zip.sha256
+      - name: Upload isolated-test-only payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ferrari16-EXT16-005-x86-x64-exact-sha-test
+          path: |
+            dist/Ferrari16_EXT16-005_Private_Test.zip
+            dist/Ferrari16_EXT16-005_Private_Test.zip.sha256
+          if-no-files-found: error
+          retention-days: 14
