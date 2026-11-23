@@ -34,6 +34,8 @@ jobs:
           python3 -m py_compile /tmp/controller-vr-v2.py
           bash -n tools/chat-controller/v0.4/entrypoint.vr.sh
           python3 -m unittest discover -s tools/chat-controller/v0.4/tests -p "test_vr_*.py" -v
+          python3 -m unittest discover -s tools/chat-controller/v0.4/tests -p "test_ferrari_external.py" -v
+          python3 -m py_compile tools/chat-controller/v0.4/ferrari_external.py
 
       - name: Separate legacy localization implementation regression tests
         run: python3 tests/test_localization_execution.py
