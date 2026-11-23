@@ -36,6 +36,12 @@ int main() {
     r.stateRestored=false;
     assert(!CanCompleteExternalStereoDraw(true,&r)); // dirty D3D state
     r.stateRestored=true;
+    r.rightDrawFailed=true;
+    assert(!CanCompleteExternalStereoDraw(true,&r)); // inconsistent GPU fault
+    r.rightDrawFailed=false;
+    r.deviceRestoreFailed=true;
+    assert(!CanCompleteExternalStereoDraw(true,&r)); // hidden restore fault
+    r.deviceRestoreFailed=false;
     r.reports=2;
     assert(!CanCompleteExternalStereoDraw(true,&r)); // duplicate report
     // First-mesh proven no-DIP is safe; missing or late reports are not.
