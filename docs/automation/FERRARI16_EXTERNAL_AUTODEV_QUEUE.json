@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-003",
+  "active_work_id": "EXT16-004",
   "work": [
     {
       "id": "EXT16-001",
@@ -170,13 +170,59 @@
       "priority": 2,
       "title": "Exact-model quality gates for 328 GTS, 575 Superamerica, F430 Spider and Testarossa Spider",
       "stage": "source_research_conversion",
-      "status": "QUEUED",
+      "status": "BLOCKED",
       "acceptance": [
         "Exact named body variant proved, including Testarossa open-top",
         "Licensed/usable source with provenance and no silent decimation/downscale",
         "Source GLB, OVC4, material/UV screenshot comparison; optional on any quality regression",
         "Do not ship unsupported third-party binaries or purchase paid assets automatically"
-      ]
+      ],
+      "result_sha": "7f9317ba49ba4852954e3d23c4ae6bb239254473",
+      "runtime_validation": "UNTESTED",
+      "static_evidence": {
+        "source_fix_commits": [
+          "1f92f6df8627c6fc5174466436abf009ccc46474",
+          "7f9317ba49ba4852954e3d23c4ae6bb239254473"
+        ],
+        "source_fix": [
+          "Dashboard overlay CRC/OVC parse failure is now overall per-car FAIL, preserving existing body failure and missing body semantics",
+          "Offline mandatory exact 4-slot gate binds named variant and roof, source/converted GLB/OVC4 SHA, private license record SHA and preview SHA",
+          "GLB triangle parity and embedded PNG/JPEG texture dimension checks prevent silent reduction; OVC4/opaque per-material PBR/UV/normal preflight required"
+        ],
+        "touched_files": [
+          "tools/ferrari16/verify_all_car_ovc.py",
+          "tests/ferrari16_overlay_status_test.py",
+          "tools/ferrari16/exact_variant_quality_gate.py",
+          "tests/ferrari16_exact_variant_quality_gate_test.py",
+          ".github/workflows/ferrari16-multicar-regression.yml"
+        ],
+        "material_blob_sha": {
+          "ovc_verifier": "3ec3bf4ab9c4f17b35c5fda46d74d36393bd046a",
+          "dashboard_regression": "2dea579131dbac5fc8c9a107e22f671baf3f7b88",
+          "exact_variant_gate": "b7b103d1a7f0ea36b8bb4e5a4f6231cd65080edf",
+          "exact_variant_regression": "19df621b1cd0d4c576bf133c3e1d5a065ffa9297",
+          "workflow": "39bfc85ca70b121755e58da132e3056aadefb255"
+        },
+        "ci_exact_source_sha": "7f9317ba49ba4852954e3d23c4ae6bb239254473",
+        "ci_ferrari16": "SUCCESS: https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/45196925338 (multicar Ubuntu and PBR HLSL Windows both green)",
+        "ci_prior_overlay_fix": "SUCCESS: https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/45196207199",
+        "windows_x86_dll_exact_sha": "NOT_VERIFIED_PENDING_BUILD_45196924796",
+        "windows_x64_host_exact_sha": "NOT_VERIFIED",
+        "private_current_4_source_glb_sha256": "UNAVAILABLE",
+        "private_current_4_converted_glb_sha256": "UNAVAILABLE",
+        "private_current_4_ovc4_sha256": "UNAVAILABLE",
+        "private_current_4_license_receipts": "UNAVAILABLE",
+        "private_current_4_source_to_ovc_screenshots": "UNAVAILABLE",
+        "testarossa_spider": "Ferrari official confirms 1986 Agnelli one-off open-top; current external candidate body equivalence UNVERIFIED",
+        "not_shipped": "No third-party binaries, paid assets, original game files, or credentials"
+      },
+      "blocking_reasons": [
+        "Four exact-variant private source GLBs, derived OVC4s, screen comparison files and rights records with current SHA256 were not available; synthetic positive/negative CI is not current 328/575/F430/Testarossa asset proof",
+        "Ferrari Testarossa Spider is the factory 1986 one-off, not ordinary coupe. No current model has passed roof/one-off identity review; all optional candidates remain non-promoted",
+        "No actual all-four current PBR/UV/interior/wheel/material texture quality acceptance, no physical Quest3 stereo, HUD, menus, cockpit and performance pass",
+        "Windows x86 game DLL + x64 host same-source exact-SHA build/artifact evidence is not yet complete"
+      ],
+      "recovery_action": "Use private authorized 328 GTS, 575 Superamerica, F430 Spider and 1986 Testarossa Spider source GLBs plus explicit rights record; run python3 tools/ferrari16/exact_variant_quality_gate.py --manifest <PRIVATE_MANIFEST.json> --json-out <PRIVATE_REPORT.json>. Correct BLOCKED model topology, roof, screenshots, normal/ORM, or texture before default selection. Repeat exact-SHA Windows x86 DLL+x64 host gates, then user Quest3 testing; do not touch v0.03."
     },
     {
       "id": "EXT16-004",
