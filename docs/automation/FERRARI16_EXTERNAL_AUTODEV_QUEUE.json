@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-007",
+  "active_work_id": "EXT16-008",
   "work": [
     {
       "id": "EXT16-001",
@@ -370,7 +370,7 @@
       "id": "EXT16-007",
       "priority": 0,
       "stage": "source_fix",
-      "status": "ACTIVE",
+      "status": "BLOCKED",
       "recovery_of": "EXT16-001",
       "title": "Implement an atomic two-eye external-car frame transaction and prevent left-eye partial raster on right-eye failure",
       "acceptance": [
@@ -385,7 +385,61 @@
         "src/vr/d3d9/stereo_renderer_r7.inc"
       ],
       "runtime_validation": "UNTESTED",
-      "distinct_material_only": true
+      "distinct_material_only": true,
+      "result_sha": "85afea2c8024b42073677352a270b436261c62b1",
+      "material_delta": [
+        "Actual src/vr/game/dino_external_d3d9.hpp DrawNativeScene() refuses external GPU submission before D3D resource creation while isolated two-eye atomic staging is absent; native 49F3E0 stock callback remains reachable without any live external raster",
+        "R7 physical left-first/right-second DrawIndexedPrimitive has a pre-first-DIP no-physical-draw gate with scoped receipt proof and E_FAIL for opt-in external-only draw",
+        "R30 direct/raw indexed draw and R33 final indexed dispatcher independently enforce same early no-raster fence, including hook-chain partial installation",
+        "New pure external_car_atomic_precommit.hpp models whole-vehicle L/R isolated color/depth, exact frame/pose, GPU restore and one atomic pair publication; production backend truthfully remains disabled",
+        "New portable 16-slot positive/negative stock and synthetic staged-proof failure regressions; Ferrari16 CI workflow enforces gate ordering in GPU owner, R7, R30, R33"
+      ],
+      "static_evidence": {
+        "source_fix_commits": [
+          "2e52a163a6eacc4d579f0f7185ab52bd34b40ac4",
+          "70b299d02cb98b8713e5252732aa12c445a9e770",
+          "99d5b1948aa15d5eb66cdc7786bdccb0b1b31461",
+          "85afea2c8024b42073677352a270b436261c62b1"
+        ],
+        "validated_source_sha": "85afea2c8024b42073677352a270b436261c62b1",
+        "git_blob_sha": {
+          "precommit_policy_hpp": "05211a86221e84711e3e97b562d49594cd7ceb80",
+          "portable_injection_test_cpp": "a1b2693a1136e31d3386763e0c53bf3dd3b322ff",
+          "gpu_owner_hpp": "fd442a57a9d340183390740a7fc536f2a1b0bcc0",
+          "r7_inc": "9e78e37a501652f2184638a3aff38d72cd1997c3",
+          "r30_cpp": "4562b5c30a8005346631cf06812573b785403747",
+          "r33_cpp": "60d6581770c68b2c37600b9e447a2329da86e34e",
+          "ci_workflow": "3fa9df1d1c4d2ebd3b9c71824ffb527cf0ab486a"
+        },
+        "portable_cpp17_local": "PASS: staged-proof gate / 16 slots / before-left and injected right-after-left / Reset / state restore / partial mesh (isolated C++ harness; local original-gate reference used a semantic stub; definitive exact source uses GitHub Actions)",
+        "ferrari16_multicar_ci": {
+          "run_id": 45282716610,
+          "exact_sha": "85afea2c8024b42073677352a270b436261c62b1",
+          "multicar": "SUCCESS",
+          "pbr_hlsl": "SUCCESS"
+        },
+        "windows_x86_game_x64_host_same_sha": {
+          "run_id": 45282716599,
+          "status_at_transition": "IN_PROGRESS; not certified"
+        },
+        "windows_x86_generic_build": {
+          "run_id": 45282716856,
+          "status_at_transition": "IN_PROGRESS; not certified"
+        },
+        "renderer_result": "FAIL_CLOSED_STOCK_ONLY: no real whole-vehicle isolated color/depth staging; no external vehicle visuals enabled",
+        "r7_r30_r33_route_trace": "GPU owner DrawNativeScene -> IDirect3DDevice9::DrawIndexedPrimitive -> R33 final hook (can raw bypass R30/R7), R30 indexed hook (may raw bypass R7), R7 left live DIP then right live DIP; Present later publishes direct D3D9Ex/D3D11 or SBS host OpenXR stereo. New guards stop any external submission BEFORE this chain; player 49F3E0 callback routes to stock on clean no-raster receipt.",
+        "protected_v003": "No release branch modified. No vrhost/, quest_cockpit_v2_* or Start-OutRun.cmd modified in this task",
+        "physical_quest3": "UNTESTED",
+        "external_16_actual_assets_pbr_normal_uv_sha": "NOT_REVALIDATED; no external binary redistributed",
+        "score": "NO_NEW_SCORE: task incomplete; staging backend not delivered"
+      },
+      "blocking_reasons": [
+        "The actual all-or-stock GPU transaction is NOT implemented: no separate whole-vehicle left/right color AND depth staging, and no single atomic two-eye OpenXR publication. Current conservative gate intentionally disables external models and shows original cars.",
+        "An R7/right-eye GPU failure AFTER a left live raster cannot be rolled back; current guard only prevents that unsafe attempt. Synthetic positive staged-proof tests are not a physical GPU staged transaction or guarantee of external visualization.",
+        "Exact-SHA Windows x86 game DLL and x64 host/package validation still IN_PROGRESS at transition, not certified; HMD, per-car 16 asset material/normal and real FPS remain UNTESTED.",
+        "Native callback replacement still suppresses dashboard/occupant/shadow callbacks when external draws are later enabled; EXT16-008 must verify retail ABI separately before promotion."
+      ],
+      "recovery_action": "Implement a genuine GPU two-eye whole-car offscreen color/depth transaction with shared atomic presentation/stock pre-raster fallback; ensure no live eye/depth mutation before both staged eyes and all meshes succeed, preserve shader/PBR and renderer source owners, inject right-eye after-left failure, ResetEx, state restore, partial mesh and loss faults on actual GPU; verify identical-SHA Windows x86 DLL+x64 host CI and user Quest3. Retain fail-closed source safety guards until this evidence exists."
     },
     {
       "id": "EXT16-008",
@@ -452,7 +506,7 @@
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 01:08 KST",
+  "last_updated_kst": "2026-11-24T07:46:54+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
@@ -469,5 +523,13 @@
     "reason": "Operator requests continuous debugging after 01:08 dispatch stopped",
     "last_observed_live_dispatch": "2026-11-24T01:04:29+09:00",
     "resume_work_id": "EXT16-007"
+  },
+  "last_transition": {
+    "task_id": "EXT16-007",
+    "result": "BLOCKED",
+    "material_sha": "85afea2c8024b42073677352a270b436261c62b1",
+    "next_work_id": "EXT16-008",
+    "runtime_validation": "UNTESTED",
+    "stock_fallback_only": true
   }
 }
