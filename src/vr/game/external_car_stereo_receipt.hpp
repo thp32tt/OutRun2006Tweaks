@@ -19,7 +19,8 @@ struct ExternalStereoMeshReceipt final {
     bool Complete() const noexcept {
         return expectedPose!=0 && reports==1 &&
             observedPose==expectedPose && leftSucceeded &&
-            rightSucceeded && stateRestored && geometryStereo;
+            rightSucceeded && stateRestored && geometryStereo &&
+            !rightDrawFailed && !deviceRestoreFailed;
     }
 };
 // Compact failure proof retained for the native per-car diagnostic log.
@@ -67,8 +68,8 @@ inline const char* ExternalEyeFailureName(ExternalEyeFailure failure) noexcept {
     return "UNKNOWN_EYE_FAILURE";
 }
 // A D3D9 callback may return LEFT-eye S_OK even if RIGHT failed.
- // Preserve the original result for ordinary game draws, but a scoped
- // external mesh can report success only with a complete physical pair.
+// Preserve the original result for ordinary game draws, but a scoped
+// external mesh can report success only with a complete physical pair.
 inline bool CanCompleteExternalStereoDraw(
     bool leftDrawSucceeded,const ExternalStereoMeshReceipt* receipt) noexcept {
     return leftDrawSucceeded && (!receipt || receipt->Complete());
