@@ -22,6 +22,9 @@ CARS = (
 LEGACY = {7: "288gto.ovc", 11: "f40.ovc"}
 MAX_FILE = 128 * 1024 * 1024
 MAX_GPU = 112 * 1024 * 1024
+# Match the C++ loader's 0.04f, not Python's binary64 literal 0.04.
+# A correct float32 DDS/OVC field for 0.04 rounds to 0.03999999910593033.
+MIN_ROUGHNESS_F32 = struct.unpack("<f", struct.pack("<f", 0.04))[0]
 MAGIC = {b"OVRCAB15": 1, b"OVRCABH2": 2,
          b"OVRCABH3": 3, b"OVRCABH4": 4}
 
@@ -183,7 +186,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
             require(at + 12 <= len(data), "PBR factors")
             rough, metal, normal_strength = struct.unpack_from("<3f", data, at)
             require(all(map(math.isfinite, (rough, metal, normal_strength))) and
-                    0.04 <= rough <= 1 and 0 <= metal <= 1 and
+                    MIN_ROUGHNESS_F32 <= rough <= 1 and 0 <= metal <= 1 and
                     0 <= normal_strength <= 2, "PBR factor bounds")
             at += 12
             for index in range(2):
@@ -362,6 +365,30 @@ def self_test() -> None:
         degraded = inspect(path)
         assert degraded["pbr_uncovered"]["degenerate_uv"] == [0]
         assert not pbr_map_coverage(degraded)
+        # Python binary64 0.04 is larger than the valid D3D9 C++ 0.04f.
+        # Without a float32 boundary the verifier falsely rejects genuine
+        # 575 Superamerica files even though the native OVC parser accepts.
+        pbr_roughness_offset = len(group) + 4 + len(dds) + 8
+        exact_f32 = bytearray(mapped)
+        struct.pack_into("<f", exact_f32, pbr_roughness_offset, 0.04)
+        header_f32 = b"OVRCABH4" + struct.pack(
+            "<7I", 4, 1, 1, 3, 1, len(exact_f32),
+            zlib.crc32(exact_f32) & 0xffffffff)
+        path.write_bytes(header_f32 + exact_f32)
+        assert inspect(path)["version"] == 4
+        assert pbr_map_coverage(inspect(path))
+        below_f32 = bytearray(exact_f32)
+        struct.pack_into("<f", below_f32, pbr_roughness_offset, 0.039)
+        below_header = b"OVRCABH4" + struct.pack(
+            "<7I", 4, 1, 1, 3, 1, len(below_f32),
+            zlib.crc32(below_f32) & 0xffffffff)
+        path.write_bytes(below_header + below_f32)
+        try:
+            inspect(path)
+        except OvcError as error:
+            assert str(error) == "PBR factor bounds", str(error)
+        else:
+            raise AssertionError("Below-0.04f PBR roughness was accepted")
     # Runtime V1 requires 128x128, 8 mips, DXT1 and the known 72-byte
     # legacy tail; simply checking the 11136-byte container is insufficient.
     legacy_dds = bytearray(11136)
