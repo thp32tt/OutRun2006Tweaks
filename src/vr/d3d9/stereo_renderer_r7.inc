@@ -2086,7 +2086,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			const auto failureAtEntry=FrameFailureReason;
 			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))
 			{
-                if(OutRunVR::DinoSidecar::ActiveExternalPbrStereo) {
+                if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {
                     OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
                     return E_FAIL;
                 }
@@ -2098,7 +2098,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			}
 			if(StereoWanted()&&!TargetIsBackBuffer())
 			{
-                if(OutRunVR::DinoSidecar::ActiveExternalPbrStereo) {
+                if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {
                     OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
                     return E_FAIL;
                 }
@@ -2126,7 +2126,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			{
                 // A failed PBR classification is NOT permission for a mono
                 // fallback DIP; no pixels have been submitted yet.
-                if(OutRunVR::DinoSidecar::ActiveExternalPbrStereo) {
+                if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {
                     OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
                     return E_FAIL;
                 }
@@ -2138,6 +2138,14 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					failureAtEntry,FrameFailureReason);
 				return hr;
 			}
+
+            // The fixed-function diagnostic also needs an actual stereo
+            // world owner. Never silently submit a mono external mesh.
+            if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh &&
+               (!draw.worldStereo || !draw.fixedFunctionWorld)) {
+                OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
+                return E_FAIL;
+            }
 			// A programmable PBR DIP must have a proven world eye-pair.
             // Classification as NonWorld is not an acceptable mono draw.
             if(OutRunVR::DinoSidecar::ActiveExternalPbrStereo &&
@@ -2150,7 +2158,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			{
 				InvalidateRightDepthStencilIfLeftMayWrite(device);
 				PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);
-                if(draw.externalPbrWorld) {
+                if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {
                     OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
                     return E_FAIL;
                 }
@@ -2188,7 +2196,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					if(!rolledBack)
 						NoteRestoreFailure(draw.fixedFunctionWorld?
 							"left-eye fixed-function rollback":"left-eye c64 rollback");
-					if(draw.externalPbrWorld) {
+					if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {
                         // Partial GPU constant upload requires rollback proof.
                         if(rolledBack)
                             OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
@@ -2340,7 +2348,12 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 				true,leftHr,rightDrawAttempted,rightHr,rightFailure,restoreOk,
 				failureAtEntry,FrameFailureReason);
-			return leftHr;
+			// Keep v0.03's normal game HRESULT, but external mesh
+            // calls must not propagate LEFT S_OK after RIGHT/restore failure.
+            return OutRunVR::DinoSidecar::CanCompleteExternalStereoDraw(
+                SUCCEEDED(leftHr),
+                OutRunVR::DinoSidecar::ActiveExternalStereoMesh)
+                ? leftHr : E_FAIL;
 		}
 
 		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT startVertex,UINT primitiveCount){auto call=[&](){return DrawPrimitiveHook.stdcall<HRESULT>(device,type,startVertex,primitiveCount);};return ExecuteStereoDraw(device,call);}
