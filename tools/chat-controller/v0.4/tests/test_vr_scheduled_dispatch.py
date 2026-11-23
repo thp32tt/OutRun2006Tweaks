@@ -77,10 +77,10 @@ class ScheduledDispatchTests(unittest.TestCase):
                         and n.name == "vr_checkpoint_and_rollover")
         self.assertIn("vr_unconditional_resume_due", ast.get_source_segment(SOURCE, rollover))
         yml = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
-        for snippet in ('VR_SCHEDULED_DISPATCH_ENABLED: "true"',
+        for snippet in ('VR_SCHEDULED_DISPATCH_ENABLED: "false"',
                         'SCHEDULE_MINUTES: "30"',
                         'CAR_MODEL_SCHEDULE_MINUTES: "0,30"',
-                        'CAR_MODEL_C_AUTODEV_ENABLED: "true"',
+                        'CAR_MODEL_C_AUTODEV_ENABLED: "false"',
                         'CAR_MODEL_C_SCHEDULE_MINUTES: "15,45"',
                         'MODEL2_SCHEDULE_MINUTES: "0,30"',
                         'DX9EX_REVIEW_ONLY: "true"'):
