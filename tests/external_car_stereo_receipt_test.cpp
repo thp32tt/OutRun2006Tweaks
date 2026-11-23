@@ -21,6 +21,23 @@ int main() {
         assert(r.Complete());
     }
     assert(ActiveExternalStereoMesh==nullptr);
+    // Ordinary v0.03 game draws retain their original HRESULT, while scoped
+    // external meshes need a complete physical binocular pair.
+    assert(CanCompleteExternalStereoDraw(true,nullptr));
+    assert(!CanCompleteExternalStereoDraw(false,nullptr));
+    assert(CanCompleteExternalStereoDraw(true,&r));
+    assert(!CanCompleteExternalStereoDraw(false,&r));
+    r.rightSucceeded=false;
+    assert(!CanCompleteExternalStereoDraw(true,&r)); // RIGHT missing
+    r.rightSucceeded=true;
+    r.geometryStereo=false;
+    assert(!CanCompleteExternalStereoDraw(true,&r)); // doubled mono
+    r.geometryStereo=true;
+    r.stateRestored=false;
+    assert(!CanCompleteExternalStereoDraw(true,&r)); // dirty D3D state
+    r.stateRestored=true;
+    r.reports=2;
+    assert(!CanCompleteExternalStereoDraw(true,&r)); // duplicate report
     // First-mesh proven no-DIP is safe; missing or late reports are not.
     r={};r.expectedPose=44;
     {
