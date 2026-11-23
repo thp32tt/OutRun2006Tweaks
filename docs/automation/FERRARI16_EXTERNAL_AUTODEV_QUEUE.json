@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-008",
+  "active_work_id": "EXT16-009",
   "work": [
     {
       "id": "EXT16-001",
@@ -445,7 +445,7 @@
       "id": "EXT16-008",
       "priority": 1,
       "stage": "renderer_fix",
-      "status": "QUEUED",
+      "status": "BLOCKED",
       "recovery_of": "EXT16-004",
       "title": "Prove original 2006 x86 player draw leaf ownership and restore dashboard, passenger, shadow and glass on external-model fallback",
       "acceptance": [
@@ -459,7 +459,64 @@
         "docs/automation/FERRARI16_EXTERNAL_AUTODEV_QUEUE.json"
       ],
       "runtime_validation": "UNTESTED",
-      "distinct_material_only": true
+      "distinct_material_only": true,
+      "result_sha": "539edd39f8b7fd937fe95e975c764e34029a28ed",
+      "material_delta": [
+        "Removed complete 0x49F3E0 original player callback bypass from CallOriginalPlayerWithGlassScope: exact native PlayerCallbackHook.ccall player executes for every game/VR fallback, preserving original 46BD30 renderer and follow-up 49A650; no OVC preparation, per-car file I/O or GPU setup in unimplemented external path",
+        "New portable external_car_original_wrapper_contract.hpp decodes original near CALL targets 0x49F3E0->0x46BD30 and ->0x49A650 from exact 24-byte signature; guards full-wrapper replacement permanently false",
+        "Original hook installation now validates two-call ABI signature as well as existing live original PE executable bytes",
+        "New canonical PE32 exact-SHA verifier checks original 0x49F3E0 byte sequence, near rel32 call targets, and 0x49A650 RET with 16/32-bit PE section bounds and SHA256 identity",
+        "New portable C++ 16-car source-owner fallback/mesh-failure/dirty-state/embedded speed/RPM/gear regressions plus Windows actual original EXE check and static source gate added to GitHub Actions"
+      ],
+      "static_evidence": {
+        "source_commits": [
+          "91be2b6dfb5c9c67a700774918f585270f67fc9e",
+          "e24dcd95bbdd406b10fe7ac77b31f275a9310f05",
+          "57cc3d7521212f3e533cfb5e43526da03b2a11ec",
+          "539edd39f8b7fd937fe95e975c764e34029a28ed"
+        ],
+        "material_source_sha": "539edd39f8b7fd937fe95e975c764e34029a28ed",
+        "source_blobs": {
+          "hooks_graphics_cpp": "22b78f98ebc3d6e2860a511014b88f3e7fc482d9",
+          "native_callback_contract_hpp": "d6c0a31329bc69efc519c74be05016f9e5f0aa01",
+          "portable_regression_cpp": "60455cb4f99536a4e759cfbd7546001befa41c9d",
+          "canonical_exe_abi_verifier_py": "1153c73b327888f8181403d810a14b214f2d275c",
+          "build_workflow": "584c130583f7e006c6479937276a00a80ea008ac",
+          "multicar_workflow": "1c975d5f8727a94c265af141b12e19075844de4e"
+        },
+        "original_call_graph": {
+          "known_canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+          "wrapper_va": "0x0049F3E0",
+          "first_call": "0x0046BD30 via E8 45 C9 FC FF at wrapper+6",
+          "followup_call": "0x0049A650 via E8 5A B2 FF FF at wrapper+17; decomp identifies bare RET",
+          "body_renderer": "0x0046BD30 includes light/matrix changes and 0x00469600 model draw",
+          "model_renderer": "0x00469600 emits multiple PMT 0x00405360/0x004056D0 model part draws and 0x00422550/0x00422740 shadow volume leaves; no verified body-only ABI",
+          "decomp_reference": "r4dius/outrun2-decomp@e1e1c592b802a6f3f7020a676abd3ba1be479e62 src/platform/pc_vehicle_display.cpp + src/platform/vehicle_model_draw.cpp",
+          "limitations": "Decompiler/compile-time signature and CI PE hash do not prove actual physical HMD or selective original body leaf ownership"
+        },
+        "exact_sha_multicar_hlsl": {
+          "run_id": 45286827952,
+          "conclusion": "SUCCESS; portable 16-car fallback/ABI/PBR and Windows PBR shader"
+        },
+        "exact_sha_windows_x86_dll": {
+          "run_id": 45286828521,
+          "status_at_record": "IN_PROGRESS; cannot certify PASS until completed"
+        },
+        "exact_sha_x86_dll_x64_openxr_host_package": {
+          "run_id": 45286829577,
+          "status_at_record": "IN_PROGRESS; cannot certify PASS until completed"
+        },
+        "hardware": "UNTESTED",
+        "actual_16_models_uv_normal_dashboard": "UNTESTED (external path explicitly disabled since EXT16-007)",
+        "v003_protected": "No protected release branch or vrhost, QuestCockpitV2 core files modified"
+      },
+      "blocking_reasons": [
+        "No separate original x86 BODY-only draw leaf with attested callsite/ABI; 46BD30/469600 includes original lighting, numerous model parts and shadow volumes. Existing whole-wrapper replacement cannot retain original dashboard/glass/shadow ownership and must remain disabled.",
+        "EXT16-007 still has no isolated atomic GPU left/right whole-car staging; any external GPU draw enabled now could leave a partial raster on one eye. This fix deliberately preserves STOCK original body on all 16 and does not show new external cars.",
+        "Actual 16-car sidecar/cockpit dashboard/embedded RPM/speed/gear visual, normals/PBR, transparent glass and passenger/HMD fidelity are unverified; synthetic passing regressions are source-policy proofs only.",
+        "Windows same-SHA x86 DLL + x64 host/package and EXE ABI runtime step are not yet confirmed completed at queue transition; pending workflows 45286828521 and 45286829577. Quest3 user-only physical QA UNTESTED."
+      ],
+      "recovery_action": "After EXT16-007 implements isolated color/depth for two eyes, disassemble and attest a retail 0x469600/0x405360 body-only leaf (including passenger/shadow/light ownership and exact materials) and move conditional external BODY draw there without ever suppressing 0x49F3E0/0x46BD30 wholesale. Run exact-SHA x86 DLL+x64 host, canonical original EXE bytes, 16 slot positive/negative, PBR/glass/dashboard and user Quest3 check. Do not reactivate unverified external payloads or change protected v0.03."
     },
     {
       "id": "EXT16-009",
@@ -506,7 +563,7 @@
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24T07:46:54+09:00",
+  "last_updated_kst": "2026-11-24 08:15:18+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
@@ -525,11 +582,11 @@
     "resume_work_id": "EXT16-007"
   },
   "last_transition": {
-    "task_id": "EXT16-007",
+    "task_id": "EXT16-008",
     "result": "BLOCKED",
-    "material_sha": "85afea2c8024b42073677352a270b436261c62b1",
-    "next_work_id": "EXT16-008",
+    "material_sha": "539edd39f8b7fd937fe95e975c764e34029a28ed",
+    "next_work_id": "EXT16-009",
     "runtime_validation": "UNTESTED",
-    "stock_fallback_only": true
+    "renderer": "ORIGINAL_STOCK_PRESERVED"
   }
 }
