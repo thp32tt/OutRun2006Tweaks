@@ -994,6 +994,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(!OutRunVR::DinoSidecar::PermitGenericSidecar(
                extraCar || f50Car,
                OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
+               OutRunVR::DinoSidecar::PbrExternalStereoProbeActive(),
                Settings::VRExternalFerrariNativeCallbackReplacement.get()))
             return ticket;
         const auto* camera=Game::camera();
@@ -1116,10 +1117,12 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                          OutRunVR::DinoSidecar::IsF50RetailCarId(livePlayer->car_id_10) &&
                           OutRunVR::DinoSidecar::PermitGenericSidecar(
                               true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
+               OutRunVR::DinoSidecar::PbrExternalStereoProbeActive(),
                               Settings::VRExternalFerrariNativeCallbackReplacement.get())) :
              (Settings::VRExternalFerrariTest &&
               OutRunVR::DinoSidecar::PermitGenericSidecar(
                   true,OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
+               OutRunVR::DinoSidecar::PbrExternalStereoProbeActive(),
                   Settings::VRExternalFerrariNativeCallbackReplacement.get()) &&
               OutRunVR::DinoSidecar::MatchesFerrariSelection(
                   ticket.carId, Settings::VRExternalFerrariTestCarId.get())));
