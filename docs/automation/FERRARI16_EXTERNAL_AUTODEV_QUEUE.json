@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-004",
+  "active_work_id": "EXT16-005",
   "work": [
     {
       "id": "EXT16-001",
@@ -229,12 +229,68 @@
       "priority": 3,
       "title": "Repair exterior glass/alpha/depth and all sixteen native cockpit gauges and dashboards",
       "stage": "renderer_fix",
-      "status": "QUEUED",
+      "status": "BLOCKED",
       "acceptance": [
         "Depth/alpha/transparent order and left/right projection verified",
         "Speed/RPM/gear wiring and original-dashboard fallback verified",
         "Reflective glass/normal maps not silently disabled"
-      ]
+      ],
+      "result_sha": "9c902c8bb71b95e2bf056345f530d37ddbd16c2c",
+      "runtime_validation": "UNTESTED",
+      "static_evidence": {
+        "real_material_fixes": [
+          {
+            "sha": "9a3bd53e016d9013c816eda235174a07f68c4110",
+            "impact": "Partial embedded speed/RPM no longer duplicates matching dashboard overlay needles; exact expectedMeshes matches draw filter"
+          },
+          {
+            "sha": "48682c8ebf543cb97437df7181996f363b0080c4",
+            "impact": "Exterior glass tagged meshes receive back-to-front view-depth sorting using bounded stack data; opaque unchanged"
+          },
+          {
+            "sha": "9c902c8bb71b95e2bf056345f530d37ddbd16c2c",
+            "impact": "Fix regression namespace compilation error; runtime GPU/renderer source identical to 48682c8"
+          }
+        ],
+        "source_blobs": {
+          "dashboard_policy_hpp": "0d212085457def1bf3990b0f34db886dc220a014",
+          "gpu_renderer_hpp": "0f0f312a1cd53f438680334ff60591ab6d3b600c",
+          "draw_order_hpp": "0e40ce52eac8495c6a18b55e127f0b8d82332584",
+          "dashboard_test_cpp": "69ec4a3ef2fdde0354f8792674c0506f71bb332f",
+          "draw_order_test_cpp": "13fbfa7151114b86b4d2c86b5cf994acf34ca052"
+        },
+        "ci_exact_sha": "9c902c8bb71b95e2bf056345f530d37ddbd16c2c",
+        "ci_static_and_windows_hlsl": {
+          "run_id": 45203044256,
+          "conclusion": "SUCCESS",
+          "jobs": "Ubuntu multicar including updated positive/negative dash/transparent-depth tests and Windows D3DCompiler HLSL both PASS"
+        },
+        "ci_previous_dashboard_sha": "9a3bd53e016d9013c816eda235174a07f68c4110",
+        "ci_previous_dashboard_run": 45202155700,
+        "ci_test_namespace_failure": {
+          "sha": "48682c8ebf543cb97437df7181996f363b0080c4",
+          "run": 45202777034,
+          "result": "FAIL (test names unqualified), fixed in 9c902c8; not a runtime regression"
+        },
+        "win32_x86_build_run": 45203044314,
+        "win32_x86_build_conclusion_at_record": "IN_PROGRESS",
+        "win64_host_exact_sha": "NOT_VERIFIED",
+        "physical_eye_projection": "UNTESTED",
+        "original_dashboard_fallback_during_full_body_replacement": "UNPROVEN",
+        "all_16_actual_dashboard_body_and_overlay_manifest_sha": "UNAVAILABLE",
+        "all_16_glass_alpha_and_reflection_quality": "UNVERIFIED",
+        "all_16_production_pbr_normal_map_real_assets": "UNVERIFIED",
+        "private_rights": "No external binaries or original game assets committed",
+        "v003_protected": "No changes in protected release branch"
+      },
+      "blocking_reasons": [
+        "Actual 16-car OVC4 sidecar + per-slot dashboard meshes and calibrated speed/RPM/gear bindings missing private SHA and screenshot proofs; static logic pass cannot certify all 16 installed cars",
+        "Whole player callback replacement still suppresses stock PMT subdraws, including possible native dashboard, passenger, shadow and glass duties. Selective original-dashboard fallback lacks exact retail ABI/leaf proof and user Quest3 check; never imply full stock-dash parity",
+        "Glass sorting is a camera-center approximation because R7 owns physical eye replay, and name-tagged glass cannot certify correct alpha/material tagging or visual reflective normals for private OVCs",
+        "Same-source Win32 game DLL build was not complete when recorded and x64 host exact-SHA CI/package parity not verified",
+        "No actual Quest3 two-eye projection, depth, alpha, 120fps, menu/focus, dash or visual QA; RUNTIME_VALIDATION=UNTESTED"
+      ],
+      "recovery_action": "Prove native original body-only suppression and retained original dashboard through retail 46BD30/469600/405360/4056D0 ABI, or fail closed to stock. Validate private per-car OVC4/overlay SHA, all 16 gauge bindings, texture transparency, normal/ORM and source GLB reference captures. Compare physical L/R glass and gauges on Quest3 before promoting. Finish exact-SHA x86 DLL + x64 host build+test artifact gate. Do not modify v0.03."
     },
     {
       "id": "EXT16-005",
