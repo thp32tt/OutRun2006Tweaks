@@ -4,6 +4,9 @@
 #include <vector>
 #include <limits>
 using OutRunVR::DinoSidecar::MeshInDrawPass;
+using OutRunVR::DinoSidecar::ExternalGlassViewDepth;
+using OutRunVR::DinoSidecar::GlassDepthItem;
+using OutRunVR::DinoSidecar::SortGlassBackToFront;
 int main() {
     // Input order deliberately interleaves transparent and opaque meshes.
     const std::array<bool,5> glass{true,false,true,false,true};
