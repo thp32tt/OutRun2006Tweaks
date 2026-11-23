@@ -22,6 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 tests/ferrari16_pbr_material_gate_test.py
           python3 tools/ferrari16/verify_all_car_ovc.py --self-test
       - name: Assert exact sixteen-car routing and per-car diagnostics in production source
         shell: bash
@@ -129,6 +130,18 @@ jobs:
           assert 'PBR_SHADER_UNAVAILABLE' in gpu
           assert 'LastLoadFailureName()' in source
           assert '--require-pbr-maps' in Path('tools/ferrari16/verify_all_car_ovc.py').read_text()
+          preflight=Path('tools/ferrari16/verify_all_car_ovc.py').read_text()
+          quality=Path('tools/ferrari16/pbr_material_gate.py').read_text()
+          assert 'opaque_materials.add(material)' in preflight
+          assert 'normal_materials.add(material_id)' in preflight
+          assert 'orm_materials.add(material_id)' in preflight
+          assert 'triangle_uv_basis(*uvs)' in preflight
+          assert 'pbr_all_opaque_covered' in preflight
+          assert 'pbr_uncovered' in preflight
+          assert 'ovc_sha256' in preflight
+          assert 'uncovered_pbr_materials(' in quality
+          assert 'no_orm' in quality and 'no_normal' in quality
+          assert 'degenerate_uv' in quality
           assert 'float3 faceN = cross(dpdx,dpdy)' in pbr
           assert 'ScopedExternalPbrStereo' in scope
           assert 'ExternalPbrEyeConstants(' in pbr
