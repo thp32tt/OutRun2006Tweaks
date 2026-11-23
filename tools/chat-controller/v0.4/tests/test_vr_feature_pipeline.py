@@ -255,7 +255,8 @@ class FeatureModeTests(unittest.TestCase):
     def test_compose_and_legacy_dedup(self):
         compose = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
         part3 = (PARTS / "controller.py.part03").read_text(encoding="utf-8")
-        self.assertIn('VR_FEATURE_DEVELOPMENT_ENABLED: "true"', compose)
+        self.assertIn('VR_FEATURE_DEVELOPMENT_ENABLED: "false"', compose)
+        self.assertIn('EXTERNAL_MODEL_AUTODEV_ENABLED: "true"', compose)
         self.assertIn('CONVERSION_DXVK_ENABLED: "false"', compose)
         self.assertIn('task_commit.get("sha") == active.get("retry_failed_sha")', part3)
         self.assertIn('conversion_request_feature_c6(', part3)
