@@ -34,8 +34,11 @@ set "OUTRUN_VR_LAUNCH=1"
 set "OUTRUN_VR_FORCE_DISABLED=0"
 set "OUTRUN_VR_R23_PIXEL_PROBE=0"
 set "OUTRUN_VR_FILE_LOG=1"
-rem PBR-only diagnostic: normal/ORM maps stay enabled. Do NOT use to certify runtime.
+rem PBR-only diagnostic: fixed-function probe OFF, independent PBR
+rem admission ON. All runtime and R7 dual-eye receipts still fail closed.
+rem Neither flag is enabled by the protected v0.03 release launcher.
 set "OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=0"
+set "OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=1"
 
 rem Isolated sixteen-car driver-eye A/B only; never install into working v0.03.
 rem Match the proven diagnostic startup order: prepare the OpenXR host before the
