@@ -85,6 +85,59 @@ jobs:
           python tools/ferrari16/private_test_package.py verify --package dist/Ferrari16_EXT16-005_Private_Test.zip --source-sha $env:GITHUB_SHA
           if($LASTEXITCODE -ne 0){throw 'Package verification failed'}
           Get-Content dist/Ferrari16_EXT16-005_Private_Test.zip.sha256
+      - name: Synthetic Windows install and rollback positive/negative proof
+        shell: pwsh
+        run: |
+          $out=Join-Path $env:RUNNER_TEMP 'Ferrari16ExactShaZipReadback'
+          $game=Join-Path $env:RUNNER_TEMP 'Ferrari16SyntheticIsolatedGame'
+          Expand-Archive -LiteralPath dist/Ferrari16_EXT16-005_Private_Test.zip -DestinationPath $out
+          New-Item -ItemType Directory -Path $game -Force|Out-Null
+          $installer=Join-Path $out 'INSTALL-FERRARI16-ISOLATED.ps1'
+          $restorer=Join-Path $out 'RESTORE-FERRARI16-ISOLATED.ps1'
+          & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game -Install *> $null
+          if($LASTEXITCODE -eq 0){throw 'MISSING ISOLATED MARKER WAS ACCEPTED'}
+          [IO.File]::WriteAllBytes((Join-Path $game 'OR2006C2C.exe'),[byte[]](1,2,3,4))
+          [IO.File]::WriteAllBytes((Join-Path $game 'dinput8.dll'),[byte[]](5,6,7,8))
+          [IO.File]::WriteAllBytes((Join-Path $game 'outrun-vr-host.exe'),[byte[]](9,10,11,12))
+          'synthetic ini' | Set-Content -LiteralPath (Join-Path $game 'OutRun2006Tweaks.ini')
+          $hashes=@{}
+          foreach($name in @('OR2006C2C.exe','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini')){
+            $hashes[$name]=(Get-FileHash -LiteralPath (Join-Path $game $name) -Algorithm SHA256).Hash.ToLowerInvariant()
+          }
+          $marker=[ordered]@{Schema=1;Purpose='FERRARI16_ISOLATED_V003_TEST_COPY'
+            TestRoot=$game;SourceRoot='SYNTHETIC_ONLY_SOURCE_NOT_REAL';OriginalHashes=$hashes}
+          ($marker|ConvertTo-Json -Depth 5)|Set-Content -LiteralPath (Join-Path $game '.ferrari16-isolated.json') -Encoding UTF8
+          'tamper' | Add-Content -LiteralPath (Join-Path $game 'OutRun2006Tweaks.ini')
+          & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game -Install *> $null
+          if($LASTEXITCODE -eq 0){throw 'TAMPERED TEST COPY WAS ACCEPTED'}
+          'synthetic ini' | Set-Content -LiteralPath (Join-Path $game 'OutRun2006Tweaks.ini')
+          & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game
+          if($LASTEXITCODE -ne 0){throw 'Verify-only installer preflight failed'}
+          if((Get-FileHash (Join-Path $game 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hashes['dinput8.dll']){
+            throw 'Verify-only unexpectedly modified game DLL'
+          }
+          & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game -Install
+          if($LASTEXITCODE -ne 0){throw 'Synthetic isolated installer failed'}
+          $backup=Get-ChildItem -LiteralPath $game -Directory -Filter 'FERRARI16_BACKUP_*' |
+            Select-Object -First 1
+          if(!$backup){throw 'No real rollback backup'}
+          $dll=Join-Path $game 'dinput8.dll'
+          [IO.File]::WriteAllBytes($dll,[byte[]](1,1,1))
+          & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backup.FullName *> $null
+          if($LASTEXITCODE -eq 0){throw 'TAMPERED PATCH RESTORE WAS ACCEPTED'}
+          Copy-Item -LiteralPath (Join-Path $out 'PAYLOAD/dinput8.dll') -Destination $dll -Force
+          & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backup.FullName
+          if($LASTEXITCODE -ne 0){throw 'Rollback restore failed'}
+          foreach($name in @('dinput8.dll','outrun-vr-host.exe')){
+            if((Get-FileHash (Join-Path $game $name) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hashes[$name]){
+              throw "$name original not restored"
+            }
+          }
+          if(Test-Path (Join-Path $game 'RUN-FERRARI16-V003-ALL-CARS.cmd')){
+            throw 'Rollback retained test launcher'
+          }
+          Write-Host 'WIN_5_1_INSTALL_ROLLBACK_NEGATIVE_POSITIVE_PASS_SYNTHETIC_ONLY'
+
       - name: Upload isolated-test-only payload
         uses: actions/upload-artifact@v4
         with:
