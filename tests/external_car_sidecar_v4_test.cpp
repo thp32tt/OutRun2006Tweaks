@@ -1,4 +1,5 @@
 #include "../src/vr/game/dino_external_sidecar.hpp"
+#include "../src/vr/game/external_car_selection.hpp"
 #include <cassert>
 #include <cstdint>
 #include <cstring>
@@ -53,9 +54,9 @@ static std::vector<std::uint8_t> Dds1x1Dxt5() {
     return d;
 }
 
-static std::vector<std::uint8_t> Make(bool goodAxis=true) {
+static std::vector<std::uint8_t> Make(bool goodAxis=true,
+                                      const std::string& name="EXT_OPAQUE_00") {
     std::vector<std::uint8_t> payload;
-    const std::string name="EXT_OPAQUE_00";
     PutU16(payload,static_cast<std::uint16_t>(name.size()));
     PutU16(payload,0);PutU32(payload,3);PutU32(payload,3);PutU32(payload,4);
     Append(payload,name.data(),name.size());
@@ -103,5 +104,38 @@ int main() {
     auto bad=Make(false);Model rejected;
     assert(!Parse(bad.data(),bad.size(),rejected,error));
     assert(error=="dashboard binding bounds");
+    // All sixteen canonical slots: a valid model must parse; identical
+    // indices or zero-area positions with recalculated CRC must NOT admit a
+    // blank replacement for the corresponding original retail car.
+    for(unsigned canonical=0;canonical<30u;++canonical) {
+        if(!IsFerrari16CanonicalCarId(static_cast<unsigned char>(canonical)))
+            continue;
+        const std::string name="EXT_CAR_"+std::to_string(canonical);
+        const auto valid=Make(true,name);
+        Model accepted;
+        assert(Parse(valid.data(),valid.size(),accepted,error));
+        assert(accepted.meshes.size()==1 && accepted.meshes[0].name==name);
+        const std::size_t vbOff=36u+16u+name.size();
+        const std::size_t ibOff=vbOff+3u*sizeof(Vertex);
+        auto repeated=valid;
+        SetU32(repeated,ibOff+4u,0u);
+        SetU32(repeated,ibOff+8u,0u);
+        SetU32(repeated,32u,Crc32(repeated.data()+36u,repeated.size()-36u));
+        Model rejectedRepeated;
+        assert(!Parse(repeated.data(),repeated.size(),rejectedRepeated,error));
+        assert(error=="group degenerate geometry");
+        auto collapsed=valid;
+        // v2.y = 0 => all three vertex positions lie on the X axis.
+        SetU32(collapsed,vbOff+2u*sizeof(Vertex)+4u,0u);
+        SetU32(collapsed,32u,Crc32(collapsed.data()+36u,collapsed.size()-36u));
+        Model rejectedCollapsed;
+        assert(!Parse(collapsed.data(),collapsed.size(),rejectedCollapsed,error));
+        assert(error=="group degenerate geometry");
+        auto badCrc=valid;
+        badCrc[ibOff]^=0x01u;
+        Model rejectedCrc;
+        assert(!Parse(badCrc.data(),badCrc.size(),rejectedCrc,error));
+        assert(error=="sidecar header/CRC");
+    }
     std::cout<<"EXTERNAL_SIDECAR_V4_PARSE_PASS\n";
 }

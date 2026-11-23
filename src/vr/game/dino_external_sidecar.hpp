@@ -179,6 +179,24 @@ inline bool Parse(const std::uint8_t* d,std::size_t size,Model& out,std::string&
             if(idx>=n)return fail("index outside vertex group");
             mesh.indices[i]=idx;
         }
+        // A CRC-valid sidecar can still contain only zero-area triangles.
+        // Such a mesh reports successful GPU submission but draws no car;
+        // the native callback would then be suppressed in the same frame.
+        // Allow degenerate helper triangles, but require at least one real
+        // triangle in every group before admitting the external model.
+        bool hasDrawableTriangle=false;
+        for(unsigned i=0;i<ic;i+=3u) {
+            const auto& a=mesh.vertices[mesh.indices[i]];
+            const auto& b=mesh.vertices[mesh.indices[i+1u]];
+            const auto& c=mesh.vertices[mesh.indices[i+2u]];
+            const double ux=double(b.x)-a.x,uy=double(b.y)-a.y,uz=double(b.z)-a.z;
+            const double vx=double(c.x)-a.x,vy=double(c.y)-a.y,vz=double(c.z)-a.z;
+            if(uy*vz-uz*vy!=0.0 || uz*vx-ux*vz!=0.0 || ux*vy-uy*vx!=0.0) {
+                hasDrawableTriangle=true;
+                break;
+            }
+        }
+        if(!hasDrawableTriangle)return fail("group degenerate geometry");
         pos+=ib;
         nv+=n;nt+=ic/3u;
         if(nv>vertices||nt>triangles)return fail("model total");
