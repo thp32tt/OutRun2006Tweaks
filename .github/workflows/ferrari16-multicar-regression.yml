@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -22,6 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 tools/ferrari16/verify_original_player_callback_abi.py --self-test
           python3 tests/ferrari16_pbr_material_gate_test.py
           python3 tests/ferrari16_overlay_status_test.py
           python3 tests/ferrari16_launcher_isolation_test.py
@@ -56,7 +57,17 @@ jobs:
           assert 'terminalMilestone' in source
           assert 'MaterialModeName()' in source
           assert 'transformSamplesByCar[id]++' in source
-          assert 'if(f50.valid && DrawPreparedF50External(f50))' in source
+          # EXT16-008: Full 49F3E0 wrapper includes an additional 49A650
+          # CALL after 46BD30. It must NEVER be skipped by a sidecar.
+          player_wrapper=source[source.index('static void CallOriginalPlayerWithGlassScope('):source.index('static void __cdecl OnPlayerCallback(')]
+          assert 'PlayerCallbackHook.ccall<void>(player);' in player_wrapper
+          assert 'PrepareF50External(player)' not in player_wrapper
+          assert 'DrawPreparedF50External(f50)' not in player_wrapper
+          assert 'return;' not in player_wrapper
+          abi=Path('src/vr/game/external_car_original_wrapper_contract.hpp').read_text()
+          assert 'MaySkipRetailPlayerWrapper() noexcept {return false;}' in abi
+          assert 'RetailPlayerFollowupCallVa=0x0049A650u' in abi
+          assert 'ExactRetailPlayerWrapperTwoCalls(' in source
           assert 'D3DRS_CLIPPING,TRUE' in gpu
           assert 'D3DRS_CLIPPLANEENABLE,0u' in gpu
           assert 'if(!MeshInDrawPass(m.glass,pass))continue;' in gpu

@@ -18,6 +18,7 @@
 #include "vr/game/quest_cockpit_v2_glass_hook.hpp"
 #include "vr/game/dino_external_d3d9.hpp"
 #include "vr/game/dino_external_original_car_gate.hpp"
+#include "vr/game/external_car_original_wrapper_contract.hpp"
 #include "vr/game/external_car_trace_budget.hpp"
 #include "vr/game/f50_external_pose_filter.hpp"
 #include "vr/state/state_block_tracker.hpp"
@@ -1281,13 +1282,15 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
-        auto f50=PrepareF50External(player);
-        // Preserve v0.03 startup/menu/2D fallback semantics: if the experimental
-        // sidecar was not admitted, NEVER query camera, XR or player state in
-        // DrawPreparedF50External. The retail callback alone owns this path.
-        // Suppress stock only after a valid, matching external submission.
-        if(f50.valid && DrawPreparedF50External(f50))
-            return;
+        // EXT16-008: canonical retail 49F3E0 calls 46BD30 *then* 49A650.
+        // This is NOT a body-only leaf. The old success branch returned
+        // before executing BOTH original calls (including the unknown
+        // follow-up), taking dashboard/glass/shadow/passenger duties with it.
+        // Keep the entire native callback as the sole owner until a separately
+        // proven BODY-only leaf and isolated L/R atomic staging are available.
+        // This intentionally avoids PrepareF50External sidecar IO/CPU work
+        // on the still-disabled external path, restoring v0.03 frame cost.
+        static_assert(!OutRunVR::DinoSidecar::MaySkipRetailPlayerWrapper());
         QuestCockpitGlassLive::PlayerCallback scope(player);
         PlayerCallbackHook.ccall<void>(player);
     }
@@ -1404,7 +1407,12 @@ public:
             0xC9,0xFC,0xFF,0x68,0xF0,0xE7,0x82,0x00,
             0x56,0xE8,0x5A,0xB2,0xFF,0xFF,0x83,0xC4
         }};
-        if (!MatchOriginalRva(FrameEnterRva,begin) ||
+        // The installed wrapper must preserve the separate 46BD30 and
+        // 49A650 near CALL edges; matching the prologue is NOT proof that
+        // either child is an independently suppressible vehicle BODY leaf.
+        if (!OutRunVR::DinoSidecar::ExactRetailPlayerWrapperTwoCalls(
+                player.data(),player.size()) ||
+            !MatchOriginalRva(FrameEnterRva,begin) ||
             !MatchOriginalRva(FrameEndRva,end) ||
             !MatchOriginalRva(PlayerCallbackRva,player)) {
             spdlog::warn("VR COCKPIT V2 native frame probe unavailable: "
