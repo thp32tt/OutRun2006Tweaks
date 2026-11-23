@@ -85,6 +85,9 @@ jobs:
           mid_dispatch=Path('src/vr/d3d9/stereo_renderer_r30.cpp').read_text()
           mid_dip=mid_dispatch[mid_dispatch.index('HRESULT __stdcall DrawIndexedPrimitiveDestR30('):mid_dispatch.index('HRESULT __stdcall DrawPrimitiveUPDestR30(')]
           assert 'MaySubmitExternalCarLiveEye()' in mid_dip
+          native=gpu[gpu.index('GpuDrawResult DrawNativeScene('):gpu.index('inline GpuOwner& GlobalGpu()')]
+          assert 'RuntimeExternalCarAtomicStageReady()' in native
+          assert native.index('RuntimeExternalCarAtomicStageReady()') < native.index('EnsureResources(device)')
           assert mid_dip.index('MaySubmitExternalCarLiveEye()') < mid_dip.index('R30TryXyzrhwIndexedPrimitiveVB(')
           assert 'ProveExternalNoPhysicalDraw();' in mid_dip
           assert final_dip.index('MaySubmitExternalCarLiveEye()') < final_dip.index('const bool telemetry = R33TelemetryEnabled();')

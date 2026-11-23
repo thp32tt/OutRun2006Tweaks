@@ -29,6 +29,7 @@
 #include "dino_external_pbr_shader.hpp"
 #include "external_car_pbr_stereo_scope.hpp"
 #include "external_car_stereo_receipt.hpp"
+#include "external_car_atomic_precommit.hpp"
 #include "external_car_stereo_retry.hpp"
 #include "render_semantics.hpp"
 
@@ -677,6 +678,12 @@ public:
                      std::uint64_t expectedNativeFrame=0,
                      std::uint64_t expectedPose=0) noexcept {
         GpuDrawResult result{};
+        // First-party safety gate, independent of whether R7/R30/R33
+        // vtable hooks installed successfully. No whole-vehicle isolated
+        // L/R color+depth stage and pair-atomic publication exists yet.
+        // Return BEFORE D3D state setup, resource creation or any DIP so
+        // the original 49F3E0 player callback remains the sole raster owner.
+        if(!RuntimeExternalCarAtomicStageReady())return result;
         if(!stereoRetry_.AllowNativeAttempt())return result;
         if(!EnsureResources(device) || expectedNativeFrame==0 || expectedPose==0)
             return result;
