@@ -165,6 +165,7 @@ class Progression(unittest.TestCase):
         from unittest.mock import AsyncMock, Mock
         ns = self.ns
         ns.update(CONVERSION_DX11_ENABLED=True, CONVERSION_DX9EX_ENABLED=True,
+                  EXTERNAL_MODEL_AUTODEV_ENABLED=False,
                   CONVERSION_ONLY_SLOT="", TZ=timezone.utc)
         ns["save_queue_state"] = Mock()
         ns["write_runtime"] = Mock()
