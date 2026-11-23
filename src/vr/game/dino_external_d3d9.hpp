@@ -73,6 +73,15 @@ inline bool FixedFunctionExternalStereoProbeActive() noexcept {
         L"OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST",flag,4)==1 &&
         flag[0]==L'1' && flag[1]==L'\0';
 }
+ // Off by default. Only the PBR diagnostic runner enables this independent
+ // admission route; final acceptance still requires R7's per-mesh dual-eye
+ // physical receipt plus its exact shader identity and restore proof.
+inline bool PbrExternalStereoProbeActive() noexcept {
+    wchar_t flag[4]{};
+    return GetEnvironmentVariableW(
+        L"OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST",flag,4)==1 &&
+        flag[0]==L'1' && flag[1]==L'\0';
+}
 enum class FerrariModelSlot : unsigned char { F50, Gto288, F40, GenericId };
 enum class SidecarRole : unsigned char { Vehicle, DashboardOverlay };
 struct GpuDrawResult final {
