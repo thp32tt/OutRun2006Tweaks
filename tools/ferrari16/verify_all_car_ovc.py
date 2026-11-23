@@ -2,12 +2,14 @@
 """Read-only Ferrari16 OVC preflight. No game files are changed or uploaded."""
 from __future__ import annotations
 import argparse
+import hashlib
 import json
 import math
 import struct
 import tempfile
 import zlib
 from pathlib import Path
+from pbr_material_gate import uncovered_pbr_materials, triangle_uv_basis
 
 CARS = (
     (0, "Dino 246 GTS"), (1, "365 GTS/4 Daytona"), (2, "F50"),
@@ -103,6 +105,12 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     at, gpu_bytes, total_v, total_tris = 36, 0, 0, 0
     min_y = math.inf
     zero_normals = 0
+    # Match the runtime's exact glass tag; all other mesh materials are
+    # opaque and must own their own PBR maps for strict map certification.
+    opaque_materials: set[int] = set()
+    usable_uv_materials: set[int] = set()
+    normal_materials: set[int] = set()
+    orm_materials: set[int] = set()
     for _ in range(groups):
         head = 12 if version == 1 else 16
         require(at + head <= len(data), "mesh header")
@@ -120,7 +128,11 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
         name = data[at:at + name_bytes]
         require(b"\x00" not in name and (version != 1 or name[:3] == b"LHD"),
                 "mesh identity")
+        is_glass = name.startswith((b"F50_GLASS_", b"EXT_GLASS_"))
+        if not is_glass:
+            opaque_materials.add(material)
         at += name_bytes
+        vertex_start = at
         for i in range(count_v):
             values = struct.unpack_from("<8f", data, at + i * 32)
             require(all(math.isfinite(x) and abs(x) <= 10000 for x in values),
@@ -131,8 +143,20 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
         at += vertex_bytes
         fmt = "<H" if width_i == 2 else "<I"
         for i in range(count_i):
-            require(struct.unpack_from(fmt, data, at + i * width_i)[0] < count_v,
-                    "mesh index out of bounds")
+            idx = struct.unpack_from(fmt, data, at + i * width_i)[0]
+            require(idx < count_v, "mesh index out of bounds")
+            if (not is_glass and material not in usable_uv_materials and
+                    i % 3 == 2):
+                # The shader's derivative-based TBN is impossible when all
+                # UV triangle determinants are tiny/zero. Inspect the mesh
+                # material's first usable basis, without retaining all indices.
+                tri = tuple(struct.unpack_from(
+                    fmt, data, at + j * width_i)[0] for j in (i - 2, i - 1, i))
+                uvs = tuple(struct.unpack_from(
+                    "<2f", data, vertex_start + vertex * 32 + 24)
+                    for vertex in tri)
+                if triangle_uv_basis(*uvs):
+                    usable_uv_materials.add(material)
         at += index_bytes
         gpu_bytes += vertex_bytes + index_bytes
         total_v += count_v
@@ -152,7 +176,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     if version >= 3:
         require(data[at:at + 8] == b"OVCPBR3!", "PBR header")
         at += 8
-        for _ in range(materials):
+        for material_id in range(materials):
             require(at + 12 <= len(data), "PBR factors")
             rough, metal, normal_strength = struct.unpack_from("<3f", data, at)
             require(all(map(math.isfinite, (rough, metal, normal_strength))) and
@@ -168,8 +192,10 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                     gpu_bytes += length
                     if index == 0:
                         normal_maps += 1
+                        normal_materials.add(material_id)
                     else:
                         orm_maps += 1
+                        orm_materials.add(material_id)
                 require(gpu_bytes <= MAX_GPU, "PBR GPU budget")
     dashboards = 0
     if version == 4:
@@ -209,17 +235,26 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
         require(-1.20 <= min_y <= 0.25 and
                 max(0., 0.035 - min_y) <= 1.25,
                 "runtime floor placement cannot accept this vehicle")
+    uncovered = uncovered_pbr_materials(
+        version, opaque_materials, normal_materials, orm_materials,
+        usable_uv_materials)
     return {"version": version, "groups": groups, "triangles": tris,
             "vertices": vertices, "materials": materials,
             "normal_maps": normal_maps, "orm_maps": orm_maps,
             "zero_normal_vertices": zero_normals,
+            "opaque_materials": sorted(opaque_materials),
+            "usable_uv_materials": sorted(usable_uv_materials),
+            "pbr_uncovered": uncovered,
+            "pbr_all_opaque_covered": not any(uncovered.values()),
+            "ovc_sha256": hashlib.sha256(data).hexdigest(),
             "dashboard_bindings": dashboards, "floor_min_y": round(min_y, 4)}
 
 
 def pbr_map_coverage(details: dict) -> bool:
+    # File-wide totals are insufficient: orphan maps or all-degenerate UV
+    # triangles do not reach the actual opaque body PBR shader material.
     return (details.get("version", 0) >= 3 and
-            details.get("normal_maps", 0) > 0 and
-            details.get("orm_maps", 0) > 0)
+            details.get("pbr_all_opaque_covered", False) is True)
 
 
 def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
@@ -237,7 +272,9 @@ def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
                 details = inspect(model)
                 if require_pbr_maps and not pbr_map_coverage(details):
                     status = "FAIL"
-                    details["reason"] = "required PBR normal/ORM maps missing"
+                    details["reason"] = (
+                        "required per-opaque-material normal/ORM/UV coverage: " +
+                        json.dumps(details["pbr_uncovered"], sort_keys=True))
                 else:
                     status = "PASS"
             except (OvcError, OSError, struct.error) as error:
@@ -282,6 +319,8 @@ def self_test() -> None:
         path.write_bytes(header + payload)
         assert inspect(path)["triangles"] == 1
         assert inspect(path)["zero_normal_vertices"] == 0
+        assert inspect(path)["opaque_materials"] == [0]
+        assert inspect(path)["usable_uv_materials"] == [0]
         assert not pbr_map_coverage(inspect(path))
         b = bytearray(path.read_bytes())
         b[-1] ^= 1
@@ -304,7 +343,22 @@ def self_test() -> None:
         path.write_bytes(mapped_header + mapped)
         covered = inspect(path)
         assert covered["normal_maps"] == 1 and covered["orm_maps"] == 1
+        assert covered["pbr_uncovered"]["no_normal"] == []
+        assert covered["pbr_uncovered"]["no_orm"] == []
         assert pbr_map_coverage(covered)
+        # A valid CRC and two populated PBR DDS maps are insufficient when
+        # every triangle's UV determinant is zero: the shader cannot build TBN.
+        no_uv = bytearray(mapped)
+        vertex_start = 16 + len(name)
+        for vertex in range(3):
+            struct.pack_into("<2f", no_uv, vertex_start + vertex * 32 + 24, 0., 0.)
+        no_uv_header = b"OVRCABH4" + struct.pack(
+            "<7I", 4, 1, 1, 3, 1, len(no_uv),
+            zlib.crc32(no_uv) & 0xffffffff)
+        path.write_bytes(no_uv_header + no_uv)
+        degraded = inspect(path)
+        assert degraded["pbr_uncovered"]["degenerate_uv"] == [0]
+        assert not pbr_map_coverage(degraded)
     # Runtime V1 requires 128x128, 8 mips, DXT1 and the known 72-byte
     # legacy tail; simply checking the 11136-byte container is insufficient.
     legacy_dds = bytearray(11136)
