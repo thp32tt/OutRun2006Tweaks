@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "project": "Ferrari16 external 3D model integration and stereo/PBR repair",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "target_branch": "automation/ferrari16-external-20261123",
+  "controller_branch": "chat-controller-downloads",
+  "cadence_kst_minutes": [
+    0,
+    30
+  ],
+  "one_owner_slot": "A",
+  "max_unchanged_dispatches": 3,
+  "baseline": {
+    "source_branch": "fix/ferrari16-pbr-stereo-20261123",
+    "source_sha": "876e7d0d4845c823663db0904d8c41834fab0973",
+    "earlier_exact_optional_candidates": 16,
+    "earlier_default_high_quality_exact_count": 13,
+    "latest_effective_package_status": "REVERIFY_REQUIRED",
+    "quest3_hardware_validation": "UNTESTED",
+    "protected_release": "v0.03 baseline (verify SHA before promotion)"
+  },
+  "active_work_id": "EXT16-001",
+  "work": [
+    {
+      "id": "EXT16-001",
+      "priority": 0,
+      "title": "Restore base game and dual-eye runtime parity; preserve working v0.03",
+      "stage": "source_fix",
+      "status": "ACTIVE",
+      "acceptance": [
+        "Baseline vs new build diff on all stereo/loader gates",
+        "Both eyes succeed or full original-model fallback; no partial-eye success",
+        "No 2D theater/menu focus regression; no unverified performance claims",
+        "Modified C++ and targeted positive/negative regression tests committed"
+      ]
+    },
+    {
+      "id": "EXT16-002",
+      "priority": 1,
+      "title": "Finish all 16 vehicle static OVC4/OVRCABH and texture/PBR normal-map validation",
+      "stage": "source_fix",
+      "status": "QUEUED",
+      "acceptance": [
+        "Machine-checked list of 16 slot->vehicle/source identities",
+        "UV, indices, normals/tangents, DDS mip, channel packing and texture CRC",
+        "All 16: correct 4-wheel/axle/scale/ground/interior checks",
+        "Native draw and original-model fallback do not corrupt overlay"
+      ]
+    },
+    {
+      "id": "EXT16-003",
+      "priority": 2,
+      "title": "Exact-model quality gates for 328 GTS, 575 Superamerica, F430 Spider and Testarossa Spider",
+      "stage": "source_research_conversion",
+      "status": "QUEUED",
+      "acceptance": [
+        "Exact named body variant proved, including Testarossa open-top",
+        "Licensed/usable source with provenance and no silent decimation/downscale",
+        "Source GLB, OVC4, material/UV screenshot comparison; optional on any quality regression",
+        "Do not ship unsupported third-party binaries or purchase paid assets automatically"
+      ]
+    },
+    {
+      "id": "EXT16-004",
+      "priority": 3,
+      "title": "Repair exterior glass/alpha/depth and all sixteen native cockpit gauges and dashboards",
+      "stage": "renderer_fix",
+      "status": "QUEUED",
+      "acceptance": [
+        "Depth/alpha/transparent order and left/right projection verified",
+        "Speed/RPM/gear wiring and original-dashboard fallback verified",
+        "Reflective glass/normal maps not silently disabled"
+      ]
+    },
+    {
+      "id": "EXT16-005",
+      "priority": 4,
+      "title": "Repeatable 16-car independent build, static CI and test package",
+      "stage": "test_and_package",
+      "status": "QUEUED",
+      "acceptance": [
+        "Windows x86 game DLL + x64 host+ OpenXR/package exact SHA gates PASS",
+        "All 16 static positive/negative loader/fallback tests PASS",
+        "Rollback/backup, sha256 manifests, logs and direct launcher in private package",
+        "No Quest3 HMD PASS inferred from CI"
+      ]
+    },
+    {
+      "id": "EXT16-006",
+      "priority": 5,
+      "title": "Quest 3 live visual QA and final model promotion gate",
+      "stage": "hardware_qa",
+      "status": "QUEUED",
+      "requires_user_headset": true,
+      "acceptance": [
+        "Same SHA tested on Quest 3/VDXR by user",
+        "Stereo, framerate, menu focus, driver view, glass, gauges and 16 cars physically checked",
+        "Only promote accepted exact alternatives; any failure rolls back",
+        "Set WAITING_USER_HMD rather than claiming automatic hardware pass"
+      ]
+    }
+  ],
+  "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
+  "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
+  "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
+  "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
+  "last_updated_kst": "2026-11-23"
+}
