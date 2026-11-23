@@ -1,6 +1,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <initializer_list>
 #include "../src/vr/game/external_car_original_wrapper_contract.hpp"
 #include "../src/vr/game/external_car_atomic_precommit.hpp"
 #include "../src/vr/game/dino_external_original_car_gate.hpp"
@@ -83,8 +84,10 @@ int main(){
         speed.kind=DashboardKind::SpeedNeedle;
         rpm.kind=DashboardKind::RpmNeedle;
         gear.kind=DashboardKind::GearVisible;
+        gear.gear=3u;
         const auto telemetry=SanitizeDashboardTelemetry(88.f,4200u,3u);
         assert(telemetry.valid && telemetry.gear==3u);
+        assert(DashboardOverlayMeshVisible(&gear,telemetry,0u));
         assert(DashboardNeedleMask(&speed,1)==DashboardSpeedNeedleBit);
         assert(DashboardNeedleMask(&rpm,1)==DashboardRpmNeedleBit);
         std::array<DashboardBinding,2> both{{speed,rpm}};
