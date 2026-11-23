@@ -42,7 +42,7 @@ def extract_canonical_exe(path: Path) -> bytes:
     if binary[:2] != b"MZ":
         raise ValueError("invalid DOS header")
     pe = struct.unpack_from("<I", binary, 0x3C)[0]
-    if binary[pe:pe + 4] != b"PE\\x00\\x00":
+    if binary[pe:pe + 4] != bytes.fromhex("50450000"):
         raise ValueError("invalid PE signature")
     if struct.unpack_from("<H", binary, pe + 24)[0] != 0x10B:
         raise ValueError("not canonical PE32 x86")
@@ -72,7 +72,7 @@ def self_test() -> None:
         except ValueError:
             continue
         raise AssertionError(f"corruption at {offset} was accepted")
-    for damaged in (PREFIX[:-1], b"", PREFIX + b"\\x00"):
+    for damaged in (PREFIX[:-1], b"", PREFIX + bytes.fromhex("00")):
         try:
             verify(damaged)
         except ValueError:
