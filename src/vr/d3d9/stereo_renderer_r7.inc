@@ -1,4 +1,5 @@
 #include "../game/external_car_stereo_receipt.hpp"
+#include "../game/external_car_atomic_precommit.hpp"
 #include "../game/external_car_pbr_stereo_scope.hpp"
 #include "../game/external_car_pbr_eye_math.hpp"
 #include "../game/external_car_eye_transform_proof.hpp"
@@ -2121,6 +2122,17 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				return hr;
 			}
 
+			// EXT16-007 fail-closed until the WHOLE vehicle can be staged in
+			// isolated L/R color+depth and committed as one pair. R7 currently
+			// writes LEFT live before RIGHT; neither HRESULT nor a late stereo
+			// receipt can undo LEFT pixels if RIGHT subsequently fails.
+			// Reject before the FIRST external DIP so the original 49F3E0
+			// callback can draw the complete stock car in this same frame.
+			if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh &&
+			   !OutRunVR::DinoSidecar::MaySubmitExternalCarLiveEye()) {
+				OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
+				return E_FAIL;
+			}
 			DrawStereoState draw{};
 			if(!PrepareDuplicatedDraw(device,draw))
 			{
