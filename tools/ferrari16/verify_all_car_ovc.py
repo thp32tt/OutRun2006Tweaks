@@ -9,7 +9,7 @@ import struct
 import tempfile
 import zlib
 from pathlib import Path
-from pbr_material_gate import uncovered_pbr_materials, triangle_uv_basis
+from pbr_material_gate import uncovered_pbr_materials, triangle_has_pbr_basis
 
 CARS = (
     (0, "Dino 246 GTS"), (1, "365 GTS/4 Daytona"), (2, "F50"),
@@ -155,7 +155,10 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                 uvs = tuple(struct.unpack_from(
                     "<2f", data, vertex_start + vertex * 32 + 24)
                     for vertex in tri)
-                if triangle_uv_basis(*uvs):
+                positions = tuple(struct.unpack_from(
+                    "<3f", data, vertex_start + vertex * 32)
+                    for vertex in tri)
+                if triangle_has_pbr_basis(*positions, *uvs):
                     usable_uv_materials.add(material)
         at += index_bytes
         gpu_bytes += vertex_bytes + index_bytes
