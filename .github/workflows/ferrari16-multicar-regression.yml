@@ -65,6 +65,14 @@ jobs:
           assert 'ProveExternalNoPhysicalDraw()' in Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
           assert 'ProveExternalNoPhysicalDraw()' in Path('src/vr/d3d9/stereo_renderer_r33.cpp').read_text()
           assert 'DistinctFiniteExternalEyeTransforms(' in Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
+          # External physical submissions must not report LEFT-only S_OK.
+          r7=Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
+          receipt=Path('src/vr/game/external_car_stereo_receipt.hpp').read_text()
+          draw=r7[r7.index('HRESULT ExecuteStereoDraw('):r7.index('HRESULT __stdcall DrawPrimitiveDest(')]
+          assert draw.count('if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {')>=5
+          assert 'CanCompleteExternalStereoDraw(' in draw
+          assert '(!draw.worldStereo || !draw.fixedFunctionWorld)' in draw
+          assert 'leftDrawSucceeded && (!receipt || receipt->Complete())' in receipt
           assert 'receipt->rightDrawFailed = receipt->rightDrawFailed || rightGpuFailure' in Path('src/vr/game/external_car_stereo_receipt.hpp').read_text()
           assert 'stereoRetry_.OnSoftStereoFailure()' in gpu
           assert 'ScopedExternalVehicleSemantic externalScope' in gpu
