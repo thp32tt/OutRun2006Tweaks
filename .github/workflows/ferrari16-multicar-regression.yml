@@ -138,6 +138,11 @@ jobs:
           assert 'triangle_has_pbr_basis(*positions, *uvs)' in preflight
           assert 'pbr_all_opaque_covered' in preflight
           assert 'pbr_uncovered' in preflight
+          # Do not reject legal IEEE-754 float32 0.04f roughness (real 575
+          # historical OVC), and reject subminimum CRC-recomputed fixtures.
+          assert 'MIN_ROUGHNESS_F32' in preflight
+          assert 'MIN_ROUGHNESS_F32 <= rough <= 1' in preflight
+          assert 'Below-0.04f PBR roughness was accepted' in preflight
           assert 'ovc_sha256' in preflight
           assert 'uncovered_pbr_materials(' in quality
           assert 'no_orm' in quality and 'no_normal' in quality
