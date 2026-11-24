@@ -40,3 +40,35 @@ jobs:
           assert b["OUTRUN_REWORK_POLL_SECONDS"].endswith(":-600}")
           print("COMPOSE_SAME_CADENCE_AND_TWO_EXISTING_SERVICES_PASS")
           PY
+
+  repair-unit-and-one-real-atlas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization
+            localization/automation_inputs/candidate_outputs
+            localization/automation_inputs/hd_original_png_source_plan.json
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/Keyboard/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify flat background and original ink caps
+        run: |
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          python -m unittest discover -s tools/localization -p test_hd_cleanplate_repair.py -v
+      - name: Run actual first-family HD DDS through cleanplate repair (sample, not full queue)
+        run: |
+          python tools/localization/hd_cleanplate_repair.py --repo-root . --asset-sha "$(git rev-parse HEAD)" --out "$RUNNER_TEMP/repair-sample" --limit 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-hd-cleanplate-real-atlas-sample-${{ github.run_id }}
+          path: ${{ runner.temp }}/repair-sample/
+          retention-days: 14
+          if-no-files-found: error
