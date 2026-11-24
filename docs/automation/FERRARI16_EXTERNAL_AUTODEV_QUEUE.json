@@ -1481,18 +1481,49 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Trace glass alpha/depth order, PBR shading and reflection in both eye submission; inspect material DDS channel semantics and UV source-area versus screen-derivative threshold separately without lowering strict asset gate or promoting candidates. Verify outstanding exact-SHA Windows workflows; real atomic staging and R30/R33 primitive HRESULT recovery remain open."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-2300-PBR-DEGENERATE-NORMAL-HALF-VECTOR",
+          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "Glass transparency and PBR shading: shader normal and eye/half-vector degeneracy",
+          "source_material_sha": "3d1136673302b26186ed256511393b500f485327",
+          "source_defect": "VS unconditionally normalized a zero transformed normal before PS geometric fallback, so undefined normal could be interpolated. PS unconditionally normalized a coincident eye delta and antiparallel L+V; these undefined unit vectors can contaminate GGX lighting. This is a shader math defect, not evidence of current Quest3 symptoms while the external stage fence is closed.",
+          "source_fix": "Preserve zero or extremely short transformed normals for existing geometric fallback, with guarded rsqrt; guard degenerate eye and half vectors and suppress directional specular when either invalid. Keep existing nondegenerate normal, albedo/ORM, normal map TBN, alpha and depth behavior. No shader register, vertex ABI or runtime admission change.",
+          "source_blob_sha1": {
+            "src/vr/game/dino_external_pbr_shader.hpp": "3662ebb490d78033f198a7077775627ce2f5698a",
+            "tests/ferrari16_pbr_derivative_gate_test.py": "457f8bbaf8358cbf50c82d3e94d1c8611a8dd5c0"
+          },
+          "positive_negative_regressions": [
+            "Local Python executed isolated math from new test: 16 slot IDs x two eye labels x eight normal/view/half-vector cases = 256 PASS; zero/tiny normal, nondegenerate normal, coincident/tiny eye delta, opposite L/V, valid half vector. Synthetic math, not GPU or actual asset test.",
+            "Existing Python CI regression now includes shader source guards plus same numeric cases. Actual committed complete Python test and Windows HLSL compile not executed locally; local DNS to api.github.com unavailable."
+          ],
+          "same_sha_ci": {
+            "sha": "3d1136673302b26186ed256511393b500f485327",
+            "status": "UNVERIFIED",
+            "note": "Commit workflow lookup PR-filtered empty and combined status empty; no exact-SHA Windows x86 DLL, x64 host, HLSL or packaging PASS asserted."
+          },
+          "render_trace": [
+            "DrawNativeScene captures D3DSBT_ALL, sets opaque depth writes then glass source-over ADD with depth writes disabled and depth test enabled; sorted once by latched center-camera mesh centroid. Parallel eye translation preserves centroid depth order in existing test, but canted cameras/intersecting glass not proven. No per-eye sorting change.",
+            "R7 identity scope uploads per-eye c4/c8 and pixel c1; PBR VS normal c12 unchanged, no register ABI changes. Shader analytic GGX light/ambient only; no environment reflection sampler and no reflection authenticity claim. Two-sided glass backface lighting remains open; no speculative visual change.",
+            "RuntimeExternalCarAtomicStageReady is false before any sidecar D3D resource/draw setup; actual L/R whole vehicle color/depth transaction remains unimplemented. No activation or native fallback changes."
+          ],
+          "asset_validation": "No actual private GLB/OVC, DDS, per-vehicle QA or model identity/rights checked. No candidates promoted. No N100 use.",
+          "protected_v003": "Only external PBR shader and existing portable regression changed on target automation branch; native callback, ABI, game/host launch, stable release and deployment untouched.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Inspect isolated Windows package PE32/PE32+ optional header and executable/DLL role and rollback failure paths; continue glass overlap/two-sided material and real per-eye staging proof separately. Verify outstanding exact-SHA CI without rerun."
         }
       ],
-      "latest_material_sha": "322d5f2818ff08662b0909c02c972352fe38574c",
-      "latest_static_ci": "EXACT_HELPER_UNIT_PASS_80_SYNTHETIC_STRENGTH_PASS_FULL_OVC_WINDOWS_CI_UNVERIFIED",
-      "next_focus": "Trace glass alpha/depth order, PBR shading and reflection in both eye submission; inspect material DDS channel semantics and UV source-area versus screen-derivative threshold separately without lowering strict asset gate or promoting candidates. Verify outstanding exact-SHA Windows workflows; real atomic staging and R30/R33 primitive HRESULT recovery remain open."
+      "latest_material_sha": "3d1136673302b26186ed256511393b500f485327",
+      "latest_static_ci": "LOCAL_256_SYNTHETIC_MATH_PASS_EXACT_SHA_CI_UNVERIFIED",
+      "next_focus": "Inspect isolated Windows package PE32/PE32+ optional header and executable/DLL role and rollback failure paths; continue glass overlap/two-sided material and real per-eye staging proof separately. Verify outstanding exact-SHA CI without rerun."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 22:30:00+09:00",
+  "last_updated_kst": "2026-11-24 23:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
