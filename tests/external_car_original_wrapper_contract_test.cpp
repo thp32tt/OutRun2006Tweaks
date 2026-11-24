@@ -90,6 +90,40 @@ int main(){
     assert(!MatchReadableRetailSignature(corrupt.data(),bytes,
         [](const void*,std::size_t){return true;}));
 
+    // The prior 24-byte signature ended mid-ADD ESP and never checked
+    // stack cleanup, POP ESI or RET. All three bytes now matter.
+    static_assert(bytes.size()==27);
+    assert(!ExactRetailPlayerWrapperTwoCalls(bytes.data(),24));
+    for(std::size_t i=24;i<bytes.size();++i) {
+        auto bad=bytes;bad[i]^=1;
+        assert(!ExactRetailPlayerWrapperTwoCalls(bad.data(),bad.size()));
+    }
+    constexpr auto ret=RetailPlayerFollowupRet;
+    for(unsigned slot=0;slot<16;++slot)
+        for(bool wrapperOk:{false,true})
+            for(bool tailOk:{false,true})
+                for(bool wrapperReadable:{false,true})
+                    for(bool followupReadable:{false,true}) {
+                        auto wrapper=bytes;
+                        if(!wrapperOk)wrapper[24]^=1;
+                        auto callee=ret;
+                        if(!tailOk)callee[0]=0x90;
+                        unsigned followupReads=0;
+                        const bool ok=MatchReadableRetailPlayerWrapper(
+                            wrapper.data(),callee.data(),
+                            [&](const void* ptr,std::size_t len) {
+                                if(ptr==wrapper.data()) {
+                                    assert(len==27);return wrapperReadable;
+                                }
+                                assert(ptr==callee.data() && len==1);
+                                ++followupReads;return followupReadable;
+                            });
+                        assert(ok==(wrapperOk&&tailOk&&wrapperReadable&&followupReadable));
+                        assert(followupReads==(wrapperOk&&wrapperReadable?1u:0u));
+                    }
+    assert(!MatchReadableRetailPlayerWrapper(bytes.data(),nullptr,
+        [](const void*,std::size_t){return true;}));
+
     // Every canonical Ferrari slot (0..14, 28) remains on the ORIGINAL
     // complete callback: body, stock dashboard, glass/alpha, passenger and
     // shadow follow-up are not skipped. This is callback ownership parity,

@@ -93,7 +93,14 @@ jobs:
           abi=Path('src/vr/game/external_car_original_wrapper_contract.hpp').read_text()
           assert 'MaySkipRetailPlayerWrapper() noexcept {return false;}' in abi
           assert 'RetailPlayerFollowupCallVa=0x0049A650u' in abi
-          assert 'ExactRetailPlayerWrapperTwoCalls(' in source
+          assert 'MatchReadableRetailPlayerWrapper(' in source
+          install=source[source.index('constexpr int followupRva='):source.index('auto first=safetyhook::create_mid(',source.index('constexpr int followupRva='))]
+          assert 'playerCode,followupCode' in install
+          assert 'QuestCockpitGlassLive::Memory(address,size)' in install
+          assert 'RetailPlayerFollowupCallVa-0x00400000u' in install
+          assert 'std::array<std::uint8_t,27> RetailPlayerWrapperPrefix' in abi
+          assert 'RetailPlayerFollowupRet{{0xC3}}' in abi
+          assert '0x0C,0x5E,0xC3' in abi
           assert 'D3DRS_CLIPPING,TRUE' in gpu
           assert 'D3DRS_CLIPPLANEENABLE,0u' in gpu
           assert 'if(!MeshInDrawPass(m.glass,pass))continue;' in gpu

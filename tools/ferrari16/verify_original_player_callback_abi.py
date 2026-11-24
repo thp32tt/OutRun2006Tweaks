@@ -15,7 +15,7 @@ FIRST = 0x46BD30
 FOLLOWUP = 0x49A650
 EXE_SHA256 = "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3"
 PREFIX = bytes.fromhex(
-    "568b74240856e845c9fcff68f0e7820056e85ab2ffff83c4"
+    "568b74240856e845c9fcff68f0e7820056e85ab2ffff83c40c5ec3"
 )
 
 
@@ -32,6 +32,11 @@ def verify(prefix: bytes) -> None:
         raise ValueError("retail two-call chain is not the attested ABI")
     if prefix[11:17] != bytes.fromhex("68f0e7820056"):
         raise ValueError("missing push 82E7F0 / push ESI follow-up arguments")
+
+
+def verify_followup(code: bytes) -> None:
+    if code != b"\xc3":
+        raise ValueError("49A650 is not a bare RET in this canonical EXE")
 
 
 def extract_canonical_exe(path: Path, va: int = CALLER, count_bytes: int = len(PREFIX)) -> bytes:
@@ -64,7 +69,14 @@ def extract_canonical_exe(path: Path, va: int = CALLER, count_bytes: int = len(P
 
 def self_test() -> None:
     verify(PREFIX)
-    for offset in (0, 6, 7, 11, 17, 18, 22):
+    verify_followup(bytes.fromhex("c3"))
+    for bad in (b"", bytes.fromhex("90"), bytes.fromhex("c2"), bytes.fromhex("c300")):
+        try:
+            verify_followup(bad)
+        except ValueError:
+            continue
+        raise AssertionError("invalid follow-up accepted")
+    for offset in (0, 6, 7, 11, 17, 18, 22, 24, 25, 26):
         damaged = bytearray(PREFIX)
         damaged[offset] ^= 1
         try:
@@ -72,7 +84,7 @@ def self_test() -> None:
         except ValueError:
             continue
         raise AssertionError(f"corruption at {offset} was accepted")
-    for damaged in (PREFIX[:-1], b"", PREFIX + bytes.fromhex("00")):
+    for damaged in (PREFIX[:24], PREFIX[:-1], b"", PREFIX + bytes.fromhex("00")):
         try:
             verify(damaged)
         except ValueError:
@@ -98,8 +110,7 @@ def main() -> None:
         verify(extract_canonical_exe(options.exe))
         # The decompiled PC x86 build identifies 49A650 as a bare RET.
         # Its identity does not turn 46BD30/469600 into a body-only leaf.
-        if extract_canonical_exe(options.exe, FOLLOWUP, 1) != bytes.fromhex("c3"):
-            raise ValueError("49A650 is not a bare RET in this canonical EXE")
+        verify_followup(extract_canonical_exe(options.exe, FOLLOWUP, 1))
         print("EXT16_008_EXACT_SHA_PE32_WRAPPER_TWO_CALL_EDGES_PASS",
               hex(CALLER), hex(FIRST), hex(FOLLOWUP))
     if not options.self_test and options.exe is None:

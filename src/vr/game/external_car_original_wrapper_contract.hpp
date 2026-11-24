@@ -17,11 +17,14 @@ namespace OutRunVR::DinoSidecar {
 inline constexpr std::uint32_t RetailPlayerWrapperVa=0x0049F3E0u;
 inline constexpr std::uint32_t RetailPlayerDisplayCallVa=0x0046BD30u;
 inline constexpr std::uint32_t RetailPlayerFollowupCallVa=0x0049A650u;
-inline constexpr std::array<std::uint8_t,24> RetailPlayerWrapperPrefix{{
+inline constexpr std::array<std::uint8_t,27> RetailPlayerWrapperPrefix{{
     0x56,0x8B,0x74,0x24,0x08,0x56,0xE8,0x45,
     0xC9,0xFC,0xFF,0x68,0xF0,0xE7,0x82,0x00,
-    0x56,0xE8,0x5A,0xB2,0xFF,0xFF,0x83,0xC4
+    0x56,0xE8,0x5A,0xB2,0xFF,0xFF,0x83,0xC4,0x0C,0x5E,0xC3
 }};
+inline constexpr std::array<std::uint8_t,1> RetailPlayerFollowupRet{{0xC3}};
+// Full cdecl wrapper: three pushed arguments are removed by ADD ESP,0Ch,
+// then POP ESI; RET. The old 24-byte prefix ended inside ADD ESP.
 
 // The unsigned wrap computes near rel32 targets identically on x86 and the
 // Linux regression runner, including negative two's-complement displacements.
@@ -57,6 +60,16 @@ inline bool MatchReadableRetailSignature(const std::uint8_t* p,
     for(std::size_t i=0;i<N;++i)
         if(p[i]!=expected[i])return false;
     return true;
+}
+
+// Both live addresses must match the exact canonical ABI before installing
+// a trampoline. A readable wrapper alone does not attest the follow-up
+// callee. No bytes from a rejected memory span may be dereferenced.
+template<class Readable>
+inline bool MatchReadableRetailPlayerWrapper(const std::uint8_t* wrapper,
+    const std::uint8_t* followup,Readable readable) {
+    return MatchReadableRetailSignature(wrapper,RetailPlayerWrapperPrefix,readable) &&
+        MatchReadableRetailSignature(followup,RetailPlayerFollowupRet,readable);
 }
 
 // NOTE: even proving the wrapper signature does NOT prove an isolated BODY

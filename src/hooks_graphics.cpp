@@ -1404,19 +1404,19 @@ public:
             0x25,0x7D,0x00,0x3B,0xC1,0x8B,0x0D,
             0xF4,0x25,0x7D,0x00,0x75,0x08,0x3B,0x0D,0x10
         }};
-        constexpr std::array<std::uint8_t,24> player{{
-            0x56,0x8B,0x74,0x24,0x08,0x56,0xE8,0x45,
-            0xC9,0xFC,0xFF,0x68,0xF0,0xE7,0x82,0x00,
-            0x56,0xE8,0x5A,0xB2,0xFF,0xFF,0x83,0xC4
-        }};
+        constexpr int followupRva=static_cast<int>(
+            OutRunVR::DinoSidecar::RetailPlayerFollowupCallVa-0x00400000u);
+        const auto* playerCode=Module::exe_ptr<std::uint8_t>(PlayerCallbackRva);
+        const auto* followupCode=Module::exe_ptr<std::uint8_t>(followupRva);
         // The installed wrapper must preserve the separate 46BD30 and
         // 49A650 near CALL edges; matching the prologue is NOT proof that
         // either child is an independently suppressible vehicle BODY leaf.
-        if (!OutRunVR::DinoSidecar::ExactRetailPlayerWrapperTwoCalls(
-                player.data(),player.size()) ||
-            !MatchOriginalRva(FrameEnterRva,begin) ||
+        if (!MatchOriginalRva(FrameEnterRva,begin) ||
             !MatchOriginalRva(FrameEndRva,end) ||
-            !MatchOriginalRva(PlayerCallbackRva,player)) {
+            !OutRunVR::DinoSidecar::MatchReadableRetailPlayerWrapper(
+                playerCode,followupCode,[](const void* address,std::size_t size) noexcept {
+                    return QuestCockpitGlassLive::Memory(address,size);
+                })) {
             spdlog::warn("VR COCKPIT V2 native frame probe unavailable: "
                 "original EXE signatures differ; cockpit remains disabled");
             return false;
