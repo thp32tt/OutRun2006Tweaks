@@ -266,7 +266,8 @@ static QueueCount CaptureBefore(DrawBuffer* q) noexcept {
     out.buffer=q;out.before=count;return out;
 }
 static void CaptureAfter(const QueueCount& before,std::uint64_t epoch) noexcept {
-    if(!epoch||TooMany||before.before<0||!before.buffer||
+    if(!epoch||epoch!=OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch()||
+       TooMany||before.before<0||!before.buffer||
        !Memory(before.buffer,sizeof(DrawBuffer)))return;
     const DrawBuffer* q=before.buffer;
     const int count=q->NumBuffers_0;
@@ -281,14 +282,10 @@ static void CaptureAfter(const QueueCount& before,std::uint64_t epoch) noexcept 
         std::uint32_t id=0;
         std::memcpy(&id,reinterpret_cast<const char*>(e)+0x38,sizeof(id));
         if(!id||id==0xffffffffu)continue;
-        bool seen=false;
-        for(std::size_t j=0;j<TokenCount;++j)
-            if(Tokens[j].entry==e&&Tokens[j].epoch==epoch){seen=true;break;}
-        if(seen)continue;
-        if(TokenCount==Tokens.size()){
+        if(!OutRunVR::QuestCockpitV2::Glass::RememberDeferredOwner(
+               Tokens,TokenCount,Token{e,id,e->CullNode_18,epoch})) {
             TooMany=true;TokenCount=0;return;
         }
-        Tokens[TokenCount++]={e,id,e->CullNode_18,epoch};
     }
 }
 struct PlayerCallback {
@@ -346,7 +343,8 @@ static bool HasDeferredOwner(const SafetyHookContext& ctx,
         std::uint32_t currentId=0;
         std::memcpy(&currentId,
             reinterpret_cast<const char*>(t.entry)+0x38,sizeof(currentId));
-        if(currentId==t.id)return true;
+        if(OutRunVR::QuestCockpitV2::Glass::DeferredOwnerMatches(
+               t,Token{t.entry,currentId,t.entry->CullNode_18,epoch}))return true;
     }
     return false;
 }

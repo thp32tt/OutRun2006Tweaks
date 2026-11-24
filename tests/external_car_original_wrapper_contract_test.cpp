@@ -6,6 +6,7 @@
 #include "../src/vr/game/external_car_atomic_precommit.hpp"
 #include "../src/vr/game/dino_external_original_car_gate.hpp"
 #include "../src/vr/game/external_car_dashboard.hpp"
+#include "../src/vr/game/quest_cockpit_v2_glass_hook.hpp"
 using namespace OutRunVR::DinoSidecar;
 static OriginalCarGate ValidGate(){
     OriginalCarGate g{};
@@ -15,7 +16,38 @@ static OriginalCarGate ValidGate(){
     g.ticketPose=g.livePose=22;
     return g;
 }
+static void TestDeferredGlassOwnerRefresh(){
+    using namespace OutRunVR::QuestCockpitV2::Glass;
+    struct Token {
+        const int* entry=nullptr;
+        std::uint32_t id=0;
+        const int* node=nullptr;
+        std::uint64_t epoch=0;
+    };
+    int entry=0,otherEntry=0,nodeA=0,nodeB=0;
+    std::array<Token,1> tokens{};
+    std::size_t count=0;
+    const Token original{&entry,10,&nodeA,7};
+    const Token reused{&entry,11,&nodeB,7};
+    assert(RememberDeferredOwner(tokens,count,original));
+    assert(count==1 && DeferredOwnerMatches(tokens[0],original));
+    assert(!DeferredOwnerMatches(tokens[0],reused));
+    // A newly captured original-player entry at the same queue address
+    // must replace the old token, even when the bounded table is full.
+    assert(RememberDeferredOwner(tokens,count,reused));
+    assert(count==1 && DeferredOwnerMatches(tokens[0],reused));
+    assert(!DeferredOwnerMatches(tokens[0],original));
+    assert(!DeferredOwnerMatches(tokens[0],Token{&entry,11,&nodeA,7}));
+    assert(!DeferredOwnerMatches(tokens[0],Token{&entry,11,&nodeB,8}));
+    assert(!DeferredOwnerMatches(tokens[0],Token{&otherEntry,11,&nodeB,7}));
+    assert(!RememberDeferredOwner(tokens,count,Token{&otherEntry,12,&nodeB,7}));
+    assert(!RememberDeferredOwner(tokens,count,Token{&entry,0,&nodeB,7}));
+    assert(!RememberDeferredOwner(tokens,count,Token{&entry,0xffffffffu,&nodeB,7}));
+    assert(!RememberDeferredOwner(tokens,count,Token{&entry,11,&nodeB,0}));
+    assert(count==1 && DeferredOwnerMatches(tokens[0],reused));
+}
 int main(){
+    TestDeferredGlassOwnerRefresh();
     static_assert(!MaySkipRetailPlayerWrapper(),
         "A proven two-call retail wrapper is not a body-only draw leaf");
     static_assert(!RuntimeExternalCarAtomicStageReady(),

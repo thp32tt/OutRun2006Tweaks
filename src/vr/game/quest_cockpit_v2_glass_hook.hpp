@@ -2,10 +2,39 @@
 // Quest APK-derived selective PC player-glass material gate. PURE C++17.
 // This checks only the exact dark-tint/alpha/blend family, not scene light.
 // A material candidate is never, by itself, player glass ownership.
+#include <array>
+#include <cstddef>
 #include <cmath>
 #include <cstdint>
 
 namespace OutRunVR::QuestCockpitV2::Glass {
+// The retail deferred draw queue can reuse a descriptor address. A newly
+// captured player descriptor supersedes the old identity in the same epoch.
+// Keep capacity bounded; never grant ownership from an address alone.
+template<class Token, std::size_t N>
+inline bool RememberDeferredOwner(std::array<Token,N>& tokens,
+    std::size_t& count, const Token& current) noexcept {
+    if(count>N || !current.entry || !current.epoch || !current.id ||
+       current.id==0xffffffffu)return false;
+    for(std::size_t i=0;i<count;++i) {
+        if(tokens[i].entry==current.entry && tokens[i].epoch==current.epoch) {
+            tokens[i]=current;
+            return true;
+        }
+    }
+    if(count==N)return false;
+    tokens[count++]=current;
+    return true;
+}
+template<class Token>
+inline bool DeferredOwnerMatches(const Token& saved,
+    const Token& current) noexcept {
+    return current.entry && current.epoch && current.id &&
+        current.id!=0xffffffffu && saved.entry==current.entry &&
+        saved.epoch==current.epoch && saved.id==current.id &&
+        saved.node==current.node;
+}
+
 inline constexpr bool Blend(std::uint32_t flags,
     std::uint32_t srcEffective, std::uint32_t dstEffective) noexcept
 {
