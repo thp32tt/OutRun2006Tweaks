@@ -2,6 +2,15 @@
 #include "../d3d9/r30_state_restore_result.hpp"
 
 namespace OutRunVR::StereoLowerDraw {
+// A speculative UP-to-VB route may decline before any physical draw. In that
+// case preserve the incoming stream binding, not the side effect of an UP
+// call that has not executed. Once attempted, reproduce native UP's NULL.
+template<class RestoreOriginal,class ClearForUp>
+inline bool FinishSpeculativeUpStream(bool physicalAttempted,
+    RestoreOriginal restoreOriginal, ClearForUp clearForUp) noexcept {
+    return physicalAttempted ? clearForUp() : restoreOriginal();
+}
+
 // Distinguish a safe pre-raster decline from an actual GPU HRESULT.
 // E_NOTIMPL is a valid failure HRESULT; it cannot also mean "not drawn".
 template<class Result>

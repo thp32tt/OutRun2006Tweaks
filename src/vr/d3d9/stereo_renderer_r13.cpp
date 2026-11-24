@@ -408,8 +408,7 @@ namespace OutRunVRStereo
             FirstMainClearLogged = false;
             FirstDepthBootstrapLogged = false;
             PresentEpoch = 1;
-            LastMainDepthClearEpoch = 0;
-            LastMainDepthClearFlags = 0;
+            LastMainDepthClearStamp.Invalidate();
             LastMainDepthClearZ = 1.0f;
             LastMainDepthClearStencil = 0;
             LastMainDepthClearDesc = {};

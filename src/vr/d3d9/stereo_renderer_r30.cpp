@@ -6661,47 +6661,70 @@ namespace OutRunVRStereo
                             device, scratch.left.data(),
                             scratch.right.data(), vertexCount, stride))
                     {
-                        bool physicalDrawAttempted = false;
-                        auto physicalEye = [&](unsigned eye) {
-                            R30ScopedInternalPass guard;
-                            const HRESULT bind =
-                                R30ParticleGpuRing.bindEye(eye);
-                            if (FAILED(bind)) return bind;
-                            // Mark BEFORE issuing the real driver call: even a
-                            // failed Draw may already have rasterized fragments.
-                            physicalDrawAttempted = true;
-                            return R29OwnerCallRawDrawPrimitive(
-                                device, type, 0u, primitiveCount);
-                        };
-                        const HRESULT gpuHr = R30ExecuteXyzrhwStereo(
-                            device, state,
-                            [&]() { return physicalEye(0); },
-                            [&]() { return physicalEye(1); },
-                            "R30/WorldParticle-DynamicVB", false,
-                            &physicalDrawAttempted);
-                        // Native DrawPrimitiveUP leaves stream-0 NULL. No
-                        // caller-visible D3D9 stream state may leak.
-                        if (!R30ParticleGpuRing.finishUp())
+                        IDirect3DVertexBuffer9* savedStream = nullptr;
+                        UINT savedOffset = 0, savedStride = 0;
+                        const HRESULT savedHr = device->GetStreamSource(
+                            0, &savedStream, &savedOffset, &savedStride);
+                        if (FAILED(savedHr))
                         {
-                            R29OwnerMarkRightDrawFailed();
-                            R29OwnerNoteRestoreFailure(
-                                "R30 WorldParticle GPU stream restore");
-                            R29OwnerArmMonoSafety();
+                            if (savedStream) savedStream->Release();
+                            // No bind or draw occurred; use the ordinary UP path.
+                        }
+                        else
+                        {
+                            bool physicalDrawAttempted = false;
+                            auto physicalEye = [&](unsigned eye) {
+                                R30ScopedInternalPass guard;
+                                const HRESULT bind =
+                                    R30ParticleGpuRing.bindEye(eye);
+                                if (FAILED(bind)) return bind;
+                                // Mark BEFORE issuing the real driver call: even a
+                                // failed Draw may already have rasterized fragments.
+                                physicalDrawAttempted = true;
+                                return R29OwnerCallRawDrawPrimitive(
+                                    device, type, 0u, primitiveCount);
+                            };
+                            const HRESULT gpuHr = R30ExecuteXyzrhwStereo(
+                                device, state,
+                                [&]() { return physicalEye(0); },
+                                [&]() { return physicalEye(1); },
+                                "R30/WorldParticle-DynamicVB", false,
+                                &physicalDrawAttempted);
+                            // Preserve the incoming stream on a pre-raster decline;
+                            // only a physically attempted UP replacement owns the
+                            // original API's stream-0 NULL side effect.
+                            bool streamRestored = false;
+                            {
+                                R30ScopedInternalPass guard;
+                                streamRestored = OutRunVR::StereoLowerDraw::FinishSpeculativeUpStream(
+                                    physicalDrawAttempted,
+                                    [&]() { return SUCCEEDED(device->SetStreamSource(
+                                        0, savedStream, savedOffset, savedStride)); },
+                                    [&]() { return R30ParticleGpuRing.finishUp(); });
+                            }
+                            if (savedStream) savedStream->Release();
+                            if (!streamRestored)
+                            {
+                                R29OwnerMarkRightDrawFailed();
+                                R29OwnerNoteRestoreFailure(
+                                    "R30 WorldParticle GPU stream restore");
+                                R29OwnerArmMonoSafety();
+                                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
+                                    gpuHr, physicalDrawAttempted, false,
+                                    static_cast<HRESULT>(E_NOTIMPL), static_cast<HRESULT>(E_FAIL));
+                            }
+                            // A failed first-eye SetStreamSource cannot draw a
+                            // particle. With the stream restored, retry the
+                            // original UP path instead of silently losing it.
+                            // Never retry after either eye attempted GPU raster:
+                            // that could duplicate alpha or hide a half-eye frame.
+                            if (OutRunVR::R30ParticleUpload::MayUseNativeUpAfterGpuAttempt(
+                                    physicalDrawAttempted, true, FAILED(gpuHr)))
+                                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
                             return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
-                                gpuHr, physicalDrawAttempted, false,
+                                gpuHr, physicalDrawAttempted, true,
                                 static_cast<HRESULT>(E_NOTIMPL), static_cast<HRESULT>(E_FAIL));
                         }
-                        // A failed first-eye SetStreamSource cannot draw a
-                        // particle. With the stream restored, retry the
-                        // original UP path instead of silently losing it.
-                        // Never retry after either eye attempted GPU raster:
-                        // that could duplicate alpha or hide a half-eye frame.
-                        if (OutRunVR::R30ParticleUpload::MayUseNativeUpAfterGpuAttempt(
-                                physicalDrawAttempted, true, FAILED(gpuHr)))
-                            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
-                        return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
-                            gpuHr, physicalDrawAttempted, true,
-                            static_cast<HRESULT>(E_NOTIMPL), static_cast<HRESULT>(E_FAIL));
                     }
                 }
             }

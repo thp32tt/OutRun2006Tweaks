@@ -116,6 +116,17 @@ jobs:
           bootstrap=r7[r7.index('bool TryBootstrapRightDepthFromRecentClear('):r7.index('std::uint32_t NextStereoFrameId()')]
           assert bootstrap.index('!LastMainDepthClearStamp.Current(PresentEpoch)') < bootstrap.index('ClearHook.stdcall<HRESULT>')
           assert 'LastMainDepthClearStamp.Record(PresentEpoch,depthFlags);' in r7
+          r13=Path('src/vr/d3d9/stereo_renderer_r13.cpp').read_text()
+          assert 'LastMainDepthClearStamp.Invalidate();' in r13
+          assert 'LastMainDepthClearEpoch' not in r13 and 'LastMainDepthClearFlags' not in r13
+          particle=Path('src/vr/d3d9/stereo_renderer_r30.cpp').read_text()
+          particle=particle[particle.index('IDirect3DVertexBuffer9* savedStream = nullptr;'):particle.index('bool leftAttempted = false;',particle.index('IDirect3DVertexBuffer9* savedStream = nullptr;'))]
+          assert particle.index('device->GetStreamSource(') < particle.index('R30ParticleGpuRing.bindEye(eye)')
+          assert particle.index('physicalDrawAttempted = true;') < particle.index('R29OwnerCallRawDrawPrimitive(')
+          assert 'FinishSpeculativeUpStream(' in particle
+          assert '0, savedStream, savedOffset, savedStride' in particle
+          assert 'R30ParticleGpuRing.finishUp();' in particle
+          assert particle.index('if (!streamRestored)') < particle.index('MayUseNativeUpAfterGpuAttempt(')
           receipt=Path('src/vr/game/external_car_stereo_receipt.hpp').read_text()
           draw=r7[r7.index('HRESULT ExecuteStereoDraw('):r7.index('HRESULT __stdcall DrawPrimitiveDest(')]
           assert draw.count('if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {')>=5
@@ -310,7 +321,7 @@ jobs:
         run: |
           set -euo pipefail
           changed="$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- src/vr/d3d9)"
-          if grep -Ev '^src/vr/d3d9/(stereo_renderer_r(7\.inc|30\.cpp|32\.cpp|33\.cpp)|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
+          if grep -Ev '^src/vr/d3d9/(stereo_renderer_r(7\.inc|13\.cpp|30\.cpp|32\.cpp|33\.cpp)|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
             echo "$changed"
             exit 1
           fi
@@ -326,6 +337,15 @@ jobs:
           from pathlib import Path
           import subprocess
           base = '2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7'
+          # R13 ResetEx must consume the same clear receipt as R7 Reset.
+          # Allow exactly the old two reset assignments -> one invalidation.
+          r13path = 'src/vr/d3d9/stereo_renderer_r13.cpp'
+          old13 = subprocess.check_output(['git','show',base+':'+r13path])
+          newline13 = b'\r\n' if b'\r\n' in old13 else b'\n'
+          marker13 = b'            LastMainDepthClearEpoch = 0;' + newline13 + b'            LastMainDepthClearFlags = 0;'
+          assert old13.count(marker13) == 1
+          expected13 = old13.replace(marker13, b'            LastMainDepthClearStamp.Invalidate();', 1)
+          assert Path(r13path).read_bytes() == expected13, 'Unreviewed R13 change'
           paths = {
               'src/vr/d3d9/stereo_renderer_r32.cpp': ('R32Review', False),
               'src/vr/core/r32_review_api.hpp': ('R32Review', True),

@@ -111,6 +111,33 @@ int main() {
                         if (attempted && driver==NotImpl) assert(hr==NotImpl);
                         if (!restored && !attempted && driver==NotImpl) assert(hr==Fail);
                     }
+    // DynamicVB must not manufacture DrawPrimitiveUP's stream-clear side
+    // effect before a physical attempt. The lower route may reject without
+    // executing any UP, so the original VB/offset/stride must survive.
+    for (unsigned slot=0; slot<16; ++slot)
+        for (bool attempted : {false,true})
+            for (bool success : {false,true})
+                for (bool hadStream : {false,true}) {
+                    unsigned restoreCalls=0, clearCalls=0;
+                    unsigned binding=99, offset=32, stride=24;
+                    const bool restored=OutRunVR::StereoLowerDraw::FinishSpeculativeUpStream(
+                        attempted,
+                        [&]() { ++restoreCalls; if(success) {
+                            binding=hadStream?7u:0u; offset=hadStream?12u:0u;
+                            stride=hadStream?28u:0u; } return success; },
+                        [&]() { ++clearCalls; if(success) binding=offset=stride=0;
+                            return success; });
+                    assert(restored==success);
+                    assert(restoreCalls==(!attempted?1u:0u));
+                    assert(clearCalls==(attempted?1u:0u));
+                    if(success) {
+                        assert(binding==(!attempted&&hadStream?7u:0u));
+                        assert(offset==(!attempted&&hadStream?12u:0u));
+                        assert(stride==(!attempted&&hadStream?28u:0u));
+                    }
+                    const auto result=Attempt::AfterRoute(NotImpl,attempted,restored,NotImpl,Fail);
+                    assert(result.handled==(attempted||!success));
+                }
     static_assert(Attempt::AfterDraw(NotImpl,true,Fail).handled);
     static_assert(Attempt::AfterDraw(Ok,false,Fail).hr==Fail);
 }
