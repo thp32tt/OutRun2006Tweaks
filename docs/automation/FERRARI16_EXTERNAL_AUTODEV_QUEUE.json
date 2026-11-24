@@ -776,11 +776,75 @@
           "private_current_16_model_asset_proof": "UNVERIFIED; no source rights or asset binary changed",
           "runtime_validation": "UNTESTED",
           "next_trace": "Implement and fault-inject isolated whole-vehicle dual-eye color+depth staging with a proven all-or-stock publish/rollback strategy BEFORE first live external DIP; retain R33/R30/R7 fences, stock 49F3E0 two-call wrapper, x86 ABI and Quest3 runtime UNTESTED."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-1600-R30-HANDLED-HRESULT-RESTORE",
+          "status": "PATCHED_STATIC_CI_PASS_WINDOWS_FULL_GATE_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "D3D9 R30/R33: direct/raw DIP bypass, HRESULT recovery, state restoration and original fallback",
+          "source_owner": "R30TryScreenSpaceFovDraw -> R30GuardScreenSpace; R33 final DIP fence, R30/R29 raw and cross-TU support dispatch",
+          "source_defect": "R30 used E_NOTIMPL for both pre-draw route decline and an actual LEFT GPU HRESULT; R30GuardScreenSpace could call R29 after a physical attempt. Four successful-LEFT exits including failed c64/RT/depth/viewport restore returned LEFT S_OK after dirty GPU state. This is a shared renderer failure-path defect, not proof of the user's actual HMD symptom.",
+          "source_fix": "Typed Attempt<HRESULT> with explicit handled status. Pre-raster declines and clean left-upload rollback allow lower draw; dirty rollback and all five post-left exits are handled. ResultAfterRestore preserves existing real error, returns E_FAIL on restore failure after otherwise successful left. P0 test marker migrated to typed signature with additional dirty-rollback mutation; no original visual accounting assertions removed.",
+          "source_commits": [
+            "8a13f1d152549b79eea804be9a5327d6cb8e36b9",
+            "54899646bdee15aecf35635aada8079ebb5be1b5"
+          ],
+          "source_material_sha": "54899646bdee15aecf35635aada8079ebb5be1b5",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r30.cpp": "c306a7b3f27cfc3457eab2fa53d666860f153445",
+            "src/vr/game/stereo_lower_draw_result.hpp": "4014ebf54f5ce72f2e4e7ddadfdedb8e84df1c9e",
+            "tests/stereo_lower_draw_result_test.cpp": "c966ff5f20e07c4fef423305bdf00f04935559c6",
+            ".github/workflows/ferrari16-multicar-regression.yml": "a85ca2f22e9cecdb46a9bbf5205be95b9e7e30bc",
+            "tools/verify_vr_visual_composition_p0.py": "a389ec96623d0524e1c485ba42a507672814eebf"
+          },
+          "positive_negative_regressions": [
+            "PASS exact SHA 54899646: positive pre-raster decline/clean rollback calls R29 once.",
+            "PASS exact SHA 54899646: negative actual LEFT E_NOTIMPL preserves GPU error with zero R29 retry; dirty pre-draw rollback blocks lower route; successful LEFT plus failed state restore returns E_FAIL; original error preserved.",
+            "PASS exact SHA 54899646: C++/Python Ferrari16 regressions, production source-order assertions, Windows PBR HLSL compile, protected v0.03 paths.",
+            "Initial HUD inspector 45344843316 failed on prior HRESULT string signature; source verifier updated without bypass and added dirty-rollback mutation. Final source 54899646 static-exe-analysis job including P0 visual composition passed; full workflow completion separately tracked."
+          ],
+          "same_sha_ci": {
+            "sha": "54899646bdee15aecf35635aada8079ebb5be1b5",
+            "multicar_and_windows_hlsl": {
+              "run_id": 45345015192,
+              "status": "completed",
+              "conclusion": "success",
+              "head_sha": "54899646bdee15aecf35635aada8079ebb5be1b5"
+            },
+            "windows_win32_dll": {
+              "run_id": 45345015312,
+              "status": "in_progress",
+              "conclusion": null,
+              "head_sha": "54899646bdee15aecf35635aada8079ebb5be1b5"
+            },
+            "windows_x86_x64_package": {
+              "run_id": 45345015337,
+              "status": "in_progress",
+              "conclusion": null,
+              "head_sha": "54899646bdee15aecf35635aada8079ebb5be1b5"
+            },
+            "hud_inspector": {
+              "run_id": 45345015170,
+              "status": "in_progress",
+              "conclusion": null,
+              "head_sha": "54899646bdee15aecf35635aada8079ebb5be1b5"
+            }
+          },
+          "remaining_trace": [
+            "R33 DrawIndexedPrimitiveDestR33 entry still rejects external mesh prior to direct/raw or fastpath while atomic stage disabled; R30 corresponding entry and R7 also remain fail-closed. No external vehicle activation.",
+            "R33 active path R32ReviewTryXyzrhwIndexedPrimitiveVB -> R30SupportTryXyzrhwIndexedPrimitiveVB -> R30TryXyzrhwIndexedPrimitiveVB -> R30ExecuteXyzrhwStereo -> R29OwnerCallRawDrawIndexedPrimitiveUP retains HRESULT-based E_NOTIMPL ambiguity. R33 lines 2050-2084 uses sentinel on F11, FVF142 and XYZRHW; R30 lines 7511-7544 actually submits raw indexed UP then returns ResultAfterRestore. Distinct next work: propagate handled/physical-attempt evidence across support bridge, not normalize GPU HRESULT or bypass fallback.",
+            "R33 lower wrapper R32LowerFailClosed delegates once; R30CallLowerDrawIndexedPrimitive directly invokes R29 trampoline. This explains why repairing R30 own screen route alone does not certify active R33 fastpaths.",
+            "Whole-vehicle isolated L/R color and depth staging, real GPU RIGHT failure injection, stock 49F3E0 wrapper proof and Quest3 physical test remain open."
+          ],
+          "protected_v003": "Not modified; exact final multicar CI protection assertions PASS.",
+          "asset_validation": "No current 16 licensed private source or OVC QA added; all model material, glass, dashboard, and HMD visual acceptance remain unverified.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "PENDING_FULL_WINDOWS_CI_NO_SCORE_YET",
+          "next_trace": "Verify exact SHA 54899646 build/package and HUD results if still pending; continue R33 raw indexed XYZRHW/FVF142 handled-vs-declined propagation with physical failure injection and no duplicate native fallback. Preserve full-vehicle atomic staging blocker."
         }
       ],
-      "latest_material_sha": "f5058de7adaa3af041d6ecf15144388200758a8b",
-      "latest_static_ci": "SUCCESS_EXACT_SOURCE_SHA",
-      "next_focus": "R7 whole-vehicle isolated L/R color+depth staging, stereo pair-atomic publish and physical RIGHT failure injection before first live DIP; test protected v0.03 parity."
+      "latest_material_sha": "54899646bdee15aecf35635aada8079ebb5be1b5",
+      "latest_static_ci": "MULTICAR_AND_HLSL_SUCCESS_EXACT_SOURCE_SHA_FULL_WINDOWS_PENDING",
+      "next_focus": "R33 active raw indexed XYZRHW/FVF142 path: propagate explicit handled/physical-attempt outcome across R30 support interface; test E_NOTIMPL after raw raster, stream/index restore failure and clean decline. Keep atomic two-eye color/depth blocker."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
