@@ -1512,18 +1512,51 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Inspect isolated Windows package PE32/PE32+ optional header and executable/DLL role and rollback failure paths; continue glass overlap/two-sided material and real per-eye staging proof separately. Verify outstanding exact-SHA CI without rerun."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-2330-PE-IMAGE-ROLE-ENVELOPE",
+          "status": "PATCHED_EXACT_BLOB_LOCAL_PACKAGE_TEST_PASS_WINDOWS_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "Windows x86 DLL+x64 host exact-SHA packaging and isolated install/rollback",
+          "source_material_sha": "83c4b119027f12dd4101eb16ad0dd83097f782ab",
+          "source_defect": "private_test_package.py pe_machine read only MZ/PE signature and machine field; the previous 256-byte fixture lacked a usable COFF/optional header/section table yet passed. Same-machine EXE in DLL slot, DLL in host slot, or truncated PE section data could receive valid package SHA256/ZIP CRC and static approval.",
+          "source_fix": "Use shared bounded PE image envelope validator in both build_package and verify_package: expected x86 PE32 DLL vs x64 PE32+ executable, IMAGE_FILE_EXECUTABLE_IMAGE and DLL flag, bounded COFF/optional header/data-directory count/section table/header and image sizes, file-backed executable section and nonzero host entry point within executable raw bytes; permit DLL entry point zero. Preserve package filenames/schema/source SHA/rights/runtime fences. This is structural validation, not full PE loader or signature verification.",
+          "source_blob_sha1": {
+            "tools/ferrari16/pe_image_contract.py": "b184465930108d11f2673670f68294e6f0a9e9e0",
+            "tools/ferrari16/private_test_package.py": "f93f6cae0b81624167a38e5b3b06179f7d95d5b2",
+            "tests/ferrari16_package_integrity_test.py": "08d253a4e7d9c952351e0d90c889128e0e42fc00"
+          },
+          "positive_negative_regressions": [
+            "Local actual Python execution of full committed ferrari16_package_integrity_test.py: 10 unittest methods PASS. All three local files git hash-object exactly match committed blob IDs.",
+            "New PE envelope subcases: 3 positive (valid x86 DLL and x64 EXE, DLL zero entry), 35 negative (16 field mutations for each architecture, 2 truncated images, 1 zero entry EXE). Both build and readback reject 2 wrong-role payloads each even with recomputed QA hashes/SHA256SUMS/ZIP CRC. Existing SHA, wrong architecture, missing/extra files and unauthorized HMD-claim tests retained.",
+            "No N100 use. Tests are synthetic and do not execute actual PE or Windows loader."
+          ],
+          "same_sha_ci": {
+            "sha": "83c4b119027f12dd4101eb16ad0dd83097f782ab",
+            "status": "UNVERIFIED",
+            "note": "Commit workflow lookup PR-filtered empty and combined status empty. Existing push workflow still calls package tests, builds x86 DLL/x64 host, packages and runs PS5.1 isolated install/restore. Actual run result not observed; no CI skip/rerun or claimed PASS."
+          },
+          "render_trace": [
+            "Build exact SHA -> source_items -> assert_binaries -> QA ContentSha256 -> ZIP -> verify_package -> SHA and PE validation. Existing installer checks exact manifest names/hashes before backup and writes; it does not independently validate PE roles if manifest and payload are both replaced, so extracted-package parity remains a separate follow-up.",
+            "RESTORE preflights patched DLL/host, saved hashes and launcher hashes, then copies originals sequentially and deletes launchers. Failure after first copy can leave mixed runtime and prevent ordinary retry because patched-hash gate requires both patched bytes. No rollback transactional fix made this cycle; investigate resumable recovery and verified backup/manifest anchoring with failure injection.",
+            "No runtime renderer, shader, OVC, x86 ABI, stereo, PBR, glass, dashboard, menu or host focus changes; atomic GPU stage remains disabled per prior trace."
+          ],
+          "asset_validation": "No actual 16 vehicle GLB/OVC or licensed textures accessed, no model hash/quality/rights validation, no candidate promotion.",
+          "protected_v003": "Only offline packager, new helper and existing Python CI test changed on automation branch; no release, installer/restore scripts, host, game DLL source, assets or deployment modifications.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Trace 328 GTS/575 Superamerica/F430 Spider/Testarossa Spider exact-variant source-to-OVC material/texture binding and decoded preview evidence with positive/negative synthetic cases; preserve all blocked promotions and rights. Separate pending isolated installer PE parity, rollback partial-write recovery, real pair-atomic GPU stage and exact-SHA Windows CI remain open."
         }
       ],
-      "latest_material_sha": "3d1136673302b26186ed256511393b500f485327",
-      "latest_static_ci": "LOCAL_256_SYNTHETIC_MATH_PASS_EXACT_SHA_CI_UNVERIFIED",
-      "next_focus": "Inspect isolated Windows package PE32/PE32+ optional header and executable/DLL role and rollback failure paths; continue glass overlap/two-sided material and real per-eye staging proof separately. Verify outstanding exact-SHA CI without rerun."
+      "latest_material_sha": "83c4b119027f12dd4101eb16ad0dd83097f782ab",
+      "latest_static_ci": "EXACT_BLOB_FULL_PACKAGE_10_UNITTEST_PASS_WINDOWS_CI_UNVERIFIED",
+      "next_focus": "Trace 328 GTS/575 Superamerica/F430 Spider/Testarossa Spider exact-variant source-to-OVC material/texture binding and decoded preview evidence with positive/negative synthetic cases; preserve all blocked promotions and rights. Separate pending isolated installer PE parity, rollback partial-write recovery, real pair-atomic GPU stage and exact-SHA Windows CI remain open."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 23:00:00+09:00",
+  "last_updated_kst": "2026-11-24 23:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
