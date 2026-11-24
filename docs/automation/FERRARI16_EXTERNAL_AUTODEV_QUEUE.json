@@ -2007,19 +2007,83 @@
           "asset_validation": "Synthetic Windows fixtures only; no private models or actual 16-car acceptance. N100 unused.",
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
-          "next_trace": "Verify native eight rollback negatives and exact SHA Windows build/package. Trace reparse/hardlink isolation and recoverability after partial copy/remove; then return to per-eye glass sorting and isolated whole-car color/depth pair staging."
+          "next_trace": "Verify native eight rollback negatives and exact SHA Windows build/package. Trace reparse/hardlink isolation and recoverability after partial copy/remove; then return to per-eye glass sorting and isolated whole-car color/depth pair staging.",
+          "followup_exact_sha_ci": {
+            "sha": "f48176adfe7a9fc7042a4c754306354b0bcbb6f0",
+            "runs": [
+              {
+                "id": 45471033269,
+                "conclusion": "success"
+              },
+              {
+                "id": 45471033423,
+                "conclusion": "success"
+              },
+              {
+                "id": 45471033719,
+                "conclusion": "success"
+              }
+            ],
+            "native_rollback_job": 138718715870,
+            "conclusion": "success",
+            "score_ledger_status": "not yet credited in latest readable SSOT; no duplicate credit in iteration 28"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER28-GLB-VERTEX-VALUE-CONTRACT",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Slot provenance and optional exact 328 GTS / 575 SA / F430 Spider / Testarossa Spider: source-to-OVC quality",
+          "source_material_sha": "74224448638577d67426169017606c5aeb33685b",
+          "source_blob_sha1": {
+            "tools/ferrari16/exact_variant_quality_gate.py": "c37bcfbe514d2c3ca32cfc29cce38c66ee1f41a3",
+            "tests/ferrari16_exact_variant_quality_gate_test.py": "b8be802ad9fc49aadb4ce03d7a00242297a59ca0"
+          },
+          "source_defect": "GLB accessor validated metadata, count, byte bounds and indices but never read float attribute values. Nonfinite position/UV/normal and zero-length normals could pass source-to-converted static quality if final OVC was independently valid and other metadata matched.",
+          "source_fix": "Read core float POSITION/NORMAL/TEXCOORD_0 values in bounded 4096-vertex stride-aware batches; reject NaN/Inf and normal length squared <=1e-12; cache checked accessor/semantic pairs. Normalized integer UV support unchanged.",
+          "positive_negative_regressions": [
+            "Valid tightly packed and interleaved GLB attributes with NaN padding, indexed and non-indexed routes; all four slots exercise strided positive.",
+            "Converted GLB NaN position/UV, Inf normal, zero-length normal and strided NaN position negatives; all four slots source GLB NaN position/UV and zero normal negatives, SHA recomputed; tests wired into existing multicar workflow. No local Python execution claimed."
+          ],
+          "same_sha_ci": {
+            "sha": "74224448638577d67426169017606c5aeb33685b",
+            "runs": [
+              {
+                "id": 45476416912,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45476416922,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45476417327,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              }
+            ]
+          },
+          "render_trace": [
+            "validate_one -> evidence_file SHA -> glb_stats(source/converted) -> accessor -> material_binding -> inspect(final OVC) -> pbr_map_coverage. OVC already rejects nonfinite float and counts normals <=1e-12. No runtime renderer or admission change; final OVC geometry/material correspondence, scene reachability, actual texture decoding and human visual quality remain unproven."
+          ],
+          "protected_v003": "External automation branch only. No v0.03, game binaries, player ABI, launch, eye state, or deployment changes.",
+          "asset_validation": "Synthetic fixtures only; no actual licensed model promotion or private asset access; N100 unused.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; latest readable AI2 ledger 2901",
+          "next_trace": "Verify exact-SHA CI and outstanding unique scores; investigate reachable scene/node transforms and GLB-to-OVC geometry/material correspondence (including semantic PBR factors) before any optional exact-slot promotion. Rotate to graphics performance/stereo staging path next."
         }
       ],
-      "latest_material_sha": "f48176adfe7a9fc7042a4c754306354b0bcbb6f0",
-      "latest_static_ci": "Exact-SHA multicar Linux PASS; Windows build/package verification pending",
-      "next_focus": "Verify native eight rollback negatives and exact SHA Windows build/package. Trace reparse/hardlink isolation and recoverability after partial copy/remove; then return to per-eye glass sorting and isolated whole-car color/depth pair staging."
+      "latest_material_sha": "74224448638577d67426169017606c5aeb33685b",
+      "latest_static_ci": "Exact-SHA three workflows in progress; previous iteration 27 exact SHA all three SUCCESS",
+      "next_focus": "Verify exact-SHA CI and outstanding unique scores; investigate reachable scene/node transforms and GLB-to-OVC geometry/material correspondence (including semantic PBR factors) before any optional exact-slot promotion. Rotate to graphics performance/stereo staging path next."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 03:30:00+09:00",
+  "last_updated_kst": "2026-11-25 05:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
