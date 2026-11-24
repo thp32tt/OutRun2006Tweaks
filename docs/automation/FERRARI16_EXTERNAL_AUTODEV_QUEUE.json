@@ -843,7 +843,7 @@
         },
         {
           "cycle_key": "EXT16-011-20261124-1630-R33-INDEXED-XYZRHW-ATTEMPT",
-          "status": "PATCHED_FINAL_CI_PENDING_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_MULTICAR_BUILD_PACKAGE_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "Retail wrapper ABI preservation; alternate unresolved R30/R32/R33 indexed XYZRHW physical attempt vs decline",
           "source_material_sha": "891e5c5919dbb49b68cbb94dfe7c2b793745d2d9",
           "source_defect": "R30TryXyzrhwIndexedPrimitiveVB and R33 final dispatch overload E_NOTIMPL as pre-raster decline even after native indexed UP attempt. VB/IB restoration failure can also leave E_NOTIMPL interpreted as permission for lower draw. Duplicate physical raster or dirty-state fallback is possible; HMD symptom not proven.",
@@ -869,22 +869,22 @@
               {
                 "run_id": 45349094929,
                 "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
-                "status": "in_progress",
-                "conclusion": null,
-                "head_sha": "891e5c5919dbb49b68cbb94dfe7c2b793745d2d9"
-              },
-              {
-                "run_id": 45349094746,
-                "name": "Build",
-                "status": "in_progress",
-                "conclusion": null,
+                "status": "completed",
+                "conclusion": "success",
                 "head_sha": "891e5c5919dbb49b68cbb94dfe7c2b793745d2d9"
               },
               {
                 "run_id": 45349094787,
                 "name": "Ferrari16 All-Car Sidecar Regression",
-                "status": "in_progress",
-                "conclusion": null,
+                "status": "completed",
+                "conclusion": "success",
+                "head_sha": "891e5c5919dbb49b68cbb94dfe7c2b793745d2d9"
+              },
+              {
+                "run_id": 45349094746,
+                "name": "Build",
+                "status": "completed",
+                "conclusion": "success",
                 "head_sha": "891e5c5919dbb49b68cbb94dfe7c2b793745d2d9"
               }
             ]
@@ -893,7 +893,7 @@
           "protected_v003": "No release branch, player callback, launch or host source modified.",
           "asset_validation": "Private model SHA and all 16 actual UV/normal/PBR/glass/mesh/gauge validations remain unverified; no promotion or binary modification.",
           "runtime_validation": "UNTESTED",
-          "score_state": "PENDING_EXACT_SHA_CI_NO_NEW_SCORE",
+          "score_state": "NO_LEDGER_CHANGE_THIS_CYCLE",
           "next_trace": "Trace remaining FVF142 and F11 actual HRESULT sentinel paths across R30/R33 including pre-admission decline and projection/stream restore; separately prove retail body-only ABI before enabling external atomic staging. Verify current source exact-SHA CI and no duplicate score.",
           "source_commits": [
             "c7d0394bd16588f827b70cbf230f60d56660580a",
@@ -934,11 +934,68 @@
             ]
           },
           "initial_ci_analysis": "Initial exact SHA multicar C++ regressions, OVC smoke, production source assertions, official core/host unchanged, HLSL PASS; old renderer owner gate rejected R32 forwarding return type. Verified R32 cpp and two API headers against baseline: only exact return type and added include. Gate now requires complete byte equality after only those transformations; no unrestricted R32 allowance. First gate edit had malformed YAML from string replacement; corrected in final SHA. No CI skip."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-1700-FVF142-PAUSE-HUD-ATTEMPT",
+          "status": "PATCHED_EXACT_SHA_CI_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "v0.03 menu/fullscreen/OpenXR parity; FVF142 ESC pause, HUD, projected rank physical draw failure",
+          "source_material_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f",
+          "source_defect": "R30TryFixedFunctionOriginalSpriteStereo returns HRESULT E_NOTIMPL both for clean pre-admission decline and failed eye projection setup or raw physical draw. Four active R33 FVF142 call sites then fall through to XYZRHW/normal route, risking duplicate native draw or dirty projection state.",
+          "source_fix": "Typed Attempt<HRESULT> across R30 owner, four R30 support API bridges and four R33 draw hooks. Record leftRouteEntered before SetTransform, so attempted eye setup is handled even if raw draw never executes. AfterRoute preserves actual errors and rejects dirty projection rollback, allows clean pre-admission fallback only. Existing producer admission, matrices, restore, mono safety, PBR external fence and v0.03 launch/host unchanged.",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r30.cpp": "0552be21303183f64b9c4d5a203ed4d02c2f6f5b",
+            "src/vr/d3d9/stereo_renderer_r33.cpp": "a3565b3edee2e3ac980189941bdb7df084d02570",
+            "src/vr/core/r30_support_api.hpp": "b59043f639394853a14a0766ed35ecfd3fae1ab6",
+            "tests/stereo_lower_draw_result_test.cpp": "b1e9f3269c866513b668ef2c341f973b1fc82e70",
+            ".github/workflows/ferrari16-multicar-regression.yml": "b6e174474a7c9c04957ed478213abbbf8d2f5cf7"
+          },
+          "positive_negative_regressions": [
+            "Six new C++ assertions/cases: clean pre-admission decline fallback once; setup attempted E_NOTIMPL zero fallback with both restoration outcomes; dirty no-entry decline fails; success plus dirty restoration fails; existing failure preserved. Production source-order assertions on entry before SetTransform and rawDraw, restoration before outcome and all four handled dispatch gates. Baseline comparison still byte-exact except enumerated API signatures. No physical GPU fault injection claimed."
+          ],
+          "same_sha_ci": {
+            "sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f",
+            "runs": [
+              {
+                "run_id": 45352524003,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null,
+                "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
+              },
+              {
+                "run_id": 45352523978,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress",
+                "conclusion": null,
+                "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
+              },
+              {
+                "run_id": 45352523934,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success",
+                "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
+              },
+              {
+                "run_id": 45352523866,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null,
+                "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
+              }
+            ]
+          },
+          "baseline_trace": "GitHub compare 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 vs starting HEAD 2bdb9a83: protected Start-OutRun.cmd, vrhost, quest cockpit core unchanged; inspected isolated ALL-CARS, MODEL-OFF and PBR-TRACE launchers preserve hidden host prewarm, D3D9Ex, DirectGpuOnly, cadence=1, 2496x2688, HUD=.55, Menu=.75; actual fullscreen/foreground/VDXR runtime untested. No new evidence of host defect; do not alter it.",
+          "protected_v003": "No release, host, player wrapper, assets or launch scripts modified. Existing external live-DIP fence remains.",
+          "asset_validation": "All 16 private source/OVC mesh/UV/normal/PBR/real glass and gauges unverified; no assets changed/promoted.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "PENDING_EXACT_SHA_CI_NO_NEW_SCORE",
+          "next_trace": "Inspect F11 R30TryExternalImGuiIndexed and R32ReviewTryExternalImGuiIndexed HRESULT/restore path, then remaining Primitive/UP XYZRHW and whole-car atomic staging; verify exact SHA CI. Preserve stock original ABI and 16 model rights."
         }
       ],
-      "latest_material_sha": "891e5c5919dbb49b68cbb94dfe7c2b793745d2d9",
-      "latest_static_ci": "FINAL_EXACT_SHA_CI_PENDING",
-      "next_focus": "Trace remaining FVF142 and F11 actual HRESULT sentinel paths across R30/R33 including pre-admission decline and projection/stream restore; separately prove retail body-only ABI before enabling external atomic staging. Verify current source exact-SHA CI and no duplicate score."
+      "latest_material_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f",
+      "latest_static_ci": "EXACT_SOURCE_SHA_CI_PENDING",
+      "next_focus": "Inspect F11 R30TryExternalImGuiIndexed and R32ReviewTryExternalImGuiIndexed HRESULT/restore path, then remaining Primitive/UP XYZRHW and whole-car atomic staging; verify exact SHA CI. Preserve stock original ABI and 16 model rights."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
