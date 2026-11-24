@@ -2214,7 +2214,7 @@
           "protected_v003": "Only external automation branch modified; original wrapper body unchanged, no stable release, v0.03 launch/host, PBR shader, model bytes, rights, or deployment changes.",
           "asset_validation": "Synthetic logic only; no real car/OVC or HMD validation; N100 unused.",
           "runtime_validation": "UNTESTED",
-          "score_state": "EXACT_SHA_CI_SUCCESS_UNCREDITED; ledger blob 63b798b9a5b8d8cf13114fd5c15d8b7cda018c82 confirmed AI2 2904 and no prior gear SHA; 2MB contents connector empty, N100 gh unavailable; no score write confirmed",
+          "score_state": "CREDITED_ONCE_AI2_2904_PLUS_1_EQUALS_2905_LEDGER_9f445a9ea8fa80c03fe7aa68be995d51c1f5108f",
           "next_trace": "Check exact SHA CI including HUD Inspector. Rotate to pair color/depth staging and body-only ABI boundary, inspect live stock rendering versus v0.03 with new counterexamples; no live external admission until isolated pair proof.",
           "followup_exact_sha_ci": {
             "sha": "bae4ca8ae807671fec7677cda905b4fb20a94b7b",
@@ -2291,7 +2291,7 @@
           "protected_v003": "Automation branch only. No stock player wrapper, original release, x86 ABI, PBR shader, host, menu, licensed assets or deployment modifications. N100 read-only GitHub CI/score API only.",
           "asset_validation": "Synthetic tests, no actual 16 model validation or promotion",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_CREDIT_WINDOWS_CI_FAILED; repair included in iteration32; exact SHA revalidation pending",
+          "score_state": "CREDITED_ONCE_AFTER_R13_REPAIR_AI2_2905_PLUS_1_EQUALS_2906_LEDGER_9f445a9ea8fa80c03fe7aa68be995d51c1f5108f",
           "next_trace": "Trace right-depth bootstrap after unmirrored writes or partial clears, and failed RT/depth/viewport restore propagation across R7/R29/R30/R33. Implement isolated whole-vehicle L/R color+depth ownership and real right-eye failure proof only when safe; preserve stock wrapper and fail-closed external admission. Verify exact SHA CI and reconcile outstanding unique scores.",
           "followup_exact_sha_ci": {
             "sha": "7c5ba56609f5aa7ac4c0151c3cd02dc49f0dad4a",
@@ -2311,6 +2311,28 @@
             ],
             "conclusion": "failure",
             "detail": "Windows compiler C2065 in R13 lines 411-412 stale names of R7 clear epoch/flags after stamp refactor. Corrected in iteration 32; do not credit failed SHA."
+          },
+          "integrated_exact_sha_ci": {
+            "sha": "329ddbe9e8c4135d88cc953b8f66542f001d17d9",
+            "runs": [
+              {
+                "id": 45496877258,
+                "conclusion": "success"
+              },
+              {
+                "id": 45496876961,
+                "conclusion": "success"
+              },
+              {
+                "id": 45496876805,
+                "conclusion": "success"
+              },
+              {
+                "id": 45496876701,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
           }
         },
         {
@@ -2365,20 +2387,104 @@
           "protected_v003": "Automation branch only, original release, native callback, ABI, PBR shaders, menus, host, private models, rights and deployment untouched. Existing scope restrictions preserved; exact R13 transformation added, no CI skip. N100 used only for read-only CI run lookup.",
           "asset_validation": "Synthetic only; actual sixteen models not verified or promoted",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; last confirmed 2904; iter30 success uncredited, iter31 failed and repaired in iter32",
-          "next_trace": "Inspect R7/R29/R30/R33 right-depth bootstrap restore-failure propagation and same-surface Clear receipt after intervening writes; prove safe native fallback before any real external activation. Verify iteration32 exact-SHA Windows CI, then reconcile unique score including pending iteration30. No atomic stage admission without true bilateral color/depth ownership and real GPU failure evidence."
+          "score_state": "CREDITED_ONCE_AI2_2906_PLUS_1_EQUALS_2907_LEDGER_9f445a9ea8fa80c03fe7aa68be995d51c1f5108f",
+          "next_trace": "Inspect R7/R29/R30/R33 right-depth bootstrap restore-failure propagation and same-surface Clear receipt after intervening writes; prove safe native fallback before any real external activation. Verify iteration32 exact-SHA Windows CI, then reconcile unique score including pending iteration30. No atomic stage admission without true bilateral color/depth ownership and real GPU failure evidence.",
+          "followup_exact_sha_ci": {
+            "sha": "329ddbe9e8c4135d88cc953b8f66542f001d17d9",
+            "runs": [
+              {
+                "id": 45496877258,
+                "conclusion": "success"
+              },
+              {
+                "id": 45496876961,
+                "conclusion": "success"
+              },
+              {
+                "id": 45496876805,
+                "conclusion": "success"
+              },
+              {
+                "id": 45496876701,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER33-RETAIL-FULL-WRAPPER-ABI",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Retail x86 body wrapper ABI 46BD30/469600 and preserve stock native callback",
+          "source_material_sha": "09cf633777496fb72caa067c7815973e714fc86b",
+          "source_blob_sha1": {
+            "src/vr/game/external_car_original_wrapper_contract.hpp": "17bbc727c59b2a0f353b6daa94d341723023f6b3",
+            "src/hooks_graphics.cpp": "e0bbc3739fdefe8afd389342072409007279e08e",
+            "tests/external_car_original_wrapper_contract_test.cpp": "95cb617efba11b4651184f69c0baa605f6301612",
+            "tools/ferrari16/verify_original_player_callback_abi.py": "effb314530f81b77e89de73ab1b33dd1e161569c",
+            ".github/workflows/ferrari16-multicar-regression.yml": "0b3928846bde8ec6ad748bbf57aaa178963b4cdb"
+          },
+          "source_defect": "Prior 24-byte runtime/offline signature ended mid ADD ESP, so an altered stack cleanup, POP ESI or RET passed the live hook admission. Runtime checked wrapper but not 49A650 RET despite offline attestation. Exact canonical binary confirms 27-byte wrapper ending 83 C4 0C 5E C3 and 49A650 C3.",
+          "source_fix": "One canonical 27-byte signature in shared header; validate full readable span and separately readable follow-up RET live before creating hook. Offline exact SHA verifier checks full wrapper plus RET; old 24-byte truncation and corrupt cleanup/return rejected. Full stock player trampoline and atomic stage fence unchanged.",
+          "positive_negative_regressions": [
+            "256 synthetic slot/wrapper/follow-up validity/readability combinations plus mutated epilogue bytes, null callee and truncated signature; short-circuit rejects unreadable wrapper before followup read.",
+            "Python self-test mutates wrapper epilogue and RET, including truncation. CI checks actual hook admission before hook creation and preserves full player call. Canonical EXE read-only sample SHA verified; no EXE stored or published."
+          ],
+          "same_sha_ci": {
+            "sha": "09cf633777496fb72caa067c7815973e714fc86b",
+            "runs": [
+              {
+                "id": 45501773859,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "conclusion": "success"
+              },
+              {
+                "id": 45501773857,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45501773888,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45501773979,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "retail_evidence": {
+            "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+            "canonical_size": 3674112,
+            "wrapper_va": "0x49F3E0",
+            "wrapper_epilogue": "83 C4 0C 5E C3",
+            "followup_va": "0x49A650",
+            "followup_byte": "C3",
+            "first_va": "0x46BD30",
+            "model_va": "0x469600",
+            "reference": "r4dius/outrun2-decomp@e1e1c592 src/platform/pc_vehicle_display.cpp:71-104 (blob 45b601c4c8cc27c74c2f3e72b6c6171907c6b87c); src/platform/vehicle_model_draw.cpp:386-432 (blob df9c61a0d764ae8990115cfeaef7e0110ddb5914)",
+            "scope": "46BD30 invokes 469600; 469600 uses multiple PMT draw leaves 405360/4056D0 and shadow leaves 422550/422740. No independently verified body-only ownership; no suppression or new hook."
+          },
+          "protected_v003": "Only automation branch, no stable release, original callback body, passenger hooks, PBR shader, menus/host, model bytes, license or deployment change. Runtime gate tightened for unverified executable variants; canonical EXE signature matches. N100 used for one bounded approved upstream EXE read in memory and read-only CI query, no build.",
+          "asset_validation": "Synthetic tests only; actual 16 models and per-car PBR not certified.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; previous three independent fixes credited once ledger 9f445a9ea8fa80c03fe7aa68be995d51c1f5108f confirmed AI2 2907",
+          "next_trace": "Trace 469600 layout+0 PMT body candidate to exact per-car draw entry material/queue consumers; prove isolated body ownership independent of wheels, shadows, stock dashboard, passengers and glass, and preserve complete 49F3E0 wrapper. Rotate to actual OVC/PBR material-to-mesh correspondence if body leaf proof unavailable; verify current exact-SHA CI and do not enable external raster without isolated bilateral staging."
         }
       ],
-      "latest_material_sha": "329ddbe9e8c4135d88cc953b8f66542f001d17d9",
-      "latest_static_ci": "Iteration32 exact-SHA Windows + sidecar/HUD runs pending; iteration31 failed Windows builds (R13 references) corrected",
-      "next_focus": "Inspect R7/R29/R30/R33 right-depth bootstrap restore-failure propagation and same-surface Clear receipt after intervening writes; prove safe native fallback before any real external activation. Verify iteration32 exact-SHA Windows CI, then reconcile unique score including pending iteration30. No atomic stage admission without true bilateral color/depth ownership and real GPU failure evidence."
+      "latest_material_sha": "09cf633777496fb72caa067c7815973e714fc86b",
+      "latest_static_ci": "Iteration33 multicar/HLSL success, Windows/HUD/package pending; iteration30 and integrated 31/32 all exact-SHA CI success and credited once",
+      "next_focus": "Trace 469600 layout+0 PMT body candidate to exact per-car draw entry material/queue consumers; prove isolated body ownership independent of wheels, shadows, stock dashboard, passengers and glass, and preserve complete 49F3E0 wrapper. Rotate to actual OVC/PBR material-to-mesh correspondence if body leaf proof unavailable; verify current exact-SHA CI and do not enable external raster without isolated bilateral staging."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 07:00:00+09:00",
+  "last_updated_kst": "2026-11-25 07:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
