@@ -136,10 +136,15 @@ inline float DashboardAngle(
     if(!telemetry.valid || binding.kind==DashboardKind::GearVisible)return 0.f;
     const float value=binding.kind==DashboardKind::SpeedNeedle ?
         telemetry.speedKph:telemetry.rpm;
-    const float u=std::clamp((value-binding.inputMin)/
-        (binding.inputMax-binding.inputMin),0.f,1.f);
-    return binding.angleMinRad+
-        (binding.angleMaxRad-binding.angleMinRad)*u;
+    // Every finite float calibration accepted by the OVC parser must
+    // interpolate without float overflow (e.g. -FLT_MAX to +FLT_MAX).
+    const double lo=binding.inputMin,hi=binding.inputMax;
+    if(!std::isfinite(value) || !std::isfinite(lo) ||
+       !std::isfinite(hi) || !(hi>lo))return 0.f;
+    const double u=std::clamp((static_cast<double>(value)-lo)/
+        (hi-lo),0.0,1.0);
+    return static_cast<float>(binding.angleMinRad+
+        (static_cast<double>(binding.angleMaxRad)-binding.angleMinRad)*u);
 }
 
 using DashboardMatrix=std::array<float,16>;
@@ -163,8 +168,16 @@ inline DashboardMatrix DashboardLocalRotation(
     const DashboardBinding& b,const DashboardTelemetry& t) noexcept
 {
     const float angle=DashboardAngle(b,t);
-    if(std::fabs(angle)<1e-8f)return DashboardIdentity();
-    const float x=b.axis[0],y=b.axis[1],z=b.axis[2];
+    if(!std::isfinite(angle) || std::fabs(angle)<1e-8f)
+        return DashboardIdentity();
+    // ValidDashboardBinding deliberately accepts small axis length errors
+    // from exported assets. Rodrigues requires a unit axis: otherwise the
+    // needle scales/shears and changes length instead of rotating rigidly.
+    const float len2=b.axis[0]*b.axis[0]+b.axis[1]*b.axis[1]+b.axis[2]*b.axis[2];
+    if(!std::isfinite(len2) || len2<0.9801f || len2>1.0201f)
+        return DashboardIdentity();
+    const float invLen=1.f/std::sqrt(len2);
+    const float x=b.axis[0]*invLen,y=b.axis[1]*invLen,z=b.axis[2]*invLen;
     const float c=std::cos(angle),s=std::sin(angle),q=1.f-c;
     // Row-vector Rodrigues matrix (D3D9/D3DX convention).
     DashboardMatrix r{{q*x*x+c,   q*x*y+s*z, q*x*z-s*y, 0.f,

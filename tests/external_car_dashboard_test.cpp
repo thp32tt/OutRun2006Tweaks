@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <limits>
 
 using namespace OutRunVR::DinoSidecar;
 
@@ -81,6 +82,55 @@ int main() {
     assert(!DashboardOverlayMeshVisible(&gear,wrongGear,DashboardBothNeedles));
     DashboardTelemetry invalidTelemetry{};
     assert(!DashboardOverlayMeshVisible(&gear,invalidTelemetry,0u));
+
+    // A tolerated exporter length error must not scale/shear a needle.
+    // Compare every element to the same pivot rotation about a unit axis.
+    for(const auto kind : {DashboardKind::SpeedNeedle,DashboardKind::RpmNeedle}) {
+        DashboardBinding unit=pivot;
+        unit.kind=kind;
+        unit.axis={{0.6f,0.8f,0.f}};
+        unit.pivot={{1.f,-2.f,3.f}};
+        unit.angleMinRad=-halfPi;unit.angleMaxRad=halfPi;
+        const auto sample=SanitizeDashboardTelemetry(1.f,1u,1u);
+        const auto expected=DashboardLocalRotation(unit,sample);
+        assert(ValidDashboardBinding(unit,3));
+        for(float scale : {0.995f,1.f,1.005f}) {
+            auto perturbed=unit;
+            for(float& a:perturbed.axis)a*=scale;
+            assert(ValidDashboardBinding(perturbed,3));
+            const auto actual=DashboardLocalRotation(perturbed,sample);
+            for(unsigned j=0;j<16;++j)assert(Near(actual[j],expected[j]));
+            // Unit rows, perpendicular rows, and unchanged pivot.
+            for(unsigned row=0;row<3;++row) {
+                for(unsigned col=0;col<3;++col) {
+                    float dot=0.f;
+                    for(unsigned k=0;k<3;++k)
+                        dot+=actual[4*row+k]*actual[4*col+k];
+                    assert(Near(dot,row==col?1.f:0.f));
+                }
+                float point=actual[12+row];
+                for(unsigned k=0;k<3;++k)point+=unit.pivot[k]*actual[4*k+row];
+                assert(Near(point,unit.pivot[row]));
+            }
+        }
+        // Negative: zero/out-of-tolerance axes never produce a bad matrix.
+        for(float scale : {0.f,0.5f,1.1f}) {
+            auto badAxis=unit;
+            for(float& a:badAxis.axis)a*=scale;
+            assert(!ValidDashboardBinding(badAxis,3));
+            assert(DashboardLocalRotation(badAxis,sample)==DashboardIdentity());
+        }
+        // Valid, extreme finite float32 calibration previously overflowed
+        // its denominator to infinity and returned the minimum angle.
+        auto wide=unit;
+        wide.inputMin=-(std::numeric_limits<float>::max)();
+        wide.inputMax=(std::numeric_limits<float>::max)();
+        assert(ValidDashboardBinding(wide,3));
+        assert(Near(DashboardAngle(wide,sample),0.f));
+        wide.inputMin=wide.inputMax;
+        assert(!ValidDashboardBinding(wide,3));
+        assert(DashboardAngle(wide,sample)==0.f);
+    }
 
     speed.axis={{0.f,0.f,0.5f}};
     assert(!ValidDashboardBinding(speed,3));
