@@ -157,7 +157,6 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
     gh=bridge.gh
     pointer,_=await asyncio.to_thread(gh.read_json,QROOT+"/latest.json",BRANCH)
     if pointer is None:return None
-    archive,doc=await asyncio.to_thread(fetch_evidence,pointer,home,token)
     rel=QROOT+"/visual/run-"+str(pointer["run_id"])+".json"
     state,etag=await asyncio.to_thread(gh.read_json,rel,BRANCH)
     if state is None:
@@ -165,13 +164,19 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
                "manifest_sha256":pointer["manifest_sha256"],"records":{}}
     if state.get("run_id")!=pointer["run_id"] or state.get("manifest_sha256")!=pointer["manifest_sha256"]:
         raise ValueError("ATLAS_STATE_POINTER_MISMATCH")
-    records=state["records"]; byid={t["task_id"]:t for t in doc["tasks"]}
+    records=state["records"]
+    terminal={"DONE","HOLD_SEND_UNCERTAIN","HOLD_RESPONSE_TIMEOUT"}
+    if len(records)==104 and all(x.get("status") in terminal for x in records.values()):
+        return None
+    archive,doc=await asyncio.to_thread(fetch_evidence,pointer,home,token)
+    byid={t["task_id"]:t for t in doc["tasks"]}
     if not set(records)<=set(byid):raise ValueError("ATLAS_STATE_TASK_MISMATCH")
     async def save():
         nonlocal etag
         await asyncio.to_thread(gh.write_json,rel,BRANCH,state,etag,etag is not None)
         saved,etag=await asyncio.to_thread(gh.read_json,rel,BRANCH)
         if saved!=state:raise ValueError("ATLAS_STATE_READBACK")
+    reviewed=None
     for tid,rec in records.items():
         if rec.get("status")=="CLAIMED":
             # Crash between claim and verified send: never silently re-send.
@@ -184,14 +189,22 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
             if pg is None:return {"status":"ATLAS_WAIT_LOGIN_OR_CHAT","task_id":tid}
             parts=await pg.locator('[data-markdown-text-tone="assistant"],[data-message-author-role="assistant"]').all_inner_texts()
             decision=parse_decision("\n".join(parts[-3:]),byid[tid])
-            if decision is None:return {"status":"ATLAS_WAIT_EXACT_JSON","task_id":tid}
+            if decision is None:
+                rec["wait_polls"]=int(rec.get("wait_polls",0))+1
+                if rec["wait_polls"]>=6:
+                    rec["status"]="HOLD_RESPONSE_TIMEOUT"
+                    await save()
+                    return {"status":"ATLAS_RESPONSE_TIMEOUT_RECORDED","task_id":tid}
+                await save()
+                return {"status":"ATLAS_WAIT_EXACT_JSON","task_id":tid}
             rec.update(status="DONE",decision=decision);await save()
-            return {"status":"ATLAS_REVIEW_SAVED","task_id":tid,"decision":decision["decision"],"completed":sum(x["status"]=="DONE" for x in records.values()),"total":104}
+            reviewed={"task_id":tid,"decision":decision["decision"]}
+            break
     t=next((x for x in doc["tasks"] if x["task_id"] not in records),None)
     if t is None:
         # Preserve explicit uncertain receipts. Existing A/B loop can resume;
         # only all-104 DONE permits the feedback generation.
-        return None
+        return {"status":"ATLAS_LAST_REVIEW_SAVED","reviewed":reviewed,"completed":sum(x["status"]=="DONE" for x in records.values()),"total":104} if reviewed else None
     pg=await bridge.page("C1")
     if pg is None:return {"status":"ATLAS_WAIT_LOGIN"}
     paths=await asyncio.to_thread(stage_images,archive,t,home)
@@ -207,4 +220,4 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
         del records[tid]
     else:rec.update(status="HOLD_SEND_UNCERTAIN",send_outcome=outcome)
     await save()
-    return {"status":"ATLAS_"+outcome,"task_id":tid,"completed":sum(x["status"]=="DONE" for x in records.values()),"total":104}
+    return {"status":"ATLAS_"+outcome,"task_id":tid,"reviewed":reviewed,"completed":sum(x["status"]=="DONE" for x in records.values()),"total":104}
