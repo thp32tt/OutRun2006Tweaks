@@ -15,12 +15,23 @@ int main() {
     assert(DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp));
     rv[12]=0.f;
     rp[8]=0.012f; // canted/asymmetric eye projection
-    assert(DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp));
+    assert(!DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp)); // zero IPD, projection-only
     rp[8]=0.f;
     assert(!DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp));
     assert(!DistinctFiniteExternalEyeTransforms(nullptr,rv,lp,rp));
     rv[0]=std::numeric_limits<float>::quiet_NaN();
     assert(!DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp));
-    rv[0]=lv[0];rp[11]=std::numeric_limits<float>::infinity();
+    rv[0]=lv[0];
+    rv[12]=1.e-8f; // numerical jitter cannot be eye baseline
+    assert(!DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp));
+    rv[12]=0.f;
+    rv[0]=0.f;rv[1]=1.f;rv[4]=-1.f;rv[5]=0.f;
+    assert(!DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp)); // orientation-only
+    rv[12]=0.032f;
+    assert(DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp)); // rotated + real baseline
+    rv[3]=0.1f;
+    assert(!DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp)); // invalid affine eye
+    rv[3]=0.f;
+    rp[11]=std::numeric_limits<float>::infinity();
     assert(!DistinctFiniteExternalEyeTransforms(lv,rv,lp,rp));
 }

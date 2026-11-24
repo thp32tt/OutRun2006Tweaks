@@ -23,6 +23,8 @@ jobs:
           if($LASTEXITCODE -ne 0){throw 'Package tamper gate failed'}
           python tests/ferrari16_launcher_isolation_test.py
           if($LASTEXITCODE -ne 0){throw 'Tamper tests failed'}
+          python tools/ferrari16/v003_parity_gate.py --self-test
+          if($LASTEXITCODE -ne 0){throw 'v0.03 parity gate failed'}
       - name: Windows PowerShell 5.1 syntax gates
         shell: powershell
         run: |
