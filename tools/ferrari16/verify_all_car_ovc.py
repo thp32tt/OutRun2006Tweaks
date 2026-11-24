@@ -110,6 +110,8 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     zero_normals = 0
     # Match the runtime's exact glass tag; all other mesh materials are
     # opaque and must own their own PBR maps for strict map certification.
+    used_materials: set[int] = set()
+    incomplete_albedo_mips: set[int] = set()
     opaque_materials: set[int] = set()
     usable_uv_materials: set[int] = set()
     invalid_uv_materials: set[int] = set()
@@ -133,6 +135,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
         name = data[at:at + name_bytes]
         require(b"\x00" not in name and (version != 1 or name[:3] == b"LHD"),
                 "mesh identity")
+        used_materials.add(material)
         is_glass = name.startswith((b"F50_GLASS_", b"EXT_GLASS_"))
         if not is_glass:
             opaque_materials.add(material)
@@ -183,10 +186,15 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
         require(gpu_bytes <= MAX_GPU and total_v <= vertices and
                 total_tris <= tris, "mesh cumulative budget")
     require(total_v == vertices and total_tris == tris, "mesh totals mismatch")
-    for _ in range(materials):
+    for material_id in range(materials):
         length = u32(data, at)
         at += 4
         dds_length(data, at, length, version == 1)
+        # Albedo is sampled for both opaque and glass groups. A valid
+        # short mip chain can render, but must not earn strict HQ approval.
+        height, width, mips = (u32(data, at + k) for k in (12, 16, 28))
+        if mips != max(width, height).bit_length():
+            incomplete_albedo_mips.add(material_id)
         at += length
         gpu_bytes += length
         require(gpu_bytes <= MAX_GPU, "albedo GPU budget")
@@ -266,6 +274,8 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
         version, opaque_materials, normal_materials, orm_materials,
         usable_uv_materials, invalid_uv_materials,
         incomplete_mips_materials)
+    uncovered["incomplete_albedo_mips"] = sorted(
+        used_materials & incomplete_albedo_mips)
     return {"version": version, "groups": groups, "triangles": tris,
             "vertices": vertices, "materials": materials,
             "normal_maps": normal_maps, "orm_maps": orm_maps,
@@ -441,6 +451,21 @@ def self_test() -> None:
         assert short_details["pbr_uncovered"]["incomplete_pbr_mips"] == [0]
         assert not pbr_map_coverage(short_details), (
             "CRC-valid truncated normal DDS mip chain passed strict PBR")
+        # The same valid short DDS as ALBEDO must also fail the HQ gate.
+        # Complete 4x4/2x2/1x1 chain must pass with identical PBR maps.
+        full_albedo = bytearray(short_mip_dds) + bytearray(20)
+        struct.pack_into("<I", full_albedo, 28, 3)
+        for albedo, expected in ((short_mip_dds, False), (full_albedo, True)):
+            fixture = (group + struct.pack("<I", len(albedo)) + albedo
+                       + mapped[len(group) + 4 + len(dds):])
+            fixture_header = b"OVRCABH4" + struct.pack(
+                "<7I", 4, 1, 1, 3, 1, len(fixture),
+                zlib.crc32(fixture) & 0xffffffff)
+            path.write_bytes(fixture_header + fixture)
+            details = inspect(path)
+            assert details["pbr_uncovered"]["incomplete_albedo_mips"] == (
+                [] if expected else [0])
+            assert pbr_map_coverage(details) == expected
         # A valid CRC and two populated PBR DDS maps are insufficient when
         # every triangle's UV determinant is zero: the shader cannot build TBN.
         no_uv = bytearray(mapped)

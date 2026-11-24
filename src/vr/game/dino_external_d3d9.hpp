@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include "dino_external_sidecar.hpp"
+#include "external_car_dds_upload.hpp"
 #include "external_car_normal_repair.hpp"
 #include "external_car_ground.hpp"
 #include "external_car_draw_order.hpp"
@@ -165,8 +166,10 @@ class GpuOwner final {
             texture.format==TextureFormat::DXT5?16u:0u;
         IDirect3DTexture9* staging=nullptr;
         if(FAILED(dev->CreateTexture(texture.width,texture.height,texture.mips,0,
-                                     format,D3DPOOL_SYSTEMMEM,&staging,nullptr))||!staging)
+                                     format,D3DPOOL_SYSTEMMEM,&staging,nullptr))||!staging) {
+            if(staging)staging->Release();
             return false;
+        }
         std::size_t pos=128;
         for(UINT mip=0;mip<texture.mips;++mip) {
             const unsigned width=(texture.width>>mip)?(texture.width>>mip):1u;
@@ -181,14 +184,15 @@ class GpuOwner final {
             if(FAILED(staging->LockRect(mip,&locked,nullptr,0))) {
                 staging->Release();return false;
             }
-            if(!locked.pBits || locked.Pitch<static_cast<INT>(row)) {
-                staging->UnlockRect(mip);staging->Release();return false;
+            // A successful LockRect must be paired with exactly one unlock.
+            // Failed unlock means this mip was not safely committed: never
+            // allocate/publish the default-pool texture from this staging data.
+            if(!CopyAndUnlockDdsMip(locked.pBits,locked.Pitch,
+                    texture.dds.data()+pos,rows,row,[&]() noexcept {
+                        return SUCCEEDED(staging->UnlockRect(mip));
+                    })) {
+                staging->Release();return false;
             }
-            for(unsigned y=0;y<rows;++y)
-                std::memcpy(static_cast<std::uint8_t*>(locked.pBits)+
-                            std::size_t(locked.Pitch)*y,
-                            texture.dds.data()+pos+std::size_t(row)*y,row);
-            staging->UnlockRect(mip);
             pos+=std::size_t(rows)*row;
         }
         HRESULT hr=dev->CreateTexture(texture.width,texture.height,texture.mips,0,
