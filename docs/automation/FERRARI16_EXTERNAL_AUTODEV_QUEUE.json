@@ -1848,7 +1848,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER25-DDS-2D-RESOURCE-CONTRACT",
-          "status": "PATCHED_MULTICAR_JOB_PASS_WINDOWS_CI_PENDING_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "OVC4 mesh/material integrity, DDS mip chains, per-material normal/ORM and CRC",
           "source_material_sha": "7d117432d44b03697baa04a098ef5a718a330002",
           "source_blob_sha1": {
@@ -1867,20 +1867,20 @@
             "sha": "7d117432d44b03697baa04a098ef5a718a330002",
             "runs": [
               {
-                "id": 45460732466,
-                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
-                "status": "in_progress",
-                "conclusion": null
+                "id": 45460732735,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "id": 45460732444,
                 "name": "Build",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               },
               {
-                "id": 45460732735,
-                "name": "Ferrari16 All-Car Sidecar Regression",
+                "id": 45460732466,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
                 "status": "completed",
                 "conclusion": "success"
               }
@@ -1895,13 +1895,74 @@
           ],
           "asset_validation": "Synthetic fixtures only; no private model/OVC/DDS bytes, rights, dashboard appearance, exact variant or HMD claims; no N100 use.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "score_state": "CREDITED_ONCE_AI2_2899_PLUS_1_EQUALS_2900_LEDGER_6e6489a2e5691f05298a210340e28ca585e52f24",
           "next_trace": "Check exact-SHA Windows x86/x64 and HLSL completion; inspect DDS BC1 alpha/normal semantics and per-material texture role validation, then actual licensed OVC private hashes when available. Preserve stock callback and investigate atomic whole-car L/R color+depth staging."
+        },
+        {
+          "cycle_key": "EXT16-011-ITER26-GLASS-TEXTURE-ROUTING-STATE",
+          "status": "PATCHED_MULTICAR_HLSL_PASS_WINDOWS_CI_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "Glass transparency and PBR shading: alpha sort in both eyes, normal-map shader paths, reflections and depth write regression",
+          "source_material_sha": "5b561a24caa49f8daceafd1aeb0e119e246c5cfd",
+          "source_blob_sha1": {
+            ".github/workflows/ferrari16-multicar-regression.yml": "501ca912255fc877992758575e31c7e6e71c0a1a",
+            "src/vr/game/dino_external_d3d9.hpp": "1440cece9b2dd930b38b2be8d78ec352140d8373",
+            "src/vr/game/external_car_draw_order.hpp": "3c1101412beaca6cef64e8cd69cd7b86ed654bea",
+            "tests/external_car_draw_order_test.cpp": "c1de241ac8601d30b4de9db13603924c50933cfc"
+          },
+          "source_defect": "DrawNativeScene left stage-0 D3DTSS_RESULTARG inherited even though stage 1 is disabled; D3D9 final color/alpha comes from CURRENT, not TEMP. It also left D3DRS_WRAP0/1/2 inherited; these are interpolation wrapping, not sampler addressing, and PBR TEXCOORD0/1/2 are world position, world normal and UV. Counterexample is a legal inherited state, not measured on the user's headset.",
+          "source_fix": "ConfigureExternalTextureRouting before any draw, under existing captured state: stage 0 CURRENT, WRAP0/1/2 zero; propagate first setter failure into E_FAIL/no DIP; preserve sampler ADDRESS_WRAP, opaque then glass, glass ZWRITE FALSE, blend ADD, original state-block Apply and atomic stage fence.",
+          "positive_negative_regressions": [
+            "Compiled portable helper transaction in existing draw-order test: 16 repeated slot cases x 16 inherited states x 5 setter outcomes = 1280 synthetic combinations; 256 success and 1024 failure. Test simulates state restoration; no actual D3D stateblock fault injection.",
+            "Production source order assertions in existing CI guard: capture before routing, exact four state writes, route before guarded draws, Apply after DIP, original atomic stage guard and glass depth/alpha unchanged.",
+            "Exact source multicar Linux job 138700056615 SUCCESS; Windows PBR HLSL job 138700057166 SUCCESS. No local full suite run."
+          ],
+          "same_sha_ci": {
+            "sha": "5b561a24caa49f8daceafd1aeb0e119e246c5cfd",
+            "runs": [
+              {
+                "id": 45465747985,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45465747978,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45465748157,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ],
+            "multicar_job": 138700056615,
+            "multicar_job_status": "success",
+            "pbr_hlsl_job": 138700057166,
+            "pbr_hlsl_status": "success"
+          },
+          "render_trace": [
+            "DrawNativeScene currently exits before EnsureResources because isolated pair stage is absent; no actual external raster admitted. If staged in future, stateblock Capture -> routing/texture stage and sampler setup -> PBR Bind -> centroid sort from latched center view -> opaque depth-writing then glass source-over with no depth write -> per-mesh shader eye scope -> DIP -> stateblock Apply.",
+            "Glass order uses center camera and unanimated world, not independently sorted per physical eye; parallel eyes usually preserve ordering, canted views or animated geometry may not. Do not claim independent eye sorting or activate live draw to test.",
+            "SM3 normal-map/ORM and per-eye c4/c8/c1 uploads untouched; no real environment reflection map or glass visual verification. Current PBR HLSL is direct light plus ambient, not proof of full reflection quality."
+          ],
+          "references": [
+            "https://learn.microsoft.com/windows/win32/direct3d9/d3dtexturestagestatetype",
+            "https://learn.microsoft.com/en-us/windows/win32/direct3d9/texture-wrapping",
+            "https://learn.microsoft.com/en-us/windows/win32/direct3d9/texture-addressing-modes"
+          ],
+          "protected_v003": "External automation branch only; no stable release, host, launcher, player ABI, model bytes or rights change.",
+          "asset_validation": "No private actual model/OVC/DDS or Quest3; synthetic tests only; N100 unused.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Verify remaining exact-SHA Windows build/package and score once. Trace animated-world glass sort and per-eye camera depth ordering, then design isolated pair color/depth staging without opening existing live raster fence; inspect PBR TBN/ORM semantic quality independently."
         }
       ],
-      "latest_material_sha": "7d117432d44b03697baa04a098ef5a718a330002",
-      "latest_static_ci": "Exact-SHA Linux multicar job PASS; Windows x86/x64 and HLSL pending",
-      "next_focus": "Check exact-SHA Windows x86/x64 and HLSL completion; inspect DDS BC1 alpha/normal semantics and per-material texture role validation, then actual licensed OVC private hashes when available. Preserve stock callback and investigate atomic whole-car L/R color+depth staging."
+      "latest_material_sha": "5b561a24caa49f8daceafd1aeb0e119e246c5cfd",
+      "latest_static_ci": "Exact-SHA multicar + Windows HLSL SUCCESS; Win32 build and x86/x64 package pending",
+      "next_focus": "Verify remaining exact-SHA Windows build/package and score once. Trace animated-world glass sort and per-eye camera depth ordering, then design isolated pair color/depth staging without opening existing live raster fence; inspect PBR TBN/ORM semantic quality independently."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
