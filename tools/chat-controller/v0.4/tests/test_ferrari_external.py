@@ -144,5 +144,117 @@ class ExternalModelCycleTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(q["ferrari_external_simple_A"]["last_task_id"], "EXT16-001")
 
 
+
+class ContinuousDebugTests(unittest.TestCase):
+    def test_hmd_stage_falls_back_to_perpetual_debug_without_claiming_hmd(self):
+        q = fixture()
+        q["work"].append({"id": "EXT16-006", "stage": "hardware_qa",
+                          "status": "QUEUED", "requires_user_headset": True})
+        q["work"].append({"id": "EXT16-011", "stage": "source_fix",
+                          "status": "ACTIVE", "continuous_debug": True,
+                          "title": "repeat debug", "acceptance": ["real tests"]})
+        q["active_work_id"] = "EXT16-006"
+        q["continuous_debug_policy"] = {"enabled": True, "work_id": "EXT16-011",
+                                        "focus_rotation": ["eyes", "PBR"]}
+        self.assertIsNone(_module.choose_external_work(q, REPO, BRANCH))
+        work = _module.choose_continuous_debug_work(q, REPO, BRANCH)
+        self.assertEqual(work["id"], "EXT16-011")
+        self.assertFalse(work.get("requires_user_headset", False))
+        self.assertEqual(q["active_work_id"], "EXT16-006")
+        prompt = _module.make_external_prompt(work, q, "a"*40, True, 7, "PBR")
+        self.assertIn("DEBUG_ITERATION=7", prompt)
+        self.assertIn("ROTATING_FOCUS=PBR", prompt)
+        self.assertIn("커밋이 없어도", prompt)
+        self.assertIn("EXT16-011", prompt)
+
+    def test_blocked_continuous_task_still_available_for_next_debug_cycle(self):
+        q = fixture()
+        q["active_work_id"] = "EXT16-011"
+        q["work"].append({"id": "EXT16-011", "stage": "source_fix",
+                          "status": "BLOCKED", "continuous_debug": True})
+        q["continuous_debug_policy"] = {"enabled": True, "work_id": "EXT16-011"}
+        self.assertIsNone(_module.choose_external_work(q, REPO, BRANCH))
+        selected = _module.choose_continuous_debug_work(q, REPO, BRANCH)
+        self.assertEqual(selected["status"], "ACTIVE")
+        self.assertEqual(q["work"][-1]["status"], "BLOCKED")  # do not fake success
+
+    def test_perpetual_debug_requires_explicit_enable_and_valid_scope(self):
+        q = fixture()
+        q["work"].append({"id": "EXT16-011", "stage": "source_fix",
+                          "status": "ACTIVE", "continuous_debug": True})
+        self.assertIsNone(_module.choose_continuous_debug_work(q, REPO, BRANCH))
+        q["continuous_debug_policy"] = {"enabled": True, "work_id": "EXT16-011"}
+        with self.assertRaises(ValueError):
+            _module.choose_continuous_debug_work(q, "thp32tt/imsi1", "main")
+        self.assertEqual(_module.choose_continuous_debug_work(q, REPO, BRANCH)["id"],
+                         "EXT16-011")
+
+
+class ContinuousDebugCycleTests(unittest.IsolatedAsyncioTestCase):
+    async def test_debug_keeps_dispatching_without_sha_change_and_rotates_focus(self):
+        zone = timezone(timedelta(hours=9))
+        now = datetime(2026, 11, 24, 14, 0, tzinfo=zone)
+        queue = fixture()
+        queue["active_work_id"] = "EXT16-006"
+        queue["work"].append({"id": "EXT16-006", "stage": "hardware_qa",
+                              "requires_user_headset": True, "status": "QUEUED"})
+        queue["work"].append({"id": "EXT16-011", "stage": "source_fix",
+                              "continuous_debug": True, "status": "ACTIVE",
+                              "title": "Continuous trace", "acceptance": ["fix only proven defects"]})
+        queue["continuous_debug_policy"] = {
+            "enabled": True, "work_id": "EXT16-011",
+            "focus_rotation": ["left eye", "normal map", "fallback"]}
+        state = {"ferrari_external_initialized": True,
+                 "ferrari_external_simple_A": {"new_chat_required": True}}
+        page = SimpleNamespace(url="https://chatgpt.com/g/g-p-6ab9a64fc428819198c7f39765d764bf/project")
+        slot = SimpleNamespace(name="A", url=None, runs=0, last_sent_at=None,
+            last_result=None, last_assistant_hash=None, last_assistant_change_at=None,
+            watchdog_resumes_since_schedule=0)
+        reg = SimpleNamespace(slots=[slot])
+        sends = AsyncMock(return_value="sent")
+        api = lambda path: ({"encoding": "base64", "content":
+            base64.b64encode(json.dumps(queue).encode()).decode()}
+            if "/contents/" in path else {"commit": {"sha": "a"*40}})
+        host = {
+            "AUTO_SEND": True, "CAR_MODEL_AUTODEV_ENABLED": True,
+            "EXTERNAL_MODEL_AUTODEV_ENABLED": True,
+            "CAR_MODEL_GITHUB_REPO": REPO, "CAR_MODEL_TARGET_BRANCH": BRANCH,
+            "load_registry": lambda _now: reg,
+            "save_registry": Mock(), "save_queue_state": Mock(), "write_runtime": Mock(),
+            "send_guard_reason": lambda *args: "",
+            "_parse_iso": lambda raw: datetime.fromisoformat(raw) if raw else None,
+            "github_api_json": api,
+            "replace_with_fresh_slot_page": AsyncMock(return_value=page),
+            "hard_replace_slot_page": AsyncMock(return_value=page),
+            "slot_page": AsyncMock(return_value=page),
+            "detect_busy": AsyncMock(return_value=False),
+            "detect_conversation_limit": AsyncMock(return_value=False),
+            "ensure_logged_in": AsyncMock(return_value=True),
+            "is_slot_project_url": lambda url, slot: True,
+            "detect_rate_limit": AsyncMock(return_value=False),
+            "detect_limit": AsyncMock(return_value=False),
+            "ensure_thinking_level": AsyncMock(return_value=True),
+            "send_message": sends,
+            "wait_for_chat_url": AsyncMock(return_value=page.url + "/c/test"),
+            "note_successful_request": Mock(), "mark_rate_limit": Mock(), "TZ": zone
+        }
+        # 6 consecutive half-hour windows on identical GitHub SHA; no hard hold.
+        for k in range(6):
+            self.assertTrue(await _module.external_model_cycle(
+                None, {}, state, now + timedelta(minutes=30*k), host))
+        self.assertEqual(sends.await_count, 6)
+        prompts = [x.args[1] for x in sends.await_args_list]
+        self.assertIn("ROTATING_FOCUS=left eye", prompts[0])
+        self.assertIn("ROTATING_FOCUS=normal map", prompts[1])
+        self.assertIn("ROTATING_FOCUS=fallback", prompts[2])
+        self.assertIn("ROTATING_FOCUS=left eye", prompts[3])
+        self.assertEqual(state["ferrari_external_simple_A"]["debug_cycle_count"], 6)
+        self.assertEqual(state["ferrari_external_simple_A"]["same_progress_dispatches"], 6)
+        self.assertEqual(host["hard_replace_slot_page"].await_count, 2)
+        self.assertFalse(await _module.external_model_cycle(
+            None, {}, state, now + timedelta(minutes=150), host))  # no double send
+        self.assertEqual(sends.await_count, 6)
+
+
 if __name__ == "__main__":
     unittest.main()
