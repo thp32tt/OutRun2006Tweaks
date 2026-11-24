@@ -87,6 +87,52 @@ def dispatch_qa(token: str) -> None:
     api_call(path, token, method="POST", json_body={"ref": BRANCH})
 
 
+
+REPAIR_WORKFLOW="outrun-hd-cleanplate-repair.yml"
+REPAIR_QUEUE_BRANCH="korean-localization-qa-queue-20261104"
+REPAIR_QUEUE_ROOT="localization/automation_runs/hd_cleanplate_repair"
+
+def repair_pointer(token):
+    import base64
+    try:
+        data=api_call("/contents/"+REPAIR_QUEUE_ROOT+"/latest.json?ref="+REPAIR_QUEUE_BRANCH,token)
+    except urllib.error.HTTPError as exc:
+        if exc.code==404:return None
+        raise
+    if not isinstance(data,dict) or data.get("encoding")!="base64":
+        raise ValueError("REPAIR_POINTER_RESPONSE")
+    ptr=json.loads(base64.b64decode(data["content"]))
+    if ptr.get("schema")!="outrun.hd.cleanplate-queue-pointer.v1":
+        raise ValueError("REPAIR_POINTER_SCHEMA")
+    return ptr
+
+def repair_cycle(sha,token,prior):
+    obj=api_call("/actions/workflows/"+REPAIR_WORKFLOW+"/runs?per_page=5",token)
+    runs=obj.get("workflow_runs",[])
+    if not isinstance(runs,list):raise ValueError("REPAIR_RUNS_INVALID")
+    ptr=repair_pointer(token)
+    last=runs[0] if runs else {}
+    active=any(r.get("status") in ("queued","in_progress","pending","waiting","requested") for r in runs)
+    receipt=prior.get("last_repair_dispatched_sha")
+    status="GITHUB_SCHEDULE_FALLBACK"
+    if active:
+        status="REPAIR_RUNNING_OR_QUEUED"
+    elif ptr and ptr.get("asset_sha")==sha:
+        status="REPAIR_QUEUE_PUBLISHED_GPT_FEEDBACK_ON_SCHEDULE"
+    elif token and receipt!=sha and not any(r.get("display_title")=="HD cleanplate "+sha for r in runs):
+        api_call("/actions/workflows/"+REPAIR_WORKFLOW+"/dispatches",token,method="POST",
+                 json_body={"ref":"master","inputs":{"asset_sha":sha}})
+        receipt=sha;status="REPAIR_DISPATCHED"
+    elif token:
+        status="REPAIR_DEDUP_OR_SCHEDULE_RETRY"
+    return {"status":status,"last_repair_dispatched_sha":receipt,
+            "run_id":last.get("id"),"run_status":last.get("status"),"run_conclusion":last.get("conclusion"),
+            "published_run_id":ptr.get("run_id") if ptr else None,
+            "published_asset_sha":ptr.get("asset_sha") if ptr else None,
+            "published_counts":ptr.get("counts") if ptr else None,
+            "runtime_validation":"UNTESTED","release_approved":False}
+
+
 def atomic_json(path: Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=".gh-monitor-")
@@ -138,6 +184,14 @@ def check_cycle(home: Path, token: str) -> dict:
         "runtime_validation": "UNTESTED",
         "release_approved": False,
     }
+    if os.environ.get("OUTRUN_CLEANPLATE_REPAIR_ENABLED","0")=="1":
+        try:
+            info=repair_cycle(sha,token,prior)
+            data["cleanplate_repair"]=info
+            data["last_repair_dispatched_sha"]=info["last_repair_dispatched_sha"]
+        except Exception as exc:
+            data["cleanplate_repair"]={"status":"REPAIR_MONITOR_HOLD","error_type":type(exc).__name__}
+            data["last_repair_dispatched_sha"]=prior.get("last_repair_dispatched_sha")
     atomic_json(previous_file, data)
     return data
 
