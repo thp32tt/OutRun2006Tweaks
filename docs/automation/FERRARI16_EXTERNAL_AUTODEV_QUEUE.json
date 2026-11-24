@@ -1414,18 +1414,52 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Inspect remaining R30/R33 PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW sentinel and particle stream rollback; verify exact SHA CI and investigate live queue reuse using owned runtime traces, preserving atomic staging and original callback."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-2200-LAUNCH-MODE-ISOLATION",
+          "status": "PATCHED_SOURCE_INTERPRETER_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "v0.03 menu/fullscreen focus and explicit VR/2D launch; diagnostic environment separation",
+          "source_material_sha": "79190865247627d8509be9239ff0cf7c37296ee7",
+          "source_defect": "All four isolated Ferrari16 launchers used IF ERRORLEVEL 2 followed by unconditional GOTO MODE_2D. Windows CHOICE returns 0 on cancellation and 255 on error, so these conditions can launch 2D or VR without an explicit choice. Fixed-function and model-off launchers also left PBR diagnostic flag inherited, and 2D left both flags inherited.",
+          "source_fix": "Require exact successful 1/2 selection via descending ERRORLEVEL guards; cancel/error returns 89 without starting either process. Set both external diagnostic flags explicitly in all four launchers and both modes. Protected v0.03 launchers unchanged.",
+          "source_blob_sha1": {
+            "tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd": "e707e8fbd6dcf7bfeb174517ca0aee2a453fb285",
+            "tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd": "0f5b14fc307deb2ce1ef77e3d596c8bff1974596",
+            "tools/ferrari16/RUN-FERRARI16-V003-MODEL-OFF.cmd": "e43adb578a77ab529b7f20e266e607bd7a6764dc",
+            "tools/ferrari16/RUN-FERRARI16-V003-PBR-TRACE.cmd": "94a4cb7fc567c9e7026cd4328086bcbb7e948445",
+            "tests/ferrari16_launcher_isolation_test.py": "0699edc08a8c5f3a613e00c2ee0ee0a53e32edbd"
+          },
+          "positive_negative_regressions": [
+            "Actual fetched source interpreted with JS: 24 choice cases and 32 inherited probe flag cases PASS; eight old cancel/error counterexamples reproduced. Not native CMD or full Python execution.",
+            "Existing CI test file now includes equivalent actual-source Python dispatch/probe cases and negative mutations, plus 24 native Windows CMD fixture cases using real extracted branch lines with injected statuses; no game/host launched. Both existing workflow gates retained."
+          ],
+          "same_sha_ci": {
+            "sha": "79190865247627d8509be9239ff0cf7c37296ee7",
+            "status": "UNVERIFIED",
+            "note": "Commit workflow lookup (PR-filtered) and combined statuses empty; previous db020cc also no runs reported. No native Windows or exact-SHA build pass asserted; no rerun."
+          },
+          "render_trace": [
+            "Compared all ten protected v0.03 blob SHA1 anchors, all match including host OpenXR runtime, menu aspect/projection and direct transport. R7 GameplayActive and adjacent stereo eligibility function text unchanged over compared 96-line span. Actual 48 baseline game flags match in all four launchers except FileLogging=true on two intentional trace modes.",
+            "Hidden PowerShell host prewarm and DLL AutoLaunchHost fallback, 2496x2688 eye resolution, mirror preserve aspect, direct GPU, and stock rendering gates unchanged. Does not establish actual focus/fullscreen/VDXR behavior or explain previously reported gameplay 2D symptom.",
+            "PBR/fixed-function env consumers require exact one-character 1; inherited PBR no longer accidentally enables diagnostic admission. Whole-car atomic raster remains disabled. No claim of per-car material validation."
+          ],
+          "protected_v003": "Only four isolated launcher scripts and test file changed on external automation branch; no protected release branch, native host/launcher, x86 DLL source, shader, model, licensing or stage fence change.",
+          "asset_validation": "No actual private 16 model binaries, UV, normal maps, dashboard or licensing evidence inspected.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Inspect actual 16-car OVC4 per-material DDS mip/UV/tangent/PBR bounds and remaining loader negatives; verify exact SHA CI of current/previous patches without rerun; preserve native renderer fence. Separate R30/R33 remaining raw primitive HRESULT rollback and real GPU stage work remain open."
         }
       ],
-      "latest_material_sha": "db020cca19baf659c3a8dc424ee842efc18e6d93",
-      "latest_static_ci": "LOCAL_DEFERRED_GLASS_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED",
-      "next_focus": "Inspect remaining R30/R33 PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW sentinel and particle stream rollback; verify exact SHA CI and investigate live queue reuse using owned runtime traces, preserving atomic staging and original callback."
+      "latest_material_sha": "79190865247627d8509be9239ff0cf7c37296ee7",
+      "latest_static_ci": "SOURCE_INTERPRETER_56_PASS_EXACT_SHA_CI_UNVERIFIED",
+      "next_focus": "Inspect actual 16-car OVC4 per-material DDS mip/UV/tangent/PBR bounds and remaining loader negatives; verify exact SHA CI of current/previous patches without rerun; preserve native renderer fence. Separate R30/R33 remaining raw primitive HRESULT rollback and real GPU stage work remain open."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 21:31:00+09:00",
+  "last_updated_kst": "2026-11-24 22:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
