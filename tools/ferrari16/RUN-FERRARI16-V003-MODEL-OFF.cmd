@@ -69,6 +69,8 @@ set "OUTRUN_VR_DIRECT_TRANSPORT=1"
 set "OUTRUN_VR_DIRECT_ONLY=1"
 set "OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION=0"
 set "OUTRUN_VR_TARGET_REFRESH_HZ=0"
+rem Pin physical A/B host to runtime-recommended scale (v0.03 default).
+set "OUTRUN_VR_RENDER_SCALE=1.0"
 set "OUTRUN_VR_CADENCE_MODE=1"
 set "OUTRUN_VR_CADENCE_TARGET_HZ=0"
 set "OUTRUN_VR_CADENCE_MAX_HZ=120"
@@ -81,6 +83,8 @@ if exist "%OUTRUN_VR_HOST%" (
 
 start "" "%~dp0OR2006C2C.exe" ^
  -VR.Enabled=true ^
+ -VR.HmdlessDebugMode=0 ^
+ -VR.Stereo=true ^
  -VR.AutoLaunchHost=true ^
  -FramerateLimit=0 ^
  -FramerateFastLoad=0 ^

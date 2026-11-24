@@ -73,6 +73,24 @@ def probe_flags(source, mode, inherited):
             flags["OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST"])
 
 
+def physical_vr_policy(source, inherited_scale, saved_debug, saved_stereo):
+    """Evaluate actual VR SET/CLI ordering for hidden prewarm and DLL fallback."""
+    vr = source.split(":MODE_VR\n", 1)[1].split("\n:CHECK_HOST", 1)[0]
+    prewarm = vr.index("Start-Process -FilePath $env:OUTRUN_VR_HOST")
+    start = vr.index('start "" "%~dp0OR2006C2C.exe"')
+    assert prewarm < start
+    def scale_at(offset):
+        matches = re.findall(r'^set "OUTRUN_VR_RENDER_SCALE=([^"]+)"$',
+                             vr[:offset], re.M)
+        return matches[-1] if matches else inherited_scale
+    settings = {"HmdlessDebugMode": saved_debug, "Stereo": saved_stereo}
+    for name, value in re.findall(r'-VR\.(HmdlessDebugMode|Stereo)=([^\s^]+)',
+                                  vr[start:]):
+        settings[name] = value
+    return (scale_at(prewarm), scale_at(start),
+            settings["HmdlessDebugMode"], settings["Stereo"])
+
+
 def host_guard(source):
     return source.split("\n:CHECK_HOST\n", 1)[1]
 
@@ -206,6 +224,31 @@ class LauncherIsolationTest(unittest.TestCase):
                 broken = source.replace('set "' + pbr + '=0"\n', "")
                 self.assertNotEqual(probe_flags(broken, "MODE_VR",
                                                {fixed: 1, pbr: 1}), vr_expected)
+
+    def test_physical_vr_launch_ignores_diagnostic_overrides(self):
+        for name in LAUNCHERS:
+            source = (ROOT / name).read_text(encoding="utf-8")
+            for scale in ("0.5", "1.7", "1.0"):
+                for debug in ("0", "2"):
+                    for stereo in ("true", "false"):
+                        with self.subTest(launcher=name, scale=scale,
+                                          debug=debug, stereo=stereo):
+                            self.assertEqual(physical_vr_policy(source, scale, debug, stereo),
+                                             ("1.0", "1.0", "0", "true"))
+            for marker in ('set "OUTRUN_VR_RENDER_SCALE=1.0"\n',
+                           ' -VR.HmdlessDebugMode=0 ^\n', ' -VR.Stereo=true ^\n'):
+                self.assertEqual(source.count(marker), 1)
+                broken = source.replace(marker, "")
+                self.assertNotEqual(physical_vr_policy(broken, "0.5", "2", "false"),
+                                    ("1.0", "1.0", "0", "true"))
+            late = source.replace('set "OUTRUN_VR_RENDER_SCALE=1.0"\n', "").replace(
+                '\nstart "" "%~dp0OR2006C2C.exe" ^',
+                '\nset "OUTRUN_VR_RENDER_SCALE=1.0"\nstart "" "%~dp0OR2006C2C.exe" ^')
+            self.assertEqual(physical_vr_policy(late, "0.5", "2", "false"),
+                             ("0.5", "1.0", "0", "true"))
+            flat = source.split(":MODE_2D\n", 1)[1].split(":MODE_VR\n", 1)[0]
+            self.assertIn('set "OUTRUN_VR_FORCE_DISABLED=1"', flat)
+            self.assertNotIn("-VR.Stereo=true", flat)
 
     def test_all_real_launchers_positive(self):
         for name in LAUNCHERS:
