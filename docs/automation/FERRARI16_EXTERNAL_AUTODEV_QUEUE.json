@@ -682,14 +682,61 @@
       ],
       "do_not_autoclose": true,
       "do_not_mark_complete_static": true,
-      "last_seen_hmd_stage": "EXT16-006 WAITING_USER_HMD"
+      "last_seen_hmd_stage": "EXT16-006 WAITING_USER_HMD",
+      "debug_cycles": [
+        {
+          "cycle_key": "EXT16-011-20261124-1413-PBR-DERIVATIVE-TBN",
+          "status": "PATCHED_STATIC_ONLY_CONTINUE_ACTIVE",
+          "trace_owner": "src/vr/game/dino_external_pbr_shader.hpp PixelSource() HLSL PS3 derivative TBN, runtime normalMap sampler s1",
+          "source_defect": "Absolute abs(det)>1e-7 threshold rejected valid orthogonal/mirrored UV derivatives projected across 5000x3000 pixels (det=6.6667e-8) although normal map is present; T was also normalized after projection without zero-length guard.",
+          "source_fix": "Compare squared UV derivative determinant with gradient-area energy (det^2>1e-8*|ddxUV|^2*|ddyUV|^2) and reject zero gradient/tangent/bitangent before normalization; preserve mirror handedness and normal/ORM shader lookups.",
+          "source_material_sha": "a99938b07e9b7f52a854807db5a7314927ca76e6",
+          "source_blob_sha1": {
+            "src/vr/game/dino_external_pbr_shader.hpp": "83200bb5bf2751c42ea858a467a3f643b99e2be6",
+            "tests/ferrari16_pbr_derivative_gate_test.py": "d71f7c50b620cc76b379f26e9c1a65704e8b9d7f",
+            ".github/workflows/ferrari16-multicar-regression.yml": "2a06fccf2d17cf87231395794f97582b34d454e4"
+          },
+          "regressions": [
+            "POSITIVE orthogonal high/low pixel UV scale and mirrored UV: PASS",
+            "NEGATIVE parallel, nearly parallel, and zero derivative UV: PASS",
+            "Legacy absolute threshold numeric counterexample established",
+            "Previously failed source test at f13bfd due out-of-range near-underflow scale fixture; corrected only test domain at a999 with 1e-30 stability floor"
+          ],
+          "same_sha_ci": {
+            "source_sha": "a99938b07e9b7f52a854807db5a7314927ca76e6",
+            "multicar_and_python": {
+              "run_id": 45332247784,
+              "conclusion": "SUCCESS"
+            },
+            "windows_sm3_hlsl": {
+              "run_id": 45332247784,
+              "conclusion": "SUCCESS"
+            },
+            "win32_x86_game_dll_build": {
+              "run_id": 45332247752,
+              "conclusion": "SUCCESS"
+            },
+            "windows_x86_dll_x64_openxr_host_exact_sha_zip_and_rollback": {
+              "run_id": 45332247847,
+              "conclusion": "SUCCESS"
+            }
+          },
+          "protected_v003": "NOT_MODIFIED; active launch/menu/host/Quest cockpit untouched",
+          "runtime_validation": "UNTESTED",
+          "limits": "Current external renderer is fail-closed stock-only because EXT16-007 whole-vehicle two-eye color/depth atomic staging is absent; HMD/FPS and current 16 private licensed OVC/GLB PBR material acceptance not proven.",
+          "next_trace": "R7 ExecuteStereoDraw() left live draw before right target/depth, design isolated whole-vehicle stereo color+depth staging and fail-before-first-live DIP with right-eye fault injection; preserve x86 retail 49F3E0 full wrapper and v0.03"
+        }
+      ],
+      "latest_material_sha": "a99938b07e9b7f52a854807db5a7314927ca76e6",
+      "latest_static_ci": "SUCCESS_EXACT_SOURCE_SHA",
+      "next_focus": "R7 ExecuteStereoDraw() left live draw before right target/depth, design isolated whole-vehicle stereo color+depth staging and fail-before-first-live DIP with right-eye fault injection; preserve x86 retail 49F3E0 full wrapper and v0.03"
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 08:15:18+09:00",
+  "last_updated_kst": "2026-11-24 14:24:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
