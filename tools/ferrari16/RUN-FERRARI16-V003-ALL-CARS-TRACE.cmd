@@ -22,8 +22,11 @@ echo [1] 2D + FFB
 echo [2] VR + FFB
 echo.
 choice /C 12 /N /M "Select 1 or 2: "
+rem CHOICE returns 0 on cancel, 255 on error; neither is a launch request.
+if errorlevel 3 exit /b 89
 if errorlevel 2 goto MODE_VR
-goto MODE_2D
+if errorlevel 1 goto MODE_2D
+exit /b 89
 
 :MODE_2D
 rem The release dinput8.dll contains both the normal Tweaks/FFB code and VR.
@@ -37,6 +40,8 @@ if not errorlevel 1 (
 )
 set "OUTRUN_VR_LAUNCH=0"
 set "OUTRUN_VR_FORCE_DISABLED=1"
+set "OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=0"
+set "OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=0"
 set "OUTRUN_VR_FILE_LOG=0"
 start "" "%~dp0OR2006C2C.exe"
 exit /b 0
@@ -56,6 +61,7 @@ set "OUTRUN_VR_FORCE_DISABLED=0"
 set "OUTRUN_VR_R23_PIXEL_PROBE=0"
 set "OUTRUN_VR_FILE_LOG=1"
 set "OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=1"
+set "OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=0"
 
 rem Isolated sixteen-car driver-eye A/B only; never install into working v0.03.
 rem Match the proven diagnostic startup order: prepare the OpenXR host before the
