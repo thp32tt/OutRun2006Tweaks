@@ -87,16 +87,27 @@ float4 mainPS(PixelIn input) : COLOR0 {
     float2 dtdx = ddx(input.uv);
     float2 dtdy = ddy(input.uv);
     float det = dtdx.x*dtdy.y-dtdx.y*dtdy.x;
-    if (factors.w > 0.5 && abs(det) > 0.0000001) {
-        // UV mirror parity changes both tangent direction and handedness.
-        float3 T = normalize((dpdx*dtdy.y-dpdy*dtdx.y)/det);
-        T = normalize(T-N*dot(N,T));
+    // A fixed absolute determinant threshold depends on projected area:
+    // even a valid UV basis can lose its normal map on a very large
+    // cockpit triangle. Compare the squared UV area to the gradient energies
+    // to keep the decision invariant under screen resolution/scale.
+    float gradientArea2 = dot(dtdx,dtdx)*dot(dtdy,dtdy);
+    if (factors.w > 0.5 && gradientArea2 > 1.e-30 &&
+        det*det > gradientArea2*1.e-8) {
+        // Mirrored UV islands retain their signed tangent handedness.
+        // Never normalize a tangent parallel to a malformed source normal.
+        float3 T = (dpdx*dtdy.y-dpdy*dtdx.y)/det;
+        T = T-N*dot(N,T);
+        float tangentSq = dot(T,T);
         float3 derivativeB = (dpdy*dtdx.x-dpdx*dtdy.x)/det;
-        float handedness = dot(cross(N,T),derivativeB) < 0 ? -1.0 : 1.0;
-        float3 B = normalize(cross(N,T))*handedness;
-        float3 mapN = tex2D(normalMap,input.uv).xyz*2.0-1.0;
-        mapN.xy *= factors.z;
-        N = normalize(mapN.x*T+mapN.y*B+mapN.z*N);
+        if (tangentSq > 1.e-12 && dot(derivativeB,derivativeB) > 1.e-12) {
+            T *= rsqrt(tangentSq);
+            float handedness = dot(cross(N,T),derivativeB) < 0 ? -1.0 : 1.0;
+            float3 B = normalize(cross(N,T))*handedness;
+            float3 mapN = tex2D(normalMap,input.uv).xyz*2.0-1.0;
+            mapN.xy *= factors.z;
+            N = normalize(mapN.x*T+mapN.y*B+mapN.z*N);
+        }
     }
     float3 L = normalize(float3(-0.45,0.85,-0.28));
     float3 V = normalize(eyeAndOrm.xyz-input.worldPosition);
