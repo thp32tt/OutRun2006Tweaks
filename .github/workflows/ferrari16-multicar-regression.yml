@@ -39,6 +39,14 @@ jobs:
           gpu=Path('src/vr/game/dino_external_d3d9.hpp').read_text()
           selection=Path('src/vr/game/external_car_selection.hpp').read_text()
           between=source[source.index('static F50ExternalDrawTicket PrepareF50External('):source.index('static bool DrawPreparedF50External(')]
+          # Real source-order regression: no OVC IO/selector/device reads if
+          # the atomic two-eye owner has not been implemented and admitted.
+          assert 'MayPrepareExternalCarAssets(' in between
+          guard=between.index('MayPrepareExternalCarAssets(')
+          assert 'RuntimeExternalCarAtomicStageReady()' in between[guard:guard+200]
+          for costly in ('GetLatchedStereoFrameView()', 'Game::D3DDevice()',
+                         'GlobalGpu()', 'SelectSidecar(', 'SafeFloorLift('):
+              assert guard < between.index(costly), costly
           assert 'ticket.slot=extraCar ?' in between
           assert 'FerrariModelSlot::GenericId :' in between
           assert 'const float requestedLift=!extraCar ?' in between

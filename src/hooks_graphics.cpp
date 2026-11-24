@@ -992,11 +992,17 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // experimental replacement needs explicit acknowledgment and either
         // fixed-function A/B or PBR physical stereo diagnostic opt-in.
         // This gate occurs before reading camera/XR or attempting any OVC IO.
-        if(!OutRunVR::DinoSidecar::PermitGenericSidecar(
+        const bool ownerAuthorized=OutRunVR::DinoSidecar::PermitGenericSidecar(
                extraCar || f50Car,
                OutRunVR::DinoSidecar::FixedFunctionExternalStereoProbeActive(),
                OutRunVR::DinoSidecar::PbrExternalStereoProbeActive(),
-               Settings::VRExternalFerrariNativeCallbackReplacement.get()))
+               Settings::VRExternalFerrariNativeCallbackReplacement.get());
+        // EXT16-011 R7: no isolated L/R whole-vehicle color+depth backend.
+        // Reject before GetLatchedStereoFrameView, device access, SelectSidecar
+        // or SafeFloorLift's async OVC parse; leave the stock callback intact.
+        if(!OutRunVR::DinoSidecar::MayPrepareExternalCarAssets(
+               ownerAuthorized,
+               OutRunVR::DinoSidecar::RuntimeExternalCarAtomicStageReady()))
             return ticket;
         const auto* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();

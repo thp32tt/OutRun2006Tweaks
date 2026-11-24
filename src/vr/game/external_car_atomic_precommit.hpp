@@ -27,6 +27,17 @@ struct ExternalCarAtomicStageProof final {
             rightStageSucceeded && !partialMeshFailure;
     }
 };
+// No OVC parse/upload should begin until the authorized callback has a
+// whole-vehicle isolated stereo owner. DrawNativeScene's later guard is too
+// late: SafeFloorLift can already launch a costly async private asset parse.
+// Pure admission policy: this does NOT enable the unimplemented backend.
+inline constexpr bool MayPrepareExternalCarAssets(
+    bool ownerAuthorized, bool atomicStageReady) noexcept {
+    return ownerAuthorized && atomicStageReady;
+}
+static_assert(!MayPrepareExternalCarAssets(true,false));
+static_assert(!MayPrepareExternalCarAssets(false,true));
+static_assert(MayPrepareExternalCarAssets(true,true));
 // Only the two-eye staged renderer is permitted to turn this on after
 // implementation and device/reset + GPU failure testing. This revision has
 // NO SUCH BACKEND. Never accept live LEFT then live RIGHT as a substitute.

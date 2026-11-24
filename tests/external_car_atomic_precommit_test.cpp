@@ -24,9 +24,32 @@ struct FakeR7LiveEye {
         return true;
     }
 };
+// Simulate the pre-render preparation and its CPU/GPU side effects.
+struct FakeExternalPreparation final {
+    unsigned cpuOvcReads=0,gpuAllocations=0;
+    bool TryPrepare(bool authorized,bool atomicReady) noexcept {
+        if(!MayPrepareExternalCarAssets(authorized,atomicReady))return false;
+        ++cpuOvcReads;
+        ++gpuAllocations;
+        return true;
+    }
+};
 int main() {
     static_assert(!MaySubmitExternalCarLiveEye(),
         "Live-eye R7 external raster cannot be enabled without atomic staging");
+    // Positive: hypothetical authorized + staged backend permits prepare.
+    // Negative: rejected route or missing atomic backend does zero OVC/GPU work.
+    for(bool authorized: {false,true})
+        for(bool stageReady: {false,true}) {
+            FakeExternalPreparation prep{};
+            const bool allowed=authorized && stageReady;
+            assert(prep.TryPrepare(authorized,stageReady)==allowed);
+            assert(prep.cpuOvcReads==static_cast<unsigned>(allowed));
+            assert(prep.gpuAllocations==static_cast<unsigned>(allowed));
+        }
+    FakeExternalPreparation production{};
+    assert(!production.TryPrepare(true,RuntimeExternalCarAtomicStageReady()));
+    assert(production.cpuOvcReads==0 && production.gpuAllocations==0);
     const auto admitted=Admit();
     for(unsigned slot=0;slot<16;++slot) {
         for(bool injectAfterLeft: {false,true}) {
