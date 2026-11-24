@@ -1779,18 +1779,50 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Verify exact source CI; inspect R30/R33 UP buffer binding and post-left render-target/depth ownership; trace 16-car OVC material boundary separately. Maintain fail-closed external transaction and protected original callback."
+        },
+        {
+          "cycle_key": "EXT16-011-20261125-0230-RETAIL-ABI-READABLE-SPAN",
+          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "Retail x86 body wrapper ABI 46BD30/469600: preserve stock dashboard, shadow, passengers and glass",
+          "source_material_sha": "5a5cabeea00682b09efb965ecd2d717544a632a6",
+          "source_blob_sha1": {
+            "src/hooks_graphics.cpp": "6257cdab1be1699ec8184fe634c2be8976bffb09",
+            "src/vr/game/external_car_original_wrapper_contract.hpp": "b96059d0250f8a8fc1d235ef0615a4db57ecd97d",
+            "tests/external_car_original_wrapper_contract_test.cpp": "61e2713cac649ce64977094324f1f324075b7a72"
+          },
+          "source_defect": "MatchOriginalRva accepted PAGE_EXECUTE without read-permission validation and used addition-based span bounds. RetailCallTarget offset+5 wraps for SIZE_MAX-4 through SIZE_MAX, allowing out-of-bounds dereference. Defensive ABI validation defects; no evidence these caused reported stereo/FPS symptoms; production call offsets are fixed 6/17.",
+          "source_fix": "Use existing committed/readable/non-guarded Memory span validator before live signature comparison for all three original native hook signatures; subtract-before-compare rel32 bounds; add positive and negative tests to existing wrapper contract suite. Keep complete original callback and external raster fence unchanged.",
+          "positive_negative_regressions": [
+            "Local g++ C++17 -Wall -Wextra -Werror -pedantic ASan/UBSan manually reproduced exact changed portable helper fragments: two canonical CALLs, five wrapping offsets, two truncated offsets, valid/denied/null/mismatched signature and PROT_NONE page with denied read predicate PASS. Old arithmetic admits all five wrap offsets; no deliberate UB executed.",
+            "Committed full wrapper contract test adds these checks except Linux-specific PROT_NONE. Full suite and Windows VirtualQuery path not executed locally."
+          ],
+          "same_sha_ci": {
+            "sha": "5a5cabeea00682b09efb965ecd2d717544a632a6",
+            "status": "UNVERIFIED",
+            "note": "PR-filtered commit workflow list and combined statuses empty; no rerun, no PASS claim."
+          },
+          "call_graph_trace": [
+            "Re-read r4dius/outrun2-decomp@e1e1c592b802a6f3f7020a676abd3ba1be479e62 src/platform/pc_vehicle_display.cpp and vehicle_model_draw.cpp: 46BD30 changes sunlight and matrix then 469600 emits PMT queues, steering, roof, wheel, shadow leaves; layout+0 body candidate not material/part-attested.",
+            "49F3E0 two CALL edges remain unchanged; CallOriginalPlayerWithGlassScope invokes original exactly once in all OnPlayerCallback routes. No live EXE reread, no new body-only callsite proof, no external draw activation.",
+            "Glass material scope and previous deferred owner refresh retained. PBR boundary, actual 16 slots and GPU atomic staging remain independently unverified."
+          ],
+          "protected_v003": "Only automation branch native signature validation and tests changed; no release, original body geometry, PBR shader, host, launcher or asset change.",
+          "asset_validation": "No private models/OVC/DDS or rights promotion; N100 unused.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Trace exact retail 469600 layout+0 PMT candidate to original material/queue consumer by slot, without suppressing steering, shadow or stock dashboard. Investigate isolated L/R color+depth staging and verify exact source CI; keep external admission fail-closed."
         }
       ],
-      "latest_material_sha": "6f422083ed8b051572ff10a9da2fe50f2aeafddc",
-      "latest_static_ci": "Portable Lock/Unlock helper 8/8 PASS; full exact-SHA CI UNVERIFIED",
-      "next_focus": "Verify exact source CI; inspect R30/R33 UP buffer binding and post-left render-target/depth ownership; trace 16-car OVC material boundary separately. Maintain fail-closed external transaction and protected original callback."
+      "latest_material_sha": "5a5cabeea00682b09efb965ecd2d717544a632a6",
+      "latest_static_ci": "Portable ABI guard fragment ASan/UBSan PASS; full exact-SHA Windows x86/x64 and multicar CI UNVERIFIED",
+      "next_focus": "Trace exact retail 469600 layout+0 PMT candidate to original material/queue consumer by slot, without suppressing steering, shadow or stock dashboard. Investigate isolated L/R color+depth staging and verify exact source CI; keep external admission fail-closed."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 02:02:00+09:00",
+  "last_updated_kst": "2026-11-25 02:32:38+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
