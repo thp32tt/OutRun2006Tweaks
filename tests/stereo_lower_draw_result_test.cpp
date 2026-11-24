@@ -95,6 +95,22 @@ int main() {
             assert(hr == (setupOk ? (restored || driver < 0 ? driver : Fail)
                                   : (restored ? Ok : Fail)));
         }
+    // DP/VB, DP/UP and DIP/UP use the exact typed bridge in both R30
+    // and R33. Cover the optional particle VB pre-bind failure as well.
+    for (unsigned route=0; route<3; ++route)
+        for (unsigned owner=0; owner<2; ++owner)
+            for (bool attempted : {false,true})
+                for (bool restored : {false,true})
+                    for (Result driver : {NotImpl,Fail,Ok}) {
+                        const auto outcome=Attempt::AfterRoute(
+                            driver,attempted,restored,NotImpl,Fail);
+                        unsigned lower=0;
+                        const auto hr=outcome.handled ? outcome.hr : (++lower,Ok);
+                        const bool safeDecline=!attempted && restored && driver==NotImpl;
+                        assert(lower==(safeDecline ? 1u : 0u));
+                        if (attempted && driver==NotImpl) assert(hr==NotImpl);
+                        if (!restored && !attempted && driver==NotImpl) assert(hr==Fail);
+                    }
     static_assert(Attempt::AfterDraw(NotImpl,true,Fail).handled);
     static_assert(Attempt::AfterDraw(Ok,false,Fail).hr==Fail);
 }

@@ -1056,18 +1056,18 @@ namespace OutRunVRStereo
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept
     { return R30SupportTryExternalImGuiIndexed(d,t,b,m,n,s,p); }
 
-    HRESULT R32ReviewTryXyzrhwPrimitiveVB(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
     { return R30SupportTryXyzrhwPrimitiveVB(d,t,s,p); }
     OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept
     { return R30SupportTryXyzrhwIndexedPrimitiveVB(d,t,b,m,n,s,p); }
-    HRESULT R32ReviewTryXyzrhwPrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwPrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
         const void* data, UINT st) noexcept
     { return R30SupportTryXyzrhwPrimitiveUP(d,t,p,data,st); }
-    HRESULT R32ReviewTryXyzrhwIndexedPrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwIndexedPrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         UINT m, UINT n, UINT p, const void* idx,
         D3DFORMAT f, const void* v, UINT st) noexcept

@@ -55,7 +55,7 @@ namespace OutRunVRStereo
     OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryExternalImGuiIndexed(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept;
-    HRESULT R30SupportTryXyzrhwPrimitiveVB(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept;
     // R62 exact original-game car-above-rank FVF=0x142 bridge.
     // Not a generic screen HUD, VS effect or world mesh dispatcher.
@@ -77,10 +77,10 @@ namespace OutRunVRStereo
     OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept;
-    HRESULT R30SupportTryXyzrhwPrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwPrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
         const void* data, UINT st) noexcept;
-    HRESULT R30SupportTryXyzrhwIndexedPrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwIndexedPrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         UINT m, UINT n, UINT p, const void* idx,
         D3DFORMAT f, const void* v, UINT st) noexcept;

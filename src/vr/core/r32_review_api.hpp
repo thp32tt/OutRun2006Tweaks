@@ -196,17 +196,17 @@ namespace OutRunVRStereo
         IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
         INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
         UINT startIndex, UINT primitiveCount) noexcept;
-    HRESULT R32ReviewTryXyzrhwPrimitiveVB(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwPrimitiveVB(
         IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
         UINT startVertex, UINT primitiveCount) noexcept;
     OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
         INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
         UINT startIndex, UINT primitiveCount) noexcept;
-    HRESULT R32ReviewTryXyzrhwPrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwPrimitiveUP(
         IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
         UINT primitiveCount, const void* data, UINT stride) noexcept;
-    HRESULT R32ReviewTryXyzrhwIndexedPrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwIndexedPrimitiveUP(
         IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
         UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
         const void* indexData, D3DFORMAT indexFormat,

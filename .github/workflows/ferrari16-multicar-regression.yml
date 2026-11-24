@@ -135,6 +135,17 @@ jobs:
           assert 'if (xyzrhw.handled)' in mid_dip and 'return xyzrhw.hr;' in mid_dip
           assert 'if (xyzrhw.handled)' in final_dip and 'return xyzrhw.hr;' in final_dip
           assert 'xyzrhw != E_NOTIMPL' not in final_dip
+          # All three remaining XYZRHW routes preserve the physical HRESULT
+          # through R30 -> R32 -> R33 without replaying a native draw.
+          for name in ('PrimitiveVB','PrimitiveUP','IndexedPrimitiveUP'):
+              owner_start = mid_dispatch.index('Attempt<HRESULT> R30TryXyzrhw'+name+'(')
+              owner_end = mid_dispatch.index('bool leftAttempted = false;', owner_start)
+              owner_tail = mid_dispatch[owner_end:mid_dispatch.index('::AfterRoute(', owner_end)]
+              assert owner_tail.index('leftAttempted = true;') < owner_tail.index('return R29OwnerCallRawDraw')
+          assert 'xyzrhw != E_NOTIMPL' not in mid_dispatch
+          assert 'xyzrhw != E_NOTIMPL' not in final_dispatch
+          assert mid_dispatch.count('if (xyzrhw.handled)') == 4
+          assert final_dispatch.count('if (xyzrhw.handled)') == 4
           sprite_owner = mid_dispatch[mid_dispatch.index('Attempt<HRESULT> R30TryFixedFunctionOriginalSpriteStereo('):mid_dispatch.index('Attempt<HRESULT> R30TryXyzrhwIndexedPrimitiveVB(')]
           assert sprite_owner.index('leftRouteEntered = true;') < sprite_owner.index('device->SetTransform(') < sprite_owner.index('return rawDraw();')
           assert sprite_owner.index('&originalProjection));') < sprite_owner.index('hr, leftRouteEntered, restored')
@@ -289,7 +300,9 @@ jobs:
               'src/vr/core/r30_support_api.hpp': ('R30Support', True),
           }
           def expected_bridge(original, prefix, header):
-              names = ['TryXyzrhwIndexedPrimitiveVB', 'TryExternalImGuiIndexed']
+              names = ['TryXyzrhwIndexedPrimitiveVB', 'TryExternalImGuiIndexed',
+                       'TryXyzrhwPrimitiveVB', 'TryXyzrhwPrimitiveUP',
+                       'TryXyzrhwIndexedPrimitiveUP']
               if prefix == 'R30Support':
                   names += ['TryFixedFunctionProjectedRankIndexed',
                             'TryFixedFunctionOriginalSpritePrimitive',

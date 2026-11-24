@@ -6598,34 +6598,34 @@ namespace OutRunVRStereo
                 leftHr, restoreOk, static_cast<HRESULT>(E_FAIL));
         }
 
-        HRESULT R30TryXyzrhwPrimitiveUP(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryXyzrhwPrimitiveUP(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
             R30XyzrhwState state{};
             if (!R30PrepareXyzrhwState(device, state))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             const UINT vertexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
             if (!vertexCount || vertexCount > 262144u)
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, data, vertexCount, stride, state))
             {
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             R30ScratchLease lease;
             if (!lease)
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             auto& scratch = *lease.buffers;
             if (!R30TransformXyzrhwStereo(
                     data, vertexCount, stride, state,
                     scratch.left, scratch.right))
             {
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             // Candidate optimization: only the EXACT WorldParticle semantic
@@ -6687,7 +6687,9 @@ namespace OutRunVRStereo
                             R29OwnerNoteRestoreFailure(
                                 "R30 WorldParticle GPU stream restore");
                             R29OwnerArmMonoSafety();
-                            return FAILED(gpuHr) ? gpuHr : E_FAIL;
+                            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
+                                gpuHr, physicalDrawAttempted, false,
+                                static_cast<HRESULT>(E_NOTIMPL), static_cast<HRESULT>(E_FAIL));
                         }
                         // A failed first-eye SetStreamSource cannot draw a
                         // particle. With the stream restored, retry the
@@ -6696,13 +6698,17 @@ namespace OutRunVRStereo
                         // that could duplicate alpha or hide a half-eye frame.
                         if (OutRunVR::R30ParticleUpload::MayUseNativeUpAfterGpuAttempt(
                                 physicalDrawAttempted, true, FAILED(gpuHr)))
-                            return E_NOTIMPL;
-                        return gpuHr == E_NOTIMPL ? E_FAIL : gpuHr;
+                            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                        return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
+                            gpuHr, physicalDrawAttempted, true,
+                            static_cast<HRESULT>(E_NOTIMPL), static_cast<HRESULT>(E_FAIL));
                     }
                 }
             }
 
+            bool leftAttempted = false;
             auto leftDraw = [&]() {
+                leftAttempted = true;
                 return R29OwnerCallRawDrawPrimitiveUP(
                     device, type, primitiveCount,
                     scratch.left.data(), stride);
@@ -6712,12 +6718,15 @@ namespace OutRunVRStereo
                     device, type, primitiveCount,
                     scratch.right.data(), stride);
             };
-            return R30ExecuteXyzrhwStereo(
+            const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
                 "R30.6/DrawPrimitiveUP-XYZRHW");
+            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
+                hr, leftAttempted, true, static_cast<HRESULT>(E_NOTIMPL),
+                static_cast<HRESULT>(E_FAIL));
         }
 
-        HRESULT R30TryXyzrhwIndexedPrimitiveUP(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryXyzrhwIndexedPrimitiveUP(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
             const void* indexData, D3DFORMAT indexFormat,
@@ -6725,7 +6734,7 @@ namespace OutRunVRStereo
         {
             R30XyzrhwState state{};
             if (!R30PrepareXyzrhwState(device, state))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             const UINT indexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
@@ -6733,7 +6742,7 @@ namespace OutRunVRStereo
                 indexCount > OutRunVR::R30IndexedUpBounds::MaxIndices ||
                 (indexFormat != D3DFMT_INDEX16 &&
                  indexFormat != D3DFMT_INDEX32))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             // D3D9 supplies a legal [minVertexIndex, minVertexIndex+numVertices)
             // window for UP indices. R30 used to preserve that absolute base in
@@ -6744,13 +6753,13 @@ namespace OutRunVRStereo
             const std::uint64_t declaredEnd =
                 static_cast<std::uint64_t>(minVertexIndex) + numVertices;
             if (numVertices == 0 || declaredEnd > 262144u)
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             const std::uint64_t firstVertexByte =
                 static_cast<std::uint64_t>(minVertexIndex) * stride;
             if (firstVertexByte >
                 static_cast<std::uint64_t>(
                     (std::numeric_limits<std::size_t>::max)()))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             const auto* windowVertexData =
                 static_cast<const std::uint8_t*>(vertexData) +
                 static_cast<std::size_t>(firstVertexByte);
@@ -6758,7 +6767,7 @@ namespace OutRunVRStereo
 
             R30ScratchLease lease;
             if (!lease)
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             auto& scratch = *lease.buffers;
             // Reuse a UP-only local mask. Clearing only last draw's referenced
             // vertices avoids zero-filling the whole declared window.
@@ -6773,7 +6782,7 @@ namespace OutRunVRStereo
             }
             catch (...)
             {
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             UINT knownUsedCount = 0;
@@ -6808,7 +6817,7 @@ namespace OutRunVRStereo
                 ? collectUsed(static_cast<const std::uint16_t*>(indexData))
                 : collectUsed(static_cast<const std::uint32_t*>(indexData));
             if (!validIndices)
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             const void* drawIndexData = indexData;
             if (minVertexIndex != 0)
@@ -6843,7 +6852,7 @@ namespace OutRunVRStereo
                 }
                 catch (...)
                 {
-                    return E_NOTIMPL;
+                    return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
                 }
             }
 
@@ -6853,7 +6862,7 @@ namespace OutRunVRStereo
                     &scratch.upTouched))
             {
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             if (!R30TransformXyzrhwStereo(
@@ -6862,10 +6871,12 @@ namespace OutRunVRStereo
                     &scratch.upUsed, knownUsedCount, &scratch.upTouched))
             {
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
+            bool leftAttempted = false;
             auto leftDraw = [&]() {
+                leftAttempted = true;
                 return R29OwnerCallRawDrawIndexedPrimitiveUP(
                     device, type, 0u, numVertices,
                     primitiveCount, drawIndexData, indexFormat,
@@ -6877,23 +6888,26 @@ namespace OutRunVRStereo
                     primitiveCount, drawIndexData, indexFormat,
                     scratch.right.data(), stride);
             };
-            return R30ExecuteXyzrhwStereo(
+            const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
                 "R30.6/DrawIndexedPrimitiveUP-XYZRHW");
+            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
+                hr, leftAttempted, true, static_cast<HRESULT>(E_NOTIMPL),
+                static_cast<HRESULT>(E_FAIL));
         }
 
-        HRESULT R30TryXyzrhwPrimitiveVB(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryXyzrhwPrimitiveVB(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT startVertex, UINT primitiveCount)
         {
             R30XyzrhwState state{};
             if (!R30PrepareXyzrhwState(device, state))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             const UINT vertexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
             if (!vertexCount || vertexCount > 262144u)
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             IDirect3DVertexBuffer9* vb = nullptr;
             UINT streamOffset = 0;
@@ -6903,7 +6917,7 @@ namespace OutRunVRStereo
                 !vb || stride < sizeof(float) * 4)
             {
                 if (vb) vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             R30EnsureVertexBufferHooks(vb);
@@ -6913,7 +6927,7 @@ namespace OutRunVRStereo
             if (!vbShadow)
             {
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
             const std::uint64_t firstByte =
                 static_cast<std::uint64_t>(streamOffset) +
@@ -6925,14 +6939,14 @@ namespace OutRunVRStereo
                 firstByte > UINT_MAX || byteCount > UINT_MAX)
             {
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             R30ScratchLease lease;
             if (!lease)
             {
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
             auto& scratch = *lease.buffers;
             if (!R30CopyVertexShadow(vbShadow,
@@ -6942,7 +6956,7 @@ namespace OutRunVRStereo
             {
                 vb->Release();
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             if (!R30ConfigureXyzrhwWorldEffect(
@@ -6955,10 +6969,12 @@ namespace OutRunVRStereo
             {
                 vb->Release();
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
+            bool leftAttempted = false;
             auto leftDraw = [&]() {
+                leftAttempted = true;
                 return R29OwnerCallRawDrawPrimitiveUP(
                     device, type, primitiveCount,
                     scratch.left.data(), stride);
@@ -6989,8 +7005,9 @@ namespace OutRunVRStereo
                 R29OwnerArmMonoSafety();
             }
             vb->Release();
-            return OutRunVR::R30StateRestore::ResultAfterRestore(
-                hr, streamRestored, static_cast<HRESULT>(E_FAIL));
+            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
+                hr, leftAttempted, streamRestored, static_cast<HRESULT>(E_NOTIMPL),
+                static_cast<HRESULT>(E_FAIL));
         }
 
 
@@ -8577,10 +8594,10 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
-            const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
+            const auto xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
-            if (xyzrhw != E_NOTIMPL)
-                return xyzrhw;
+            if (xyzrhw.handled)
+                return xyzrhw.hr;
 
             auto actual = [&]() {
                 return R29OwnerCallRawDrawPrimitive(
@@ -8631,10 +8648,10 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
-            const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
+            const auto xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
-            if (xyzrhw != E_NOTIMPL)
-                return xyzrhw;
+            if (xyzrhw.handled)
+                return xyzrhw.hr;
 
             auto actual = [&]() {
                 return R29OwnerCallRawDrawPrimitiveUP(
@@ -8654,11 +8671,11 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
-            const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
+            const auto xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
-            if (xyzrhw != E_NOTIMPL)
-                return xyzrhw;
+            if (xyzrhw.handled)
+                return xyzrhw.hr;
 
             auto actual = [&]() {
                 return R29OwnerCallRawDrawIndexedPrimitiveUP(device, type,
@@ -8944,7 +8961,7 @@ namespace OutRunVRStereo
         return R30TryExternalImGuiIndexed(d,t,b,m,n,s,p);
     }
 
-    HRESULT R30SupportTryXyzrhwPrimitiveVB(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
     {
         return R30TryXyzrhwPrimitiveVB(d,t,s,p);
@@ -8981,13 +8998,13 @@ namespace OutRunVRStereo
     {
         return R30TryXyzrhwIndexedPrimitiveVB(d,t,b,m,n,s,p);
     }
-    HRESULT R30SupportTryXyzrhwPrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwPrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
         const void* data, UINT st) noexcept
     {
         return R30TryXyzrhwPrimitiveUP(d,t,p,data,st);
     }
-    HRESULT R30SupportTryXyzrhwIndexedPrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwIndexedPrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         UINT m, UINT n, UINT p, const void* idx,
         D3DFORMAT f, const void* v, UINT st) noexcept

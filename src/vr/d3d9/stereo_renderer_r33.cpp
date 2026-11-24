@@ -1967,18 +1967,18 @@ namespace OutRunVRStereo
                             OutRunVR::UniversalTrace::Route::R30FixedSprite);
                     if (exact.handled) return exact.hr;
                 }
-                const HRESULT xyzrhw = tryXyzrhw
+                const auto xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwPrimitiveVB(
                     device, type, startVertex, primitiveCount)
-                    : E_NOTIMPL;
-                if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
+                    : OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                if (GpuWaterProbe::Enabled() && xyzrhw.handled)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::Xyzrhw);
-                if (xyzrhw != E_NOTIMPL) {
+                if (xyzrhw.handled) {
                     if (telemetry)
                         OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                             OutRunVR::UniversalTrace::Route::R30Xyzrhw);
-                    return xyzrhw;
+                    return xyzrhw.hr;
                 }
 
                 auto actual = [&]() {
@@ -2164,18 +2164,18 @@ namespace OutRunVRStereo
                             OutRunVR::UniversalTrace::Route::R30FixedSprite);
                     if (exact.handled) return exact.hr;
                 }
-                const HRESULT xyzrhw = tryXyzrhw
+                const auto xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride)
-                    : E_NOTIMPL;
-                if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
+                    : OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                if (GpuWaterProbe::Enabled() && xyzrhw.handled)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::Xyzrhw);
-                if (xyzrhw != E_NOTIMPL) {
+                if (xyzrhw.handled) {
                     if (telemetry)
                         OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                             OutRunVR::UniversalTrace::Route::R30Xyzrhw);
-                    return xyzrhw;
+                    return xyzrhw.hr;
                 }
 
                 auto actual = [&]() {
@@ -2235,19 +2235,19 @@ namespace OutRunVRStereo
                             OutRunVR::UniversalTrace::Route::R30FixedSprite);
                     if (exact.handled) return exact.hr;
                 }
-                const HRESULT xyzrhw = tryXyzrhw
+                const auto xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride)
-                    : E_NOTIMPL;
-                if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
+                    : OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                if (GpuWaterProbe::Enabled() && xyzrhw.handled)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::Xyzrhw);
-                if (xyzrhw != E_NOTIMPL) {
+                if (xyzrhw.handled) {
                     if (telemetry)
                         OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                             OutRunVR::UniversalTrace::Route::R30Xyzrhw);
-                    return xyzrhw;
+                    return xyzrhw.hr;
                 }
 
                 auto actual = [&]() {
