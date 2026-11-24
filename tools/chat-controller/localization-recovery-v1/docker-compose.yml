@@ -25,6 +25,7 @@ services:
       TZ: Asia/Seoul
       OUTRUN_GITOPS_HOME: /data/gitops
       OUTRUN_GITOPS_POLL_SECONDS: "${OUTRUN_GITOPS_POLL_SECONDS:-900}"
+      OUTRUN_CLEANPLATE_REPAIR_ENABLED: "${OUTRUN_CLEANPLATE_REPAIR_ENABLED:-1}"
       # Optional fine-grained GitHub Actions:Read and write PAT.
       # Without it the Docker only observes; GitHub cron/push still runs QA.
       OUTRUN_GITHUB_ACTIONS_TOKEN: "${OUTRUN_GITHUB_ACTIONS_TOKEN:-}"
@@ -65,6 +66,10 @@ services:
       OUTRUN_REWORK_HOME: /data/hd-rework
       OUTRUN_REWORK_BROWSER_PROFILE_DIR: /browser-profile
       OUTRUN_REWORK_POLL_SECONDS: "${OUTRUN_REWORK_POLL_SECONDS:-600}"
+      # Same C1 browser/profile, one full DDS per existing poll; no new Chrome.
+      OUTRUN_ATLAS_VISUAL_QA_ENABLED: "${OUTRUN_ATLAS_VISUAL_QA_ENABLED:-1}"
+      # Optional Actions:read token for the compact PNG artifact; Contents token is fallback.
+      OUTRUN_GITHUB_ACTIONS_TOKEN: "${OUTRUN_GITHUB_ACTIONS_TOKEN:-}"
       # Reuse-only QA queue remains immutable. Connect the independent,
       # SHA-proved ImageGen fallback queue (8 staged, 7 previously AB_SENT).
       # New generation is permitted only if there is no previous send receipt.
