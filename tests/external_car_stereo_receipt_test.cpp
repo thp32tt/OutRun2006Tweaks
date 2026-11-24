@@ -65,6 +65,25 @@ int main() {
         assert(r.provedNoPhysicalDraw==restored);
         assert(r.deviceRestoreFailed==!restored);
     }
+    // All 16 combinations of c64-c67 restore outcomes, including a
+    // failing first/middle register: every independent restore must run.
+    for(unsigned mask=0;mask<16;++mask) {
+        unsigned calls=0;
+        const bool restored=RestoreStereoWvpRegisters(4,[&](unsigned reg) {
+            assert(reg==calls++);
+            return (mask&(1u<<reg))!=0;
+        });
+        assert(calls==4 && restored==(mask==15u));
+        r={};r.expectedPose=44;
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalPreRasterRollback(restored);
+        assert(CanFallbackAfterNoExternalRaster(r,0,0)==restored);
+        // Simulate a failed RIGHT GPU draw after a live LEFT draw. Even
+        // complete WVP restoration cannot prove zero physical submission.
+        RecordExternalStereoMeshPair(true,false,restored,44,true,true,!restored);
+        assert(!r.Complete() && !CanFallbackAfterNoExternalRaster(r,0,0));
+        assert(r.rightDrawFailed && r.deviceRestoreFailed==!restored);
+    }
     // First-mesh proven no-DIP is safe; missing or late reports are not.
     r={};r.expectedPose=44;
     {

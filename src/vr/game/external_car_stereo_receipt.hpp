@@ -102,6 +102,16 @@ inline bool RestoreExternalStereoTransformPair(RestoreView view,RestoreProjectio
     const bool projectionOk=projection();
     return viewOk && projectionOk;
 }
+// Restore independent c64-c67 registers even after a failed setter.
+// Keep the failure sticky while making the best possible device recovery.
+template<class RestoreRegister>
+inline bool RestoreStereoWvpRegisters(unsigned count,RestoreRegister restore) noexcept {
+    bool ok=true;
+    for(unsigned reg=0;reg<count;++reg) {
+        if(!restore(reg))ok=false;
+    }
+    return ok;
+}
 inline void RecordExternalPreRasterRollback(bool restored) noexcept {
     if(!ActiveExternalStereoMesh)return;
     if(restored) {

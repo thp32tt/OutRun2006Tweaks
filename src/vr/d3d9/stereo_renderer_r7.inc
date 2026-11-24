@@ -1377,6 +1377,16 @@ namespace OutRunVRStereo
 			return true;
 		}
 
+		// Upload may stop on failure; rollback must attempt every original register.
+		bool RestoreWvpOneRegisterAtATime(IDirect3DDevice9* device, const float* constants)
+		{
+			return OutRunVR::DinoSidecar::RestoreStereoWvpRegisters(
+				OutRunWvpRegisterCount, [&](unsigned reg) {
+					return SUCCEEDED(device->SetVertexShaderConstantF(
+						OutRunWvpRegister + reg, constants + reg * 4, 1));
+				});
+		}
+
         // The PBR VS consumes c4/c8 directly (not D3DTS_VIEW/PROJECTION).
         // Its pixel shader also requires the matching per-eye camera position.
         bool SetExternalPbrEyeConstants(IDirect3DDevice9* device,
@@ -1823,7 +1833,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		}
 
 		void NoteRestoreFailure(const char* what){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailureRestoreFailed);++RestoreFailures;if(!FirstRestoreFailureLogged){FirstRestoreFailureLogged=true;spdlog::warn("VR stereo: renderer state restore failed at {}; frame forced to mono fallback",what);}}
-		bool RestoreRightPassState(IDirect3DDevice9* device,IDirect3DSurface9* savedRt,IDirect3DSurface9* savedDepth,const D3DVIEWPORT9& savedViewport,const float* originalConstants,bool restoreWvp){bool ok=true;if(savedRt&&FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,savedRt)))ok=false;const HRESULT depthHr=SetDepthStencilSurfaceHook?SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,savedDepth):device->SetDepthStencilSurface(savedDepth);if(FAILED(depthHr))ok=false;if(FAILED(device->SetViewport(&savedViewport)))ok=false;if(restoreWvp&&!SetWvpOneRegisterAtATime(device,originalConstants))ok=false;return ok;}
+		bool RestoreRightPassState(IDirect3DDevice9* device,IDirect3DSurface9* savedRt,IDirect3DSurface9* savedDepth,const D3DVIEWPORT9& savedViewport,const float* originalConstants,bool restoreWvp){bool ok=true;if(savedRt&&FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,savedRt)))ok=false;const HRESULT depthHr=SetDepthStencilSurfaceHook?SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,savedDepth):device->SetDepthStencilSurface(savedDepth);if(FAILED(depthHr))ok=false;if(FAILED(device->SetViewport(&savedViewport)))ok=false;if(restoreWvp&&!RestoreWvpOneRegisterAtATime(device,originalConstants))ok=false;return ok;}
 		bool TryBootstrapRightDepthFromRecentClear(IDirect3DDevice9*device)
 		{
 			++DepthBootstrapAttempts;
@@ -2202,7 +2212,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                             RestoreExternalPbrConstants(device,draw) :
                             (draw.fixedFunctionWorld ?
                             RestoreFixedFunctionTransforms(device,draw) :
-                            SetWvpOneRegisterAtATime(device,draw.originalConstants));
+                            RestoreWvpOneRegisterAtATime(device,draw.originalConstants));
 					}
 					InvalidateRightDepthStencilIfLeftMayWrite(device);
 					PoisonFrame(OutRunVR::StereoFailureLeftWvpUploadFailed);
@@ -2243,7 +2253,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                             RestoreExternalPbrConstants(device,draw) :
                             (draw.fixedFunctionWorld ?
                             RestoreFixedFunctionTransforms(device,draw) :
-                            SetWvpOneRegisterAtATime(device,draw.originalConstants));
+                            RestoreWvpOneRegisterAtATime(device,draw.originalConstants));
 					}
 					if(!restored)
 						NoteRestoreFailure(draw.fixedFunctionWorld?
