@@ -56,7 +56,8 @@ static std::vector<std::uint8_t> Dds1x1Dxt5() {
 }
 
 static std::vector<std::uint8_t> Make(bool goodAxis=true,
-                                      const std::string& name="EXT_OPAQUE_00") {
+                                      const std::string& name="EXT_OPAQUE_00",
+                                      bool maps=false) {
     std::vector<std::uint8_t> payload;
     PutU16(payload,static_cast<std::uint16_t>(name.size()));
     PutU16(payload,0);PutU32(payload,3);PutU32(payload,3);PutU32(payload,4);
@@ -70,7 +71,10 @@ static std::vector<std::uint8_t> Make(bool goodAxis=true,
     Append(payload,dds.data(),dds.size());
     Append(payload,"OVCPBR3!",8);
     PutF32(payload,0.5f);PutF32(payload,0.f);PutF32(payload,1.f);
-    PutU32(payload,0);PutU32(payload,0);
+    for(unsigned role=0;role<2;++role) {
+        PutU32(payload,maps?static_cast<std::uint32_t>(dds.size()):0u);
+        if(maps)Append(payload,dds.data(),dds.size());
+    }
     Append(payload,"OVCDASH4",8);PutU32(payload,1);
     PutU32(payload,0);PutU32(payload,1);PutU32(payload,0);PutU32(payload,0);
     PutF32(payload,0);PutF32(payload,0);PutF32(payload,0);
@@ -118,6 +122,33 @@ int main() {
         assert(accepted.meshes.size()==1 && accepted.meshes[0].name==name);
         const std::size_t vbOff=36u+16u+name.size();
         const std::size_t ibOff=vbOff+3u*sizeof(Vertex);
+        // All three DDS roles share ParseDds. Test every canonical slot.
+        const auto mapped=Make(true,name,true);
+        const std::size_t albedo=ibOff+12u+4u;
+        const std::size_t normal=albedo+132u+8u+12u+4u;
+        const std::size_t orm=normal+132u+4u;
+        struct ResourceCase { unsigned field,value; bool accepted; };
+        const ResourceCase cases[]={
+            {112u,0u,true},{24u,1u,true},
+            {112u,0x200u,false},{112u,0x400u,false},
+            {112u,0x8000u,false},{112u,0x200000u,false},
+            {8u,0x800000u,false},{24u,2u,false}
+        };
+        for(const auto offset:{albedo,normal,orm}) {
+            for(const auto& c:cases) {
+                auto fixture=mapped;
+                SetU32(fixture,offset+c.field,c.value);
+                SetU32(fixture,32u,Crc32(fixture.data()+36u,fixture.size()-36u));
+                Model checked;
+                assert(Parse(fixture.data(),fixture.size(),checked,error)==c.accepted);
+                if(c.accepted) {
+                    assert(checked.pbrMaterials.size()==1);
+                    assert(!checked.pbrMaterials[0].normal.dds.empty());
+                    assert(!checked.pbrMaterials[0].orm.dds.empty());
+                } else assert(error==(offset==albedo?
+                    "unsupported dds texture":"unsupported pbr dds texture"));
+            }
+        }
         auto repeated=valid;
         SetU32(repeated,ibOff+4u,0u);
         SetU32(repeated,ibOff+8u,0u);

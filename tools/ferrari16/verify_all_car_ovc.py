@@ -53,6 +53,10 @@ def dds_length(data: bytes, offset: int, count: int, legacy: bool) -> int:
     d = memoryview(data)[offset:offset + count]
     require(d[:4] == b"DDS " and u32(d, 4) == 124 and u32(d, 76) == 32,
             "DDS signature/headers")
+    # Native CreateTexture uploads 2D only; reject cube faces and volumes.
+    require(not (u32(d, 112) & 0x0020fe00) and
+            not (u32(d, 8) & 0x00800000) and u32(d, 24) <= 1,
+            "DDS non-2D resource")
     height, width, mips = u32(d, 12), u32(d, 16), u32(d, 28)
     require(0 < width <= 2048 and 0 < height <= 2048 and
             width & (width - 1) == 0 and height & (height - 1) == 0,
@@ -422,6 +426,32 @@ def self_test() -> None:
         assert covered["pbr_uncovered"]["no_normal"] == []
         assert covered["pbr_uncovered"]["no_orm"] == []
         assert pbr_map_coverage(covered)
+        # All sixteen slots and three DDS roles, with valid outer CRC.
+        albedo_offset = len(group) + 4
+        normal_offset = albedo_offset + len(dds) + 8 + 12 + 4
+        orm_offset = normal_offset + len(dds) + 4
+        for car_id, _ in CARS:
+            slot_path = Path(directory) / f"car_id_{car_id:02d}.ovc"
+            for texture_offset in (albedo_offset, normal_offset, orm_offset):
+                for field, value, expected in (
+                    (112, 0, True), (24, 1, True),
+                    (112, 0x200, False), (112, 0x400, False),
+                    (112, 0x8000, False), (112, 0x200000, False),
+                    (8, 0x800000, False), (24, 2, False),
+                ):
+                    fixture = bytearray(mapped)
+                    struct.pack_into("<I", fixture, texture_offset + field, value)
+                    fixture_header = b"OVRCABH4" + struct.pack(
+                        "<7I", 4, 1, 1, 3, 1, len(fixture),
+                        zlib.crc32(fixture) & 0xffffffff)
+                    slot_path.write_bytes(fixture_header + fixture)
+                    try:
+                        details = inspect(slot_path)
+                    except OvcError as error:
+                        assert not expected and str(error) == "DDS non-2D resource"
+                    else:
+                        assert expected and pbr_map_coverage(details), (
+                            car_id, texture_offset, field, value)
         # CRC-correct OVC4 with full DDS maps but zero material strength
         # is structurally renderable, not a functioning normal-mapped body.
         # Exercise positive/negative strengths for every canonical slot.

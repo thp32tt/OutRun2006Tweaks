@@ -75,6 +75,10 @@ inline bool ParseDds(const std::uint8_t* d,std::size_t size,Texture& out,bool le
     if(!d || size<128 || std::memcmp(d,"DDS ",4)!=0 ||
        U32(d+4)!=124 || U32(d+76)!=32 || U32(d+12)==0 || U32(d+16)==0)
         return false;
+    // CreateTexture uploads a 2D resource, never a cube or volume.
+    // Reject even a single-face/slice payload with a recomputed OVC CRC.
+    if((U32(d+112)&0x0020fe00u)!=0u || (U32(d+8)&0x00800000u)!=0u ||
+       U32(d+24)>1u)return false;
     const unsigned width=U32(d+16),height=U32(d+12);
     if(width>2048 || height>2048 ||
        (width&(width-1))!=0 || (height&(height-1))!=0)
