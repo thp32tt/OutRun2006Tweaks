@@ -994,7 +994,7 @@
         },
         {
           "cycle_key": "EXT16-011-20261124-1730-DDS-UPLOAD-ALBEDO-MIPS",
-          "status": "PATCHED_EXACT_SHA_CI_PENDING_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_MULTICAR_BUILD_PACKAGE_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "OVC4 material integrity and DDS mip upload/strict albedo coverage",
           "source_material_sha": "9336248121ed595104d41fd7917854f11347062d",
           "source_defect": "UploadDDS ignored staging UnlockRect HRESULT and could publish a texture after a failed mip commit. Strict PBR preflight checked normal/ORM full mip chain but not albedo of used materials, including glass. CRC alone cannot prove complete mip coverage.",
@@ -1017,22 +1017,22 @@
               {
                 "run_id": 45356828291,
                 "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
-                "status": "in_progress",
-                "conclusion": null,
+                "status": "completed",
+                "conclusion": "success",
                 "head_sha": "9336248121ed595104d41fd7917854f11347062d"
               },
               {
                 "run_id": 45356828298,
                 "name": "Build",
-                "status": "in_progress",
-                "conclusion": null,
+                "status": "completed",
+                "conclusion": "success",
                 "head_sha": "9336248121ed595104d41fd7917854f11347062d"
               },
               {
                 "run_id": 45356828559,
                 "name": "Ferrari16 All-Car Sidecar Regression",
-                "status": "in_progress",
-                "conclusion": null,
+                "status": "completed",
+                "conclusion": "success",
                 "head_sha": "9336248121ed595104d41fd7917854f11347062d"
               }
             ]
@@ -1040,20 +1040,51 @@
           "asset_validation": "No private car OVC/GLB files accessed or modified; actual sixteen vehicle source/processed hashes, mesh and channel quality unverified. No asset promotion or licensing change.",
           "protected_v003": "No release, player wrapper, renderer hooks, launch or host changes. External atomic pre-DIP fence unchanged.",
           "runtime_validation": "UNTESTED",
-          "score_state": "PENDING_EXACT_SHA_CI_NO_NEW_SCORE",
+          "score_state": "NO_LEDGER_CHANGE_THIS_CYCLE",
           "next_trace": "Trace per-material sRGB/linear sampler state, normalScale=0 and ORM channel packing, glass alpha/depth and DDS failure fallback; verify current exact-SHA CI; continue whole-vehicle atomic eye staging."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-1800-PBR-NORMAL-STRENGTH",
+          "status": "PATCHED_EXACT_SHA_CI_UNCONFIRMED_CONTINUE_ACTIVE",
+          "rotating_focus": "Glass transparency and PBR shading; normal strength zero and degenerate mapped normal",
+          "source_material_sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
+          "source_defect": "OVC parser permits normalScale=0. Pixel shader sampled a bound map and normalized mapN.z*N at zero strength; negative Z flips the base normal, zero vector has undefined normalization. A degenerate mapped vector at nonzero strength was also unguarded.",
+          "source_fix": "Require factors.z > 0 before applying the derivative TBN normal map. Preserve unperturbed N when mapped vector squared length <= 1e-12; keep handedness, nonzero strength, existing alpha, ORM and eye constants unchanged.",
+          "source_blob_sha1": {
+            "src/vr/game/dino_external_pbr_shader.hpp": "3e9243bff31513c3b615d30becacb0f117a8b141",
+            "tests/ferrari16_pbr_derivative_gate_test.py": "f706e7323a1a35c363603b1920df07d1c2ca1de4"
+          },
+          "positive_negative_regressions": [
+            "Existing CI Python derivative test extended: zero strength with negative/zero/positive Z, missing map, degenerate/near-zero vectors preserve normal; valid positive map, strength 2 and mirrored UV still perturb correctly. Source guards assert ordering and no unconditional mapped normalize.",
+            "224 portable reference assertions executed in JS against the same mathematical predicate; committed HLSL source order checked. Actual Python CI and SM3 compiler results not yet confirmed for new SHA; no physical GPU fault injection."
+          ],
+          "same_sha_ci": {
+            "sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
+            "status": "UNCONFIRMED",
+            "note": "GitHub commit-workflow lookup returned no runs (PR-filtered wrapper), combined statuses empty. Do not inherit prior SHA success."
+          },
+          "remaining_trace": [
+            "DrawNativeScene sorts glass centroids once using latched center view and shares order across both eyes; depth writes disabled for glass, depth test remains enabled, blend ADD source-over, saved state Apply checked. No independent per-eye sorting or real overlap acceptance established.",
+            "Pixel shader albedo gamma decode/encode explicit; sampler sRGB disabled for albedo/normal/ORM. Shader currently has analytic light/specular and ambient, no environment-reflection sampler; do not claim authentic environment reflections.",
+            "RuntimeExternalCarAtomicStageReady remains false: no new external DIP activation; whole-vehicle L/R color+depth pair-atomic publication remains open."
+          ],
+          "protected_v003": "Only external PBR shader and existing Python test changed; release, x86 ABI, hooks, launch/host and external pre-DIP safety fence unchanged.",
+          "asset_validation": "No private 16 car assets, hashes or visual validation; no model promotions or licensing changes.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI",
+          "next_trace": "Confirm exact SHA Windows SM3 HLSL, multicar, x86 DLL/x64 package CI. Investigate glass center-vs-eye order and two-sided shading with concrete overlap counterexamples; preserve whole-vehicle atomic staging and stock fallback gates."
         }
       ],
-      "latest_material_sha": "9336248121ed595104d41fd7917854f11347062d",
-      "latest_static_ci": "EXACT_SOURCE_SHA_CI_PENDING",
-      "next_focus": "Trace per-material sRGB/linear sampler state, normalScale=0 and ORM channel packing, glass alpha/depth and DDS failure fallback; verify current exact-SHA CI; continue whole-vehicle atomic eye staging."
+      "latest_material_sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
+      "latest_static_ci": "EXACT_SOURCE_SHA_CI_UNCONFIRMED",
+      "next_focus": "Confirm exact SHA Windows SM3 HLSL, multicar, x86 DLL/x64 package CI. Investigate glass center-vs-eye order and two-sided shading with concrete overlap counterexamples; preserve whole-vehicle atomic staging and stock fallback gates."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 14:24:00+09:00",
+  "last_updated_kst": "2026-11-24 18:02:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
