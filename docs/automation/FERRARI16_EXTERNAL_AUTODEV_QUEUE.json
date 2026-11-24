@@ -1533,7 +1533,8 @@
           "same_sha_ci": {
             "sha": "83c4b119027f12dd4101eb16ad0dd83097f782ab",
             "status": "UNVERIFIED",
-            "note": "Commit workflow lookup PR-filtered empty and combined status empty. Existing push workflow still calls package tests, builds x86 DLL/x64 host, packages and runs PS5.1 isolated install/restore. Actual run result not observed; no CI skip/rerun or claimed PASS."
+            "note": "Commit workflow lookup PR-filtered empty and combined status empty. Existing push workflow still calls package tests, builds x86 DLL/x64 host, packages and runs PS5.1 isolated install/restore. Actual run result not observed; no CI skip/rerun or claimed PASS.",
+            "followup_verified": "2026-11-25 00:00 KST: push runs 45415133743 multicar, 45415133789 isolated Win32 DLL+x64 host package/install/rollback and 45415133821 Build all success on exact 83c4b119. No rerun or duplicate score."
           },
           "render_trace": [
             "Build exact SHA -> source_items -> assert_binaries -> QA ContentSha256 -> ZIP -> verify_package -> SHA and PE validation. Existing installer checks exact manifest names/hashes before backup and writes; it does not independently validate PE roles if manifest and payload are both replaced, so extracted-package parity remains a separate follow-up.",
@@ -1545,18 +1546,69 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Trace 328 GTS/575 Superamerica/F430 Spider/Testarossa Spider exact-variant source-to-OVC material/texture binding and decoded preview evidence with positive/negative synthetic cases; preserve all blocked promotions and rights. Separate pending isolated installer PE parity, rollback partial-write recovery, real pair-atomic GPU stage and exact-SHA Windows CI remain open."
+        },
+        {
+          "cycle_key": "EXT16-011-20261125-0000-GLB-MATERIAL-BINDINGS",
+          "status": "PATCHED_MULTICAR_EXACT_SHA_PASS_CONTINUE_ACTIVE",
+          "rotating_focus": "Four optional exact variants: source-to-converted GLB actual primitive material texture role binding",
+          "source_material_sha": "16c29dcb751a9996dc9295f0e0c39a09ef76dc72",
+          "source_defect": "GLB inventory/name/size and triangle comparison accepted missing/invalid primitive material, orphan normal/metallic-roughness, swapped texture roles, unsupported UV or changed alpha mode despite unchanged image inventory and triangles.",
+          "source_fix": "Resolve primitive->material->texture->image; require used non-BLEND primitive normal and metallic-roughness references, validate UV0 and reject unsupported texture transforms/extensions, compare per-alpha/material role signature triangle counts by image name rather than texture index. Conservative quality gate; no promotion, renderer or native ABI changes.",
+          "source_blob_sha1": {
+            "tools/ferrari16/exact_variant_quality_gate.py": "6ab34cfbc7f253b413f159465dbcfbae8aac9c36",
+            "tests/ferrari16_exact_variant_quality_gate_test.py": "38180fba69f2806ec0a7ccbb558cb1faf1384838"
+          },
+          "positive_negative_regressions": [
+            "Four exact variant slot IDs x 1 valid reorder and 9 negative cases = 40 new synthetic cases. Missing material, orphan normal/ORM, invalid texture/image indices, unsupported UV/transform, swapped roles and changed alpha. Existing indexed/non-indexed, wrong variant, rights, hash, downscale and OVC tests retained.",
+            "GitHub multicar exact source job completed success including Python smoke and production source checks; local network DNS unavailable, no local full test claimed."
+          ],
+          "same_sha_ci": {
+            "sha": "16c29dcb751a9996dc9295f0e0c39a09ef76dc72",
+            "runs": [
+              {
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "id": 45420817341,
+                "status": "in_progress",
+                "conclusion": null,
+                "sha": "16c29dcb751a9996dc9295f0e0c39a09ef76dc72"
+              },
+              {
+                "name": "Build",
+                "id": 45420817347,
+                "status": "in_progress",
+                "conclusion": null,
+                "sha": "16c29dcb751a9996dc9295f0e0c39a09ef76dc72"
+              },
+              {
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "id": 45420817296,
+                "status": "completed",
+                "conclusion": "success",
+                "sha": "16c29dcb751a9996dc9295f0e0c39a09ef76dc72"
+              }
+            ]
+          },
+          "render_trace": [
+            "GLB bounds and indices -> used primitive binding -> named embedded image dimensions -> source/converted material triangle counters -> OVC4 CRC, geometry and strict opaque normal/ORM/UV coverage. OVC texture identity/pixel equivalence is not proven by GLB signature and OVC map coverage.",
+            "Preview files currently only hash/suffix checked and fake preview bytes pass; separate next hypothesis. Material factors, sampler changes, decoded texture pixel and per-mesh mapping remain unverified. Real pair-atomic GPU stage still closed; stock path protected."
+          ],
+          "asset_validation": "No private actual 16 GLB/OVC or rights inspected; four candidates not promoted. N100 unused.",
+          "protected_v003": "Only offline gate/test changed. No runtime renderer, host, launch, stable release, game files or deployment changes.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Graphics performance: trace R7/R30/R33 duplicate render submissions, state capture/restore and GPU synchronization/allocation under existing fail-closed stage; prove concrete counterexample before patch. Separately inspect decoded PNG/JPEG preview evidence (current fake fixture bytes accepted), material factors/pixel equivalence, OVC texture mapping receipts, installer PE parity and partial restore recovery. No private asset promotion or atomic-stage enable."
         }
       ],
-      "latest_material_sha": "83c4b119027f12dd4101eb16ad0dd83097f782ab",
-      "latest_static_ci": "EXACT_BLOB_FULL_PACKAGE_10_UNITTEST_PASS_WINDOWS_CI_UNVERIFIED",
-      "next_focus": "Trace 328 GTS/575 Superamerica/F430 Spider/Testarossa Spider exact-variant source-to-OVC material/texture binding and decoded preview evidence with positive/negative synthetic cases; preserve all blocked promotions and rights. Separate pending isolated installer PE parity, rollback partial-write recovery, real pair-atomic GPU stage and exact-SHA Windows CI remain open."
+      "latest_material_sha": "16c29dcb751a9996dc9295f0e0c39a09ef76dc72",
+      "latest_static_ci": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package: in_progress; Build: in_progress; Ferrari16 All-Car Sidecar Regression: success",
+      "next_focus": "Graphics performance: trace R7/R30/R33 duplicate render submissions, state capture/restore and GPU synchronization/allocation under existing fail-closed stage; prove concrete counterexample before patch. Separately inspect decoded PNG/JPEG preview evidence (current fake fixture bytes accepted), material factors/pixel equivalence, OVC texture mapping receipts, installer PE parity and partial restore recovery. No private asset promotion or atomic-stage enable."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 23:30:00+09:00",
+  "last_updated_kst": "2026-11-25 00:03:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
