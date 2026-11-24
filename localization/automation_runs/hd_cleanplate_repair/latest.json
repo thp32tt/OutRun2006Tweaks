@@ -1,0 +1,17 @@
+{
+  "artifact_id": 14893858940,
+  "asset_sha": "5d1b4ad51698fa220d9f8559bbb5f44abd36f72d",
+  "counts": {
+    "atlases": 104,
+    "changed_dds": 74,
+    "held": 611,
+    "painted": 343,
+    "roi": 954
+  },
+  "generation": 1,
+  "manifest_sha256": "42bc76b14b32e4d1c1b0ef42c283c06acd1d8a54622d6c948f0d746fe354ee73",
+  "release_approved": false,
+  "run_id": 45333597142,
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun.hd.cleanplate-queue-pointer.v1"
+}
