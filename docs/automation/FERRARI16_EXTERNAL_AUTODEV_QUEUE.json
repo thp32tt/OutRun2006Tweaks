@@ -725,11 +725,62 @@
           "runtime_validation": "UNTESTED",
           "limits": "Current external renderer is fail-closed stock-only because EXT16-007 whole-vehicle two-eye color/depth atomic staging is absent; HMD/FPS and current 16 private licensed OVC/GLB PBR material acceptance not proven.",
           "next_trace": "R7 ExecuteStereoDraw() left live draw before right target/depth, design isolated whole-vehicle stereo color+depth staging and fail-before-first-live DIP with right-eye fault injection; preserve x86 retail 49F3E0 full wrapper and v0.03"
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-1531-R7-OVC-PREPARATION-FAILCLOSE",
+          "status": "PATCHED_EXACT_SHA_CI_PASS_CONTINUE_ACTIVE",
+          "rotating_focus": "DX9Ex R7: left/right raster staging, texture/depth ownership, proof of all-or-stock transaction, failing right-eye injection",
+          "source_owner": "src/hooks_graphics.cpp PrepareF50External -> GpuOwner::SafeFloorLift -> EnsureLoaded; R33/R30/R7 DrawIndexedPrimitive",
+          "source_defect": "PrepareF50External launched async OVC disk/CRC/mesh and selector work even though current atomic stereo stage guard in DrawNativeScene always returned before physical draw; wasted private model IO/CPU for each opted-in vehicle selection without a possible external GPU submission.",
+          "evidence_call_graph": [
+            "hooks_graphics.cpp PrepareF50External: permit experimental route -> SelectSidecar -> SafeFloorLift -> device/eye ticket, before DrawPreparedF50External.",
+            "dino_external_d3d9.hpp SafeFloorLift -> EnsureLoaded: std::async OVC ReadFile/Parse/normal repair; DrawNativeScene aborts at RuntimeExternalCarAtomicStageReady() before EnsureResources.",
+            "stereo_renderer_r33.cpp:2010-2018 and stereo_renderer_r30.cpp:8584-8591 reject un-staged external DIP before any physical raster.",
+            "stereo_renderer_r7.inc:2231 LEFT live draw, 2267-2295 RIGHT RT/depth/viewport then draw, 2353-2368 stereo report and E_FAIL cannot reverse live LEFT pixels."
+          ],
+          "source_fix": "Add pure authorized+atomic-ready preparation gate and reject in PrepareF50External before GetLatchedStereoFrameView, device acquisition, GlobalGpu SelectSidecar, SafeFloorLift and OVC async parse. Leave disabled atomic stage and all physical R7/R30/R33 fences unchanged.",
+          "source_material_sha": "f5058de7adaa3af041d6ecf15144388200758a8b",
+          "source_blob_sha1": {
+            "src/hooks_graphics.cpp": "6774c35db27226be2e109b4105113c1a277373a4",
+            "src/vr/game/external_car_atomic_precommit.hpp": "df706d660bdbd616c46fb942c58a6086b453788c",
+            "tests/external_car_atomic_precommit_test.cpp": "6d6aa779b3ae49a45a22d15860b85066cbb5e540",
+            ".github/workflows/ferrari16-multicar-regression.yml": "97fc61e7cffb282b8e9968ffeea095f9ae15c3cd"
+          },
+          "positive_negative_regressions": [
+            "PASS: authorized hypothetical staged owner permits exactly one mock CPU OVC read and one GPU allocation.",
+            "PASS: absent backend and/or unauthorized owner forbids all mock OVC reads/GPU allocations, including all sixteen previous live-eye injection cases.",
+            "PASS: GitHub source-order gate prevents async OVC, selection, device or XR path before atomic-ready admission.",
+            "PASS: previous Ferrari16 C++/Python OVC/PBR/mesh corruption and Windows SM3 shader checks remain green."
+          ],
+          "same_sha_ci": {
+            "sha": "f5058de7adaa3af041d6ecf15144388200758a8b",
+            "ferrari16_cpp_python_and_windows_hlsl": {
+              "run_id": 45341532460,
+              "conclusion": "SUCCESS"
+            },
+            "windows_x86_game_dll_build": {
+              "run_id": 45341532404,
+              "conclusion": "SUCCESS"
+            },
+            "windows_x86_dll_x64_openxr_host_exact_sha_zip_and_rollback": {
+              "run_id": 45341532514,
+              "conclusion": "SUCCESS"
+            },
+            "hud_inspector": {
+              "run_id": 45341532541,
+              "conclusion": "SUCCESS"
+            }
+          },
+          "failed_hypothesis": "R7 RIGHT failure HRESULT/mesh receipt alone can undo a successful physical LEFT raster; false: both color and depth are already live, so current external renderer must remain STOCK_ONLY until isolation/atomic publication is implemented.",
+          "protected_v003": "NOT_MODIFIED; Windows CI protected paths and R7-only drift gate PASS",
+          "private_current_16_model_asset_proof": "UNVERIFIED; no source rights or asset binary changed",
+          "runtime_validation": "UNTESTED",
+          "next_trace": "Implement and fault-inject isolated whole-vehicle dual-eye color+depth staging with a proven all-or-stock publish/rollback strategy BEFORE first live external DIP; retain R33/R30/R7 fences, stock 49F3E0 two-call wrapper, x86 ABI and Quest3 runtime UNTESTED."
         }
       ],
-      "latest_material_sha": "a99938b07e9b7f52a854807db5a7314927ca76e6",
+      "latest_material_sha": "f5058de7adaa3af041d6ecf15144388200758a8b",
       "latest_static_ci": "SUCCESS_EXACT_SOURCE_SHA",
-      "next_focus": "R7 ExecuteStereoDraw() left live draw before right target/depth, design isolated whole-vehicle stereo color+depth staging and fail-before-first-live DIP with right-eye fault injection; preserve x86 retail 49F3E0 full wrapper and v0.03"
+      "next_focus": "R7 whole-vehicle isolated L/R color+depth staging, stereo pair-atomic publish and physical RIGHT failure injection before first live DIP; test protected v0.03 parity."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
