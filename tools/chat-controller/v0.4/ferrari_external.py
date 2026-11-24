@@ -46,8 +46,40 @@ def choose_external_work(queue: dict, expected_repo: str, expected_branch: str) 
     return active
 
 
-def make_external_prompt(work: dict, queue: dict, source_sha: str, continuation: bool) -> str:
+def choose_continuous_debug_work(queue: dict, expected_repo: str, expected_branch: str) -> dict | None:
+    """When fixed work runs out, keep investigating independent, known open defects.
+
+    This does not mark blocked/completed work as passed, nor auto-pass HMD QA.
+    The same task ID is reused across 30-minute diagnostic dispatches.
+    """
+    policy = queue.get("continuous_debug_policy") or {}
+    if policy.get("enabled") is not True:
+        return None
+    if queue.get("repository") != expected_repo or queue.get("target_branch") != expected_branch:
+        raise ValueError("continuous debugging scope mismatch")
+    debug_id = policy.get("work_id")
+    if not isinstance(debug_id, str) or not re.fullmatch(r"EXT16-[0-9]{3}", debug_id):
+        raise ValueError("invalid continuous debug work ID")
+    item = next((w for w in queue["work"] if w["id"] == debug_id), None)
+    if not item or item.get("continuous_debug") is not True or item.get("requires_user_headset"):
+        raise ValueError("continuous debug work must be explicit and non-HMD")
+    if item.get("stage") not in VALID_STAGES:
+        raise ValueError("invalid continuous debug stage")
+    # Never change persisted queue status or erase blocked evidence.
+    return dict(item, status="ACTIVE")
+
+
+def make_external_prompt(work: dict, queue: dict, source_sha: str, continuation: bool,
+                         debug_iteration: int = 0, debug_focus: str = "") -> str:
     task_id = work["id"]
+    continuous = work.get("continuous_debug") is True
+    preface = ([
+        f"CONTINUOUS_DEBUG=1, DEBUG_ITERATION={debug_iteration}, ROTATING_FOCUS={debug_focus}",
+        "영구 디버깅 큐: 기존 BLOCKED/COMPLETE_STATIC 근거를 보존하고 동일 EXT16-011 ID로 계속 추적한다. 원인을 못 찾았거나 이번 회차 코드 커밋이 없어도 작업을 종료/차단/완료로 바꾸지 마.",
+        "이번 회차에는 ROTATING_FOCUS를 우선해 콜 그래프, 실패 경로, 예외, VR 렌더 상태, 16대 PBR 경계조건을 추적하라. 수정 가능한 실제 결함이면 소스+양성/음성 테스트 커밋; 결함이 입증되지 않으면 코드 변경을 꾸미지 말고 다른 경로를 조사하고 관찰 증거 및 다음 가설을 남겨라.",
+        "00/30분 실행은 독립된 진단 회차다. 중복 검토/반복 보고를 신규 성과로 가산하지 말고, 사용자 Quest3 실기 통과·16대 개인 모델 실물을 자동으로 인증하지 마.",
+        "이 작업 항목은 정적 CI 통과, 미발견, 자료 미확보, WAIT_INPUT만으로 영구 종료하지 않는다. 큐의 EXT16-011은 ACTIVE 유지, active_work_id도 EXT16-011 유지. 불가한 단일 가설은 기록 후 다음 회차로 넘긴다.",
+    ] if continuous else [])
     return "\n".join([
         f"[자동개발 외부차량] TASK_ID={task_id}, MODE=FERRARI16_EXTERNAL, CONTINUATION={int(continuation)}",
         "프로젝트=OutRun 2006 Ferrari16 외부 3D 모델·스테레오/PBR 정상화. 원본 운전석 PMT 형상 리워크 아님.",
@@ -60,7 +92,9 @@ def make_external_prompt(work: dict, queue: dict, source_sha: str, continuation:
         "소스는 GitHub 우선, ChatGPT 작업환경 우선, N100에서는 사설 원본·대형 GLB/OVC 실측 및 최소 보조작업만 수행. N100 과부하 큰 빌드·반복검색 금지.",
         "소스/가공품 SHA, 차량별 재질·노멀·메시 QA, 음성 테스트, Windows x86 DLL+x64 host exact-SHA CI를 구분해서 기록. 기존 정상 릴리즈를 덮어쓰지 마.",
         "제3자 모델 저작권·변환/배포 조건 준수. 공개 Git에 외부 상용 모델 바이너리, 게임 원본, 인증정보 올리지 마. 유료 구매·차단 우회 불가.",
-        "완료할 때만 같은 큐 JSON의 현재 항목 status=COMPLETE_STATIC, material SHA/CI evidence를 추가하고 active_work_id를 다음 QUEUED 작업으로 진행. 실패/차단이면 status=BLOCKED와 구체적 이유 및 대안 기록, 다음 독립 작업으로 진행.",
+        *preface,
+        ("이번 회차에 실제 수정했으면 결과 SHA와 테스트를 기록하되 EXT16-011 status/active_work_id는 유지하고 다음 진단 회차를 계속한다. 수정사항이 없으면 증거/가설만 정리하고 상태는 유지." if continuous else
+         "완료할 때만 같은 큐 JSON의 현재 항목 status=COMPLETE_STATIC, material SHA/CI evidence를 추가하고 active_work_id를 다음 QUEUED 작업으로 진행. 실패/차단이면 status=BLOCKED와 구체적 이유 및 대안 기록, 다음 독립 작업으로 진행."),
         "실기 Quest3 테스트는 사용자만 가능. HMD/RUNTIME_VALIDATION=UNTESTED 또는 WAITING_USER_HMD; 정적 CI로 가상현실 완성이라 주장하지 마.",
         "새 TASK_ID 발급·기존 중단 프로젝트 재개·우회 커밋·CI-skip 금지. 한 가지 완성된 수정 단위가 끝나면 실제 SHA 기록 후 다음 미완료 하위 단계를 계속 수행.",
         f"끝에 TASK_ID={task_id}, RESULT_SHA=<실제 SHA 또는 NONE>, MATERIAL_DELTA=<실제 변경>, NEXT_ACTION=<다음 구현>, RUNTIME_VALIDATION=UNTESTED를 기재.",
@@ -108,7 +142,9 @@ async def external_model_cycle(context, pages: dict, q: dict, now: datetime, hos
         return False
 
     last = g("_parse_iso")(state.get("last_sent_at"))
-    if last and (now - last).total_seconds() < 1800:
+    # Distinct :00 and :30 windows, even if the previous browser send was delayed.
+    # Keep a minimum safety gap for rate-limit and accidental clock overlap.
+    if last and (now - last).total_seconds() < 600:
         return False
     repo = g("CAR_MODEL_GITHUB_REPO")
     branch = g("CAR_MODEL_TARGET_BRANCH")
@@ -124,6 +160,8 @@ async def external_model_cycle(context, pages: dict, q: dict, now: datetime, hos
             raise ValueError("GitHub queue unavailable")
         queue = json.loads(base64.b64decode(remote["content"]))
         work = choose_external_work(queue, repo, branch)
+        if work is None:
+            work = choose_continuous_debug_work(queue, repo, branch)
         head_result = api(f"{prefix}/branches/{encoded_branch}")
         head = head_result["commit"]["sha"]
         if not re.fullmatch(r"[0-9a-f]{40}", head):
@@ -142,7 +180,9 @@ async def external_model_cycle(context, pages: dict, q: dict, now: datetime, hos
         state["same_progress_dispatches"] = 0
         g("save_queue_state")(q)
     max_repeat = int(queue.get("max_unchanged_dispatches", 3))
-    if int(state.get("same_progress_dispatches") or 0) >= max(1, min(max_repeat, 3)):
+    # Continuous diagnostics must not stop just because no new commit was found.
+    # Every 30-minute window is a new hypothesis, NOT a fake material success.
+    if not work.get("continuous_debug") and int(state.get("same_progress_dispatches") or 0) >= max(1, min(max_repeat, 3)):
         g("write_runtime")(status="external_model_waiting_for_progress",
             last_action=f"{work['id']} no new GitHub HEAD after {max_repeat} sends; retry only after material progress")
         return False
@@ -182,7 +222,13 @@ async def external_model_cycle(context, pages: dict, q: dict, now: datetime, hos
         return False
     if not await g("ensure_thinking_level")(page):
         return False
-    prompt = make_external_prompt(work, queue, head, bool(last))
+    debug_iteration = int(state.get("debug_cycle_count") or 0) + 1
+    rotation = (queue.get("continuous_debug_policy") or {}).get("focus_rotation") or []
+    if work.get("continuous_debug") and rotation:
+        debug_focus = str(rotation[(debug_iteration - 1) % len(rotation)])[:320]
+    else:
+        debug_focus = ""
+    prompt = make_external_prompt(work, queue, head, bool(last), debug_iteration, debug_focus)
     outcome = await g("send_message")(page, prompt, slot_name=SLOT)
     if outcome != "sent":
         g("write_runtime")(status="external_model_send_retry", last_action=f"send outcome={outcome}")
@@ -209,11 +255,14 @@ async def external_model_cycle(context, pages: dict, q: dict, now: datetime, hos
         state["chat_started_at"] = at.isoformat()
     state["new_chat_required"] = False
     state["last_task_id"] = work["id"]
+    if work.get("continuous_debug"):
+        state["debug_cycle_count"] = debug_iteration
+        state["debug_focus"] = debug_focus
     state["last_git_head"] = head
     state["same_progress_dispatches"] = int(state.get("same_progress_dispatches") or 0) + 1
     g("save_queue_state")(q)
-    g("write_runtime")(status="external_model_running",
-        last_action=f"{work['id']} dispatched KST :00/:30; Github HEAD={head[:12]}",
+    g("write_runtime")(status="external_model_continuous_debug" if work.get("continuous_debug") else "external_model_running",
+        last_action=f"{work['id']} debug cycle={debug_iteration} focus={debug_focus[:100]} Github HEAD={head[:12]}" if work.get("continuous_debug") else f"{work['id']} dispatched KST :00/:30; Github HEAD={head[:12]}",
         external_model_task_id=work["id"], external_model_git_head=head,
         external_model_dispatches_without_progress=state["same_progress_dispatches"])
     return True
