@@ -1205,7 +1205,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 ticket.device,ticket.world,ticket.view,ticket.projection,
                 ticket.dashboard,
                 OutRunVR::DinoSidecar::GlobalGpu().HasEmbeddedSpeedAndRpm(),
-                ticket.nativeFrame,ticket.xrPose);
+                ticket.nativeFrame,ticket.xrPose,
+                OutRunVR::DinoSidecar::GlobalGpu().EmbeddedGearMask());
         if(Settings::VRTelemetry || Settings::VRExternalFerrariDiag) {
             // One globally bounded diagnostic hid every later Ferrari after
             // the first eight 575 frames. Bound receipts per canonical model.

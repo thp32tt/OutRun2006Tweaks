@@ -83,6 +83,47 @@ int main() {
     DashboardTelemetry invalidTelemetry{};
     assert(!DashboardOverlayMeshVisible(&gear,invalidTelemetry,0u));
 
+    // Body and overlay may both contain gear digits. Coverage is per gear:
+    // prevent duplicate draws only for the same digit, never lose a digit
+    // that exists exclusively in the optional overlay. Receipt counting
+    // and actual mesh submission use the same visibility predicate.
+    assert(DashboardGearMask(nullptr,0)==0u);
+    assert(DashboardGearMask(&speed,1)==0u);
+    DashboardBinding badGear=gear;
+    badGear.gear=32u;
+    assert(DashboardGearMask(&badGear,1)==0u);
+    assert(DashboardGearMask(&gear,1)==(1u<<5));
+    for(unsigned slot=0;slot<16;++slot) {
+        (void)slot;
+        for(unsigned bodyGear=0;bodyGear<8;++bodyGear) {
+            DashboardBinding bodyDigit=gear;
+            bodyDigit.gear=bodyGear;
+            const unsigned mask=DashboardGearMask(&bodyDigit,1);
+            for(unsigned liveGear=0;liveGear<8;++liveGear) {
+                const auto sample=SanitizeDashboardTelemetry(60.f,4000u,liveGear);
+                for(unsigned needleMask=0;needleMask<4;++needleMask) {
+                    unsigned bodyDraws=DashboardMeshVisible(&bodyDigit,sample)?1u:0u;
+                    unsigned overlayDraws=0u;
+                    for(unsigned digit=0;digit<8;++digit) {
+                        DashboardBinding overlayDigit=gear;
+                        overlayDigit.gear=digit;
+                        const bool visible=DashboardOverlayMeshVisible(
+                            &overlayDigit,sample,needleMask,mask);
+                        assert(visible==(digit==liveGear && digit!=bodyGear));
+                        overlayDraws+=visible?1u:0u;
+                    }
+                    assert(bodyDraws+overlayDraws==1u);
+                    assert(!DashboardOverlayMeshVisible(&bodyDigit,
+                        invalidTelemetry,needleMask,mask));
+                    assert(DashboardOverlayMeshVisible(&speed,sample,needleMask,mask)==
+                        DashboardOverlayMeshVisible(&speed,sample,needleMask));
+                    assert(DashboardOverlayMeshVisible(&rpm,sample,needleMask,mask)==
+                        DashboardOverlayMeshVisible(&rpm,sample,needleMask));
+                }
+            }
+        }
+    }
+
     // A tolerated exporter length error must not scale/shear a needle.
     // Compare every element to the same pivot rotation about a unit axis.
     for(const auto kind : {DashboardKind::SpeedNeedle,DashboardKind::RpmNeedle}) {

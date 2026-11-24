@@ -655,6 +655,12 @@ public:
             DashboardNeedleMask(cpu_.dashboardBindings.data(),
                                 cpu_.dashboardBindings.size()) : 0u;
     }
+    // Only body-owned gear bindings can suppress a matching overlay gear.
+    unsigned EmbeddedGearMask() const noexcept {
+        return role_==SidecarRole::Vehicle && loaded_ ?
+            DashboardGearMask(cpu_.dashboardBindings.data(),
+                              cpu_.dashboardBindings.size()) : 0u;
+    }
     // Only a real installed sidecar with a resolvable fixed filename may
     // become a render candidate. Parse/CRC/PBR/ground QA still guard draw.
     bool Installed() const noexcept {
@@ -690,7 +696,8 @@ public:
                     const DashboardTelemetry& dashboard,
                      unsigned embeddedNeedleMask=0u,
                      std::uint64_t expectedNativeFrame=0,
-                     std::uint64_t expectedPose=0) noexcept {
+                     std::uint64_t expectedPose=0,
+                     unsigned embeddedGearMask=0u) noexcept {
         GpuDrawResult result{};
         // First-party safety gate, independent of whether R7/R30/R33
         // vtable hooks installed successfully. No whole-vehicle isolated
@@ -705,7 +712,7 @@ public:
         if(!EnsureResources(device))return result;
         for(const auto& mesh:meshes_) {
             const auto* binding=DashboardFor(mesh);
-            if(DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask))
+            if(DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask,embeddedGearMask))
                 ++result.receipt.expectedMeshes;
         }
         // Nothing drawable: do not mutate render state or quarantine GPU.
@@ -834,7 +841,7 @@ public:
             const auto& m=meshes_[pass?glassOrder[order].index:order];
             if(!MeshInDrawPass(m.glass,pass))continue;
             const DashboardBinding* binding=DashboardFor(m);
-            if(!DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask))
+            if(!DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask,embeddedGearMask))
                 continue;
             const D3DMATRIX meshWorld=AnimatedWorld(world,binding,dashboard);
             // Opaque first, then tagged translucent glass. Transparent glass

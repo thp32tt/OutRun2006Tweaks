@@ -76,6 +76,13 @@ jobs:
           assert 'terminalMilestone' in source
           assert 'MaterialModeName()' in source
           assert 'transformSamplesByCar[id]++' in source
+          # Gear coverage must reach BOTH receipt count and real mesh draw,
+          # only after the body is certified complete, never stock fallback.
+          assert gpu.count('DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask,embeddedGearMask)') == 2
+          assert 'DashboardGearMask(cpu_.dashboardBindings.data(),' in gpu
+          overlay=source[source.index('if(route==OutRunVR::DinoSidecar::OriginalCarRoute::ExternalComplete &&'):source.index('if(Settings::VRTelemetry || Settings::VRExternalFerrariDiag)')]
+          assert 'GlobalGpu().EmbeddedGearMask()' in overlay
+          assert 'GlobalGpu().HasEmbeddedSpeedAndRpm()' in overlay
           # EXT16-008: Full 49F3E0 wrapper includes an additional 49A650
           # CALL after 46BD30. It must NEVER be skipped by a sidecar.
           player_wrapper=source[source.index('static void CallOriginalPlayerWithGlassScope('):source.index('static void __cdecl OnPlayerCallback(')]

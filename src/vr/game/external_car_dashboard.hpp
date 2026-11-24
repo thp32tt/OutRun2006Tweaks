@@ -113,9 +113,21 @@ inline unsigned DashboardNeedleMask(
     }
     return mask;
 }
+// Gear coverage is per displayed gear, not a single all-gears flag.
+// A body with only gear 3 must still allow overlay gear 4, for example.
+inline unsigned DashboardGearMask(
+    const DashboardBinding* bindings,std::size_t count) noexcept
+{
+    unsigned mask=0u;
+    if(!bindings)return mask;
+    for(std::size_t i=0;i<count;++i)
+        if(bindings[i].kind==DashboardKind::GearVisible && bindings[i].gear<=7u)
+            mask|=1u<<bindings[i].gear;
+    return mask;
+}
 inline bool DashboardOverlayMeshVisible(
     const DashboardBinding* binding,const DashboardTelemetry& telemetry,
-    unsigned embeddedMask) noexcept
+    unsigned embeddedMask,unsigned embeddedGearMask=0u) noexcept
 {
     // Both needles embedded: gear-only, suppress redundant unbound housing.
     if(embeddedMask==DashboardBothNeedles &&
@@ -126,6 +138,9 @@ inline bool DashboardOverlayMeshVisible(
            (embeddedMask&DashboardSpeedNeedleBit))return false;
         if(binding->kind==DashboardKind::RpmNeedle &&
            (embeddedMask&DashboardRpmNeedleBit))return false;
+        if(binding->kind==DashboardKind::GearVisible &&
+           binding->gear<=7u && (embeddedGearMask&(1u<<binding->gear)))
+            return false;
     }
     return DashboardMeshVisible(binding,telemetry);
 }
