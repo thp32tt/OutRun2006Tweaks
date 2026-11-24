@@ -3,6 +3,7 @@
 #include "../game/external_car_pbr_stereo_scope.hpp"
 #include "../game/external_car_pbr_eye_math.hpp"
 #include "../game/external_car_eye_transform_proof.hpp"
+#include "depth_clear_replay_stamp.hpp"
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -223,8 +224,7 @@ namespace OutRunVRStereo
 		bool LastStereoWanted = false;
 		bool FramePoseMismatchLogged = false;
 		std::uint64_t PresentEpoch = 1;
-		std::uint64_t LastMainDepthClearEpoch = 0;
-		DWORD LastMainDepthClearFlags = 0;
+		OutRunVR::DepthClearReplayStamp LastMainDepthClearStamp{};
 		float LastMainDepthClearZ = 1.0f;
 		DWORD LastMainDepthClearStencil = 0;
 		D3DSURFACE_DESC LastMainDepthClearDesc{};
@@ -1519,7 +1519,7 @@ namespace OutRunVRStereo
 			const DWORD depthFlags=flags&(D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL);
 			if(!depthFlags||!TargetIsBackBuffer()||!TrackedDepthStencil||!ClearCoversStereoBackbuffer(device,count,rects))return;
 			D3DSURFACE_DESC desc{};if(FAILED(TrackedDepthStencil->GetDesc(&desc)))return;
-			LastMainDepthClearEpoch=PresentEpoch;LastMainDepthClearFlags=depthFlags;LastMainDepthClearZ=z;LastMainDepthClearStencil=stencil;LastMainDepthClearDesc=desc;++FullMainDepthClears;
+			LastMainDepthClearStamp.Record(PresentEpoch,depthFlags);LastMainDepthClearZ=z;LastMainDepthClearStencil=stencil;LastMainDepthClearDesc=desc;++FullMainDepthClears;
 			if(!FirstMainClearLogged){FirstMainClearLogged=true;spdlog::info("VR stereo: full main depth clear observed count={} flags=0x{:x} z={} stencil={} epoch={}",count,static_cast<unsigned>(depthFlags),z,stencil,PresentEpoch);}
 		}
 
@@ -1579,6 +1579,7 @@ namespace OutRunVRStereo
 		{
 			// A Reset can recycle a COM address for a different depth format.
 			TrackedStencilFormatKnown = false;
+			LastMainDepthClearStamp.Invalidate();
             // Reset/ResetEx may reuse a COM address for another device.
             DirectTransportFacts = {};
 			StereoResourcesReady=false;
@@ -1837,10 +1838,10 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		bool TryBootstrapRightDepthFromRecentClear(IDirect3DDevice9*device)
 		{
 			++DepthBootstrapAttempts;
-			if(!device||!RightEyeSurface||!RightEyeDepth||!TrackedDepthStencil||LastMainDepthClearEpoch!=PresentEpoch)return false;
+			if(!device||!RightEyeSurface||!RightEyeDepth||!TrackedDepthStencil||!LastMainDepthClearStamp.Current(PresentEpoch))return false;
 			D3DSURFACE_DESC leftDesc{},rightDesc{};if(FAILED(TrackedDepthStencil->GetDesc(&leftDesc))||FAILED(RightEyeDepth->GetDesc(&rightDesc)))return false;
 			if(!DepthDescMatches(leftDesc,rightDesc)||!DepthDescMatches(leftDesc,LastMainDepthClearDesc))return false;
-			DWORD replayFlags=0;if(!RightDepthSynchronized&&(LastMainDepthClearFlags&D3DCLEAR_ZBUFFER))replayFlags|=D3DCLEAR_ZBUFFER;if(!RightStencilSynchronized&&(LastMainDepthClearFlags&D3DCLEAR_STENCIL)&&FormatHasStencil(leftDesc.Format))replayFlags|=D3DCLEAR_STENCIL;if(!replayFlags)return false;
+			DWORD replayFlags=0;if(!RightDepthSynchronized&&(LastMainDepthClearStamp.flags&D3DCLEAR_ZBUFFER))replayFlags|=D3DCLEAR_ZBUFFER;if(!RightStencilSynchronized&&(LastMainDepthClearStamp.flags&D3DCLEAR_STENCIL)&&FormatHasStencil(leftDesc.Format))replayFlags|=D3DCLEAR_STENCIL;if(!replayFlags)return false;
 			D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport)))return false;
 			// 01513: Clear(count=0) covers only the active viewport. Never
 			// certify whole-surface RIGHT depth/stencil sync from a cropped
@@ -2454,6 +2455,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr))
 			{
 				const bool changed=TrackedDepthStencil!=surface;
+				LastMainDepthClearStamp.OnBindingChange(changed);
 				if(changed) TrackedStencilFormatKnown=false;
 				ReplaceSurfaceRef(TrackedDepthStencil,surface);
 				if(changed&&StereoResourcesReady&&TargetIsBackBuffer())
@@ -2699,7 +2701,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};if(++PresentEpoch==0)PresentEpoch=1;return hr;
 		}
 
-		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;QuestNativePairLatch={};LastMainDepthClearEpoch=0;LastMainDepthClearFlags=0;LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
+		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;QuestNativePairLatch={};LastMainDepthClearStamp.Invalidate();LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
 
 		constexpr std::uint32_t StereoInstallPending = 0;
 		constexpr std::uint32_t StereoInstallReady = 1;

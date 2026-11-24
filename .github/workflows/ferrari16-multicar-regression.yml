@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test external_car_dds_upload_test external_car_mesh_upload_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test stereo_lower_draw_result_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test external_car_dds_upload_test external_car_mesh_upload_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test depth_clear_replay_stamp_test stereo_lower_draw_result_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -108,6 +108,14 @@ jobs:
           assert 'DistinctFiniteExternalEyeTransforms(' in Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
           # External physical submissions must not report LEFT-only S_OK.
           r7=Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
+          # A descriptor-compatible depth rebind must revoke the old clear receipt.
+          depth_bind=r7[r7.index('HRESULT __stdcall SetDepthStencilSurfaceDest('):r7.index('HRESULT __stdcall QueryIssueDest(')]
+          assert depth_bind.index('LastMainDepthClearStamp.OnBindingChange(changed);') < depth_bind.index('ReplaceSurfaceRef(TrackedDepthStencil,surface);')
+          retire=r7[r7.index('void ReleaseStereoResources()'):r7.index('bool CreateRightDepthForTracked(')]
+          assert retire.index('LastMainDepthClearStamp.Invalidate();') < retire.index('ReleaseCom(TrackedDepthStencil)')
+          bootstrap=r7[r7.index('bool TryBootstrapRightDepthFromRecentClear('):r7.index('std::uint32_t NextStereoFrameId()')]
+          assert bootstrap.index('!LastMainDepthClearStamp.Current(PresentEpoch)') < bootstrap.index('ClearHook.stdcall<HRESULT>')
+          assert 'LastMainDepthClearStamp.Record(PresentEpoch,depthFlags);' in r7
           receipt=Path('src/vr/game/external_car_stereo_receipt.hpp').read_text()
           draw=r7[r7.index('HRESULT ExecuteStereoDraw('):r7.index('HRESULT __stdcall DrawPrimitiveDest(')]
           assert draw.count('if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {')>=5
