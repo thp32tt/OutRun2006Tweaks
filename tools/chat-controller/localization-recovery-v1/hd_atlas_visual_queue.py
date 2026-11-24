@@ -140,6 +140,31 @@ def parse_decision(body,task):
                 "reason":d["reason"][:1000],"bbox_proposals":proposals}
     return None
 
+def review_key(task):
+    obj=[task["target"],task["source_dds_sha256"],task["candidate_dds_sha256"],
+         [task["images"][k]["sha256"] for k in ("source","clean","final")]]
+    return digest(json.dumps(obj,separators=(",",":"),ensure_ascii=False).encode())
+
+def reused_records(previous,tasks,previous_run_id):
+    indexed={r.get("review_key"):r for r in previous.get("records",{}).values()
+             if r.get("status")=="DONE" and H64.fullmatch(r.get("review_key",""))}
+    out={}
+    for task in tasks:
+        key=review_key(task)
+        prior=indexed.get(key)
+        if not prior or prior.get("target")!=task["target"] or prior.get("source_dds_sha256")!=task["source_dds_sha256"] or prior.get("candidate_dds_sha256")!=task["candidate_dds_sha256"]:
+            continue
+        # Native and source/CLEAN/final preview bytes are identical. Reuse the
+        # old model decision, but recheck HOLD/proposal validity against current
+        # work-order metadata. Never submit the exact same images twice.
+        decision=dict(prior.get("decision",{}),task_id=task["task_id"])
+        parsed=parse_decision(json.dumps(decision,ensure_ascii=False),task)
+        if parsed is None:continue
+        out[task["task_id"]]={"status":"DONE","target":task["target"],
+             "source_dds_sha256":task["source_dds_sha256"],"candidate_dds_sha256":task["candidate_dds_sha256"],
+             "review_key":key,"decision":parsed,"reused_from_run_id":previous_run_id}
+    return out
+
 def prompt_for(t):
     rows=[{"roi_id":r["roi_id"],"english":r["english"],"korean":r["korean"],"bbox_xyxy":r["bbox_xyxy"],"reason":r["reason"]} for r in t["holds"]]
     return ("OutRun 2006 HD 전체 DDS 한 장 독립 시각 QA. 이미지 생성하지 마세요. "
@@ -177,6 +202,15 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
         saved,etag=await asyncio.to_thread(gh.read_json,rel,BRANCH)
         if saved!=state:raise ValueError("ATLAS_STATE_READBACK")
     reviewed=None
+    if not records and type(pointer.get("previous_run_id")) is int and pointer["previous_run_id"]<pointer["run_id"]:
+        prev,_=await asyncio.to_thread(gh.read_json,QROOT+"/visual/run-"+str(pointer["previous_run_id"])+".json",BRANCH)
+        if (isinstance(prev,dict) and prev.get("run_id")==pointer["previous_run_id"]
+            and prev.get("manifest_sha256")==pointer.get("previous_manifest_sha256")):
+            records.update(reused_records(prev,doc["tasks"],pointer["previous_run_id"]))
+            if records:
+                await save()
+                if len(records)==104:
+                    return {"status":"ATLAS_ALL_IDENTICAL_REVIEWS_REUSED","completed":104,"total":104}
     for tid,rec in records.items():
         if rec.get("status")=="CLAIMED":
             # Crash between claim and verified send: never silently re-send.
@@ -209,7 +243,7 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
     if pg is None:return {"status":"ATLAS_WAIT_LOGIN"}
     paths=await asyncio.to_thread(stage_images,archive,t,home)
     tid=t["task_id"]
-    rec={"status":"CLAIMED","target":t["target"],"source_dds_sha256":t["source_dds_sha256"],"candidate_dds_sha256":t["candidate_dds_sha256"]}
+    rec={"status":"CLAIMED","review_key":review_key(t),"target":t["target"],"source_dds_sha256":t["source_dds_sha256"],"candidate_dds_sha256":t["candidate_dds_sha256"]}
     records[tid]=rec
     await save()
     outcome=await bridge.send_with_png(pg,t,prompt_for(t),paths,False)
