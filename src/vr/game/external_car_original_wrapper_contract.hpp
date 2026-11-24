@@ -28,7 +28,8 @@ inline constexpr std::array<std::uint8_t,24> RetailPlayerWrapperPrefix{{
 constexpr std::uint32_t RetailCallTarget(const std::uint8_t* p,
     std::size_t len,std::size_t callOffset,
     std::uint32_t functionVa=RetailPlayerWrapperVa) noexcept {
-    if(!p || callOffset+5u>len || p[callOffset]!=0xE8u)return 0u;
+    if(!p || callOffset>len || len-callOffset<5u ||
+       p[callOffset]!=0xE8u)return 0u;
     const std::uint32_t disp=std::uint32_t(p[callOffset+1]) |
         (std::uint32_t(p[callOffset+2])<<8u) |
         (std::uint32_t(p[callOffset+3])<<16u) |
@@ -46,6 +47,17 @@ constexpr bool ExactRetailPlayerWrapperTwoCalls(const std::uint8_t* p,
 static_assert(ExactRetailPlayerWrapperTwoCalls(
     RetailPlayerWrapperPrefix.data(),RetailPlayerWrapperPrefix.size()),
     "Retail player wrapper CALL targets changed");
+
+// Verify a live code signature only after the platform confirms that the
+// complete span is readable. Never compare bytes on a rejected page.
+template<std::size_t N,class Readable>
+inline bool MatchReadableRetailSignature(const std::uint8_t* p,
+    const std::array<std::uint8_t,N>& expected,Readable readable) {
+    if(!p || N==0 || !readable(p,N))return false;
+    for(std::size_t i=0;i<N;++i)
+        if(p[i]!=expected[i])return false;
+    return true;
+}
 
 // NOTE: even proving the wrapper signature does NOT prove an isolated BODY
 // draw leaf; 46BD30 could own stock gauges/glass/shadow/ancillary draws.

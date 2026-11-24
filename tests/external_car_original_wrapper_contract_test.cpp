@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cstdint>
 #include <initializer_list>
+#include <limits>
 #include "../src/vr/game/external_car_original_wrapper_contract.hpp"
 #include "../src/vr/game/external_car_atomic_precommit.hpp"
 #include "../src/vr/game/dino_external_original_car_gate.hpp"
@@ -66,6 +67,28 @@ int main(){
     assert(!ExactRetailPlayerWrapperTwoCalls(corrupt.data(),corrupt.size()));
     assert(RetailCallTarget(bytes.data(),3,6)==0u);
     assert(RetailCallTarget(bytes.data(),bytes.size(),5)==0u);
+    // A hostile/invalid offset must not wrap the size_t end check and
+    // read outside the code buffer, on either x86 or x64.
+    const auto maxOffset=std::numeric_limits<std::size_t>::max();
+    for(std::size_t k=0;k<5;++k)
+        assert(RetailCallTarget(bytes.data(),bytes.size(),maxOffset-k)==0u);
+    assert(RetailCallTarget(bytes.data(),bytes.size(),bytes.size())==0u);
+    assert(RetailCallTarget(bytes.data(),bytes.size(),bytes.size()-4)==0u);
+    unsigned reads=0;
+    const auto fullSpan=[&](const void* p,std::size_t n){
+        ++reads;return p==bytes.data() && n==bytes.size();
+    };
+    assert(MatchReadableRetailSignature(bytes.data(),bytes,fullSpan));
+    assert(reads==1);
+    assert(!MatchReadableRetailSignature(nullptr,bytes,fullSpan));
+    assert(reads==1);
+    const auto denied=[&](const void*,std::size_t n){
+        ++reads;assert(n==bytes.size());return false;
+    };
+    assert(!MatchReadableRetailSignature(bytes.data(),bytes,denied));
+    assert(reads==2);
+    assert(!MatchReadableRetailSignature(corrupt.data(),bytes,
+        [](const void*,std::size_t){return true;}));
 
     // Every canonical Ferrari slot (0..14, 28) remains on the ORIGINAL
     // complete callback: body, stock dashboard, glass/alpha, passenger and

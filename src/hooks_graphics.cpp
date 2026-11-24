@@ -1377,14 +1377,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // Reject all other executable builds and any previously detoured
         // entrypoints; never patch an unknown instruction stream.
         const auto* p=Module::exe_ptr<std::uint8_t>(rva);
-        MEMORY_BASIC_INFORMATION info{};
-        if (!p || VirtualQuery(p,&info,sizeof(info))!=sizeof(info) ||
-            info.State!=MEM_COMMIT || (info.Protect & PAGE_GUARD) ||
-            (info.Protect & PAGE_NOACCESS) ||
-            reinterpret_cast<std::uintptr_t>(p)+N >
-                reinterpret_cast<std::uintptr_t>(info.BaseAddress)+info.RegionSize)
-            return false;
-        return std::equal(signature.begin(),signature.end(),p);
+        return OutRunVR::DinoSidecar::MatchReadableRetailSignature(
+            p,signature,[](const void* address,std::size_t size) noexcept {
+                return QuestCockpitGlassLive::Memory(address,size);
+            });
     }
 public:
     std::string_view description() override {
