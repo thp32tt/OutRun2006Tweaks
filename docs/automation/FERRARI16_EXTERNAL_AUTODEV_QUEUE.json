@@ -1448,18 +1448,51 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Inspect actual 16-car OVC4 per-material DDS mip/UV/tangent/PBR bounds and remaining loader negatives; verify exact SHA CI of current/previous patches without rerun; preserve native renderer fence. Separate R30/R33 remaining raw primitive HRESULT rollback and real GPU stage work remain open."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-2230-OVC-DISABLED-NORMAL-COVERAGE",
+          "status": "PATCHED_EXACT_HELPER_LOCAL_PASS_FULL_OVC_AND_WINDOWS_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "Actual 16 car OVC4 material contracts: normal/ORM DDS and material strength",
+          "source_material_sha": "322d5f2818ff08662b0909c02c972352fe38574c",
+          "source_defect": "OVC strict preflight counted a normal DDS as PBR coverage even when the same opaque material's normal_strength was +0 or -0. Native parser accepts 0 structurally, but current SM3 shader samples normalMap only if factors.z > 0. A CRC-valid full-mip normal and ORM pair with zero strength therefore earned a false strict quality pass.",
+          "source_fix": "Track disabled normal strength separately from structural map counts. Strict coverage fails only when a used opaque material has an attached normal map with zero strength; absent maps remain no_normal; glass-only/orphan maps do not fail this opaque criterion. Do not alter structural acceptance or shader, native ABI, stage gate or asset promotion. Add OVC4 synthetic fixture mutation with recomputed CRC for all 16 slot names and +0/-0/.25/1/2 strengths.",
+          "source_blob_sha1": {
+            "tools/ferrari16/pbr_material_gate.py": "015e86ec42d6787caab2b1b8881506a477873ca4",
+            "tools/ferrari16/verify_all_car_ovc.py": "3cb2df4026778fd908efb69e8a14e8997b51f2bb",
+            "tests/ferrari16_pbr_material_gate_test.py": "bd5b33ebe4ba05ec171294eb92216af5bccf1215"
+          },
+          "positive_negative_regressions": [
+            "Local Python3 ran the complete committed pbr_material_gate.py plus ferrari16_pbr_material_gate_test.py, both local git hash-object results exactly match source blob IDs; PASS.",
+            "Additional local 80 synthetic scalar decisions (16 slot IDs x five float32 strengths, 32 disabled and 48 positive) PASS using exact helper. Not full OVC parsing or actual assets.",
+            "Existing verify_all_car_ovc.py --self-test now contains 80 CRC-correct synthetic full OVC4 cases covering positive/negative strengths with unchanged normal/ORM counts. This full parser suite is committed but not locally executed; existing CI commands retained."
+          ],
+          "same_sha_ci": {
+            "sha": "322d5f2818ff08662b0909c02c972352fe38574c",
+            "status": "UNVERIFIED",
+            "note": "Commit workflow lookup PR-filtered and combined status empty. No full OVC self-test, Windows x86 DLL/x64 host, HLSL or package pass claimed; no rerun."
+          },
+          "render_trace": [
+            "OVC header/payload CRC -> mesh group used/opaque set -> DDS exact length/mip coverage -> PBR factors (0..2 strength) -> normal and ORM map IDs -> strict coverage. Native ParseDds/Parse structural zero allowed; current shader gate factors.z > 0 confirms disabled semantics.",
+            "Existing UV preflight comment and absolute source UV triangle determinant threshold differ from current relative screen-space derivative gate. Source triangle UVs and projected gradients are not interchangeable; preserved existing conservative criterion pending geometric/sampling proof, no asset promotion. Existing CRC, DDS, mesh geometry, floor placement and mip gates unchanged.",
+            "Atomic GPU stage remains disabled; native stock callback and v0.03 unchanged. No visual normal/ORM confirmation inferred."
+          ],
+          "asset_validation": "No private actual 16 vehicle sources/GLB/OVC accessed or modified; no asset SHA or model quality/rights certification. 328 GTS/575 SA/F430 Spider/Testarossa Spider not promoted.",
+          "protected_v003": "Only read-only strict OVC QA scripts/tests changed, no renderer, host, launcher, actual game files, PBR shader or model files changed. No N100 use.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Trace glass alpha/depth order, PBR shading and reflection in both eye submission; inspect material DDS channel semantics and UV source-area versus screen-derivative threshold separately without lowering strict asset gate or promoting candidates. Verify outstanding exact-SHA Windows workflows; real atomic staging and R30/R33 primitive HRESULT recovery remain open."
         }
       ],
-      "latest_material_sha": "79190865247627d8509be9239ff0cf7c37296ee7",
-      "latest_static_ci": "SOURCE_INTERPRETER_56_PASS_EXACT_SHA_CI_UNVERIFIED",
-      "next_focus": "Inspect actual 16-car OVC4 per-material DDS mip/UV/tangent/PBR bounds and remaining loader negatives; verify exact SHA CI of current/previous patches without rerun; preserve native renderer fence. Separate R30/R33 remaining raw primitive HRESULT rollback and real GPU stage work remain open."
+      "latest_material_sha": "322d5f2818ff08662b0909c02c972352fe38574c",
+      "latest_static_ci": "EXACT_HELPER_UNIT_PASS_80_SYNTHETIC_STRENGTH_PASS_FULL_OVC_WINDOWS_CI_UNVERIFIED",
+      "next_focus": "Trace glass alpha/depth order, PBR shading and reflection in both eye submission; inspect material DDS channel semantics and UV source-area versus screen-derivative threshold separately without lowering strict asset gate or promoting candidates. Verify outstanding exact-SHA Windows workflows; real atomic staging and R30/R33 primitive HRESULT recovery remain open."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 22:00:00+09:00",
+  "last_updated_kst": "2026-11-24 22:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
