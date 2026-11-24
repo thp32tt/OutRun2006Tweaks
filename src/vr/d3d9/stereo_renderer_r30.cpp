@@ -3869,14 +3869,15 @@ namespace OutRunVRStereo
             return true;
         }
 
-        HRESULT R30TryExternalImGuiIndexed(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryExternalImGuiIndexed(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             INT baseVertexIndex, UINT minVertexIndex,
             UINT numVertices, UINT startIndex,
             UINT primitiveCount) noexcept
         {
+            using Attempt = OutRunVR::StereoLowerDraw::Attempt<HRESULT>;
             if (type != D3DPT_TRIANGLELIST || primitiveCount == 0)
-                return E_NOTIMPL;
+                return Attempt::Declined();
 
             R30XyzrhwState state{};
             D3DMATRIX stockProjection{}, eyeProjection[2]{};
@@ -3884,7 +3885,7 @@ namespace OutRunVRStereo
             if (!R30PrepareExternalImGuiProjection(
                     device, state, stockProjection, eyeProjection,
                     stockScissor, eyeScissors))
-                return E_NOTIMPL;
+                return Attempt::Declined();
 
             R30CaptureSkyGlowSceneBeforeHud(device);
             const auto rawDraw = [&]() noexcept {
@@ -3918,16 +3919,18 @@ namespace OutRunVRStereo
                     R29OwnerNoteRestoreFailure(
                         "R84/F11 initial projection/scissor");
                     R29OwnerArmMonoSafety();
-                    return E_FAIL;
+                    return Attempt::Handled(E_FAIL);
                 }
-                return E_NOTIMPL;
+                return Attempt::Declined();
             }
 
             R29OwnerNoteStereoDrawWithoutMonoBackup();
             const HRESULT leftHr = rawDraw();
             if (FAILED(leftHr))
             {
-                restoreOverlay();
+                const bool restored = restoreOverlay();
+                if (!restored)
+                    R29OwnerNoteRestoreFailure("R84/F11 left draw projection/scissor");
                 R29OwnerMarkRightDrawFailed();
                 R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(
                     device);
@@ -3935,7 +3938,7 @@ namespace OutRunVRStereo
                     OutRunVR::StereoFailureLeftDrawFailed,
                     "R84/F11 ImGui-left", leftHr);
                 R29OwnerArmMonoSafety();
-                return leftHr;
+                return Attempt::AfterDraw(leftHr, restored, static_cast<HRESULT>(E_FAIL));
             }
 
             const auto frame = R29OwnerCaptureFrameSnapshot();
@@ -4008,7 +4011,7 @@ namespace OutRunVRStereo
                     "R84/F11 stereo projection/scissor");
                 R29OwnerArmMonoSafety();
             }
-            return leftHr;
+            return Attempt::AfterDraw(leftHr, restoreOk, static_cast<HRESULT>(E_FAIL));
         }
 
         bool R30XyzrhwHasProjectedDepthSignature(
@@ -8934,7 +8937,7 @@ namespace OutRunVRStereo
         R30TelemetryNoteScreenSpaceFovDraw();
     }
 
-    HRESULT R30SupportTryExternalImGuiIndexed(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryExternalImGuiIndexed(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept
     {

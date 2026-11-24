@@ -52,7 +52,7 @@ namespace OutRunVRStereo
     void R30SupportNoteScreenSpaceFovDraw() noexcept;
 
     // R30 owns the four XYZRHW paths and four R29 lower replay families.
-    HRESULT R30SupportTryExternalImGuiIndexed(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryExternalImGuiIndexed(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept;
     HRESULT R30SupportTryXyzrhwPrimitiveVB(

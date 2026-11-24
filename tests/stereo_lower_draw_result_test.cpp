@@ -75,6 +75,26 @@ int main() {
     }
     assert(Attempt::AfterRoute(Ok,true,false,NotImpl,Fail).hr == Fail);
     assert(Attempt::AfterRoute(Fail,true,true,NotImpl,Fail).hr == Fail);
+    // F11 indexed ImGui: clean admission/setup decline is the only
+    // permission to try FVF142 or generic DIP. An actual driver's E_NOTIMPL
+    // must not replay native LEFT, even with a clean overlay restore.
+    for (bool setupOk : {false,true}) for (bool projection : {false,true})
+        for (bool scissor : {false,true}) for (Result driver : {NotImpl,Fail,Ok}) {
+            const bool restored = projection && scissor;
+            unsigned leftCalls = 0, lowerCalls = 0;
+            Attempt outcome;
+            if (!setupOk)
+                outcome = restored ? Attempt::Declined() : Attempt::Handled(Fail);
+            else {
+                ++leftCalls;
+                outcome = Attempt::AfterDraw(driver,restored,Fail);
+            }
+            const Result hr = outcome.handled ? outcome.hr : (++lowerCalls,Ok);
+            assert(leftCalls == (setupOk ? 1u : 0u));
+            assert(lowerCalls == (!setupOk && restored ? 1u : 0u));
+            assert(hr == (setupOk ? (restored || driver < 0 ? driver : Fail)
+                                  : (restored ? Ok : Fail)));
+        }
     static_assert(Attempt::AfterDraw(NotImpl,true,Fail).handled);
     static_assert(Attempt::AfterDraw(Ok,false,Fail).hr==Fail);
 }

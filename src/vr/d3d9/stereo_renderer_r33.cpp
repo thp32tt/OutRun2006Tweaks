@@ -2047,15 +2047,15 @@ namespace OutRunVRStereo
                     // External F11 is fixed-function XYZ rather than XYZRHW.
                     // The active split R84 chain must own it before game
                     // fixed-sprite and generic geometry fallback paths.
-                    const HRESULT f11 =
+                    const auto f11 =
                         R32ReviewTryExternalImGuiIndexed(
                             device, type, baseVertexIndex, minVertexIndex,
                             numVertices, startIndex, primitiveCount);
-                    if (f11 != E_NOTIMPL) {
+                    if (f11.handled) {
                         if (telemetry)
                             OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                                 OutRunVR::UniversalTrace::Route::R30FixedSprite);
-                        return f11;
+                        return f11.hr;
                     }
 
                     const auto r62 = R30SupportTryFixedFunctionProjectedRankIndexed(
