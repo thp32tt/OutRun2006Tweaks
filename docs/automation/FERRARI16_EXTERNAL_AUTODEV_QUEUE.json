@@ -1045,7 +1045,7 @@
         },
         {
           "cycle_key": "EXT16-011-20261124-1800-PBR-NORMAL-STRENGTH",
-          "status": "PATCHED_EXACT_SHA_CI_UNCONFIRMED_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_MULTICAR_BUILD_PACKAGE_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "Glass transparency and PBR shading; normal strength zero and degenerate mapped normal",
           "source_material_sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
           "source_defect": "OVC parser permits normalScale=0. Pixel shader sampled a bound map and normalized mapN.z*N at zero strength; negative Z flips the base normal, zero vector has undefined normalization. A degenerate mapped vector at nonzero strength was also unguarded.",
@@ -1060,8 +1060,30 @@
           ],
           "same_sha_ci": {
             "sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
-            "status": "UNCONFIRMED",
-            "note": "GitHub commit-workflow lookup returned no runs (PR-filtered wrapper), combined statuses empty. Do not inherit prior SHA success."
+            "runs": [
+              {
+                "run_id": 45361644729,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "head_sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "run_id": 45361644789,
+                "name": "Build",
+                "head_sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "run_id": 45361644669,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "head_sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ],
+            "note": "Confirmed by public GitHub Actions API head_sha filter; matching GitHub jobs checked. Prior unconfirmed status superseded."
           },
           "remaining_trace": [
             "DrawNativeScene sorts glass centroids once using latched center view and shares order across both eyes; depth writes disabled for glass, depth test remains enabled, blend ADD source-over, saved state Apply checked. No independent per-eye sorting or real overlap acceptance established.",
@@ -1071,12 +1093,12 @@
           "protected_v003": "Only external PBR shader and existing Python test changed; release, x86 ABI, hooks, launch/host and external pre-DIP safety fence unchanged.",
           "asset_validation": "No private 16 car assets, hashes or visual validation; no model promotions or licensing changes.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI",
+          "score_state": "NO_LEDGER_CHANGE_THIS_CYCLE",
           "next_trace": "Confirm exact SHA Windows SM3 HLSL, multicar, x86 DLL/x64 package CI. Investigate glass center-vs-eye order and two-sided shading with concrete overlap counterexamples; preserve whole-vehicle atomic staging and stock fallback gates."
         },
         {
           "cycle_key": "EXT16-011-20261124-1830-PACKAGE-MANIFEST-COVERAGE",
-          "status": "PATCHED_EXACT_SHA_CI_UNCONFIRMED_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_MULTICAR_BUILD_PACKAGE_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "Windows x86 DLL+x64 host exact-SHA tests, isolated install/rollback",
           "source_material_sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
           "source_commits": [
@@ -1096,8 +1118,30 @@
           ],
           "same_sha_ci": {
             "sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
-            "status": "UNCONFIRMED",
-            "note": "Commit workflow lookup PR-filtered returns no runs; combined statuses empty. Actual Windows script parse, install/rollback and x86/x64 build remain unverified. No CI skip."
+            "runs": [
+              {
+                "run_id": 45366053333,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "head_sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "run_id": 45366053207,
+                "name": "Build",
+                "head_sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "run_id": 45366053358,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "head_sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ],
+            "note": "Confirmed by public GitHub Actions API head_sha filter; matching GitHub jobs checked. Prior unconfirmed status superseded."
           },
           "prior_ci": "833cbc36 normal strength exact-SHA CI still unconfirmed via available connector; no rerun or duplicate score.",
           "remaining_trace": [
@@ -1108,20 +1152,73 @@
           "protected_v003": "Only isolated installer and its branch CI workflow modified; release, runtime game/host, launchers, assets and original callback not modified.",
           "asset_validation": "No actual private asset hashes/UV/PBR/gauge or physical Quest3 validation.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI",
+          "score_state": "NO_LEDGER_CHANGE_THIS_CYCLE",
           "next_trace": "Verify 35ab4b78 exact Windows CI; harden PE32/PE32+ optional header and executable-vs-DLL role validation, then rollback failure injection and vehicle atomic stereo staging."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-1900-GLB-ACCESSOR-BUFFER-PROVENANCE",
+          "status": "PATCHED_EXACT_SHA_MULTICAR_HLSL_PASS_WINDOWS_PACKAGE_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "Exact 328 GTS, 575 Superamerica, F430 Spider, Testarossa Spider source-to-OVC provenance gate",
+          "source_material_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
+          "source_defect": "glb_stats certified geometry from JSON accessor count without reading actual vertex buffers, validating attribute references or checking index values. Synthetic positive fixture contained only PNG header bytes, no vertex/index data. A hash-matched metadata-only or truncated source/conversion could falsely pass static gate.",
+          "source_fix": "Validate embedded buffer size and bufferView references; require actual byte ranges and core glTF accessor types for POSITION/NORMAL/TEXCOORD_0 and unsigned indices; enforce matching vertex counts, component/stride alignment and bounded index values; support indexed and nonindexed triangle primitives; reject unsupported sparse/quantized geometry instead of certifying it from metadata. Texture bufferView must reference embedded buffer zero. Stream indices in 16K-element chunks. No model admission or runtime policy change.",
+          "source_blob_sha1": {
+            "tools/ferrari16/exact_variant_quality_gate.py": "323b669c6a36ad33081b888d81e8db1214d5b2b7",
+            "tests/ferrari16_exact_variant_quality_gate_test.py": "183c3d19d429d40f9d0008fd1896e3f936bb9cf0"
+          },
+          "positive_negative_regressions": [
+            "Synthetic fixture now contains actual POSITION/NORMAL/UV/index bytes and named texture headers. Indexed and nonindexed positive fixtures; 9 new negative fixtures: invalid accessor reference, absent bufferView, short view, mismatched vertex count, foreign geometry buffer, foreign image buffer, invalid signed index format, out-of-range vertex index, sparse metadata. Recomputed source SHA for each mutation; previous rights/roof/texture resolution/triangle count negatives retained.",
+            "Exact GitHub blob SHA1 checked for all five Python files, actual Python exact-variant tests and verify_all_car_ovc.py --self-test both PASS using minimal N100 temp fixture (local environment could not resolve GitHub); temp files removed. No models, repo checkout or build on N100.",
+            "GitHub Actions multicar + Windows D3DCompiler HLSL jobs success for exact SHA."
+          ],
+          "same_sha_ci": {
+            "sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
+            "runs": [
+              {
+                "run_id": 45370725001,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "head_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "run_id": 45370725690,
+                "name": "Build",
+                "head_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "run_id": 45370724868,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "head_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
+                "status": "in_progress",
+                "conclusion": null
+              }
+            ]
+          },
+          "remaining_trace": [
+            "Preview evidence currently checks suffix/hash but not decoded image content; embedded image check is header only. Source metadata and typed geometry validation do not establish visual identity, legal authorization, decoded material coverage or OVC per-material fidelity.",
+            "Prior blocked exact variants remain blocked. Slot 6 retail Testarossa vs one-off 62897 Spider identity remains distinct; no unverified asset promotion.",
+            "Whole-car atomic two-eye stage remains disabled. PE image role validation and transactional rollback remain open."
+          ],
+          "protected_v003": "Only offline exact variant quality gate and its existing CI test changed; release, game/host, launcher, assets, ABI and render hooks untouched.",
+          "asset_validation": "No private licensed GLB/OVC source bytes or real asset SHA read; all actual per-car QA remains unverified. No candidate promoted.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_WINDOWS_CI_AND_LEDGER",
+          "next_trace": "Verify a21b3fbd exact x86 DLL/x64 package CI; trace preview authenticity and texture/material reference completeness, or rotating performance focus: external resource scheduling and duplicate draw costs; preserve atomic stereo stage blocker."
         }
       ],
-      "latest_material_sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
-      "latest_static_ci": "EXACT_SOURCE_SHA_CI_UNCONFIRMED",
-      "next_focus": "Verify 35ab4b78 exact Windows CI; harden PE32/PE32+ optional header and executable-vs-DLL role validation, then rollback failure injection and vehicle atomic stereo staging."
+      "latest_material_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
+      "latest_static_ci": "EXACT_SOURCE_SHA_MULTICAR_HLSL_PASS_WINDOWS_PACKAGE_PENDING",
+      "next_focus": "Verify a21b3fbd exact x86 DLL/x64 package CI; trace preview authenticity and texture/material reference completeness, or rotating performance focus: external resource scheduling and duplicate draw costs; preserve atomic stereo stage blocker."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 18:30:00+09:00",
+  "last_updated_kst": "2026-11-24 19:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
