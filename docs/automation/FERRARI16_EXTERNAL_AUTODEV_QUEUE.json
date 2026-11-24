@@ -1845,18 +1845,70 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Inspect OVC4 per-material DDS mip chain/UV/tangent/normal/ORM and CRC boundary for all 16 slots; positive and corrupt input fixtures; verify exact SHA CI. Retain original callback and external atomic raster fence; investigate native host handshake and foreground ownership separately."
+        },
+        {
+          "cycle_key": "EXT16-011-ITER25-DDS-2D-RESOURCE-CONTRACT",
+          "status": "PATCHED_MULTICAR_JOB_PASS_WINDOWS_CI_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "OVC4 mesh/material integrity, DDS mip chains, per-material normal/ORM and CRC",
+          "source_material_sha": "7d117432d44b03697baa04a098ef5a718a330002",
+          "source_blob_sha1": {
+            "src/vr/game/dino_external_sidecar.hpp": "3c62bb6616f2aa9b2a5a15c6ced7e95721b79add",
+            "tools/ferrari16/verify_all_car_ovc.py": "d33c41746d6d75cb5a70c7db1f4c6cc4b12f2983",
+            "tests/external_car_sidecar_v4_test.cpp": "9c5fa7dd79a399f1ea6df81d82995c1a60655aed",
+            ".github/workflows/ferrari16-multicar-regression.yml": "bafbf40b2014601f79aba52312fcf8d34dd1b1f1"
+          },
+          "source_defect": "Native ParseDds and offline dds_length ignored cube/face and volume caps2, DDSD_DEPTH, and depth >1. A CRC-correct single-face/slice payload could pass while CreateTexture uploads only 2D. No proof that private models contain such headers.",
+          "source_fix": "Reject non-2D resource declarations in both parsers before mip validation; retain legacy, DXT1/DXT5/ARGB32, mip byte and CRC checks. 16 canonical slots x 3 texture roles x 8 positive/negative cases per parser with recalculated OVC CRC. No private asset or render admission change.",
+          "positive_negative_regressions": [
+            "Local g++ C++17 strict warnings manually transcribed new predicate: 384/384 repeated slot/role cases; Python independent 8/8 predicate cases. These are not full local parser runs.",
+            "Exact source SHA multicar Linux job 138682264617 SUCCESS: EXTERNAL_SIDECAR_V4_PARSE_PASS, FERRARI16_OVC_READONLY_PREFLIGHT_SELFTEST_PASS, PBR coverage/derivative tests and EXACT_R32_TYPED_BRIDGE_ONLY_PASS."
+          ],
+          "same_sha_ci": {
+            "sha": "7d117432d44b03697baa04a098ef5a718a330002",
+            "runs": [
+              {
+                "id": 45460732466,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45460732444,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45460732735,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ],
+            "multicar_job": 138682264617,
+            "multicar_job_status": "success"
+          },
+          "ci_scope_repair": "Base SHA 7037c004 multicar failed because two earlier reviewed R30 particle upload headers were excluded. Re-read exact 6f422083 source diff and pinned both existing blob SHAs, retained original R32 byte-exact check and rejection of all other paths. First commit 705aabd8 had malformed regex from JS replacement expansion; corrected in 7d117432 before validation. No CI skip; no extra score for corrective commit.",
+          "render_trace": [
+            "Parse -> ParseDds (albedo and optional normal/ORM) -> Texture -> D3D9 CreateTexture 2D -> LockRect per mip. Offline inspect validates same header, CRC, totals, per-material maps, complete mips, UV and geometry. Actual pixel/normal/ORM semantic quality not proved.",
+            "External atomic whole-car raster remains fenced; original callback retained. Existing v0.03 and protected release untouched."
+          ],
+          "asset_validation": "Synthetic fixtures only; no private model/OVC/DDS bytes, rights, dashboard appearance, exact variant or HMD claims; no N100 use.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Check exact-SHA Windows x86/x64 and HLSL completion; inspect DDS BC1 alpha/normal semantics and per-material texture role validation, then actual licensed OVC private hashes when available. Preserve stock callback and investigate atomic whole-car L/R color+depth staging."
         }
       ],
-      "latest_material_sha": "ed0d6645cec751bfc893cf0b0da55102af0d47ec",
-      "latest_static_ci": "Source-modeled host scan 32/32 PASS; native CMD and full exact-SHA Windows x86/x64 CI UNVERIFIED",
-      "next_focus": "Inspect OVC4 per-material DDS mip chain/UV/tangent/normal/ORM and CRC boundary for all 16 slots; positive and corrupt input fixtures; verify exact SHA CI. Retain original callback and external atomic raster fence; investigate native host handshake and foreground ownership separately."
+      "latest_material_sha": "7d117432d44b03697baa04a098ef5a718a330002",
+      "latest_static_ci": "Exact-SHA Linux multicar job PASS; Windows x86/x64 and HLSL pending",
+      "next_focus": "Check exact-SHA Windows x86/x64 and HLSL completion; inspect DDS BC1 alpha/normal semantics and per-material texture role validation, then actual licensed OVC private hashes when available. Preserve stock callback and investigate atomic whole-car L/R color+depth staging."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 03:02:16+09:00",
+  "last_updated_kst": "2026-11-25 03:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
