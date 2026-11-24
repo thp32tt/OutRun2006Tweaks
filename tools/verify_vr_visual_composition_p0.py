@@ -3533,7 +3533,9 @@ def check_r30_pre_draw_accounting(xyz, shader):
         raise SystemExit('R30 shader: pre-GPU rollback must not undo a non-existent Draw')
     failed_upload = shader[shader.index('if (!leftWvpOk)'):]
     require_order(failed_upload, 'R30 left c64 upload failure returns without draw accounting',
-                  'if (!leftWvpOk)', 'return E_NOTIMPL;',
+                  'if (!leftWvpOk)', 'if (!restored)',
+                  'return R30ScreenDrawAttempt::Handled(E_FAIL);',
+                  'return R30ScreenDrawAttempt::Declined();',
                   'R29OwnerNoteStereoDrawWithoutMonoBackup();',
                   'const HRESULT leftHr = actualDraw();')
     require_order(xyz, 'R30 physical rank and result proofs precede accounting',
@@ -3543,7 +3545,7 @@ def check_r30_pre_draw_accounting(xyz, shader):
                   'R29OwnerNoteStereoDrawWithoutMonoBackup();')
 
 xyz_body = function_body(r30_r84_admission, 'HRESULT R30ExecuteXyzrhwStereo(')
-screen_body = function_body(r30_r84_admission, 'HRESULT R30TryScreenSpaceFovDraw(')
+screen_body = function_body(r30_r84_admission, 'R30ScreenDrawAttempt R30TryScreenSpaceFovDraw(')
 check_r30_pre_draw_accounting(xyz_body, screen_body)
 for desc, mutant_xyz, mutant_shader in (
     ('premature XYZRHW accounting',
@@ -3560,6 +3562,9 @@ for desc, mutant_xyz, mutant_shader in (
                          'if (!leftWvpOk)', 1)),
     ('missing shader depth generation', xyz_body,
      screen_body.replace('R29OwnerNoteMainDepthContentWrite();', '', 1)),
+    ('dirty shader rollback incorrectly permits lower draw', xyz_body,
+     screen_body.replace('return R30ScreenDrawAttempt::Handled(E_FAIL);',
+                         'return R30ScreenDrawAttempt::Declined();', 1)),
     ('spurious native pre-draw undo', xyz_body,
      screen_body.replace('const HRESULT leftHr = actualDraw();',
                          'R29OwnerUndoStereoDrawCount();\n'
