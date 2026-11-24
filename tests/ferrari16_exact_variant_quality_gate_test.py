@@ -29,9 +29,27 @@ def glb(path: Path, *, triangles: int = 1, width: int = 2,
         return len(views) - 1
 
     count = triangles * 3
-    position = append(struct.pack("<9f", 0,0,0, 1,0,0, 0,1,0) * triangles)
-    normal = append(struct.pack("<3f", 0,0,1) * count)
-    uv = append(struct.pack("<6f", 0,0, 1,0, 0,1) * triangles)
+    positions = [0.,0.,0., 1.,0.,0., 0.,1.,0.] * triangles
+    normals = [0.,0.,1.] * count
+    uvs = [0.,0., 1.,0., 0.,1.] * triangles
+    if defect == "nan-position":
+        positions[-1] = float("nan")
+    elif defect == "inf-normal":
+        normals[-1] = float("inf")
+    elif defect == "zero-normal":
+        normals[-3:] = [0.,0.,0.]
+    elif defect == "nan-uv":
+        uvs[-1] = float("nan")
+    if defect in ("strided-position", "strided-nan-position"):
+        if defect == "strided-nan-position":
+            positions[-1] = float("nan")
+        position = append(b"".join(struct.pack("<3fI", *positions[i:i+3], 0x7fc00000)
+                                   for i in range(0, len(positions), 3)))
+        views[position]["byteStride"] = 16
+    else:
+        position = append(struct.pack("<" + "f" * len(positions), *positions))
+    normal = append(struct.pack("<" + "f" * len(normals), *normals))
+    uv = append(struct.pack("<" + "f" * len(uvs), *uvs))
     indices = list(range(count))
     if defect == "index-oob":
         indices[-1] = count
@@ -181,6 +199,11 @@ def main() -> None:
             ("index-format", "index format"),
             ("index-oob", "index out of bounds"),
             ("sparse", "unsupported accessor"),
+            ("nan-position", "nonfinite vertex attribute: POSITION"),
+            ("inf-normal", "nonfinite vertex attribute: NORMAL"),
+            ("zero-normal", "zero-length normal"),
+            ("nan-uv", "nonfinite vertex attribute: TEXCOORD_0"),
+            ("strided-nan-position", "nonfinite vertex attribute: POSITION"),
         ):
             glb(converted, defect=defect)
             wrong = copy.deepcopy(entry)
@@ -197,6 +220,18 @@ def main() -> None:
             glb(converted, defect="reorder-textures")
             candidate["converted_glb"] = hashed(converted)
             assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+            glb(converted, defect="strided-position")
+            candidate["converted_glb"] = hashed(converted)
+            assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+            # Both source and converted evidence must contain usable values.
+            for defect, reason in (("nan-position", "nonfinite vertex attribute"),
+                                   ("zero-normal", "zero-length normal"),
+                                   ("nan-uv", "nonfinite vertex attribute")):
+                glb(source, defect=defect)
+                candidate["source_glb"] = hashed(source)
+                expected_fail(candidate, root, reason)
+            glb(source)
+            candidate["source_glb"] = hashed(source)
             for defect, reason in (
                 ("missing-material", "primitive material reference"),
                 ("orphan-normal", "missing normal binding"),

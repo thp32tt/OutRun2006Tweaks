@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 import struct
 from collections import Counter
@@ -184,6 +185,8 @@ def glb_stats(path: Path) -> dict:
                     "GLB bufferView bounds")
             return view, start, count
 
+        checked_float_accessors = set()
+
         def accessor(idx: object, semantic: str) -> tuple[int, int, int, int]:
             require(type(idx) is int and 0 <= idx < len(accessors),
                     "GLB accessor reference: " + semantic)
@@ -226,6 +229,30 @@ def glb_stats(path: Path) -> dict:
                 require("byteStride" not in view, "GLB strided index accessor")
             elif "byteStride" in view:
                 require(stride % 4 == 0, "GLB vertex stride alignment")
+            # Bounds and matching counts do not establish that vertex values
+            # are usable. Check core float attributes in bounded batches,
+            # respecting interleaved strides and avoiding repeat shared reads.
+            key = (idx, semantic)
+            if component == 5126 and key not in checked_float_accessors:
+                f.seek(bin_base + start + offset)
+                fmt = "<2f" if semantic == "TEXCOORD_0" else "<3f"
+                remaining = count
+                while remaining:
+                    batch = min(remaining, 4096)
+                    span = (batch - 1) * stride + element
+                    data = f.read(span)
+                    require(len(data) == span, "GLB truncated vertex data: " + semantic)
+                    for i in range(batch):
+                        values = struct.unpack_from(fmt, data, i * stride)
+                        require(all(map(math.isfinite, values)),
+                                "GLB nonfinite vertex attribute: " + semantic)
+                        if semantic == "NORMAL":
+                            require(sum(n * n for n in values) > 1e-12,
+                                    "GLB zero-length normal")
+                    remaining -= batch
+                    if remaining:
+                        f.seek(stride - element, 1)
+                checked_float_accessors.add(key)
             return count, start + offset, component, element
         triangles = 0
         material_triangles = Counter()
