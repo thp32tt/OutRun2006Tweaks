@@ -2006,7 +2006,7 @@
           "protected_v003": "Only automation branch rollback script and native CI fixture changed. No real original installation touched; no game assets or rights changes.",
           "asset_validation": "Synthetic Windows fixtures only; no private models or actual 16-car acceptance. N100 unused.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "score_state": "CREDITED_ONCE_AI2_2901_PLUS_1_EQUALS_2902_LEDGER_f623f6ca54555b4b136809c7ebcecef3366986a6",
           "next_trace": "Verify native eight rollback negatives and exact SHA Windows build/package. Trace reparse/hardlink isolation and recoverability after partial copy/remove; then return to per-eye glass sorting and isolated whole-car color/depth pair staging.",
           "followup_exact_sha_ci": {
             "sha": "f48176adfe7a9fc7042a4c754306354b0bcbb6f0",
@@ -2070,20 +2070,89 @@
           "protected_v003": "External automation branch only. No v0.03, game binaries, player ABI, launch, eye state, or deployment changes.",
           "asset_validation": "Synthetic fixtures only; no actual licensed model promotion or private asset access; N100 unused.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; latest readable AI2 ledger 2901",
-          "next_trace": "Verify exact-SHA CI and outstanding unique scores; investigate reachable scene/node transforms and GLB-to-OVC geometry/material correspondence (including semantic PBR factors) before any optional exact-slot promotion. Rotate to graphics performance/stereo staging path next."
+          "score_state": "CREDITED_ONCE_AI2_2902_PLUS_1_EQUALS_2903_LEDGER_f623f6ca54555b4b136809c7ebcecef3366986a6",
+          "next_trace": "Verify exact-SHA CI and outstanding unique scores; investigate reachable scene/node transforms and GLB-to-OVC geometry/material correspondence (including semantic PBR factors) before any optional exact-slot promotion. Rotate to graphics performance/stereo staging path next.",
+          "followup_exact_sha_ci": {
+            "sha": "74224448638577d67426169017606c5aeb33685b",
+            "runs": [
+              {
+                "id": 45476417327,
+                "conclusion": "success"
+              },
+              {
+                "id": 45476416912,
+                "conclusion": "success"
+              },
+              {
+                "id": 45476416922,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER29-STATEBLOCK-CAPTURE-RETRY",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Graphics performance: state churn and failed GPU allocation/capture retries",
+          "source_material_sha": "bc83ff56a915ca9095c396f9e8063f3685d1bd0b",
+          "source_blob_sha1": {
+            "src/vr/game/dino_external_d3d9.hpp": "8b6672419f5047af77af37faaf4cc40bfdc2965d",
+            "src/vr/game/external_car_stereo_retry.hpp": "674eb791aef60696e828529c7bdf8335f54df24c",
+            "tests/external_car_stereo_retry_test.cpp": "68340e8e051fc47ca40e98ef15ba0fe67c03ec92",
+            ".github/workflows/ferrari16-multicar-regression.yml": "b69a20ea6d9382be653b32906ad667b11a17a40f"
+          },
+          "source_defect": "DrawNativeScene attempted EnsureResources before checking invalid device/frame/pose; failed full stateblock create or capture returned without bounded retry, and a nonnull output on failed create was not released. Dormant under current atomic-stage and wrapper fences, not evidence of current live frame-rate regression.",
+          "source_fix": "Validate ticket before cooldown and resources; use existing 120-native-callback soft retry on stateblock create/capture failure before any render setter/DIP; release nonnull failed output and clear pointer; retain uploaded model, preserve existing Apply/physical receipt/quarantine.",
+          "positive_negative_regressions": [
+            "16 canonical slots x five mock create/capture outcomes; successful ownership transfer, failed create null/non-null, null-success, failed capture; no draw on failure, exactly one release for allocated failed block, no repeated creation during 120 callbacks, retry and reset rearm.",
+            "CI source assertions bind actual pre-upload ticket check and helper/capture/first setter ordering; existing texture routing, opaque/glass and atomic-stage assertions unchanged."
+          ],
+          "same_sha_ci": {
+            "sha": "bc83ff56a915ca9095c396f9e8063f3685d1bd0b",
+            "runs": [
+              {
+                "id": 45481791683,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45481791769,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45481791604,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ]
+          },
+          "render_trace": [
+            "CallOriginalPlayerWithGlassScope -> original 49F3E0 only; PrepareF50External and DrawNativeScene still fenced by RuntimeExternalCarAtomicStageReady()==false. R30/R33 scope guards forbid live external DIP. No external GPU uploads or duplicate external eye draws on current stock callback path.",
+            "Future staged path: EnsureLoaded worker -> EnsureGpu incremental DDS/mesh upload -> stateblock Create/Capture -> setters -> opaque then sorted glass -> R7 eye receipt -> Apply. Current repeated capture failures bounded without caching state across native draw; no actual FPS measurements.",
+            "Remaining hypotheses: per-mesh state churn, center-camera glass ordering, actual stereo staging, performance of live native fallback vs v0.03; no safe evidence to elide setters across replay or alter original route."
+          ],
+          "protected_v003": "Automation branch only; no v0.03, game files, ABI, menus, shader semantics, release or deployment changed. Existing native wrapper/atomic fence retained.",
+          "asset_validation": "Synthetic tests only; no actual asset promotion, rights changes, private assets, or N100 usage.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; prior two independently credited, confirmed AI2 2903",
+          "next_trace": "Verify same-SHA CI; compare live stock native draw/replay path to v0.03 and inspect repeated state restoration, GPU query synchronization and frame ownership without enabling external live draw. Investigate GLB-to-OVC geometry/material correspondence independently."
         }
       ],
-      "latest_material_sha": "74224448638577d67426169017606c5aeb33685b",
-      "latest_static_ci": "Exact-SHA three workflows in progress; previous iteration 27 exact SHA all three SUCCESS",
-      "next_focus": "Verify exact-SHA CI and outstanding unique scores; investigate reachable scene/node transforms and GLB-to-OVC geometry/material correspondence (including semantic PBR factors) before any optional exact-slot promotion. Rotate to graphics performance/stereo staging path next."
+      "latest_material_sha": "bc83ff56a915ca9095c396f9e8063f3685d1bd0b",
+      "latest_static_ci": "Exact-SHA iteration 29 runs recorded; iteration 27/28 all three success and scored once",
+      "next_focus": "Verify same-SHA CI; compare live stock native draw/replay path to v0.03 and inspect repeated state restoration, GPU query synchronization and frame ownership without enabling external live draw. Investigate GLB-to-OVC geometry/material correspondence independently."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 05:00:00+09:00",
+  "last_updated_kst": "2026-11-25 05:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
