@@ -2214,20 +2214,97 @@
           "protected_v003": "Only external automation branch modified; original wrapper body unchanged, no stable release, v0.03 launch/host, PBR shader, model bytes, rights, or deployment changes.",
           "asset_validation": "Synthetic logic only; no real car/OVC or HMD validation; N100 unused.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; prior iter29 credited once, confirmed AI2 2904",
-          "next_trace": "Check exact SHA CI including HUD Inspector. Rotate to pair color/depth staging and body-only ABI boundary, inspect live stock rendering versus v0.03 with new counterexamples; no live external admission until isolated pair proof."
+          "score_state": "EXACT_SHA_CI_SUCCESS_UNCREDITED; ledger blob 63b798b9a5b8d8cf13114fd5c15d8b7cda018c82 confirmed AI2 2904 and no prior gear SHA; 2MB contents connector empty, N100 gh unavailable; no score write confirmed",
+          "next_trace": "Check exact SHA CI including HUD Inspector. Rotate to pair color/depth staging and body-only ABI boundary, inspect live stock rendering versus v0.03 with new counterexamples; no live external admission until isolated pair proof.",
+          "followup_exact_sha_ci": {
+            "sha": "bae4ca8ae807671fec7677cda905b4fb20a94b7b",
+            "runs": [
+              {
+                "id": 45486751846,
+                "conclusion": "success"
+              },
+              {
+                "id": 45486752147,
+                "conclusion": "success"
+              },
+              {
+                "id": 45486751902,
+                "conclusion": "success"
+              },
+              {
+                "id": 45486751927,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER31-R7-DEPTH-CLEAR-IDENTITY",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "DX9Ex R7 right depth replay ownership and right-eye failure",
+          "source_material_sha": "7c5ba56609f5aa7ac4c0151c3cd02dc49f0dad4a",
+          "source_fix_commit": "8a0d3b0e3fd839ada0029fe9b3a4cc00f3b94ac1",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r7.inc": "f0cdcdd3400345111057f1ce1dad39e6aa95b642",
+            "src/vr/d3d9/depth_clear_replay_stamp.hpp": "4259202e36f2ac3862cd8f996988904ea0b74886",
+            "tests/depth_clear_replay_stamp_test.cpp": "928667f013a73e7f4fcc61a0094eb6730fb1d62c"
+          },
+          "source_defect": "SetDepthStencilSurfaceDest invalidated sync on a different COM surface but retained the previous full clear epoch/flags. Same-Present descriptor-compatible B could replay A's clear and falsely certify right depth/stencil; A->B->A and resource retirement could retain stale proof.",
+          "source_fix": "DepthClearReplayStamp records full clear epoch/flags, revokes proof before changed binding replaces tracked surface and on resource retirement/reset; same identity retains receipt, new full clear reauthorizes. Bootstrap requires current receipt before ClearHook; descriptor checks unchanged.",
+          "positive_negative_regressions": [
+            "48 repeated synthetic slot/flag cases, same identity/new full clear positive, changed identity, rebind, new Present, retirement and zero flags negative. Exact local Git blob hashes matched; C++17 -Werror PASS; mutation removing change invalidation fails assertion.",
+            "Source-order CI assertions bind production stamp record, rebind, retire and bootstrap before GPU clear."
+          ],
+          "same_sha_ci": {
+            "sha": "7c5ba56609f5aa7ac4c0151c3cd02dc49f0dad4a",
+            "runs": [
+              {
+                "id": 45492248445,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45492248374,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45492248376,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "initial_ci": {
+            "sha": "8a0d3b0e3fd839ada0029fe9b3a4cc00f3b94ac1",
+            "run": 45492104697,
+            "conclusion": "failure",
+            "detail": "C++ tests, OVC, production routing, v0.03 core and HLSL passed; stereo path allowlist rejected new helper. Followup pins exact reviewed blob, keeps previous R30 hashes and R32 byte guard; no CI skip."
+          },
+          "render_trace": [
+            "R7 full clear record -> depth binding transition -> PrepareDuplicatedDraw -> TryBootstrapRightDepthFromRecentClear; R29 owner exports same helper to R30/R33.",
+            "ExecuteStereoDraw still writes LEFT live before RIGHT RT/depth/viewport/DIP. RestoreRightPassState cannot undo raster; external pre-DIP fence remains false. Existing source tests simulate right-failure guard only; no real GPU injection.",
+            "Bootstrap restore failure and same-surface writes after clear remain separate hypotheses; this patch does not fix those."
+          ],
+          "protected_v003": "Automation branch only. No stock player wrapper, original release, x86 ABI, PBR shader, host, menu, licensed assets or deployment modifications. N100 read-only GitHub CI/score API only.",
+          "asset_validation": "Synthetic tests, no actual 16 model validation or promotion",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; prior confirmed 2904, iteration30 uncredited",
+          "next_trace": "Trace right-depth bootstrap after unmirrored writes or partial clears, and failed RT/depth/viewport restore propagation across R7/R29/R30/R33. Implement isolated whole-vehicle L/R color+depth ownership and real right-eye failure proof only when safe; preserve stock wrapper and fail-closed external admission. Verify exact SHA CI and reconcile outstanding unique scores."
         }
       ],
-      "latest_material_sha": "bae4ca8ae807671fec7677cda905b4fb20a94b7b",
-      "latest_static_ci": "Exact SHA iteration 30 runs recorded; iteration 29 all three success and scored once",
-      "next_focus": "Check exact SHA CI including HUD Inspector. Rotate to pair color/depth staging and body-only ABI boundary, inspect live stock rendering versus v0.03 with new counterexamples; no live external admission until isolated pair proof."
+      "latest_material_sha": "7c5ba56609f5aa7ac4c0151c3cd02dc49f0dad4a",
+      "latest_static_ci": "Iteration 31 exact SHA CI pending; iteration 30 all four success, score reconciliation outstanding",
+      "next_focus": "Trace right-depth bootstrap after unmirrored writes or partial clears, and failed RT/depth/viewport restore propagation across R7/R29/R30/R33. Implement isolated whole-vehicle L/R color+depth ownership and real right-eye failure proof only when safe; preserve stock wrapper and fail-closed external admission. Verify exact SHA CI and reconcile outstanding unique scores."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 06:00:00+09:00",
+  "last_updated_kst": "2026-11-25 06:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
