@@ -44,6 +44,7 @@ def glb(path: Path, *, triangles: int = 1, width: int = 2,
         {"bufferView": index, "componentType": 5123, "type": "SCALAR", "count": count},
     ]
     primitive = {"attributes": {"POSITION": 0, "NORMAL": 1, "TEXCOORD_0": 2}, "mode": 4}
+    primitive["material"] = 0
     if indexed:
         primitive["indices"] = 3
     if defect == "attribute-reference":
@@ -68,9 +69,38 @@ def glb(path: Path, *, triangles: int = 1, width: int = 2,
         "bufferViews": views,
         "images": [{"name": "normal", "bufferView": image0, "mimeType": "image/png"},
                    {"name": "orm", "bufferView": image1, "mimeType": "image/png"}],
+        "textures": [{"source": 0}, {"source": 1}],
+        "materials": [{
+            "normalTexture": {"index": 0},
+            "pbrMetallicRoughness": {"metallicRoughnessTexture": {"index": 1}},
+        }],
         "accessors": accessors,
         "meshes": [{"primitives": [primitive]}],
     }
+    material = doc["materials"][0]
+    if defect == "missing-material":
+        del primitive["material"]
+    elif defect == "orphan-normal":
+        del material["normalTexture"]
+    elif defect == "orphan-orm":
+        del material["pbrMetallicRoughness"]["metallicRoughnessTexture"]
+    elif defect == "bad-texture":
+        material["normalTexture"]["index"] = 99
+    elif defect == "bad-image":
+        doc["textures"][0]["source"] = 99
+    elif defect == "wrong-uv":
+        material["normalTexture"]["texCoord"] = 1
+    elif defect == "uv-transform":
+        material["normalTexture"]["extensions"] = {"KHR_texture_transform": {"offset": [1, 0]}}
+    elif defect == "swap-roles":
+        material["normalTexture"]["index"] = 1
+        material["pbrMetallicRoughness"]["metallicRoughnessTexture"]["index"] = 0
+    elif defect == "alpha-change":
+        material["alphaMode"] = "BLEND"
+    elif defect == "reorder-textures":
+        doc["textures"].reverse()
+        material["normalTexture"]["index"] = 1
+        material["pbrMetallicRoughness"]["metallicRoughnessTexture"]["index"] = 0
     j = json.dumps(doc, separators=(",", ":")).encode()
     j += b" " * ((-len(j)) % 4)
     raw += b"\x00" * ((-len(raw)) % 4)
@@ -156,6 +186,31 @@ def main() -> None:
             wrong = copy.deepcopy(entry)
             wrong["converted_glb"] = hashed(converted)
             expected_fail(wrong, root, reason)
+        # Identical image inventory and triangle count are insufficient.
+        # Exercise all four exact slots; index reordering is benign but
+        # semantic role loss/swaps and unsupported UV routes are not.
+        for cid, (variant, roof) in EXACT.items():
+            candidate = copy.deepcopy(entry)
+            candidate.update(car_id=cid, variant=variant, roof=roof)
+            if cid == 6:
+                candidate["one_off_chassis"] = "62897"
+            glb(converted, defect="reorder-textures")
+            candidate["converted_glb"] = hashed(converted)
+            assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+            for defect, reason in (
+                ("missing-material", "primitive material reference"),
+                ("orphan-normal", "missing normal binding"),
+                ("orphan-orm", "missing metallic_roughness binding"),
+                ("bad-texture", "texture reference"),
+                ("bad-image", "texture image reference"),
+                ("wrong-uv", "unsupported texture UV mapping"),
+                ("uv-transform", "unsupported texture UV mapping"),
+                ("swap-roles", "material texture binding/triangle mismatch"),
+                ("alpha-change", "material texture binding/triangle mismatch"),
+            ):
+                glb(converted, defect=defect)
+                candidate["converted_glb"] = hashed(converted)
+                expected_fail(candidate, root, reason)
         glb(converted)
         wrong = copy.deepcopy(entry)
         wrong["variant"] = "328 GTB"

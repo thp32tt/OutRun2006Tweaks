@@ -12,6 +12,7 @@ import hashlib
 import json
 import re
 import struct
+from collections import Counter
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -92,6 +93,56 @@ def image_dimensions(data: bytes) -> tuple[int, int]:
                 return w, h
             at += length
     raise GateError("unsupported/malformed embedded image (PNG/JPEG required)")
+
+
+def material_binding(doc: dict, primitive: dict) -> tuple:
+    """Resolve actual used texture roles, not the inventory of embedded images.
+
+    The OVC vertex ABI has one UV pair. Unsupported UV sets/transforms need
+    explicit baking evidence; this offline gate cannot certify them.
+    """
+    materials = doc.get("materials", [])
+    textures = doc.get("textures", [])
+    images = doc.get("images", [])
+    index = primitive.get("material")
+    require(type(index) is int and 0 <= index < len(materials),
+            "GLB primitive material reference")
+    material = materials[index]
+    alpha = material.get("alphaMode", "OPAQUE")
+    require(alpha in ("OPAQUE", "MASK", "BLEND"), "GLB material alpha mode")
+    pbr = material.get("pbrMetallicRoughness", {})
+    roles = (
+        ("albedo", pbr.get("baseColorTexture")),
+        ("normal", material.get("normalTexture")),
+        ("metallic_roughness", pbr.get("metallicRoughnessTexture")),
+        ("occlusion", material.get("occlusionTexture")),
+        ("emissive", material.get("emissiveTexture")),
+    )
+    bindings = []
+    for role, info in roles:
+        if info is None:
+            require(alpha == "BLEND" or role not in ("normal", "metallic_roughness"),
+                    "GLB opaque material missing " + role + " binding")
+            bindings.append((role, None))
+            continue
+        require(isinstance(info, dict), "GLB texture info: " + role)
+        uv = info.get("texCoord", 0)
+        require(type(uv) is int and uv == 0 and
+                "TEXCOORD_0" in primitive.get("attributes", {}) and
+                "KHR_texture_transform" not in info.get("extensions", {}),
+                "GLB unsupported texture UV mapping: " + role)
+        texture_index = info.get("index")
+        require(type(texture_index) is int and 0 <= texture_index < len(textures),
+                "GLB texture reference: " + role)
+        texture = textures[texture_index]
+        image_index = texture.get("source")
+        require(type(image_index) is int and 0 <= image_index < len(images) and
+                not texture.get("extensions"),
+                "GLB texture image reference: " + role)
+        name = images[image_index].get("name")
+        require(isinstance(name, str) and bool(name), "GLB texture image name")
+        bindings.append((role, name))
+    return alpha, tuple(bindings)
 
 
 def glb_stats(path: Path) -> dict:
@@ -177,6 +228,7 @@ def glb_stats(path: Path) -> dict:
                 require(stride % 4 == 0, "GLB vertex stride alignment")
             return count, start + offset, component, element
         triangles = 0
+        material_triangles = Counter()
         for mesh in doc.get("meshes", []):
             for p in mesh.get("primitives", []):
                 require(p.get("mode", 4) == 4, "non-triangle GLB primitive")
@@ -204,6 +256,7 @@ def glb_stats(path: Path) -> dict:
                         remaining -= batch
                 require(count % 3 == 0, "GLB triangle index count")
                 triangles += count // 3
+                material_triangles[material_binding(doc, p)] += count // 3
         require(triangles > 0, "GLB contains no mesh triangles")
         images = {}
         for img in doc.get("images", []):
@@ -217,7 +270,8 @@ def glb_stats(path: Path) -> dict:
             f.seek(bin_base + start)
             images[name] = image_dimensions(f.read(count))
         require(images, "GLB has no named embedded textures")
-        return {"triangles": triangles, "textures": images}
+        return {"triangles": triangles, "textures": images,
+                "material_triangles": material_triangles}
 
 
 def validate_one(entry: dict, root: Path) -> dict:
@@ -256,6 +310,8 @@ def validate_one(entry: dict, root: Path) -> dict:
         w2, h2 = b["textures"][name]
         require(w2 >= width and h2 >= height,
                 "silent texture downscale: " + name)
+    require(a["material_triangles"] == b["material_triangles"],
+            "source-to-converted GLB material texture binding/triangle mismatch")
     o = inspect(final)
     require(o["version"] == 4 and o["triangles"] == b["triangles"],
             "OVC4 missing / triangle decimation or non-equivalent mesh")
