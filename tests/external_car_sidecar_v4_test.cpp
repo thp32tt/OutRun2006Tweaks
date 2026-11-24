@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -131,6 +132,28 @@ int main() {
         Model rejectedCollapsed;
         assert(!Parse(collapsed.data(),collapsed.size(),rejectedCollapsed,error));
         assert(error=="group degenerate geometry");
+        // Match the offline gear-pivot parity fixtures. Native parser
+        // already rejects invalid pivots even for visibility-only gears.
+        const std::size_t dash=valid.size()-56u;
+        for(float pivot : {0.f,-10000.f,10000.f,
+                std::numeric_limits<float>::quiet_NaN(),
+                std::numeric_limits<float>::infinity(),
+                -std::numeric_limits<float>::infinity(),10001.f,-10001.f}) {
+            auto gear=valid;
+            SetU32(gear,dash+4u,3u);
+            SetU32(gear,dash+8u,5u);
+            std::uint32_t bits=0;std::memcpy(&bits,&pivot,4);
+            SetU32(gear,dash+16u,bits);
+            SetU32(gear,32u,Crc32(gear.data()+36u,gear.size()-36u));
+            Model gearModel;
+            const bool expected=std::isfinite(pivot) && std::fabs(pivot)<=10000.f;
+            assert(Parse(gear.data(),gear.size(),gearModel,error)==expected);
+            if(expected) {
+                const auto& binding=gearModel.dashboardBindings[0];
+                assert(DashboardMeshVisible(&binding,SanitizeDashboardTelemetry(0.f,0u,5u)));
+                assert(!DashboardMeshVisible(&binding,SanitizeDashboardTelemetry(0.f,0u,4u)));
+            } else assert(error=="dashboard binding bounds");
+        }
         auto badCrc=valid;
         badCrc[ibOff]^=0x01u;
         Model rejectedCrc;

@@ -7,7 +7,7 @@ import zlib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools" / "ferrari16"))
-from verify_all_car_ovc import audit  # noqa: E402
+from verify_all_car_ovc import CARS, audit  # noqa: E402
 
 
 def valid_v4() -> bytes:
@@ -35,8 +35,18 @@ def valid_v4() -> bytes:
         zlib.crc32(payload) & 0xffffffff) + payload
 
 
-def entry(root: Path) -> dict:
-    return next(row for row in audit(root) if row["id"] == 8)
+def gear_v4(pivot: float, gear: int = 5) -> bytes:
+    payload = bytearray(valid_v4()[36:])
+    struct.pack_into("<I", payload, len(payload) - 4, 1)
+    payload += struct.pack("<4I10f", 0, 3, gear, 0,
+                           pivot, 0, 0, 0, 0, 1, 0, 1, 0, 1)
+    return b"OVRCABH4" + struct.pack(
+        "<7I", 4, 1, 1, 3, 1, len(payload),
+        zlib.crc32(payload) & 0xffffffff) + payload
+
+
+def entry(root: Path, cid: int = 8) -> dict:
+    return next(row for row in audit(root) if row["id"] == cid)
 
 
 def main() -> None:
@@ -73,6 +83,31 @@ def main() -> None:
 
         overlay.unlink()
         assert entry(root)["status"] == "MISSING"  # ordinary original fallback
+
+        # A valid CRC and gear number are insufficient: native checks
+        # the pivot even though gear visibility does not rotate the mesh.
+        # Test both body-embedded and independent dashboard records.
+        for cid, _ in CARS:
+            body = root / "ExternalCars" / f"car_id_{cid:02d}.ovc"
+            overlay = root / "ExternalCars" / "Dashboard" / f"car_id_{cid:02d}.ovc"
+            for target in (body, overlay):
+                body.write_bytes(valid)
+                overlay.unlink(missing_ok=True)
+                for pivot in (0.0, -10000.0, 10000.0):
+                    target.write_bytes(gear_v4(pivot))
+                    assert entry(root, cid)["status"] == "PASS"
+                for pivot in (float("nan"), float("inf"), -float("inf"),
+                              10001.0, -10001.0):
+                    target.write_bytes(gear_v4(pivot))
+                    row = entry(root, cid)
+                    assert row["status"] == "FAIL"
+                    assert "dashboard pivot bounds" in row["body"]["reason"]
+                target.write_bytes(gear_v4(0.0, gear=8))
+                row = entry(root, cid)
+                assert row["status"] == "FAIL"
+                assert "gear bound" in row["body"]["reason"]
+            body.unlink()
+            overlay.unlink()
     print("FERRARI16_DASHBOARD_OVERLAY_POSITIVE_NEGATIVE_PASS")
 
 

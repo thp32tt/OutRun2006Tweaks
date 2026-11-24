@@ -253,13 +253,17 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                     reserved == 0 and mesh_index not in used_indices,
                     "dashboard indices/kind")
             used_indices.add(mesh_index)
+            vals = struct.unpack_from("<10f", data, at + 16)
+            pivot, axis = vals[:3], vals[3:6]
+            # Native ValidDashboardBinding checks pivot before branching
+            # on GearVisible. A CRC-valid gear record with a NaN/Inf or
+            # out-of-range pivot must not earn offline approval.
+            require(all(math.isfinite(x) and abs(x) <= 10000 for x in pivot),
+                    "dashboard pivot bounds")
             if kind == 3:
                 require(gear <= 7, "gear bound")
             else:
-                vals = struct.unpack_from("<10f", data, at + 16)
-                pivot, axis = vals[:3], vals[3:6]
                 require(all(math.isfinite(x) for x in vals) and
-                        all(abs(x) <= 10000 for x in pivot) and
                         all(abs(x) <= 1.001 for x in axis) and
                         0.9801 <= sum(x*x for x in axis) <= 1.0201 and
                         vals[7] > vals[6] and
