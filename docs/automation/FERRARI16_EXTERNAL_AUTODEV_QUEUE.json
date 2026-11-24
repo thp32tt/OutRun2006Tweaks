@@ -1586,7 +1586,8 @@
                 "conclusion": "success",
                 "sha": "16c29dcb751a9996dc9295f0e0c39a09ef76dc72"
               }
-            ]
+            ],
+            "followup_verified": "2026-11-25 00:30 KST: exact source SHA 16c29dcb push runs 45420817296 multicar/HLSL, 45420817341 isolated package, 45420817347 Build all success. No rerun or duplicate score."
           },
           "render_trace": [
             "GLB bounds and indices -> used primitive binding -> named embedded image dimensions -> source/converted material triangle counters -> OVC4 CRC, geometry and strict opaque normal/ORM/UV coverage. OVC texture identity/pixel equivalence is not proven by GLB signature and OVC map coverage.",
@@ -1597,18 +1598,81 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Graphics performance: trace R7/R30/R33 duplicate render submissions, state capture/restore and GPU synchronization/allocation under existing fail-closed stage; prove concrete counterexample before patch. Separately inspect decoded PNG/JPEG preview evidence (current fake fixture bytes accepted), material factors/pixel equivalence, OVC texture mapping receipts, installer PE parity and partial restore recovery. No private asset promotion or atomic-stage enable."
+        },
+        {
+          "cycle_key": "EXT16-011-20261125-0030-XYZRHW-RAW-HRESULT-REPLAY",
+          "status": "PATCHED_EXACT_SHA_MULTICAR_PASS_CONTINUE_ACTIVE",
+          "rotating_focus": "Graphics performance and failure-path duplication: R30/R32/R33 DP/VB, DP/UP and DIP/UP physical draw ownership",
+          "source_material_sha": "b0f96821131429d824eba921a1b68bf4f5594cb3",
+          "source_defect": "All three remaining XYZRHW fastpaths returned bare HRESULT. Actual raw LEFT E_NOTIMPL from the driver was indistinguishable from pre-draw decline, so R30/R33 could delegate to another native renderer after a physical attempt. Optional particle GPU route already mapped E_NOTIMPL to E_FAIL but lost exact HRESULT. A dirty VB stream restore could also collide with the old sentinel. This is conditional duplicate GPU work, not a measured headset FPS diagnosis.",
+          "source_fix": "Use existing StereoLowerDraw::Attempt<HRESULT> across R30 implementations, R30 support/R32 review signatures and R33 callers. Set leftAttempted before actual raw draw, preserve physical HRESULT, allow decline only for pre-draw/no raster clean state; maintain particle pre-bind fallback and fail-closed restore behavior. Extend exact-byte baseline bridge guard solely for three explicitly reviewed return-type signatures, no broad bypass.",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r30.cpp": "29ba6ef41192e6b0316db7f22ff7f3d7edf86ac9",
+            "src/vr/d3d9/stereo_renderer_r33.cpp": "ad92b2000587b23a7ababd4929d496cca0443a34",
+            "src/vr/d3d9/stereo_renderer_r32.cpp": "85aae367f650a190a6c594b27e2802e0ddeabe34",
+            "src/vr/core/r30_support_api.hpp": "4f5e0152638685101454156f0155923a150fd464",
+            "src/vr/core/r32_review_api.hpp": "5cde8c7c183cdcd5b11c360ecb6a1cd00867cc98",
+            "tests/stereo_lower_draw_result_test.cpp": "1c299caa9c077a1e836a468fbe3a94c85401618b",
+            ".github/workflows/ferrari16-multicar-regression.yml": "4634a456d4730ac13511d5c766929de2dab3d33b"
+          },
+          "positive_negative_regressions": [
+            "3 API routes x 2 dispatch owners x 2 physical attempt states x 2 restore states x 3 HRESULTs = 72 synthetic cases; assert only clean pre-raster decline delegates, physical E_NOTIMPL preserved and dirty pre-raster sentinel maps to failure.",
+            "Exact-SHA GitHub multicar C++/Python, production-source ordering, v0.03 protection and exact typed R32 bridge byte-check, plus Windows HLSL compilation succeeded in run 45426537979. These are portable/structural checks, not real driver fault injection."
+          ],
+          "same_sha_ci": {
+            "sha": "b0f96821131429d824eba921a1b68bf4f5594cb3",
+            "runs": [
+              {
+                "name": "OutRun EXE HUD Inspector CI",
+                "id": 45426537885,
+                "status": "in_progress",
+                "conclusion": null,
+                "sha": "b0f96821131429d824eba921a1b68bf4f5594cb3"
+              },
+              {
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "id": 45426537832,
+                "status": "in_progress",
+                "conclusion": null,
+                "sha": "b0f96821131429d824eba921a1b68bf4f5594cb3"
+              },
+              {
+                "name": "Build",
+                "id": 45426537840,
+                "status": "in_progress",
+                "conclusion": null,
+                "sha": "b0f96821131429d824eba921a1b68bf4f5594cb3"
+              },
+              {
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "id": 45426537979,
+                "status": "completed",
+                "conclusion": "success",
+                "sha": "b0f96821131429d824eba921a1b68bf4f5594cb3"
+              }
+            ]
+          },
+          "render_trace": [
+            "R33 raster guard -> exact sprite owner -> R32ReviewTryXyzrhw* -> R30Support -> R30TryXyzrhw* -> R30ExecuteXyzrhwStereo -> raw LEFT/RIGHT -> typed attempt -> no replay of handled result.",
+            "R7 GPU event queries and state allocation remain separate hypotheses. Existing R30 SkyGlow caches state block per resource epoch; external DrawNativeScene state allocation is unreachable while RuntimeExternalCarAtomicStageReady is false. No speculative GPU cache or synchronization changes."
+          ],
+          "asset_validation": "No private actual 16 GLB/OVC or rights inspected; no candidates promoted. N100 unused.",
+          "protected_v003": "Stable release branch and deployment untouched. Native stereo behavior on external automation branch changed only in the reviewed error/fallback paths. No whole-car atomic stage activation, model, PBR shader, launcher or host change.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Compare v0.03 versus latest driver cockpit, speed/RPM/gear, player overlays and exact producer identity, including source ownership and right-eye restore. Separately trace renderer staging and decoded PNG/JPEG provenance; no activation or asset promotion."
         }
       ],
-      "latest_material_sha": "16c29dcb751a9996dc9295f0e0c39a09ef76dc72",
-      "latest_static_ci": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package: in_progress; Build: in_progress; Ferrari16 All-Car Sidecar Regression: success",
-      "next_focus": "Graphics performance: trace R7/R30/R33 duplicate render submissions, state capture/restore and GPU synchronization/allocation under existing fail-closed stage; prove concrete counterexample before patch. Separately inspect decoded PNG/JPEG preview evidence (current fake fixture bytes accepted), material factors/pixel equivalence, OVC texture mapping receipts, installer PE parity and partial restore recovery. No private asset promotion or atomic-stage enable."
+      "latest_material_sha": "b0f96821131429d824eba921a1b68bf4f5594cb3",
+      "latest_static_ci": "OutRun EXE HUD Inspector CI: in_progress; Ferrari16 EXT16-005 Exact SHA Isolated Test Package: in_progress; Build: in_progress; Ferrari16 All-Car Sidecar Regression: success",
+      "next_focus": "Compare v0.03 versus latest driver cockpit, speed/RPM/gear, player overlays and exact producer identity, including source ownership and right-eye restore. Separately trace renderer staging and decoded PNG/JPEG provenance; no activation or asset promotion."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 00:03:00+09:00",
+  "last_updated_kst": "2026-11-25 00:32:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
