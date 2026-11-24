@@ -38,14 +38,18 @@ HOOK:("PlayerCallbackHook.ccall<void>(player);",
 FENCE:("inline constexpr bool RuntimeExternalCarAtomicStageReady() noexcept {\n    return false;",),
 EYE:("separationSq>separationSqMin","cameraCentre(leftView)-cameraCentre(rightView)"),
 }
+def canonical_text(data):
+ # Windows Git checkout may write CRLF; Git object bytes are LF.
+ return data.replace(b"\r\n",b"\n")
 def blob_sha(data):
+ data=canonical_text(data)
  return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 def check(files, protected=PROTECTED_BLOBS):
  errors=[]
  for path,expected in protected.items():
   if path not in files or blob_sha(files[path])!=expected:errors.append("PROTECTED_DRIFT:"+path)
  for path,needles in MARKERS.items():
-  s=files.get(path,b"").decode("utf-8",errors="replace")
+  s=canonical_text(files.get(path,b"")).decode("utf-8",errors="replace")
   for needle in needles:
    if needle not in s:errors.append("ROUTE_DRIFT:"+path+":"+needle)
  return errors
@@ -54,6 +58,8 @@ def test_negative():
  protected={p:blob_sha(v) for p,v in example.items()}
  for path,markers in MARKERS.items():example[path]="\n".join(markers).encode()
  assert not check(example,protected)
+ windows={p:v.replace(b"\n",b"\r\n") for p,v in example.items()}
+ assert not check(windows,protected), "Windows CRLF checkout rejected"
  def reject(path,old,new):
   altered=dict(example)
   assert old in altered[path]
@@ -64,6 +70,9 @@ def test_negative():
  reject(R7,b"SetExternalPbrEyeConstants(device,draw,1)",b"SetExternalPbrEyeConstants(device,draw,0)")
  reject(R7,b"PresentationGameplay:OutRunVR::PresentationTheater",b"PresentationTheater:OutRunVR::PresentationTheater")
  reject("Start-OutRun.cmd",b"baseline",b"modified")
+ malformed=dict(windows)
+ malformed["Start-OutRun.cmd"]=malformed["Start-OutRun.cmd"].replace(b"baseline",b"modified")
+ assert check(malformed,protected), "Real Windows CRLF mutation escaped"
  reject("vrhost/src/main.cpp",b"baseline",b"modified")
  reject("vrhost/src/runtime/openxr_api_compat.hpp",b"baseline",b"modified")
  reject("vrhost/src/runtime/projection_pair_pipeline.hpp",b"baseline",b"modified")

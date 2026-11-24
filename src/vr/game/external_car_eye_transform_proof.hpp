@@ -1,6 +1,7 @@
 #pragma once
 // Device-independent proof for the physical external-car fixed-function path.
-// A pair of successful eye DIPs still draws mono if camera centres coincide.\n// Distinct projection alone (asymmetric lenses) does NOT prove stereo depth.
+// A pair of successful eye DIPs still draws mono if camera centres coincide.
+// Distinct projection alone (asymmetric lenses) does NOT prove stereo depth.
 #include <cmath>
 #include <cstddef>
 
