@@ -1,0 +1,42 @@
+name: OutRun HD Cleanplate Docker Control Tests
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: [".github/workflows/outrun-hd-cleanplate-control-tests.yml"]
+permissions:
+  contents: read
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: localization-controller-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/chat-controller/localization-recovery-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test imports only; no Chromium or N100 work
+        run: python -m pip install --disable-pip-version-check Pillow==11.3.0 playwright==1.63.0 PyYAML
+      - name: Verify Python, Compose and existing plus new browser/controller gates
+        working-directory: tools/chat-controller/localization-recovery-v1
+        run: |
+          python -m py_compile hd_atlas_visual_queue.py github_chat_rework_controller.py github_actions_light_controller.py
+          python -m unittest -v test_hd_atlas_visual_queue test_github_actions_light_controller test_github_chat_rework_controller
+          python - <<'PY'
+          import yaml
+          with open("docker-compose.yml") as f:d=yaml.safe_load(f)
+          s=d["services"]
+          a=s["outrun-chat-controller-localization-recovery"]["environment"]
+          b=s["outrun-chat-qa-rework"]["environment"]
+          assert a["OUTRUN_CLEANPLATE_REPAIR_ENABLED"].endswith(":-1}")
+          assert b["OUTRUN_ATLAS_VISUAL_QA_ENABLED"].endswith(":-1}")
+          assert a["OUTRUN_GITOPS_POLL_SECONDS"].endswith(":-900}")
+          assert b["OUTRUN_REWORK_POLL_SECONDS"].endswith(":-600}")
+          print("COMPOSE_SAME_CADENCE_AND_TWO_EXISTING_SERVICES_PASS")
+          PY
