@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test external_car_dds_upload_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test stereo_lower_draw_result_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test external_car_dds_upload_test external_car_mesh_upload_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test stereo_lower_draw_result_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -42,6 +42,11 @@ jobs:
           assert upload.index('if(!CopyAndUnlockDdsMip(') < upload.index('D3DPOOL_DEFAULT,out')
           assert 'return SUCCEEDED(staging->UnlockRect(mip));' in upload
           assert 'staging->Release();return false;' in upload[upload.index('if(!CopyAndUnlockDdsMip('):upload.index('D3DPOOL_DEFAULT,out')]
+          mesh=gpu[gpu.index('const UINT vertexBytes='):gpu.index('const DashboardBinding* DashboardFor(')]
+          assert '|| !next.vb ||' in mesh and '|| !next.ib)' in mesh
+          assert mesh.count('if(!UploadExternalMeshBuffer(')==2
+          assert mesh.index('return SUCCEEDED(next.vb->Unlock());') < mesh.index('return RejectGpu(dev,"VERTEX_BUFFER_UPLOAD_FAILED");') < mesh.index('return SUCCEEDED(next.ib->Unlock());') < mesh.index('return RejectGpu(dev,"INDEX_BUFFER_UPLOAD_FAILED");') < mesh.index('meshes_.push_back(next);') < mesh.index('++nextMesh_;')
+          assert mesh.count('next.vb->Release();next.ib->Release();')==2
           between=source[source.index('static F50ExternalDrawTicket PrepareF50External('):source.index('static bool DrawPreparedF50External(')]
           # Real source-order regression: no OVC IO/selector/device reads if
           # the atomic two-eye owner has not been implemented and admitted.

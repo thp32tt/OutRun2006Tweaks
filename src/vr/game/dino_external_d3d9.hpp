@@ -20,6 +20,7 @@
 #include <vector>
 #include "dino_external_sidecar.hpp"
 #include "external_car_dds_upload.hpp"
+#include "external_car_mesh_upload.hpp"
 #include "external_car_normal_repair.hpp"
 #include "external_car_ground.hpp"
 #include "external_car_draw_order.hpp"
@@ -464,34 +465,43 @@ class GpuOwner final {
             const UINT vertexBytes=next.vertexCount*sizeof(Vertex);
             const UINT indexBytes=next.indexCount*(m.index32?4u:2u);
             if(FAILED(dev->CreateVertexBuffer(vertexBytes,D3DUSAGE_WRITEONLY,
-                    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,D3DPOOL_DEFAULT,&next.vb,nullptr)) ||
+                    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,D3DPOOL_DEFAULT,&next.vb,nullptr)) || !next.vb ||
                FAILED(dev->CreateIndexBuffer(indexBytes,D3DUSAGE_WRITEONLY,
                     m.index32?D3DFMT_INDEX32:D3DFMT_INDEX16,
-                    D3DPOOL_DEFAULT,&next.ib,nullptr))) {
+                    D3DPOOL_DEFAULT,&next.ib,nullptr)) || !next.ib) {
                 if(next.vb)next.vb->Release();
                 if(next.ib)next.ib->Release();
                 return RejectGpu(dev);
             }
-            void* vData=nullptr;
-            void* iData=nullptr;
-            if(FAILED(next.vb->Lock(0,vertexBytes,&vData,0)) || !vData) {
-                next.vb->Release();next.ib->Release();return RejectGpu(dev);
+            if(!UploadExternalMeshBuffer(
+                    [&](void** data) noexcept {
+                        return SUCCEEDED(next.vb->Lock(0,vertexBytes,data,0));
+                    },
+                    [&](void* data) noexcept {
+                        std::memcpy(data,m.vertices.data(),vertexBytes);
+                    },
+                    [&]() noexcept {return SUCCEEDED(next.vb->Unlock());})) {
+                next.vb->Release();next.ib->Release();
+                return RejectGpu(dev,"VERTEX_BUFFER_UPLOAD_FAILED");
             }
-            std::memcpy(vData,m.vertices.data(),vertexBytes);
-            next.vb->Unlock();
-            if(FAILED(next.ib->Lock(0,indexBytes,&iData,0)) || !iData) {
-                next.vb->Release();next.ib->Release();return RejectGpu(dev);
+            if(!UploadExternalMeshBuffer(
+                    [&](void** data) noexcept {
+                        return SUCCEEDED(next.ib->Lock(0,indexBytes,data,0));
+                    },
+                    [&](void* data) noexcept {
+                        if(m.index32)
+                            std::memcpy(data,m.indices.data(),indexBytes);
+                        else {
+                            // OVC1/16-bit OVC2 require explicit narrowing.
+                            auto* indexOut=static_cast<std::uint16_t*>(data);
+                            for(UINT i=0;i<next.indexCount;++i)
+                                indexOut[i]=static_cast<std::uint16_t>(m.indices[i]);
+                        }
+                    },
+                    [&]() noexcept {return SUCCEEDED(next.ib->Unlock());})) {
+                next.vb->Release();next.ib->Release();
+                return RejectGpu(dev,"INDEX_BUFFER_UPLOAD_FAILED");
             }
-            if(m.index32)
-                std::memcpy(iData,m.indices.data(),indexBytes);
-            else {
-                // OVC1/16-bit OVC2 are converted explicitly: a uint32 vector
-                // must not be copied byte-for-byte into an INDEX16 buffer.
-                auto* indexOut=static_cast<std::uint16_t*>(iData);
-                for(UINT i=0;i<next.indexCount;++i)
-                    indexOut[i]=static_cast<std::uint16_t>(m.indices[i]);
-            }
-            next.ib->Unlock();
             meshes_.push_back(next);
             ++nextMesh_;
             return false;
