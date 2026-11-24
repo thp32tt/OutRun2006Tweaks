@@ -310,7 +310,7 @@ jobs:
         run: |
           set -euo pipefail
           changed="$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- src/vr/d3d9)"
-          if grep -Ev '^src/vr/d3d9/(stereo_renderer_r(7\.inc|30\.cpp|32\.cpp|33\.cpp)|r30_particle_(dual_eye_ring|upload_policy)\.hpp)$' <<< "$changed" | grep -q .; then
+          if grep -Ev '^src/vr/d3d9/(stereo_renderer_r(7\.inc|30\.cpp|32\.cpp|33\.cpp)|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
             echo "$changed"
             exit 1
           fi
@@ -318,6 +318,8 @@ jobs:
           # Further byte changes fail closed; the R32 bridge guard remains.
           test "$(git hash-object src/vr/d3d9/r30_particle_dual_eye_ring.hpp)" = 55832210c09cff2c4940d7a06745b15f09284243
           test "$(git hash-object src/vr/d3d9/r30_particle_upload_policy.hpp)" = 40f32f3a349ef61cd109d6f55c364c98b2f7434e
+          # EXT16-011 iteration 31: pin the exact reviewed R7 clear receipt helper.
+          test "$(git hash-object src/vr/d3d9/depth_clear_replay_stamp.hpp)" = 4259202e36f2ac3862cd8f996988904ea0b74886
           # R32 remains restricted to the exact single reviewed return type.
           # Require all remaining bytes of the original file and both headers.
           python3 - <<'PY'
