@@ -1073,18 +1073,55 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI",
           "next_trace": "Confirm exact SHA Windows SM3 HLSL, multicar, x86 DLL/x64 package CI. Investigate glass center-vs-eye order and two-sided shading with concrete overlap counterexamples; preserve whole-vehicle atomic staging and stock fallback gates."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-1830-PACKAGE-MANIFEST-COVERAGE",
+          "status": "PATCHED_EXACT_SHA_CI_UNCONFIRMED_CONTINUE_ACTIVE",
+          "rotating_focus": "Windows x86 DLL+x64 host exact-SHA tests, isolated install/rollback",
+          "source_material_sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
+          "source_commits": [
+            "0701609b6d80285c8980b59f62a556de57c942ff",
+            "35ab4b786c42892a100d9bd71f44fdbf940e8596"
+          ],
+          "source_defect": "INSTALL-FERRARI16-ISOLATED.ps1 verified only properties present in QA.json ContentSha256. Removing a payload or launcher hash, or providing an empty map, allowed omitted bytes to bypass preflight; subsequent backup manifest rehashed actual unverified bytes. Python ZIP verifier already required exact map, but extracted installer did not.",
+          "source_fix": "Require PSCustomObject hash map with exactly 13 allowlisted case-sensitive names and lowercase SHA256 strings. Validate names before resolving paths, then check every required file before verification-only success or installation/backup writes. Match Python packager contract; no new task or release changes.",
+          "source_blob_sha1": {
+            "tools/ferrari16/INSTALL-FERRARI16-ISOLATED.ps1": "e2a0a116f78008447d2c1192906912b84c050849",
+            ".github/workflows/ferrari16-exact-sha-test-package.yml": "8b7fcd819e410612eb529bfd7c0b5de25709753d"
+          },
+          "positive_negative_regressions": [
+            "Committed Windows PowerShell 5.1 tests: 7 invalid fixtures x verify-only and install modes (missing DLL hash with changed DLL, missing launcher hash, empty map, absent map, unexpected path replacing expected key, malformed digest, changed DLL). Each must reject before backup/launcher creation and preserve original DLL/host SHA. Existing valid verify/install/tampered rollback/restore tests retained.",
+            "Executed JS reference contract positive + 7 negatives, exact 13 names matched against Python producer, source order and single script body checks PASS. This is not PowerShell execution; local pwsh unavailable.",
+            "Initial commit had a JS replacement expansion of literal PowerShell regex ending; corrected in 35ab4b78, read-back verified. Initial SHA not certified."
+          ],
+          "same_sha_ci": {
+            "sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
+            "status": "UNCONFIRMED",
+            "note": "Commit workflow lookup PR-filtered returns no runs; combined statuses empty. Actual Windows script parse, install/rollback and x86/x64 build remain unverified. No CI skip."
+          },
+          "prior_ci": "833cbc36 normal strength exact-SHA CI still unconfirmed via available connector; no rerun or duplicate score.",
+          "remaining_trace": [
+            "Python pe_machine validates only MZ/PE signature and machine, not optional header magic, image type or section envelope; investigate next with positive/negative fixtures.",
+            "Restore validates backup bytes before copying but multi-file failure mid-restore remains a separate hypothesis.",
+            "Atomic whole-car eye staging remains disabled; no change to renderer, all 16 private OVC files or asset rights."
+          ],
+          "protected_v003": "Only isolated installer and its branch CI workflow modified; release, runtime game/host, launchers, assets and original callback not modified.",
+          "asset_validation": "No actual private asset hashes/UV/PBR/gauge or physical Quest3 validation.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI",
+          "next_trace": "Verify 35ab4b78 exact Windows CI; harden PE32/PE32+ optional header and executable-vs-DLL role validation, then rollback failure injection and vehicle atomic stereo staging."
         }
       ],
-      "latest_material_sha": "833cbc36f463a09f75b00d55e456621d96cd26ba",
+      "latest_material_sha": "35ab4b786c42892a100d9bd71f44fdbf940e8596",
       "latest_static_ci": "EXACT_SOURCE_SHA_CI_UNCONFIRMED",
-      "next_focus": "Confirm exact SHA Windows SM3 HLSL, multicar, x86 DLL/x64 package CI. Investigate glass center-vs-eye order and two-sided shading with concrete overlap counterexamples; preserve whole-vehicle atomic staging and stock fallback gates."
+      "next_focus": "Verify 35ab4b78 exact Windows CI; harden PE32/PE32+ optional header and executable-vs-DLL role validation, then rollback failure injection and vehicle atomic stereo staging."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 18:02:00+09:00",
+  "last_updated_kst": "2026-11-24 18:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
