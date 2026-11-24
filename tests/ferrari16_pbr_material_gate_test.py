@@ -29,8 +29,18 @@ def main() -> None:
     assert not pbr_opaque_coverage_ok(4, set(), {0}, {0}, {0})
     assert uncovered_pbr_materials(4, {0, 1}, {0}, {1}, {1}) == {
         "no_normal": [1], "no_orm": [0], "degenerate_uv": [0],
+        "disabled_normal_strength": [],
         "partially_degenerate_uv": [], "incomplete_pbr_mips": [],
         "unsupported_version": [], "no_opaque_materials": []}
+    # A disabled normal map attached to a used opaque material is not
+    # functional coverage; an unused or glass-only material is exempt.
+    assert not pbr_opaque_coverage_ok(
+        4, {0, 1}, {0, 1}, {0, 1}, {0, 1}, disabled_normal_strength={1})
+    assert pbr_opaque_coverage_ok(
+        4, {0}, {0, 1}, {0}, {0}, disabled_normal_strength={1})
+    assert uncovered_pbr_materials(
+        4, {0, 1}, {0}, {0, 1}, {0, 1},
+        disabled_normal_strength={0, 1})["disabled_normal_strength"] == [0]
     assert triangle_uv_basis((0., 0.), (1., 0.), (0., 1.))
     assert triangle_uv_basis((0., 0.), (0., 1.), (1., 0.))  # mirrored UV
     assert not triangle_uv_basis((0., 0.), (0., 0.), (0., 0.))

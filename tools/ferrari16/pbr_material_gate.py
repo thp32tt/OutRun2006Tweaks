@@ -13,12 +13,15 @@ def uncovered_pbr_materials(version: int, opaque: Iterable[int],
                             normal: Iterable[int], orm: Iterable[int],
                             usable_uv: Iterable[int],
                             invalid_uv: Iterable[int] = (),
-                            incomplete_mips: Iterable[int] = ()) -> dict[str, list[int]]:
+                            incomplete_mips: Iterable[int] = (),
+                            disabled_normal_strength: Iterable[int] = ()) -> dict[str, list[int]]:
     """Return failed coverage categories, without claiming visual quality."""
     used = set(opaque)
     n, o, uv = set(normal), set(orm), set(usable_uv)
     return {
         "no_normal": sorted(used - n),
+        # A present DDS is not active when the shader strength is zero.
+        "disabled_normal_strength": sorted(used & n & set(disabled_normal_strength)),
         "no_orm": sorted(used - o),
         "degenerate_uv": sorted(used - uv),
         "partially_degenerate_uv": sorted(used & set(invalid_uv)),
@@ -32,10 +35,11 @@ def pbr_opaque_coverage_ok(version: int, opaque: Iterable[int],
                            normal: Iterable[int], orm: Iterable[int],
                            usable_uv: Iterable[int],
                            invalid_uv: Iterable[int] = (),
-                           incomplete_mips: Iterable[int] = ()) -> bool:
+                           incomplete_mips: Iterable[int] = (),
+                           disabled_normal_strength: Iterable[int] = ()) -> bool:
     return not any(uncovered_pbr_materials(
         version, opaque, normal, orm, usable_uv,
-        invalid_uv, incomplete_mips).values())
+        invalid_uv, incomplete_mips, disabled_normal_strength).values())
 
 
 def triangle_uv_basis(u0: tuple[float, float], u1: tuple[float, float],

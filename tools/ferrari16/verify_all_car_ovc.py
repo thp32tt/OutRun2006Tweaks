@@ -117,6 +117,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     invalid_uv_materials: set[int] = set()
     incomplete_mips_materials: set[int] = set()
     normal_materials: set[int] = set()
+    disabled_normal_strength: set[int] = set()
     orm_materials: set[int] = set()
     for _ in range(groups):
         head = 12 if version == 1 else 16
@@ -228,6 +229,11 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                     if index == 0:
                         normal_maps += 1
                         normal_materials.add(material_id)
+                        # The SM3 pixel shader only samples normalMap for
+                        # factors.z > 0. Keep map counts structural, but do
+                        # not certify a disabled map as functional PBR.
+                        if normal_strength == 0.0:
+                            disabled_normal_strength.add(material_id)
                     else:
                         orm_maps += 1
                         orm_materials.add(material_id)
@@ -273,12 +279,13 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     uncovered = uncovered_pbr_materials(
         version, opaque_materials, normal_materials, orm_materials,
         usable_uv_materials, invalid_uv_materials,
-        incomplete_mips_materials)
+        incomplete_mips_materials, disabled_normal_strength)
     uncovered["incomplete_albedo_mips"] = sorted(
         used_materials & incomplete_albedo_mips)
     return {"version": version, "groups": groups, "triangles": tris,
             "vertices": vertices, "materials": materials,
             "normal_maps": normal_maps, "orm_maps": orm_maps,
+            "disabled_normal_strength_materials": sorted(disabled_normal_strength),
             "zero_normal_vertices": zero_normals,
             "opaque_materials": sorted(opaque_materials),
             "usable_uv_materials": sorted(usable_uv_materials),
@@ -411,6 +418,28 @@ def self_test() -> None:
         assert covered["pbr_uncovered"]["no_normal"] == []
         assert covered["pbr_uncovered"]["no_orm"] == []
         assert pbr_map_coverage(covered)
+        # CRC-correct OVC4 with full DDS maps but zero material strength
+        # is structurally renderable, not a functioning normal-mapped body.
+        # Exercise positive/negative strengths for every canonical slot.
+        strength_offset = len(group) + 4 + len(dds) + 8 + 8
+        for car_id, _ in CARS:
+            slot_path = Path(directory) / f"car_id_{car_id:02d}.ovc"
+            for strength, expected in ((0., False), (-0., False),
+                                       (.25, True), (1., True), (2., True)):
+                fixture = bytearray(mapped)
+                struct.pack_into("<f", fixture, strength_offset, strength)
+                fixture_header = b"OVRCABH4" + struct.pack(
+                    "<7I", 4, 1, 1, 3, 1, len(fixture),
+                    zlib.crc32(fixture) & 0xffffffff)
+                slot_path.write_bytes(fixture_header + fixture)
+                details = inspect(slot_path)
+                assert details["normal_maps"] == 1 and details["orm_maps"] == 1
+                assert details["pbr_uncovered"]["no_normal"] == []
+                assert details["disabled_normal_strength_materials"] == (
+                    [] if expected else [0])
+                assert details["pbr_uncovered"]["disabled_normal_strength"] == (
+                    [] if expected else [0])
+                assert pbr_map_coverage(details) == expected, (car_id, strength)
         # Two opaque meshes share one PBR material. One mesh is UV-valid
         # while its sibling has collapsed UV. A file-wide "any UV" gate
         # incorrectly certified these CRC-valid broken normal maps.
