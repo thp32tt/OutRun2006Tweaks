@@ -1747,18 +1747,50 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Verify source exact SHA Windows x86/x64 and multicar CI. Trace isolated whole-car L/R color+depth staging with reset/epoch and actual right-eye failure proof; inspect R7 depth bootstrap/replay and surface ownership for concrete faults without opening external admission."
+        },
+        {
+          "cycle_key": "EXT16-011-20261125-0200-R30-PARTICLE-RING-LOCK-TRANSACTION",
+          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "D3D9 R30/R33 direct/raw DIP bypass, HRESULT recovery, state restoration and original fallback",
+          "source_material_sha": "6f422083ed8b051572ff10a9da2fe50f2aeafddc",
+          "source_blob_sha1": {
+            "src/vr/d3d9/r30_particle_dual_eye_ring.hpp": "55832210c09cff2c4940d7a06745b15f09284243",
+            "src/vr/d3d9/r30_particle_upload_policy.hpp": "40f32f3a349ef61cd109d6f55c364c98b2f7434e",
+            "tests/external_car_stereo_receipt_test.cpp": "3b59cea09d3ef0d486e1e04c2d1ad6b771131513"
+          },
+          "source_defect": "Optional R30 DynamicVB particle ring returned after a successful Lock with null mapping without Unlock, and could retain invalid buffer after failed creation or lock. A rejected prepare also retained previous pair stride/bindability. These are defensive failure-path counterexamples, not observed real-driver faults.",
+          "source_fix": "Disable stale pair binding at prepare entry; release failed allocation; balance successful Lock even with null mapping; invalidate ring on any failed upload; publish offsets/stride only after valid copy and successful Unlock. Preserve existing raw UP fallback and physical attempt/dirty stream veto.",
+          "positive_negative_regressions": [
+            "Local g++ C++17 -Wall -Wextra -Werror -pedantic exact portable helper fragment: 8/8 lock/map/unlock combinations pass; old null mapping after successful Lock skips Unlock in 2 combinations. Full committed test and Windows COM ring not run locally.",
+            "Existing compiled receipt test extended with 8 upload outcome combinations and native UP fallback safety assertions. No GPU driver fault injection."
+          ],
+          "same_sha_ci": {
+            "sha": "6f422083ed8b051572ff10a9da2fe50f2aeafddc",
+            "status": "UNVERIFIED",
+            "note": "Commit workflow PR-only listing and combined status empty for both current source and previous c5e5f56a. No rerun, no PASS claim."
+          },
+          "render_trace": [
+            "R33 DIP entry rejects un-staged external mesh before F11/FVF142/XYZRHW/raw/lower; R30 DIP entry independently rejects before raw and R29. Typed handled result prevents actual E_NOTIMPL replay in both owners.",
+            "R30TryXyzrhwPrimitiveUP optional exact WorldParticle -> ring.prepare -> bindEye -> raw DrawPrimitive -> finishUp; failed prepare uses transformed native UP path without native VB submission. Successful physical attempt cannot replay, failed stream restore handled. Ring is opt-in and not evidence of user FPS symptom.",
+            "R33 fast world uses batch c64 and R32 right state restore; ordinary game right-only failure retains native left HRESULT with Present veto. External whole-car color/depth staging remains unavailable and guards unchanged."
+          ],
+          "protected_v003": "External automation branch only; no stable release, host, launcher, model shader, original x86 ABI, PBR or deployment change.",
+          "asset_validation": "No private models, OVC/DDS, licensing or HMD validation; no promotion; no N100 use.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Verify exact source CI; inspect R30/R33 UP buffer binding and post-left render-target/depth ownership; trace 16-car OVC material boundary separately. Maintain fail-closed external transaction and protected original callback."
         }
       ],
-      "latest_material_sha": "c5e5f56aded5cce88ca135a21b050a606c53e519",
-      "latest_static_ci": "Local portable WVP restore 16/16 PASS; exact-SHA Windows and full regression CI UNVERIFIED",
-      "next_focus": "Verify source exact SHA Windows x86/x64 and multicar CI. Trace isolated whole-car L/R color+depth staging with reset/epoch and actual right-eye failure proof; inspect R7 depth bootstrap/replay and surface ownership for concrete faults without opening external admission."
+      "latest_material_sha": "6f422083ed8b051572ff10a9da2fe50f2aeafddc",
+      "latest_static_ci": "Portable Lock/Unlock helper 8/8 PASS; full exact-SHA CI UNVERIFIED",
+      "next_focus": "Verify exact source CI; inspect R30/R33 UP buffer binding and post-left render-target/depth ownership; trace 16-car OVC material boundary separately. Maintain fail-closed external transaction and protected original callback."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 01:32:00+09:00",
+  "last_updated_kst": "2026-11-25 02:02:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
