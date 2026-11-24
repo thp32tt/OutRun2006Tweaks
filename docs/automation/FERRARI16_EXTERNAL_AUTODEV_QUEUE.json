@@ -1650,7 +1650,8 @@
                 "conclusion": "success",
                 "sha": "b0f96821131429d824eba921a1b68bf4f5594cb3"
               }
-            ]
+            ],
+            "followup_verified": "2026-11-25 01:00 KST: exact source b0f968211 push runs 45426537979 multicar/HLSL, 45426537832 isolated package, 45426537840 Build and 45426537885 HUD Inspector all completed success. No rerun or duplicate score."
           },
           "render_trace": [
             "R33 raster guard -> exact sprite owner -> R32ReviewTryXyzrhw* -> R30Support -> R30TryXyzrhw* -> R30ExecuteXyzrhwStereo -> raw LEFT/RIGHT -> typed attempt -> no replay of handled result.",
@@ -1661,18 +1662,71 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Compare v0.03 versus latest driver cockpit, speed/RPM/gear, player overlays and exact producer identity, including source ownership and right-eye restore. Separately trace renderer staging and decoded PNG/JPEG provenance; no activation or asset promotion."
+        },
+        {
+          "cycle_key": "EXT16-011-20261125-0100-DASHBOARD-GEAR-PIVOT-PARITY",
+          "status": "PATCHED_EXACT_SHA_CPP_PYTHON_STEPS_PASS_CONTINUE_ACTIVE",
+          "rotating_focus": "Cockpit and instrument parity: OVC4 GearVisible embedded and overlay loader contract versus offline approval",
+          "source_material_sha": "0e4c562c57817a3433fb132774262c6128aea5e8",
+          "source_defect": "Native ValidDashboardBinding checks finite pivot and abs<=10000 before GearVisible return; Python inspect only checked gear<=7 on kind 3, admitting CRC-valid gear bindings rejected by actual C++ Parse. Both embedded vehicle and standalone dashboard preflight affected.",
+          "source_fix": "Decode pivot for all dashboard kinds, reject invalid pivot before kind branch; preserve native policy for unused gear axis/calibration, gear range, needle bounds and original runtime.",
+          "source_blob_sha1": {
+            "tools/ferrari16/verify_all_car_ovc.py": "c015c004d2a2ac50e16df55d6a050f7fa3ffa81f",
+            "tests/ferrari16_overlay_status_test.py": "91d3c7552cc9e8984094b7e03dcc6b36b57d1345",
+            "tests/external_car_sidecar_v4_test.cpp": "ac4cc4730021b6a6efef5d6bce2b9fa5efee1c56"
+          },
+          "positive_negative_regressions": [
+            "Python 16 slots x 2 locations x (3 positive + 5 invalid pivot + 1 invalid gear) = 288 synthetic CRC-correct cases; native C++ 16 slots x 8 pivots = 128 parse cases with gear visibility assertions on positive fixtures. Total 416 cases, not actual vehicle models.",
+            "Exact source multicar run 45432281695 C++ contracts, Python OVC tests, production source assertions, protected v0.03 and bridge checks reported success; final workflow/package status separately tracked."
+          ],
+          "same_sha_ci": {
+            "sha": "0e4c562c57817a3433fb132774262c6128aea5e8",
+            "runs": [
+              {
+                "name": "Build",
+                "id": 45432282027,
+                "status": "in_progress",
+                "conclusion": null,
+                "sha": "0e4c562c57817a3433fb132774262c6128aea5e8"
+              },
+              {
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "id": 45432281695,
+                "status": "completed",
+                "conclusion": "success",
+                "sha": "0e4c562c57817a3433fb132774262c6128aea5e8"
+              },
+              {
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "id": 45432281772,
+                "status": "in_progress",
+                "conclusion": null,
+                "sha": "0e4c562c57817a3433fb132774262c6128aea5e8"
+              }
+            ]
+          },
+          "render_trace": [
+            "Baseline 2446269a original player wrapper calls stock callback; current wrapper also unconditionally calls original PlayerCallbackHook with glass scope and static prohibition on skipping wrapper. External Prepare/Draw not invoked from this wrapper, so no claim current runtime gear symptom caused by this bug.",
+            "OVC4 header/CRC -> dashboard record -> native ValidDashboardBinding -> gear visibility -> external DrawNativeScene; offline inspect now matches native pivot gate. Telemetry source uses player +1F8 speed, +208 gear, +20C RPM with per-frame/player latch; actual offset semantics and HMD visual display not proven this cycle.",
+            "Potential unbound dashboard housing suppression when both embedded needles exist is not proven without asset ownership; no change. Native atomic stage remains closed."
+          ],
+          "asset_validation": "No actual private 16 source/OVC/DDS, rights or visual cockpit QA; no candidates promoted. N100 unused.",
+          "protected_v003": "Only offline verifier and tests changed; no runtime game, host, launcher, stable release or deployment changes.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Revisit R7 isolated L/R color/depth staging ownership and pre-raster fallback proof; keep atomic stage closed until implemented and verified. Also investigate unbound dashboard housing suppression by embedded needle mask, per-player telemetry provenance and decoded preview evidence as distinct hypotheses without speculative edits."
         }
       ],
-      "latest_material_sha": "b0f96821131429d824eba921a1b68bf4f5594cb3",
-      "latest_static_ci": "OutRun EXE HUD Inspector CI: in_progress; Ferrari16 EXT16-005 Exact SHA Isolated Test Package: in_progress; Build: in_progress; Ferrari16 All-Car Sidecar Regression: success",
-      "next_focus": "Compare v0.03 versus latest driver cockpit, speed/RPM/gear, player overlays and exact producer identity, including source ownership and right-eye restore. Separately trace renderer staging and decoded PNG/JPEG provenance; no activation or asset promotion."
+      "latest_material_sha": "0e4c562c57817a3433fb132774262c6128aea5e8",
+      "latest_static_ci": "Build: in_progress; Ferrari16 All-Car Sidecar Regression: success; Ferrari16 EXT16-005 Exact SHA Isolated Test Package: in_progress",
+      "next_focus": "Revisit R7 isolated L/R color/depth staging ownership and pre-raster fallback proof; keep atomic stage closed until implemented and verified. Also investigate unbound dashboard housing suppression by embedded needle mask, per-player telemetry provenance and decoded preview evidence as distinct hypotheses without speculative edits."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 00:32:00+09:00",
+  "last_updated_kst": "2026-11-25 01:02:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
