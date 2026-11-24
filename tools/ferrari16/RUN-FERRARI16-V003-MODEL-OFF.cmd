@@ -33,11 +33,10 @@ rem The release dinput8.dll contains both the normal Tweaks/FFB code and VR.
 rem Direct 2D explicitly disables only VR hooks; wheel FFB stays loaded.
 rem A globally named taskkill would terminate even the working v0.03 host.
 rem Fail closed instead; close any existing host manually before testing.
-tasklist /FI "IMAGENAME eq outrun-vr-host.exe" 2>nul | find /I "outrun-vr-host.exe" >nul
-if not errorlevel 1 (
- echo [EXT16] Another VR host is running. Close it before isolated testing.
- exit /b 88
-)
+call :CHECK_HOST
+if errorlevel 89 exit /b 89
+if errorlevel 88 exit /b 88
+if errorlevel 1 exit /b 89
 set "OUTRUN_VR_LAUNCH=0"
 set "OUTRUN_VR_FORCE_DISABLED=1"
 set "OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=0"
@@ -51,11 +50,10 @@ rem Ferrari16 private diagnostic on unmodified v0.03 VR launch settings.
 rem No PowerShell script is required: all launch-only VR settings are passed here.
 rem A globally named taskkill would terminate even the working v0.03 host.
 rem Fail closed instead; close any existing host manually before testing.
-tasklist /FI "IMAGENAME eq outrun-vr-host.exe" 2>nul | find /I "outrun-vr-host.exe" >nul
-if not errorlevel 1 (
- echo [EXT16] Another VR host is running. Close it before isolated testing.
- exit /b 88
-)
+call :CHECK_HOST
+if errorlevel 89 exit /b 89
+if errorlevel 88 exit /b 88
+if errorlevel 1 exit /b 89
 set "OUTRUN_VR_LAUNCH=1"
 set "OUTRUN_VR_FORCE_DISABLED=0"
 set "OUTRUN_VR_R23_PIXEL_PROBE=0"
@@ -134,4 +132,24 @@ start "" "%~dp0OR2006C2C.exe" ^
  -VR.F50ExternalModel=false ^
  -VR.ExternalFerrariNativeCallbackReplacement=false ^
  -VR.ExternalFerrariDiag=false
+exit /b 0
+
+:CHECK_HOST
+rem FOR /F consumes CSV image names plus an explicit successful-scan marker.
+rem The marker is emitted only if TASKLIST succeeds; a failed query must
+rem never be treated as proof that the v0.03 host is absent.
+set "EXT16_HOST_SCAN_OK="
+set "EXT16_HOST_FOUND="
+for /f "tokens=1 delims=," %%P in ('tasklist /FI "IMAGENAME eq outrun-vr-host.exe" /FO CSV /NH 2^>nul ^&^& echo EXT16_TASKLIST_OK') do (
+ if /I "%%~P"=="outrun-vr-host.exe" set "EXT16_HOST_FOUND=1"
+ if "%%~P"=="EXT16_TASKLIST_OK" set "EXT16_HOST_SCAN_OK=1"
+)
+if not defined EXT16_HOST_SCAN_OK (
+ echo [EXT16] Cannot verify VR host absence. Refusing isolated launch.
+ exit /b 89
+)
+if defined EXT16_HOST_FOUND (
+ echo [EXT16] Another VR host is running. Close it before isolated testing.
+ exit /b 88
+)
 exit /b 0

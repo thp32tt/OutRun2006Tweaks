@@ -28,8 +28,13 @@ def is_isolated_launcher(source):
     launch_at = low.find('start "" "%~dp0or2006c2c.exe"')
     return (marker_at >= 0 and launch_at > marker_at
             and 'taskkill /im outrun-vr-host.exe' not in low
-            and low.count('tasklist /fi "imagename eq outrun-vr-host.exe"') == 2
-            and low.count("if not errorlevel 1 (") >= 2
+            and low.count("call :check_host") == 2
+            and low.count("if errorlevel 89 exit /b 89") == 2
+            and low.count("if errorlevel 88 exit /b 88") == 2
+            and low.count("if errorlevel 1 exit /b 89") == 2
+            and low.count('tasklist /fi "imagename eq outrun-vr-host.exe"') == 1
+            and "^&^& echo ext16_tasklist_ok" in low
+            and "if not defined ext16_host_scan_ok (" in low
             and 'exit /b 87' in low and 'exit /b 88' in low)
 
 def choice_dispatch(source):
@@ -68,7 +73,85 @@ def probe_flags(source, mode, inherited):
             flags["OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST"])
 
 
+def host_guard(source):
+    return source.split("\n:CHECK_HOST\n", 1)[1]
+
+
+def simulate_host_scan(source, rows, tasklist_status):
+    """Model the actual guard's CSV first field and success marker."""
+    guard = host_guard(source)
+    assert 'set "EXT16_HOST_SCAN_OK="' in guard
+    assert 'set "EXT16_HOST_FOUND="' in guard
+    assert '^&^& echo EXT16_TASKLIST_OK' in guard
+    assert 'if not defined EXT16_HOST_SCAN_OK (' in guard
+    assert 'if defined EXT16_HOST_FOUND (' in guard
+    output = list(rows)
+    if tasklist_status == 0:
+        output.append("EXT16_TASKLIST_OK")
+    fields = [row.split(",", 1)[0].strip('"') for row in output]
+    if "EXT16_TASKLIST_OK" not in fields:
+        return 89
+    if any(field.lower() == "outrun-vr-host.exe" for field in fields):
+        return 88
+    return 0
+
+
+HOST_SCAN_CASES = (
+    ((), 0, 0),
+    (("INFO: No tasks match the specified criteria.",), 0, 0),
+    (('"outrun-vr-host.exe","1234","Console","1","1 K"',), 0, 88),
+    (('"OUTRUN-VR-HOST.EXE","4321"',), 0, 88),
+    ((), 1, 89),
+    (("ERROR: Access denied.",), 1, 89),
+    (('"outrun-vr-host.exe","1234"',), 1, 89),
+    ((), 9009, 89),
+)
+
+
 class LauncherIsolationTest(unittest.TestCase):
+    def test_host_scan_routes_and_negative(self):
+        for name in LAUNCHERS:
+            source = (ROOT / name).read_text(encoding="utf-8")
+            for rows, code, expected in HOST_SCAN_CASES:
+                with self.subTest(launcher=name, rows=rows, code=code):
+                    self.assertEqual(simulate_host_scan(source, rows, code), expected)
+            # Old pipe tested FIND only; empty/failed TASKLIST allowed launch.
+            self.assertEqual(simulate_host_scan(source, (), 1), 89)
+            self.assertFalse(is_isolated_launcher(source.replace(
+                "^&^& echo EXT16_TASKLIST_OK", "^& echo EXT16_TASKLIST_OK")))
+            self.assertFalse(is_isolated_launcher(source.replace(
+                "if errorlevel 89 exit /b 89", "rem ignore scan failure")))
+
+    @unittest.skipUnless(os.name == "nt", "actual CMD guard requires Windows")
+    def test_native_cmd_host_scan(self):
+        # Replace only TASKLIST with a deterministic fixture. The FOR /F,
+        # escaping, marker, variable reset and subroutine are real CMD code.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            stub = root / "scan-stub.cmd"
+            fixture = root / "host-guard.cmd"
+            for name in LAUNCHERS:
+                source = (ROOT / name).read_text(encoding="utf-8")
+                guard = host_guard(source)
+                command = 'tasklist /FI "IMAGENAME eq outrun-vr-host.exe" /FO CSV /NH'
+                self.assertEqual(guard.count(command), 1)
+                guard = guard.replace(command, "call scan-stub.cmd")
+                fixture.write_text(
+                    '@echo off\nsetlocal\nset "EXT16_HOST_SCAN_OK=1"\n'
+                    'set "EXT16_HOST_FOUND=1"\ncall :CHECK_HOST\n'
+                    'if errorlevel 89 exit /b 89\nif errorlevel 88 exit /b 88\n'
+                    'if errorlevel 1 exit /b 89\nexit /b 0\n:CHECK_HOST\n'
+                    + guard, encoding="ascii")
+                for rows, code, expected in HOST_SCAN_CASES:
+                    stub.write_text("@echo off\n" +
+                        "".join("echo " + row + "\n" for row in rows) +
+                        "exit /b " + str(code) + "\n", encoding="ascii")
+                    with self.subTest(launcher=name, rows=rows, code=code):
+                        result = subprocess.run(
+                            ["cmd.exe", "/d", "/c", fixture.name], cwd=root,
+                            capture_output=True, timeout=10)
+                        self.assertEqual(result.returncode, expected)
+
     def test_choice_routes_and_negative(self):
         for name in LAUNCHERS:
             source = (ROOT / name).read_text(encoding="utf-8")
@@ -144,7 +227,7 @@ class LauncherIsolationTest(unittest.TestCase):
     def test_negative_no_host_conflict_guard(self):
         source = (ROOT / LAUNCHERS[0]).read_text(encoding="utf-8")
         self.assertFalse(is_isolated_launcher(source.replace(
-            'tasklist /FI "IMAGENAME eq outrun-vr-host.exe"', 'echo removed')))
+            'call :CHECK_HOST', 'echo removed')))
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
