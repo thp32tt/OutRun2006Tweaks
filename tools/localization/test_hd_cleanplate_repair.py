@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 from PIL import Image,ImageDraw
 import hd_cleanplate_repair as m
+import hd_cleanplate_flat_background as flat
 
 class RepairTests(unittest.TestCase):
     def test_95_percent_caps_actual_native_ink_not_canvas(self):
@@ -35,6 +36,26 @@ class RepairTests(unittest.TestCase):
                 {"roi_id":"id2","target":"a","source_dds_sha256":"b"*64,"bbox_xyxy":[-1,5,90,80]}]}))
             got,n=m.load_refinements(p,groups)
             self.assertEqual(n,1);self.assertEqual(got,{"id1":[5,5,90,80]})
+    def test_opaque_flat_cleanplate_restores_only_text_mask(self):
+        x=Image.new("RGBA",(160,70),(80,90,100,255))
+        d=ImageDraw.Draw(x)
+        for off in (35,57,79,101):
+            d.rectangle((off,25,off+10,43),fill=(255,255,255,255))
+        cand=Image.new("RGBA",(120,50))
+        ImageDraw.Draw(cand).ellipse((15,10,104,39),fill=(255,230,40,255))
+        raw=io.BytesIO();cand.save(raw,format="PNG")
+        clean=x.copy();final=x.copy()
+        row={"roi_id":"Q001_"+"a"*16,"english":"GO","korean":"출발","_bbox":[10,10,150,60]}
+        rec=flat.trial(x,clean,final,row,raw.getvalue(),m.fit_line95,m.candidate_no_panel)
+        self.assertEqual(rec["clean_type"],"EXACT_UNIFORM_OPAQUE_BORDER_BACKGROUND_TEST_ONLY")
+        self.assertIsNone(flat.diff_mask(clean,Image.new("RGBA",x.size,(80,90,100,255))).getbbox())
+        self.assertEqual(final.getpixel((2,2)),x.getpixel((2,2)))
+        self.assertIsNotNone(flat.diff_mask(clean,final).getbbox())
+    def test_nonuniform_panel_rejected(self):
+        x=Image.new("RGBA",(80,40),(80,90,100,255))
+        x.putpixel((1,1),(81,90,100,255))
+        with self.assertRaisesRegex(ValueError,"NOT_UNIFORM"):
+            flat.flat_source_mask(x)
     def test_family_first(self):
         self.assertLess(m.priority("textures/load/Keyboard/x/FA7BBB13_1024x512.dds"),
                         m.priority("textures/load/x/FF2462BB_1024x512.dds"))
