@@ -1811,18 +1811,52 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Trace exact retail 469600 layout+0 PMT candidate to original material/queue consumer by slot, without suppressing steering, shadow or stock dashboard. Investigate isolated L/R color+depth staging and verify exact source CI; keep external admission fail-closed."
+        },
+        {
+          "cycle_key": "EXT16-011-ITER24-ISOLATED-HOST-SCAN",
+          "status": "PATCHED_SOURCE_MODEL_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "v0.03 versus latest: 4:3 theatre/menu fullscreen, initial OpenXR focus and VDXR eye projections, no 2D fallback",
+          "source_material_sha": "ed0d6645cec751bfc893cf0b0da55102af0d47ec",
+          "source_blob_sha1": {
+            "tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd": "7c6a91d458541f41df0ebdfcc0416ce74b8ee8ca",
+            "tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd": "ff7535926f5d7953c03c709621b0f1fb33b04623",
+            "tools/ferrari16/RUN-FERRARI16-V003-MODEL-OFF.cmd": "6e3e889187f020b31b9f5ec5a0d58f0a39a30cc1",
+            "tools/ferrari16/RUN-FERRARI16-V003-PBR-TRACE.cmd": "882b802e22f7c7e282bd36535443f92c886f1c72",
+            "tests/ferrari16_launcher_isolation_test.py": "49576315b0ca04c33c3fc77da65bfdc0374090ad"
+          },
+          "source_defect": "The four isolated launchers checked only FIND's exit status after TASKLIST | FIND. Empty output from a failed TASKLIST was indistinguishable from a successful scan with no host, so an isolated game/host could start while the protected host was unverified. This is a deterministic failure-path counterexample, not a measured cause of headset focus symptoms.",
+          "source_fix": "Both explicit 2D and VR paths call a common local CHECK_HOST subroutine per launcher. FOR /F consumes TASKLIST CSV image names and a success marker emitted only via &&. Clear inherited scan state, reject unverified scan (89), reject detected host (88), permit verified absent host (0); preserve CHOICE gate, prewarm/AutoLaunchHost policy, flags and all existing VR settings. No new PowerShell dependency or global taskkill.",
+          "positive_negative_regressions": [
+            "Source-model JavaScript evaluation against four proposed script texts, 8 cases each = 32/32 PASS: no host, localized informational row, matching host, case-insensitive match, empty failed query, access denied, partial host row with failure, command not found. Old pipeline empty failed query counterexample reproduced by status semantics.",
+            "Committed Python source-model and native Windows CMD fixture tests, including stale inherited scan flags and negative missing success guard. Python suite and actual CMD execution not run locally; existing Linux multicar and Windows package workflows already invoke this test."
+          ],
+          "same_sha_ci": {
+            "sha": "ed0d6645cec751bfc893cf0b0da55102af0d47ec",
+            "status": "UNVERIFIED",
+            "note": "PR-filtered commit workflow listing and combined statuses empty. Push CI not certified; no rerun and no CI skip."
+          },
+          "render_trace": [
+            "Protected v0.03 baseline 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7: verified all ten protected Git blob IDs from exact new source SHA against existing pinned gate, including both launchers, main.cpp, vr_runtime.hpp, menu_projection_pair.hpp, menu_content_aspect.hpp, projection_pair_pipeline.hpp, openxr_api_compat.hpp, d3d9ex_direct_passthrough.hpp and menu_letterbox_geometry.hpp.",
+            "Isolated launchers preserve explicit mode dispatch, hidden PowerShell prewarm then game with VR.AutoLaunchHost=true, render 2496x2688, direct-only D3D9Ex, HUD 0.55, menu scale 0.75 and culling 8. No changes to runtime focus or projection math.",
+            "R7 line 1910 publishes gameplay vs theater from GameplayActive(); line 2143 external live-eye fence; lines 2201/2285 per-eye PBR constants; lines 2277/2279 right RT/depth; line 2358 distinct eye transforms. Not a proof of real session focus, full atomic two-eye staging or 16-car actual PBR."
+          ],
+          "protected_v003": "All ten protected blobs exact match. Only four isolated launchers and their test changed. Existing original player, menu, host, PBR, protected release and deployment unchanged. Host query is a snapshot, not a cross-process lock.",
+          "asset_validation": "No private OVC/DDS, model promotion, rights change, or N100 work.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Inspect OVC4 per-material DDS mip chain/UV/tangent/normal/ORM and CRC boundary for all 16 slots; positive and corrupt input fixtures; verify exact SHA CI. Retain original callback and external atomic raster fence; investigate native host handshake and foreground ownership separately."
         }
       ],
-      "latest_material_sha": "5a5cabeea00682b09efb965ecd2d717544a632a6",
-      "latest_static_ci": "Portable ABI guard fragment ASan/UBSan PASS; full exact-SHA Windows x86/x64 and multicar CI UNVERIFIED",
-      "next_focus": "Trace exact retail 469600 layout+0 PMT candidate to original material/queue consumer by slot, without suppressing steering, shadow or stock dashboard. Investigate isolated L/R color+depth staging and verify exact source CI; keep external admission fail-closed."
+      "latest_material_sha": "ed0d6645cec751bfc893cf0b0da55102af0d47ec",
+      "latest_static_ci": "Source-modeled host scan 32/32 PASS; native CMD and full exact-SHA Windows x86/x64 CI UNVERIFIED",
+      "next_focus": "Inspect OVC4 per-material DDS mip chain/UV/tangent/normal/ORM and CRC boundary for all 16 slots; positive and corrupt input fixtures; verify exact SHA CI. Retain original callback and external atomic raster fence; investigate native host handshake and foreground ownership separately."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 02:32:38+09:00",
+  "last_updated_kst": "2026-11-25",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
