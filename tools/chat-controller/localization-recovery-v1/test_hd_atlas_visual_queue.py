@@ -30,6 +30,16 @@ class AtlasQueueTests(unittest.TestCase):
         p=q.parse_decision(json.dumps(d),t)
         self.assertEqual(len(p["bbox_proposals"]),1)
         self.assertEqual(p["bbox_proposals"][0]["bbox_xyxy"],[1,2,50,30])
+    def test_identical_native_and_clean_evidence_reuses_prior_decision(self):
+        t=task()
+        t["images"]={k:{"sha256":"3"*64} for k in ("source","clean","final")}
+        d={**{k:t[k] for k in ("task_id","source_dds_sha256","candidate_dds_sha256")},
+           "decision":"REWORK_REQUIRED","reason":"untranslated"}
+        prior={"records":{"old":{"status":"DONE","review_key":q.review_key(t),"target":t["target"],
+                "source_dds_sha256":t["source_dds_sha256"],"candidate_dds_sha256":t["candidate_dds_sha256"],"decision":d}}}
+        self.assertEqual(q.reused_records(prior,[t],7)[t["task_id"]]["reused_from_run_id"],7)
+        t["images"]["clean"]["sha256"]="4"*64
+        self.assertEqual(q.reused_records(prior,[t],7),{})
     def test_no_token_artifact_refused(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaisesRegex(ValueError,"TOKEN_REQUIRED"):q.fetch_evidence({},Path(d),"")
