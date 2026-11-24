@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools" / "ferrari16"))
 from pbr_material_gate import (  # noqa: E402
     uncovered_pbr_materials, pbr_opaque_coverage_ok,
-    triangle_has_pbr_basis, triangle_uv_basis)
+    triangle_has_pbr_basis, triangle_uv_basis, triangle_source_tangent_collapsed)
 
 
 def main() -> None:
@@ -51,6 +51,22 @@ def main() -> None:
                                       (0, 0), (1, 0), (0, 1))
     assert not triangle_has_pbr_basis((0, 0, 0), (1, 0, 0), (0, 1, 0),
                                       (0, 0), (0, 0), (0, 0))
+    positions = ((0., 0., 0.), (1., 0., 0.), (0., 1., 0.))
+    for uvs, tangent in (
+            (((0., 0.), (1., 0.), (0., 1.)), (1., 0., 0.)),
+            (((0., 0.), (-1., 0.), (0., 1.)), (1., 0., 0.)),
+            (((0., 0.), (0., 1.), (1., 0.)), (0., 1., 0.))):
+        assert triangle_source_tangent_collapsed(positions, uvs, (tangent,)*3)
+        assert triangle_source_tangent_collapsed(
+            positions, uvs, (tuple(-2*x for x in tangent),)*3)
+        assert not triangle_source_tangent_collapsed(
+            positions, uvs, ((0., 0., 1.),)*3)
+        assert not triangle_source_tangent_collapsed(
+            positions, uvs, ((0., 0., 0.),)*3)
+        assert not triangle_source_tangent_collapsed(
+            positions, uvs, (tangent, (0., 0., 1.), tangent))
+        assert not triangle_source_tangent_collapsed(
+            positions, uvs, (tangent, tuple(-x for x in tangent), tangent))
     print("FERRARI16_PBR_PER_OPAQUE_MATERIAL_POSITIVE_NEGATIVE_PASS")
 
 

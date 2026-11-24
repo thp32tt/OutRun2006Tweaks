@@ -9,7 +9,8 @@ import struct
 import tempfile
 import zlib
 from pathlib import Path
-from pbr_material_gate import uncovered_pbr_materials, triangle_has_pbr_basis
+from pbr_material_gate import (uncovered_pbr_materials, triangle_has_pbr_basis,
+                               triangle_source_tangent_collapsed)
 
 CARS = (
     (0, "Dino 246 GTS"), (1, "365 GTS/4 Daytona"), (2, "F50"),
@@ -119,6 +120,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     opaque_materials: set[int] = set()
     usable_uv_materials: set[int] = set()
     invalid_uv_materials: set[int] = set()
+    collapsed_tangent_materials: set[int] = set()
     incomplete_mips_materials: set[int] = set()
     normal_materials: set[int] = set()
     disabled_normal_strength: set[int] = set()
@@ -179,6 +181,15 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                         for vertex in tri)
                     if triangle_has_pbr_basis(*positions, *uvs):
                         usable_uv_materials.add(material)
+                        # UV area alone does not prove that the shader's
+                        # orthogonalized tangent survives the imported normal.
+                        if material not in collapsed_tangent_materials:
+                            normals = tuple(struct.unpack_from(
+                                "<3f", data, vertex_start + vertex * 32 + 12)
+                                for vertex in tri)
+                            if triangle_source_tangent_collapsed(
+                                    positions, uvs, normals):
+                                collapsed_tangent_materials.add(material)
                     else:
                         invalid_uv_materials.add(material)
         # Match the x86 native parser's fail-closed zero-area mesh policy.
@@ -288,6 +299,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
         version, opaque_materials, normal_materials, orm_materials,
         usable_uv_materials, invalid_uv_materials,
         incomplete_mips_materials, disabled_normal_strength)
+    uncovered["collapsed_source_tangent"] = sorted(collapsed_tangent_materials)
     uncovered["incomplete_albedo_mips"] = sorted(
         used_materials & incomplete_albedo_mips)
     return {"version": version, "groups": groups, "triangles": tris,
@@ -298,6 +310,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
             "opaque_materials": sorted(opaque_materials),
             "usable_uv_materials": sorted(usable_uv_materials),
             "invalid_uv_materials": sorted(invalid_uv_materials),
+            "collapsed_tangent_materials": sorted(collapsed_tangent_materials),
             "incomplete_mips_materials": sorted(incomplete_mips_materials),
             "pbr_uncovered": uncovered,
             "pbr_all_opaque_covered": not any(uncovered.values()),
@@ -426,6 +439,51 @@ def self_test() -> None:
         assert covered["pbr_uncovered"]["no_normal"] == []
         assert covered["pbr_uncovered"]["no_orm"] == []
         assert pbr_map_coverage(covered)
+        # Full DDS chains and nondegenerate UV are insufficient if all
+        # source normals are parallel to the UV tangent. Recompute CRC so
+        # that strict material QA, not container corruption, rejects it.
+        for car_id, _ in CARS:
+            slot_path = Path(directory) / f"car_id_{car_id:02d}.ovc"
+            for normal, expected in (
+                    ((0., 0., 1.), True), ((0., 0., -1.), True),
+                    ((0., 0., 0.), True), ((1., 0., 0.), False),
+                    ((-2., 0., 0.), False)):
+                fixture = bytearray(mapped)
+                for vertex in range(3):
+                    struct.pack_into("<3f", fixture,
+                                     16 + len(name) + vertex * 32 + 12, *normal)
+                fixture_header = b"OVRCABH4" + struct.pack(
+                    "<7I", 4, 1, 1, 3, 1, len(fixture),
+                    zlib.crc32(fixture) & 0xffffffff)
+                slot_path.write_bytes(fixture_header + fixture)
+                details = inspect(slot_path)
+                assert details["usable_uv_materials"] == [0]
+                assert details["normal_maps"] == details["orm_maps"] == 1
+                assert details["pbr_uncovered"]["collapsed_source_tangent"] == (
+                    [] if expected else [0])
+                assert pbr_map_coverage(details) == expected, (car_id, normal)
+        # A good sibling mesh on the same material must not hide a bad one.
+        broken = bytearray(group)
+        for vertex in range(3):
+            struct.pack_into("<3f", broken,
+                             16 + len(name) + vertex * 32 + 12, 1., 0., 0.)
+        mixed = group + broken + mapped[len(group):]
+        mixed_header = b"OVRCABH4" + struct.pack(
+            "<7I", 4, 2, 1, 6, 2, len(mixed),
+            zlib.crc32(mixed) & 0xffffffff)
+        path.write_bytes(mixed_header + mixed)
+        assert inspect(path)["collapsed_tangent_materials"] == [0]
+        assert not pbr_map_coverage(inspect(path))
+        # Glass uses the separate transparent path, not strict opaque PBR.
+        glass_name = b"EXT_GLASS_00"
+        glass_group = (struct.pack("<HHIII", len(glass_name), 0, 3, 3, 4)
+                       + glass_name + broken[16 + len(name):])
+        mixed = group + glass_group + mapped[len(group):]
+        mixed_header = b"OVRCABH4" + struct.pack(
+            "<7I", 4, 2, 1, 6, 2, len(mixed),
+            zlib.crc32(mixed) & 0xffffffff)
+        path.write_bytes(mixed_header + mixed)
+        assert pbr_map_coverage(inspect(path))
         # All sixteen slots and three DDS roles, with valid outer CRC.
         albedo_offset = len(group) + 4
         normal_offset = albedo_offset + len(dds) + 8 + 12 + 4

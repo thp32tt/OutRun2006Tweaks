@@ -63,3 +63,40 @@ def triangle_has_pbr_basis(p0: tuple[float, float, float],
     nx, ny, nz = ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx
     return ((nx * nx + ny * ny + nz * nz) > 1.e-24 and
             triangle_uv_basis(u0, u1, u2))
+
+
+def triangle_source_tangent_collapsed(positions, uvs, normals) -> bool:
+    """Detect a definite malformed source frame, not screen-space GPU proof.
+
+    For a nondegenerate triangle the derivative tangent is proportional to
+    AB*dv2 - AC*dv1. If all imported normals point along that same line
+    and have the same sign, interpolated N is parallel to T throughout
+    the triangle. The SM3 Gram-Schmidt step T -= N*dot(N,T) collapses.
+    Zero normals are deliberately excluded: native repair/face fallback
+    may provide a valid basis. Mixed normals are not certified by this test.
+    """
+    p0, p1, p2 = positions
+    uv0, uv1, uv2 = uvs
+    if not triangle_has_pbr_basis(p0, p1, p2, uv0, uv1, uv2):
+        return False
+    dv1, dv2 = uv1[1] - uv0[1], uv2[1] - uv0[1]
+    t = tuple((p1[i] - p0[i]) * dv2 - (p2[i] - p0[i]) * dv1
+              for i in range(3))
+    if not any(t):
+        return False
+    sign = None
+    for n in normals:
+        # Match the runtime's usable imported normal threshold. Exact
+        # collinearity is a conservative source-space failure witness.
+        if sum(x*x for x in n) <= 1.e-12:
+            return False
+        cross = (n[1]*t[2] - n[2]*t[1],
+                 n[2]*t[0] - n[0]*t[2],
+                 n[0]*t[1] - n[1]*t[0])
+        if any(cross):
+            return False
+        positive = sum(n[i]*t[i] for i in range(3)) > 0
+        if sign is not None and sign != positive:
+            return False
+        sign = positive
+    return sign is not None
