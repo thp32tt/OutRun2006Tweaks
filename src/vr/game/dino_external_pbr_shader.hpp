@@ -92,7 +92,9 @@ float4 mainPS(PixelIn input) : COLOR0 {
     // cockpit triangle. Compare the squared UV area to the gradient energies
     // to keep the decision invariant under screen resolution/scale.
     float gradientArea2 = dot(dtdx,dtdx)*dot(dtdy,dtdy);
-    if (factors.w > 0.5 && gradientArea2 > 1.e-30 &&
+    // Zero normal strength disables perturbation even for a bound map
+    // with negative or zero Z; preserve the unperturbed normal.
+    if (factors.w > 0.5 && factors.z > 0.0 && gradientArea2 > 1.e-30 &&
         det*det > gradientArea2*1.e-8) {
         // Mirrored UV islands retain their signed tangent handedness.
         // Never normalize a tangent parallel to a malformed source normal.
@@ -106,7 +108,9 @@ float4 mainPS(PixelIn input) : COLOR0 {
             float3 B = normalize(cross(N,T))*handedness;
             float3 mapN = tex2D(normalMap,input.uv).xyz*2.0-1.0;
             mapN.xy *= factors.z;
-            N = normalize(mapN.x*T+mapN.y*B+mapN.z*N);
+            float3 mappedN = mapN.x*T+mapN.y*B+mapN.z*N;
+            float mappedSq = dot(mappedN,mappedN);
+            if (mappedSq > 1.e-12) N = mappedN * rsqrt(mappedSq);
         }
     }
     float3 L = normalize(float3(-0.45,0.85,-0.28));

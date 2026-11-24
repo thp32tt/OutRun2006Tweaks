@@ -6,6 +6,7 @@ derivatives. Compile the actual HLSL separately in the Windows CI job.
 No game/external model files or proprietary textures are required.
 """
 from pathlib import Path
+from math import isfinite, sqrt
 
 SHADER = Path(__file__).resolve().parents[1] / "src/vr/game/dino_external_pbr_shader.hpp"
 
@@ -19,6 +20,21 @@ def valid_derivative_basis(dx: tuple[float, float],
     return gradient_area2 > 1.e-30 and det * det > gradient_area2 * 1.e-8
 
 
+def mapped_normal(sample: tuple[float, float, float], strength: float,
+                  has_map: bool, mirrored: bool = False) -> tuple[float, float, float]:
+    # Orthonormal TBN: T=(1,0,0), B=(0,+/-1,0), N=(0,0,1).
+    # sample is already decoded from [0,1] to [-1,1].
+    base = (0., 0., 1.)
+    if not has_map or strength <= 0.:
+        return base
+    x, y, z = sample
+    candidate = (x * strength, y * strength * (-1. if mirrored else 1.), z)
+    length_sq = sum(v * v for v in candidate)
+    if length_sq <= 1.e-12:
+        return base
+    return tuple(v / sqrt(length_sq) for v in candidate)
+
+
 def main() -> None:
     shader = SHADER.read_text()
     assert "float gradientArea2 = dot(dtdx,dtdx)*dot(dtdy,dtdy);" in shader
@@ -30,6 +46,29 @@ def main() -> None:
     assert "T *= rsqrt(tangentSq);" in shader
     assert "handedness = dot(cross(N,T),derivativeB) < 0" in shader
     assert "mapN.xy *= factors.z;" in shader
+    strength_gate = shader.index("if (factors.w > 0.5 && factors.z > 0.0 &&")
+    sample_pos = shader.index("tex2D(normalMap,input.uv)")
+    assert strength_gate < sample_pos
+    assert "float3 mappedN = mapN.x*T+mapN.y*B+mapN.z*N;" in shader
+    assert "float mappedSq = dot(mappedN,mappedN);" in shader
+    assert "if (mappedSq > 1.e-12) N = mappedN * rsqrt(mappedSq);" in shader
+    assert "N = normalize(mapN.x*T+mapN.y*B+mapN.z*N);" not in shader
+    # Zero strength is a material-level disable, not a negative-Z flip.
+    for _car in (*range(15), 28):
+        for texel in ((0., 0., -1.), (0., 0., 0.), (.6, .2, .8)):
+            assert mapped_normal(texel, 0., True) == (0., 0., 1.)
+            assert mapped_normal(texel, 1., False) == (0., 0., 1.)
+        assert mapped_normal((0., 0., 0.), 1., True) == (0., 0., 1.)
+        assert mapped_normal((1.e-8, 0., 0.), 1., True) == (0., 0., 1.)
+        assert mapped_normal((0., 0., 1.), 1., True) == (0., 0., 1.)
+        perturbed = mapped_normal((.6, .2, .8), 1., True)
+        mirrored = mapped_normal((.6, .2, .8), 1., True, True)
+        stronger = mapped_normal((.6, .2, .8), 2., True)
+        assert all(isfinite(v) for v in perturbed)
+        assert abs(sum(v*v for v in perturbed)-1.) < 1.e-12
+        assert perturbed[0] > 0. and perturbed[1] > 0.
+        assert mirrored == (perturbed[0], -perturbed[1], perturbed[2])
+        assert stronger[0] > perturbed[0]
     assert "tex2D(normalMap,input.uv)" in shader
     assert "tex2D(ormMap,input.uv)" in shader
 
