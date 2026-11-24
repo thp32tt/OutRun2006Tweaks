@@ -19,7 +19,7 @@
     "quest3_hardware_validation": "UNTESTED",
     "protected_release": "v0.03 baseline (verify SHA before promotion)"
   },
-  "active_work_id": "EXT16-010",
+  "active_work_id": "EXT16-006",
   "work": [
     {
       "id": "EXT16-001",
@@ -588,7 +588,7 @@
       "id": "EXT16-010",
       "priority": 3,
       "stage": "test_and_package",
-      "status": "QUEUED",
+      "status": "COMPLETE_STATIC",
       "recovery_of": "EXT16-001",
       "title": "Regression-gate v0.03 menu/fullscreen focus and eye-depth parity independently of model package acceptance",
       "acceptance": [
@@ -602,7 +602,59 @@
         "EXT16-005 static package result"
       ],
       "runtime_validation": "UNTESTED",
-      "distinct_material_only": true
+      "distinct_material_only": true,
+      "result_sha": "823b7ec3154ba7894b6cbb88c66d45b50a859a5a",
+      "hmd_status": "WAITING_USER_HMD",
+      "material_delta": [
+        "Corrected active external-car physical-eye certification: projection-only stereo, zero-IPD, orientation-only and non-affine/near-zero separated D3D9 VIEW pairs are now rejected by actual row-vector camera-centre proof; preserves R7 original player eyes and v0.03 host.",
+        "Added real source read-only v0.03 launch/host/menu/OpenXR/left/right RT+depth/fallback parity gate anchored by ten protected baseline Git blob SHA-1 checks; twelve deterministic positive/negative mutation checks for wrong eye/RT/depth/theatre/host/launcher/fallback; Windows CRLF normalization without accepting tampered source.",
+        "Wired new parity and negative tests into existing multicar C++/Python+Windows PBR-HLSL and exact-SHA Win32 x86 game DLL + x64 OpenXR host/test ZIP workflows. No proprietary vehicle binaries or protected release altered."
+      ],
+      "static_evidence": {
+        "protected_v003_source_sha": "2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7",
+        "material_source_sha": "823b7ec3154ba7894b6cbb88c66d45b50a859a5a",
+        "material_git_blob_sha1": {
+          "src/vr/game/external_car_eye_transform_proof.hpp": "544b30329ec3a0343c7f78c7bb9d5a85f6fe612a",
+          "tests/external_car_eye_transform_proof_test.cpp": "fae7b1ecb0426e181a555e0837bee1b029eab7f5",
+          "tools/ferrari16/v003_parity_gate.py": "48b318eab1ae16daaab7f0cb977f5f022be52b7",
+          ".github/workflows/ferrari16-multicar-regression.yml": "6a1093eac4c2cbb53e74d18f543e68d889da60da",
+          ".github/workflows/ferrari16-exact-sha-test-package.yml": "01c9eb0e799ac7b53dffa35511caaf344356d3e7"
+        },
+        "ci_exact_same_source_sha": "823b7ec3154ba7894b6cbb88c66d45b50a859a5a",
+        "ci_ferrari16_multicar_cpp_python_windows_hlsl": {
+          "run_id": 45299906781,
+          "conclusion": "SUCCESS",
+          "head_sha": "823b7ec3154ba7894b6cbb88c66d45b50a859a5a"
+        },
+        "ci_windows_build_x86": {
+          "run_id": 45299906900,
+          "conclusion": "SUCCESS",
+          "head_sha": "823b7ec3154ba7894b6cbb88c66d45b50a859a5a"
+        },
+        "ci_windows_x86_dll_x64_openxr_host_exact_sha_package": {
+          "run_id": 45299906805,
+          "conclusion": "SUCCESS",
+          "head_sha": "823b7ec3154ba7894b6cbb88c66d45b50a859a5a",
+          "steps": [
+            "exact SHA + Python positive/negative gate",
+            "PS 5.1 parser",
+            "Win32 x86 game DLL",
+            "x64 OpenXR host",
+            "test ZIP generation and SHA readback",
+            "Windows isolated synthetic tamper/install/rollback",
+            "artifact upload"
+          ]
+        },
+        "physical_quest3_vdxr": "WAITING_USER_HMD",
+        "physical_menu_fullscreen_focus": "WAITING_USER_HMD",
+        "physical_eye_depth_glass_dashboards": "WAITING_USER_HMD",
+        "fps_p95_measured": "UNTESTED_NOT_INFERRED_FROM_CI",
+        "current_16_model_licensed_source_glb_ovc_uv_normal_pbr_sha": "NOT_REVALIDATED_IN_THIS_TASK",
+        "production_external_car_staging": "NOT_IMPLEMENTED_STOCK_ONLY_FAIL_CLOSED_EXT16_007",
+        "protected_v003_modified": false,
+        "artifact_licensing": "No third-party binaries, game assets or credentials added"
+      },
+      "next_action": "EXT16-006: user Quest3/VDXR physical menu, focus, eye depth, glass, cockpit and p95/fps validation on exact static package; keep external-car GPU disabled/stock fallback until EXT16-007 atomic two-eye color/depth staging and private 16-slot source PBR/rights proof. Do not promote models or claim performance from CI."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
