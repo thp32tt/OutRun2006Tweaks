@@ -135,8 +135,11 @@ class Github:
         self.token=token
 
     def req(self, rel, branch, payload=None):
-        if not (rel.startswith(QROOT+"/") or rel.startswith(LEGACY_QROOT+"/state/") or rel.startswith(APPROVED+"/")):
+        atlas_root="localization/automation_runs/hd_cleanplate_repair/"
+        if not (rel.startswith(QROOT+"/") or rel.startswith(LEGACY_QROOT+"/state/") or rel.startswith(APPROVED+"/") or rel.startswith(atlas_root)):
             raise ValueError("UNTRUSTED_PATH")
+        if rel.startswith(atlas_root) and (branch!=QUEUE_BRANCH or (payload is not None and not re.fullmatch(re.escape(atlas_root)+r"visual/run-[0-9]+\.json",rel))):
+            raise ValueError("ATLAS_QUEUE_WRITE_SCOPE")
         if branch not in (QUEUE_BRANCH,ASSETS_BRANCH):
             raise ValueError("UNAPPROVED_BRANCH")
         if (payload is not None and QROOT != LEGACY_QROOT
@@ -1236,6 +1239,11 @@ class ChatBridge:
         return "C1_PASS_STAGED_FOR_GITHUB_TEST_ONLY"
 
     async def cycle(self):
+        if os.getenv("OUTRUN_ATLAS_VISUAL_QA_ENABLED","0")=="1":
+            from hd_atlas_visual_queue import atlas_cycle
+            result=await atlas_cycle(self,ROOT,os.getenv("OUTRUN_GITHUB_ACTIONS_TOKEN","").strip() or TOKEN,is_saved_chat_url)
+            if result is not None:
+                return result
         if not self.remote_state_recovered:
             # Exactly once per worker lifetime, restore every SHA-bound
             # submitted/C1-pending receipt, including older rotated batches.
