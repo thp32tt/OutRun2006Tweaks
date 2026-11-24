@@ -35,8 +35,45 @@ def mapped_normal(sample: tuple[float, float, float], strength: float,
     return tuple(v / sqrt(length_sq) for v in candidate)
 
 
+def safe_unit(v: tuple[float, float, float],
+              floor: float) -> tuple[float, float, float]:
+    length_sq = sum(x*x for x in v)
+    if length_sq <= floor:
+        return (0., 0., 0.)
+    return tuple(x / sqrt(max(length_sq, floor)) for x in v)
+
+
 def main() -> None:
     shader = SHADER.read_text()
+    assert "o.worldNormal = normalize(mul(" not in shader
+    assert "float3 transformedNormal = mul(input.normal, worldNormalMatrix);" in shader
+    assert "normalSq > 1.e-30 ?" in shader
+    assert "transformedNormal * rsqrt(max(normalSq,1.e-30))" in shader
+    assert "normalize(eyeAndOrm.xyz-input.worldPosition)" not in shader
+    assert "normalize(L+V)" not in shader
+    assert "eyeDelta * rsqrt(max(eyeSq,1.e-12))" in shader
+    assert "halfVector * rsqrt(max(halfSq,1.e-12))" in shader
+    assert "float3 specular = eyeSq > 1.e-12 && halfSq > 1.e-12 ?" in shader
+    light = safe_unit((-.45, .85, -.28), 1.e-12)
+    for _car in (*range(15), 28):
+        for _eye in (0, 1):
+            assert safe_unit((0., 0., 0.), 1.e-30) == (0., 0., 0.)
+            assert safe_unit((1.e-16, 0., 0.), 1.e-30) == (0., 0., 0.)
+            assert safe_unit((1.e-10, 0., 0.), 1.e-30) == (1., 0., 0.)
+            assert safe_unit((0., 0., 2.), 1.e-30) == (0., 0., 1.)
+            for delta, expected in (((0., 0., 0.), False),
+                                    ((1.e-7, 0., 0.), False),
+                                    (tuple(-x for x in light), False),
+                                    (light, True)):
+                v = safe_unit(delta, 1.e-12)
+                h = tuple(a+b for a, b in zip(light, v))
+                half = safe_unit(h, 1.e-12)
+                assert all(isfinite(x) for x in (*v, *half))
+                enabled = (sum(x*x for x in delta) > 1.e-12 and
+                           sum(x*x for x in h) > 1.e-12)
+                assert enabled is expected
+                if expected:
+                    assert abs(sum(x*x for x in half)-1.) < 1.e-12
     assert "float gradientArea2 = dot(dtdx,dtdx)*dot(dtdy,dtdy);" in shader
     assert "gradientArea2 > 1.e-30" in shader
     assert "det*det > gradientArea2*1.e-8" in shader

@@ -37,7 +37,12 @@ VertexOut mainVS(VertexIn input) {
     VertexOut o;
     float4 w = mul(float4(input.position,1), world);
     o.worldPosition = w.xyz;
-    o.worldNormal = normalize(mul(input.normal, worldNormalMatrix));
+    // normalize(0) is undefined in HLSL. Preserve a zero normal so the
+    // pixel shader can derive a geometric normal rather than interpolate NaN.
+    float3 transformedNormal = mul(input.normal, worldNormalMatrix);
+    float normalSq = dot(transformedNormal,transformedNormal);
+    o.worldNormal = normalSq > 1.e-30 ?
+        transformedNormal * rsqrt(max(normalSq,1.e-30)) : float3(0,0,0);
     o.uv = input.uv;
     o.position = mul(mul(w,view),projection);
     return o;
@@ -114,8 +119,16 @@ float4 mainPS(PixelIn input) : COLOR0 {
         }
     }
     float3 L = normalize(float3(-0.45,0.85,-0.28));
-    float3 V = normalize(eyeAndOrm.xyz-input.worldPosition);
-    float3 H = normalize(L+V);
+    // An eye coincident with a surface vertex or a view direction
+    // antiparallel to L has no defined unit vector / half vector.
+    float3 eyeDelta = eyeAndOrm.xyz-input.worldPosition;
+    float eyeSq = dot(eyeDelta,eyeDelta);
+    float3 V = eyeSq > 1.e-12 ?
+        eyeDelta * rsqrt(max(eyeSq,1.e-12)) : float3(0,0,0);
+    float3 halfVector = L+V;
+    float halfSq = dot(halfVector,halfVector);
+    float3 H = halfSq > 1.e-12 ?
+        halfVector * rsqrt(max(halfSq,1.e-12)) : float3(0,0,0);
     float NL = saturate(dot(N,L));
     float NV = max(saturate(dot(N,V)),0.001);
     float NH = saturate(dot(N,H));
@@ -128,7 +141,9 @@ float4 mainPS(PixelIn input) : COLOR0 {
     float geometry = (NL/(NL*(1-k)+k))*(NV/(NV*(1-k)+k));
     float3 F0 = lerp(float3(0.04,0.04,0.04),albedo,metallic);
     float3 fresnel = F0+(1-F0)*pow(1-VH,5);
-    float3 specular = distribution*geometry*fresnel/(4*NL*NV+0.001);
+    // No valid eye/half vector means no directional specular highlight.
+    float3 specular = eyeSq > 1.e-12 && halfSq > 1.e-12 ?
+        distribution*geometry*fresnel/(4*NL*NV+0.001) : float3(0,0,0);
     float3 diffuse = (1-fresnel)*(1-metallic)*albedo/pi;
     float3 radiance = (diffuse+specular)*NL*2.0;
     float3 ambient = ao*(albedo*(1-metallic)*0.16+F0*0.045);
