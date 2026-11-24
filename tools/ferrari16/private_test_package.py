@@ -6,8 +6,9 @@ import json
 import os
 from pathlib import Path
 import re
-import struct
 import zipfile
+
+from pe_image_contract import assert_pe_image
 
 LAUNCHERS = (
     "RUN-FERRARI16-V003-ALL-CARS.cmd",
@@ -43,19 +44,9 @@ Static CI != Quest3 or VDXR stereo/framerate validation. HMD=UNTESTED.
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
-def pe_machine(data):
-    if len(data) < 0x88 or data[:2] != b"MZ":
-        raise ValueError("not a PE file")
-    offset = struct.unpack_from("<I", data, 0x3c)[0]
-    if offset > len(data) - 6 or data[offset:offset + 4] != b"PE\x00\x00":
-        raise ValueError("invalid PE header")
-    return struct.unpack_from("<H", data, offset + 4)[0]
-
 def assert_binaries(items):
-    if pe_machine(items[PAYLOAD[0]]) != 0x14c:
-        raise ValueError("game DLL must be PE x86")
-    if pe_machine(items[PAYLOAD[1]]) != 0x8664:
-        raise ValueError("OpenXR host must be PE x64")
+    assert_pe_image(items[PAYLOAD[0]], 0x14c, True, "game DLL must be PE x86")
+    assert_pe_image(items[PAYLOAD[1]], 0x8664, False, "OpenXR host must be PE x64")
 
 def source_items(root, dll, host):
     root = Path(root)
