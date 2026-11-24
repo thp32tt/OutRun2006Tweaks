@@ -1211,7 +1211,7 @@
         },
         {
           "cycle_key": "EXT16-011-20261124-1930-MESH-BUFFER-UPLOAD",
-          "status": "PATCHED_LOCAL_REGRESSION_PASS_EXACT_SHA_CI_PENDING_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_MULTICAR_BUILD_PACKAGE_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "Graphics performance: D3D9 allocation, mesh upload completion and state/replay ownership",
           "source_material_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
           "source_defect": "EnsureGpu ignored VB/IB Unlock HRESULT; successful Lock with null data skipped Unlock; buffer allocation did not reject success with null COM pointer. Uncommitted buffers could enter meshes_ and advance GPU readiness.",
@@ -1233,15 +1233,15 @@
                 "run_id": 45375706244,
                 "name": "Build",
                 "head_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "run_id": 45375704871,
                 "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
                 "head_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "run_id": 45375704893,
@@ -1250,7 +1250,8 @@
                 "status": "completed",
                 "conclusion": "success"
               }
-            ]
+            ],
+            "note": "20:00 exact head_sha filtered API confirmed all three workflows success; prior pending superseded, no duplicate score."
           },
           "performance_trace": [
             "PrepareF50External admission and DrawNativeScene both short-circuit before CPU/GPU work while RuntimeExternalCarAtomicStageReady is false. Current external branch therefore cannot attribute observed headset FPS to this currently fenced path.",
@@ -1262,18 +1263,70 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Confirm exact SHA CI; investigate state-block allocation and duplicate material/state binding with lower stereo owner mutation proof; compare stock dashboard, overlay and native callback parity, retain atomic stage fence."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-2000-DASHBOARD-RIGID-ROTATION",
+          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "Baseline v0.03 driver cockpit, speed/RPM gear, player overlay and native callback parity",
+          "source_material_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
+          "source_defect": "ValidDashboardBinding and Python OVC inspector intentionally accept small axis length error; DashboardLocalRotation used the unnormalized axis in Rodrigues, producing non-rigid rotation. Finite float32 input calibration -FLT_MAX to +FLT_MAX passed both gates but float subtraction overflowed to infinity, causing zero instead of midpoint interpolation.",
+          "source_fix": "Normalize accepted near-unit axis before Rodrigues; reject invalid/degenerate axis and nonfinite angle to identity; use double intermediate for calibration subtraction, division, and interpolation and reject invalid interval. No format acceptance, stock HUD, gear visibility, ABI or external admission changes.",
+          "source_blob_sha1": {
+            "src/vr/game/external_car_dashboard.hpp": "30ddb0e1b718ef29269776fd87f9e747576fe238",
+            "tests/external_car_dashboard_test.cpp": "8389b4cfd5b45dd48ae8f680f757a55597532305"
+          },
+          "positive_negative_regressions": [
+            "Existing CI C++ dashboard test now checks speed and RPM axes at lengths 0.995, 1.0, 1.005 against unit-axis matrix, orthonormal rows and fixed pivot; rejects zero/0.5/1.1 lengths; validates extreme finite range midpoint and invalid equal interval. Existing gear/embedded speed-RPM mask and frame latch tests retained.",
+            "Local actual g++ C++17 -O2 -Wall -Wextra -Werror -pedantic isolated arithmetic counterexample passed: old max matrix error 0.00638402 and 0.00641596 at scales 0.995 and 1.005; fixed error 0 for both; old extreme-range interpolation 0 vs corrected 0.5. Local DNS could not resolve GitHub, so this is a reproduced arithmetic fragment, not execution of exact committed complete test. Exact committed tests delegated to existing GitHub Actions."
+          ],
+          "same_sha_ci": {
+            "sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
+            "runs": [
+              {
+                "run_id": 45380247429,
+                "name": "Build",
+                "head_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "run_id": 45380247418,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "head_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "run_id": 45380247574,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "head_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ]
+          },
+          "remaining_trace": [
+            "Fetched original v0.03 2446269a and latest hooks_graphics.cpp: OnPlayerCallback function byte-identical; CallOriginalPlayerWithGlassScope differs only by explanatory comments and static_assert, same QuestCockpitGlassLive scope and PlayerCallbackHook.ccall<void>(player). Original wrapper still sole raster owner; no sidecar draw admission.",
+            "Dashboard telemetry +0x1F8/+0x208/+0x20C remains latched by native frame and player; actual values, gear masks, per-car calibration and body/overlay integration require real assets/HMD. No physical gauge parity claim.",
+            "Atomic whole-car L/R color+depth staging remains disabled. Separate body and dashboard receipts cannot certify whole-car transaction. Next trace overlay ownership and stage ordering before enabling."
+          ],
+          "protected_v003": "Only portable external dashboard helper and test changed. No stock release, hook, x86 ABI, renderer, host or launcher changes.",
+          "asset_validation": "No private GLB/OVC data accessed or changed, no per-car material or model promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Verify exact source SHA CI; inspect whole-vehicle plus dashboard two-eye staging ownership, overlay failure transaction, and reset/epoch/selection boundaries; preserve stock wrapper."
         }
       ],
-      "latest_material_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
-      "latest_static_ci": "LOCAL_MESH_UPLOAD_REGRESSION_PASS_EXACT_SHA_CI_PENDING",
-      "next_focus": "Confirm exact SHA CI; investigate state-block allocation and duplicate material/state binding with lower stereo owner mutation proof; compare stock dashboard, overlay and native callback parity, retain atomic stage fence."
+      "latest_material_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
+      "latest_static_ci": "LOCAL_DASHBOARD_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_PENDING",
+      "next_focus": "Verify exact source SHA CI; inspect whole-vehicle plus dashboard two-eye staging ownership, overlay failure transaction, and reset/epoch/selection boundaries; preserve stock wrapper."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 19:32:00+09:00",
+  "last_updated_kst": "2026-11-24 20:01:37+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
