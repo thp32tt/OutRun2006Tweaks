@@ -2471,20 +2471,87 @@
           "protected_v003": "Only automation branch, no stable release, original callback body, passenger hooks, PBR shader, menus/host, model bytes, license or deployment change. Runtime gate tightened for unverified executable variants; canonical EXE signature matches. N100 used for one bounded approved upstream EXE read in memory and read-only CI query, no build.",
           "asset_validation": "Synthetic tests only; actual 16 models and per-car PBR not certified.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; previous three independent fixes credited once ledger 9f445a9ea8fa80c03fe7aa68be995d51c1f5108f confirmed AI2 2907",
-          "next_trace": "Trace 469600 layout+0 PMT body candidate to exact per-car draw entry material/queue consumers; prove isolated body ownership independent of wheels, shadows, stock dashboard, passengers and glass, and preserve complete 49F3E0 wrapper. Rotate to actual OVC/PBR material-to-mesh correspondence if body leaf proof unavailable; verify current exact-SHA CI and do not enable external raster without isolated bilateral staging."
+          "score_state": "EXACT_SHA_CI_SUCCESS_UNCREDITED; scoreboard read-only verification found last confirmed 2907, no prior 09cf6337 entry; no ledger mutation this cycle.",
+          "next_trace": "Trace 469600 layout+0 PMT body candidate to exact per-car draw entry material/queue consumers; prove isolated body ownership independent of wheels, shadows, stock dashboard, passengers and glass, and preserve complete 49F3E0 wrapper. Rotate to actual OVC/PBR material-to-mesh correspondence if body leaf proof unavailable; verify current exact-SHA CI and do not enable external raster without isolated bilateral staging.",
+          "followup_exact_sha_ci": {
+            "sha": "09cf633777496fb72caa067c7815973e714fc86b",
+            "runs": [
+              {
+                "id": 45501773859,
+                "conclusion": "success"
+              },
+              {
+                "id": 45501773857,
+                "conclusion": "success"
+              },
+              {
+                "id": 45501773888,
+                "conclusion": "success"
+              },
+              {
+                "id": 45501773979,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER34-PHYSICAL-VR-LAUNCH-POLICY",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "v0.03 vs isolated launch: initial physical XR, theatre/menu and projection extent parity",
+          "source_material_sha": "0cdd25535f9550b4325bd11d6783a0409a7ac2fe",
+          "source_blob_sha1": {
+            "tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd": "84088a81078de2c7f0b96eee6a3f466efd80e9fc",
+            "tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd": "8f941a6832e2e7bf8caf30b55eca69179e57ec39",
+            "tools/ferrari16/RUN-FERRARI16-V003-MODEL-OFF.cmd": "b1a4f6ffcfb24d007c120887edf85f7faa64c8d2",
+            "tools/ferrari16/RUN-FERRARI16-V003-PBR-TRACE.cmd": "673a39e834fa6e031cdf40bd3fb198a2a4fcf5d2",
+            "tests/ferrari16_launcher_isolation_test.py": "e2424d80ecffedf82f8c9c6cac4ced3b97399893"
+          },
+          "source_defect": "All four isolated VR launchers inherited OUTRUN_VR_RENDER_SCALE from the caller and did not override saved VR.HmdlessDebugMode/VR.Stereo. Host ReadRenderScale consumes env before allocating projection swapchains; settings.cpp suppresses auto launch for nonzero debug mode; outrun_renderer.cpp can select synthetic pose, R7 HostDirectTransportReady refuses hmdless and StereoWanted requires Stereo. Installer pins initial INI only, not subsequent launches. Old fixture with scale=0.5, debug=2, stereo=false propagates all three. This is a reproducible launch-policy failure, not proof of reported runtime symptom.",
+          "source_fix": "Set host scale=1.0 before hidden prewarm and inherited DLL AutoLaunchHost path; force VR.HmdlessDebugMode=0 and VR.Stereo=true in all four isolated VR mode CLI branches only. Explicit 2D choice remains. v0.03 default host recommended scale and game 2496x2688 flags preserved; no changes to stable launch or host source.",
+          "positive_negative_regressions": [
+            "64 JS source-policy assertions on four real launcher texts: 48 positive combinations, 12 removed-setting mutants, four prepatch counterexamples.",
+            "Existing Python launcher regression now also verifies 48 positive combinations, 12 removed-setting mutants, four late-assignment cases and 2D route preservation; runs in existing multicar workflow; actual Python/Windows execution not yet observed."
+          ],
+          "same_sha_ci": {
+            "sha": "0cdd25535f9550b4325bd11d6783a0409a7ac2fe",
+            "runs": [
+              {
+                "id": 45506550817,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45506550897,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45506552168,
+                "name": "Build",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "Compared baseline 2446269a to HEAD; protected v0.03 Start-OutRun scripts, host main/runtime/menu/projection/OpenXR/transport and menu geometry blobs unchanged; no new raster admission, PBR/material, ABI or licensed assets modified. N100 used only for two read-only GitHub lookups, no build.",
+          "asset_validation": "No actual model/OVC/PBR or per-car asset certification. Runtime hardware QA untested.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; scoreboard 2907 confirmed; iter33 uncredited",
+          "next_trace": "Inspect game-side PresentationGameplay/Theater and direct-only cached projection transition on first valid pose/frame, including mode switch and asymmetric eye receipts; compare R7 reset/publish transitions with 2446269a and host consumer, fix only demonstrated new counterexamples. Confirm iteration34 exact SHA CI and reconcile unique prior score."
         }
       ],
-      "latest_material_sha": "09cf633777496fb72caa067c7815973e714fc86b",
-      "latest_static_ci": "Iteration33 multicar/HLSL success, Windows/HUD/package pending; iteration30 and integrated 31/32 all exact-SHA CI success and credited once",
-      "next_focus": "Trace 469600 layout+0 PMT body candidate to exact per-car draw entry material/queue consumers; prove isolated body ownership independent of wheels, shadows, stock dashboard, passengers and glass, and preserve complete 49F3E0 wrapper. Rotate to actual OVC/PBR material-to-mesh correspondence if body leaf proof unavailable; verify current exact-SHA CI and do not enable external raster without isolated bilateral staging."
+      "latest_material_sha": "0cdd25535f9550b4325bd11d6783a0409a7ac2fe",
+      "latest_static_ci": "Iteration34 exact source SHA three observed push workflows in progress; iteration33 all four exact SHA workflows success, uncredited",
+      "next_focus": "Inspect game-side PresentationGameplay/Theater and direct-only cached projection transition on first valid pose/frame, including mode switch and asymmetric eye receipts; compare R7 reset/publish transitions with 2446269a and host consumer, fix only demonstrated new counterexamples. Confirm iteration34 exact SHA CI and reconcile unique prior score."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 07:30:00+09:00",
+  "last_updated_kst": "2026-11-25 08:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
