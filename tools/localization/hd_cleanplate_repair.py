@@ -16,6 +16,7 @@ from unittest.mock import patch
 from PIL import Image, ImageChops, ImageOps
 import github_ab_imagegen_atlas_batch as atlas
 import hd_strict_qa as strict
+from hd_cleanplate_flat_background import add_flat_repairs
 
 SCHEMA="outrun.hd.cleanplate-repair.v1"
 FAMILIES=("FA7BBB13","39229D64","455717B2","ACF61D7C","31C58963")
@@ -148,6 +149,12 @@ def build(root,out,asset_sha,feedback=None,limit=104):
                     holds=[{"roi_id":r["roi_id"],"reason":str(exc)[:150]} for r in rows]
             if not painted:
                 dds=None;final=clean=source
+            # Separate explicit flat opaque-panel restoration lane; nonuniform
+            # photographs/gradients and shared art remain untouched HOLDs.
+            flat=add_flat_repairs(raw,source,clean,final,painted,holds,rows,root,direction,fit_line95,candidate_no_panel,atlas.native_image)
+            if flat is not None:
+                dds,final,clean,painted,holds=flat
+            totals["flat_background_repaired"]+=sum(p.get("clean_type")=="EXACT_UNIFORM_OPAQUE_BORDER_BACKGROUND_TEST_ONLY" for p in painted)
             if len(painted)+len(holds)!=len(rows):
                 raise ValueError("REPAIR_ROI_ACCOUNTING:"+target)
             byid={r["roi_id"]:r for r in rows}
