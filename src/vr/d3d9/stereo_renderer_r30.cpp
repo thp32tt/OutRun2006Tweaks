@@ -28,6 +28,7 @@
 #include "stereo_completion_gate.hpp"
 #include "../game/external_car_stereo_receipt.hpp"
 #include "r30_state_restore_result.hpp"
+#include "../game/stereo_lower_draw_result.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "hud_original_wvp_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
@@ -8125,21 +8126,23 @@ namespace OutRunVRStereo
             return true;
         }
 
+        using R30ScreenDrawAttempt = OutRunVR::StereoLowerDraw::Attempt<HRESULT>;
+
         template <typename ActualDraw>
-        HRESULT R30TryScreenSpaceFovDraw(
+        R30ScreenDrawAttempt R30TryScreenSpaceFovDraw(
             IDirect3DDevice9* device, ActualDraw&& actualDraw,
             const char* site)
         {
             if (!R29OwnerStableStereoBase(device))
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
 
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
             if (screenKind == R30ScreenSpaceKind::None)
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
 
             if (!R29OwnerEnsureStereoResources(device))
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
 
             auto frame = R29OwnerCaptureFrameSnapshot();
             if (frame.trackedDepthStencil &&
@@ -8151,21 +8154,21 @@ namespace OutRunVRStereo
             }
             if (frame.trackedDepthStencil && !frame.rightDepthSynchronized &&
                 R29OwnerDepthTestActive(device))
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
             if (frame.trackedDepthStencil && !frame.rightStencilSynchronized &&
                 R29OwnerStencilTestActive(device))
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
 
             OutRunVRRenderer::LatchedStereoFrame stereo{};
             if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
                 stereo.poseSequence == 0)
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
 
             // If perspective world geometry already established this Present's
             // pose sequence, screen-space correction must use that exact packet.
             if (frame.poseSequence != 0 &&
                 frame.poseSequence != stereo.poseSequence)
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
 
             float original[16]{};
             float eyeConstants[2][16]{};
@@ -8176,7 +8179,7 @@ namespace OutRunVRStereo
                     eyeScale, eyeOffset))
             {
                 R30RecordTelemetryCounter(R30ScreenSpaceBuildFailures);
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
             }
 
             // The six +TIME sprite/numeric original producers may use this
@@ -8190,7 +8193,7 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
             OutRunVR::StageExtensionPhysical::Source stageBefore{};
             if (exactStage && !R30CaptureStagePhysicalSource(stageBefore))
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
 
             // The shader C993 path is an exact WORLD centre, not the outer
             // CABE flare discs or an arbitrary alpha HUD sprite. R33 has a
@@ -8246,12 +8249,12 @@ namespace OutRunVRStereo
             if (exactCentre &&
                 !OutRunVR::LensCentre::IsCoherentNativeCentrePair(
                     centreBefore.draw, centreBefore.raw))
-                return E_NOTIMPL; // no native GPU eye submitted
+                return R30ScreenDrawAttempt::Declined(); // no native GPU eye submitted
 
             D3DVIEWPORT9 savedViewport{};
             if (!R29OwnerTryGetTrackedViewport(savedViewport) &&
                 FAILED(device->GetViewport(&savedViewport)))
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
 
             // Runtime evidence on 7081b389 ruled out per-eye scissor
             // remapping. Keep the original game's scissor state untouched:
@@ -8289,9 +8292,10 @@ namespace OutRunVRStereo
                     R29OwnerReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R30/HUD-left-WVP-rollback", E_FAIL);
                     R29OwnerArmMonoSafety();
-                    return E_FAIL;
+                    // A failed rollback owns this result even without a DIP.
+                    return R30ScreenDrawAttempt::Handled(E_FAIL);
                 }
-                return E_NOTIMPL;
+                return R30ScreenDrawAttempt::Declined();
             }
 
             // A rejected left-eye c64 upload is not a GPU draw. Keep the
@@ -8321,7 +8325,7 @@ namespace OutRunVRStereo
                 if (!restored)
                     R29OwnerNoteRestoreFailure("R30 HUD left draw c64");
                 R29OwnerArmMonoSafety();
-                return leftHr;
+                return R30ScreenDrawAttempt::AfterDraw(leftHr, restored, static_cast<HRESULT>(E_FAIL));
             }
 
             if (exactCentre)
@@ -8352,7 +8356,7 @@ namespace OutRunVRStereo
                         R29OwnerNoteRestoreFailure(
                             "R30 C993 centre post-left c64");
                     R29OwnerArmMonoSafety();
-                    return leftHr;
+                    return R30ScreenDrawAttempt::AfterDraw(leftHr, restored, static_cast<HRESULT>(E_FAIL));
                 }
             }
 
@@ -8378,7 +8382,7 @@ namespace OutRunVRStereo
                     if (!restored)
                         R29OwnerNoteRestoreFailure("R30 +TIME post-left c64");
                     R29OwnerArmMonoSafety();
-                    return leftHr;
+                    return R30ScreenDrawAttempt::AfterDraw(leftHr, restored, static_cast<HRESULT>(E_FAIL));
                 }
             }
 
@@ -8417,7 +8421,7 @@ namespace OutRunVRStereo
                     R29OwnerNoteRestoreFailure(
                         "R30 HUD post-left viewport fence c64");
                 R29OwnerArmMonoSafety();
-                return leftHr;
+                return R30ScreenDrawAttempt::AfterDraw(leftHr, restored, static_cast<HRESULT>(E_FAIL));
             }
 
             // Game left-eye draw may update tracked surfaces.
@@ -8540,7 +8544,7 @@ namespace OutRunVRStereo
                 R29OwnerNoteRestoreFailure("R30 HUD right-eye draw");
                 R29OwnerArmMonoSafety();
             }
-            return leftHr;
+            return R30ScreenDrawAttempt::AfterDraw(leftHr, restoreOk, static_cast<HRESULT>(E_FAIL));
         }
 
         template <typename ActualDraw, typename R29Draw>
@@ -8548,10 +8552,12 @@ namespace OutRunVRStereo
             ActualDraw&& actualDraw, R29Draw&& r29Draw,
             const char* site)
         {
-            const HRESULT hr = R30TryScreenSpaceFovDraw(
+            const auto attempt = R30TryScreenSpaceFovDraw(
                 device, std::forward<ActualDraw>(actualDraw), site);
-            if (hr != E_NOTIMPL)
-                return hr;
+            // Never retry a physical draw (or dirty rollback) just because
+            // its actual HRESULT happens to equal the old decline sentinel.
+            if (attempt.handled)
+                return attempt.hr;
             R30RecordTelemetryCounter(R30ScreenSpaceFallbacks);
             return r29Draw();
         }
