@@ -937,7 +937,7 @@
         },
         {
           "cycle_key": "EXT16-011-20261124-1700-FVF142-PAUSE-HUD-ATTEMPT",
-          "status": "PATCHED_EXACT_SHA_CI_PENDING_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_FULL_CI_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "v0.03 menu/fullscreen/OpenXR parity; FVF142 ESC pause, HUD, projected rank physical draw failure",
           "source_material_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f",
           "source_defect": "R30TryFixedFunctionOriginalSpriteStereo returns HRESULT E_NOTIMPL both for clean pre-admission decline and failed eye projection setup or raw physical draw. Four active R33 FVF142 call sites then fall through to XYZRHW/normal route, risking duplicate native draw or dirty projection state.",
@@ -956,20 +956,6 @@
             "sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f",
             "runs": [
               {
-                "run_id": 45352524003,
-                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
-                "status": "in_progress",
-                "conclusion": null,
-                "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
-              },
-              {
-                "run_id": 45352523978,
-                "name": "OutRun EXE HUD Inspector CI",
-                "status": "in_progress",
-                "conclusion": null,
-                "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
-              },
-              {
                 "run_id": 45352523934,
                 "name": "Ferrari16 All-Car Sidecar Regression",
                 "status": "completed",
@@ -977,10 +963,24 @@
                 "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
               },
               {
+                "run_id": 45352523978,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "completed",
+                "conclusion": "success",
+                "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
+              },
+              {
                 "run_id": 45352523866,
                 "name": "Build",
-                "status": "in_progress",
-                "conclusion": null,
+                "status": "completed",
+                "conclusion": "success",
+                "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
+              },
+              {
+                "run_id": 45352524003,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "completed",
+                "conclusion": "success",
                 "head_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f"
               }
             ]
@@ -989,13 +989,64 @@
           "protected_v003": "No release, host, player wrapper, assets or launch scripts modified. Existing external live-DIP fence remains.",
           "asset_validation": "All 16 private source/OVC mesh/UV/normal/PBR/real glass and gauges unverified; no assets changed/promoted.",
           "runtime_validation": "UNTESTED",
-          "score_state": "PENDING_EXACT_SHA_CI_NO_NEW_SCORE",
+          "score_state": "NO_LEDGER_CHANGE_THIS_CYCLE",
           "next_trace": "Inspect F11 R30TryExternalImGuiIndexed and R32ReviewTryExternalImGuiIndexed HRESULT/restore path, then remaining Primitive/UP XYZRHW and whole-car atomic staging; verify exact SHA CI. Preserve stock original ABI and 16 model rights."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-1730-DDS-UPLOAD-ALBEDO-MIPS",
+          "status": "PATCHED_EXACT_SHA_CI_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "OVC4 material integrity and DDS mip upload/strict albedo coverage",
+          "source_material_sha": "9336248121ed595104d41fd7917854f11347062d",
+          "source_defect": "UploadDDS ignored staging UnlockRect HRESULT and could publish a texture after a failed mip commit. Strict PBR preflight checked normal/ORM full mip chain but not albedo of used materials, including glass. CRC alone cannot prove complete mip coverage.",
+          "source_fix": "Portable CopyAndUnlockDdsMip copies padded rows, unlocks once even for invalid lock data and propagates failure. UploadDDS releases staging and aborts before default-pool creation or UpdateTexture on failure. Also releases unexpected staging pointer on failed CreateTexture. OVC inspection tracks used material IDs and reports incomplete_albedo_mips independently of normal/ORM; existing basic structural compatibility remains, strict HQ gate rejects missing levels on used albedo.",
+          "source_blob_sha1": {
+            "src/vr/game/dino_external_d3d9.hpp": "ced5a8e45836cb15c523b258f6f6b30c1a47580c",
+            "src/vr/game/external_car_dds_upload.hpp": "2acd61c6165db404e0e453ed475cda5d8a348e31",
+            "tests/external_car_dds_upload_test.cpp": "ce07bc1e8b2963b3a76d56a32afc953b5c9b975c",
+            "tools/ferrari16/verify_all_car_ovc.py": "95f7472391d34c5e0ae50d328ae22a57bea8a777",
+            ".github/workflows/ferrari16-multicar-regression.yml": "becabe8e9082eefb85f1625e60bb3cf7b7422ab2"
+          },
+          "positive_negative_regressions": [
+            "C++ padded pitch successful copy/unlock vs injected unlock failure: exactly one unlock, zero publication on failure. Negative invalid pitch and null lock bits; untouched output on invalid lock metadata.",
+            "Python synthetic CRC-correct V4 4x4 single-mip albedo rejected by strict PBR gate; same albedo with 4x4/2x2/1x1 full mip chain accepted with unchanged normal/ORM. Existing UV/geometry/CRC/normal/ORM tests preserved.",
+            "CI source-order check confirms failure before default-pool texture creation. Mock tests do not prove physical GPU behavior."
+          ],
+          "same_sha_ci": {
+            "sha": "9336248121ed595104d41fd7917854f11347062d",
+            "runs": [
+              {
+                "run_id": 45356828291,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null,
+                "head_sha": "9336248121ed595104d41fd7917854f11347062d"
+              },
+              {
+                "run_id": 45356828298,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null,
+                "head_sha": "9336248121ed595104d41fd7917854f11347062d"
+              },
+              {
+                "run_id": 45356828559,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress",
+                "conclusion": null,
+                "head_sha": "9336248121ed595104d41fd7917854f11347062d"
+              }
+            ]
+          },
+          "asset_validation": "No private car OVC/GLB files accessed or modified; actual sixteen vehicle source/processed hashes, mesh and channel quality unverified. No asset promotion or licensing change.",
+          "protected_v003": "No release, player wrapper, renderer hooks, launch or host changes. External atomic pre-DIP fence unchanged.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "PENDING_EXACT_SHA_CI_NO_NEW_SCORE",
+          "next_trace": "Trace per-material sRGB/linear sampler state, normalScale=0 and ORM channel packing, glass alpha/depth and DDS failure fallback; verify current exact-SHA CI; continue whole-vehicle atomic eye staging."
         }
       ],
-      "latest_material_sha": "4072cf4ecf90fe952eb6061c7b2d304d0d15142f",
+      "latest_material_sha": "9336248121ed595104d41fd7917854f11347062d",
       "latest_static_ci": "EXACT_SOURCE_SHA_CI_PENDING",
-      "next_focus": "Inspect F11 R30TryExternalImGuiIndexed and R32ReviewTryExternalImGuiIndexed HRESULT/restore path, then remaining Primitive/UP XYZRHW and whole-car atomic staging; verify exact SHA CI. Preserve stock original ABI and 16 model rights."
+      "next_focus": "Trace per-material sRGB/linear sampler state, normalScale=0 and ORM channel packing, glass alpha/depth and DDS failure fallback; verify current exact-SHA CI; continue whole-vehicle atomic eye staging."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
