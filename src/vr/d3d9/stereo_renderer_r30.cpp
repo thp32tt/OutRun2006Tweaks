@@ -6998,9 +6998,9 @@ namespace OutRunVRStereo
         // Restore the exact producer-scoped fixed-function HUD branch using
         // R84's already-coherent finite optical +TIME/GOAL/ScreenHud plane.
         // Never promote untagged/foreign, world, external ImGui or SkyGlow.
-        // Inapplicable/unproven input returns E_NOTIMPL before GPU writes.
+        // Inapplicable/unproven input declines before GPU writes.
         template <typename RawDraw>
-        HRESULT R30TryFixedFunctionOriginalSpriteStereo(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryFixedFunctionOriginalSpriteStereo(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, RawDraw&& rawDraw)
         {
@@ -7023,31 +7023,31 @@ namespace OutRunVRStereo
                 !R29OwnerTargetIsBackBuffer() ||
                 !R29OwnerStableStereoBase(device) ||
                 (!projected && !exactHud && !pauseOverlay))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             const auto* marker = CurrentProjectedMarker();
             if (projected && (!marker || !marker->valid))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             // The R29 setter/StateBlock identity is only a hotpath hint,
             // never proof that the current real D3D9 draw binds a shader.
             // R33 may reach this exact R62 path despite a stale shadow; the
             // live COM getter below is the definitive fixed-function test.
             IDirect3DVertexShader9* liveShader = nullptr;
             if (FAILED(device->GetVertexShader(&liveShader)))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             if (liveShader)
             {
                 liveShader->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
             DWORD fvf = 0;
             if (FAILED(device->GetFVF(&fvf)) || fvf != 0x00000142u)
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             // Rank marker must still prove its captured Calc3D2D source.
             // Native HUD uses its separate exact ScreenHud queue producer.
             if (!OutRunVR::RankMarker::ExactR84FixedFnSpriteOwner(
                     projected, marker && marker->valid, exactHud,
                     pauseOverlay, true, fvf, true, true))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             if (projected)
                 OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
                     OutRunVR::GameSemantic::CurrentRenderProducerToken(),
@@ -7070,17 +7070,17 @@ namespace OutRunVRStereo
                     device, nullptr, 0u, 0u, state) ||
                 (projected && !state.projectedWorldMarker) ||
                 ((exactHud || pauseOverlay) && !state.stageExtensionEyePlane))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             D3DMATRIX originalProjection{};
             if (FAILED(device->GetTransform(
                     D3DTS_PROJECTION, &originalProjection)) ||
                 !R29OwnerMatrixFinite(originalProjection))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             D3DMATRIX eyeProjection[2]{};
             const float requestedScale = Settings::VRHudScale.get();
             if (!std::isfinite(requestedScale))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             const float markerScale =
                 std::clamp(requestedScale, 0.30f, 1.20f);
             for (int eye = 0; eye < 2; ++eye)
@@ -7099,7 +7099,7 @@ namespace OutRunVRStereo
                     if (state.projectedVehicleRankDepth &&
                         !R30ApplyProjectedRankClipDepth(
                             clipShift, state.projectedRank, eye))
-                        return E_NOTIMPL;
+                        return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
                     eyeProjection[eye] =
                         R29OwnerMultiplyMatrix(originalProjection, clipShift);
                 }
@@ -7133,12 +7133,17 @@ namespace OutRunVRStereo
                     }
                 }
                 if (!R29OwnerMatrixFinite(eyeProjection[eye]))
-                    return E_NOTIMPL;
+                    return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
             // Exactly two eyes; same original fixed-function XYZ vertices,
             // same vehicle anchor, distinct eye FOV/pose. Preserve original
             // game PROJECTION after either success or failure.
+            // Entering the eye setup may mutate driver state even if the
+            // projection setter fails before rawDraw. Such failures are
+            // handled, never interpreted as a safe pre-admission decline.
+            bool leftRouteEntered = false;
             const auto drawEye = [&](int eye) -> HRESULT {
+                if (eye == 0) leftRouteEntered = true;
                 R30ScopedInternalPass guard;
                 const HRESULT set = device->SetTransform(
                     D3DTS_PROJECTION, &eyeProjection[eye]);
@@ -7185,15 +7190,16 @@ namespace OutRunVRStereo
                         count, projected && marker && marker->valid ? 1 : 0,
                         primitiveCount);
             }
-            return OutRunVR::R30StateRestore::ResultAfterRestore(
-                hr, restored, static_cast<HRESULT>(E_FAIL));
+            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
+                hr, leftRouteEntered, restored, static_cast<HRESULT>(E_NOTIMPL),
+                static_cast<HRESULT>(E_FAIL));
         }
 
 
         // The EXE may submit the same tagged 0x142 sprite family by indexed
         // VB, non-indexed VB, or immediate UP. Native left + right must share
         // one physical source and the same fixed-function projection restore.
-        HRESULT R30TryFixedFunctionProjectedRankIndexed(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryFixedFunctionProjectedRankIndexed(
             IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
             INT b, UINT m, UINT n, UINT s, UINT p)
         {
@@ -7202,7 +7208,7 @@ namespace OutRunVRStereo
             });
         }
 
-        HRESULT R30TryFixedFunctionOriginalSpritePrimitive(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryFixedFunctionOriginalSpritePrimitive(
             IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p)
         {
             return R30TryFixedFunctionOriginalSpriteStereo(d, t, p, [&] {
@@ -7210,19 +7216,19 @@ namespace OutRunVRStereo
             });
         }
 
-        HRESULT R30TryFixedFunctionOriginalSpritePrimitiveUP(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryFixedFunctionOriginalSpritePrimitiveUP(
             IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
             const void* data, UINT stride)
         {
             // XYZ + DIFFUSE + TEX1 is 12+4+8 bytes. Never read a partial
             // application-owned UP quad or alter unowned geometry.
-            if (!data || stride < 24u) return E_NOTIMPL;
+            if (!data || stride < 24u) return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             return R30TryFixedFunctionOriginalSpriteStereo(d, t, p, [&] {
                 return R29OwnerCallRawDrawPrimitiveUP(d,t,p,data,stride);
             });
         }
 
-        HRESULT R30TryFixedFunctionOriginalSpriteIndexedUP(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryFixedFunctionOriginalSpriteIndexedUP(
             IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
             UINT minVertex, UINT vertexCount, UINT p,
             const void* indices, D3DFORMAT format,
@@ -7230,7 +7236,7 @@ namespace OutRunVRStereo
         {
             if (!indices || !vertices || stride < 24u ||
                 (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             return R30TryFixedFunctionOriginalSpriteStereo(d, t, p, [&] {
                 return R29OwnerCallRawDrawIndexedPrimitiveUP(d,t,
                     minVertex,vertexCount,p,indices,format,vertices,stride);
@@ -8940,25 +8946,25 @@ namespace OutRunVRStereo
     {
         return R30TryXyzrhwPrimitiveVB(d,t,s,p);
     }
-    HRESULT R30SupportTryFixedFunctionProjectedRankIndexed(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryFixedFunctionProjectedRankIndexed(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept
     {
         return R30TryFixedFunctionProjectedRankIndexed(d,t,b,m,n,s,p);
     }
 
-    HRESULT R30SupportTryFixedFunctionOriginalSpritePrimitive(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryFixedFunctionOriginalSpritePrimitive(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
     {
         return R30TryFixedFunctionOriginalSpritePrimitive(d,t,s,p);
     }
-    HRESULT R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
         const void* data, UINT stride) noexcept
     {
         return R30TryFixedFunctionOriginalSpritePrimitiveUP(d,t,p,data,stride);
     }
-    HRESULT R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT m, UINT n, UINT p,
         const void* indices, D3DFORMAT format,
         const void* vertices, UINT stride) noexcept

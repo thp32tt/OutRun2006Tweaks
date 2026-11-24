@@ -59,17 +59,17 @@ namespace OutRunVRStereo
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept;
     // R62 exact original-game car-above-rank FVF=0x142 bridge.
     // Not a generic screen HUD, VS effect or world mesh dispatcher.
-    HRESULT R30SupportTryFixedFunctionProjectedRankIndexed(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryFixedFunctionProjectedRankIndexed(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept;
     // Source-gated FVF142 native ScreenHud / vehicle rank / ESC fixed-function
     // submissions. Used only inside the existing R33 guarded game draw hooks.
-    HRESULT R30SupportTryFixedFunctionOriginalSpritePrimitive(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryFixedFunctionOriginalSpritePrimitive(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept;
-    HRESULT R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
         const void* data, UINT stride) noexcept;
-    HRESULT R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         UINT minVertex, UINT vertexCount, UINT p,
         const void* indices, D3DFORMAT format,

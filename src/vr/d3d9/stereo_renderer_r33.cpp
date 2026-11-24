@@ -1960,12 +1960,12 @@ namespace OutRunVRStereo
                 // exact producer, target and stereo pose before GPU writes.
                 if (resyncAlreadyFlushed)
                 {
-                    const HRESULT exact = R30SupportTryFixedFunctionOriginalSpritePrimitive(
+                    const auto exact = R30SupportTryFixedFunctionOriginalSpritePrimitive(
                         device, type, startVertex, primitiveCount);
-                    if (telemetry && exact != E_NOTIMPL)
+                    if (telemetry && exact.handled)
                         OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                             OutRunVR::UniversalTrace::Route::R30FixedSprite);
-                    if (exact != E_NOTIMPL) return exact;
+                    if (exact.handled) return exact.hr;
                 }
                 const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwPrimitiveVB(
@@ -2058,14 +2058,14 @@ namespace OutRunVRStereo
                         return f11;
                     }
 
-                    const HRESULT r62 = R30SupportTryFixedFunctionProjectedRankIndexed(
+                    const auto r62 = R30SupportTryFixedFunctionProjectedRankIndexed(
                         device, type, baseVertexIndex, minVertexIndex,
                         numVertices, startIndex, primitiveCount);
-                    if (r62 != E_NOTIMPL) {
+                    if (r62.handled) {
                         if (telemetry)
                             OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                                 OutRunVR::UniversalTrace::Route::R30FixedSprite);
-                        return r62;
+                        return r62.hr;
                     }
                 }
                 const auto xyzrhw = tryXyzrhw
@@ -2157,12 +2157,12 @@ namespace OutRunVRStereo
                 // exact producer, target and stereo pose before GPU writes.
                 if (resyncAlreadyFlushed)
                 {
-                    const HRESULT exact = R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
+                    const auto exact = R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
                         device, type, primitiveCount, data, stride);
-                    if (telemetry && exact != E_NOTIMPL)
+                    if (telemetry && exact.handled)
                         OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                             OutRunVR::UniversalTrace::Route::R30FixedSprite);
-                    if (exact != E_NOTIMPL) return exact;
+                    if (exact.handled) return exact.hr;
                 }
                 const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwPrimitiveUP(
@@ -2227,13 +2227,13 @@ namespace OutRunVRStereo
                 // exact producer, target and stereo pose before GPU writes.
                 if (resyncAlreadyFlushed)
                 {
-                    const HRESULT exact = R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
+                    const auto exact = R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
                         device, type, minVertexIndex, numVertices, primitiveCount,
                         indexData, indexFormat, vertexData, stride);
-                    if (telemetry && exact != E_NOTIMPL)
+                    if (telemetry && exact.handled)
                         OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                             OutRunVR::UniversalTrace::Route::R30FixedSprite);
-                    if (exact != E_NOTIMPL) return exact;
+                    if (exact.handled) return exact.hr;
                 }
                 const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwIndexedPrimitiveUP(

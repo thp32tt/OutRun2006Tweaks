@@ -63,6 +63,18 @@ int main() {
             }
         }
     }
+    // FVF142 route entry means projection setup was attempted, even if
+    // the setter fails before raw raster. Clean pre-admission declines
+    // still allow native fallback exactly once.
+    for (bool entered : {false,true}) for (bool restored : {false,true}) {
+        const auto outcome = Attempt::AfterRoute(NotImpl,entered,restored,NotImpl,Fail);
+        unsigned nativeFallback = 0;
+        const Result hr = outcome.handled ? outcome.hr : (++nativeFallback,Ok);
+        assert(nativeFallback == (!entered && restored ? 1u : 0u));
+        assert(hr == (entered ? NotImpl : (restored ? Ok : Fail)));
+    }
+    assert(Attempt::AfterRoute(Ok,true,false,NotImpl,Fail).hr == Fail);
+    assert(Attempt::AfterRoute(Fail,true,true,NotImpl,Fail).hr == Fail);
     static_assert(Attempt::AfterDraw(NotImpl,true,Fail).handled);
     static_assert(Attempt::AfterDraw(Ok,false,Fail).hr==Fail);
 }
