@@ -142,6 +142,15 @@ class ExternalModelCycleTests(unittest.IsolatedAsyncioTestCase):
             now + timedelta(minutes=120), host))
         self.assertEqual(sends.await_count, 4)
         self.assertEqual(q["ferrari_external_simple_A"]["last_task_id"], "EXT16-001")
+        # If a :30 browser send was seven minutes late, do not miss the next :00.
+        self.assertTrue(await _module.external_model_cycle(None, {}, q,
+            now + timedelta(minutes=150), host))
+        q["ferrari_external_simple_A"]["last_sent_at"] = (
+            now + timedelta(minutes=157)).isoformat()
+        slot.last_sent_at = q["ferrari_external_simple_A"]["last_sent_at"]
+        self.assertTrue(await _module.external_model_cycle(None, {}, q,
+            now + timedelta(minutes=180), host))
+        self.assertEqual(sends.await_count, 6)
 
 
 
