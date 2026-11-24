@@ -176,6 +176,62 @@ jobs:
           & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backup.FullName *> $null
           if($LASTEXITCODE -eq 0){throw 'TAMPERED PATCH RESTORE WAS ACCEPTED'}
           Copy-Item -LiteralPath (Join-Path $out 'PAYLOAD/dinput8.dll') -Destination $dll -Force
+          # Corrupt rollback manifests must fail BEFORE touching installed files.
+          $manifest=Join-Path $backup.FullName 'manifest.json'
+          $manifestBytes=[IO.File]::ReadAllBytes($manifest)
+          $backupDll=Join-Path $backup.FullName 'dinput8.dll'
+          $backupBytes=[IO.File]::ReadAllBytes($backupDll)
+          $sentinel=Join-Path $env:RUNNER_TEMP 'Ferrari16RollbackOutsideSentinel.txt'
+          'must survive'|Set-Content -LiteralPath $sentinel
+          $sentinelHash=(Get-FileHash -LiteralPath $sentinel).Hash.ToLowerInvariant()
+          $tracked=@('dinput8.dll','outrun-vr-host.exe','OR2006C2C.exe','OutRun2006Tweaks.ini',
+            'RUN-FERRARI16-V003-ALL-CARS.cmd','RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
+            'RUN-FERRARI16-V003-MODEL-OFF.cmd','RUN-FERRARI16-V003-PBR-TRACE.cmd')
+          $before=@{}
+          foreach($name in $tracked){$before[$name]=(Get-FileHash -LiteralPath (Join-Path $game $name)).Hash}
+          foreach($case in @('missing-map','empty-map','missing-launcher','unexpected-file',
+                              'outside-path','case-alias','malformed-hash','changed-backup-and-hash')){
+            $b=[Text.Encoding]::UTF8.GetString($manifestBytes).TrimStart([char]0xfeff)|ConvertFrom-Json
+            [IO.File]::WriteAllBytes($backupDll,$backupBytes)
+            $name='RUN-FERRARI16-V003-ALL-CARS.cmd'
+            switch($case){
+              'missing-map' {$b.PSObject.Properties.Remove('Launchers')}
+              'empty-map' {$b.Launchers=[pscustomobject]@{}}
+              'missing-launcher' {$b.Launchers.PSObject.Properties.Remove($name)}
+              'unexpected-file' {
+                $b.Launchers.PSObject.Properties.Remove($name)
+                $b.Launchers|Add-Member -NotePropertyName 'OR2006C2C.exe' -NotePropertyValue $hashes['OR2006C2C.exe']
+              }
+              'outside-path' {
+                $b.Launchers.PSObject.Properties.Remove($name)
+                $b.Launchers|Add-Member -NotePropertyName '../Ferrari16RollbackOutsideSentinel.txt' -NotePropertyValue $sentinelHash
+              }
+              'case-alias' {
+                $value=$b.Launchers.$name
+                $b.Launchers.PSObject.Properties.Remove($name)
+                $b.Launchers|Add-Member -NotePropertyName ($name.ToLowerInvariant()) -NotePropertyValue $value
+              }
+              'malformed-hash' {$b.Launchers.$name='not-sha256'}
+              'changed-backup-and-hash' {
+                [IO.File]::WriteAllBytes($backupDll,[byte[]](55,66,77))
+                $b.OriginalDll=(Get-FileHash -LiteralPath $backupDll).Hash.ToLowerInvariant()
+              }
+            }
+            ($b|ConvertTo-Json -Depth 8)|Set-Content -LiteralPath $manifest -Encoding UTF8
+            & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backup.FullName *> $null
+            if($LASTEXITCODE -eq 0){throw "INVALID ROLLBACK MANIFEST ACCEPTED: $case"}
+            foreach($name in $tracked){
+              if((Get-FileHash -LiteralPath (Join-Path $game $name)).Hash -ne $before[$name]){
+                throw "Invalid rollback modified $name in $case"
+              }
+            }
+            if((Get-FileHash -LiteralPath $sentinel).Hash.ToLowerInvariant() -ne $sentinelHash){
+              throw 'Invalid rollback modified outside sentinel'
+            }
+          }
+          [IO.File]::WriteAllBytes($manifest,$manifestBytes)
+          [IO.File]::WriteAllBytes($backupDll,$backupBytes)
+          Write-Host 'PS51_ROLLBACK_MANIFEST_NEGATIVE_8_PASS'
           & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backup.FullName
           if($LASTEXITCODE -ne 0){throw 'Rollback restore failed'}
           foreach($name in @('dinput8.dll','outrun-vr-host.exe')){
