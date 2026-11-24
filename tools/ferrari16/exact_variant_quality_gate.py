@@ -115,9 +115,67 @@ def glb_stats(path: Path) -> dict:
         bin_base = f.tell()
         buffers = doc.get("buffers", [])
         require(len(buffers) == 1 and not buffers[0].get("uri") and
-                buffers[0].get("byteLength", -1) <= bin_length,
+                type(buffers[0].get("byteLength")) is int and
+                0 < buffers[0]["byteLength"] <= bin_length,
                 "GLB external buffers unsupported")
+        buffer_bytes = buffers[0]["byteLength"]
+        views = doc.get("bufferViews", [])
         accessors = doc.get("accessors", [])
+
+        def view_bounds(idx: object) -> tuple[dict, int, int]:
+            require(type(idx) is int and 0 <= idx < len(views),
+                    "GLB bufferView reference")
+            view = views[idx]
+            start, count = view.get("byteOffset", 0), view.get("byteLength", -1)
+            require(type(view.get("buffer")) is int and view["buffer"] == 0 and
+                    type(start) is int and type(count) is int and
+                    start >= 0 and count > 0 and start + count <= buffer_bytes,
+                    "GLB bufferView bounds")
+            return view, start, count
+
+        def accessor(idx: object, semantic: str) -> tuple[int, int, int, int]:
+            require(type(idx) is int and 0 <= idx < len(accessors),
+                    "GLB accessor reference: " + semantic)
+            a = accessors[idx]
+            count, component = a.get("count"), a.get("componentType")
+            require(type(count) is int and 0 < count <= 6000000 and
+                    type(component) is int and "sparse" not in a,
+                    "GLB unsupported accessor: " + semantic)
+            normalized = a.get("normalized", False)
+            require(type(normalized) is bool, "GLB accessor normalized flag")
+            # This offline approval gate supports core, directly backed
+            # glTF attributes. Sparse/compressed/quantized geometry must be
+            # decoded before approval, not certified from metadata alone.
+            if semantic in ("POSITION", "NORMAL"):
+                require(a.get("type") == "VEC3" and component == 5126 and
+                        not normalized, "GLB attribute format: " + semantic)
+                element = 12
+            elif semantic == "TEXCOORD_0":
+                require(a.get("type") == "VEC2" and
+                        ((component == 5126 and not normalized) or
+                         (component in (5121, 5123) and normalized)),
+                        "GLB attribute format: " + semantic)
+                element = {5126: 8, 5121: 2, 5123: 4}[component]
+            else:
+                require(a.get("type") == "SCALAR" and
+                        component in (5121, 5123, 5125) and not normalized,
+                        "GLB index format")
+                element = {5121: 1, 5123: 2, 5125: 4}[component]
+            view, start, size = view_bounds(a.get("bufferView"))
+            offset = a.get("byteOffset", 0)
+            stride = view.get("byteStride", element)
+            alignment = {5121: 1, 5123: 2, 5125: 4, 5126: 4}[component]
+            require(type(offset) is int and offset >= 0 and
+                    type(stride) is int and element <= stride <= 252 and
+                    stride % alignment == 0 and offset % alignment == 0 and
+                    (start + offset) % alignment == 0 and
+                    offset + (count - 1) * stride + element <= size,
+                    "GLB accessor byte bounds: " + semantic)
+            if semantic == "indices":
+                require("byteStride" not in view, "GLB strided index accessor")
+            elif "byteStride" in view:
+                require(stride % 4 == 0, "GLB vertex stride alignment")
+            return count, start + offset, component, element
         triangles = 0
         for mesh in doc.get("meshes", []):
             for p in mesh.get("primitives", []):
@@ -125,28 +183,36 @@ def glb_stats(path: Path) -> dict:
                 attributes = p.get("attributes", {})
                 require(all(k in attributes for k in ("POSITION", "NORMAL", "TEXCOORD_0")),
                         "GLB missing position/normal/UV attributes")
-                a = p.get("indices", attributes["POSITION"])
-                require(isinstance(a, int) and 0 <= a < len(accessors),
-                        "GLB primitive accessor")
-                count = accessors[a].get("count", -1)
-                require(isinstance(count, int) and count > 0 and count % 3 == 0,
-                        "GLB triangle index count")
+                position_count = accessor(attributes["POSITION"], "POSITION")[0]
+                for semantic in ("NORMAL", "TEXCOORD_0"):
+                    require(accessor(attributes[semantic], semantic)[0] == position_count,
+                            "GLB vertex attribute count mismatch")
+                count = position_count
+                if "indices" in p:
+                    count, start, component, element = accessor(p["indices"], "indices")
+                    # Stream index bytes in bounded chunks. A CRC/hash-valid
+                    # file can still reference nonexistent vertices.
+                    f.seek(bin_base + start)
+                    fmt = {5121: "<B", 5123: "<H", 5125: "<I"}[component]
+                    remaining = count
+                    while remaining:
+                        batch = min(remaining, 16384)
+                        data = f.read(batch * element)
+                        require(len(data) == batch * element and
+                                all(i[0] < position_count for i in struct.iter_unpack(fmt, data)),
+                                "GLB index out of bounds")
+                        remaining -= batch
+                require(count % 3 == 0, "GLB triangle index count")
                 triangles += count // 3
         require(triangles > 0, "GLB contains no mesh triangles")
         images = {}
         for img in doc.get("images", []):
             name = img.get("name")
             idx = img.get("bufferView")
-            views = doc.get("bufferViews", [])
             require(isinstance(name, str) and name and name not in images,
                     "GLB embedded texture names must be unique")
-            require(isinstance(idx, int) and 0 <= idx < len(views),
-                    "GLB texture must be embedded")
-            view = views[idx]
-            start, count = view.get("byteOffset", 0), view.get("byteLength", -1)
-            require(isinstance(start, int) and isinstance(count, int) and
-                    start >= 0 and 0 < count <= 32 * 1024 * 1024 and
-                    start + count <= buffers[0]["byteLength"],
+            view, start, count = view_bounds(idx)
+            require(count <= 32 * 1024 * 1024 and "byteStride" not in view,
                     "GLB image bufferView bounds")
             f.seek(bin_base + start)
             images[name] = image_dimensions(f.read(count))

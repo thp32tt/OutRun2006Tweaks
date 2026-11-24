@@ -14,23 +14,62 @@ from ferrari16_overlay_status_test import valid_v4  # noqa: E402
 import zlib
 
 
-def glb(path: Path, *, triangles: int = 1, width: int = 2) -> None:
+def glb(path: Path, *, triangles: int = 1, width: int = 2,
+        defect: str = "", indexed: bool = True) -> None:
     png = b"\x89PNG\r\n\x1a\n" + struct.pack(">I", 13) + b"IHDR"
     png += struct.pack(">II", width, width) + b"\x08\x06\x00\x00\x00"
     png += b"\x00\x00\x00\x00"
-    raw = png + png
+    raw = bytearray()
+    views = []
+
+    def append(data: bytes) -> int:
+        raw.extend(b"\x00" * ((-len(raw)) % 4))
+        views.append({"buffer": 0, "byteOffset": len(raw), "byteLength": len(data)})
+        raw.extend(data)
+        return len(views) - 1
+
+    count = triangles * 3
+    position = append(struct.pack("<9f", 0,0,0, 1,0,0, 0,1,0) * triangles)
+    normal = append(struct.pack("<3f", 0,0,1) * count)
+    uv = append(struct.pack("<6f", 0,0, 1,0, 0,1) * triangles)
+    indices = list(range(count))
+    if defect == "index-oob":
+        indices[-1] = count
+    index = append(struct.pack("<" + "H" * count, *indices))
+    image0, image1 = append(png), append(png)
+    accessors = [
+        {"bufferView": position, "componentType": 5126, "type": "VEC3", "count": count},
+        {"bufferView": normal, "componentType": 5126, "type": "VEC3", "count": count},
+        {"bufferView": uv, "componentType": 5126, "type": "VEC2", "count": count},
+        {"bufferView": index, "componentType": 5123, "type": "SCALAR", "count": count},
+    ]
+    primitive = {"attributes": {"POSITION": 0, "NORMAL": 1, "TEXCOORD_0": 2}, "mode": 4}
+    if indexed:
+        primitive["indices"] = 3
+    if defect == "attribute-reference":
+        primitive["attributes"]["NORMAL"] = 99
+    elif defect == "missing-view":
+        del accessors[0]["bufferView"]
+    elif defect == "short-view":
+        views[position]["byteLength"] -= 4
+    elif defect == "count-mismatch":
+        accessors[1]["count"] -= 1
+    elif defect == "foreign-buffer":
+        views[uv]["buffer"] = 1
+    elif defect == "image-buffer":
+        views[image0]["buffer"] = 1
+    elif defect == "index-format":
+        accessors[3]["componentType"] = 5122
+    elif defect == "sparse":
+        accessors[0]["sparse"] = {"count": 1}
     doc = {
         "asset": {"version": "2.0"},
         "buffers": [{"byteLength": len(raw)}],
-        "bufferViews": [
-            {"buffer": 0, "byteOffset": 0, "byteLength": len(png)},
-            {"buffer": 0, "byteOffset": len(png), "byteLength": len(png)}],
-        "images": [{"name": "normal", "bufferView": 0, "mimeType": "image/png"},
-                   {"name": "orm", "bufferView": 1, "mimeType": "image/png"}],
-        "accessors": [{"count": triangles * 3}],
-        "meshes": [{"primitives": [{"attributes": {
-            "POSITION": 0, "NORMAL": 0, "TEXCOORD_0": 0},
-            "indices": 0, "mode": 4}]}],
+        "bufferViews": views,
+        "images": [{"name": "normal", "bufferView": image0, "mimeType": "image/png"},
+                   {"name": "orm", "bufferView": image1, "mimeType": "image/png"}],
+        "accessors": accessors,
+        "meshes": [{"primitives": [primitive]}],
     }
     j = json.dumps(doc, separators=(",", ":")).encode()
     j += b" " * ((-len(j)) % 4)
@@ -96,6 +135,28 @@ def main() -> None:
             "ovc4": hashed(ovc),
         }
         assert validate_one(entry, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+        # Exercise both supported primitive routes and reject metadata-only
+        # meshes even when provenance hashes and reported triangle counts match.
+        glb(converted, indexed=False)
+        nonindexed = copy.deepcopy(entry)
+        nonindexed["converted_glb"] = hashed(converted)
+        assert validate_one(nonindexed, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+        for defect, reason in (
+            ("attribute-reference", "accessor reference"),
+            ("missing-view", "bufferView reference"),
+            ("short-view", "accessor byte bounds"),
+            ("count-mismatch", "vertex attribute count mismatch"),
+            ("foreign-buffer", "bufferView bounds"),
+            ("image-buffer", "bufferView bounds"),
+            ("index-format", "index format"),
+            ("index-oob", "index out of bounds"),
+            ("sparse", "unsupported accessor"),
+        ):
+            glb(converted, defect=defect)
+            wrong = copy.deepcopy(entry)
+            wrong["converted_glb"] = hashed(converted)
+            expected_fail(wrong, root, reason)
+        glb(converted)
         wrong = copy.deepcopy(entry)
         wrong["variant"] = "328 GTB"
         expected_fail(wrong, root, "wrong exact body")
