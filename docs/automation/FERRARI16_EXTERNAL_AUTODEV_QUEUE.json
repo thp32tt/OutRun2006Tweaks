@@ -2139,20 +2139,95 @@
           "protected_v003": "Automation branch only; no v0.03, game files, ABI, menus, shader semantics, release or deployment changed. Existing native wrapper/atomic fence retained.",
           "asset_validation": "Synthetic tests only; no actual asset promotion, rights changes, private assets, or N100 usage.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; prior two independently credited, confirmed AI2 2903",
-          "next_trace": "Verify same-SHA CI; compare live stock native draw/replay path to v0.03 and inspect repeated state restoration, GPU query synchronization and frame ownership without enabling external live draw. Investigate GLB-to-OVC geometry/material correspondence independently."
+          "score_state": "CREDITED_ONCE_AI2_2903_PLUS_1_EQUALS_2904_LEDGER_062a086392927b626a51f5d0a12d0f9151975dc1",
+          "next_trace": "Verify same-SHA CI; compare live stock native draw/replay path to v0.03 and inspect repeated state restoration, GPU query synchronization and frame ownership without enabling external live draw. Investigate GLB-to-OVC geometry/material correspondence independently.",
+          "followup_exact_sha_ci": {
+            "sha": "bc83ff56a915ca9095c396f9e8063f3685d1bd0b",
+            "runs": [
+              {
+                "id": 45481791604,
+                "conclusion": "success"
+              },
+              {
+                "id": 45481791683,
+                "conclusion": "success"
+              },
+              {
+                "id": 45481791769,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER30-DASHBOARD-GEAR-COVERAGE",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Baseline versus latest driver cockpit, speed/RPM/gear and player overlays",
+          "source_material_sha": "bae4ca8ae807671fec7677cda905b4fb20a94b7b",
+          "source_blob_sha1": {
+            "src/vr/game/external_car_dashboard.hpp": "416adffd6b7044a931993913d34fe83912ec382d",
+            "src/vr/game/dino_external_d3d9.hpp": "85f415bc49c7df5f263129e17e0d91bae1c788b9",
+            "src/hooks_graphics.cpp": "ef2160721887df8bdb6bce07f46d51e5e313e349",
+            "tests/external_car_dashboard_test.cpp": "057bc004ebd522418a70eb7a052248343b1f7b80",
+            ".github/workflows/ferrari16-multicar-regression.yml": "e16c3f3cd76f35f9c8dd7f1b7abc1589ca0bb0fe"
+          },
+          "source_defect": "Body embedded speed/RPM coverage suppresses corresponding standalone overlay needles, but GearVisible is omitted. If body and standalone overlay both contain the current gear, both submit it; potential duplicate depth/color and redundant DIP. Conversely an all-gears boolean would lose digits absent from the body.",
+          "source_fix": "Build per-gear 8-bit coverage from body bindings, propagate only when body route ExternalComplete and overlay selection matches; use same predicate for expected mesh receipt and draw. Preserve needle mask and gear-only housing logic, current telemetry, native wrapper, and atomic stage fence.",
+          "positive_negative_regressions": [
+            "16 canonical slots x 8 body gears x 8 live gears x 4 needle masks = 4096 synthetic configurations, each with all eight overlay digits; exactly one body-or-overlay digit if overlay complete, matching body gear suppressed, missing body digit retained, invalid telemetry hidden, needle behavior unchanged. Null/malformed gear mask tests. Existing tests plus CI source-order checks bind production draw and receipt count."
+          ],
+          "same_sha_ci": {
+            "sha": "bae4ca8ae807671fec7677cda905b4fb20a94b7b",
+            "runs": [
+              {
+                "id": 45486752147,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45486751902,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45486751927,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45486751846,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ]
+          },
+          "render_trace": [
+            "Baseline v0.03 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 hooks_graphics blob 6b15c31c59995ca2061a44eb08a5b145278f6fdb CallOriginalPlayerWithGlassScope invokes original 49F3E0. No dino_external or external dashboard header in baseline tree. Current wrapper also calls original and never invokes external preparation/draw; atomic stage readiness remains false.",
+            "Dormant external path: DashboardFrameLatch -> body DrawNativeScene -> ChooseOriginalCarRoute ExternalComplete -> matching dashboard selection -> overlay DrawNativeScene -> expectedMeshes and actual mesh visibility; now both use same per-gear suppression. No stock dashboard/HUD suppression introduced.",
+            "No evidence this defect caused currently reported real-HMD regression; full external activation still blocked by absent pair staging and body-only ABI leaf."
+          ],
+          "protected_v003": "Only external automation branch modified; original wrapper body unchanged, no stable release, v0.03 launch/host, PBR shader, model bytes, rights, or deployment changes.",
+          "asset_validation": "Synthetic logic only; no real car/OVC or HMD validation; N100 unused.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; prior iter29 credited once, confirmed AI2 2904",
+          "next_trace": "Check exact SHA CI including HUD Inspector. Rotate to pair color/depth staging and body-only ABI boundary, inspect live stock rendering versus v0.03 with new counterexamples; no live external admission until isolated pair proof."
         }
       ],
-      "latest_material_sha": "bc83ff56a915ca9095c396f9e8063f3685d1bd0b",
-      "latest_static_ci": "Exact-SHA iteration 29 runs recorded; iteration 27/28 all three success and scored once",
-      "next_focus": "Verify same-SHA CI; compare live stock native draw/replay path to v0.03 and inspect repeated state restoration, GPU query synchronization and frame ownership without enabling external live draw. Investigate GLB-to-OVC geometry/material correspondence independently."
+      "latest_material_sha": "bae4ca8ae807671fec7677cda905b4fb20a94b7b",
+      "latest_static_ci": "Exact SHA iteration 30 runs recorded; iteration 29 all three success and scored once",
+      "next_focus": "Check exact SHA CI including HUD Inspector. Rotate to pair color/depth staging and body-only ABI boundary, inspect live stock rendering versus v0.03 with new counterexamples; no live external admission until isolated pair proof."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 05:30:00+09:00",
+  "last_updated_kst": "2026-11-25 06:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
