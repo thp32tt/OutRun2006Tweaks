@@ -1157,7 +1157,7 @@
         },
         {
           "cycle_key": "EXT16-011-20261124-1900-GLB-ACCESSOR-BUFFER-PROVENANCE",
-          "status": "PATCHED_EXACT_SHA_MULTICAR_HLSL_PASS_WINDOWS_PACKAGE_PENDING_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_MULTICAR_BUILD_PACKAGE_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "Exact 328 GTS, 575 Superamerica, F430 Spider, Testarossa Spider source-to-OVC provenance gate",
           "source_material_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
           "source_defect": "glb_stats certified geometry from JSON accessor count without reading actual vertex buffers, validating attribute references or checking index values. Synthetic positive fixture contained only PNG header bytes, no vertex/index data. A hash-matched metadata-only or truncated source/conversion could falsely pass static gate.",
@@ -1185,17 +1185,18 @@
                 "run_id": 45370725690,
                 "name": "Build",
                 "head_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "run_id": 45370724868,
                 "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
                 "head_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               }
-            ]
+            ],
+            "note": "19:30 cycle exact head_sha filtered GitHub Actions API confirmed all three completed success; no duplicate score."
           },
           "remaining_trace": [
             "Preview evidence currently checks suffix/hash but not decoded image content; embedded image check is header only. Source metadata and typed geometry validation do not establish visual identity, legal authorization, decoded material coverage or OVC per-material fidelity.",
@@ -1207,18 +1208,72 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_WINDOWS_CI_AND_LEDGER",
           "next_trace": "Verify a21b3fbd exact x86 DLL/x64 package CI; trace preview authenticity and texture/material reference completeness, or rotating performance focus: external resource scheduling and duplicate draw costs; preserve atomic stereo stage blocker."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-1930-MESH-BUFFER-UPLOAD",
+          "status": "PATCHED_LOCAL_REGRESSION_PASS_EXACT_SHA_CI_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "Graphics performance: D3D9 allocation, mesh upload completion and state/replay ownership",
+          "source_material_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
+          "source_defect": "EnsureGpu ignored VB/IB Unlock HRESULT; successful Lock with null data skipped Unlock; buffer allocation did not reject success with null COM pointer. Uncommitted buffers could enter meshes_ and advance GPU readiness.",
+          "source_fix": "Require non-null VB/IB after creation; shared UploadExternalMeshBuffer balances successful Lock with exactly one Unlock and returns true only when copy pointer and Unlock are valid. Both uploads must succeed before mesh publication; failure releases both buffers and rejects GPU resources with reason. Existing reset/device retry, INDEX16 narrowing and stock callback preserved.",
+          "source_blob_sha1": {
+            "src/vr/game/dino_external_d3d9.hpp": "a21e913573c39fcc09e20bcacbeb2e5b0f0f3bd1",
+            "src/vr/game/external_car_mesh_upload.hpp": "017f20aaee0669704dfa3b35b36cfe426d655fa4",
+            "tests/external_car_mesh_upload_test.cpp": "7b8e12ca970e6d3e402c3f73c576de82dfe91619",
+            ".github/workflows/ferrari16-multicar-regression.yml": "21c90612a9af6e5473e32a524060eced45e9117b"
+          },
+          "positive_negative_regressions": [
+            "Local actual g++ C++17 -O2 -Wall -Wextra -Werror -pedantic compile and execution PASS for 64 paired VB/IB lock/null/unlock combinations (1 accepted, 63 rejected). GitHub blob SHA1 for helper and test matched local git hash-object exactly.",
+            "CI production-source assertions require non-null Create results, checked VB/IB Unlock before publication, both failure release paths and nextMesh increment after publication. Existing all-car gates preserved."
+          ],
+          "same_sha_ci": {
+            "sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
+            "runs": [
+              {
+                "run_id": 45375706244,
+                "name": "Build",
+                "head_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "run_id": 45375704871,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "head_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "run_id": 45375704893,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "head_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ]
+          },
+          "performance_trace": [
+            "PrepareF50External admission and DrawNativeScene both short-circuit before CPU/GPU work while RuntimeExternalCarAtomicStageReady is false. Current external branch therefore cannot attribute observed headset FPS to this currently fenced path.",
+            "EnsureGpu prepares one albedo/PBR map or mesh per callback; cache returns immediately for Ready owner; RejectGpu releases resources and uses device-generation retry policy. No FPS claim, no change to allocation rate.",
+            "DrawNativeScene creates/captures D3DSBT_ALL once per invocation; per mesh rebinds world, five blend/depth states, VB/IB and material textures/constants; each eligible DIP has a stereo receipt and R7 owns eye duplication. Glass sort uses bounded stack array. No unproven state-cache change because lower owner may mutate state. Next trace repeated state writes and stateblock allocation cost with state restore proof, baseline dashboard/overlays and stock callback."
+          ],
+          "protected_v003": "Only external GPU upload helper, tests and branch CI changed; no v0.03 release, x86 ABI, native callback, host, launcher, PBR shader or live eye admission changes.",
+          "asset_validation": "No actual licensed 16 vehicle source/OVC bytes inspected or changed. No quality or rights promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Confirm exact SHA CI; investigate state-block allocation and duplicate material/state binding with lower stereo owner mutation proof; compare stock dashboard, overlay and native callback parity, retain atomic stage fence."
         }
       ],
-      "latest_material_sha": "a21b3fbd39c293a7f8d42622ce4762cf73f7331f",
-      "latest_static_ci": "EXACT_SOURCE_SHA_MULTICAR_HLSL_PASS_WINDOWS_PACKAGE_PENDING",
-      "next_focus": "Verify a21b3fbd exact x86 DLL/x64 package CI; trace preview authenticity and texture/material reference completeness, or rotating performance focus: external resource scheduling and duplicate draw costs; preserve atomic stereo stage blocker."
+      "latest_material_sha": "bdd1a3c5d6fa12c012eb62c2682486df14bc0fe9",
+      "latest_static_ci": "LOCAL_MESH_UPLOAD_REGRESSION_PASS_EXACT_SHA_CI_PENDING",
+      "next_focus": "Confirm exact SHA CI; investigate state-block allocation and duplicate material/state binding with lower stereo owner mutation proof; compare stock dashboard, overlay and native callback parity, retain atomic stage fence."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 19:00:00+09:00",
+  "last_updated_kst": "2026-11-24 19:32:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
