@@ -1383,18 +1383,49 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Inspect R30/R33 remaining PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW sentinel and particle VB stream rollback; migrate only proven raw attempts and verify exact-SHA CI. Preserve original callback and fail-closed external staging."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-2130-DEFERRED-GLASS-OWNER",
+          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "Retail x86 body wrapper ABI 46BD30/469600 and original deferred glass ownership",
+          "source_material_sha": "db020cca19baf659c3a8dc424ee842efc18e6d93",
+          "source_defect": "CaptureAfter discarded a newly captured player DrawEntry whenever its address and epoch matched an existing token, even when ID/culling node had changed. HasDeferredOwner then rejected the new genuine player identity. A scope unwinding after a native frame epoch change could also append old-epoch tokens to the new frame's bounded table. Deterministic source counterexample; actual game queue reuse frequency and visible symptoms not measured.",
+          "source_fix": "Refresh identity on the same entry/epoch in bounded token table; match exact entry, ID, node and epoch; reject invalid IDs and stale-epoch CaptureAfter before queue inspection. No change to tint/reflection formulas, wrapper call count or external gate.",
+          "source_blob_sha1": {
+            "src/hooks_graphics.cpp": "b215272619c08404d413fb037d6a16b03df2d1e0",
+            "src/vr/game/quest_cockpit_v2_glass_hook.hpp": "f2c53ed0d5422bf0cf14f16429f453b1b3cae8c7",
+            "tests/external_car_original_wrapper_contract_test.cpp": "932033ad5dd4599883c905268ed5af1217cacd68"
+          },
+          "positive_negative_regressions": [
+            "Local g++ C++17 -O2 -Wall -Wextra -Werror -pedantic compiled and ran reproduced helper/test fragment; old duplicate skip reproduced, current valid identity accepted even at capacity; old identity, wrong node/epoch/address, invalid ID and overflow rejected. Full exact committed test not locally executed.",
+            "Existing CI external_car_original_wrapper_contract_test now exercises helper plus preserved 16-slot wrapper/route gates; no CI bypass."
+          ],
+          "same_sha_ci": {
+            "sha": "db020cca19baf659c3a8dc424ee842efc18e6d93",
+            "status": "UNVERIFIED",
+            "note": "PR-filtered commit workflow connector returned no runs; push CI not certified. No rerun or pass claimed."
+          },
+          "call_graph_trace": [
+            "49F3E0 -> 46BD30 -> 469600 multiple PMT and shadow leaves; separate 49A650 follow-up retained. CallOriginalPlayerWithGlassScope still invokes original trampoline exactly once and no sidecar preparation.",
+            "PlayerCallback captures immediate/deferred native queues; material hook matches entry address, ID at +0x38, culling node and native epoch. Actual body-only leaf remains unproven. No external raster admission enabled."
+          ],
+          "protected_v003": "Stable release branch, host, launcher, original callback body, staging fence and PBR untouched; only shared glass queue identity behavior on automation branch.",
+          "asset_validation": "No private 16-car models or PBR maps inspected; no model or rights promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Inspect remaining R30/R33 PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW sentinel and particle stream rollback; verify exact SHA CI and investigate live queue reuse using owned runtime traces, preserving atomic staging and original callback."
         }
       ],
-      "latest_material_sha": "699c9a08b3d1ed9747eb9b5473c6b97df68d7a3f",
-      "latest_static_ci": "LOCAL_F11_24_CASE_PASS_EXACT_SHA_CI_UNVERIFIED",
-      "next_focus": "Inspect R30/R33 remaining PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW sentinel and particle VB stream rollback; migrate only proven raw attempts and verify exact-SHA CI. Preserve original callback and fail-closed external staging."
+      "latest_material_sha": "db020cca19baf659c3a8dc424ee842efc18e6d93",
+      "latest_static_ci": "LOCAL_DEFERRED_GLASS_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED",
+      "next_focus": "Inspect remaining R30/R33 PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW sentinel and particle stream rollback; verify exact SHA CI and investigate live queue reuse using owned runtime traces, preserving atomic staging and original callback."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 21:02:00+09:00",
+  "last_updated_kst": "2026-11-24 21:31:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
