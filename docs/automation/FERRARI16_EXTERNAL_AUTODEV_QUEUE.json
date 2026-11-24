@@ -1266,7 +1266,7 @@
         },
         {
           "cycle_key": "EXT16-011-20261124-2000-DASHBOARD-RIGID-ROTATION",
-          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_PENDING_CONTINUE_ACTIVE",
+          "status": "PATCHED_RECORDED_EXACT_SHA_RUN_JOBS_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "Baseline v0.03 driver cockpit, speed/RPM gear, player overlay and native callback parity",
           "source_material_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
           "source_defect": "ValidDashboardBinding and Python OVC inspector intentionally accept small axis length error; DashboardLocalRotation used the unnormalized axis in Rodrigues, producing non-rigid rotation. Finite float32 input calibration -FLT_MAX to +FLT_MAX passed both gates but float subtraction overflowed to infinity, causing zero instead of midpoint interpolation.",
@@ -1286,15 +1286,15 @@
                 "run_id": 45380247429,
                 "name": "Build",
                 "head_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "run_id": 45380247418,
                 "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
                 "head_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "run_id": 45380247574,
@@ -1303,7 +1303,8 @@
                 "status": "completed",
                 "conclusion": "success"
               }
-            ]
+            ],
+            "note": "20:30 checked jobs of all three previously recorded exact-SHA run IDs: Win32 Release build, exact-sha-x86-x64-package, PBR HLSL and multicar all completed success. Job wrapper omits head_sha; SHA association from earlier recorded run metadata."
           },
           "remaining_trace": [
             "Fetched original v0.03 2446269a and latest hooks_graphics.cpp: OnPlayerCallback function byte-identical; CallOriginalPlayerWithGlassScope differs only by explanatory comments and static_assert, same QuestCockpitGlassLive scope and PlayerCallbackHook.ccall<void>(player). Original wrapper still sole raster owner; no sidecar draw admission.",
@@ -1315,18 +1316,49 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Verify exact source SHA CI; inspect whole-vehicle plus dashboard two-eye staging ownership, overlay failure transaction, and reset/epoch/selection boundaries; preserve stock wrapper."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-2030-R7-RESTORE-FAULT",
+          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "DX9Ex R7 left/right raster staging, texture/depth ownership and right-eye failure",
+          "source_material_sha": "51f358184a9bf0a6477b424bdc0036403e686537",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r7.inc": "de56032867018ef3e4f3f40836d61308893a0c1c",
+            "src/vr/game/external_car_stereo_receipt.hpp": "2eb9b8209ae00ac385cc42e43492ad6db60f6294",
+            "tests/external_car_stereo_receipt_test.cpp": "3e4770afb9510c770453b55ba0a3cdc1a6eead07"
+          },
+          "source_defect": "RestoreFixedFunctionTransforms short-circuited projection restoration if VIEW restoration failed. ExecuteStereoDraw left-eye upload rollback failure returned before physical receipt recording, classifying dirty pre-raster failure as missing report.",
+          "source_fix": "Always attempt both independent fixed-function restores, require both success. Record pre-raster rollback failure as sticky deviceRestoreFailed even with zero reports; reject later no-raster proof after dirty rollback. Preserve successful stock HRESULT and fail-closed external admission.",
+          "positive_negative_regressions": [
+            "Local g++ C++17 -Wall -Wextra -Werror -pedantic reproduced exact helper fragment: masks 0/2 old VIEW/PROJECTION calls 1/0 vs fixed 1/1, masks 1/3 both 1/1; only mask 3 succeeds. All assertions passed. Not the full committed test.",
+            "Committed existing external_car_stereo_receipt_test.cpp exercises all four restore combinations, no-DIP proof only on clean rollback, sticky dirty failure and existing right-GPU failure/duplicate-report/stock route checks. Full suite CI unverified."
+          ],
+          "same_sha_ci": {
+            "sha": "51f358184a9bf0a6477b424bdc0036403e686537",
+            "status": "UNVERIFIED",
+            "note": "GitHub commit workflow wrapper filters PR runs and returned empty; local DNS cannot resolve api.github.com; N100 approved download rejected API host. No PASS asserted."
+          },
+          "r7_trace": [
+            "R7 ExecuteStereoDraw 2125 pre-first-DIP fence, 2231 left live DIP, 2267-2295 right RT/depth/viewport and draw, 2353 report. After LEFT live writes, right failure cannot undo color/depth. Actual all-or-stock GPU staging remains unavailable; no guard lifted.",
+            "PBR shader path sets fixedFunctionWorld=true alongside externalPbrWorld at 1060-1074; c4/c8/pixel c1 restore attempts all three. Fixed-function path now likewise attempts both. No material, texture, shader or private model changes.",
+            "No physical right-eye GPU injection or GPU pair publication; portable failure injection only. R30/R33 guards unchanged."
+          ],
+          "protected_v003": "No stable release branch, x86 player ABI, launcher, host, asset/license or deployment changes. R7 shared restore failure path changes only in external automation branch.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Implement/verify isolated whole-vehicle and dashboard color/depth stage with reset/epoch ownership; investigate R7 WVP restore loop short-circuit and actual right-eye failure after staged left. Confirm exact SHA CI without rerun."
         }
       ],
-      "latest_material_sha": "9ad14e54c70ad243feff0356826924ba63bbd611",
-      "latest_static_ci": "LOCAL_DASHBOARD_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_PENDING",
-      "next_focus": "Verify exact source SHA CI; inspect whole-vehicle plus dashboard two-eye staging ownership, overlay failure transaction, and reset/epoch/selection boundaries; preserve stock wrapper."
+      "latest_material_sha": "51f358184a9bf0a6477b424bdc0036403e686537",
+      "latest_static_ci": "LOCAL_R7_RESTORE_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED",
+      "next_focus": "Implement/verify isolated whole-vehicle and dashboard color/depth stage with reset/epoch ownership; investigate R7 WVP restore loop short-circuit and actual right-eye failure after staged left. Confirm exact SHA CI without rerun."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 20:01:37+09:00",
+  "last_updated_kst": "2026-11-24 20:33:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
