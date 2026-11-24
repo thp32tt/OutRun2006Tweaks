@@ -2471,7 +2471,7 @@
           "protected_v003": "Only automation branch, no stable release, original callback body, passenger hooks, PBR shader, menus/host, model bytes, license or deployment change. Runtime gate tightened for unverified executable variants; canonical EXE signature matches. N100 used for one bounded approved upstream EXE read in memory and read-only CI query, no build.",
           "asset_validation": "Synthetic tests only; actual 16 models and per-car PBR not certified.",
           "runtime_validation": "UNTESTED",
-          "score_state": "EXACT_SHA_CI_SUCCESS_UNCREDITED; scoreboard read-only verification found last confirmed 2907, no prior 09cf6337 entry; no ledger mutation this cycle.",
+          "score_state": "CREDITED_ONCE_AI2_2907_PLUS_1_EQUALS_2908_LEDGER_ec254ec4b2f71758d29a3fe04542d1b9ee598dce",
           "next_trace": "Trace 469600 layout+0 PMT body candidate to exact per-car draw entry material/queue consumers; prove isolated body ownership independent of wheels, shadows, stock dashboard, passengers and glass, and preserve complete 49F3E0 wrapper. Rotate to actual OVC/PBR material-to-mesh correspondence if body leaf proof unavailable; verify current exact-SHA CI and do not enable external raster without isolated bilateral staging.",
           "followup_exact_sha_ci": {
             "sha": "09cf633777496fb72caa067c7815973e714fc86b",
@@ -2538,20 +2538,81 @@
           "protected_v003": "Compared baseline 2446269a to HEAD; protected v0.03 Start-OutRun scripts, host main/runtime/menu/projection/OpenXR/transport and menu geometry blobs unchanged; no new raster admission, PBR/material, ABI or licensed assets modified. N100 used only for two read-only GitHub lookups, no build.",
           "asset_validation": "No actual model/OVC/PBR or per-car asset certification. Runtime hardware QA untested.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; scoreboard 2907 confirmed; iter33 uncredited",
-          "next_trace": "Inspect game-side PresentationGameplay/Theater and direct-only cached projection transition on first valid pose/frame, including mode switch and asymmetric eye receipts; compare R7 reset/publish transitions with 2446269a and host consumer, fix only demonstrated new counterexamples. Confirm iteration34 exact SHA CI and reconcile unique prior score."
+          "score_state": "CREDITED_ONCE_AI2_2908_PLUS_1_EQUALS_2909_LEDGER_ec254ec4b2f71758d29a3fe04542d1b9ee598dce",
+          "next_trace": "Inspect game-side PresentationGameplay/Theater and direct-only cached projection transition on first valid pose/frame, including mode switch and asymmetric eye receipts; compare R7 reset/publish transitions with 2446269a and host consumer, fix only demonstrated new counterexamples. Confirm iteration34 exact SHA CI and reconcile unique prior score.",
+          "followup_exact_sha_ci": {
+            "sha": "0cdd25535f9550b4325bd11d6783a0409a7ac2fe",
+            "runs": [
+              {
+                "id": 45506550817,
+                "conclusion": "success"
+              },
+              {
+                "id": 45506552168,
+                "conclusion": "success"
+              },
+              {
+                "id": 45506550897,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER35-SOURCE-TANGENT-COLLAPSE",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "16-car OVC4 mesh integrity, DDS mip/normal/ORM, strict source tangent contract",
+          "source_material_sha": "be58f50c50fa2e6076490d24aa007b5049e7be55",
+          "source_blob_sha1": {
+            "tools/ferrari16/pbr_material_gate.py": "0fdea7ef3c62211c09eb5b296861ccdab66f8465",
+            "tools/ferrari16/verify_all_car_ovc.py": "95963317497aadb3cd35943d8f481ccd343224fd",
+            "tests/ferrari16_pbr_material_gate_test.py": "078c24a83de3fcfdb34180b9fc6c339caa18958d"
+          },
+          "source_defect": "Strict OVC preflight checked geometry/UV determinant, full DDS and normal strength but not imported normal orientation relative to the UV tangent. A finite triangle in XY with UV (0,0),(1,0),(0,1), all normals +X, valid CRC and both maps passed strict coverage; SM3 T -= N*dot(N,T) collapses for identity/rigid world and bypasses normal-map sampling. Runtime normal repair deliberately preserves nonzero imported normals. Reproduced with actual old Python verifier, not merely a hypothetical policy.",
+          "source_fix": "Add conservative exact-collinearity same-sign source normal witness for each opaque triangle with valid UV; track material IDs in collapsed_source_tangent and reject strict PBR coverage even when a sibling mesh on same material is good. Preserve structural parsing, source normals, zero-normal repair/fallback, glass exemption, live shader, v0.03 and runtime atomic fence. Does not certify mixed or screen-space tangent cases.",
+          "positive_negative_regressions": [
+            "80 CRC-recomputed synthetic OVC4 cases across all 16 canonical slots (48 valid/repairable, 32 malformed tangent cases); shared-material bad sibling and tagged glass exemption; 18 source tangent helper assertions across ordinary/mirrored/swapped UV and positive/negative/mixed normals.",
+            "Exact committed Python pbr_material_gate_test.py and verify_all_car_ovc.py --self-test both exit 0. Same generated malformed OVC tested against original base returns strict True; patched SHA returns False."
+          ],
+          "same_sha_ci": {
+            "sha": "be58f50c50fa2e6076490d24aa007b5049e7be55",
+            "runs": [
+              {
+                "id": 45510700400,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45510700401,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45510700398,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "Only offline verification tools/tests on external automation branch. No runtime shader, x86 ABI, host, menus, deployment, licensed source/converted assets or native fallback modified. Local environment GitHub DNS unavailable; N100 used only for bounded public-source fetch and tiny synthetic Python checks/read-only CI, no build.",
+          "asset_validation": "Synthetic OVC4 only; no current private 16-car source or converted bytes verified or promoted. Historical 2026-11-16 16/16 manifest SHA matched, 0/16 strict PBR passed per prior EXT16-009 audit, not current installed asset QA.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; prior independent iterations 33/34 reconciled once, AI2 2909 ledger ec254ec4b2f71758d29a3fe04542d1b9ee598dce",
+          "next_trace": "Trace source-space UV conditioning versus relative SM3 derivative threshold and DDS pixel semantic/channel packing (normal RGB vs packed ORM); find concrete current source/converted SHA and rights evidence before private model repair. Continue real stereo pair staging investigation; confirm iteration35 exact SHA CI."
         }
       ],
-      "latest_material_sha": "0cdd25535f9550b4325bd11d6783a0409a7ac2fe",
-      "latest_static_ci": "Iteration34 exact source SHA three observed push workflows in progress; iteration33 all four exact SHA workflows success, uncredited",
-      "next_focus": "Inspect game-side PresentationGameplay/Theater and direct-only cached projection transition on first valid pose/frame, including mode switch and asymmetric eye receipts; compare R7 reset/publish transitions with 2446269a and host consumer, fix only demonstrated new counterexamples. Confirm iteration34 exact SHA CI and reconcile unique prior score."
+      "latest_material_sha": "be58f50c50fa2e6076490d24aa007b5049e7be55",
+      "latest_static_ci": "Iteration35 Python exact-source selftests PASS; three applicable push CI workflows in progress; iteration34 exact-SHA three workflows success and credited once",
+      "next_focus": "Trace source-space UV conditioning versus relative SM3 derivative threshold and DDS pixel semantic/channel packing (normal RGB vs packed ORM); find concrete current source/converted SHA and rights evidence before private model repair. Continue real stereo pair staging investigation; confirm iteration35 exact SHA CI."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 08:00:00+09:00",
+  "last_updated_kst": "2026-11-25 08:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
