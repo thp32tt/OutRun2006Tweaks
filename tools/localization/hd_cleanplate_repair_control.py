@@ -43,7 +43,11 @@ def validate_completed_feedback(state,pointer):
     result=[]
     for t,record in records.items():
         d=record.get("decision",{})
-        if d.get("task_id")!=t or d.get("decision")!="REWORK_REQUIRED":continue
+        if (record.get("status")!="DONE" or d.get("task_id")!=t or d.get("decision")!="REWORK_REQUIRED"
+            or d.get("source_dds_sha256")!=record.get("source_dds_sha256")
+            or d.get("candidate_dds_sha256")!=record.get("candidate_dds_sha256")
+            or not H64.fullmatch(record.get("source_dds_sha256",""))
+            or not H64.fullmatch(record.get("candidate_dds_sha256",""))):continue
         for item in d.get("bbox_proposals",[]):
             result.append({"roi_id":item["roi_id"],"bbox_xyxy":item["bbox_xyxy"],
                 "target":record["target"],"source_dds_sha256":record["source_dds_sha256"]})
@@ -68,6 +72,10 @@ def prepare(asset_sha,out):
         if pointer.get("asset_sha")==asset_sha:
             if pointer.get("generation",1)>=2 or not candidates:return "skip",int(pointer.get("generation",1))
             gen=2;proposals=candidates
+        else:
+            # New candidates may arrive during QA. Source-bound earlier proposals
+            # still receive fresh containment/native checks in the new build.
+            proposals=candidates
     Path(out).write_text(json.dumps({"schema":"outrun.hd.cleanplate-feedback.v1","proposals":proposals}),encoding="utf-8")
     return "build",gen
 
@@ -83,6 +91,9 @@ def publish(asset_sha,run_id,artifact_id,generation,manifest):
              "counts":doc["counts"],"release_approved":False,"runtime_validation":"UNTESTED"}
     prior,etag=read(ROOT+"/latest.json")
     if prior and prior.get("run_id",0)>run_id:raise ValueError("OLDER_RUN_CANNOT_REPLACE_LATEST")
+    if prior and type(prior.get("run_id")) is int and prior["run_id"]<run_id and H64.fullmatch(prior.get("manifest_sha256","")):
+        pointer["previous_run_id"]=prior["run_id"]
+        pointer["previous_manifest_sha256"]=prior["manifest_sha256"]
     write(ROOT+"/latest.json",pointer,etag)
     print(json.dumps(pointer,sort_keys=True))
 
