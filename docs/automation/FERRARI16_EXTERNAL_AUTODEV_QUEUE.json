@@ -2291,20 +2291,94 @@
           "protected_v003": "Automation branch only. No stock player wrapper, original release, x86 ABI, PBR shader, host, menu, licensed assets or deployment modifications. N100 read-only GitHub CI/score API only.",
           "asset_validation": "Synthetic tests, no actual 16 model validation or promotion",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; prior confirmed 2904, iteration30 uncredited",
-          "next_trace": "Trace right-depth bootstrap after unmirrored writes or partial clears, and failed RT/depth/viewport restore propagation across R7/R29/R30/R33. Implement isolated whole-vehicle L/R color+depth ownership and real right-eye failure proof only when safe; preserve stock wrapper and fail-closed external admission. Verify exact SHA CI and reconcile outstanding unique scores."
+          "score_state": "NO_CREDIT_WINDOWS_CI_FAILED; repair included in iteration32; exact SHA revalidation pending",
+          "next_trace": "Trace right-depth bootstrap after unmirrored writes or partial clears, and failed RT/depth/viewport restore propagation across R7/R29/R30/R33. Implement isolated whole-vehicle L/R color+depth ownership and real right-eye failure proof only when safe; preserve stock wrapper and fail-closed external admission. Verify exact SHA CI and reconcile outstanding unique scores.",
+          "followup_exact_sha_ci": {
+            "sha": "7c5ba56609f5aa7ac4c0151c3cd02dc49f0dad4a",
+            "runs": [
+              {
+                "id": 45492248376,
+                "conclusion": "success"
+              },
+              {
+                "id": 45492248445,
+                "conclusion": "failure"
+              },
+              {
+                "id": 45492248374,
+                "conclusion": "failure"
+              }
+            ],
+            "conclusion": "failure",
+            "detail": "Windows compiler C2065 in R13 lines 411-412 stale names of R7 clear epoch/flags after stamp refactor. Corrected in iteration 32; do not credit failed SHA."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER32-R30-SPECULATIVE-UP-STREAM",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "R30/R33 direct/raw DIP bypass, HRESULT recovery, state restoration and original fallback",
+          "source_material_sha": "329ddbe9e8c4135d88cc953b8f66542f001d17d9",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r13.cpp": "179f161ecfb2b41f711336da8f8748aafc54aa20",
+            "src/vr/d3d9/stereo_renderer_r30.cpp": "7bffe9ad6b15e761357b1e300dd6f1156b66143f",
+            "src/vr/game/stereo_lower_draw_result.hpp": "cf3d76692d724fabedd759b254b37f91df5e620c",
+            "tests/stereo_lower_draw_result_test.cpp": "7ee4d592dc45839c5ff7dfec2d8c670b760eaf31",
+            ".github/workflows/ferrari16-multicar-regression.yml": "abdd5c69f76b51d7a85fe5826db8d79116edbb2d"
+          },
+          "source_defect": "Optional R30 particle DynamicVB route unconditionally called finishUp (SetStreamSource(0,NULL,0,0)) even when source admission or first bind failed before raw DrawPrimitive. It could then report Declined, delegating to R33/lower owner with an altered native stream binding although no UP executed. Separately iteration31 changed R7 clear fields but missed R13 ResetEx references, causing exact-SHA Windows build failures.",
+          "source_fix": "Capture stream0 COM reference, offset and stride before speculative bind; on failed getter skip optimization to ordinary UP. Restore original binding on pre-draw decline; only after physical attempt apply native UP NULL side effect. Release retained reference, internal-pass restoration, failed restore poisons frame and prevents fallback; retain typed handled/declined result and existing GPU ring upload policies. R13 replaces exactly two obsolete reset assignments with stamp invalidation; scope guard verifies R13 byte-exact baseline except that replacement.",
+          "positive_negative_regressions": [
+            "128 synthetic slot/physical-attempt/restore-outcome/original-binding combinations test selected restore operation, original binding/offset/stride, native NULL side effect, and typed no-retry behavior. Source-order tests bind live snapshot before bind, attempt flag before raw driver call, restore gate before fallback.",
+            "Existing PBR and external live pre-DIP fences unchanged; no GPU/HMD injection claimed."
+          ],
+          "same_sha_ci": {
+            "sha": "329ddbe9e8c4135d88cc953b8f66542f001d17d9",
+            "runs": [
+              {
+                "id": 45496877258,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45496876805,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45496876701,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress"
+              },
+              {
+                "id": 45496876961,
+                "name": "Build",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "render_trace": [
+            "R33 DIP -> external pre-raster guard -> typed F11/FVF142/XYZRHW -> dispatch/raw or R29 lower. R30 DIP has independent external guard; neither permits live external DIP while RuntimeExternalCarAtomicStageReady false.",
+            "R30 particle optimization -> prepare ring -> bindEye -> physicalDrawAttempted before raw driver call -> R30ExecuteXyzrhwStereo -> finish/rollback -> typed AfterRoute or safe Declined -> R33/R30 lower. Original stream was unconditionally cleared even when source admission refused all physical draws.",
+            "R13 ResetEx textual R7 state consumer now uses stamp invalidation; no R13 runtime logic outside that exact reset migration changed."
+          ],
+          "protected_v003": "Automation branch only, original release, native callback, ABI, PBR shaders, menus, host, private models, rights and deployment untouched. Existing scope restrictions preserved; exact R13 transformation added, no CI skip. N100 used only for read-only CI run lookup.",
+          "asset_validation": "Synthetic only; actual sixteen models not verified or promoted",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI; last confirmed 2904; iter30 success uncredited, iter31 failed and repaired in iter32",
+          "next_trace": "Inspect R7/R29/R30/R33 right-depth bootstrap restore-failure propagation and same-surface Clear receipt after intervening writes; prove safe native fallback before any real external activation. Verify iteration32 exact-SHA Windows CI, then reconcile unique score including pending iteration30. No atomic stage admission without true bilateral color/depth ownership and real GPU failure evidence."
         }
       ],
-      "latest_material_sha": "7c5ba56609f5aa7ac4c0151c3cd02dc49f0dad4a",
-      "latest_static_ci": "Iteration 31 exact SHA CI pending; iteration 30 all four success, score reconciliation outstanding",
-      "next_focus": "Trace right-depth bootstrap after unmirrored writes or partial clears, and failed RT/depth/viewport restore propagation across R7/R29/R30/R33. Implement isolated whole-vehicle L/R color+depth ownership and real right-eye failure proof only when safe; preserve stock wrapper and fail-closed external admission. Verify exact SHA CI and reconcile outstanding unique scores."
+      "latest_material_sha": "329ddbe9e8c4135d88cc953b8f66542f001d17d9",
+      "latest_static_ci": "Iteration32 exact-SHA Windows + sidecar/HUD runs pending; iteration31 failed Windows builds (R13 references) corrected",
+      "next_focus": "Inspect R7/R29/R30/R33 right-depth bootstrap restore-failure propagation and same-surface Clear receipt after intervening writes; prove safe native fallback before any real external activation. Verify iteration32 exact-SHA Windows CI, then reconcile unique score including pending iteration30. No atomic stage admission without true bilateral color/depth ownership and real GPU failure evidence."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 06:30:00+09:00",
+  "last_updated_kst": "2026-11-25 07:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
