@@ -249,25 +249,12 @@ jobs:
         run: |
           set -euo pipefail
           changed="$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- src/vr/d3d9)"
-          if grep -Ev '^src/vr/d3d9/stereo_renderer_r(7\.inc|30\.cpp|32\.cpp|33\.cpp)
-
-  pbr-hlsl:
-    runs-on: windows-2022
-    steps:
-      - uses: actions/checkout@v4
-      - name: Compile the exact runtime vertex/pixel HLSL with Windows D3DCompiler
-        shell: cmd
-        run: |
-          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat" || exit /b 1
-          cl /nologo /std:c++17 /EHsc /W4 "tests\external_car_pbr_shader_compile_test.cpp" /Fe:"%RUNNER_TEMP%\ferrari16_pbr_shader_test.exe" /link d3dcompiler.lib || exit /b 1
-          "%RUNNER_TEMP%\ferrari16_pbr_shader_test.exe" || exit /b 1
- <<< "$changed" | grep -q .; then
+          if grep -Ev '^src/vr/d3d9/stereo_renderer_r(7\.inc|30\.cpp|32\.cpp|33\.cpp)$' <<< "$changed" | grep -q .; then
             echo "$changed"
             exit 1
           fi
-          # R32 is not a newly unrestricted stereo owner. Require the ENTIRE
-          # original file and both bridge headers byte-for-byte, apart from
-          # the single reviewed return type and header include.
+          # R32 remains restricted to the exact single reviewed return type.
+          # Require all remaining bytes of the original file and both headers.
           python3 - <<'PY'
           from pathlib import Path
           import subprocess
@@ -292,7 +279,6 @@ jobs:
               expected = expected_bridge(old, prefix, header)
               actual = Path(path).read_bytes()
               assert actual == expected, 'Unreviewed baseline bridge change: ' + path
-              # A second unrelated modification must never be admitted.
               assert actual + b'\n// unauthorized change\n' != expected
           print('EXACT_R32_TYPED_BRIDGE_ONLY_PASS')
           PY
