@@ -30,6 +30,16 @@ constexpr bool Eligible(const Gate& g) noexcept {
     return g.vertices <= kMaxPerEyeBytes / g.stride &&
            g.vertices * g.stride >= kMinPerEyeBytes;
 }
+// A successful Lock owns an Unlock even if the returned mapping is null.
+// Never publish the pair unless both the copy and Unlock can complete.
+template<class Copy,class Unlock>
+inline bool FinishMappedParticleUpload(bool lockSucceeded,void* mapped,
+    Copy copy,Unlock unlock) noexcept {
+    if(!lockSucceeded)return false;
+    if(mapped)copy(mapped);
+    const bool unlocked=unlock();
+    return mapped!=nullptr && unlocked;
+}
 // A failed first-eye DynamicVB stream bind invokes no GPU DrawPrimitive.
 // Once a physical eye draw has been attempted (even if its HRESULT failed),
 // replaying native DrawPrimitiveUP could double-blend particles or leave the

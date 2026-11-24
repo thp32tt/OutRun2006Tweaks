@@ -27,6 +27,8 @@ public:
     }
     bool prepare(IDirect3DDevice9* d, const void* left, const void* right,
                  std::uint32_t vertices, std::uint32_t stride) noexcept {
+        // A rejected prepare must never leave a previous eye pair bindable.
+        stride_ = 0;
         if (!d || !left || !right || !stride || !vertices ||
             vertices > kMaxPerEyeBytes / stride)
             return false;
@@ -38,7 +40,10 @@ public:
             const HRESULT created = d->CreateVertexBuffer(
                 kCapacity, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, 0,
                 D3DPOOL_DEFAULT, &buffer_, nullptr);
-            if (FAILED(created) || !buffer_) return false;
+            if (FAILED(created) || !buffer_) {
+                invalidate(); // release even an unexpected pointer on failure
+                return false;
+            }
             writeOffset_ = 0;
         }
         const std::uint32_t alignment =
@@ -48,15 +53,16 @@ public:
             total > kCapacity - writeOffset_ - alignment;
         const std::uint32_t start = discard ? 0u : writeOffset_ + alignment;
         void* mapped = nullptr;
-        if (FAILED(buffer_->Lock(start, total, &mapped,
-                discard || start == 0 ? D3DLOCK_DISCARD : D3DLOCK_NOOVERWRITE))
-            || !mapped)
-            return false;
-        std::memcpy(mapped, left, eyeBytes);
-        std::memcpy(static_cast<std::uint8_t*>(mapped) + eyeBytes,
-                    right, eyeBytes);
-        if (FAILED(buffer_->Unlock())) {
-            invalidate();
+        const HRESULT locked = buffer_->Lock(start, total, &mapped,
+            discard || start == 0 ? D3DLOCK_DISCARD : D3DLOCK_NOOVERWRITE);
+        if (!FinishMappedParticleUpload(SUCCEEDED(locked), mapped,
+                [&](void* dst) {
+                    std::memcpy(dst, left, eyeBytes);
+                    std::memcpy(static_cast<std::uint8_t*>(dst) + eyeBytes,
+                                right, eyeBytes);
+                },
+                [&]() { return SUCCEEDED(buffer_->Unlock()); })) {
+            invalidate(); // no uncommitted/locked buffer may be reused
             return false;
         }
         stride_ = stride;

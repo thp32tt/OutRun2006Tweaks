@@ -1,5 +1,6 @@
 #include "../src/vr/game/external_car_stereo_receipt.hpp"
 #include "../src/vr/game/dino_external_original_car_gate.hpp"
+#include "../src/vr/d3d9/r30_particle_upload_policy.hpp"
 #include <cassert>
 using namespace OutRunVR::DinoSidecar;
 
@@ -12,6 +13,29 @@ static OriginalCarGate Admitted() {
     return gate;
 }
 int main() {
+    // R30 DynamicVB: exercise the actual portable Lock/Unlock transaction
+    // used by the dual-eye ring before either native raw draw is admitted.
+    for(unsigned mask=0;mask<8;++mask) {
+        const bool locked=(mask&1u)!=0, mapped=(mask&2u)!=0;
+        const bool unlockOk=(mask&4u)!=0;
+        int value=0, copies=0, unlocks=0;
+        const bool ready=OutRunVR::R30ParticleUpload::FinishMappedParticleUpload(
+            locked,mapped?&value:nullptr,
+            [&](void* p) { assert(unlocks==0); ++copies; *static_cast<int*>(p)=42; },
+            [&]() { ++unlocks; return unlockOk; });
+        assert(copies==int(locked&&mapped));
+        assert(unlocks==int(locked));
+        assert(ready==(locked&&mapped&&unlockOk));
+        assert(value==(locked&&mapped?42:0));
+        // The no-raster failure may fall back, but dirty stream or an
+        // attempted physical draw must never be replayed.
+        if(!ready) {
+            using OutRunVR::R30ParticleUpload::MayUseNativeUpAfterGpuAttempt;
+            assert(MayUseNativeUpAfterGpuAttempt(false,true,true));
+            assert(!MayUseNativeUpAfterGpuAttempt(true,true,true));
+            assert(!MayUseNativeUpAfterGpuAttempt(false,false,true));
+        }
+    }
     ExternalStereoMeshReceipt r{};
     r.expectedPose=44;
     assert(!r.Complete());
