@@ -15,5 +15,13 @@ struct Attempt final {
         return Handled(R30StateRestore::ResultAfterRestore(
             hr,restored,restoreError));
     }
+    // Decline only if no native draw was attempted and restoration was clean.
+    // Preserve real driver HRESULTs even when they equal the decline sentinel.
+    static constexpr Attempt AfterRoute(Result hr, bool attempted, bool restored,
+                                        Result declineHr, Result restoreError) noexcept {
+        if (!attempted && restored && hr == declineHr) return Declined();
+        if (!attempted && !restored && hr == declineHr) return Handled(restoreError);
+        return AfterDraw(hr, restored, restoreError);
+    }
 };
 } // namespace OutRunVR::StereoLowerDraw

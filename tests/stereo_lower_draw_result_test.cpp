@@ -45,6 +45,24 @@ int main() {
             assert(d.physicalLeft==1 && d.lowerCalls==0);
         }
     }
+    // R30 -> support API -> R32 -> R33 indexed route uses the same typed
+    // outcome; simulate a real raw indexed UP attempt and both VB/IB restores.
+    for (bool stream : {false,true}) for (bool indices : {false,true}) {
+        for (bool attempted : {false,true}) {
+            for (Result hr : {NotImpl,Fail,Ok}) {
+                const bool restored = stream && indices;
+                const auto a = Attempt::AfterRoute(hr,attempted,restored,NotImpl,Fail);
+                unsigned lowerCalls = 0;
+                const auto finalHr = a.handled ? a.hr : (++lowerCalls,Ok);
+                const bool decline = !attempted && restored && hr==NotImpl;
+                assert(a.handled == !decline);
+                assert(lowerCalls == (decline ? 1u : 0u));
+                const auto expected = decline ? Ok :
+                    (!restored && ((!attempted && hr==NotImpl) || hr>=0) ? Fail : hr);
+                assert(finalHr == expected);
+            }
+        }
+    }
     static_assert(Attempt::AfterDraw(NotImpl,true,Fail).handled);
     static_assert(Attempt::AfterDraw(Ok,false,Fail).hr==Fail);
 }

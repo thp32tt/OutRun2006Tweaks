@@ -7237,19 +7237,19 @@ namespace OutRunVRStereo
             });
         }
 
-        HRESULT R30TryXyzrhwIndexedPrimitiveVB(
+        OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30TryXyzrhwIndexedPrimitiveVB(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
             R30XyzrhwState state{};
             if (!R30PrepareXyzrhwState(device, state))
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             const UINT indexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
             if (!indexCount || !numVertices || indexCount > 524288u)
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             IDirect3DVertexBuffer9* vb = nullptr;
             IDirect3DIndexBuffer9* ib = nullptr;
@@ -7262,7 +7262,7 @@ namespace OutRunVRStereo
             {
                 if (ib) ib->Release();
                 if (vb) vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             R30EnsureVertexBufferHooks(vb);
@@ -7275,7 +7275,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
             const UINT indexSize =
                 ibShadow->indexFormat == D3DFMT_INDEX16 ? 2u : 4u;
@@ -7289,7 +7289,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             R30ScratchLease lease;
@@ -7297,7 +7297,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
             auto& scratch = *lease.buffers;
             if (!R30CopyIndexShadow(ibShadow,
@@ -7308,7 +7308,7 @@ namespace OutRunVRStereo
                 ib->Release();
                 vb->Release();
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             // The already-shadowed index source needs no intermediate
@@ -7356,7 +7356,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             const std::uint64_t vertexCount64 =
@@ -7365,7 +7365,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
             const UINT vertexCount = static_cast<UINT>(vertexCount64);
 
@@ -7380,7 +7380,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             if (!R30CopyVertexShadow(vbShadow,
@@ -7391,7 +7391,7 @@ namespace OutRunVRStereo
                 ib->Release();
                 vb->Release();
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             // The first index pass has already validated physical addresses
@@ -7432,7 +7432,7 @@ namespace OutRunVRStereo
                 {
                     ib->Release();
                     vb->Release();
-                    return E_NOTIMPL;
+                    return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
                 }
 
                 for (UINT i = 0; i < indexCount; ++i)
@@ -7450,7 +7450,7 @@ namespace OutRunVRStereo
                     {
                         ib->Release();
                         vb->Release();
-                        return E_NOTIMPL;
+                        return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
                     }
                     if (!scratch.used[static_cast<std::size_t>(local)])
                     {
@@ -7466,7 +7466,7 @@ namespace OutRunVRStereo
                         {
                             ib->Release();
                             vb->Release();
-                            return E_NOTIMPL;
+                            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
                         }
                         ++knownUsedCount;
                         scratch.used[static_cast<std::size_t>(local)] = 1;
@@ -7505,10 +7505,12 @@ namespace OutRunVRStereo
                 ib->Release();
                 vb->Release();
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return E_NOTIMPL;
+                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
+            bool leftAttempted = false;
             auto leftDraw = [&]() {
+                leftAttempted = true;
                 return R29OwnerCallRawDrawIndexedPrimitiveUP(
                     device, type, 0u, vertexCount, primitiveCount,
                     rebased, ibShadow->indexFormat, scratch.left.data(), stride);
@@ -7540,8 +7542,9 @@ namespace OutRunVRStereo
             }
             ib->Release();
             vb->Release();
-            return OutRunVR::R30StateRestore::ResultAfterRestore(
-                hr, restoreOk, static_cast<HRESULT>(E_FAIL));
+            return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::AfterRoute(
+                hr, leftAttempted, restoreOk, static_cast<HRESULT>(E_NOTIMPL),
+                static_cast<HRESULT>(E_FAIL));
         }
 
         // Called on every eligible FlatPerspectiveEffect draw. The cache key
@@ -8595,11 +8598,11 @@ namespace OutRunVRStereo
                 OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
                 return E_FAIL;
             }
-            const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
+            const auto xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
-            if (xyzrhw != E_NOTIMPL)
-                return xyzrhw;
+            if (xyzrhw.handled)
+                return xyzrhw.hr;
 
             auto actual = [&]() {
                 return R29OwnerCallRawDrawIndexedPrimitive(device, type,
@@ -8963,7 +8966,7 @@ namespace OutRunVRStereo
         return R30TryFixedFunctionOriginalSpriteIndexedUP(
             d,t,m,n,p,indices,format,vertices,stride);
     }
-    HRESULT R30SupportTryXyzrhwIndexedPrimitiveVB(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept
     {

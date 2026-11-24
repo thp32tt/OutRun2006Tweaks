@@ -1,4 +1,5 @@
 #pragma once
+#include "../game/stereo_lower_draw_result.hpp"
 // Behavior-neutral R30/lower-owner services consumed by R31.
 //
 // R31 is being prepared for independent translation-unit compilation. These
@@ -73,7 +74,7 @@ namespace OutRunVRStereo
         UINT minVertex, UINT vertexCount, UINT p,
         const void* indices, D3DFORMAT format,
         const void* vertices, UINT stride) noexcept;
-    HRESULT R30SupportTryXyzrhwIndexedPrimitiveVB(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R30SupportTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept;
     HRESULT R30SupportTryXyzrhwPrimitiveUP(

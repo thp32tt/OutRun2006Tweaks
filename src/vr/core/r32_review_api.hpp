@@ -1,4 +1,5 @@
 #pragma once
+#include "../game/stereo_lower_draw_result.hpp"
 // Explicit R32 functional-owner boundary consumed by the R33 final dispatcher.
 //
 // This interface is intentionally behavior-neutral. R32 still owns the same
@@ -198,7 +199,7 @@ namespace OutRunVRStereo
     HRESULT R32ReviewTryXyzrhwPrimitiveVB(
         IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
         UINT startVertex, UINT primitiveCount) noexcept;
-    HRESULT R32ReviewTryXyzrhwIndexedPrimitiveVB(
+    OutRunVR::StereoLowerDraw::Attempt<HRESULT> R32ReviewTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
         INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
         UINT startIndex, UINT primitiveCount) noexcept;

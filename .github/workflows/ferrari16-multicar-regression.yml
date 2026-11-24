@@ -119,6 +119,13 @@ jobs:
           assert 'RuntimeExternalCarAtomicStageReady()' in native
           assert native.index('RuntimeExternalCarAtomicStageReady()') < native.index('EnsureResources(device)')
           assert mid_dip.index('MaySubmitExternalCarLiveEye()') < mid_dip.index('R30TryXyzrhwIndexedPrimitiveVB(')
+          indexed_owner = mid_dispatch[mid_dispatch.index('Attempt<HRESULT> R30TryXyzrhwIndexedPrimitiveVB('):mid_dispatch.index('// Called on every eligible FlatPerspectiveEffect draw.')]
+          assert indexed_owner.index('leftAttempted = true;') < indexed_owner.index('return R29OwnerCallRawDrawIndexedPrimitiveUP(')
+          assert indexed_owner.index('SetStreamSource(0, vb, streamOffset, stride)') < indexed_owner.index('SetIndices(ib)')
+          assert 'hr, leftAttempted, restoreOk' in indexed_owner
+          assert 'if (xyzrhw.handled)' in mid_dip and 'return xyzrhw.hr;' in mid_dip
+          assert 'if (xyzrhw.handled)' in final_dip and 'return xyzrhw.hr;' in final_dip
+          assert 'xyzrhw != E_NOTIMPL' not in final_dip
           assert 'ProveExternalNoPhysicalDraw();' in mid_dip
           assert final_dip.index('MaySubmitExternalCarLiveEye()') < final_dip.index('const bool telemetry = R33TelemetryEnabled();')
           assert 'ProveExternalNoPhysicalDraw();' in final_dip[final_dip.index('MaySubmitExternalCarLiveEye()'):final_dip.index('const bool telemetry = R33TelemetryEnabled();')]
