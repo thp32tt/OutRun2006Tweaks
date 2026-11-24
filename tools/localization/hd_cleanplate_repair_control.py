@@ -38,7 +38,7 @@ def validate_completed_feedback(state,pointer):
         return None
     records=state.get("records",{})
     # No feedback generation until the entire 104-atlas batch was reviewed.
-    if len(records)!=104 or any(x.get("status")!="DONE" for x in records.values()):
+    if len(records)!=104 or any(x.get("status") not in ("DONE","HOLD_SEND_UNCERTAIN","HOLD_RESPONSE_TIMEOUT") for x in records.values()):
         return None
     result=[]
     for t,record in records.items():
@@ -59,12 +59,15 @@ def prepare(asset_sha,out):
     if not H40.fullmatch(asset_sha):raise ValueError("BAD_ASSET_SHA")
     pointer,_=read(ROOT+"/latest.json")
     gen=1;proposals=[]
-    if pointer and pointer.get("asset_sha")==asset_sha:
-        if pointer.get("generation",1)>=2:return "skip",2
+    if pointer:
         state,_=read(ROOT+"/visual/run-"+str(pointer["run_id"])+".json")
         candidates=validate_completed_feedback(state,pointer)
-        if not candidates:return "skip",1
-        gen=2;proposals=candidates
+        # A new source-branch commit must not discard an in-flight 104-DDS
+        # review. Keep the active manifest until terminal receipts exist.
+        if candidates is None:return "skip",int(pointer.get("generation",1))
+        if pointer.get("asset_sha")==asset_sha:
+            if pointer.get("generation",1)>=2 or not candidates:return "skip",int(pointer.get("generation",1))
+            gen=2;proposals=candidates
     Path(out).write_text(json.dumps({"schema":"outrun.hd.cleanplate-feedback.v1","proposals":proposals}),encoding="utf-8")
     return "build",gen
 
