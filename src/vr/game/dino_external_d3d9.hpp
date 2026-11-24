@@ -698,9 +698,11 @@ public:
         // Return BEFORE D3D state setup, resource creation or any DIP so
         // the original 49F3E0 player callback remains the sole raster owner.
         if(!RuntimeExternalCarAtomicStageReady())return result;
+        // A stale/invalid ticket must not consume retry budget or start
+        // any expensive DDS/mesh preparation.
+        if(!device || expectedNativeFrame==0 || expectedPose==0)return result;
         if(!stereoRetry_.AllowNativeAttempt())return result;
-        if(!EnsureResources(device) || expectedNativeFrame==0 || expectedPose==0)
-            return result;
+        if(!EnsureResources(device))return result;
         for(const auto& mesh:meshes_) {
             const auto* binding=DashboardFor(mesh);
             if(DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask))
@@ -709,9 +711,13 @@ public:
         // Nothing drawable: do not mutate render state or quarantine GPU.
         if(result.receipt.expectedMeshes==0)return result;
         IDirect3DStateBlock9* saved=nullptr;
-        if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&saved))||!saved)
+        if(!CaptureExternalDrawState(saved,stereoRetry_,
+            [&](IDirect3DStateBlock9** out) noexcept {
+                return SUCCEEDED(device->CreateStateBlock(D3DSBT_ALL,out));
+            },
+            [&]() noexcept {return SUCCEEDED(saved->Capture());},
+            [&]() noexcept {saved->Release();}))
             return result;
-        if(FAILED(saved->Capture())){saved->Release();return result;}
         HRESULT hr=S_OK;
         bool eyeProofOnlyFailure=false;
         const DWORD fvf=D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1;

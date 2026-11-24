@@ -17,4 +17,17 @@ struct ExternalStereoRetryPolicy final {
     }
     void OnSelectionOrDeviceReset() noexcept { remaining=0; }
 };
+// Creation/capture failure occurs before render state changes or raster.
+// Retain the uploaded model, but avoid allocating another full state block
+// on every native callback. A defensive release handles a nonnull output
+// even on a failed create. Successful capture transfers ownership to caller.
+template<class State,class Create,class Capture,class Release>
+inline bool CaptureExternalDrawState(State*& state,
+    ExternalStereoRetryPolicy& retry,Create create,Capture capture,
+    Release release) noexcept {
+    if(create(&state) && state && capture())return true;
+    if(state) {release();state=nullptr;}
+    retry.OnSoftStereoFailure();
+    return false;
+}
 } // namespace OutRunVR::DinoSidecar

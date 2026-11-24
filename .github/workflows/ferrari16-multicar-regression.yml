@@ -134,7 +134,10 @@ jobs:
           assert 'D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE' in native
           assert 'D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE' in native
           assert 'RuntimeExternalCarAtomicStageReady()' in native
-          assert native.index('RuntimeExternalCarAtomicStageReady()') < native.index('EnsureResources(device)')
+          assert native.index('RuntimeExternalCarAtomicStageReady()') < native.index('if(!device || expectedNativeFrame==0 || expectedPose==0)') < native.index('stereoRetry_.AllowNativeAttempt()') < native.index('EnsureResources(device)')
+          assert native.index('CaptureExternalDrawState(saved,stereoRetry_') < native.index('saved->Capture()') < native.index('device->SetVertexShader(nullptr)')
+          assert 'return SUCCEEDED(device->CreateStateBlock(D3DSBT_ALL,out));' in native
+          assert '[&]() noexcept {saved->Release();}' in native
           assert mid_dip.index('MaySubmitExternalCarLiveEye()') < mid_dip.index('R30TryXyzrhwIndexedPrimitiveVB(')
           indexed_owner = mid_dispatch[mid_dispatch.index('Attempt<HRESULT> R30TryXyzrhwIndexedPrimitiveVB('):mid_dispatch.index('// Called on every eligible FlatPerspectiveEffect draw.')]
           assert indexed_owner.index('leftAttempted = true;') < indexed_owner.index('return R29OwnerCallRawDrawIndexedPrimitiveUP(')
