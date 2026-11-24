@@ -1703,7 +1703,8 @@
                 "conclusion": null,
                 "sha": "0e4c562c57817a3433fb132774262c6128aea5e8"
               }
-            ]
+            ],
+            "followup_verified": "2026-11-25 01:30 KST: recorded source run 45432282027 Win32 Release build and 45432281772 exact-sha-x86-x64-package jobs both completed success; no rerun or duplicate score."
           },
           "render_trace": [
             "Baseline 2446269a original player wrapper calls stock callback; current wrapper also unconditionally calls original PlayerCallbackHook with glass scope and static prohibition on skipping wrapper. External Prepare/Draw not invoked from this wrapper, so no claim current runtime gear symptom caused by this bug.",
@@ -1715,18 +1716,49 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Revisit R7 isolated L/R color/depth staging ownership and pre-raster fallback proof; keep atomic stage closed until implemented and verified. Also investigate unbound dashboard housing suppression by embedded needle mask, per-player telemetry provenance and decoded preview evidence as distinct hypotheses without speculative edits."
+        },
+        {
+          "cycle_key": "EXT16-011-20261125-0130-R7-WVP-RESTORE",
+          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "DX9Ex R7 left/right raster staging, depth ownership and right-eye failure restore",
+          "source_material_sha": "c5e5f56aded5cce88ca135a21b050a606c53e519",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r7.inc": "086443bd2462806d1fb59fdc5182c4990396f99e",
+            "src/vr/game/external_car_stereo_receipt.hpp": "a56525eca5db8a83c252c184108d260d763f7ca2",
+            "tests/external_car_stereo_receipt_test.cpp": "63acf4f50f6fb365e2181b07ed5a6f1e5e274d94"
+          },
+          "source_defect": "R7 SetWvpOneRegisterAtATime was shared by eye upload and three original WVP rollback paths. Failure on c64/c65/c66 aborts remaining independent c64-c67 writes, leaving stale eye constants even when remaining setters would succeed.",
+          "source_fix": "Keep early-stop eye upload. Add RestoreStereoWvpRegisters with sticky aggregate failure and always attempt every register; use for left upload rollback, left draw failure rollback, and right pass restoration. Preserve fixed-function/PBR separate restores, existing frame poison and external fail-closed admission.",
+          "positive_negative_regressions": [
+            "Local g++ C++17 -Wall -Wextra -Werror -pedantic exact helper fragment versus old loop: 16/16 masks pass; 14/16 old masks skip later independent restoration, all-success mask succeeds and all other masks report failure. Full committed suite not executed locally.",
+            "Committed existing receipt test covers all 16 outcomes, ordered four restore calls, clean/dirty pre-raster stock fallback, simulated RIGHT failure after LEFT live and rejection of no-raster proof even if all restores succeed. Physical GPU injection not performed."
+          ],
+          "same_sha_ci": {
+            "sha": "c5e5f56aded5cce88ca135a21b050a606c53e519",
+            "status": "UNVERIFIED",
+            "note": "Source ref push confirmed; workflow connector PR-only listing and combined status both returned empty. No full exact-SHA CI PASS asserted or rerun requested."
+          },
+          "render_trace": [
+            "R7 pre-raster external fence remains closed. ExecuteStereoDraw left DIP precedes RIGHT RT, depth, viewport and draw; even all four restored c64-c67 cannot undo live LEFT color/depth.",
+            "RestoreRightPassState attempts RT/depth/viewport then original WVP; after change each WVP register attempted independently. PBR c4/c8/pixel c1 and fixed-function VIEW/PROJECTION already attempt independent restores. No staging/publish activation."
+          ],
+          "protected_v003": "Only external automation branch shared legacy R7 failure recovery and portable receipt tests changed; no stable release, host, launcher, x86 player ABI, asset/license, deployment or material shader change.",
+          "asset_validation": "No private source/model/OVC/DDS or 16-car visual QA; no promotion; N100 unused.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Verify source exact SHA Windows x86/x64 and multicar CI. Trace isolated whole-car L/R color+depth staging with reset/epoch and actual right-eye failure proof; inspect R7 depth bootstrap/replay and surface ownership for concrete faults without opening external admission."
         }
       ],
-      "latest_material_sha": "0e4c562c57817a3433fb132774262c6128aea5e8",
-      "latest_static_ci": "Build: in_progress; Ferrari16 All-Car Sidecar Regression: success; Ferrari16 EXT16-005 Exact SHA Isolated Test Package: in_progress",
-      "next_focus": "Revisit R7 isolated L/R color/depth staging ownership and pre-raster fallback proof; keep atomic stage closed until implemented and verified. Also investigate unbound dashboard housing suppression by embedded needle mask, per-player telemetry provenance and decoded preview evidence as distinct hypotheses without speculative edits."
+      "latest_material_sha": "c5e5f56aded5cce88ca135a21b050a606c53e519",
+      "latest_static_ci": "Local portable WVP restore 16/16 PASS; exact-SHA Windows and full regression CI UNVERIFIED",
+      "next_focus": "Verify source exact SHA Windows x86/x64 and multicar CI. Trace isolated whole-car L/R color+depth staging with reset/epoch and actual right-eye failure proof; inspect R7 depth bootstrap/replay and surface ownership for concrete faults without opening external admission."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 01:02:00+09:00",
+  "last_updated_kst": "2026-11-25 01:32:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
