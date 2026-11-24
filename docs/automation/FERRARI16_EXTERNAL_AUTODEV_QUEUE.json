@@ -1347,18 +1347,54 @@
           "runtime_validation": "UNTESTED",
           "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
           "next_trace": "Implement/verify isolated whole-vehicle and dashboard color/depth stage with reset/epoch ownership; investigate R7 WVP restore loop short-circuit and actual right-eye failure after staged left. Confirm exact SHA CI without rerun."
+        },
+        {
+          "cycle_key": "EXT16-011-20261124-2100-F11-RAW-DIP-ATTEMPT",
+          "status": "PATCHED_LOCAL_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED_CONTINUE_ACTIVE",
+          "rotating_focus": "D3D9 R30/R33 direct/raw DIP bypass, HRESULT recovery, state restore and original fallback",
+          "source_material_sha": "699c9a08b3d1ed9747eb9b5473c6b97df68d7a3f",
+          "source_blob_sha1": {
+            ".github/workflows/ferrari16-multicar-regression.yml": "eccee065aaadf3b96234df248468a1c9230829b8",
+            "src/vr/core/r30_support_api.hpp": "e36c21fb490161334a51c0d9da762d84ef8451de",
+            "src/vr/core/r32_review_api.hpp": "6cb762d76a23ab76d70a6b4541d8c33ce9431326",
+            "src/vr/d3d9/stereo_renderer_r30.cpp": "4a1c42ff14cb732326ecffb8346ac17b86f88799",
+            "src/vr/d3d9/stereo_renderer_r32.cpp": "940211c4c9ec40963f60276d85532bbdf1a9cb81",
+            "src/vr/d3d9/stereo_renderer_r33.cpp": "2af53d696c2796b4efa1b784a4a2261c421b15fb",
+            "tests/stereo_lower_draw_result_test.cpp": "b5e4d7063b46fbf1a9ee44a7c8fc58404f39f45d"
+          },
+          "source_defect": "Active F11 XYZ ImGui owner returns raw LEFT HRESULT E_NOTIMPL, which final R33 treats as pre-raster decline and can route to FVF142 or generic DIP. RIGHT state restoration failure returns LEFT success; LEFT raw draw failure discarded overlay restore result.",
+          "source_fix": "Typed Attempt<HRESULT> across R30 F11 owner/support declaration/definition, R32 forwarding declaration/definition and final R33. Clean admission or clean pre-raster setup rollback alone declines. Dirty setup is handled E_FAIL, all actual LEFT attempts handled; propagate restore failure after LEFT success, preserve actual driver HRESULT, explicitly record failed LEFT overlay restoration. Existing right-only error with clean rollback preserves stock LEFT result and frame poison. Narrow CI bridge baseline allowance to exact signature replacement; add production F11 owner and final dispatch guards.",
+          "positive_negative_regressions": [
+            "Local g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic independently reproduced the exact Attempt/ResultAfterRestore fragment and new 24-case test matrix; PASS 24 outcomes, old duplicate risk 4, old false success 3. Not full exact-commit execution.",
+            "Existing committed stereo_lower_draw_result_test.cpp extends setup x projection restore x scissor restore x actual HRESULT combinations, asserts clean decline exactly one lower call, actual LEFT attempt zero lower calls, dirty success returns E_FAIL and actual error preserved. CI source assertions added; existing regression gates retained."
+          ],
+          "same_sha_ci": {
+            "sha": "699c9a08b3d1ed9747eb9b5473c6b97df68d7a3f",
+            "status": "UNVERIFIED",
+            "note": "Commit workflow connector returned empty (PR-only listing); no exact SHA push workflow conclusion observed. Prior R7 SHA CI remains unverified, not rerun. Local DNS unavailable; no N100 build."
+          },
+          "render_trace": [
+            "R33 DrawIndexedPrimitiveDestR33 pre-first-live external fence still before telemetry and raw route. F11 -> R32ReviewTryExternalImGuiIndexed -> R30SupportTryExternalImGuiIndexed -> R30TryExternalImGuiIndexed -> R29OwnerCallRawDrawIndexedPrimitive. Now handled result stops R62, XYZRHW and R33Dispatch after real native attempt.",
+            "F11 right RT/depth/viewport restore and projection/scissor restore remain separate; restoreOverlay executes both setters even on first failure. R30/R33 indexed XYZRHW and FVF142 handled fixes retained. PBR external meshes remain fail-closed and cannot enter F11 path.",
+            "Remaining R30/R33 PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW HRESULT sentinel call sites at R33 1973/2170/2242; R30 dynamic particle VB finishUp can return E_NOTIMPL after dirty restoration. Trace separately, not claimed fixed."
+          ],
+          "protected_v003": "No stable release branch, x86 player callback, host, launcher, or asset change. Shared F11 failure behavior modified only on external automation branch. Physical all-or-stock staging still absent.",
+          "asset_validation": "No private 16-car source, OVC, UV, PBR, glass, dashboard, licensing or model promotion performed.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Inspect R30/R33 remaining PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW sentinel and particle VB stream rollback; migrate only proven raw attempts and verify exact-SHA CI. Preserve original callback and fail-closed external staging."
         }
       ],
-      "latest_material_sha": "51f358184a9bf0a6477b424bdc0036403e686537",
-      "latest_static_ci": "LOCAL_R7_RESTORE_COUNTEREXAMPLE_PASS_EXACT_SHA_CI_UNVERIFIED",
-      "next_focus": "Implement/verify isolated whole-vehicle and dashboard color/depth stage with reset/epoch ownership; investigate R7 WVP restore loop short-circuit and actual right-eye failure after staged left. Confirm exact SHA CI without rerun."
+      "latest_material_sha": "699c9a08b3d1ed9747eb9b5473c6b97df68d7a3f",
+      "latest_static_ci": "LOCAL_F11_24_CASE_PASS_EXACT_SHA_CI_UNVERIFIED",
+      "next_focus": "Inspect R30/R33 remaining PrimitiveVB/PrimitiveUP/IndexedPrimitiveUP XYZRHW sentinel and particle VB stream rollback; migrate only proven raw attempts and verify exact-SHA CI. Preserve original callback and fail-closed external staging."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-24 20:33:00+09:00",
+  "last_updated_kst": "2026-11-24 21:02:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
