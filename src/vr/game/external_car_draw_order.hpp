@@ -38,6 +38,18 @@ inline void SortGlassBackToFront(GlassDepthItem* items,
         return a.viewZ==b.viewZ ? a.index<b.index : a.viewZ>b.viewZ;
     });
 }
+// The source owns UV interpolation; sampler ADDRESS_WRAP is independent.
+// Stage 0 is the final fixed-function stage, so its output must be CURRENT.
+// Shader TEXCOORD0/1/2 carry world position, normal and UV respectively.
+// A failed state setter must stop before any external raster submission.
+template<class SetCurrent,class SetWrap>
+inline bool ConfigureExternalTextureRouting(SetCurrent setCurrent,
+                                             SetWrap setWrap) noexcept {
+    if(!setCurrent())return false;
+    for(unsigned coordinate=0;coordinate<3u;++coordinate)
+        if(!setWrap(coordinate))return false;
+    return true;
+}
 static_assert(MeshInDrawPass(false,0u));
 static_assert(!MeshInDrawPass(true,0u));
 static_assert(MeshInDrawPass(true,1u));

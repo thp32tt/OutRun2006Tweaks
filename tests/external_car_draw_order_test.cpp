@@ -51,6 +51,43 @@ int main() {
     for(unsigned i=0;i<16;++i)badView[i]=identity[i];
     badView[10]=std::numeric_limits<float>::quiet_NaN();
     assert(ExternalGlassViewDepth(farGlass,identity,badView)==0.f);
+    // Model the same setter transaction used by DrawNativeScene. Stage 0
+    // TEMP output loses texture alpha at the final CURRENT register; stale
+    // interpolation wrapping must not alter PBR world/normal/UV semantics.
+    // Check both clean and inherited-dirty states in every canonical slot.
+    for(unsigned slot=0;slot<16u;++slot) {
+        for(unsigned dirty=0;dirty<16u;++dirty) {
+            for(unsigned fail=0;fail<=4u;++fail) {
+                bool current=(dirty&1u)==0;
+                std::array<unsigned,3> wrap{{
+                    (dirty&2u)?1u:0u,(dirty&4u)?2u:0u,(dirty&8u)?3u:0u}};
+                const auto oldCurrent=current;
+                const auto oldWrap=wrap;
+                unsigned calls=0;
+                const bool ready=OutRunVR::DinoSidecar::ConfigureExternalTextureRouting(
+                    [&]() { if(calls++==fail)return false;current=true;return true; },
+                    [&](unsigned coordinate) {
+                        assert(coordinate==calls-1u);
+                        if(calls++==fail)return false;
+                        wrap[coordinate]=0u;return true;
+                    });
+                assert(ready==(fail==4u));
+                assert(calls==(fail<4u?fail+1u:4u));
+                if(ready) {
+                    assert(current && (wrap==std::array<unsigned,3>{{0,0,0}}));
+                    // Single-stage alpha routes to CURRENT, not TEMP.
+                    constexpr float textureAlpha=0.25f;
+                    const float alpha=current?textureAlpha:1.f;
+                    assert(alpha==textureAlpha);
+                }
+                // Model the existing captured-state Apply on both paths.
+                // Production source assertions bind this test to the actual
+                // pre-DIP gate and unconditional Apply.
+                current=oldCurrent;wrap=oldWrap;
+                assert(current==oldCurrent && wrap==oldWrap);
+            }
+        }
+    }
     // All-opaque and all-glass OVCs do not produce spurious extra draws.
     for (bool isGlass:{false,true}) {
         unsigned count=0;

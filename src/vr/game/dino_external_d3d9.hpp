@@ -751,6 +751,14 @@ public:
            FAILED(device->SetRenderState(D3DRS_COLORWRITEENABLE,
                   D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
                   D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA)) ||
+           !ConfigureExternalTextureRouting(
+               [&]() { return SUCCEEDED(device->SetTextureStageState(
+                   0,D3DTSS_RESULTARG,D3DTA_CURRENT)); },
+               [&](unsigned coordinate) {
+                   constexpr D3DRENDERSTATETYPE states[]{
+                       D3DRS_WRAP0,D3DRS_WRAP1,D3DRS_WRAP2};
+                   return SUCCEEDED(device->SetRenderState(states[coordinate],0u));
+               }) ||
            FAILED(device->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_SELECTARG1)) ||
            FAILED(device->SetTextureStageState(0,D3DTSS_COLORARG1,D3DTA_TEXTURE)) ||
            FAILED(device->SetTextureStageState(0,D3DTSS_ALPHAOP,D3DTOP_SELECTARG1)) ||
