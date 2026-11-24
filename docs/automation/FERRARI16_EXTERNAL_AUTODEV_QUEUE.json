@@ -1900,7 +1900,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER26-GLASS-TEXTURE-ROUTING-STATE",
-          "status": "PATCHED_MULTICAR_HLSL_PASS_WINDOWS_CI_PENDING_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "Glass transparency and PBR shading: alpha sort in both eyes, normal-map shader paths, reflections and depth write regression",
           "source_material_sha": "5b561a24caa49f8daceafd1aeb0e119e246c5cfd",
           "source_blob_sha1": {
@@ -1922,14 +1922,14 @@
               {
                 "id": 45465747985,
                 "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "id": 45465747978,
                 "name": "Build",
-                "status": "in_progress",
-                "conclusion": null
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "id": 45465748157,
@@ -1956,13 +1956,63 @@
           "protected_v003": "External automation branch only; no stable release, host, launcher, player ABI, model bytes or rights change.",
           "asset_validation": "No private actual model/OVC/DDS or Quest3; synthetic tests only; N100 unused.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "score_state": "CREDITED_ONCE_AI2_2900_PLUS_1_EQUALS_2901_LEDGER_6fb66c43d289af74eeeffb75b6cdb5072636e915",
           "next_trace": "Verify remaining exact-SHA Windows build/package and score once. Trace animated-world glass sort and per-eye camera depth ordering, then design isolated pair color/depth staging without opening existing live raster fence; inspect PBR TBN/ORM semantic quality independently."
+        },
+        {
+          "cycle_key": "EXT16-011-ITER27-ROLLBACK-MANIFEST-CONTRACT",
+          "status": "PATCHED_MULTICAR_JOB_PASS_WINDOWS_CI_PENDING_CONTINUE_ACTIVE",
+          "rotating_focus": "Windows x86 DLL+x64 host exact-SHA tests: corrupt input, isolated install and reversible rollback",
+          "source_material_sha": "f48176adfe7a9fc7042a4c754306354b0bcbb6f0",
+          "source_blob_sha1": {
+            ".github/workflows/ferrari16-exact-sha-test-package.yml": "6b7341f31803146e158fad812575dd164d59df9e",
+            "tools/ferrari16/RESTORE-FERRARI16-ISOLATED.ps1": "d477c75da5afb6d8ad974cbaf198db614e5bcfbe"
+          },
+          "source_defect": "RESTORE trusted manifest Launchers properties as deletion paths, including an empty map or arbitrary filename with correct hash. A modified manifest could delete the game EXE or a sibling sentinel, or omit a launcher while returning PASS. Backup original hashes were trusted from the same manifest rather than independently matching PREPARE marker.",
+          "source_fix": "Require exact four canonical launcher names, case and SHA256 shape; validate all before any copy/remove, operate only on fixed names. Bind backup OriginalDll/Host to independent isolation marker; reject same source/test root. Existing installed payload, backup byte hashes, marker hash and process gates retained.",
+          "positive_negative_regressions": [
+            "Added eight Windows PowerShell 5.1 native negative cases using synthetic exact-SHA extracted package: missing/empty map, missing launcher, unrelated game file, outside sibling path, case alias, malformed hash, changed backup bytes plus matching manifest hash. Verify all eight tracked game files and outside sentinel remain unchanged; restore original fixture then existing successful rollback. No local Windows execution; native proof pending unless package workflow completes.",
+            "Exact-SHA multicar Linux job 138718714108 SUCCESS; prior 16-car parser regressions unchanged."
+          ],
+          "same_sha_ci": {
+            "sha": "f48176adfe7a9fc7042a4c754306354b0bcbb6f0",
+            "runs": [
+              {
+                "id": 45471033719,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45471033423,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45471033269,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ],
+            "multicar_job": 138718714108,
+            "multicar_job_status": "success"
+          },
+          "render_trace": [
+            "Package build -> SHA256/PE x86+x64 ZIP readback -> synthetic marker -> install backup -> restore. No change to render path, OVC/PBR shaders, launchers, or external admission fence.",
+            "Remaining isolation concerns: reparse/hardlink ancestors and partial rollback on second-copy/remove failure; no claim of full transactional or adversarial filesystem security."
+          ],
+          "protected_v003": "Only automation branch rollback script and native CI fixture changed. No real original installation touched; no game assets or rights changes.",
+          "asset_validation": "Synthetic Windows fixtures only; no private models or actual 16-car acceptance. N100 unused.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_FULL_EXACT_SHA_CI_AND_LEDGER",
+          "next_trace": "Verify native eight rollback negatives and exact SHA Windows build/package. Trace reparse/hardlink isolation and recoverability after partial copy/remove; then return to per-eye glass sorting and isolated whole-car color/depth pair staging."
         }
       ],
-      "latest_material_sha": "5b561a24caa49f8daceafd1aeb0e119e246c5cfd",
-      "latest_static_ci": "Exact-SHA multicar + Windows HLSL SUCCESS; Win32 build and x86/x64 package pending",
-      "next_focus": "Verify remaining exact-SHA Windows build/package and score once. Trace animated-world glass sort and per-eye camera depth ordering, then design isolated pair color/depth staging without opening existing live raster fence; inspect PBR TBN/ORM semantic quality independently."
+      "latest_material_sha": "f48176adfe7a9fc7042a4c754306354b0bcbb6f0",
+      "latest_static_ci": "Exact-SHA multicar Linux PASS; Windows build/package verification pending",
+      "next_focus": "Verify native eight rollback negatives and exact SHA Windows build/package. Trace reparse/hardlink isolation and recoverability after partial copy/remove; then return to per-eye glass sorting and isolated whole-car color/depth pair staging."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
