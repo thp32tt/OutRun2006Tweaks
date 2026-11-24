@@ -44,6 +44,27 @@ int main() {
     r.deviceRestoreFailed=false;
     r.reports=2;
     assert(!CanCompleteExternalStereoDraw(true,&r)); // duplicate report
+    // Inject each independent restore failure: projection restoration must
+    // still execute after a failed view restore. Both success is required.
+    for(unsigned mask=0;mask<4;++mask) {
+        unsigned viewCalls=0,projectionCalls=0;
+        const bool restored=RestoreExternalStereoTransformPair(
+            [&]() { ++viewCalls; return (mask&1u)!=0; },
+            [&]() { ++projectionCalls; return (mask&2u)!=0; });
+        assert(viewCalls==1 && projectionCalls==1);
+        assert(restored==(mask==3u));
+        r={};r.expectedPose=44;
+        ScopedExternalStereoMeshReceipt scope(r);
+        RecordExternalPreRasterRollback(restored);
+        assert(r.reports==0 && !r.Complete());
+        assert(CanFallbackAfterNoExternalRaster(r,0,0)==restored);
+        assert(ClassifyExternalEyeFailure(r)==(restored ?
+            ExternalEyeFailure::ProvenNoPhysicalDraw :
+            ExternalEyeFailure::DeviceRestoreFailed));
+        ProveExternalNoPhysicalDraw(); // later clean guard cannot erase fault
+        assert(r.provedNoPhysicalDraw==restored);
+        assert(r.deviceRestoreFailed==!restored);
+    }
     // First-mesh proven no-DIP is safe; missing or late reports are not.
     r={};r.expectedPose=44;
     {

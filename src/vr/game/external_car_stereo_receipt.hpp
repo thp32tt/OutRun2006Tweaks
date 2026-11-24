@@ -34,6 +34,8 @@ inline ExternalEyeFailure ClassifyExternalEyeFailure(
     const ExternalStereoMeshReceipt& r) noexcept
 {
     if(r.Complete())return ExternalEyeFailure::None;
+    // A failed pre-raster rollback is a hard device fault even with no DIP.
+    if(r.reports==0 && r.deviceRestoreFailed)return ExternalEyeFailure::DeviceRestoreFailed;
     if(r.reports==0)return r.provedNoPhysicalDraw ?
         ExternalEyeFailure::ProvenNoPhysicalDraw : ExternalEyeFailure::MissingReport;
     // Keep a physical RIGHT GPU fault visible even when the renderer chain
@@ -90,7 +92,24 @@ public:
 };
 inline void ProveExternalNoPhysicalDraw() noexcept {
     auto* r=ActiveExternalStereoMesh;
-    if(r && r->reports==0)r->provedNoPhysicalDraw=true;
+    if(r && r->reports==0 && !r->deviceRestoreFailed)r->provedNoPhysicalDraw=true;
+}
+// Restore both independent transforms even when the first setter fails.
+// Unlike eye upload, rollback must not short-circuit on the first error.
+template<class RestoreView,class RestoreProjection>
+inline bool RestoreExternalStereoTransformPair(RestoreView view,RestoreProjection projection) noexcept {
+    const bool viewOk=view();
+    const bool projectionOk=projection();
+    return viewOk && projectionOk;
+}
+inline void RecordExternalPreRasterRollback(bool restored) noexcept {
+    if(!ActiveExternalStereoMesh)return;
+    if(restored) {
+        ProveExternalNoPhysicalDraw();
+    } else {
+        ActiveExternalStereoMesh->provedNoPhysicalDraw=false;
+        ActiveExternalStereoMesh->deviceRestoreFailed=true;
+    }
 }
 inline bool CanFallbackAfterNoExternalRaster(
     const ExternalStereoMeshReceipt& r,unsigned attemptedBefore,

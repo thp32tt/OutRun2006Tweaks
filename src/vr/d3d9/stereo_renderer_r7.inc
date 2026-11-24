@@ -1425,11 +1425,12 @@ namespace OutRunVRStereo
 		bool RestoreFixedFunctionTransforms(IDirect3DDevice9* device,
 			const DrawStereoState& draw)
 		{
-			return device &&
-				SUCCEEDED(device->SetTransform(
-					D3DTS_VIEW, &draw.fixedOriginalView)) &&
-				SUCCEEDED(device->SetTransform(
-					D3DTS_PROJECTION, &draw.fixedOriginalProjection));
+			if(!device)return false;
+			return OutRunVR::DinoSidecar::RestoreExternalStereoTransformPair(
+				[&]() { return SUCCEEDED(device->SetTransform(
+					D3DTS_VIEW, &draw.fixedOriginalView)); },
+				[&]() { return SUCCEEDED(device->SetTransform(
+					D3DTS_PROJECTION, &draw.fixedOriginalProjection)); });
 		}
 
 		bool FormatHasStencil(D3DFORMAT format)
@@ -2210,8 +2211,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 							"left-eye fixed-function rollback":"left-eye c64 rollback");
 					if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {
                         // Partial GPU constant upload requires rollback proof.
-                        if(rolledBack)
-                            OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
+                        OutRunVR::DinoSidecar::RecordExternalPreRasterRollback(rolledBack);
                         return E_FAIL;
                     }
 					const HRESULT hr=drawCall();
