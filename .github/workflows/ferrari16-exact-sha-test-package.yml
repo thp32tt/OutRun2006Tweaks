@@ -115,6 +115,52 @@ jobs:
           & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game -Install *> $null
           if($LASTEXITCODE -eq 0){throw 'TAMPERED TEST COPY WAS ACCEPTED'}
           'synthetic ini' | Set-Content -LiteralPath (Join-Path $game 'OutRun2006Tweaks.ini')
+          # Exercise the actual PS5.1 install entry, not just the Python ZIP verifier.
+          $qaPath=Join-Path $out 'QA.json'
+          $qaBytes=[IO.File]::ReadAllBytes($qaPath)
+          $payload=Join-Path $out 'PAYLOAD/dinput8.dll'
+          $payloadBytes=[IO.File]::ReadAllBytes($payload)
+          foreach($case in @('missing-dll','missing-launcher','empty-map','missing-map',
+                              'unexpected-path','malformed-hash','changed-dll')){
+            $qa=[Text.Encoding]::UTF8.GetString($qaBytes)|ConvertFrom-Json
+            [IO.File]::WriteAllBytes($payload,$payloadBytes)
+            switch($case){
+              'missing-dll' {
+                $qa.ContentSha256.PSObject.Properties.Remove('PAYLOAD/dinput8.dll')
+                [IO.File]::WriteAllBytes($payload,[byte[]](1,2,3))
+              }
+              'missing-launcher' {
+                $qa.ContentSha256.PSObject.Properties.Remove('LAUNCHERS/RUN-FERRARI16-V003-ALL-CARS.cmd')
+              }
+              'empty-map' {$qa.ContentSha256=[pscustomobject]@{}}
+              'missing-map' {$qa.PSObject.Properties.Remove('ContentSha256')}
+              'unexpected-path' {
+                $qa.ContentSha256.PSObject.Properties.Remove('PAYLOAD/dinput8.dll')
+                $qa.ContentSha256|Add-Member -NotePropertyName '../unexpected.bin' -NotePropertyValue ('0'*64)
+              }
+              'malformed-hash' {$qa.ContentSha256.'PAYLOAD/dinput8.dll'='not-sha256'}
+              'changed-dll' {[IO.File]::WriteAllBytes($payload,[byte[]](1,2,3))}
+            }
+            ($qa|ConvertTo-Json -Depth 8)|Set-Content -LiteralPath $qaPath -Encoding UTF8
+            foreach($installMode in @($false,$true)){
+              $extra=@()
+              if($installMode){$extra=@('-Install')}
+              & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game @extra *> $null
+              if($LASTEXITCODE -eq 0){throw "INVALID PACKAGE ACCEPTED: $case install=$installMode"}
+              foreach($name in @('dinput8.dll','outrun-vr-host.exe')){
+                if((Get-FileHash -LiteralPath (Join-Path $game $name) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hashes[$name]){
+                  throw "Invalid package modified $name"
+                }
+              }
+              if(@(Get-ChildItem -LiteralPath $game -Filter 'FERRARI16_BACKUP_*').Count -or
+                 @(Get-ChildItem -LiteralPath $game -Filter 'RUN-FERRARI16-V003-*.cmd').Count){
+                throw 'Invalid package created backup or launcher'
+              }
+            }
+          }
+          [IO.File]::WriteAllBytes($qaPath,$qaBytes)
+          [IO.File]::WriteAllBytes($payload,$payloadBytes)
+          Write-Host 'PS51_PACKAGE_MANIFEST_NEGATIVE_14_PASS'
           & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game
           if($LASTEXITCODE -ne 0){throw 'Verify-only installer preflight failed'}
           if((Get-FileHash (Join-Path $game 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hashes['dinput8.dll']){
