@@ -4046,7 +4046,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER56-PBR-AMBIGUOUS-BITANGENT",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_APPLICABLE_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "Glass transparency and PBR shading: alpha sort in both eyes, normal-map shader paths, reflections and depth write regression",
           "source_material_sha": "598b991f0a0859a5137c81d8c9c0fdf128ac3727",
           "source_blob_sha1": {
@@ -4092,20 +4092,90 @@
           "protected_v003": "Only automation branch external PBR shader and existing regression. No changes to original PMT, x86 player ABI, native fallback, Quest focus, menu/dashboard, host/launcher, stable release or deployment. No change to pre-DIP atomic fence.",
           "asset_validation": "No actual 16 private GLB/OVC/DDS hashes, UV/normal/PBR/wheel/instrument QA, exact variant or rights checks; no promotion or upload.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_ITER56_SCORE_PENDING_EXACT_SHA_CI; iteration55 credited once AI2 2928+1=2929 ledger b7feefa481cb6d9083219bb7810549a814adad05",
-          "next_trace": "Confirm iteration56 exact SHA Windows Build and isolated x86 DLL/x64 host package. Trace normalMap implicit-gradient tex2D inside varying TBN predicate versus PS3 compiler lowering/explicit texldd; do not assume a compiled shader is invalid without disassembly. Trace R7 EnsureStereoResources initial allocation/restore receipt and external whole-vehicle eye-pair atomic staging; preserve original v0.03 wrapper and fail-closed gate."
+          "score_state": "CREDITED_ONCE_AI2_2929_PLUS_1_EQUALS_2930_LEDGER_48375e9753dcbf8ded643f12ade9b7ab702f1f6a",
+          "next_trace": "Confirm iteration56 exact SHA Windows Build and isolated x86 DLL/x64 host package. Trace normalMap implicit-gradient tex2D inside varying TBN predicate versus PS3 compiler lowering/explicit texldd; do not assume a compiled shader is invalid without disassembly. Trace R7 EnsureStereoResources initial allocation/restore receipt and external whole-vehicle eye-pair atomic staging; preserve original v0.03 wrapper and fail-closed gate.",
+          "followup_exact_sha_ci": {
+            "sha": "598b991f0a0859a5137c81d8c9c0fdf128ac3727",
+            "runs": [
+              {
+                "id": 45591067823,
+                "conclusion": "success"
+              },
+              {
+                "id": 45591067454,
+                "conclusion": "success"
+              },
+              {
+                "id": 45591067497,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "Actions API exact head_sha verified; HLSL, multicar, Win32 Release, x86 DLL/x64 host build and synthetic PS51 install/restore jobs confirmed."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER57-PE-SECTION-OVERLAP",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Windows x86 DLL+x64 host exact-SHA tests: 16-car corrupt input negatives, packaging, isolated launch and reversible rollback",
+          "source_material_sha": "95e16cd0c36100db29e683aa34384f854329a6d4",
+          "source_blob_sha1": {
+            "tools/ferrari16/pe_image_contract.py": "cb3a665d868bfd304e8ae7fe6a9dd58b83b3a425",
+            "tests/ferrari16_package_integrity_test.py": "3815917f2ecaebdb663a4a89607473ba57cdbf11"
+          },
+          "source_defect": "PE envelope checked each raw and virtual range in isolation but accepted overlapping ranges. Synthetic PE32 DLL and PE32+ EXE with distinct second section aliasing first raw bytes or RVA passed the old gate. Rehashed ZIP could therefore be accepted despite invalid/ambiguous section layout. No actual built payload corruption or Windows loader failure observed.",
+          "source_fix": "Collect bounded nonempty raw and virtual intervals; sort and reject strict overlaps, allow adjacent ranges and preserve empty intervals, entry check and architecture/role. This is a conservative package envelope contract, not a complete PE loader.",
+          "positive_negative_regressions": [
+            "Exact blob SHA verified for changed files, unchanged package entrypoint and old gate. N100 bounded Python unittest: 11/11 pass including two positive two-section architectures, 4 negative build cases and 4 negative rehashed ZIP cases, plus existing tests.",
+            "Direct old-vs-new: 4 synthetic architecture/overlap pairs old accepted, new rejected with expected reason. No real model inputs or runtime tests."
+          ],
+          "call_graph_trace": [
+            "build_package -> source_items -> assert_binaries -> assert_pe_image -> ZIP write -> verify_package -> SHA256SUMS and QA hash verification -> assert_binaries. Both build and readback share new gate.",
+            "Inspected INSTALL/RESTORE and existing workflow reparse/hardlink/hash-map/rollback tests. PREPARE only checks immediate source children before recursive copy; nested reparse and failure recovery need separate Windows proof. Extracted installer verifies hashes but does not run Python PE envelope. No speculative change to scripts this cycle.",
+            "No native render, stereo gate, PBR runtime or model asset changes."
+          ],
+          "same_sha_ci": {
+            "sha": "95e16cd0c36100db29e683aa34384f854329a6d4",
+            "runs": [
+              {
+                "id": 45595721351,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45595721403,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45595721412,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha verified via Actions API; full applicable CI not yet confirmed."
+          },
+          "protected_v003": "Automation branch only, no stable release, launch, native x86 player ABI, host, render or deployment changes. No game or third-party binary uploads.",
+          "asset_validation": "No actual private 16 GLB/OVC/DDS SHA or per-car UV/normal/PBR/wheel/instrument/rights validation; no promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_ITER57_SCORE_PENDING_EXACT_SHA_CI; iteration56 credited once AI2 2929+1=2930 ledger 48375e9753dcbf8ded643f12ade9b7ab702f1f6a",
+          "next_trace": "Verify iteration57 exact SHA Windows build, all-car and isolated package. Trace PREPARE recursive copy below top-level reparse guard, launcher INI mutation and rollback failure/partial restore receipts; independently inspect extracted installer architecture validation parity and R7 atomic staging. Preserve official v0.03 and no private model upload."
         }
       ],
-      "latest_material_sha": "598b991f0a0859a5137c81d8c9c0fdf128ac3727",
-      "latest_static_ci": "Iteration56 exact blob Python regression PASS; all-car regression success; Build and isolated x86/x64 package in_progress. Iteration55 three applicable exact workflows success, credited once.",
-      "next_focus": "Confirm iteration56 exact SHA Windows Build and isolated x86 DLL/x64 host package. Trace normalMap implicit-gradient tex2D inside varying TBN predicate versus PS3 compiler lowering/explicit texldd; do not assume a compiled shader is invalid without disassembly. Trace R7 EnsureStereoResources initial allocation/restore receipt and external whole-vehicle eye-pair atomic staging; preserve original v0.03 wrapper and fail-closed gate."
+      "latest_material_sha": "95e16cd0c36100db29e683aa34384f854329a6d4",
+      "latest_static_ci": "Iteration57 exact blob 11/11 Python tests and 4 old/new counterexamples PASS; all three exact workflows in_progress. Iteration56 three applicable exact workflows success, credited once.",
+      "next_focus": "Verify iteration57 exact SHA Windows build, all-car and isolated package. Trace PREPARE recursive copy below top-level reparse guard, launcher INI mutation and rollback failure/partial restore receipts; independently inspect extracted installer architecture validation parity and R7 atomic staging. Preserve official v0.03 and no private model upload."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T19:00:00+09:00",
+  "last_updated_kst": "2026-11-25T19:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
