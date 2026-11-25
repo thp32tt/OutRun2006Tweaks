@@ -23,6 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/ferrari16/verify_original_player_callback_abi.py --self-test
+          python3 tests/r29_raw_depth_receipt_test.py
           python3 tests/ferrari16_pbr_material_gate_test.py
           python3 tests/ferrari16_pbr_derivative_gate_test.py
           python3 tests/ferrari16_overlay_status_test.py
@@ -342,12 +343,12 @@ jobs:
           git fetch --depth=1 origin 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7
           test -z "$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- vrhost src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp Start-OutRun.cmd)"
 
-      - name: Restrict stereo changes to reviewed R7 R30 R33 and exact typed R32 bridge
+      - name: Restrict stereo changes to reviewed R7 R30 R33, exact R29 raw boundary and typed R32 bridge
         shell: bash
         run: |
           set -euo pipefail
           changed="$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- src/vr/d3d9)"
-          if grep -Ev '^src/vr/d3d9/(stereo_renderer_r(7\.inc|13\.cpp|30\.cpp|32\.cpp|33\.cpp)|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
+          if grep -Ev '^src/vr/d3d9/(stereo_renderer_r(7\.inc|13\.cpp|29\.cpp|30\.cpp|32\.cpp|33\.cpp)|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
             echo "$changed"
             exit 1
           fi
@@ -372,6 +373,18 @@ jobs:
           assert old13.count(marker13) == 1
           expected13 = old13.replace(marker13, b'            LastMainDepthClearStamp.Invalidate();', 1)
           assert Path(r13path).read_bytes() == expected13, 'Unreviewed R13 change'
+          # R29 raw wrappers bypass R7 ExecuteStereoDraw. Permit exactly
+          # four calls to its existing LEFT receipt revocation helper.
+          r29path = 'src/vr/d3d9/stereo_renderer_r29.cpp'
+          old29 = subprocess.check_output(['git','show',base+':'+r29path])
+          nl29 = b'\r\n' if b'\r\n' in old29 else b'\n'
+          begin29 = old29.index(b'    HRESULT R29OwnerCallRawDrawPrimitive(')
+          end29 = old29.index(b'    HRESULT R29OwnerCallRawPresent(',begin29)
+          raw29 = old29[begin29:end29]
+          import re
+          raw29, count29 = re.subn(rb'(?m)^        return Draw(?:Indexed)?Primitive(?:UP)?Hook\.stdcall<HRESULT>\(', lambda m: b'        RevokeDepthClearReplayBeforeLeftDraw(d);'+nl29+m.group(0),raw29)
+          assert count29 == 4
+          assert Path(r29path).read_bytes() == old29[:begin29]+raw29+old29[end29:], 'Unreviewed R29 change'
           paths = {
               'src/vr/d3d9/stereo_renderer_r32.cpp': ('R32Review', False),
               'src/vr/core/r32_review_api.hpp': ('R32Review', True),
