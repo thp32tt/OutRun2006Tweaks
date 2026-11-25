@@ -15,6 +15,42 @@ function Assert-NoReparsePath([string]$p) {
         $current=[IO.Path]::GetDirectoryName($current)
     }
 }
+# Hard links are not reparse points. A normal SHA256 match does not
+# prove that overwriting this filename cannot mutate another directory.
+function Assert-SingleLinkFile([string]$p) {
+    Assert-NoReparsePath $p
+    if(-not ('Ferrari16FileIdentity' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+public static class Ferrari16FileIdentity {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Info {
+        public uint Attributes, CreationLow, CreationHigh, AccessLow, AccessHigh;
+        public uint WriteLow, WriteHigh, VolumeSerial, SizeHigh, SizeLow;
+        public uint NumberOfLinks, FileIndexHigh, FileIndexLow;
+    }
+    [DllImport("kernel32.dll", SetLastError=true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetFileInformationByHandle(SafeFileHandle file, out Info info);
+}
+'@
+    }
+    $stream=[IO.File]::Open($p,[IO.FileMode]::Open,[IO.FileAccess]::Read,
+        ([IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete))
+    try {
+        $info=New-Object Ferrari16FileIdentity+Info
+        if(-not [Ferrari16FileIdentity]::GetFileInformationByHandle($stream.SafeFileHandle,[ref]$info)) {
+            throw "Cannot prove isolated file link count: $p"
+        }
+        if($info.NumberOfLinks -ne 1) {
+            throw "Hard link is not allowed in isolated overwrite target: $p"
+        }
+    } finally {
+        $stream.Dispose()
+    }
+}
 function Hash([string]$p) {
     if(!(Test-Path -LiteralPath $p -PathType Leaf)){throw "Missing file: $p"}
     Assert-NoReparsePath $p
@@ -84,6 +120,8 @@ $payloadDll=Join-Path $package 'PAYLOAD\dinput8.dll'
 $payloadHost=Join-Path $package 'PAYLOAD\outrun-vr-host.exe'
 $sourceDll=Join-Path $root 'dinput8.dll'
 $sourceHost=Join-Path $root 'outrun-vr-host.exe'
+Assert-SingleLinkFile $sourceDll
+Assert-SingleLinkFile $sourceHost
 foreach($name in @('OR2006C2C.exe','OutRun2006Tweaks.ini','dinput8.dll','outrun-vr-host.exe')) {
     if((Hash (Join-Path $root $name)) -ne [string]$m.OriginalHashes.$name) {
         throw "Test-copy original changed: $name; refuse overwrite."

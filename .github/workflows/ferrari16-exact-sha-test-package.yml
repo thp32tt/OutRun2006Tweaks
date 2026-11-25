@@ -150,6 +150,36 @@ jobs:
             [IO.Directory]::Delete($alias)
           }
           Write-Host 'PS51_JUNCTION_INSTALL_PREPARE_NEGATIVE_3_PASS'
+          # NTFS hard links carry no reparse attribute and identical bytes.
+          # Both destinations must be preflighted before ANY install write.
+          foreach($name in @('dinput8.dll','outrun-vr-host.exe')){
+            $target=Join-Path $game $name
+            $outside=Join-Path $env:RUNNER_TEMP ('Ferrari16InstallHardLink_'+$name)
+            New-Item -ItemType HardLink -Path $outside -Target $target -ErrorAction Stop|Out-Null
+            try {
+              foreach($installMode in @($false,$true)){
+                $extra=@()
+                if($installMode){$extra=@('-Install')}
+                $result=& powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game @extra 2>&1
+                if($LASTEXITCODE -eq 0 -or ($result|Out-String) -notmatch 'Hard link is not allowed'){
+                  throw "HARD LINK INSTALL NOT REJECTED: $name install=$installMode"
+                }
+                if((Get-FileHash -LiteralPath $outside).Hash.ToLowerInvariant() -ne $hashes[$name]){
+                  throw 'Install modified outside hard link'
+                }
+                foreach($file in $hashes.Keys){
+                  if((Get-FileHash -LiteralPath (Join-Path $game $file)).Hash.ToLowerInvariant() -ne $hashes[$file]){
+                    throw "Hard link install modified $file"
+                  }
+                }
+                if(@(Get-ChildItem -LiteralPath $game -Filter 'FERRARI16_BACKUP_*').Count -or
+                   @(Get-ChildItem -LiteralPath $game -Filter 'RUN-FERRARI16-V003-*.cmd').Count){
+                  throw 'Hard link install created backup or launcher'
+                }
+              }
+            } finally { Remove-Item -LiteralPath $outside -Force }
+          }
+          Write-Host 'PS51_HARDLINK_INSTALL_NEGATIVE_4_PASS'
           'tamper' | Add-Content -LiteralPath (Join-Path $game 'OutRun2006Tweaks.ini')
           & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game -Install *> $null
           if($LASTEXITCODE -eq 0){throw 'TAMPERED TEST COPY WAS ACCEPTED'}
@@ -293,6 +323,26 @@ jobs:
           [IO.File]::WriteAllBytes($manifest,$manifestBytes)
           [IO.File]::WriteAllBytes($backupDll,$backupBytes)
           Write-Host 'PS51_ROLLBACK_MANIFEST_NEGATIVE_8_PASS'
+          foreach($name in @('dinput8.dll','outrun-vr-host.exe')){
+            $target=Join-Path $game $name
+            $outside=Join-Path $env:RUNNER_TEMP ('Ferrari16RestoreHardLink_'+$name)
+            New-Item -ItemType HardLink -Path $outside -Target $target -ErrorAction Stop|Out-Null
+            try {
+              $result=& powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backup.FullName 2>&1
+              if($LASTEXITCODE -eq 0 -or ($result|Out-String) -notmatch 'Hard link is not allowed'){
+                throw "HARD LINK ROLLBACK NOT REJECTED: $name"
+              }
+              if((Get-FileHash -LiteralPath $outside).Hash -ne $before[$name]){
+                throw 'Rollback modified outside hard link'
+              }
+              foreach($file in $tracked){
+                if((Get-FileHash -LiteralPath (Join-Path $game $file)).Hash -ne $before[$file]){
+                  throw "Hard link rollback modified $file"
+                }
+              }
+            } finally { Remove-Item -LiteralPath $outside -Force }
+          }
+          Write-Host 'PS51_HARDLINK_ROLLBACK_NEGATIVE_2_PASS'
           & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backup.FullName
           if($LASTEXITCODE -ne 0){throw 'Rollback restore failed'}
           foreach($name in @('dinput8.dll','outrun-vr-host.exe')){
