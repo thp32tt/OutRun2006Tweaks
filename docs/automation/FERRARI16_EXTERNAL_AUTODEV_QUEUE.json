@@ -3081,7 +3081,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER43-RETAIL-GLASS-CALLBACK-SCOPE",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "Retail x86 body wrapper ABI 46BD30/469600: preserve stock dashboard, shadow, passengers and glass",
           "source_material_sha": "9a5266e7694768805c594b56e752b6bd58e254b5",
           "source_blob_sha1": {
@@ -3129,20 +3129,92 @@
           "protected_v003": "Automation branch only. No stable release, x86 trampoline ABI, game PMT geometry, passenger/shadow/dashboard renderer, PBR shaders, host, launcher, models or deployment changes. Ambiguous nested outer glass entries are conservatively left stock; actual nested frequency and appearance unmeasured. Live external raster gate still false. Local GitHub DNS failed; N100 used only for read-only exact-SHA CI API query, no build.",
           "asset_validation": "No private source/processed asset SHA or rights inspected; 16 repetitions are synthetic, not individual asset QA. No model promotion.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration42 credited once 2916+1=2917 ledger 2c7cf574628b8f7f0220fec7479d5ce161a22934",
-          "next_trace": "Trace v0.03 vs current menu/theatre focus and native frame begin/end plus R29/R30/R33 direct offscreen depth ownership. Review exact SHA iteration43 CI; continue separately with per-slot PBR and isolated whole-vehicle L/R color/depth staging; never promote body-only substitution without verified leaf ownership."
+          "score_state": "CREDITED_ONCE_AI2_2917_PLUS_1_EQUALS_2918_LEDGER_3a60227b08ce60a98c8e69cb897781c81678a6b1",
+          "next_trace": "Trace v0.03 vs current menu/theatre focus and native frame begin/end plus R29/R30/R33 direct offscreen depth ownership. Review exact SHA iteration43 CI; continue separately with per-slot PBR and isolated whole-vehicle L/R color/depth staging; never promote body-only substitution without verified leaf ownership.",
+          "followup_exact_sha_ci": {
+            "sha": "9a5266e7694768805c594b56e752b6bd58e254b5",
+            "runs": [
+              {
+                "id": 45540751010,
+                "conclusion": "success"
+              },
+              {
+                "id": 45540750918,
+                "conclusion": "success"
+              },
+              {
+                "id": 45540750890,
+                "conclusion": "success"
+              },
+              {
+                "id": 45540751011,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER44-ISOLATED-GAME-HOST-SCAN",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "v0.03 versus latest: 4:3 theatre/menu fullscreen, initial OpenXR focus and VDXR eye projections, no 2D fallback",
+          "source_material_sha": "6ddd2352709f769aa18385b857606b7c80ffc086",
+          "source_blob_sha1": {
+            "tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS.cmd": "f3056ca1f8c9292ad6e426a936652aeaec339b27",
+            "tools/ferrari16/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd": "01af6ad92f6b0c4b87689bde55b620713a13fa25",
+            "tools/ferrari16/RUN-FERRARI16-V003-MODEL-OFF.cmd": "d7d6a607947a36725406fd66ff740ec6b4163cb0",
+            "tools/ferrari16/RUN-FERRARI16-V003-PBR-TRACE.cmd": "5a2d1cb54cefc1e72b45ddb57a1e94c3b3455b75",
+            "tests/ferrari16_launcher_isolation_test.py": "c5eeeb88bb2de958cb518f6d482fbd4a0ebcf707"
+          },
+          "source_defect": "Previous isolated launch guard filters TASKLIST to outrun-vr-host.exe only. An existing OR2006C2C.exe without host (2D, startup or host failure) is removed from the scan, permitting a second game in either launch mode. Existing installer already guards both names. Duplicate VR games could contend over foreground and the named shared pose mapping/clientPid; no observed runtime evidence this caused the reported HMD issue.",
+          "source_fix": "Both launch routes in each of four isolated CMD files use the existing CHECK_HOST subroutine with one unfiltered TASKLIST CSV snapshot, success marker, reset both image flags, case-insensitive exact game and host image match, exit 88 on either conflict and 89 on unverified scan. Existing choice, explicit 2D, diagnostic env, hidden host prewarm and VR CLI unchanged. No global process kill.",
+          "positive_negative_regressions": [
+            "Source-derived JS precommit 52 cases (four launchers x 13 scan fixtures) PASS; old filtered game-only counterexample admitted all four. Committed regression tests add game-only, mixed-case, both images, failed scan with game, unrelated near-name, mutations removing reset/guard or reverting filter.",
+            "Exact committed GitHub source 5 blob SHA1 values verified with Git blob framing; full Python launcher suite executed from those bytes on N100: 11 methods, 9 pass, 2 Windows-only CMD methods skipped. Native CMD fixture extended for both image names and inherited game flag. No game/host launched."
+          ],
+          "call_graph_trace": [
+            "Start-OutRun.cmd baseline 2446269a and latest isolated VR launchers compared: physical HMD, 2496x2688, HUD 0.55/menu 0.75, hidden prewarm/direct-only settings preserved. Source outrun_renderer.cpp lines 598-653 maps fixed SharedMemoryName and publishes current PID, 659-697 publishes gameplay/theater and telemetry. R7 GameplayActive/StereoWanted and PresentDest lines 347-435, 2607-2720 trace gameplay admission, direct-only hold and final publication. No proven new projection/menu fault in that path yet.",
+            "Current fix is launch isolation, not a measured correction to OpenXR rendering or 4:3 aspect. Snapshot cannot eliminate simultaneous-launch TOCTOU; a cross-process launch mutex/ownership handshake would require separate design and native verification."
+          ],
+          "same_sha_ci": {
+            "sha": "6ddd2352709f769aa18385b857606b7c80ffc086",
+            "runs": [
+              {
+                "id": 45543918228,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45543918177,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45543918230,
+                "name": "Build",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha queried via read-only Actions API; HUD workflow absent from returned snapshot; no assumed pass."
+          },
+          "protected_v003": "Only isolated launcher and existing test file changes, no Start-OutRun.cmd, VR host source, D3D9 renderer, ABI, PBR, deployment or asset changes. ChatGPT local GitHub DNS unavailable; N100 used only for small Python test and read-only CI query. No full build.",
+          "asset_validation": "No actual 16 private models, source/processed asset SHA, licensing or quality promotion. No actual HMD render or measured FPS.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration43 credited once 2917+1=2918 ledger 3a60227b08ce60a98c8e69cb897781c81678a6b1",
+          "next_trace": "Trace all 16 OVC4 material-to-mesh DDS mip, tangent/UV, alpha and normal+ORM binding integrity, with exact positive and corrupt inputs; confirm iteration44 exact SHA Windows CMD/x86/x64 CI. Independently investigate R7 Present transition snapshot and direct GPU last-safe projection identity; do not enable unimplemented bilateral staging."
         }
       ],
-      "latest_material_sha": "9a5266e7694768805c594b56e752b6bd58e254b5",
-      "latest_static_ci": "Iteration43 local scoped helper ASan/UBSan pass; exact committed source integration checks pass; all four exact SHA workflows in progress. Iteration42 exact SHA all four success.",
-      "next_focus": "Trace v0.03 vs current menu/theatre focus and native frame begin/end plus R29/R30/R33 direct offscreen depth ownership. Review exact SHA iteration43 CI; continue separately with per-slot PBR and isolated whole-vehicle L/R color/depth staging; never promote body-only substitution without verified leaf ownership."
+      "latest_material_sha": "6ddd2352709f769aa18385b857606b7c80ffc086",
+      "latest_static_ci": "Iteration44 52 source model cases PASS, full launcher Python suite 9 pass/2 Windows CMD skips, 5 exact blob hashes verified. Three exact SHA workflows in progress in API snapshot. Iteration43 four exact SHA workflows success.",
+      "next_focus": "Trace all 16 OVC4 material-to-mesh DDS mip, tangent/UV, alpha and normal+ORM binding integrity, with exact positive and corrupt inputs; confirm iteration44 exact SHA Windows CMD/x86/x64 CI. Independently investigate R7 Present transition snapshot and direct GPU last-safe projection identity; do not enable unimplemented bilateral staging."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 12:30:00+09:00",
+  "last_updated_kst": "2026-11-25 13:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
