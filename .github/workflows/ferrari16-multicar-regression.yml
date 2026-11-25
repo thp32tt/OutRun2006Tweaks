@@ -163,6 +163,11 @@ jobs:
           assert route < native.index('D3DTSS_RESULTARG,D3DTA_CURRENT') < native.index('D3DRS_WRAP0,D3DRS_WRAP1,D3DRS_WRAP2') < native.index('D3DTSS_COLOROP,D3DTOP_SELECTARG1')
           assert 'SetRenderState(states[coordinate],0u)' in native
           assert native.index('device->DrawIndexedPrimitive(') < native.index('saved->Apply()')
+          glass_sort=native[native.index('std::array<GlassDepthItem,MaxGroups>'):native.index('SortGlassBackToFront(')]
+          assert 'AnimatedWorld(world,binding,dashboard)' in glass_sort
+          assert 'm.glassCenter,&meshWorld.m[0][0],&view.m[0][0],' in glass_sort
+          assert 'projection._34' in glass_sort
+          assert 'DashboardOverlayMeshVisible(' in glass_sort
           assert 'if(!RuntimeExternalCarAtomicStageReady())return result;' in native
           assert 'D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE' in native
           assert 'D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE' in native

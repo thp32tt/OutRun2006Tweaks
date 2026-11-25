@@ -831,9 +831,16 @@ public:
         unsigned glassCount=0u;
         if(SUCCEEDED(hr))for(unsigned i=0;i<meshes_.size();++i) {
             const auto& m=meshes_[i];
-            if(m.glass && glassCount<glassOrder.size())
+            if(m.glass && glassCount<glassOrder.size()) {
+                const auto* binding=DashboardFor(m);
+                if(!DashboardOverlayMeshVisible(binding,dashboard,
+                        embeddedNeedleMask,embeddedGearMask))continue;
+                // Sort using the same animated transform as the DIP.
+                const D3DMATRIX meshWorld=AnimatedWorld(world,binding,dashboard);
                 glassOrder[glassCount++]={i,ExternalGlassViewDepth(
-                    m.glassCenter,&world.m[0][0],&view.m[0][0])};
+                    m.glassCenter,&meshWorld.m[0][0],&view.m[0][0],
+                    projection._34)};
+            }
         }
         SortGlassBackToFront(glassOrder.data(),glassCount);
         if(SUCCEEDED(hr))for(unsigned pass=0;pass<2u && SUCCEEDED(hr);++pass)

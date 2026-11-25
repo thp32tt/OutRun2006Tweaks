@@ -18,8 +18,10 @@ struct GlassDepthItem {
 };
 inline float ExternalGlassViewDepth(const float center[3],
                                     const float* world,
-                                    const float* view) noexcept {
-    if(!center || !world || !view)return 0.f;
+                                    const float* view,
+                                    float projectionWZ) noexcept {
+    if(!center || !world || !view || !std::isfinite(projectionWZ) ||
+       projectionWZ==0.f)return 0.f;
     // D3D9 row-vector convention: local * world * view, camera-space z.
     const float x=center[0]*world[0]+center[1]*world[4]+
                   center[2]*world[8]+world[12];
@@ -28,7 +30,12 @@ inline float ExternalGlassViewDepth(const float center[3],
     const float z=center[0]*world[2]+center[1]*world[6]+
                   center[2]*world[10]+world[14];
     const float depth=x*view[2]+y*view[6]+z*view[10]+view[14];
-    return std::isfinite(depth)?depth:0.f;
+    // Perspective clip W = viewZ * projection._34 (plus _44).
+    // Retail OutRun uses _34=-1: visible points have NEGATIVE view Z.
+    // Sort by signed forward distance, not raw Z or abs(Z) (behind-eye
+    // geometry must not be mistaken for distant visible glass).
+    const float forward=projectionWZ<0.f ? -depth : depth;
+    return std::isfinite(forward)?forward:0.f;
 }
 inline void SortGlassBackToFront(GlassDepthItem* items,
                                  std::size_t count) noexcept {

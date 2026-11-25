@@ -32,25 +32,71 @@ int main() {
     constexpr float nearGlass[3]{0,0,1};
     constexpr float farGlass[3]{0,0,5};
     constexpr float middleGlass[3]{0,0,3};
-    assert(ExternalGlassViewDepth(nearGlass,identity,identity)==1.f);
-    assert(ExternalGlassViewDepth(farGlass,identity,identity)==5.f);
+    assert(ExternalGlassViewDepth(nearGlass,identity,identity,1.f)==1.f);
+    assert(ExternalGlassViewDepth(farGlass,identity,identity,1.f)==5.f);
     for(const float* eye:{leftView,rightView}) {
         std::array<GlassDepthItem,4> items{{
-            {2,ExternalGlassViewDepth(nearGlass,identity,eye)},
-            {0,ExternalGlassViewDepth(farGlass,identity,eye)},
-            {3,ExternalGlassViewDepth(middleGlass,identity,eye)},
-            {1,ExternalGlassViewDepth(farGlass,identity,eye)}
+            {2,ExternalGlassViewDepth(nearGlass,identity,eye,1.f)},
+            {0,ExternalGlassViewDepth(farGlass,identity,eye,1.f)},
+            {3,ExternalGlassViewDepth(middleGlass,identity,eye,1.f)},
+            {1,ExternalGlassViewDepth(farGlass,identity,eye,1.f)}
         }};
         SortGlassBackToFront(items.data(),items.size());
         assert(items[0].index==0 && items[1].index==1);
         assert(items[2].index==3 && items[3].index==2);
     }
+    // Retail right-handed projection: _34=-1 and forward Z is negative.
+    // Source-over is not commutative: near-first makes far glass overwrite
+    // the near tint. Test both eyes, both handedness conventions, ties and
+    // a point behind the eye; do not use abs(viewZ).
+    for(unsigned slot=0;slot<16u;++slot) {
+        for(const float* eye:{leftView,rightView}) {
+            for(float sign:{-1.f,1.f}) {
+                const float nearP[3]{0,0,sign};
+                const float farP[3]{0,0,5.f*sign};
+                const float behind[3]{0,0,-10.f*sign};
+                std::array<GlassDepthItem,4> items{{
+                    {2,ExternalGlassViewDepth(nearP,identity,eye,sign)},
+                    {1,ExternalGlassViewDepth(farP,identity,eye,sign)},
+                    {3,ExternalGlassViewDepth(behind,identity,eye,sign)},
+                    {0,ExternalGlassViewDepth(farP,identity,eye,sign)}
+                }};
+                SortGlassBackToFront(items.data(),items.size());
+                assert(items[0].index==0 && items[1].index==1 &&
+                       items[2].index==2 && items[3].index==3);
+                // With 50% opacity, far blue then near red leaves red dominant.
+                const auto blend=[](float src,float dst){return src*.5f+dst*.5f;};
+                const bool farFirst=items[0].index==0;
+                const float red=farFirst?blend(1.f,blend(0.f,0.f)):
+                    blend(0.f,blend(1.f,0.f));
+                const float blue=farFirst?blend(0.f,blend(1.f,0.f)):
+                    blend(1.f,blend(0.f,0.f));
+                assert(red==.5f && blue==.25f);
+                if(sign<0.f) {
+                    // Old raw-Z sort reverses the visible pair.
+                    std::array<GlassDepthItem,2> old{{
+                        {2,nearP[2]},{0,farP[2]}}};
+                    SortGlassBackToFront(old.data(),old.size());
+                    assert(old[0].index==2);
+                }
+                // Animation can move a mesh behind another glass group.
+                float animated[16];
+                for(unsigned k=0;k<16;++k)animated[k]=identity[k];
+                animated[14]=6.f*sign;
+                assert(ExternalGlassViewDepth(nearP,animated,eye,sign)>
+                       ExternalGlassViewDepth(farP,identity,eye,sign));
+            }
+        }
+    }
+    assert(ExternalGlassViewDepth(farGlass,identity,identity,0.f)==0.f);
+    assert(ExternalGlassViewDepth(farGlass,identity,identity,
+           std::numeric_limits<float>::quiet_NaN())==0.f);
     // Deliberately malformed/nonfinite camera matrices produce deterministic
     // keys rather than NaN comparisons with undefined sort ordering.
     float badView[16]{};
     for(unsigned i=0;i<16;++i)badView[i]=identity[i];
     badView[10]=std::numeric_limits<float>::quiet_NaN();
-    assert(ExternalGlassViewDepth(farGlass,identity,badView)==0.f);
+    assert(ExternalGlassViewDepth(farGlass,identity,badView,1.f)==0.f);
     // Model the same setter transaction used by DrawNativeScene. Stage 0
     // TEMP output loses texture alpha at the final CURRENT register; stale
     // interpolation wrapping must not alter PBR world/normal/UV semantics.
