@@ -98,11 +98,13 @@ assert "SetRenderTarget" not in owner and "SetDepthStencilSurface" not in owner 
 atomic_stub=r'''
 #include <cassert>
 #include <cstdint>
+#include <initializer_list>
 using HRESULT=int;
 using UINT=unsigned;
-constexpr int FALSE=0, E_FAIL=-1, S_OK=0;
+constexpr int FALSE=0, E_FAIL=-1, S_OK=0, D3DERR_NOTFOUND=-2;
 bool FAILED(HRESULT h){return h<0;}
 bool SUCCEEDED(HRESULT h){return h>=0;}
+struct D3DCAPS9 {UINT NumSimultaneousRTs=1;};
 struct D3DSURFACE_DESC {UINT Width=0,Height=0,Format=0,MultiSampleType=0,MultiSampleQuality=0;};
 struct D3DVIEWPORT9 {UINT X=0,Y=0,Width=0,Height=0;};
 struct RECT {int left=0,top=0,right=1920,bottom=1080;};
@@ -117,11 +119,18 @@ struct IDirect3DDevice9 {
     IDirect3DSurface9 made[32]{};
     unsigned calls=0,failAt=0,nullAt=0,mismatchAt=0;
     unsigned io=0,ioFail=0,clearCalls=0,liveWrites=0;
+    UINT capsTargets=1,capsCalls=0,auxCalls=0;
+    HRESULT capsHr=S_OK,auxHr[4]{S_OK,D3DERR_NOTFOUND,D3DERR_NOTFOUND,D3DERR_NOTFOUND};
+    IDirect3DSurface9* aux[4]{};
+    HRESULT GetDeviceCaps(D3DCAPS9* c){++capsCalls;c->NumSimultaneousRTs=capsTargets;return capsHr;}
     IDirect3DSurface9 *rt=nullptr,*depth=nullptr,*liveRt=nullptr,*liveDepth=nullptr;
     D3DVIEWPORT9 viewport{0,0,1920,1080};
     RECT scissor{4,5,1800,1000};
     HRESULT op(){return ++io==ioFail?E_FAIL:S_OK;}
-    HRESULT GetRenderTarget(unsigned,IDirect3DSurface9** s){*s=rt;if(rt)++rt->refs;return op();}
+    HRESULT GetRenderTarget(unsigned slot,IDirect3DSurface9** s){
+        if(slot){assert(slot<capsTargets);++auxCalls;*s=aux[slot];if(*s)++(*s)->refs;return auxHr[slot];}
+        *s=rt;if(rt)++rt->refs;return op();
+    }
     HRESULT GetDepthStencilSurface(IDirect3DSurface9** s){*s=depth;if(depth)++depth->refs;return op();}
     HRESULT GetViewport(D3DVIEWPORT9* v){*v=viewport;return op();}
     HRESULT GetScissorRect(RECT* r){*r=scissor;return op();}
@@ -154,7 +163,7 @@ int main(){
     assert(pair.eyes[0].color!=pair.eyes[1].color&&pair.eyes[0].depth!=pair.eyes[1].depth);
     assert(pair.eyes[0].color!=&lc&&pair.eyes[1].depth!=&rd);
     const auto gen=pair.generation;
-    assert(ensure()&&d.calls==4&&pair.generation==gen);
+    assert(ensure()&&d.calls==4&&pair.generation==gen&&d.capsCalls==1);
     pair.Reset();d.empty();assert(pair.generation!=gen&&!pair.device);
     assert(ensure()&&d.calls==8);pair.Reset();d.empty();
     for(unsigned k=1;k<=4;++k){
@@ -221,6 +230,45 @@ int main(){
     assert(R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,[&](){return d.clear();},2,1)==R7CandidateSeedResult::Unavailable);
     assert(d.io==before);
     pair.Reset();d.empty();
+    // Caps failures must precede all allocations; valid limits are cached.
+    for(unsigned limit: {0u,5u,4u}){
+        IDirect3DDevice9 bad;
+        bad.capsTargets=limit;bad.capsHr=limit==4?E_FAIL:S_OK;
+        assert(!pair.Ensure(&bad,&lc,&ld,&rc,&rd,vp));
+        assert(bad.calls==0&&bad.capsCalls==1&&!pair.device&&pair.simultaneousTargets==0);
+    }
+    IDirect3DSurface9 auxSurface{};
+    unsigned mrtCases=0;
+    for(unsigned limit=1;limit<=4;++limit){
+        IDirect3DDevice9 multi;multi.capsTargets=limit;
+        assert(pair.Ensure(&multi,&lc,&ld,&rc,&rd,vp));
+        assert(pair.simultaneousTargets==limit&&multi.capsCalls==1);
+        // 3 states (unbound, S_OK null, failure) plus bound with each HRESULT.
+        for(unsigned mask=0;mask<216;++mask){
+            unsigned state=mask;bool safe=true;unsigned expectedQueries=0;
+            for(unsigned slot=1;slot<limit;++slot){
+                const unsigned k=state%6;state/=6;
+                multi.aux[slot]=k>=3?&auxSurface:nullptr;
+                multi.auxHr[slot]=(k%3==0)?D3DERR_NOTFOUND:(k%3==1?S_OK:E_FAIL);
+                if(safe){++expectedQueries;safe=k<2;}
+            }
+            multi.io=multi.clearCalls=multi.liveWrites=multi.auxCalls=0;
+            multi.rt=multi.liveRt=&lc;multi.depth=multi.liveDepth=&ld;
+            multi.viewport=vp;multi.scissor={4,5,1800,1000};
+            const auto result=R7SeedInactivePair(pair,&multi,&lc,&ld,
+                [&](IDirect3DSurface9* a){return multi.bindColor(a);},
+                [&](IDirect3DSurface9* a){return multi.bindDepth(a);},
+                [&](){return multi.clear();});
+            assert(multi.auxCalls==expectedQueries&&auxSurface.refs==0);
+            assert(lc.refs==0&&ld.refs==0&&multi.rt==&lc&&multi.depth==&ld);
+            assert(multi.liveWrites==0&&multi.clearCalls==(safe?2u:0u));
+            assert(result==(safe?R7CandidateSeedResult::Seeded:R7CandidateSeedResult::Unavailable));
+            if(!safe)assert(multi.io==4); // capture only, no setter or raster
+            ++mrtCases;
+        }
+        pair.Reset();multi.empty();assert(pair.simultaneousTargets==0);
+    }
+    assert(mrtCases==864);
 }
 '''
 with tempfile.TemporaryDirectory() as temp:

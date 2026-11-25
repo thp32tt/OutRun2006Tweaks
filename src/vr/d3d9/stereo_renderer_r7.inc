@@ -1632,6 +1632,7 @@ namespace OutRunVRStereo
             Eye eyes[2]{};
             IDirect3DDevice9* device=nullptr; // non-owning; Reset retires pair
             D3DSURFACE_DESC colorDesc{},depthDesc{};
+            UINT simultaneousTargets=0;
             std::uint64_t generation=1;
             R7AtomicCandidatePair()=default;
             R7AtomicCandidatePair(const R7AtomicCandidatePair&)=delete;
@@ -1639,7 +1640,7 @@ namespace OutRunVRStereo
             ~R7AtomicCandidatePair(){ Reset(); }
             void Reset() noexcept {
                 for(auto& eye:eyes){ReleaseCom(eye.depth);ReleaseCom(eye.color);}
-                device=nullptr;colorDesc={};depthDesc={};
+                device=nullptr;colorDesc={};depthDesc={};simultaneousTargets=0;
                 if(++generation==0)++generation;
             }
             static bool Same(const D3DSURFACE_DESC& a,const D3DSURFACE_DESC& b) noexcept {
@@ -1665,6 +1666,11 @@ namespace OutRunVRStereo
                 if(device==d && Same(colorDesc,c)&&Same(depthDesc,z)&&
                     eyes[0].color&&eyes[0].depth&&eyes[1].color&&eyes[1].depth)return true;
                 Reset();
+                // Cache the immutable device limit with the allocation.
+                // Unknown/unsupported caps cannot establish RT isolation.
+                D3DCAPS9 caps{};
+                if(FAILED(d->GetDeviceCaps(&caps))||
+                    !caps.NumSimultaneousRTs||caps.NumSimultaneousRTs>4)return false;
                 R7AtomicCandidatePair pending;
                 for(auto& eye:pending.eyes){
                     if(FAILED(d->CreateRenderTarget(c.Width,c.Height,c.Format,
@@ -1681,7 +1687,7 @@ namespace OutRunVRStereo
                 for(unsigned i=0;i<2;++i){
                     eyes[i]=pending.eyes[i];pending.eyes[i]={};
                 }
-                device=d;colorDesc=c;depthDesc=z;
+                device=d;colorDesc=c;depthDesc=z;simultaneousTargets=caps.NumSimultaneousRTs;
                 return true; // allocated only; never a raster/publication proof
             }
         };
@@ -1718,6 +1724,17 @@ namespace OutRunVRStereo
                 (!requireFullViewport||(viewport.X==0&&viewport.Y==0&&
                  viewport.Width==pair.colorDesc.Width&&viewport.Height==pair.colorDesc.Height));
             if(!captured){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
+            // The shadow MRT flags are not a physical binding proof. Leaving
+            // any auxiliary target attached would let the replay write into
+            // the live scene, even though RT0 and depth are private.
+            bool isolated=pair.simultaneousTargets>=1&&pair.simultaneousTargets<=4;
+            for(UINT slot=1;isolated&&slot<pair.simultaneousTargets;++slot){
+                IDirect3DSurface9* aux=nullptr;
+                const HRESULT hr=d->GetRenderTarget(slot,&aux);
+                isolated=!aux&&(SUCCEEDED(hr)||hr==D3DERR_NOTFOUND);
+                ReleaseCom(aux);
+            }
+            if(!isolated){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
             bool seeded=true;
             for(unsigned i=firstEye;i<firstEye+eyeCount;++i){
                 const auto& eye=pair.eyes[i];
