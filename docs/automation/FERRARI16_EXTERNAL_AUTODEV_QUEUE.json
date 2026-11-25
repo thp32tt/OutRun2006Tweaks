@@ -3812,7 +3812,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER53-DEFERRED-QUEUE-APPEND-PROVENANCE",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "Retail x86 body wrapper ABI 46BD30/469600: preserve stock dashboard, shadow, passengers and glass, positive/negative call graph",
           "source_material_sha": "ed448a0550152d6a5fb463a810f338c68d19b86b",
           "source_blob_sha1": {
@@ -3867,20 +3867,100 @@
           "protected_v003": "Automation branch only. Conservative decision: on observed queue drift disable both deferred queue token sets for that frame, which can temporarily leave stock glass tint/reflection unchanged. Immediate scope and original wrapper remain. No asset, release, host or shader changes. Local GitHub DNS unavailable; bounded N100 source copies and portable probe only.",
           "asset_validation": "No private model source/processed SHA or actual 16-car visual/material/rights verification; no promotion.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration52 HUD CI failed, previous confirmed AI2 2926 unchanged",
-          "next_trace": "Verify iteration53 exact SHA Windows Build, isolated x86/x64 package, full HUD Inspector and all-car workflows. Examine deferred queue in-place descriptor replacement with unchanged backing/count, actual live register owner provenance, and scoped PMT material rollback under nested invocation. Do not introduce leaf suppression without retail ownership and whole-car atomic stage; trace persistent R33 dirty binding recovery and v0.03 theatre/focus parity on next applicable rotation."
+          "score_state": "CREDITED_ONCE_AI2_2926_PLUS_1_EQUALS_2927_LEDGER_4c5281084001662b020db350d7da8f85cf7761f4",
+          "next_trace": "Verify iteration53 exact SHA Windows Build, isolated x86/x64 package, full HUD Inspector and all-car workflows. Examine deferred queue in-place descriptor replacement with unchanged backing/count, actual live register owner provenance, and scoped PMT material rollback under nested invocation. Do not introduce leaf suppression without retail ownership and whole-car atomic stage; trace persistent R33 dirty binding recovery and v0.03 theatre/focus parity on next applicable rotation.",
+          "followup_exact_sha_ci": {
+            "sha": "ed448a0550152d6a5fb463a810f338c68d19b86b",
+            "runs": [
+              {
+                "id": 45577119745,
+                "conclusion": "success"
+              },
+              {
+                "id": 45577119739,
+                "conclusion": "success"
+              },
+              {
+                "id": 45577119779,
+                "conclusion": "success"
+              },
+              {
+                "id": 45577119725,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "Exact head_sha verified via Actions API."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER54-CLEAR-DIRTY-RESTORE-RECEIPT",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "v0.03 versus latest: 4:3 theatre/menu fullscreen, initial OpenXR focus and VDXR eye projections, no 2D fallback",
+          "source_material_sha": "04efee0fd7262f552c7127df1a0fa817721aca68",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r7.inc": "b28df68fe2ea1fad27e938e34581d4eed09a094d",
+            "tests/r7_depth_bootstrap_restore_test.py": "cd0f81067a7c214983978ab4fb30c813c8f7edc4"
+          },
+          "source_defect": "R7 ClearDest records a full LEFT depth receipt before RIGHT clear/restore. Failed RT/depth/viewport restoration was checked only after coverage certification and invalidated sync bits only for requested depth/stencil flags, leaving a current clear replay stamp. Color-only restore failure can leave both bits true and stale receipt live; depth clear dirty restore can authorize subsequent bootstrap using untrusted attachment identity. Returned successful LEFT HRESULT despite dirty device. Related original v0.03 also had late restore check; clear replay stamp lifetime introduced by prior automation makes this a concrete distinct regression boundary, not proof of user's reported focus/FPS issue.",
+          "source_fix": "Check dirty restoration immediately after RIGHT internal pass, before any coverage query or right sync certification. Invalidate both sync bits and clear stamp regardless of clear flags, NoteRestoreFailure, return E_FAIL. Preserve original LEFT result for clean restore (including ordinary RIGHT setup/clear failure) and theatre/offscreen/raw clear routes. No host, projection, menu, launch, PBR or asset edits.",
+          "positive_negative_regressions": [
+            "Exact committed actual ClearDest + RestoreRightPassState + bootstrap extracted C++ probe passed 5 flag sets x 9 injected failure/success positions + 4 clean offscreen/theatre/MRT/resource-miss routes = 49 cases. Assert same-call HRESULT, coverage query count, receipt revocation, both sync bits, no subsequent bootstrap calls and all independent restore operations. Existing R7 bootstrap and R33 bridge probes also PASS.",
+            "N100 bounded source downloads and portable compile only; full all-car CI exact SHA success. Mock RecordFullMainDepthClear and D3D9 driver calls, no real x86 driver fault injection or HMD pixels."
+          ],
+          "call_graph_trace": [
+            "Compared exact v0.03 2446269a vs current R7: GameplayActive, HostRenderEligible, StereoWanted, ProjectionFromFov function bodies identical. Start-OutRun.cmd blob 4e6206eed8bc7062a73471b04de412240ef94b62 identical; outrun_renderer.cpp only additional game reset event include and NotifyBeforeReset, ProjectionFromFov body identical. Prior isolated launcher physical settings preserve explicit VR selection, host hidden prewarm and direct-only settings. No runtime proof of menu/fullscreen focus, initial pose or no fallback.",
+            "StereoWanted -> ClearDest -> LEFT clear -> RecordFullMainDepthClear -> RIGHT RT/depth/viewport/clear -> RestoreRightPassState -> dirty veto before ClearCoversStereoBackbuffer -> no stale receipt bootstrap. Prior R7/R29/R30/R33 same-call dirty-bootstrap guard preserved.",
+            "EnsureStereoResources initial allocation still conflates setup and restoration failure and callers can fall through raw on resource miss; unresolved distinct next trace. Subsequent draw after dirty Clear and recovery remain unproven. No external atomic stage enable or asset promotion."
+          ],
+          "same_sha_ci": {
+            "sha": "04efee0fd7262f552c7127df1a0fa817721aca68",
+            "runs": [
+              {
+                "id": 45581586110,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "id": 45581586356,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45581586085,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45581586191,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress",
+                "conclusion": null
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha verified via Actions API."
+          },
+          "protected_v003": "Only automation branch. Conservative E_FAIL when original LEFT clear succeeded but restore is dirty; real game recovery behavior not established. Stable release, original launcher, host, PBR, dashboards and model binaries unchanged.",
+          "asset_validation": "No private source/processed model SHA, 16-car actual UV/albedo/normal/PBR/rights evidence, no promotions.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration53 credited once 2926+1=2927 ledger 4c5281084001662b020db350d7da8f85cf7761f4; iteration52 original HUD CI failure retained",
+          "next_trace": "Verify iteration54 exact SHA Windows DLL+x64 host and HUD Inspector. Trace EnsureStereoResources first allocation: current GetRenderTarget/GetDepthStencilSurface failures, private initialization clear, restoration failure versus ordinary resource miss, and lower raw fallback or persistent dirty binding before later raster. Preserve v0.03 gameplay/theatre classification and physical focus. Rotate to actual 16-car OVC4/material quality contracts and preserve original wrapper and atomic external gate."
         }
       ],
-      "latest_material_sha": "ed448a0550152d6a5fb463a810f338c68d19b86b",
-      "latest_static_ci": "Iteration53 portable wrapper test and extracted P0 mutation suite + R29 owner seam PASS; four exact-SHA workflows pending. Iteration52 three exact workflows success, HUD Inspector failure preserved.",
-      "next_focus": "Verify iteration53 exact SHA Windows Build, isolated x86/x64 package, full HUD Inspector and all-car workflows. Examine deferred queue in-place descriptor replacement with unchanged backing/count, actual live register owner provenance, and scoped PMT material rollback under nested invocation. Do not introduce leaf suppression without retail ownership and whole-car atomic stage; trace persistent R33 dirty binding recovery and v0.03 theatre/focus parity on next applicable rotation."
+      "latest_material_sha": "04efee0fd7262f552c7127df1a0fa817721aca68",
+      "latest_static_ci": "Iteration54 exact committed R7 Clear/Bootstrap and R33 readiness probes PASS, all-car CI success; Windows Build/HUD Inspector/package pending. Iteration53 four exact workflows success, credited once.",
+      "next_focus": "Verify iteration54 exact SHA Windows DLL+x64 host and HUD Inspector. Trace EnsureStereoResources first allocation: current GetRenderTarget/GetDepthStencilSurface failures, private initialization clear, restoration failure versus ordinary resource miss, and lower raw fallback or persistent dirty binding before later raster. Preserve v0.03 gameplay/theatre classification and physical focus. Rotate to actual 16-car OVC4/material quality contracts and preserve original wrapper and atomic external gate."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T17:33:00+09:00",
+  "last_updated_kst": "2026-11-25T18:03:14+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
