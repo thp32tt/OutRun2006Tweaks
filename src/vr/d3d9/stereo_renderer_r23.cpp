@@ -401,6 +401,36 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // The real R23 owner bypasses R7 ClearDest for the first clear.
+        // Seed both inactive eyes from the independently proven color and
+        // depth/stencil baseline, including split game Clear calls.
+        HRESULT R23SeedExternalCandidateFromBaseline(IDirect3DDevice9* device,
+            const OutRunVR::State::D3D9RasterSnapshot& state,
+            bool stencilSafe,D3DCOLOR color) noexcept
+        {
+            if(!(Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel)||
+                !TrackedDepthStencil||FrameStereoIncomplete||FrameRightDrawFailed||
+                AnyAuxRenderTargetActive()||!TargetIsBackBuffer())
+                return D3D_OK;
+            const bool hasStencil=SurfaceHasStencil(TrackedDepthStencil);
+            if(hasStencil&&!stencilSafe)return D3D_OK;
+            const DWORD flags=D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|
+                (hasStencil?D3DCLEAR_STENCIL:0u);
+            const auto seed=R7BeginExternalAtomicResourceTransaction(device,
+                state.viewport,flags,color,R23DepthClearZ,
+                hasStencil?R23StencilClearValue:0u);
+            if(seed!=R7CandidateSeedResult::DirtyRestore)return D3D_OK;
+            ExternalAtomicReplayEpoch=0;
+            RightDepthSynchronized=false;
+            RightStencilSynchronized=false;
+            LastMainDepthClearStamp.Invalidate();
+            R9StereoSeeded=false;
+            R9MonoSeeded=false;
+            R9MonoBackupGap=true;
+            NoteRestoreFailure("R23 external inactive-pair baseline");
+            return E_FAIL;
+        }
+
         bool R23RecoveryNeedsBaseline() noexcept
         {
             return OutRunVR::RuntimeEligibility::SafetyOverlayReady.load(
@@ -458,6 +488,8 @@ namespace OutRunVRStereo
             const bool mainBefore = TargetIsBackBuffer();
             const bool mrtActive = AnyAuxRenderTargetActive();
             const bool wantsStereo = StereoWanted();
+            // This raw passive clear does not enter R7's invalidation path.
+            ExternalAtomicReplayEpoch=0;
             const HRESULT hr = ClearHook.stdcall<HRESULT>(
                 device, count, rects, flags, color, z, stencil);
             ++R23PassiveClears;
@@ -533,7 +565,15 @@ namespace OutRunVRStereo
 
             if (!R23InitializeStereoFromAuthoritativeBaseline(
                     device, actual, stencilSafe, count, rects, color))
+            {
                 R23Reject("eye-mono-initialization-failed");
+                return hr;
+            }
+            // Only the successful, eligible authoritative baseline can seed
+            // an isolated pair. Never turn a candidate failure into success
+            // if its device attachments were not restored.
+            if(FAILED(R23SeedExternalCandidateFromBaseline(device,actual,stencilSafe,color)))
+                return E_FAIL;
             return hr;
         }
 

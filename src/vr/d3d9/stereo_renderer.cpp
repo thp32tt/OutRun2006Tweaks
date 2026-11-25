@@ -413,6 +413,8 @@ namespace OutRunVRStereo
 			if (!device || !R9MonoSeeded || R9MonoBackupGap || !R9MonoSurface || !BackBuffer)
 				return false;
 			InternalPassScope guard;
+			// A mono copy overwrites the live LEFT color, not the candidate.
+			ExternalAtomicReplayEpoch=0;
 			const HRESULT hr = device->StretchRect(R9MonoSurface, nullptr, BackBuffer, nullptr, D3DTEXF_NONE);
 			if (FAILED(hr))
 			{
@@ -966,6 +968,7 @@ namespace OutRunVRStereo
 			R9StereoSeeded = false;
 			R9MonoSeeded = false;
 			R9MonoBackupGap = false;
+			ExternalAtomicReplayEpoch=0;
 			if (++PresentEpoch == 0) PresentEpoch = 1;
 			return hr;
 		}

@@ -351,3 +351,89 @@ with tempfile.TemporaryDirectory() as directory:
     subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror",
                     str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
     subprocess.run([str(p/"probe")],check=True)
+
+# Iter71: compile the actual R23 baseline candidate entrypoint with the
+# authoritative baseline flags and fault-injected R7 transaction.
+r23 = (root / "src/vr/d3d9/stereo_renderer_r23.cpp").read_text()
+r9 = (root / "src/vr/d3d9/stereo_renderer.cpp").read_text()
+body = r23[r23.index("HRESULT R23SeedExternalCandidateFromBaseline("):
+           r23.index("bool R23RecoveryNeedsBaseline()")]
+owner = r23[r23.index("HRESULT __stdcall ClearDestR23("):
+            r23.index("void R23BeforeTopLevelDraw(")]
+assert owner.index("ExternalAtomicReplayEpoch=0;") < owner.index("const HRESULT hr = ClearHook.stdcall<HRESULT>")
+assert owner.index("R23DepthBaselineSafe(") < owner.index("R23InitializeStereoFromAuthoritativeBaseline(")
+assert owner.index("R23InitializeStereoFromAuthoritativeBaseline(") < owner.index("R23SeedExternalCandidateFromBaseline(")
+assert "if(FAILED(R23SeedExternalCandidateFromBaseline(device,actual,stencilSafe,color)))\n                return E_FAIL;" in owner
+copy = r9[r9.index("bool R9RestoreMonoBeforePresent("):r9.index("void R9MaybeLogSummary()")]
+assert copy.index("ExternalAtomicReplayEpoch=0;") < copy.index("device->StretchRect(")
+assert "ExternalAtomicReplayEpoch=0;\n\t\t\tif (++PresentEpoch == 0)" in r9
+prefix = r'''
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+using HRESULT=int;using DWORD=unsigned;using D3DCOLOR=unsigned;
+constexpr HRESULT D3D_OK=0,E_FAIL=-1;
+constexpr DWORD D3DCLEAR_TARGET=1,D3DCLEAR_ZBUFFER=2,D3DCLEAR_STENCIL=4;
+struct IDirect3DDevice9{};
+struct Surface{};
+Surface depth;
+Surface* TrackedDepthStencil=&depth;
+namespace Settings {bool VRExternalFerrariTest,VRF50ExternalModel;}
+namespace OutRunVR::State {struct D3D9RasterSnapshot{unsigned viewport=123;};}
+bool FrameStereoIncomplete,FrameRightDrawFailed,mrt,mainTarget,hasStencil;
+bool RightDepthSynchronized,RightStencilSynchronized,R9StereoSeeded,R9MonoSeeded,R9MonoBackupGap;
+std::uint64_t ExternalAtomicReplayEpoch;
+float R23DepthClearZ=.625f;
+DWORD R23StencilClearValue=37;
+struct Stamp{unsigned invalidated=0;void Invalidate(){++invalidated;}} LastMainDepthClearStamp;
+unsigned notes,calls,expectedFlags;
+enum class R7CandidateSeedResult {Unavailable,Seeded,DirtyRestore};
+R7CandidateSeedResult outcome;
+bool AnyAuxRenderTargetActive(){return mrt;}
+bool TargetIsBackBuffer(){return mainTarget;}
+bool SurfaceHasStencil(Surface*){return hasStencil;}
+void NoteRestoreFailure(const char*){++notes;FrameRightDrawFailed=true;FrameStereoIncomplete=true;}
+R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* d,
+    unsigned viewport,DWORD flags,D3DCOLOR color,float z,DWORD stencil){
+    ++calls;assert(d&&viewport==123&&flags==expectedFlags&&color==0x12345678);
+    assert(z==.625f&&stencil==(hasStencil?37u:0u));
+    if(outcome==R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=71;
+    return outcome;
+}
+'''
+suffix = r'''
+int main(){
+    IDirect3DDevice9 dev;
+    unsigned cases=0;
+    for(unsigned mask=0;mask<512;++mask)
+    for(auto result:{R7CandidateSeedResult::Unavailable,R7CandidateSeedResult::Seeded,
+                     R7CandidateSeedResult::DirtyRestore}){
+        Settings::VRExternalFerrariTest=mask&1;Settings::VRF50ExternalModel=mask&2;
+        TrackedDepthStencil=(mask&4)?&depth:nullptr;
+        FrameStereoIncomplete=mask&8;FrameRightDrawFailed=mask&16;
+        mrt=mask&32;mainTarget=mask&64;hasStencil=mask&128;
+        const bool stencilSafe=mask&256;
+        const bool invoke=(mask&3)&&(mask&4)&&!(mask&56)&&mainTarget&&(!hasStencil||stencilSafe);
+        expectedFlags=3|(hasStencil?4u:0u);outcome=result;
+        RightDepthSynchronized=RightStencilSynchronized=R9StereoSeeded=R9MonoSeeded=true;
+        R9MonoBackupGap=false;ExternalAtomicReplayEpoch=0;
+        notes=calls=LastMainDepthClearStamp.invalidated=0;
+        const auto hr=R23SeedExternalCandidateFromBaseline(&dev,{},stencilSafe,0x12345678);
+        const bool dirty=invoke&&result==R7CandidateSeedResult::DirtyRestore;
+        const bool seeded=invoke&&result==R7CandidateSeedResult::Seeded;
+        assert(hr==(dirty?E_FAIL:D3D_OK)&&calls==unsigned(invoke)&&notes==unsigned(dirty));
+        assert(ExternalAtomicReplayEpoch==(seeded?71u:0u));
+        assert(RightDepthSynchronized==!dirty&&RightStencilSynchronized==!dirty);
+        assert(R9StereoSeeded==!dirty&&R9MonoSeeded==!dirty&&R9MonoBackupGap==dirty);
+        assert(LastMainDepthClearStamp.invalidated==unsigned(dirty));
+        ++cases;
+    }
+    std::cout<<"R23_EXTERNAL_BASELINE_PASS "<<cases<<"\n";
+}
+'''
+with tempfile.TemporaryDirectory() as directory:
+    p = Path(directory)
+    (p / "probe.cpp").write_text(prefix + body + suffix)
+    subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror",
+                    str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
+    subprocess.run([str(p/"probe")],check=True)
