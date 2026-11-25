@@ -1,17 +1,19 @@
 {
-  "artifact_id": 14893858940,
-  "asset_sha": "5d1b4ad51698fa220d9f8559bbb5f44abd36f72d",
+  "artifact_id": 14985979823,
+  "asset_sha": "c03151f87e25946f5d666214bd27a28c3acc8619",
   "counts": {
     "atlases": 104,
-    "changed_dds": 74,
-    "held": 611,
-    "painted": 343,
+    "changed_dds": 78,
+    "held": 571,
+    "painted": 383,
     "roi": 954
   },
   "generation": 1,
-  "manifest_sha256": "42bc76b14b32e4d1c1b0ef42c283c06acd1d8a54622d6c948f0d746fe354ee73",
+  "manifest_sha256": "73abf37db92a44fc470358e19e5fd43fd14d99259b4883e4320c882b0e9f7977",
+  "previous_manifest_sha256": "42bc76b14b32e4d1c1b0ef42c283c06acd1d8a54622d6c948f0d746fe354ee73",
+  "previous_run_id": 45333597142,
   "release_approved": false,
-  "run_id": 45333597142,
+  "run_id": 45530926148,
   "runtime_validation": "UNTESTED",
   "schema": "outrun.hd.cleanplate-queue-pointer.v1"
 }
