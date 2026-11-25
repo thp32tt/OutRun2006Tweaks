@@ -3432,7 +3432,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER48-GLB-MATERIAL-SAMPLER-PARITY",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_PASS_CONTINUE_ACTIVE",
           "rotating_focus": "Slot provenance and optional exact 328 GTS / 575 SA / F430 Spider / Testarossa Spider: source-to-OVC quality without unsupported asset promotion",
           "source_material_sha": "fc06c9600516acae94a88eb4fcde4f0d2e0e58dc",
           "source_blob_sha1": {
@@ -3464,34 +3464,92 @@
               {
                 "id": 45557552725,
                 "name": "Build",
-                "status": "in_progress"
+                "status": "completed",
+                "conclusion": "success"
               },
               {
                 "id": 45557552814,
                 "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
-                "status": "in_progress"
+                "status": "completed",
+                "conclusion": "success"
               }
             ],
-            "conclusion": "PENDING",
+            "conclusion": "success",
             "note": "Read-only Actions API exact head_sha verified."
           },
           "protected_v003": "Automation branch offline gate/tests only; no stable release, model binary, source game asset, deployment, or live raster modifications. N100 minimal Python fixture and CI query only. Equality of non-default factors (even zero normal scale) is only source-to-converted parity, not proof that final OVC honors them or that asset meets visual acceptance.",
           "asset_validation": "No actual source/processed private asset SHA, real chassis, rights or visual QA; no model promotion. All four candidate slots retain existing status. 16-car real texture/material/mesh QA remains untested.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration47 credited once 2921+1=2922 ledger 8c1fbf2f6803747731a2954309988bab00a6d1f5",
+          "score_state": "CREDITED_ONCE_AI2_2922_PLUS_1_EQUALS_2923_LEDGER_d53c9785be189e401c26feec6698169af292e78c",
           "next_trace": "Verify iteration48 exact Windows build/package; trace performance costs of repeated state capture, stereo DIP replay and resource preparation, with bounded CPU tests, no unsafe bypass of atomic stereo gate. Separately trace converted GLB per-material scalar and sampler semantics into OVC4 material records and baked DDS pixels; no unsupported asset promotion."
+        },
+        {
+          "cycle_key": "EXT16-011-ITER49-R30-REJECTED-DESCRIPTOR-CACHE",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "D3D9 performance: repeated R30 VB/IB GetDesc, shadow registry lifetime, state churn and stereo replay",
+          "source_material_sha": "57dad3ff8f0796bb9e5f488cc4916f0c794c072c",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r30.cpp": "ba2cb7f61523baa95dbb3cb6ef163d2e53aae7f7",
+            "tests/r30_shadow_descriptor_cache_test.py": "7e7a8f5a993ad3924839adaba7c69fe7025937f4"
+          },
+          "source_defect": "R30EnsureVertexShadow/R30EnsureIndexShadow treated a known rejected immutable descriptor identically to a registry miss. Repeated rejected buffer attempts therefore called GetDesc repeatedly despite stable buffer identity. This is a proven redundant CPU/COM-call path, not measured GPU time or FPS.",
+          "source_fix": "Differentiate registry membership from null shadow, retain immutable successfully queried rejected descriptors as null registry entries only with release hooks ready. Preserve transient GetDesc failure retry, accepted shadow allocation and Release(0)/rollback epoch fencing. No shadow payload allocated for rejected buffers.",
+          "positive_negative_regressions": [
+            "Actual extracted C++ lookup/ensure/release functions compiled and executed with fake D3D buffers: PASS R30_SHADOW_DESCRIPTOR_CACHE_PASS; initial+64 repeated rejected calls use one GetDesc for each buffer class, nonfinal release keeps cache; final release/address reuse and rollback-style registry/epoch clearing re-query; temporary descriptor failure and incomplete hook readiness retry; valid FVF=0/XYZRHW and INDEX16/INDEX32 cases accepted; oversize/zero rejected.",
+            "Same-SHA all-car regression workflow includes the new test and completed success. Windows DLL/package pending at observation. N100 only small extracted C++ probe; no game build."
+          ],
+          "call_graph_trace": [
+            "R30 draw/lock shadow lookup -> R30FindShadow thread-local epoch cache -> EnsureVertex/IndexShadow -> GetDesc -> eligible shadow or rejected descriptor membership -> Release final erase / rollback epoch clearing. Does not change stereo draw count or state capture/restore.",
+            "No new verified duplicate pass, GPU stall or PBR shader defect identified by this patch. Existing atomic stereo gate remains closed. No change to material or game/host deployment."
+          ],
+          "same_sha_ci": {
+            "sha": "57dad3ff8f0796bb9e5f488cc4916f0c794c072c",
+            "runs": [
+              {
+                "id": 45561379336,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45561379327,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45561379316,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45561379242,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Read-only Actions API exact head_sha verified."
+          },
+          "protected_v003": "Only automation branch source/test/CI; no stable release, native game assets, binary deployment, shader, menu, cockpit, dashboard or VR focus change.",
+          "asset_validation": "Private source/processed model SHAs and 16-car UV/albedo/normal/PBR/wheel/interior QA remain unverified; candidate statuses and rights unchanged.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration48 credited once 2922+1=2923 ledger d53c9785be189e401c26feec6698169af292e78c",
+          "next_trace": "Verify iteration49 exact Win32 build and isolated x86/x64 package before credit. Trace R30 negative-registry insertion allocation failure, release-hook lifetime/epoch and actual replay state churn / GPU synchronization; inspect per-material OVC4 factor/sampler-to-DDS baking boundary independently. Do not bypass the atomic stereo gate or promote unverified vehicles."
         }
       ],
-      "latest_material_sha": "fc06c9600516acae94a88eb4fcde4f0d2e0e58dc",
-      "latest_static_ci": "Iteration48 exact 5 blob SHA verified, full exact-variant synthetic tests PASS (84 added cases); 8 old/new counterexamples reproduced; multicar CI success, Windows build/package pending. Iteration47 exact SHA all three workflows success.",
-      "next_focus": "Verify iteration48 exact Windows build/package; trace performance costs of repeated state capture, stereo DIP replay and resource preparation, with bounded CPU tests, no unsafe bypass of atomic stereo gate. Separately trace converted GLB per-material scalar and sampler semantics into OVC4 material records and baked DDS pixels; no unsupported asset promotion."
+      "latest_material_sha": "57dad3ff8f0796bb9e5f488cc4916f0c794c072c",
+      "latest_static_ci": "Iteration49 extracted C++ descriptor regression and exact all-car CI PASS; exact Windows build/package pending at observation. Iteration48 three exact workflows success and credited once.",
+      "next_focus": "Verify iteration49 exact Win32 build and isolated x86/x64 package before credit. Trace R30 negative-registry insertion allocation failure, release-hook lifetime/epoch and actual replay state churn / GPU synchronization; inspect per-material OVC4 factor/sampler-to-DDS baking boundary independently. Do not bypass the atomic stereo gate or promote unverified vehicles."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 15:00:00+09:00",
+  "last_updated_kst": "2026-11-25T15:34:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
