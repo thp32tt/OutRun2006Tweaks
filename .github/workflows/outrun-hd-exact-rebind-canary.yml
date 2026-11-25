@@ -1,0 +1,53 @@
+name: OutRun HD Exact Text Rebind Real DDS Canary
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: [".github/workflows/outrun-hd-exact-rebind-canary.yml"]
+permissions:
+  contents: read
+jobs:
+  real-native-atlas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OMP_THREAD_LIMIT: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization
+            localization/automation_inputs/candidate_outputs
+            localization/automation_inputs/hd_original_png_source_plan.json
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/Keyboard/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Tesseract and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-eng
+          python -m pip install --disable-pip-version-check Pillow==11.3.0 numpy==2.3.4
+      - name: Exact English localization on first actual 4096x2048 DDS
+        run: python tools/localization/hd_exact_text_rebind.py --repo-root . --out "$RUNNER_TEMP/ocr_proposals.json" --limit 1
+      - name: Rebuild source CLEAN and native-size candidate using exact OCR geometry
+        run: |
+          python tools/localization/hd_cleanplate_repair.py --repo-root . --asset-sha "$(git rev-parse HEAD)" --out "$RUNNER_TEMP/canary" --feedback "$RUNNER_TEMP/ocr_proposals.json" --limit 1
+          cp "$RUNNER_TEMP/ocr_proposals.json" "$RUNNER_TEMP/canary/build/"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d=json.loads((Path(os.environ["RUNNER_TEMP"])/"canary/build/qa_report.json").read_text())
+          t=d["tasks"][0]
+          print("CANARY_ACTUAL_8_ROI",json.dumps({"target":t["target"],"previous_painted":1,"new_painted":t["painted_count"],"held":t["hold_count"],"original_size":t["native_size"],"proposals":d["feedback_proposals_used_for_geometry_trials"],"holds":t["holds"]},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exact-rebind-real-dds-canary-${{ github.run_id }}
+          path: ${{ runner.temp }}/canary/
+          retention-days: 30
+          if-no-files-found: error
