@@ -32,7 +32,10 @@ def is_isolated_launcher(source):
             and low.count("if errorlevel 89 exit /b 89") == 2
             and low.count("if errorlevel 88 exit /b 88") == 2
             and low.count("if errorlevel 1 exit /b 89") == 2
-            and low.count('tasklist /fi "imagename eq outrun-vr-host.exe"') == 1
+            and low.count('tasklist /fo csv /nh') == 1
+            and 'set "ext16_game_found="' in low
+            and 'if /i "%%~p"=="or2006c2c.exe" set "ext16_game_found=1"' in low
+            and 'if defined ext16_game_found (' in low
             and "^&^& echo ext16_tasklist_ok" in low
             and "if not defined ext16_host_scan_ok (" in low
             and 'exit /b 87' in low and 'exit /b 88' in low)
@@ -100,6 +103,10 @@ def simulate_host_scan(source, rows, tasklist_status):
     guard = host_guard(source)
     assert 'set "EXT16_HOST_SCAN_OK="' in guard
     assert 'set "EXT16_HOST_FOUND="' in guard
+    assert 'set "EXT16_GAME_FOUND="' in guard
+    assert 'tasklist /FO CSV /NH' in guard
+    assert 'if /I "%%~P"=="OR2006C2C.exe" set "EXT16_GAME_FOUND=1"' in guard
+    assert 'if defined EXT16_GAME_FOUND (' in guard
     assert '^&^& echo EXT16_TASKLIST_OK' in guard
     assert 'if not defined EXT16_HOST_SCAN_OK (' in guard
     assert 'if defined EXT16_HOST_FOUND (' in guard
@@ -109,7 +116,8 @@ def simulate_host_scan(source, rows, tasklist_status):
     fields = [row.split(",", 1)[0].strip('"') for row in output]
     if "EXT16_TASKLIST_OK" not in fields:
         return 89
-    if any(field.lower() == "outrun-vr-host.exe" for field in fields):
+    if any(field.lower() in ("outrun-vr-host.exe", "or2006c2c.exe")
+           for field in fields):
         return 88
     return 0
 
@@ -119,6 +127,11 @@ HOST_SCAN_CASES = (
     (("INFO: No tasks match the specified criteria.",), 0, 0),
     (('"outrun-vr-host.exe","1234","Console","1","1 K"',), 0, 88),
     (('"OUTRUN-VR-HOST.EXE","4321"',), 0, 88),
+    (('"OR2006C2C.exe","1111","Console","1","1 K"',), 0, 88),
+    (('"or2006c2c.EXE","2222"',), 0, 88),
+    (('"OR2006C2C.exe","1111"', '"outrun-vr-host.exe","2222"'), 0, 88),
+    (('"OR2006C2C.exe","1111"',), 1, 89),
+    (('"explorer.exe","1111"', '"OR2006C2C-backup.exe","2222"'), 0, 0),
     ((), 1, 89),
     (("ERROR: Access denied.",), 1, 89),
     (('"outrun-vr-host.exe","1234"',), 1, 89),
@@ -140,6 +153,25 @@ class LauncherIsolationTest(unittest.TestCase):
             self.assertFalse(is_isolated_launcher(source.replace(
                 "if errorlevel 89 exit /b 89", "rem ignore scan failure")))
 
+    def test_game_without_host_regression(self):
+        for name in LAUNCHERS:
+            source = (ROOT / name).read_text(encoding="utf-8")
+            game_only = ('"OR2006C2C.exe","1111"',)
+            self.assertEqual(simulate_host_scan(source, game_only, 0), 88)
+            # Old TASKLIST filter would remove the only game row before
+            # the guard saw it; its empty successful scan admitted launch.
+            old_filtered = tuple(row for row in game_only
+                                 if row.split(",", 1)[0].strip('"').lower()
+                                 == "outrun-vr-host.exe")
+            self.assertEqual(simulate_host_scan(source, old_filtered, 0), 0)
+            self.assertFalse(is_isolated_launcher(source.replace(
+                "tasklist /FO CSV /NH",
+                'tasklist /FI "IMAGENAME eq outrun-vr-host.exe" /FO CSV /NH')))
+            self.assertFalse(is_isolated_launcher(source.replace(
+                'set "EXT16_GAME_FOUND="', "rem missing game flag reset")))
+            self.assertFalse(is_isolated_launcher(source.replace(
+                'if defined EXT16_GAME_FOUND (', "if defined UNKNOWN_FLAG (")))
+
     @unittest.skipUnless(os.name == "nt", "actual CMD guard requires Windows")
     def test_native_cmd_host_scan(self):
         # Replace only TASKLIST with a deterministic fixture. The FOR /F,
@@ -151,12 +183,13 @@ class LauncherIsolationTest(unittest.TestCase):
             for name in LAUNCHERS:
                 source = (ROOT / name).read_text(encoding="utf-8")
                 guard = host_guard(source)
-                command = 'tasklist /FI "IMAGENAME eq outrun-vr-host.exe" /FO CSV /NH'
+                command = 'tasklist /FO CSV /NH'
                 self.assertEqual(guard.count(command), 1)
                 guard = guard.replace(command, "call scan-stub.cmd")
                 fixture.write_text(
                     '@echo off\nsetlocal\nset "EXT16_HOST_SCAN_OK=1"\n'
-                    'set "EXT16_HOST_FOUND=1"\ncall :CHECK_HOST\n'
+                    'set "EXT16_HOST_FOUND=1"\nset "EXT16_GAME_FOUND=1"\n'
+                    'call :CHECK_HOST\n'
                     'if errorlevel 89 exit /b 89\nif errorlevel 88 exit /b 88\n'
                     'if errorlevel 1 exit /b 89\nexit /b 0\n:CHECK_HOST\n'
                     + guard, encoding="ascii")

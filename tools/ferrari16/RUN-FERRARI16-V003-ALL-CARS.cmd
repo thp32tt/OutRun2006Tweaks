@@ -144,16 +144,24 @@ exit /b 0
 :CHECK_HOST
 rem FOR /F consumes CSV image names plus an explicit successful-scan marker.
 rem The marker is emitted only if TASKLIST succeeds; a failed query must
-rem never be treated as proof that the v0.03 host is absent.
+rem never be treated as proof that the v0.03 game and host are absent.
+rem A game can exist before its host starts or while running in 2D.
+rem Enumerate both images in one snapshot; do not terminate either process.
 set "EXT16_HOST_SCAN_OK="
 set "EXT16_HOST_FOUND="
-for /f "tokens=1 delims=," %%P in ('tasklist /FI "IMAGENAME eq outrun-vr-host.exe" /FO CSV /NH 2^>nul ^&^& echo EXT16_TASKLIST_OK') do (
+set "EXT16_GAME_FOUND="
+for /f "tokens=1 delims=," %%P in ('tasklist /FO CSV /NH 2^>nul ^&^& echo EXT16_TASKLIST_OK') do (
  if /I "%%~P"=="outrun-vr-host.exe" set "EXT16_HOST_FOUND=1"
+ if /I "%%~P"=="OR2006C2C.exe" set "EXT16_GAME_FOUND=1"
  if "%%~P"=="EXT16_TASKLIST_OK" set "EXT16_HOST_SCAN_OK=1"
 )
 if not defined EXT16_HOST_SCAN_OK (
- echo [EXT16] Cannot verify VR host absence. Refusing isolated launch.
+ echo [EXT16] Cannot verify game and VR host absence. Refusing isolated launch.
  exit /b 89
+)
+if defined EXT16_GAME_FOUND (
+ echo [EXT16] Another OutRun game is running. Close it before isolated testing.
+ exit /b 88
 )
 if defined EXT16_HOST_FOUND (
  echo [EXT16] Another VR host is running. Close it before isolated testing.
