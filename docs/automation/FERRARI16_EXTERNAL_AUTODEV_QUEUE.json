@@ -2599,20 +2599,82 @@
           "protected_v003": "Only offline verification tools/tests on external automation branch. No runtime shader, x86 ABI, host, menus, deployment, licensed source/converted assets or native fallback modified. Local environment GitHub DNS unavailable; N100 used only for bounded public-source fetch and tiny synthetic Python checks/read-only CI, no build.",
           "asset_validation": "Synthetic OVC4 only; no current private 16-car source or converted bytes verified or promoted. Historical 2026-11-16 16/16 manifest SHA matched, 0/16 strict PBR passed per prior EXT16-009 audit, not current installed asset QA.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; prior independent iterations 33/34 reconciled once, AI2 2909 ledger ec254ec4b2f71758d29a3fe04542d1b9ee598dce",
-          "next_trace": "Trace source-space UV conditioning versus relative SM3 derivative threshold and DDS pixel semantic/channel packing (normal RGB vs packed ORM); find concrete current source/converted SHA and rights evidence before private model repair. Continue real stereo pair staging investigation; confirm iteration35 exact SHA CI."
+          "score_state": "CREDITED_ONCE_AI2_2909_PLUS_1_EQUALS_2910_LEDGER_f2145d3fb9f5d87a8a0fdcce7b0a0d680a7f5096",
+          "next_trace": "Trace source-space UV conditioning versus relative SM3 derivative threshold and DDS pixel semantic/channel packing (normal RGB vs packed ORM); find concrete current source/converted SHA and rights evidence before private model repair. Continue real stereo pair staging investigation; confirm iteration35 exact SHA CI.",
+          "followup_exact_sha_ci": {
+            "sha": "be58f50c50fa2e6076490d24aa007b5049e7be55",
+            "runs": [
+              {
+                "id": 45510700400,
+                "conclusion": "success"
+              },
+              {
+                "id": 45510700401,
+                "conclusion": "success"
+              },
+              {
+                "id": 45510700398,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER36-GLASS-FORWARD-DEPTH",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Glass alpha order, actual RH camera projection and animated mesh transform",
+          "source_material_sha": "6d9a3ef7db1e5ce8752fc210835e691d40a4bdc7",
+          "source_blob_sha1": {
+            "src/vr/game/external_car_draw_order.hpp": "0f766cea2323a8d44f456ce35202f19e7b2f69a2",
+            "src/vr/game/dino_external_d3d9.hpp": "7953cd0f902899f1cc30813f54d68b81c251ab66",
+            "tests/external_car_draw_order_test.cpp": "beadf14a865a7564ec365f08102eaa98a880fb08",
+            ".github/workflows/ferrari16-multicar-regression.yml": "9f15107342c99412cbbfdb092163af631c4d4a0c"
+          },
+          "source_defect": "R7 ReadProjection requires _34 approximately -1; ProjectionFromFov preserves it. DrawNativeScene sorted raw camera-space Z descending, so visible RH glass at -1 was submitted before glass at -5, reversing source-over. Sort also used base world rather than AnimatedWorld used by DIP for a dashboard-bound mesh. Old helper tests used positive Z only.",
+          "source_fix": "Sort signed forward distance using actual projection._34 sign, never abs(Z); use same AnimatedWorld and visible dashboard binding as physical mesh draw. Preserve opaque-first order, stable source-index ties, glass depth writes off, alpha blend, PBR shaders and state restore. Existing shared center-camera order remains; no claim of eye-specific sorting.",
+          "positive_negative_regressions": [
+            "64 combinations (16 slots, two eye views, RH/LH): far-first, ties, behind-eye, alpha order, moved mesh. RH old raw-Z order reproduced; zero/nonfinite projection keys tested. Existing 1280 texture-routing cases preserved.",
+            "Exact SHA header/test fetched and compiled with g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic, exit 0; test exit 0. Existing CI source gate checks actual animated transform, visibility and projection argument."
+          ],
+          "same_sha_ci": {
+            "sha": "6d9a3ef7db1e5ce8752fc210835e691d40a4bdc7",
+            "runs": [
+              {
+                "id": 45514718951,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45514719253,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45514719283,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "External-only header/owner/tests and CI assertions; original release, x86 ABI, menu/host, shaders, model files, rights and deployment unchanged; atomic stage fence remains closed. N100 only bounded fetch and single tiny portable C++ test, no full build.",
+          "asset_validation": "Synthetic cases only; no current private per-car OVC/GLB/texture verified or modified.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; prior iteration35 credited once AI2 2910 ledger f2145d3fb9f5d87a8a0fdcce7b0a0d680a7f5096",
+          "next_trace": "Trace actual per-eye transparency ordering ownership: R7 duplicates each DIP using a shared center order, so verify any eye-specific order requires isolated whole-car bilateral color/depth stage, never simply enable live raster. Review glass depth state and native deferred draw restoration, source DDS alpha/normal/ORM semantic gate. Confirm exact SHA CI."
         }
       ],
-      "latest_material_sha": "be58f50c50fa2e6076490d24aa007b5049e7be55",
-      "latest_static_ci": "Iteration35 Python exact-source selftests PASS; three applicable push CI workflows in progress; iteration34 exact-SHA three workflows success and credited once",
-      "next_focus": "Trace source-space UV conditioning versus relative SM3 derivative threshold and DDS pixel semantic/channel packing (normal RGB vs packed ORM); find concrete current source/converted SHA and rights evidence before private model repair. Continue real stereo pair staging investigation; confirm iteration35 exact SHA CI."
+      "latest_material_sha": "6d9a3ef7db1e5ce8752fc210835e691d40a4bdc7",
+      "latest_static_ci": "Iteration36 exact-source portable draw order test PASS; three push workflows in progress; iteration35 exact-SHA three workflows success and credited once",
+      "next_focus": "Trace actual per-eye transparency ordering ownership: R7 duplicates each DIP using a shared center order, so verify any eye-specific order requires isolated whole-car bilateral color/depth stage, never simply enable live raster. Review glass depth state and native deferred draw restoration, source DDS alpha/normal/ORM semantic gate. Confirm exact SHA CI."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 08:30:00+09:00",
+  "last_updated_kst": "2026-11-25 09:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
