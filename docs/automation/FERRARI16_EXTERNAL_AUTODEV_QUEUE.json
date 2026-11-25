@@ -2852,7 +2852,7 @@
           "protected_v003": "Automation branch only. Existing whole-car native callback fence prevents sidecar GPU allocation/submission; no assumption that this is measured cause of reported FPS regression. No changes to model bytes, PBR, host or release. Actual raw/mono fallback still governed by owner; HMD/visual regression not tested.",
           "asset_validation": "No actual private model source or processed bytes/rights reviewed or promoted.",
           "runtime_validation": "UNTESTED",
-          "score_state": "ELIGIBLE_FOR_SINGLE_DELAYED_CREDIT; authoritative ledger still 2913; connector returned empty contents for large scoreboard; local ledger commit 7980cc0 not pushed (GitHub HTTPS authentication unavailable); reconcile remote before credit, no duplicate",
+          "score_state": "CREDITED_ONCE_AI2_2913_PLUS_1_EQUALS_2914_LEDGER_5dec317141941aad79f84ae8c4641c8e5ca1b463",
           "next_trace": "Trace baseline vs latest native player/occupant callbacks and dashboard overlay or sky/flare ownership; verify remaining whole-car bilateral staging and stock-fallback requirements; continue measured performance diagnosis, including redundant state reads only when safe, and verify iteration39 exact-SHA CI. No physical runtime claim.",
           "followup_exact_sha_ci": {
             "sha": "334133503b34186c8a971c6dc857e19901fee341",
@@ -2916,20 +2916,88 @@
           "protected_v003": "Offline verifier/self-test only on automation branch. No changes to original callback, runtime renderer, x86 ABI, host, menu, overlay, PBR shaders, deployment or asset bytes. Local DNS unavailable; N100 limited to tiny synthetic Python/C++ harness, read-only CI and isolated score clone; no full build.",
           "asset_validation": "Synthetic data only; no actual 16 private assets, exact variants or license approval. No model promotion.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; authoritative 2913; prior iteration39 eligible but remote ledger write blocked; no duplicate credit.",
-          "next_trace": "Trace per-eye body/dashboard staged ownership and native 49F3E0/49A650 original fallback, especially a gear-only overlay with body needle coverage and partial-eye failure. Verify current exact-SHA Windows CI and reconcile pending previous score only once. Do not open atomic raster fence without whole-car proof."
+          "score_state": "CREDITED_ONCE_AI2_2914_PLUS_1_EQUALS_2915_LEDGER_5dec317141941aad79f84ae8c4641c8e5ca1b463",
+          "next_trace": "Trace per-eye body/dashboard staged ownership and native 49F3E0/49A650 original fallback, especially a gear-only overlay with body needle coverage and partial-eye failure. Verify current exact-SHA Windows CI and reconcile pending previous score only once. Do not open atomic raster fence without whole-car proof.",
+          "followup_exact_sha_ci": {
+            "sha": "48de3cd1700b5a917d0ff9e1f8d0240da780a2c5",
+            "runs": [
+              {
+                "id": 45530019293,
+                "conclusion": "success"
+              },
+              {
+                "id": 45530019275,
+                "conclusion": "success"
+              },
+              {
+                "id": 45530019291,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER41-DEPTH-CLEAR-WRITE-REVOCATION",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "R7 same-Present full-clear replay ownership across potential LEFT writes, partial clears and failed RIGHT",
+          "source_material_sha": "75d2c79dc57e538e6bd3474a187e5c8599991dac",
+          "source_blob_sha1": {
+            "src/vr/d3d9/depth_clear_replay_stamp.hpp": "9c983f208d75c2980b81763044f40e3b334e2d87",
+            "src/vr/d3d9/stereo_renderer_r7.inc": "b8a92529ef213b7b7eafdac6905468718aa667dc",
+            "tests/depth_clear_replay_stamp_test.cpp": "d06188e2e4b26cc58a1461b2284e16baf79e299a",
+            ".github/workflows/ferrari16-multicar-regression.yml": "21e50ba6d0343113c1c8331398c25254ca08bedc"
+          },
+          "source_defect": "R7 RecordFullMainDepthClear -> DepthClearReplayStamp::Current -> TryBootstrapRightDepthFromRecentClear previously proved same Present + binding, not unchanged depth/stencil content. Full clear, later potential LEFT write/partial clear, failed RIGHT or unsynchronized plane could replay stale full clear and mark RIGHT synchronized despite intervening content. Old stamp has no write revocation. R7 offscreen clear bypass also retains old stamp.",
+          "source_fix": "Add plane-specific OnPotentialWrite to receipt; revoke before all six R7 ExecuteStereoDraw physical LEFT calls when relevant tracked depth/stencil state may write. Internal RIGHT pass and no-current-stamp skip render-state probes. ClearDest revokes attempted depth/stencil bits before offscreen/normal left clear; successful full main clear establishes fresh proof. Keep original draw HRESULT, external raster fence, release/host/ABI unchanged. Reviewed CI helper blob pin updated, not removed.",
+          "positive_negative_regressions": [
+            "384 combinations: 16 canonical slot labels x 3 initial depth/stencil clear masks x 4 possible write masks x 2 RIGHT success/failure states, with stale old-policy replay counterexample, unaffected plane/read-only positives and fresh full clear recovery. Existing binding/epoch/reset tests preserved. Portable C++17 test compiled and passed; four exact committed blob hashes independently verified against GitHub raw source.",
+            "Exact SHA multicar and PBR HLSL jobs succeeded. Source guard verifies all six LEFT revocations, unchanged RIGHT call and clear revocation before offscreen branch/new receipt. No actual GPU failure injection or per-car model runtime test."
+          ],
+          "same_sha_ci": {
+            "sha": "75d2c79dc57e538e6bd3474a187e5c8599991dac",
+            "runs": [
+              {
+                "id": 45533607232,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "id": 45533607222,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45533607186,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45533607175,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "Automation branch only. No changes to protected v0.03 release, external raster gate, x86 callback ABI, host, menu, PBR shaders, assets or deployment. No new GPU clear added. No proof for raw R30/R33 physical routes bypassing R7, offscreen sync identity or whole-vehicle stereo staging. Local GitHub DNS unavailable; N100 limited to small C++ test and read-only public fetches; no full build.",
+          "asset_validation": "No private model source/processed SHA or rights verified, no asset promotion. 16 labels are synthetic test repetitions, not actual vehicle asset checks.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; previous iterations39/40 credited once 2913+1+1=2915 ledger 5dec317141941aad79f84ae8c4641c8e5ca1b463",
+          "next_trace": "Trace R30/R33 raw draw paths bypassing R7 and their depth/stencil ownership; inspect offscreen depth identity transitions, bootstrap restoration failure and right-eye failure after physical LEFT. Never enable external raster without whole-car isolated bilateral color/depth transaction. Confirm iteration41 exact SHA Windows CI."
         }
       ],
-      "latest_material_sha": "48de3cd1700b5a917d0ff9e1f8d0240da780a2c5",
-      "latest_static_ci": "Iteration40 exact-source verifier self-test and native float32 boundary crosscheck PASS; old verifier mutation fails; multicar/HLSL exact SHA success, Windows build/package pending. Iter39 four recorded runs success.",
-      "next_focus": "Trace per-eye body/dashboard staged ownership and native 49F3E0/49A650 original fallback, especially a gear-only overlay with body needle coverage and partial-eye failure. Verify current exact-SHA Windows CI and reconcile pending previous score only once. Do not open atomic raster fence without whole-car proof."
+      "latest_material_sha": "75d2c79dc57e538e6bd3474a187e5c8599991dac",
+      "latest_static_ci": "Iteration41 384 portable synthetic cases PASS, exact blob hashes verified, multicar/HLSL PASS; Windows build/package and inspector pending. Iteration40 all exact SHA CI success.",
+      "next_focus": "Trace R30/R33 raw draw paths bypassing R7 and their depth/stencil ownership; inspect offscreen depth identity transitions, bootstrap restoration failure and right-eye failure after physical LEFT. Never enable external raster without whole-car isolated bilateral color/depth transaction. Confirm iteration41 exact SHA Windows CI."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 11:00:00+09:00",
+  "last_updated_kst": "2026-11-25 11:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
