@@ -3225,7 +3225,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER45-INDEXED-FLOOR-GLASS-BOUNDS",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "Actual 16 car material contracts: OVC4 mesh integrity, DDS mip chains, tangent/UV, per-material normal+ORM and CRC",
           "source_material_sha": "362c7a9e96c0403dcc4df5b72991077e92096d30",
           "source_blob_sha1": {
@@ -3271,20 +3271,90 @@
           "protected_v003": "Automation branch only. Stable v0.03, host, menu, renderer bridge, native ABI, PBR shader, physical stereo receipt, atomic live external gate and deployment unchanged. Extra indexed scan occurs during async CPU load and glass upload, not each frame. ChatGPT local GitHub DNS failed; N100 used one small C++/Python test and read-only CI query only; no full build. Bounds remain conservative for referenced degenerate triangles; actual car dimensions and suspension clearance unmeasured.",
           "asset_validation": "No private model SHA, 16 real car materials, DDS decoded texture semantics, manual quality or rights proof. Synthetic fixtures are not vehicle acceptance and no candidate promotion.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration44 credited once 2918+1=2919 ledger b01397e9912677cea460cf2accf51382b43faf56",
-          "next_trace": "Trace GLB used material scalar factor and texture sampler parity through OVC4 baking, especially normal strength, metallic/roughness multipliers and glass alpha; reproduce mismatches before changes. Confirm iteration45 exact SHA Windows build/package and multicar CI. Audit per-eye glass ordering and source normal/ORM role correspondence without enabling live external raster or promoting unverified assets."
+          "score_state": "CREDITED_ONCE_AI2_2919_PLUS_1_EQUALS_2920_LEDGER_a661bfd2591ab08d3113efd3174ab1291c265442",
+          "next_trace": "Trace GLB used material scalar factor and texture sampler parity through OVC4 baking, especially normal strength, metallic/roughness multipliers and glass alpha; reproduce mismatches before changes. Confirm iteration45 exact SHA Windows build/package and multicar CI. Audit per-eye glass ordering and source normal/ORM role correspondence without enabling live external raster or promoting unverified assets.",
+          "followup_exact_sha_ci": {
+            "sha": "362c7a9e96c0403dcc4df5b72991077e92096d30",
+            "runs": [
+              {
+                "id": 45547388880,
+                "conclusion": "success"
+              },
+              {
+                "id": 45547388868,
+                "conclusion": "success"
+              },
+              {
+                "id": 45547388701,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "All returned push workflows exact head_sha verified in Actions API; no HUD inspector run returned."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER46-RASTER-COVERAGE-STATE",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Glass transparency and PBR shading: alpha sort in both eyes, normal-map shader paths, reflections and depth write regression",
+          "source_material_sha": "7214c47c43cf010f8d9b3664f270119680e23e2d",
+          "source_blob_sha1": {
+            "src/vr/game/external_car_draw_order.hpp": "80bcfc4493284d26f0a0690da2dbe56b4867c93b",
+            "src/vr/game/dino_external_d3d9.hpp": "455096a96ab1de69f9222c2f79277989a4da61fc",
+            "tests/external_car_draw_order_test.cpp": "a458d64d39849f0744753930c4bbb19739d8d798",
+            ".github/workflows/ferrari16-multicar-regression.yml": "4c08df83587283e17a62d855b2fc81cc26dfa53e"
+          },
+          "source_defect": "DrawNativeScene establishes Z, alpha, cull and sampler states but inherited FILLMODE and MULTISAMPLEMASK. A legal prior pass with wireframe or zero/partial mask can make successful physical DIPs submit edges or no/subset of MSAA samples despite successful receipts. D3D9 default is SOLID and all mask bits. No evidence the current retail runtime actually leaves these states or that an XR target is maskable MSAA; the source state-isolation counterexample is conditional.",
+          "source_fix": "Set solid fill and all sample writes before any external DIP, using fail-closed ConfigureExternalRasterCoverage in the existing captured-state transaction. Preserve original state block Apply, single-sample behavior, opaque/glass depth write policy, PBR shaders, native wrapper and disabled atomic staging. Does not enable MSAA or change sample count.",
+          "positive_negative_regressions": [
+            "3840 synthetic cases: 16 slot labels x opaque/glass x 5 sample counts x two inherited fill states x four masks x three failure/success states. Verify full coverage, zero-mask old counterexample, early stop on setter failure, restoration model. Existing draw order and texture routing cases also run.",
+            "N100 lightweight exact-blob portable g++ C++17 -Wall -Wextra -Werror -pedantic UBSan run PASS; header and test Git SHA1 framing verified. CI source checks assert native setup and existing StateBlock Apply. No physical GPU rendering tested."
+          ],
+          "call_graph_trace": [
+            "GpuOwner::DrawNativeScene -> atomic fence -> CaptureExternalDrawState -> raster state setup -> PBR Bind -> signed animated center glass sort -> opaque depth writes / glass no depth writes -> per-mesh physical stereo receipt -> StateBlock Apply. Existing center-camera sorting is not independently per-eye; parallel eye translation test is not proof for canted views or intersecting panes.",
+            "Reviewed normal-map derivative TBN, packed ORM multipliers, alpha return and per-eye shader c1. Initial hypothesis that tex2D inside dynamic branch necessarily violates SM3 was rejected: read-only interpolated UV is expressly allowed (Microsoft D3D9 Flow Control Limitations, Scenario B). Existing HLSL CI success supports preserving shader. Directional lighting only, actual environment reflection and GPU visual quality unverified.",
+            "Microsoft D3DRENDERSTATETYPE docs confirm mask controls each MSAA sample write and is ignored on single sample targets; fill mode defaults to solid. No artificial shader modifications."
+          ],
+          "same_sha_ci": {
+            "sha": "7214c47c43cf010f8d9b3664f270119680e23e2d",
+            "runs": [
+              {
+                "id": 45550826133,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "id": 45550826135,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45550826182,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Actions API head_sha verified; multicar and pbr-hlsl jobs success; remaining jobs in progress. No HUD run returned."
+          },
+          "protected_v003": "Automation branch only; no stable release, native callback, shader, menu, host, deployment, or asset changes. ChatGPT local GitHub DNS unavailable; N100 minimal portable test and read-only API only. Two new state setters before per-scene mesh loop, no measured FPS impact. Atomic live external raster fence remains closed.",
+          "asset_validation": "No actual 16 private model/source/processed SHA or rights verification; no candidate promotion; no actual HMD image, physical sample mask state or FPS.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration45 credited once 2919+1=2920 ledger a661bfd2591ab08d3113efd3174ab1291c265442",
+          "next_trace": "Inspect exact-SHA Win32/x64 isolated package outcomes and actual Windows negative tests; trace source GLB sampler/factor to OVC4 texture bake and whether per-eye view sorting must change for canted/asymmetric eye poses. No unsafe live raster enable, no candidate promotion."
         }
       ],
-      "latest_material_sha": "362c7a9e96c0403dcc4df5b72991077e92096d30",
-      "latest_static_ci": "Iteration45 exact committed portable ground ASan/UBSan test and full OVC Python self-test PASS; 32 C++ and 128 OVC synthetic slot combinations; three exact SHA workflows in progress. Iteration44 three exact SHA workflows success.",
-      "next_focus": "Trace GLB used material scalar factor and texture sampler parity through OVC4 baking, especially normal strength, metallic/roughness multipliers and glass alpha; reproduce mismatches before changes. Confirm iteration45 exact SHA Windows build/package and multicar CI. Audit per-eye glass ordering and source normal/ORM role correspondence without enabling live external raster or promoting unverified assets."
+      "latest_material_sha": "7214c47c43cf010f8d9b3664f270119680e23e2d",
+      "latest_static_ci": "Iteration46 exact committed portable UBSan draw-order test PASS, 3840 new synthetic cases; exact SHA multicar/HLSL success, Win32 build and isolated x86/x64 package pending. Iteration45 three exact SHA workflows success.",
+      "next_focus": "Inspect exact-SHA Win32/x64 isolated package outcomes and actual Windows negative tests; trace source GLB sampler/factor to OVC4 texture bake and whether per-eye view sorting must change for canted/asymmetric eye poses. No unsafe live raster enable, no candidate promotion."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 13:30:00+09:00",
+  "last_updated_kst": "2026-11-25 14:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
