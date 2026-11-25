@@ -30,6 +30,7 @@ constexpr DWORD D3DCLEAR_ZBUFFER = 2, D3DCLEAR_STENCIL = 4;
 struct IDirect3DDevice9 { bool game; };
 bool InternalStereoPass = false;
 std::uint64_t PresentEpoch = 77;
+std::uint64_t ExternalAtomicReplayEpoch=0;
 OutRunVR::DepthClearReplayStamp LastMainDepthClearStamp{};
 DWORD writes = 0, expectedAtCall = 0;
 unsigned reads = 0, calls = 0, expectedHook = 0;
@@ -62,6 +63,7 @@ int main() {
     for(HRESULT failure: {0,-1,-17}) {
         LastMainDepthClearStamp.Record(current?77:76,cleared);
         InternalStereoPass=internal; writes=writeMask; injected=failure;
+        ExternalAtomicReplayEpoch=77;
         expectedHook=family; calls=reads=0;
         const bool relevant=!internal&&correctDevice&&current&&cleared!=0;
         expectedAtCall=relevant?(cleared&~writes):cleared;
@@ -74,6 +76,7 @@ int main() {
         case 3: actual=R29OwnerCallRawDrawIndexedPrimitiveUP(d,0,0,3,1,nullptr,0,nullptr,0); break;
         }
         assert(actual==failure && calls==1);
+        assert(ExternalAtomicReplayEpoch==(correctDevice?0u:77u));
         assert(LastMainDepthClearStamp.flags==expectedAtCall);
         assert(reads==(relevant?unsigned(bool(cleared&2))+unsigned(bool(cleared&4)):0u));
         ++cases;

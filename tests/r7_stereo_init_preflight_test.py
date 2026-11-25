@@ -189,6 +189,21 @@ int main(){
         if(fail>=1&&fail<=4)assert(d.clearCalls==0);
         if(fail>=5&&fail<=16)assert(d.io==fail+5);
     }
+    // Single-eye operation must not touch the other candidate.
+    d.io=d.clearCalls=d.liveWrites=0;d.ioFail=0;
+    d.rt=d.liveRt=&lc;d.depth=d.liveDepth=&ld;d.viewport=vp;
+    auto color=[&](IDirect3DSurface9* s){return d.bindColor(s);};
+    auto depth=[&](IDirect3DSurface9* s){return d.bindDepth(s);};
+    for(unsigned eye=0;eye<2;++eye){
+        unsigned draws=0;
+        const auto result=R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,
+            [&](){++draws;assert(d.rt==pair.eyes[eye].color&&d.depth==pair.eyes[eye].depth);return d.clear();},eye,1);
+        assert(result==R7CandidateSeedResult::Seeded&&draws==1);
+        assert(d.rt==&lc&&d.depth==&ld&&d.liveWrites==0);
+    }
+    const unsigned before=d.io;
+    assert(R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,[&](){return d.clear();},2,1)==R7CandidateSeedResult::Unavailable);
+    assert(d.io==before);
     pair.Reset();d.empty();
 }
 '''
@@ -199,3 +214,13 @@ with tempfile.TemporaryDirectory() as temp:
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
 print("R7 A1 inactive pair allocation/reuse/reset/fault injection PASS")
+
+# Actual R7 draw path must mirror both eyes before their live DIP, and raw
+# R29 routes must not implicitly claim coverage.
+draw=source[source.index("HRESULT ExecuteStereoDraw("):source.index("HRESULT __stdcall DrawPrimitiveDest(")]
+assert draw.index("R7ReplayInactiveEye(device,0") < draw.index("const HRESULT leftHr=drawCall();")
+assert draw.index("R7ReplayInactiveEye(device,1") < draw.index("rightHr=drawCall();")
+assert "if(FAILED(rightHr)||!restoreOk)ExternalAtomicReplayEpoch=0;" in draw
+assert "ExecuteStereoDraw(device,call,true)" in source
+assert "if(changed)ExternalAtomicReplayEpoch=0;" in source
+assert "ExternalAtomicReplayEpoch=0;" in clear

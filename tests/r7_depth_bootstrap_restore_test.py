@@ -125,6 +125,7 @@ std::atomic<bool> StereoBaseCallbacksArmed{true};
 bool InternalStereoPass=false, wanted=true, backbuffer=true,
     mrt=false, resources=true, coverage=true, FrameRightDrawFailed=false;
 unsigned coverageCalls=0, poisons=0, candidateCalls=0;
+std::uint64_t ExternalAtomicReplayEpoch=0;
 namespace Settings { bool VRExternalFerrariTest=false,VRF50ExternalModel=false; }
 enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
 R7CandidateSeedResult candidateResult=R7CandidateSeedResult::Unavailable;
