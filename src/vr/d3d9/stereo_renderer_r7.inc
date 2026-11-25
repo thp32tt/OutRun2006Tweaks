@@ -1674,7 +1674,8 @@ namespace OutRunVRStereo
         R7CandidateSeedResult R7SeedInactivePair(R7AtomicCandidatePair& pair,
             IDirect3DDevice9* d,IDirect3DSurface9* expectedRt,
             IDirect3DSurface9* expectedDepth,BindColor bindColor,
-            BindDepth bindDepth,ClearEye clearEye,unsigned firstEye=0,unsigned eyeCount=2) noexcept
+            BindDepth bindDepth,ClearEye clearEye,unsigned firstEye=0,unsigned eyeCount=2,
+            bool requireFullViewport=true) noexcept
         {
             if(firstEye>=2||!eyeCount||eyeCount>2-firstEye||
                 !d||pair.device!=d||!expectedRt||!expectedDepth||
@@ -1688,8 +1689,12 @@ namespace OutRunVRStereo
             const bool captured=SUCCEEDED(d->GetRenderTarget(0,&rt))&&rt==expectedRt&&
                 SUCCEEDED(d->GetDepthStencilSurface(&depth))&&depth==expectedDepth&&
                 SUCCEEDED(d->GetViewport(&viewport))&&SUCCEEDED(d->GetScissorRect(&scissor))&&
-                viewport.X==0&&viewport.Y==0&&viewport.Width==pair.colorDesc.Width&&
-                viewport.Height==pair.colorDesc.Height;
+                viewport.Width&&viewport.Height&&viewport.X<pair.colorDesc.Width&&
+                viewport.Y<pair.colorDesc.Height&&
+                viewport.Width<=pair.colorDesc.Width-viewport.X&&
+                viewport.Height<=pair.colorDesc.Height-viewport.Y&&
+                (!requireFullViewport||(viewport.X==0&&viewport.Y==0&&
+                 viewport.Width==pair.colorDesc.Width&&viewport.Height==pair.colorDesc.Height));
             if(!captured){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
             bool seeded=true;
             for(unsigned i=firstEye;i<firstEye+eyeCount;++i){
@@ -1735,7 +1740,7 @@ namespace OutRunVRStereo
             return result;
         }
 
-        // Replay one physical VB draw while its exact eye transforms and
+        // Replay one physical indexed or non-indexed VB draw while its exact eye transforms and
         // shaders are still bound. No UP replay (UP changes stream state).
         // A missing route invalidates the seed; this is NOT a complete scene
         // receipt until every physical owner is covered.
@@ -1751,7 +1756,7 @@ namespace OutRunVRStereo
                 liveColor,liveDepth,
                 [&](IDirect3DSurface9* s){return SetRenderTargetHook.stdcall<HRESULT>(device,0u,s);},
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
-                [&](){return drawCall();},eye,1);
+                [&](){return drawCall();},eye,1,false);
             if(result!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
             return result;
         }
@@ -2686,7 +2691,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 ? leftHr : E_FAIL;
 		}
 
-		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT startVertex,UINT primitiveCount){auto call=[&](){return DrawPrimitiveHook.stdcall<HRESULT>(device,type,startVertex,primitiveCount);};return ExecuteStereoDraw(device,call);}
+		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT startVertex,UINT primitiveCount){auto call=[&](){return DrawPrimitiveHook.stdcall<HRESULT>(device,type,startVertex,primitiveCount);};return ExecuteStereoDraw(device,call,true);}
 		HRESULT __stdcall DrawIndexedPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,INT baseVertexIndex,UINT minVertexIndex,UINT numVertices,UINT startIndex,UINT primitiveCount)
 		{
 			const auto pmt=OutRunVR::GameSemantic::CurrentLensOpaquePmtEntry;

@@ -201,6 +201,18 @@ int main(){
         assert(result==R7CandidateSeedResult::Seeded&&draws==1);
         assert(d.rt==&lc&&d.depth==&ld&&d.liveWrites==0);
     }
+    // A partial viewport is valid for a replay, not for a full seed.
+    d.viewport={20,30,640,480};d.scissor={21,31,600,400};
+    unsigned partialDraws=0;
+    auto partial=[&](){++partialDraws;assert(d.viewport.X==20&&d.viewport.Y==30&&d.viewport.Width==640&&d.scissor.left==21);return d.clear();};
+    assert(R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,partial)==R7CandidateSeedResult::Unavailable);
+    assert(partialDraws==0);
+    assert(R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,partial,0,1,false)==R7CandidateSeedResult::Seeded);
+    assert(partialDraws==1&&d.rt==&lc&&d.depth==&ld&&d.viewport.X==20&&d.scissor.left==21&&d.liveWrites==0);
+    d.viewport={1900,0,640,480};
+    assert(R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,partial,1,1,false)==R7CandidateSeedResult::Unavailable);
+    assert(partialDraws==1&&d.rt==&lc&&d.depth==&ld);
+    d.viewport=vp;
     const unsigned before=d.io;
     assert(R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,[&](){return d.clear();},2,1)==R7CandidateSeedResult::Unavailable);
     assert(d.io==before);
@@ -221,6 +233,9 @@ draw=source[source.index("HRESULT ExecuteStereoDraw("):source.index("HRESULT __s
 assert draw.index("R7ReplayInactiveEye(device,0") < draw.index("const HRESULT leftHr=drawCall();")
 assert draw.index("R7ReplayInactiveEye(device,1") < draw.index("rightHr=drawCall();")
 assert "if(FAILED(rightHr)||!restoreOk)ExternalAtomicReplayEpoch=0;" in draw
-assert "ExecuteStereoDraw(device,call,true)" in source
+assert "ExecuteStereoDraw(device,call,true)" in source[source.index("HRESULT __stdcall DrawPrimitiveDest("):source.index("HRESULT __stdcall DrawIndexedPrimitiveDest(")]
+assert "ExecuteStereoDraw(device,call,true)" in source[source.index("HRESULT __stdcall DrawIndexedPrimitiveDest("):source.index("HRESULT __stdcall DrawPrimitiveUPDest(")]
+assert "ExecuteStereoDraw(device,call,true)" not in source[source.index("HRESULT __stdcall DrawPrimitiveUPDest("):source.index("HRESULT __stdcall ClearDest(")]
+assert "[&](){return drawCall();},eye,1,false);" in source
 assert "if(changed)ExternalAtomicReplayEpoch=0;" in source
 assert "ExternalAtomicReplayEpoch=0;" in clear
