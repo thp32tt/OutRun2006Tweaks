@@ -88,7 +88,7 @@ owner_end=source.index("R7AtomicCandidatePair ExternalAtomicCandidates",owner_be
 owner=source[owner_begin:owner_end]
 assert "ExternalAtomicCandidates.Reset();" in source[source.index("void ReleaseStereoResources()"):source.index("bool CreateRightDepthForTracked(")]
 clear=source[source.index("HRESULT __stdcall ClearDest("):source.index("HRESULT __stdcall SetRenderTargetDest(")]
-assert clear.index("if(!restoreOk)") < clear.index("R7BeginExternalAtomicResourceTransaction(device,savedViewport)")
+assert clear.index("if(!restoreOk)") < clear.index("R7BeginExternalAtomicResourceTransaction(device,savedViewport,flags,color,z,stencil)")
 assert "Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel" in clear
 assert "SetRenderTarget" not in owner and "SetDepthStencilSurface" not in owner and "StretchRect" not in owner
 atomic_stub=r'''
@@ -98,18 +98,34 @@ using HRESULT=int;
 using UINT=unsigned;
 constexpr int FALSE=0, E_FAIL=-1, S_OK=0;
 bool FAILED(HRESULT h){return h<0;}
+bool SUCCEEDED(HRESULT h){return h>=0;}
 struct D3DSURFACE_DESC {UINT Width=0,Height=0,Format=0,MultiSampleType=0,MultiSampleQuality=0;};
 struct D3DVIEWPORT9 {UINT X=0,Y=0,Width=0,Height=0;};
+struct RECT {int left=0,top=0,right=1920,bottom=1080;};
 struct IDirect3DSurface9 {
     D3DSURFACE_DESC desc{};
     int refs=0;
     HRESULT GetDesc(D3DSURFACE_DESC* d){*d=desc;return S_OK;}
-    void Release(){assert(refs==1);--refs;}
+    void Release(){assert(refs>0);--refs;}
 };
 template<class T> void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
 struct IDirect3DDevice9 {
     IDirect3DSurface9 made[32]{};
     unsigned calls=0,failAt=0,nullAt=0,mismatchAt=0;
+    unsigned io=0,ioFail=0,clearCalls=0,liveWrites=0;
+    IDirect3DSurface9 *rt=nullptr,*depth=nullptr,*liveRt=nullptr,*liveDepth=nullptr;
+    D3DVIEWPORT9 viewport{0,0,1920,1080};
+    RECT scissor{4,5,1800,1000};
+    HRESULT op(){return ++io==ioFail?E_FAIL:S_OK;}
+    HRESULT GetRenderTarget(unsigned,IDirect3DSurface9** s){*s=rt;if(rt)++rt->refs;return op();}
+    HRESULT GetDepthStencilSurface(IDirect3DSurface9** s){*s=depth;if(depth)++depth->refs;return op();}
+    HRESULT GetViewport(D3DVIEWPORT9* v){*v=viewport;return op();}
+    HRESULT GetScissorRect(RECT* r){*r=scissor;return op();}
+    HRESULT SetViewport(const D3DVIEWPORT9* v){auto h=op();if(!FAILED(h))viewport=*v;return h;}
+    HRESULT SetScissorRect(const RECT* r){auto h=op();if(!FAILED(h))scissor=*r;return h;}
+    HRESULT bindColor(IDirect3DSurface9* s){auto h=op();if(!FAILED(h)){rt=s;viewport={};scissor={};}return h;}
+    HRESULT bindDepth(IDirect3DSurface9* s){auto h=op();if(!FAILED(h))depth=s;return h;}
+    HRESULT clear(){++clearCalls;if(rt==liveRt||depth==liveDepth||!rt||!depth)++liveWrites;return op();}
     HRESULT create(UINT w,UINT h,UINT f,UINT m,UINT q,IDirect3DSurface9** out){
         auto& s=made[calls++];assert(!s.refs);
         if(calls==nullAt){*out=nullptr;return S_OK;}
@@ -121,6 +137,7 @@ struct IDirect3DDevice9 {
     void empty(){for(auto& s:made)assert(s.refs==0);}
 };
 '''
+seed=source[source.index("enum class R7CandidateSeedResult"):source.index("// A successful seed is ONLY")]
 atomic_cases=r'''
 int main(){
     IDirect3DSurface9 lc{{1920,1080,1,4,0}},rc=lc;
@@ -152,12 +169,33 @@ int main(){
     assert(pair.Ensure(&other,&lc,&ld,&rc,&rd,vp));d.empty();
     pair.Reset();other.empty();
     assert(lc.refs==0&&ld.refs==0&&rc.refs==0&&rd.refs==0);
+    assert(ensure());
+    // 4 getters, 6 operations per eye, 5 independent restores.
+    for(unsigned fail=0;fail<=21;++fail){
+        d.io=d.clearCalls=d.liveWrites=0;d.ioFail=fail;
+        d.rt=d.liveRt=&lc;d.depth=d.liveDepth=&ld;d.viewport=vp;
+        d.scissor={4,5,1800,1000};
+        const auto result=R7SeedInactivePair(pair,&d,&lc,&ld,
+            [&](IDirect3DSurface9* s){return d.bindColor(s);},
+            [&](IDirect3DSurface9* s){return d.bindDepth(s);},
+            [&](){return d.clear();});
+        assert(d.liveWrites==0&&lc.refs==0&&ld.refs==0);
+        if(fail==0){assert(result==R7CandidateSeedResult::Seeded&&d.clearCalls==2);}
+        else if(fail>=17){assert(result==R7CandidateSeedResult::DirtyRestore&&d.io==21);}
+        else{assert(result==R7CandidateSeedResult::Unavailable);}
+        if(fail<=16){
+            assert(d.rt==&lc&&d.depth==&ld&&d.viewport.Width==1920&&d.scissor.left==4);
+        }
+        if(fail>=1&&fail<=4)assert(d.clearCalls==0);
+        if(fail>=5&&fail<=16)assert(d.io==fail+5);
+    }
+    pair.Reset();d.empty();
 }
 '''
 with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"atomic_candidate.cpp"
     exe=Path(temp)/"atomic_candidate"
-    cpp.write_text(atomic_stub+owner+atomic_cases)
+    cpp.write_text(atomic_stub+owner+seed+atomic_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
 print("R7 A1 inactive pair allocation/reuse/reset/fault injection PASS")

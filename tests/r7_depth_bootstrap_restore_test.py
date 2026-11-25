@@ -124,7 +124,14 @@ constexpr HRESULT D3D_OK=0;
 std::atomic<bool> StereoBaseCallbacksArmed{true};
 bool InternalStereoPass=false, wanted=true, backbuffer=true,
     mrt=false, resources=true, coverage=true, FrameRightDrawFailed=false;
-unsigned coverageCalls=0, poisons=0;
+unsigned coverageCalls=0, poisons=0, candidateCalls=0;
+namespace Settings { bool VRExternalFerrariTest=false,VRF50ExternalModel=false; }
+enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
+R7CandidateSeedResult candidateResult=R7CandidateSeedResult::Unavailable;
+R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9*,
+    const D3DVIEWPORT9&,DWORD,D3DCOLOR,float,DWORD){
+    ++candidateCalls;return candidateResult;
+}
 namespace OutRunVR {
 enum Failure {StereoFailureMrtActive, StereoFailureResourceUnavailable,
     StereoFailureClearFailed, StereoFailureViewportUnavailable};
@@ -146,7 +153,9 @@ void RecordFullMainDepthClear(IDirect3DDevice9*,DWORD,const D3DRECT*,DWORD flags
 '''
 clear_suffix = r'''
 void ResetProbe(unsigned failure){
-    step=clearCalls=notes=poisons=coverageCalls=0;failAt=failure;
+    step=clearCalls=notes=poisons=coverageCalls=candidateCalls=0;failAt=failure;
+    Settings::VRExternalFerrariTest=Settings::VRF50ExternalModel=false;
+    candidateResult=R7CandidateSeedResult::Unavailable;
     RightDepthSynchronized=RightStencilSynchronized=true;
     FrameRightDrawFailed=false;
     LastMainDepthClearStamp.Record(PresentEpoch,6);
@@ -190,6 +199,18 @@ int main(){
     assert(ClearDest(&dev,0,nullptr,6,0,1.f,0)==D3D_OK&&step==1&&poisons==1);
     ResetProbe(0);resources=false;
     assert(ClearDest(&dev,0,nullptr,6,0,1.f,0)==D3D_OK&&step==1&&poisons==1);
+    for(auto outcome:{R7CandidateSeedResult::Unavailable,R7CandidateSeedResult::Seeded,R7CandidateSeedResult::DirtyRestore}){
+        ResetProbe(0);Settings::VRExternalFerrariTest=true;candidateResult=outcome;
+        const bool dirty=outcome==R7CandidateSeedResult::DirtyRestore;
+        assert(ClearDest(&dev,0,nullptr,7,0,1.f,0)==(dirty?E_FAIL:D3D_OK));
+        assert(candidateCalls==1&&notes==unsigned(dirty));
+        assert(RightDepthSynchronized==!dirty&&RightStencilSynchronized==!dirty);
+        assert(LastMainDepthClearStamp.Current(PresentEpoch)==!dirty);
+    }
+    ResetProbe(0);Settings::VRF50ExternalModel=true;
+    assert(ClearDest(&dev,0,nullptr,1,0,1.f,0)==D3D_OK&&candidateCalls==0);
+    ResetProbe(5);Settings::VRF50ExternalModel=true;
+    assert(ClearDest(&dev,0,nullptr,7,0,1.f,0)==D3D_OK&&candidateCalls==0);
     std::cout<<"R7_CLEAR_RESTORE_RECEIPT_PASS\n";
 }
 '''

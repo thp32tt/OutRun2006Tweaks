@@ -1660,16 +1660,70 @@ namespace OutRunVRStereo
         R7AtomicCandidatePair ExternalAtomicCandidates{};
         std::uint64_t ExternalAtomicAllocationAttemptEpoch=0;
 
-        // Resource-transaction entry at a successful main-eye clear boundary,
-        // not in a mesh DIP. The existing opt-in keeps stock runs allocation-free.
-        // This is A1 allocation only; no candidate may be drawn or published yet.
-        bool R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
-            const D3DVIEWPORT9& viewport) noexcept
+        enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
+
+        // Capture actual attachments, not just the hook's shadow. No clear
+        // until all candidate attachment setters succeed.
+        template<class BindColor,class BindDepth,class ClearEye>
+        R7CandidateSeedResult R7SeedInactivePair(R7AtomicCandidatePair& pair,
+            IDirect3DDevice9* d,IDirect3DSurface9* expectedRt,
+            IDirect3DSurface9* expectedDepth,BindColor bindColor,
+            BindDepth bindDepth,ClearEye clearEye) noexcept
         {
-            if(ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return false;
+            if(!d||pair.device!=d||!expectedRt||!expectedDepth||
+                !pair.eyes[0].color||!pair.eyes[0].depth||
+                !pair.eyes[1].color||!pair.eyes[1].depth)
+                return R7CandidateSeedResult::Unavailable;
+            IDirect3DSurface9* rt=nullptr;
+            IDirect3DSurface9* depth=nullptr;
+            D3DVIEWPORT9 viewport{};
+            RECT scissor{};
+            const bool captured=SUCCEEDED(d->GetRenderTarget(0,&rt))&&rt==expectedRt&&
+                SUCCEEDED(d->GetDepthStencilSurface(&depth))&&depth==expectedDepth&&
+                SUCCEEDED(d->GetViewport(&viewport))&&SUCCEEDED(d->GetScissorRect(&scissor))&&
+                viewport.X==0&&viewport.Y==0&&viewport.Width==pair.colorDesc.Width&&
+                viewport.Height==pair.colorDesc.Height;
+            if(!captured){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
+            bool seeded=true;
+            for(const auto& eye:pair.eyes){
+                if(FAILED(bindDepth(nullptr))||FAILED(bindColor(eye.color))||
+                    FAILED(bindDepth(eye.depth))||FAILED(d->SetViewport(&viewport))||
+                    FAILED(d->SetScissorRect(&scissor))||FAILED(clearEye())){
+                    seeded=false;break;
+                }
+            }
+            // Never short-circuit recovery, including after a failed setter.
+            bool restored=true;
+            if(FAILED(bindDepth(nullptr)))restored=false;
+            if(FAILED(bindColor(rt)))restored=false;
+            if(FAILED(bindDepth(depth)))restored=false;
+            if(FAILED(d->SetViewport(&viewport)))restored=false;
+            if(FAILED(d->SetScissorRect(&scissor)))restored=false;
+            ReleaseCom(depth);ReleaseCom(rt);
+            if(!restored)return R7CandidateSeedResult::DirtyRestore;
+            return seeded?R7CandidateSeedResult::Seeded:R7CandidateSeedResult::Unavailable;
+        }
+
+        // A successful seed is ONLY the initial clear, not the current scene
+        // depth or a publication receipt. Later world draws must be replayed.
+        R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
+            const D3DVIEWPORT9& viewport,DWORD flags,D3DCOLOR color,float z,DWORD stencil) noexcept
+        {
+            if(ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
-            return ExternalAtomicCandidates.Ensure(device,TrackedRenderTarget,
-                TrackedDepthStencil,RightEyeSurface,RightEyeDepth,viewport);
+            if(!ExternalAtomicCandidates.Ensure(device,TrackedRenderTarget,
+                TrackedDepthStencil,RightEyeSurface,RightEyeDepth,viewport))
+                return R7CandidateSeedResult::Unavailable;
+            if(FormatHasStencil(ExternalAtomicCandidates.depthDesc.Format)&&
+                !(flags&D3DCLEAR_STENCIL))return R7CandidateSeedResult::Unavailable;
+            InternalPassScope guard;
+            const auto result=R7SeedInactivePair(ExternalAtomicCandidates,device,
+                TrackedRenderTarget,TrackedDepthStencil,
+                [&](IDirect3DSurface9* s){return SetRenderTargetHook.stdcall<HRESULT>(device,0u,s);},
+                [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
+                [&](){return ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),flags,color,z,stencil);});
+            if(result==R7CandidateSeedResult::DirtyRestore)ExternalAtomicCandidates.Reset();
+            return result;
         }
 
 		void ReleaseStereoResources()
@@ -2652,7 +2706,15 @@ if(WaitForEventQuery(slot.fence,1,0u))
             if(FAILED(rightHr)){FrameRightDrawFailed=true;if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;PoisonFrame(OutRunVR::StereoFailureClearFailed);}else if(ClearCoversStereoBackbuffer(device,count,rects)){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=true;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=true;
                 if((flags&(D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER))==(D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER)&&
                     (Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel))
-                    R7BeginExternalAtomicResourceTransaction(device,savedViewport);
+                {
+                    const auto seed=R7BeginExternalAtomicResourceTransaction(device,savedViewport,flags,color,z,stencil);
+                    if(seed==R7CandidateSeedResult::DirtyRestore){
+                        RightDepthSynchronized=false;RightStencilSynchronized=false;
+                        LastMainDepthClearStamp.Invalidate();
+                        NoteRestoreFailure("external inactive-pair seed");
+                        return E_FAIL;
+                    }
+                }
             }return leftHr;
 		}
 
