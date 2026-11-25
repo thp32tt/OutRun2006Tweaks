@@ -41,6 +41,8 @@ def assert_pe_image(data, machine, is_dll, label):
         reject("invalid SizeOfImage")
     executable_bytes = False
     entry_backed = False
+    raw_ranges = []
+    virtual_ranges = []
     for i in range(sections):
         section = table + i * 40
         virtual_size, rva, raw_size, raw = struct.unpack_from(
@@ -51,10 +53,21 @@ def assert_pe_image(data, machine, is_dll, label):
         if max(virtual_size, raw_size) and (
                 rva < headers_size or rva + max(virtual_size, raw_size) > image_size):
             reject("section outside virtual image")
+        # Individually bounded sections can still alias each other. A PE
+        # image must not map competing section contents to the same RVA
+        # or describe the same file bytes as separate section payloads.
+        if raw_size:
+            raw_ranges.append((raw, raw + raw_size))
+        if max(virtual_size, raw_size):
+            virtual_ranges.append((rva, rva + max(virtual_size, raw_size)))
         if raw_size and characteristics & 0x20000000:
             executable_bytes = True
             if rva <= entry < rva + raw_size:
                 entry_backed = True
+    for ranges, kind in ((raw_ranges, "raw"), (virtual_ranges, "virtual")):
+        ranges.sort()
+        if any(left[1] > right[0] for left, right in zip(ranges, ranges[1:])):
+            reject(f"overlapping {kind} sections")
     if not executable_bytes:
         reject("no file-backed executable section")
     if (entry == 0 and not is_dll) or (entry != 0 and not entry_backed):

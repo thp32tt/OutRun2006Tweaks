@@ -37,6 +37,22 @@ def make_pe(machine, is_dll=None):
     return bytes(data)
 
 
+def make_two_section_pe(machine, overlap=None):
+    data = bytearray(make_pe(machine))
+    data.extend(bytes(0x200))
+    table = 0x98 + (0xe0 if machine == 0x14c else 0xf0)
+    struct.pack_into("<H", data, 0x86, 2)
+    struct.pack_into("<I", data, 0x98 + 56, 0x3000)
+    second = table + 40
+    data[second:second + 8] = b".data\x00\x00\x00"
+    # Adjacent raw intervals, distinct RVAs in the positive control.
+    rva = 0x1000 if overlap == "virtual" else 0x2000
+    raw = 0x200 if overlap == "raw" else 0x400
+    struct.pack_into("<IIII", data, second + 8, 0x100, rva, 0x200, raw)
+    struct.pack_into("<I", data, second + 36, 0xc0000040)
+    return bytes(data)
+
+
 class PackageIntegrityTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -136,6 +152,38 @@ class PackageIntegrityTests(unittest.TestCase):
             else:
                 with self.assertRaises(ValueError):
                     pkg.assert_pe_image(no_entry, machine, dll, "test")
+
+    def test_section_overlap_build_and_rehashed_zip(self):
+        root = self.path / "root"
+        for index, machine in enumerate((0x14c, 0x8664)):
+            target = (self.dll, self.host)[index]
+            original = target.read_bytes()
+            good = make_two_section_pe(machine)
+            target.write_bytes(good)
+            pkg.build_package(root, self.dll, self.host, SHA, self.zip_path)
+            pkg.verify_package(self.zip_path, SHA)
+            for kind in ("raw", "virtual"):
+                with self.subTest(payload=pkg.PAYLOAD[index], overlap=kind):
+                    bad = make_two_section_pe(machine, kind)
+                    target.write_bytes(bad)
+                    with self.assertRaisesRegex(ValueError, f"overlapping {kind}"):
+                        pkg.build_package(root, self.dll, self.host, SHA, self.zip_path)
+                    target.write_bytes(good)
+                    def change(entries):
+                        entries[pkg.PAYLOAD[index]] = bad
+                        hashed = {name: data for name, data in entries.items()
+                                  if name not in ("QA.json", "SHA256SUMS.txt")}
+                        qa = json.loads(entries["QA.json"])
+                        qa["ContentSha256"] = {name: pkg.digest(data)
+                                               for name, data in hashed.items()}
+                        entries["QA.json"] = json.dumps(qa).encode()
+                        entries["SHA256SUMS.txt"] = pkg.contents_sha(hashed)
+                    self.rewrite(change)
+                    with self.assertRaisesRegex(ValueError, f"overlapping {kind}"):
+                        pkg.verify_package(self.zip_path, SHA)
+                    pkg.build_package(root, self.dll, self.host, SHA, self.zip_path)
+            target.write_bytes(original)
+            pkg.build_package(root, self.dll, self.host, SHA, self.zip_path)
 
     def test_negative_wrong_role_build_and_rehashed_zip(self):
         # Same machine, but DLL role reversed. Recomputed SHA/CRC cannot
