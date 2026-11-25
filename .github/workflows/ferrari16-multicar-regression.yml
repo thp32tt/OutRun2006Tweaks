@@ -123,6 +123,17 @@ jobs:
           bootstrap=r7[r7.index('bool TryBootstrapRightDepthFromRecentClear('):r7.index('std::uint32_t NextStereoFrameId()')]
           assert bootstrap.index('!LastMainDepthClearStamp.Current(PresentEpoch)') < bootstrap.index('ClearHook.stdcall<HRESULT>')
           assert 'LastMainDepthClearStamp.Record(PresentEpoch,depthFlags);' in r7
+          left_draw=r7[r7.index('HRESULT ExecuteStereoDraw('):r7.index('HRESULT __stdcall DrawPrimitiveDest(')]
+          import re
+          assert len(re.findall(r'RevokeDepthClearReplayBeforeLeftDraw\(device\);\s+const HRESULT (?:hr|leftHr)=drawCall\(\);',left_draw)) == 6
+          assert left_draw.count('rightHr=drawCall();') == 1
+          revoke=r7[r7.index('void RevokeDepthClearReplayBeforeLeftDraw('):r7.index('bool ViewportCoversStereoBackbuffer(')]
+          assert 'InternalStereoPass || !LastMainDepthClearStamp.Current(PresentEpoch)' in revoke
+          assert 'LeftDrawMayWriteDepth(device)' in revoke and 'LeftDrawMayWriteStencil(device)' in revoke
+          assert 'LastMainDepthClearStamp.OnPotentialWrite(writes);' in revoke
+          clear=r7[r7.index('HRESULT __stdcall ClearDest('):r7.index('HRESULT __stdcall SetRenderTargetDest(')]
+          assert clear.index('LastMainDepthClearStamp.OnPotentialWrite(flags&') < clear.index('if(StereoWanted()&&!TargetIsBackBuffer())')
+          assert clear.index('LastMainDepthClearStamp.OnPotentialWrite(flags&') < clear.index('RecordFullMainDepthClear(')
           r13=Path('src/vr/d3d9/stereo_renderer_r13.cpp').read_text()
           assert 'LastMainDepthClearStamp.Invalidate();' in r13
           assert 'LastMainDepthClearEpoch' not in r13 and 'LastMainDepthClearFlags' not in r13
@@ -344,8 +355,8 @@ jobs:
           # Further byte changes fail closed; the R32 bridge guard remains.
           test "$(git hash-object src/vr/d3d9/r30_particle_dual_eye_ring.hpp)" = 55832210c09cff2c4940d7a06745b15f09284243
           test "$(git hash-object src/vr/d3d9/r30_particle_upload_policy.hpp)" = 40f32f3a349ef61cd109d6f55c364c98b2f7434e
-          # EXT16-011 iteration 31: pin the exact reviewed R7 clear receipt helper.
-          test "$(git hash-object src/vr/d3d9/depth_clear_replay_stamp.hpp)" = 4259202e36f2ac3862cd8f996988904ea0b74886
+          # EXT16-011 iteration 41: pin the reviewed write-aware clear receipt helper.
+          test "$(git hash-object src/vr/d3d9/depth_clear_replay_stamp.hpp)" = 9c983f208d75c2980b81763044f40e3b334e2d87
           # R32 remains restricted to the exact single reviewed return type.
           # Require all remaining bytes of the original file and both headers.
           python3 - <<'PY'
