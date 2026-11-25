@@ -4390,7 +4390,7 @@
       ],
       "latest_material_sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
       "latest_static_ci": "Iteration60 strict dashboard PBR test amended after initial exact CI legacy missing-body assertion failure; final exact SHA CI as recorded. Iteration59 all four applicable exact workflows success and credited once.",
-      "next_focus": "A1: implement actual isolated R7 candidate color/depth pair ownership and lifecycle in production renderer; identify viable depth handling (replay/frame staging if not copyable), real entrypoint and fault-injected tests. Read atomic_stereo_plan before coding."
+      "next_focus": "A1: confirm iteration61 exact SHA CI, implement isolated candidate binding/attachment restore with fault injection and a scene-depth replay/whole-frame isolation strategy. Do not activate external live-eye guard or advance A1 before evidence."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
@@ -4470,7 +4470,8 @@
     "milestones": [
       {
         "id": "A1",
-        "status": "NEXT",
+        "status": "IN_PROGRESS",
+        "iteration61_evidence": "Production R7 inactive L/R color+depth allocation owner, successful full-clear opt-in entry, descriptor/MSAA/viewport validation, reuse and Reset/ResetEx retirement. Exact production allocator mock tests cover allocation failures/null/mismatch, reuse, device replacement and reset. CI pending; no bind, depth replay, draw or publication yet. A1 remains incomplete.",
         "deliverable": "Implement actual R7 isolated left/right color+depth candidate resource ownership, device/reset generation, descriptors, compatible MSAA and viewport. Reuse resources; no per-mesh allocation.",
         "gate": "Compiled production D3D9 backend called by a real transaction entrypoint; failure injection on allocation/bind/restore; no mutation of live pair on abort. If depth cannot be copied with D3D9, use proven depth replay or frame-level isolation; never assume StretchRect copies depth."
       },

@@ -81,3 +81,83 @@ with tempfile.TemporaryDirectory() as temp:
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
 print("R7 stereo initialization preflight: positive/negative/retry PASS")
+
+# A1: compile the real inactive-pair allocator, not a policy surrogate.
+owner_begin=source.index("struct R7AtomicCandidatePair")
+owner_end=source.index("R7AtomicCandidatePair ExternalAtomicCandidates",owner_begin)
+owner=source[owner_begin:owner_end]
+assert "ExternalAtomicCandidates.Reset();" in source[source.index("void ReleaseStereoResources()"):source.index("bool CreateRightDepthForTracked(")]
+clear=source[source.index("HRESULT __stdcall ClearDest("):source.index("HRESULT __stdcall SetRenderTargetDest(")]
+assert clear.index("if(!restoreOk)") < clear.index("R7BeginExternalAtomicResourceTransaction(device,savedViewport)")
+assert "Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel" in clear
+assert "SetRenderTarget" not in owner and "SetDepthStencilSurface" not in owner and "StretchRect" not in owner
+atomic_stub=r'''
+#include <cassert>
+#include <cstdint>
+using HRESULT=int;
+using UINT=unsigned;
+constexpr int FALSE=0, E_FAIL=-1, S_OK=0;
+bool FAILED(HRESULT h){return h<0;}
+struct D3DSURFACE_DESC {UINT Width=0,Height=0,Format=0,MultiSampleType=0,MultiSampleQuality=0;};
+struct D3DVIEWPORT9 {UINT X=0,Y=0,Width=0,Height=0;};
+struct IDirect3DSurface9 {
+    D3DSURFACE_DESC desc{};
+    int refs=0;
+    HRESULT GetDesc(D3DSURFACE_DESC* d){*d=desc;return S_OK;}
+    void Release(){assert(refs==1);--refs;}
+};
+template<class T> void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
+struct IDirect3DDevice9 {
+    IDirect3DSurface9 made[32]{};
+    unsigned calls=0,failAt=0,nullAt=0,mismatchAt=0;
+    HRESULT create(UINT w,UINT h,UINT f,UINT m,UINT q,IDirect3DSurface9** out){
+        auto& s=made[calls++];assert(!s.refs);
+        if(calls==nullAt){*out=nullptr;return S_OK;}
+        s.desc={w,h,f,m,q};if(calls==mismatchAt)++s.desc.Width;
+        s.refs=1;*out=&s;return calls==failAt?E_FAIL:S_OK;
+    }
+    HRESULT CreateRenderTarget(UINT w,UINT h,UINT f,UINT m,UINT q,int,IDirect3DSurface9** out,void*){return create(w,h,f,m,q,out);}
+    HRESULT CreateDepthStencilSurface(UINT w,UINT h,UINT f,UINT m,UINT q,int,IDirect3DSurface9** out,void*){return create(w,h,f,m,q,out);}
+    void empty(){for(auto& s:made)assert(s.refs==0);}
+};
+'''
+atomic_cases=r'''
+int main(){
+    IDirect3DSurface9 lc{{1920,1080,1,4,0}},rc=lc;
+    IDirect3DSurface9 ld{{1920,1080,2,4,0}},rd=ld;
+    D3DVIEWPORT9 vp{0,0,1920,1080};
+    IDirect3DDevice9 d;
+    R7AtomicCandidatePair pair;
+    auto ensure=[&](){return pair.Ensure(&d,&lc,&ld,&rc,&rd,vp);};
+    assert(ensure()&&d.calls==4);
+    assert(pair.eyes[0].color!=pair.eyes[1].color&&pair.eyes[0].depth!=pair.eyes[1].depth);
+    assert(pair.eyes[0].color!=&lc&&pair.eyes[1].depth!=&rd);
+    const auto gen=pair.generation;
+    assert(ensure()&&d.calls==4&&pair.generation==gen);
+    pair.Reset();d.empty();assert(pair.generation!=gen&&!pair.device);
+    assert(ensure()&&d.calls==8);pair.Reset();d.empty();
+    for(unsigned k=1;k<=4;++k){
+        IDirect3DDevice9 fail;fail.failAt=k;
+        assert(!pair.Ensure(&fail,&lc,&ld,&rc,&rd,vp));fail.empty();
+        assert(!pair.device&&!pair.eyes[0].color&&!pair.eyes[1].depth);
+        IDirect3DDevice9 null;null.nullAt=k;
+        assert(!pair.Ensure(&null,&lc,&ld,&rc,&rd,vp));null.empty();
+        IDirect3DDevice9 mismatch;mismatch.mismatchAt=k;
+        assert(!pair.Ensure(&mismatch,&lc,&ld,&rc,&rd,vp));mismatch.empty();
+    }
+    rd.desc.MultiSampleQuality=1;assert(!ensure()&&d.calls==8);
+    rd=ld;vp.X=1;assert(!ensure()&&d.calls==8);vp.X=0;
+    assert(!pair.Ensure(&d,&lc,&ld,&lc,&rd,vp)&&d.calls==8);
+    assert(ensure());IDirect3DDevice9 other;
+    assert(pair.Ensure(&other,&lc,&ld,&rc,&rd,vp));d.empty();
+    pair.Reset();other.empty();
+    assert(lc.refs==0&&ld.refs==0&&rc.refs==0&&rd.refs==0);
+}
+'''
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"atomic_candidate.cpp"
+    exe=Path(temp)/"atomic_candidate"
+    cpp.write_text(atomic_stub+owner+atomic_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+print("R7 A1 inactive pair allocation/reuse/reset/fault injection PASS")

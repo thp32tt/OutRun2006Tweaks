@@ -66,6 +66,8 @@ namespace Settings
 	extern Setting<bool> VRTelemetry;
     extern Setting<bool> VRQuestCockpitV2Enabled;
     extern Setting<bool> VRQuestCockpitV2SkyProbe;
+    extern Setting<bool> VRExternalFerrariTest;
+    extern Setting<bool> VRF50ExternalModel;
 }
 
 #ifndef OUTRUN_VR_BUILD_SHA
@@ -1589,8 +1591,91 @@ namespace OutRunVRStereo
 			if(ringSeq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
 		}
 
+
+        // EXT16-011 A1: an inactive, renderer-owned pair. Allocation never
+        // binds, clears, copies or publishes a live eye. Depth contents are
+        // deliberately undefined until a future scene replay seeds them.
+        struct R7AtomicCandidatePair
+        {
+            struct Eye {
+                IDirect3DSurface9* color=nullptr;
+                IDirect3DSurface9* depth=nullptr;
+            };
+            Eye eyes[2]{};
+            IDirect3DDevice9* device=nullptr; // non-owning; Reset retires pair
+            D3DSURFACE_DESC colorDesc{},depthDesc{};
+            std::uint64_t generation=1;
+            R7AtomicCandidatePair()=default;
+            R7AtomicCandidatePair(const R7AtomicCandidatePair&)=delete;
+            R7AtomicCandidatePair& operator=(const R7AtomicCandidatePair&)=delete;
+            ~R7AtomicCandidatePair(){ Reset(); }
+            void Reset() noexcept {
+                for(auto& eye:eyes){ReleaseCom(eye.depth);ReleaseCom(eye.color);}
+                device=nullptr;colorDesc={};depthDesc={};
+                if(++generation==0)++generation;
+            }
+            static bool Same(const D3DSURFACE_DESC& a,const D3DSURFACE_DESC& b) noexcept {
+                return a.Width==b.Width && a.Height==b.Height && a.Format==b.Format &&
+                    a.MultiSampleType==b.MultiSampleType &&
+                    a.MultiSampleQuality==b.MultiSampleQuality;
+            }
+            bool Ensure(IDirect3DDevice9* d,IDirect3DSurface9* lc,IDirect3DSurface9* ld,
+                IDirect3DSurface9* rc,IDirect3DSurface9* rd,const D3DVIEWPORT9& vp) noexcept {
+                if(device && device!=d)Reset();
+                D3DSURFACE_DESC c{},z{},otherC{},otherZ{};
+                if(!d||!lc||!ld||!rc||!rd||lc==rc||ld==rd||
+                    FAILED(lc->GetDesc(&c))||FAILED(ld->GetDesc(&z))||
+                    FAILED(rc->GetDesc(&otherC))||FAILED(rd->GetDesc(&otherZ))||
+                    !Same(c,otherC)||!Same(z,otherZ)||!c.Width||!c.Height||
+                    z.Width<c.Width||z.Height<c.Height||
+                    c.MultiSampleType!=z.MultiSampleType||
+                    c.MultiSampleQuality!=z.MultiSampleQuality||
+                    !vp.Width||!vp.Height||vp.X>=c.Width||vp.Y>=c.Height||
+                    vp.Width>c.Width-vp.X||vp.Height>c.Height-vp.Y) {
+                    Reset();return false;
+                }
+                if(device==d && Same(colorDesc,c)&&Same(depthDesc,z)&&
+                    eyes[0].color&&eyes[0].depth&&eyes[1].color&&eyes[1].depth)return true;
+                Reset();
+                R7AtomicCandidatePair pending;
+                for(auto& eye:pending.eyes){
+                    if(FAILED(d->CreateRenderTarget(c.Width,c.Height,c.Format,
+                        c.MultiSampleType,c.MultiSampleQuality,FALSE,&eye.color,nullptr))||
+                        !eye.color||
+                        FAILED(d->CreateDepthStencilSurface(z.Width,z.Height,z.Format,
+                        z.MultiSampleType,z.MultiSampleQuality,FALSE,&eye.depth,nullptr))||
+                        !eye.depth)return false;
+                    D3DSURFACE_DESC actualC{},actualZ{};
+                    if(FAILED(eye.color->GetDesc(&actualC))||
+                        FAILED(eye.depth->GetDesc(&actualZ))||
+                        !Same(c,actualC)||!Same(z,actualZ))return false;
+                }
+                for(unsigned i=0;i<2;++i){
+                    eyes[i]=pending.eyes[i];pending.eyes[i]={};
+                }
+                device=d;colorDesc=c;depthDesc=z;
+                return true; // allocated only; never a raster/publication proof
+            }
+        };
+        R7AtomicCandidatePair ExternalAtomicCandidates{};
+        std::uint64_t ExternalAtomicAllocationAttemptEpoch=0;
+
+        // Resource-transaction entry at a successful main-eye clear boundary,
+        // not in a mesh DIP. The existing opt-in keeps stock runs allocation-free.
+        // This is A1 allocation only; no candidate may be drawn or published yet.
+        bool R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
+            const D3DVIEWPORT9& viewport) noexcept
+        {
+            if(ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return false;
+            ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+            return ExternalAtomicCandidates.Ensure(device,TrackedRenderTarget,
+                TrackedDepthStencil,RightEyeSurface,RightEyeDepth,viewport);
+        }
+
 		void ReleaseStereoResources()
 		{
+            ExternalAtomicCandidates.Reset();
+            ExternalAtomicAllocationAttemptEpoch=0;
 			// A Reset can recycle a COM address for a different depth format.
 			TrackedStencilFormatKnown = false;
 			LastMainDepthClearStamp.Invalidate();
@@ -2564,7 +2649,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 NoteRestoreFailure("right-eye clear");
                 return E_FAIL;
             }
-            if(FAILED(rightHr)){FrameRightDrawFailed=true;if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;PoisonFrame(OutRunVR::StereoFailureClearFailed);}else if(ClearCoversStereoBackbuffer(device,count,rects)){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=true;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=true;}return leftHr;
+            if(FAILED(rightHr)){FrameRightDrawFailed=true;if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;PoisonFrame(OutRunVR::StereoFailureClearFailed);}else if(ClearCoversStereoBackbuffer(device,count,rects)){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=true;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=true;
+                if((flags&(D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER))==(D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER)&&
+                    (Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel))
+                    R7BeginExternalAtomicResourceTransaction(device,savedViewport);
+            }return leftHr;
 		}
 
 		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9*device,DWORD index,IDirect3DSurface9*surface){const HRESULT hr=SetRenderTargetHook.stdcall<HRESULT>(device,index,surface);if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr)){if(index==0)ReplaceSurfaceRef(TrackedRenderTarget,surface);else if(index>=1&&index<=3)AuxRenderTargetActive[index-1]=surface!=nullptr;}return hr;}
