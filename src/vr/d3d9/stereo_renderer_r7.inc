@@ -1878,7 +1878,14 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				return false;
 			}
 			if(FAILED(clearHr))return false;
-			if(replayFlags&D3DCLEAR_ZBUFFER)RightDepthSynchronized=true;if(replayFlags&D3DCLEAR_STENCIL)RightStencilSynchronized=true;++DepthBootstrapSuccesses;if(!FirstDepthBootstrapLogged){FirstDepthBootstrapLogged=true;spdlog::info("VR stereo: bootstrapped right-eye depth from same-Present full main clear flags=0x{:x} epoch={}",static_cast<unsigned>(replayFlags),PresentEpoch);}return true;
+			if(replayFlags&D3DCLEAR_ZBUFFER)RightDepthSynchronized=true;
+			if(replayFlags&D3DCLEAR_STENCIL)RightStencilSynchronized=true;
+			++DepthBootstrapSuccesses;
+			if(!FirstDepthBootstrapLogged){
+				FirstDepthBootstrapLogged=true;
+				spdlog::info("VR stereo: bootstrapped right-eye depth from same-Present full main clear flags=0x{:x} epoch={}",static_cast<unsigned>(replayFlags),PresentEpoch);
+			}
+			return true;
 		}
 		std::uint32_t NextStereoFrameId(){if(++StereoFrameCounter==0)++StereoFrameCounter;return StereoFrameCounter;}
 
