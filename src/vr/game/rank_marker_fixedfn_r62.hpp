@@ -18,6 +18,21 @@ namespace OutRunVR::RankMarker
         true, true, true, 0x144u, true, true)); // no RHW/shader HUD
     static_assert(!ExactR62FixedFnRankRoute(
         false, true, true, 0x142u, true, true)); // world/F11
+    // Reject unowned draws before querying the R29 stereo base. That
+    // query can arm mono safety, so it is not a pure candidate predicate.
+    // Actual world/HUD dispatch retains its own independent safety gate.
+    template<class TargetBackbuffer, class StableStereo>
+    bool ExactR84FixedFnSpritePreflight(
+        bool devicePresent, bool triangleList, bool projected,
+        bool markerValid, bool screenHud, bool queuedPause,
+        TargetBackbuffer&& targetBackbuffer,
+        StableStereo&& stableStereo)
+    {
+        if (!devicePresent || !triangleList ||
+            !(projected ? markerValid : (screenHud || queuedPause)))
+            return false;
+        return targetBackbuffer() && stableStereo();
+    }
     // A complete FVF142 producer is either an anchored vehicle marker, an
     // independently tagged native gameplay ScreenHud, or the exact queued
     // ESC menu shell. A missing anchor must never borrow HUD permission.

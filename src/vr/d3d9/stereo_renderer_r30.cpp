@@ -7062,13 +7062,15 @@ namespace OutRunVRStereo
                 R30IsPauseMenuElement() &&
                 pauseCommand.queued && pauseCommand.queueNode &&
                 pauseCommand.queueEpoch != 0;
-            if (!device || type != D3DPT_TRIANGLELIST ||
-                !R29OwnerTargetIsBackBuffer() ||
-                !R29OwnerStableStereoBase(device) ||
-                (!projected && !exactHud && !pauseOverlay))
-                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             const auto* marker = CurrentProjectedMarker();
-            if (projected && (!marker || !marker->valid))
+            // Ordinary world geometry must not pay for (or trigger mono
+            // safety through) a fixed-sprite candidate's R29 base check.
+            // R33 world/HUD and lower R29 retain their own stereo guards.
+            if (!OutRunVR::RankMarker::ExactR84FixedFnSpritePreflight(
+                    device != nullptr, type == D3DPT_TRIANGLELIST,
+                    projected, marker && marker->valid, exactHud, pauseOverlay,
+                    [] { return R29OwnerTargetIsBackBuffer(); },
+                    [&] { return R29OwnerStableStereoBase(device); }))
                 return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             // The R29 setter/StateBlock identity is only a hotpath hint,
             // never proof that the current real D3D9 draw binds a shader.
