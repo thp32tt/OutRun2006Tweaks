@@ -38,6 +38,9 @@ struct D3DVIEWPORT9 { unsigned X=0,Y=0,Width=100,Height=100; };
 unsigned step=0,failAt=0,clearCalls=0,restoreCalls=0,notes=0;
 unsigned bootstrapCandidateClears=0;
 bool inCandidate=false;
+bool testingFollowup=false;
+unsigned followupCalls[2]{},followupClears[2]{};
+
 HRESULT candidateClearHr=0;
 HRESULT call(){return ++step==failAt?E_FAIL:0;}
 struct IDirect3DDevice9 {
@@ -67,9 +70,20 @@ std::uint64_t PresentEpoch=7;
 std::uint64_t ExternalAtomicReplayEpoch=0;
 enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
 R7CandidateSeedResult bootstrapReplay=R7CandidateSeedResult::Unavailable;
+R7CandidateSeedResult followupResults[2]{R7CandidateSeedResult::Seeded,R7CandidateSeedResult::Seeded};
 unsigned bootstrapReplayCalls=0;
 template<class Call> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9*,
     unsigned eye,IDirect3DSurface9* rt,IDirect3DSurface9* depth,Call& clear){
+    if(testingFollowup){
+        assert(eye<2&&rt==(eye?RightEyeSurface:TrackedRenderTarget)&&depth==(eye?RightEyeDepth:TrackedDepthStencil));
+        ++followupCalls[eye];
+        const auto outcome=followupResults[eye];
+        if(outcome==R7CandidateSeedResult::Seeded){
+            ++followupClears[eye];inCandidate=true;const auto hr=clear();inCandidate=false;
+            return FAILED(hr)?R7CandidateSeedResult::Unavailable:outcome;
+        }
+        return outcome;
+    }
     assert(eye==1&&rt==RightEyeSurface&&depth==RightEyeDepth);
     ++bootstrapReplayCalls;
     if(bootstrapReplay==R7CandidateSeedResult::Seeded){
@@ -176,7 +190,7 @@ constexpr DWORD D3DCLEAR_TARGET=1;
 constexpr HRESULT D3D_OK=0;
 std::atomic<bool> StereoBaseCallbacksArmed{true};
 bool InternalStereoPass=false, wanted=true, backbuffer=true,
-    mrt=false, resources=true, coverage=true, FrameRightDrawFailed=false;
+    mrt=false, resources=true, coverage=true, FrameRightDrawFailed=false,FrameStereoIncomplete=false;
 unsigned coverageCalls=0, poisons=0, candidateCalls=0;
 unsigned internalClearCalls=0;
 DWORD internalClearFlags=0;
@@ -215,7 +229,9 @@ void ResetProbe(unsigned failure){
     Settings::VRExternalFerrariTest=Settings::VRF50ExternalModel=false;
     candidateResult=R7CandidateSeedResult::Unavailable;
     RightDepthSynchronized=RightStencilSynchronized=true;
-    FrameRightDrawFailed=false;
+    FrameRightDrawFailed=FrameStereoIncomplete=false;
+    testingFollowup=false;followupCalls[0]=followupCalls[1]=followupClears[0]=followupClears[1]=0;
+    candidateClearHr=0;
     LastMainDepthClearStamp.Record(PresentEpoch,6);
     wanted=backbuffer=resources=coverage=true;mrt=false;
     InternalStereoPass=false;StereoBaseCallbacksArmed=true;
@@ -280,6 +296,37 @@ int main(){
     ResetProbe(0);StereoBaseCallbacksArmed=false;ExternalAtomicReplayEpoch=7;
     assert(ClearDest(&dev,0,nullptr,7,0,1.f,0)==D3D_OK);
     assert(step==1&&internalClearCalls==0&&ExternalAtomicReplayEpoch==0);
+    // Actual follow-up Clear path: each eye is replayed before its live Clear.
+    // The stock clear count and HRESULT must survive unavailable candidates.
+    unsigned cases=0;
+    for(DWORD flags:{1u,2u,4u,6u,7u})
+    for(auto l:{R7CandidateSeedResult::Seeded,R7CandidateSeedResult::Unavailable,R7CandidateSeedResult::DirtyRestore})
+    for(auto r:{R7CandidateSeedResult::Seeded,R7CandidateSeedResult::Unavailable,R7CandidateSeedResult::DirtyRestore})
+    for(unsigned failure=0;failure<=8;++failure){
+        ResetProbe(failure);testingFollowup=true;ExternalAtomicReplayEpoch=PresentEpoch;
+        followupResults[0]=l;followupResults[1]=r;
+        const bool ld=l==R7CandidateSeedResult::DirtyRestore;
+        const bool rightReached=!ld&&l==R7CandidateSeedResult::Seeded&&(failure==0||failure>=5);
+        const bool rd=rightReached&&r==R7CandidateSeedResult::DirtyRestore;
+        const bool outerDirty=!ld&&((!rd&&failure>=6)||(rd&&failure>=5&&failure<=7));
+        const bool dirty=ld||rd||outerDirty;
+        const auto hr=ClearDest(&dev,0,nullptr,flags,0,1.f,0);
+        assert(hr==((dirty||failure==1)?E_FAIL:D3D_OK));
+        assert(followupCalls[0]==1&&followupCalls[1]==unsigned(rightReached));
+        assert(notes==unsigned(dirty));
+        assert(ExternalAtomicReplayEpoch==((failure==0&&l==R7CandidateSeedResult::Seeded&&r==R7CandidateSeedResult::Seeded)?PresentEpoch:0));
+        if(dirty)assert(!RightDepthSynchronized&&!RightStencilSynchronized&&!LastMainDepthClearStamp.Current(PresentEpoch));
+        if(ld)assert(clearCalls==0);
+        if(rd)assert(clearCalls==1);
+        ++cases;
+    }
+    for(unsigned mask=1;mask<=16;mask*=2){
+        ResetProbe(0);testingFollowup=true;ExternalAtomicReplayEpoch=PresentEpoch;
+        wanted=!(mask&1);backbuffer=!(mask&2);mrt=mask&4;resources=!(mask&8);FrameStereoIncomplete=mask&16;
+        assert(ClearDest(&dev,0,nullptr,2,0,1.f,0)==D3D_OK);
+        assert(!ExternalAtomicReplayEpoch&&!followupCalls[0]&&!followupCalls[1]);++cases;
+    }
+    std::cout<<"R7_FOLLOWUP_CLEAR_PASS "<<cases<<"\n";
     std::cout<<"R7_CLEAR_RESTORE_RECEIPT_PASS\n";
 }
 '''
