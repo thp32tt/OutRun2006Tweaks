@@ -338,9 +338,14 @@ class GpuOwner final {
                         return result;
                     result.normalStats=RepairExternalModelNormals(result.model);
                     float lowest=10000.f;
-                    for(const auto& mesh:result.model.meshes)
-                        for(const auto& vertex:mesh.vertices)
-                            lowest=(std::min)(lowest,vertex.y);
+                    for(const auto& mesh:result.model.meshes) {
+                        IndexedMeshBounds bounds{};
+                        if(!ComputeIndexedMeshBounds(mesh,bounds)) {
+                            result.error="OVC_INVALID_INDEXED_BOUNDS";
+                            return result;
+                        }
+                        lowest=(std::min)(lowest,bounds.low[1]);
+                    }
                     result.lowest=lowest;
                     result.parsed=true;
                 } catch(...) {
@@ -447,18 +452,12 @@ class GpuOwner final {
                 }
             next.glass=m.name.compare(0,10,"F50_GLASS_")==0 ||
                 m.name.compare(0,10,"EXT_GLASS_")==0;
-            if(next.glass && !m.vertices.empty()) {
-                float low[3]{m.vertices[0].x,m.vertices[0].y,m.vertices[0].z};
-                float high[3]{low[0],low[1],low[2]};
-                for(const auto& v:m.vertices) {
-                    const float p[3]{v.x,v.y,v.z};
-                    for(unsigned k=0;k<3;++k) {
-                        low[k]=(std::min)(low[k],p[k]);
-                        high[k]=(std::max)(high[k],p[k]);
-                    }
-                }
+            if(next.glass) {
+                IndexedMeshBounds bounds{};
+                if(!ComputeIndexedMeshBounds(m,bounds))
+                    return RejectGpu(dev,"GLASS_INDEXED_BOUNDS_INVALID");
                 for(unsigned k=0;k<3;++k)
-                    next.glassCenter[k]=low[k]*0.5f+high[k]*0.5f;
+                    next.glassCenter[k]=bounds.low[k]*0.5f+bounds.high[k]*0.5f;
             }
             next.vertexCount=static_cast<UINT>(m.vertices.size());
             next.indexCount=static_cast<UINT>(m.indices.size());

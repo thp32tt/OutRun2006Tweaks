@@ -3,7 +3,7 @@
 // Pure/portable; used only to place the visual sidecar and NEVER alter
 // original game simulation, collision, wheel physics or VR camera.
 //
-// Input modelMinY is the actual lowest local-space vertex from a validated
+// Input modelMinY is the lowest indexed local-space vertex from a validated
 // OVC. The caller must verify model ancestry, per-car native axis/scale and
 // the exact player's existing car before calling this helper.
 // This is not a terrain raycast and cannot prove dynamic suspension clearance.

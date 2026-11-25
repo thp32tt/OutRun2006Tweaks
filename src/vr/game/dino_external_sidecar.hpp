@@ -30,6 +30,30 @@ struct Mesh {
     std::vector<std::uint32_t> indices;
     bool index32=false;
 };
+// Bounds of the vertex stream actually referenced by DrawIndexedPrimitive.
+// Unused exported vertices must not lift the car or move the glass sort key.
+struct IndexedMeshBounds final {
+    std::array<float,3> low{},high{};
+};
+inline bool ComputeIndexedMeshBounds(const Mesh& mesh,
+                                     IndexedMeshBounds& out) noexcept {
+    if(mesh.indices.empty())return false;
+    IndexedMeshBounds bounds{};
+    bool first=true;
+    for(const auto index:mesh.indices) {
+        if(index>=mesh.vertices.size())return false;
+        const auto& v=mesh.vertices[index];
+        const std::array<float,3> p{{v.x,v.y,v.z}};
+        for(unsigned k=0;k<3;++k) {
+            if(!std::isfinite(p[k]))return false;
+            bounds.low[k]=first?p[k]:(std::min)(bounds.low[k],p[k]);
+            bounds.high[k]=first?p[k]:(std::max)(bounds.high[k],p[k]);
+        }
+        first=false;
+    }
+    out=bounds;
+    return true;
+}
 struct Texture {
     std::vector<std::uint8_t> dds;
     unsigned width=0,height=0,mips=0;

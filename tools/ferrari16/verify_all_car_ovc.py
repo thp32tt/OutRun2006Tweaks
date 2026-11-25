@@ -160,7 +160,6 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
             values = struct.unpack_from("<8f", data, at + i * 32)
             require(all(math.isfinite(x) and abs(x) <= 10000 for x in values),
                     "nonfinite vertex/UV/normal")
-            min_y = min(min_y, values[1])
             if sum(n*n for n in values[3:6]) <= 1e-12:
                 zero_normals += 1
         at += vertex_bytes
@@ -175,6 +174,9 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                 positions = tuple(struct.unpack_from(
                     "<3f", data, vertex_start + vertex * 32)
                     for vertex in tri)
+                # Match native indexed mesh bounds; unreferenced vertices
+                # remain structurally validated, but are never rasterized.
+                min_y = min(min_y, *(v[1] for v in positions))
                 a, b, c = positions
                 ux, uy, uz = (b[j] - a[j] for j in range(3))
                 vx, vy, vz = (c[j] - a[j] for j in range(3))
@@ -414,6 +416,34 @@ def self_test() -> None:
         path.write_bytes(header + payload)
         assert inspect(path)["triangles"] == 1
         assert inspect(path)["zero_normal_vertices"] == 0
+        # CRC-valid unused vertex must not change the drawable floor.
+        # Referencing it instead must still enforce the same envelope.
+        for car_id, _ in CARS:
+            slot_path = Path(directory) / f"car_id_{car_id:02d}.ovc"
+            for index_width, index_format in ((2, "<3H"), (4, "<3I")):
+                for overlay in (False, True):
+                    for referenced in (False, True):
+                        outlier = struct.pack("<8f", 100, -100, 100, 0, 1, 0, 0, 0)
+                        indices = (0, 2, 3) if referenced else (1, 2, 3)
+                        fixture = (struct.pack("<HHIII", len(name), 0, 4, 3, index_width)
+                                   + name + outlier + verts
+                                   + struct.pack(index_format, *indices)
+                                   + payload[len(group):])
+                        fixture_header = b"OVRCABH4" + struct.pack(
+                            "<7I", 4, 1, 1, 4, 1, len(fixture),
+                            zlib.crc32(fixture) & 0xffffffff)
+                        slot_path.write_bytes(fixture_header + fixture)
+                        if referenced:
+                            try:
+                                inspect(slot_path, dashboard_overlay=overlay)
+                            except OvcError as error:
+                                assert str(error) == ("dashboard overlay bounds" if overlay
+                                    else "runtime floor placement cannot accept this vehicle")
+                            else:
+                                raise AssertionError("referenced floor outlier accepted")
+                        else:
+                            assert inspect(slot_path, dashboard_overlay=overlay)["floor_min_y"] == 0
+        path.write_bytes(header + payload)
         # All 16 slots, speed and RPM: valid float32 boundary values must
         # agree with native ValidDashboardBinding, not binary64 literals.
         # Preserve strict PBR/geometry checks and reject invalid axes.

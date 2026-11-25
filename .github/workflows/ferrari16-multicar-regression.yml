@@ -185,6 +185,10 @@ jobs:
           glass_sort=native[native.index('std::array<GlassDepthItem,MaxGroups>'):native.index('SortGlassBackToFront(')]
           assert 'AnimatedWorld(world,binding,dashboard)' in glass_sort
           assert 'm.glassCenter,&meshWorld.m[0][0],&view.m[0][0],' in glass_sort
+          assert 'ComputeIndexedMeshBounds(mesh,bounds)' in gpu
+          assert 'ComputeIndexedMeshBounds(m,bounds)' in gpu
+          assert 'lowest=(std::min)(lowest,bounds.low[1]);' in gpu
+          assert 'next.glassCenter[k]=bounds.low[k]*0.5f+bounds.high[k]*0.5f;' in gpu
           assert 'projection._34' in glass_sort
           assert 'DashboardOverlayMeshVisible(' in glass_sort
           assert 'if(!RuntimeExternalCarAtomicStageReady())return result;' in native
