@@ -2723,20 +2723,82 @@
           "protected_v003": "Only isolated PS scripts and Windows test workflow modified on automation branch; no runtime renderer, ABI, menu, host or model bytes changed; no release overwrite. Reparse checks are not hard-link identity or TOCTOU/transaction proof; nested source tree reparse audit and interrupted rollback remain separate.",
           "asset_validation": "No current private 16-car asset bytes or rights evidence verified, no asset promotion.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration36 credited once AI2 2911 ledger b91fc42020451677b0b16d0b1a96b7c673f2cfa4",
-          "next_trace": "Trace remaining hard-link and interrupted copy/rollback transaction (DLL/host/launcher) hazards; require reproducible Windows counterexample and preserve stock fallback. Then return to bilateral GPU stage/depth ownership and private 16-car evidence. Confirm iteration37 exact-SHA CI before credit."
+          "score_state": "CREDITED_ONCE_AI2_2911_PLUS_1_EQUALS_2912_LEDGER_bdaef964c1cbb6cc893b2ac8d3fc1df9a0b13af2",
+          "next_trace": "Trace remaining hard-link and interrupted copy/rollback transaction (DLL/host/launcher) hazards; require reproducible Windows counterexample and preserve stock fallback. Then return to bilateral GPU stage/depth ownership and private 16-car evidence. Confirm iteration37 exact-SHA CI before credit.",
+          "followup_exact_sha_ci": {
+            "sha": "9fe048df24076ab9be49cbab289b1e6de2ce30d1",
+            "runs": [
+              {
+                "id": 45518848790,
+                "conclusion": "success"
+              },
+              {
+                "id": 45518848920,
+                "conclusion": "success"
+              },
+              {
+                "id": 45518849137,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER38-OVC-ALPHA-PARITY",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Exact 328 GTS / 575 SA / F430 Spider / Testarossa Spider source-to-OVC alpha draw-pass preservation",
+          "source_material_sha": "a1b54b4c44a078f20fce388cba0fc2c2d0bb8b61",
+          "source_blob_sha1": {
+            "tools/ferrari16/verify_all_car_ovc.py": "976d4fe91203b56e5e0226d1f800060e7b1a7938",
+            "tools/ferrari16/exact_variant_quality_gate.py": "308882b683e8ae34d4c0c7273c9534b939e315cb",
+            "tests/ferrari16_exact_variant_quality_gate_test.py": "e3cf641f68b4fa59c01402d046f7859f51437653"
+          },
+          "source_defect": "Source and converted GLB material binding counter preserved alpha modes, but final OVC only compared total triangles and opaque PBR coverage. A mixed source could lose transparent mesh classification while retaining triangle count, CRC and PBR. Native dino_external_d3d9.hpp sets ALPHATESTENABLE FALSE and chooses source-over/Z-write from F50_GLASS_/EXT_GLASS_ mesh names, so MASK has no equivalent native cutout pass.",
+          "source_fix": "Read actual OVC glass/opaque triangle totals from native tag prefixes, require parity with converted GLB BLEND/OPAQUE totals, fail closed for MASK in exact variant quality gate. Return alpha counts in static report; runtime and normal OVC compatibility admission unchanged.",
+          "positive_negative_regressions": [
+            "All four exact slots with both accepted glass prefixes: mixed opaque+blend and all-opaque positives, glass-to-opaque and opaque-to-glass negatives with valid CRC, source and converted MASK rejection. Existing all-car corruption/PBR/overlay tests preserved.",
+            "Five exact-source synthetic Python scripts passed: exact variant, overlay, PBR material, derivative and OVC self-test. Local GitHub DNS unavailable; N100 small temporary harness only. First harness omitted shader fixture; repeated with exact shader source and all five passed."
+          ],
+          "same_sha_ci": {
+            "sha": "a1b54b4c44a078f20fce388cba0fc2c2d0bb8b61",
+            "runs": [
+              {
+                "id": 45522542846,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "id": 45522542898,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45522542956,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "Offline verification only, no runtime/ABI/host/menu/model changes or asset promotion; original fallback remains fenced. Counts alone cannot prove per-face identity or alpha pixel fidelity; MASK rejection is conservative approval policy, not runtime feature.",
+          "asset_validation": "No actual private source or processed assets or licensing evidence read or approved; all 16 remain unverified in this cycle.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration37 credited once AI2 2912 ledger bdaef964c1cbb6cc893b2ac8d3fc1df9a0b13af2",
+          "next_trace": "Trace graphics performance and external per-eye state churn, allocation, replay and synchronization without inventing FPS or enabling unsafe raster. Later review source-to-OVC material scalar/sampler and per-mesh alpha identity beyond aggregate counts, and real private exact-variant SHA/rights. Confirm iteration38 exact-SHA CI before credit."
         }
       ],
-      "latest_material_sha": "9fe048df24076ab9be49cbab289b1e6de2ce30d1",
-      "latest_static_ci": "Iteration37 exact SHA three push workflows in progress; iteration36 exact SHA three workflows success and credited once",
-      "next_focus": "Trace remaining hard-link and interrupted copy/rollback transaction (DLL/host/launcher) hazards; require reproducible Windows counterexample and preserve stock fallback. Then return to bilateral GPU stage/depth ownership and private 16-car evidence. Confirm iteration37 exact-SHA CI before credit."
+      "latest_material_sha": "a1b54b4c44a078f20fce388cba0fc2c2d0bb8b61",
+      "latest_static_ci": "Iteration38 exact SHA multicar/HLSL workflow success; Win32 and package pending; iteration37 all three success and credited once",
+      "next_focus": "Trace graphics performance and external per-eye state churn, allocation, replay and synchronization without inventing FPS or enabling unsafe raster. Later review source-to-OVC material scalar/sampler and per-mesh alpha identity beyond aggregate counts, and real private exact-variant SHA/rights. Confirm iteration38 exact-SHA CI before credit."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 09:35:00+09:00",
+  "last_updated_kst": "2026-11-25 10:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
