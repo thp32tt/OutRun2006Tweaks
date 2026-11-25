@@ -24,6 +24,7 @@ jobs:
           set -euo pipefail
           python3 tools/ferrari16/verify_original_player_callback_abi.py --self-test
           python3 tests/r29_raw_depth_receipt_test.py
+          python3 tests/r30_shadow_descriptor_cache_test.py
           python3 tests/ferrari16_pbr_material_gate_test.py
           python3 tests/ferrari16_pbr_derivative_gate_test.py
           python3 tests/ferrari16_overlay_status_test.py

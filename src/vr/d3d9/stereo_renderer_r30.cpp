@@ -324,6 +324,7 @@ namespace OutRunVRStereo
             {
                 const void* buffer = nullptr;
                 R30ShadowPtr entry;
+                bool registered = false; // null entry can be a rejected descriptor
             };
             // A four-entry epoch-fenced working set handles interleaved static,
             // dynamic and UI VB/IB streams without repeated registry-mutex
@@ -519,7 +520,7 @@ namespace OutRunVRStereo
         R30ShadowPtr R30FindShadow(
             Buffer* buffer,
             const std::unordered_map<Buffer*, R30ShadowPtr>& registry,
-            R30ShadowLookupCache& cached)
+            R30ShadowLookupCache& cached, bool* registered = nullptr)
         {
             const auto epoch =
                 R30ShadowRegistryEpoch.load(std::memory_order_acquire);
@@ -528,7 +529,10 @@ namespace OutRunVRStereo
                 for (const auto& slot : cached.slots)
                 {
                     if (slot.buffer == buffer)
+                    {
+                        if (registered) *registered = slot.registered;
                         return slot.entry;
+                    }
                 }
             }
 
@@ -550,7 +554,9 @@ namespace OutRunVRStereo
             auto& slot = cached.slots[cached.next];
             cached.next = (cached.next + 1u) % 4u;
             slot.buffer = buffer;
-            slot.entry = it == registry.end() ? nullptr : it->second;
+            slot.registered = it != registry.end();
+            if (registered) *registered = slot.registered;
+            slot.entry = slot.registered ? it->second : nullptr;
             return slot.entry;
         }
 
@@ -564,20 +570,41 @@ namespace OutRunVRStereo
             return R30FindShadow(buffer, R30IndexShadows, R30IndexLookup);
         }
 
+        // Only immutable, successfully queried descriptors may be rejected.
+        // Store the rejection in the existing release/reset-fenced registry,
+        // not in an untracked raw-pointer cache. No shadow bytes are allocated.
+        template <typename Buffer>
+        R30ShadowPtr R30RememberRejectedShadow(Buffer* buffer,
+            std::unordered_map<Buffer*, R30ShadowPtr>& registry,
+            const std::atomic<bool>& hooksReady)
+        {
+            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+            if (!hooksReady.load(std::memory_order_acquire))
+                return nullptr;
+            auto [it, inserted] = registry.emplace(buffer, nullptr);
+            if (inserted)
+                R30ShadowRegistryEpoch.fetch_add(1, std::memory_order_release);
+            return it->second;
+        }
+
         R30ShadowPtr R30EnsureVertexShadow(IDirect3DVertexBuffer9* buffer)
         {
             if (!buffer)
                 return nullptr;
-            if (auto existing = R30FindVertexShadow(buffer))
+            bool registered = false;
+            auto existing = R30FindShadow(buffer, R30VertexShadows,
+                R30VertexLookup, &registered);
+            if (registered)
                 return existing;
             D3DVERTEXBUFFER_DESC desc{};
-            if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
-                desc.Size > R30MaxShadowBytes)
-                return nullptr;
+            if (FAILED(buffer->GetDesc(&desc)))
+                return nullptr; // transient failure: retry next call
             // XYZRHW needs a shadow; FVF=0 declaration layouts stay eligible.
-            if (desc.FVF != 0 &&
-                (desc.FVF & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW)
-                return nullptr;
+            if (!desc.Size || desc.Size > R30MaxShadowBytes ||
+                (desc.FVF != 0 &&
+                 (desc.FVF & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW))
+                return R30RememberRejectedShadow(buffer, R30VertexShadows,
+                    R30VertexBufferHooksReady);
             auto entry = std::make_shared<R30BufferShadow>();
             entry->size = desc.Size;
             entry->usage = desc.Usage;
@@ -593,14 +620,19 @@ namespace OutRunVRStereo
         {
             if (!buffer)
                 return nullptr;
-            if (auto existing = R30FindIndexShadow(buffer))
+            bool registered = false;
+            auto existing = R30FindShadow(buffer, R30IndexShadows,
+                R30IndexLookup, &registered);
+            if (registered)
                 return existing;
             D3DINDEXBUFFER_DESC desc{};
-            if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
-                desc.Size > R30MaxShadowBytes ||
+            if (FAILED(buffer->GetDesc(&desc)))
+                return nullptr; // transient failure: retry next call
+            if (!desc.Size || desc.Size > R30MaxShadowBytes ||
                 (desc.Format != D3DFMT_INDEX16 &&
                  desc.Format != D3DFMT_INDEX32))
-                return nullptr;
+                return R30RememberRejectedShadow(buffer, R30IndexShadows,
+                    R30IndexBufferHooksReady);
             auto entry = std::make_shared<R30BufferShadow>();
             entry->size = desc.Size;
             entry->usage = desc.Usage;
