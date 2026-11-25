@@ -21,10 +21,12 @@ assert "R7ReplayInactiveDraw(device,0,TrackedRenderTarget,\n                    
 assert "R7ReplayInactiveDraw(device,1,RightEyeSurface,RightEyeDepth,\n                        drawCall,up,indexedUp)" in base_draw
 assert base_draw.count("replay==R7CandidateSeedResult::DirtyRestore") == 2
 base_up = r7[r7.index("HRESULT __stdcall DrawPrimitiveUPDest("):r7.index("HRESULT __stdcall DrawIndexedPrimitiveUPDest(")]
-base_iup = r7[r7.index("HRESULT __stdcall DrawIndexedPrimitiveUPDest("):].split("\n",1)[0]
+base_iup = r7[r7.index("HRESULT __stdcall DrawIndexedPrimitiveUPDest("):r7.index("HRESULT __stdcall ClearDest(")]
 assert "ExecuteStereoDraw(device,call,true,true);" in base_up
 assert "ExecuteStereoDraw(device,call,true,true,true);" in base_iup
+base_entrypoints = base_up + base_iup
 prefix = r'''
+#define __stdcall
 #include "depth_clear_replay_stamp.hpp"
 #include <cassert>
 #include <atomic>
@@ -120,6 +122,14 @@ template<class DrawCall> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevi
         if(FAILED(hr))return R7CandidateSeedResult::Unavailable;
     }
     return replayResult;
+}
+'''
+base_dispatch_stub = r'''
+unsigned baseDispatches=0;
+template<class DrawCall> HRESULT ExecuteStereoDraw(IDirect3DDevice9*,DrawCall&& draw,bool candidate,bool up,bool indexed=false){
+    ++baseDispatches;assert(candidate&&up&&indexed==(expectedHook==3));
+    if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh)return E_FAIL;
+    return draw();
 }
 '''
 suffix = r'''
@@ -279,12 +289,54 @@ int main() {
         }
         ++cases;
     }
+    // Actual base UP entrypoints: internal owners mirror exact bound eyes,
+    // mismatches invalidate, dirty input restoration blocks live raster.
+    for(unsigned family=2;family<4;++family)
+    for(unsigned scenario=0;scenario<9;++scenario){
+        game.rt=&leftColor;game.depth=&leftDepth;
+        game.rtFail=game.depthFail=false;aux=false;mainTarget=true;
+        FrameStereoIncomplete=FrameRightDrawFailed=false;
+        ActiveOcclusionQueries=0;OcclusionQueryTrackingUnavailable=false;
+        OutRunVR::DinoSidecar::ActiveExternalStereoMesh=false;
+        InternalStereoPass=true;ExternalAtomicReplayEpoch=77;
+        LastMainDepthClearStamp.Record(77,0);expectedAtCall=0;
+        replayCalls=calls=restoreFailures=baseDispatches=0;expectedHook=family;
+        RightDepthSynchronized=RightStencilSynchronized=true;
+        replayResult=R7CandidateSeedResult::Seeded;injected=candidateInjected=0;
+        game.vb=expectedVb=&vertexBuffer;game.ib=expectedIb=&indexBuffer;
+        game.offset=12;game.stride=32;
+        game.streamGetFail=game.indexGetFail=game.streamSetFail=game.indexSetFail=false;
+        switch(scenario){
+        case 1:game.rt=&rightColor;game.depth=&rightDepth;break;
+        case 2:game.depth=&rightDepth;break;
+        case 3:game.depth=nullptr;break;
+        case 4:game.streamSetFail=true;break;
+        case 5:game.streamGetFail=true;break;
+        case 6:OutRunVR::DinoSidecar::ActiveExternalStereoMesh=true;break;
+        case 7:InternalStereoPass=false;break;
+        case 8:ActiveOcclusionQueries=1;break;
+        }
+        checkLiveInput=true;
+        const auto hr=family==2?DrawPrimitiveUPDest(&game,0,1,nullptr,0):
+            DrawIndexedPrimitiveUPDest(&game,0,0,3,1,nullptr,0,nullptr,0);
+        checkLiveInput=false;
+        assert(baseDispatches==unsigned(scenario==6||scenario==7));
+        assert(replayCalls==unsigned(scenario<=1||scenario==4||scenario==5));
+        assert(calls==unsigned(scenario!=4&&scenario!=6));
+        assert(hr==((scenario==4||scenario==6)?E_FAIL:0));
+        assert(restoreFailures==unsigned(scenario==4));
+        assert(ExternalAtomicReplayEpoch==((scenario<=1||scenario==6||scenario==7)?77u:0u));
+        if(scenario<=1)assert(replayEye==scenario);
+        assert(vertexBuffer.refs==0&&indexBuffer.refs==0);
+        for(auto* surface:{&leftColor,&leftDepth,&rightColor,&rightDepth,&otherColor,&otherDepth})assert(surface->refs==0);
+        ++cases;
+    }
     std::cout << "R29_RAW_DEPTH_RECEIPT_PASS " << cases << "\\n";
 }
 '''
 with tempfile.TemporaryDirectory() as directory:
     p = Path(directory)
-    (p / "probe.cpp").write_text(prefix + helper + raw_vb + raw + suffix)
+    (p / "probe.cpp").write_text(prefix + helper + raw_vb + raw + base_dispatch_stub + base_entrypoints + suffix)
     subprocess.run(["g++", "-std=c++17", "-O2", "-Wall", "-Wextra",
                     "-Werror", "-pedantic", "-I", str(root / "src/vr/d3d9"),
                     str(p / "probe.cpp"), "-o", str(p / "probe")], check=True)

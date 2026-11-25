@@ -230,12 +230,18 @@ print("R7 A1 inactive pair allocation/reuse/reset/fault injection PASS")
 # Actual R7 draw path must mirror both eyes before their live DIP, and raw
 # R29 routes must not implicitly claim coverage.
 draw=source[source.index("HRESULT ExecuteStereoDraw("):source.index("HRESULT __stdcall DrawPrimitiveDest(")]
-assert draw.index("R7ReplayInactiveEye(device,0") < draw.index("const HRESULT leftHr=drawCall();")
-assert draw.index("R7ReplayInactiveEye(device,1") < draw.index("rightHr=drawCall();")
+assert draw.index("R7ReplayInactiveDraw(device,0") < draw.index("const HRESULT leftHr=drawCall();")
+assert draw.index("R7ReplayInactiveDraw(device,1") < draw.index("rightHr=drawCall();")
 assert "if(FAILED(rightHr)||!restoreOk)ExternalAtomicReplayEpoch=0;" in draw
 assert "ExecuteStereoDraw(device,call,true)" in source[source.index("HRESULT __stdcall DrawPrimitiveDest("):source.index("HRESULT __stdcall DrawIndexedPrimitiveDest(")]
 assert "ExecuteStereoDraw(device,call,true)" in source[source.index("HRESULT __stdcall DrawIndexedPrimitiveDest("):source.index("HRESULT __stdcall DrawPrimitiveUPDest(")]
-assert "ExecuteStereoDraw(device,call,true)" not in source[source.index("HRESULT __stdcall DrawPrimitiveUPDest("):source.index("HRESULT __stdcall ClearDest(")]
+up=source[source.index("HRESULT __stdcall DrawPrimitiveUPDest("):source.index("HRESULT __stdcall DrawIndexedPrimitiveUPDest(")]
+iup=source[source.index("HRESULT __stdcall DrawIndexedPrimitiveUPDest("):source.index("HRESULT __stdcall ClearDest(")]
+assert "ExecuteStereoDraw(device,call,true,true);" in up
+assert "ExecuteStereoDraw(device,call,true,true,true);" in iup
+assert "R7ExecuteRawCandidateVb(device,call,true);" in up
+assert "R7ExecuteRawCandidateVb(device,call,true,true);" in iup
+assert "InternalStereoPass&&!OutRunVR::DinoSidecar::ActiveExternalStereoMesh" in up and "InternalStereoPass&&!OutRunVR::DinoSidecar::ActiveExternalStereoMesh" in iup
 assert "[&](){return drawCall();},eye,1,false);" in source
 assert "if(changed)ExternalAtomicReplayEpoch=0;" in source
 assert "ExternalAtomicReplayEpoch=0;" in clear
