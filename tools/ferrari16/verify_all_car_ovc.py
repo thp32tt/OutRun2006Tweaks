@@ -113,6 +113,7 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
     at, gpu_bytes, total_v, total_tris = 36, 0, 0, 0
     min_y = math.inf
     zero_normals = 0
+    glass_triangles = 0
     # Match the runtime's exact glass tag; all other mesh materials are
     # opaque and must own their own PBR maps for strict map certification.
     used_materials: set[int] = set()
@@ -144,7 +145,9 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                 "mesh identity")
         used_materials.add(material)
         is_glass = name.startswith((b"F50_GLASS_", b"EXT_GLASS_"))
-        if not is_glass:
+        if is_glass:
+            glass_triangles += count_i // 3
+        else:
             opaque_materials.add(material)
         at += name_bytes
         vertex_start = at
@@ -304,6 +307,8 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
         used_materials & incomplete_albedo_mips)
     return {"version": version, "groups": groups, "triangles": tris,
             "vertices": vertices, "materials": materials,
+            "glass_triangles": glass_triangles,
+            "opaque_triangles": tris - glass_triangles,
             "normal_maps": normal_maps, "orm_maps": orm_maps,
             "disabled_normal_strength_materials": sorted(disabled_normal_strength),
             "zero_normal_vertices": zero_normals,

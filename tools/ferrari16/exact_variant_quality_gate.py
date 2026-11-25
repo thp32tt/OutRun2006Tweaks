@@ -111,6 +111,9 @@ def material_binding(doc: dict, primitive: dict) -> tuple:
     material = materials[index]
     alpha = material.get("alphaMode", "OPAQUE")
     require(alpha in ("OPAQUE", "MASK", "BLEND"), "GLB material alpha mode")
+    # The native OVC draw path disables ALPHATESTENABLE and only has
+    # opaque and tagged source-over passes. Do not certify cutout loss.
+    require(alpha != "MASK", "GLB alpha MASK unsupported by OVC draw passes")
     pbr = material.get("pbrMetallicRoughness", {})
     roles = (
         ("albedo", pbr.get("baseColorTexture")),
@@ -342,10 +345,20 @@ def validate_one(entry: dict, root: Path) -> dict:
     o = inspect(final)
     require(o["version"] == 4 and o["triangles"] == b["triangles"],
             "OVC4 missing / triangle decimation or non-equivalent mesh")
+    # OVC runtime chooses blend/depth-write policy from the mesh name,
+    # not from the source material. Equal total triangles and PBR counts
+    # do not prove that transparent faces survive the conversion.
+    blend_triangles = sum(count for (alpha, _), count in
+                          b["material_triangles"].items() if alpha == "BLEND")
+    require(o["glass_triangles"] == blend_triangles and
+            o["opaque_triangles"] == b["triangles"] - blend_triangles,
+            "OVC4 alpha draw-pass triangle mismatch")
     require(pbr_map_coverage(o) and o["zero_normal_vertices"] == 0,
             "OVC4 opaque material PBR/normal coverage failed")
     return {"id": cid, "variant": expected, "status": "PASS_STATIC_SOURCE_ONLY",
             "glb_triangles": a["triangles"], "ovc_sha256": o["ovc_sha256"],
+            "glass_triangles": o["glass_triangles"],
+            "opaque_triangles": o["opaque_triangles"],
             "source_texture_dimensions": a["textures"]}
 
 

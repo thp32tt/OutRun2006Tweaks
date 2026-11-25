@@ -115,6 +115,15 @@ def glb(path: Path, *, triangles: int = 1, width: int = 2,
         material["pbrMetallicRoughness"]["metallicRoughnessTexture"]["index"] = 0
     elif defect == "alpha-change":
         material["alphaMode"] = "BLEND"
+    elif defect == "alpha-mask":
+        material["alphaMode"] = "MASK"
+    elif defect == "mixed-alpha":
+        glass = copy.deepcopy(material)
+        glass["alphaMode"] = "BLEND"
+        doc["materials"].append(glass)
+        second = copy.deepcopy(primitive)
+        second["material"] = 1
+        doc["meshes"][0]["primitives"].append(second)
     elif defect == "reorder-textures":
         doc["textures"].reverse()
         material["normalTexture"]["index"] = 1
@@ -140,6 +149,21 @@ def mapped_v4() -> bytes:
     header = b"OVRCABH4" + struct.pack("<7I", 4, 1, 1, 3, 1,
                                          len(mapped), zlib.crc32(mapped) & 0xffffffff)
     return header + mapped
+
+
+def two_group_v4(second_name: bytes) -> bytes:
+    initial = mapped_v4()
+    payload = initial[36:]
+    name_size, _, vertices, indices, index_width = struct.unpack_from(
+        "<HHIII", payload)
+    end = 16 + name_size + vertices * 32 + indices * index_width
+    # Same material and geometry; only the second mesh name changes
+    # the runtime's opaque/blended render route.
+    second = struct.pack("<HHIII", len(second_name), 0, vertices, indices,
+                         index_width) + second_name + payload[16 + name_size:end]
+    payload = payload[:end] + second + payload[end:]
+    return b"OVRCABH4" + struct.pack("<7I", 4, 2, 1, 6, 2,
+                                    len(payload), zlib.crc32(payload) & 0xffffffff) + payload
 
 
 def hashed(path: Path) -> dict:
@@ -246,7 +270,47 @@ def main() -> None:
                 glb(converted, defect=defect)
                 candidate["converted_glb"] = hashed(converted)
                 expected_fail(candidate, root, reason)
+        # All four exact slots: equal total triangles, valid CRC and
+        # complete opaque PBR still must not hide a wrong alpha draw pass.
+        for cid, (variant, roof) in EXACT.items():
+            candidate = copy.deepcopy(entry)
+            candidate.update(car_id=cid, variant=variant, roof=roof)
+            if cid == 6:
+                candidate["one_off_chassis"] = "62897"
+            for name in (b"EXT_GLASS_00", b"F50_GLASS_00"):
+                glb(source, defect="mixed-alpha")
+                glb(converted, defect="mixed-alpha")
+                ovc.write_bytes(two_group_v4(name))
+                for key, path in (("source_glb", source), ("converted_glb", converted), ("ovc4", ovc)):
+                    candidate[key] = hashed(path)
+                row = validate_one(candidate, root)
+                assert (row["opaque_triangles"], row["glass_triangles"]) == (1, 1)
+                ovc.write_bytes(two_group_v4(b"EXT_OPAQUE_01"))
+                candidate["ovc4"] = hashed(ovc)
+                expected_fail(candidate, root, "alpha draw-pass triangle mismatch")
+                # Inverse: opaque source promoted into transparent pass.
+                glb(source, triangles=2)
+                glb(converted, triangles=2)
+                ovc.write_bytes(two_group_v4(name))
+                for key, path in (("source_glb", source), ("converted_glb", converted), ("ovc4", ovc)):
+                    candidate[key] = hashed(path)
+                expected_fail(candidate, root, "alpha draw-pass triangle mismatch")
+                ovc.write_bytes(two_group_v4(b"EXT_OPAQUE_01"))
+                candidate["ovc4"] = hashed(ovc)
+                row = validate_one(candidate, root)
+                assert (row["opaque_triangles"], row["glass_triangles"]) == (2, 0)
+            # MASK is not silently treated as OPAQUE by the approval gate.
+            for target in (source, converted):
+                glb(source)
+                glb(converted)
+                glb(target, defect="alpha-mask")
+                ovc.write_bytes(mapped_v4())
+                for key, path in (("source_glb", source), ("converted_glb", converted), ("ovc4", ovc)):
+                    candidate[key] = hashed(path)
+                expected_fail(candidate, root, "alpha MASK unsupported")
+        glb(source)
         glb(converted)
+        ovc.write_bytes(mapped_v4())
         wrong = copy.deepcopy(entry)
         wrong["variant"] = "328 GTB"
         expected_fail(wrong, root, "wrong exact body")
