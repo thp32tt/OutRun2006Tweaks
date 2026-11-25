@@ -748,6 +748,7 @@ std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtom
 unsigned R7CandidateResetInFlight=0,proof=1,resets=0,calls=0;
 bool allocated=true,owned=false,nested=false;
 void R7ForgetAutomaticDepthProof(){++proof;}
+bool R7RetireDirectResetCore(){return false;}
 struct Pair{void Reset(){++resets;allocated=false;}} ExternalAtomicCandidates;
 IDirect3DDevice9Ex* expectedDevice=nullptr;
 D3DPRESENT_PARAMETERS* expectedParams=nullptr;
@@ -892,5 +893,71 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"swapchain.cpp"
     exe=Path(temp)/"swapchain"
     cpp.write_text(chain_stub+chain_owner+chain_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# Iter82: a direct ResetEx can bypass the existing R13 common retirement.
+# Test the actual R7 core retirement, not a second readiness predicate.
+direct_reset_core=source[source.index("bool R7RetireDirectResetCore()"):
+                         source.index("// Direct ResetEx bypasses")]
+direct_core_stub=r'''
+#include <cassert>
+#include <iostream>
+bool StereoResourcesReady=false,DirectTransportResourcesReady=false;
+int obj=0;
+int *BackBuffer=nullptr,*TrackedRenderTarget=nullptr,*TrackedDepthStencil=nullptr,
+    *RightEyeSurface=nullptr,*RightEyeDepth=nullptr,*LeftResolveSurface=nullptr,
+    *RightResolveSurface=nullptr;
+bool FrameHadDuplicatedDraw=true,FrameHadWorldStereo=true;
+unsigned FrameStereoPoseSequence=9;
+struct Metadata{bool valid=false;} FrameStereoMetadata;
+namespace OutRunVR{enum Reason{StereoFailureResourceUnavailable};}
+unsigned releases=0,invalidations=0,poisons=0;
+void ReleaseStereoResources(){
+    ++releases;StereoResourcesReady=false;DirectTransportResourcesReady=false;
+    BackBuffer=TrackedRenderTarget=TrackedDepthStencil=RightEyeSurface=
+        RightEyeDepth=LeftResolveSurface=RightResolveSurface=nullptr;
+}
+void InvalidateTrackedRenderStates(){++invalidations;}
+void PoisonFrame(OutRunVR::Reason reason){
+    assert(reason==OutRunVR::StereoFailureResourceUnavailable);++poisons;
+}
+'''
+direct_core_cases=r'''
+int main(){
+    for(unsigned mask=0;mask<512;++mask){
+        StereoResourcesReady=bool(mask&1);
+        BackBuffer=(mask&2)?&obj:nullptr;
+        TrackedRenderTarget=(mask&4)?&obj:nullptr;
+        TrackedDepthStencil=(mask&8)?&obj:nullptr;
+        RightEyeSurface=(mask&16)?&obj:nullptr;
+        RightEyeDepth=(mask&32)?&obj:nullptr;
+        LeftResolveSurface=(mask&64)?&obj:nullptr;
+        RightResolveSurface=(mask&128)?&obj:nullptr;
+        DirectTransportResourcesReady=bool(mask&256);
+        FrameHadDuplicatedDraw=FrameHadWorldStereo=true;
+        FrameStereoPoseSequence=9;FrameStereoMetadata.valid=true;
+        releases=invalidations=poisons=0;
+        const bool owned=mask!=0;
+        assert(R7RetireDirectResetCore()==owned);
+        assert(releases==unsigned(owned)&&invalidations==unsigned(owned)&&poisons==unsigned(owned));
+        assert(!StereoResourcesReady&&!DirectTransportResourcesReady&&!BackBuffer&&!TrackedRenderTarget&&
+            !TrackedDepthStencil&&!RightEyeSurface&&!RightEyeDepth&&!LeftResolveSurface&&!RightResolveSurface);
+        assert(FrameHadDuplicatedDraw==!owned&&FrameHadWorldStereo==!owned&&
+            FrameStereoPoseSequence==(owned?0u:9u)&&FrameStereoMetadata.valid==!owned);
+        // A nested classic owner already retired the entire R7 core.
+        assert(!R7RetireDirectResetCore()&&releases==unsigned(owned));
+    }
+    std::cout<<"R7_DIRECT_RESET_CORE_PASS 512\n";
+}
+'''
+reset_callback=source[source.index("HRESULT __stdcall R7CandidateResetExDest("):
+                      source.index("// Direct PresentEx can bypass")]
+assert reset_callback.index("if(!R7RetireDirectResetCore())ExternalAtomicCandidates.Reset();") < reset_callback.rindex("CandidateResetExHook.stdcall<HRESULT>")
+assert reset_callback.index("ExternalAtomicAllocationAttemptEpoch=PresentEpoch;",reset_callback.index("if(!R7RetireDirectResetCore())")) < reset_callback.rindex("CandidateResetExHook.stdcall<HRESULT>")
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"direct_reset_core.cpp"
+    exe=Path(temp)/"direct_reset_core"
+    cpp.write_text(direct_core_stub+direct_reset_core+direct_core_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)

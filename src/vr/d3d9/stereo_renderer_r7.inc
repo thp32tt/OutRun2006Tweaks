@@ -1856,9 +1856,32 @@ namespace OutRunVRStereo
                 window,dirty,flags);
         }
 
+        void ReleaseStereoResources();
+
+        // R13's normal reset path retires core attachments before calling
+        // ResetEx. A direct call can still reach the driver with the old
+        // backbuffer, right eye and shared transport generation retained.
+        // Release these before the physical reset; next verified frame must
+        // initialize against the actual post-reset attachments, not the cache.
+        bool R7RetireDirectResetCore() noexcept
+        {
+            const bool hasCore=StereoResourcesReady||BackBuffer||TrackedRenderTarget||
+                TrackedDepthStencil||RightEyeSurface||RightEyeDepth||
+                LeftResolveSurface||RightResolveSurface||DirectTransportResourcesReady;
+            if(!hasCore)return false;
+            ReleaseStereoResources();
+            InvalidateTrackedRenderStates();
+            FrameHadDuplicatedDraw=false;
+            FrameHadWorldStereo=false;
+            FrameStereoPoseSequence=0;
+            FrameStereoMetadata={};
+            PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);
+            return true;
+        }
+
         // Direct ResetEx bypasses the classic Reset/R13 resource retirement.
-        // Own only inactive candidate lifetime here: nested classic owners still
-        // own stock teardown, notification and state replay.
+        // Retire any still-owned R7 core attachments as well as inactive
+        // candidates. The layered classic owners keep their own lifecycle.
         HRESULT __stdcall R7CandidateResetExDest(IDirect3DDevice9Ex* device,
             D3DPRESENT_PARAMETERS* params,D3DDISPLAYMODEEX* fullscreen)
         {
@@ -1868,7 +1891,9 @@ namespace OutRunVRStereo
             ExternalAtomicReplayEpoch=0;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             R7ForgetAutomaticDepthProof();
-            ExternalAtomicCandidates.Reset();
+            if(!R7RetireDirectResetCore())ExternalAtomicCandidates.Reset();
+            // ReleaseStereoResources also clears the allocation attempt epoch.
+            ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             const HRESULT hr=CandidateResetExHook.stdcall<HRESULT>(device,params,fullscreen);
             // A nested classic owner can reset the epoch and re-capture an
             // automatic surface. ResetEx does not prove fresh depth identity.
