@@ -427,6 +427,11 @@ jobs:
               before, after = before.replace(b'\n',nl29), after.replace(b'\n',nl29)
               assert expected29.count(before) == 1
               expected29 = expected29.replace(before,after,1)
+          # Iter66: raw UP replay restores stream zero and indexed input before live raster.
+          for before, after in [(b'        RevokeDepthClearReplayBeforeLeftDraw(d);\n        return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);', b'        return R7ExecuteRawCandidateVb(d,[&](){\n            return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);\n        },true);'), (b'        RevokeDepthClearReplayBeforeLeftDraw(d);\n        return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,f,v,st);', b'        return R7ExecuteRawCandidateVb(d,[&](){\n            return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n                d,t,m,n,p,idx,f,v,st);\n        },true,true);')]:
+              before, after = before.replace(b'\n',nl29), after.replace(b'\n',nl29)
+              assert expected29.count(before) == 1
+              expected29 = expected29.replace(before,after,1)
           assert Path(r29path).read_bytes() == expected29, 'Unreviewed R29 change'
           paths = {
               'src/vr/d3d9/stereo_renderer_r32.cpp': ('R32Review', False),

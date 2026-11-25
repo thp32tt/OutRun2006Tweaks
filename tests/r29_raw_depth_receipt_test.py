@@ -30,10 +30,27 @@ using D3DPRIMITIVETYPE = int;
 using D3DFORMAT = int;
 constexpr DWORD D3DCLEAR_ZBUFFER = 2, D3DCLEAR_STENCIL = 4;
 struct IDirect3DSurface9 { int refs=0; void Release(){assert(refs>0);--refs;} };
+struct IDirect3DVertexBuffer9 : IDirect3DSurface9 {};
+struct IDirect3DIndexBuffer9 : IDirect3DSurface9 {};
+IDirect3DVertexBuffer9 vertexBuffer;
+IDirect3DIndexBuffer9 indexBuffer;
 struct IDirect3DDevice9 {
     bool game;
     IDirect3DSurface9 *rt=nullptr,*depth=nullptr;
     bool rtFail=false,depthFail=false;
+    IDirect3DVertexBuffer9* vb=nullptr;
+    IDirect3DIndexBuffer9* ib=nullptr;
+    UINT offset=0,stride=0;
+    bool streamGetFail=false,indexGetFail=false,streamSetFail=false,indexSetFail=false;
+    unsigned streamSets=0,indexSets=0;
+    HRESULT GetStreamSource(UINT,IDirect3DVertexBuffer9** out,UINT* o,UINT* s){
+        *out=vb;if(vb)++vb->refs;*o=offset;*s=stride;return streamGetFail?-1:0;
+    }
+    HRESULT GetIndices(IDirect3DIndexBuffer9** out){*out=ib;if(ib)++ib->refs;return indexGetFail?-1:0;}
+    HRESULT SetStreamSource(UINT,IDirect3DVertexBuffer9* p,UINT o,UINT s){
+        ++streamSets;if(streamSetFail)return -1;vb=p;offset=o;stride=s;return 0;
+    }
+    HRESULT SetIndices(IDirect3DIndexBuffer9* p){++indexSets;if(indexSetFail)return -1;ib=p;return 0;}
     HRESULT GetRenderTarget(unsigned,IDirect3DSurface9** out){*out=rt;if(rt)++rt->refs;return rtFail?-1:0;}
     HRESULT GetDepthStencilSurface(IDirect3DSurface9** out){*out=depth;if(depth)++depth->refs;return depthFail?-1:0;}
 };
@@ -62,16 +79,25 @@ std::uint64_t ExternalAtomicReplayEpoch=0;
 OutRunVR::DepthClearReplayStamp LastMainDepthClearStamp{};
 DWORD writes = 0, expectedAtCall = 0;
 unsigned reads = 0, calls = 0, expectedHook = 0;
-HRESULT injected = 0;
+HRESULT injected = 0, candidateInjected = 0;
+bool checkLiveInput=false;
+IDirect3DVertexBuffer9* expectedVb=nullptr;
+IDirect3DIndexBuffer9* expectedIb=nullptr;
 bool IsGameDevice(IDirect3DDevice9* d) { return d && d->game; }
 bool LeftDrawMayWriteDepth(IDirect3DDevice9*) { ++reads; return writes & 2; }
 bool LeftDrawMayWriteStencil(IDirect3DDevice9*) { ++reads; return writes & 4; }
 struct Hook {
     unsigned id;
-    template<class R, class... Args> R stdcall(Args...) {
+    template<class R, class... Args> R stdcall(IDirect3DDevice9* d,Args...) {
         assert(id == expectedHook);
         assert(LastMainDepthClearStamp.flags == expectedAtCall);
-        if(inReplay) return 0;
+        if(!inReplay&&checkLiveInput){
+            assert(d->vb==expectedVb&&d->ib==expectedIb);
+            assert(d->offset==(expectedVb?12u:0u)&&d->stride==(expectedVb?32u:0u));
+        }
+        if(id>=2){d->vb=nullptr;d->offset=d->stride=0;}
+        if(id==3)d->ib=nullptr;
+        if(inReplay) return candidateInjected;
         ++calls;
         return injected;
     }
@@ -80,7 +106,10 @@ Hook DrawPrimitiveHook{0}, DrawIndexedPrimitiveHook{1},
      DrawPrimitiveUPHook{2}, DrawIndexedPrimitiveUPHook{3};
 template<class DrawCall> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9* d,unsigned eye,IDirect3DSurface9* rt,IDirect3DSurface9* depth,DrawCall& draw){
     assert(d->rt==rt&&d->depth==depth);++replayCalls;replayEye=eye;
-    if(replayResult==R7CandidateSeedResult::Seeded){inReplay=true;draw();inReplay=false;}
+    if(replayResult==R7CandidateSeedResult::Seeded){
+        inReplay=true;const HRESULT hr=draw();inReplay=false;
+        if(FAILED(hr))return R7CandidateSeedResult::Unavailable;
+    }
     return replayResult;
 }
 '''
@@ -154,6 +183,56 @@ int main() {
         assert(ExternalAtomicReplayEpoch==(scenario<=1?77u:0u));
         assert(restoreFailures==unsigned(scenario==10));
         assert(RightDepthSynchronized==(scenario!=10)&&RightStencilSynchronized==(scenario!=10));
+        for(auto* surface:{&leftColor,&leftDepth,&rightColor,&rightDepth,&otherColor,&otherDepth})assert(surface->refs==0);
+        ++cases;
+    }
+    // UP candidate side effects must be restored BEFORE the live call.
+    // Getter failure must not draw a candidate; dirty setter failure must
+    // never issue a live draw, even if the other restoration setter succeeds.
+    for(unsigned family=2;family<4;++family)
+    for(bool bound:{false,true})
+    for(unsigned scenario=0;scenario<9;++scenario){
+        game.rt=&leftColor;game.depth=&leftDepth;
+        game.rtFail=game.depthFail=false;aux=false;mainTarget=true;
+        FrameStereoIncomplete=FrameRightDrawFailed=false;
+        ActiveOcclusionQueries=0;OcclusionQueryTrackingUnavailable=false;
+        OutRunVR::DinoSidecar::ActiveExternalStereoMesh=false;
+        InternalStereoPass=false;ExternalAtomicReplayEpoch=77;
+        LastMainDepthClearStamp.Record(77,0);expectedAtCall=0;
+        replayCalls=calls=restoreFailures=0;expectedHook=family;
+        RightDepthSynchronized=RightStencilSynchronized=true;
+        replayResult=R7CandidateSeedResult::Seeded;injected=candidateInjected=0;
+        game.vb=expectedVb=bound?&vertexBuffer:nullptr;
+        game.ib=expectedIb=bound?&indexBuffer:nullptr;
+        game.offset=bound?12u:0u;game.stride=bound?32u:0u;
+        game.streamSets=game.indexSets=0;
+        game.streamGetFail=game.indexGetFail=game.streamSetFail=game.indexSetFail=false;
+        switch(scenario){
+        case 1:game.rt=&rightColor;game.depth=&rightDepth;InternalStereoPass=true;break;
+        case 2:game.streamGetFail=true;break;
+        case 3:game.indexGetFail=true;break;
+        case 4:game.streamSetFail=true;break;
+        case 5:game.indexSetFail=true;break;
+        case 6:candidateInjected=-17;break;
+        case 7:injected=-17;break;
+        case 8:ActiveOcclusionQueries=1;break;
+        }
+        checkLiveInput=true;
+        const auto hr=family==2?R29OwnerCallRawDrawPrimitiveUP(&game,0,1,nullptr,0):
+            R29OwnerCallRawDrawIndexedPrimitiveUP(&game,0,0,3,1,nullptr,0,nullptr,0);
+        checkLiveInput=false;
+        const bool dirty=scenario==4||(family==3&&scenario==5);
+        const bool captured=scenario!=2&&!(family==3&&scenario==3)&&scenario!=8;
+        const bool valid=(scenario<=1||(family==2&&(scenario==3||scenario==5)));
+        assert(calls==unsigned(!dirty)&&restoreFailures==unsigned(dirty));
+        assert(hr==(dirty?E_FAIL:injected));
+        assert(replayCalls==unsigned(scenario!=8));
+        assert(game.streamSets==unsigned(captured));
+        assert(game.indexSets==unsigned(captured&&family==3));
+        assert(ExternalAtomicReplayEpoch==(valid?77u:0u));
+        assert(vertexBuffer.refs==0&&indexBuffer.refs==0);
+        assert(RightDepthSynchronized==!dirty&&RightStencilSynchronized==!dirty);
+        if(!dirty){assert(!game.vb);assert(game.ib==(family==3?nullptr:expectedIb));}
         for(auto* surface:{&leftColor,&leftDepth,&rightColor,&rightDepth,&otherColor,&otherDepth})assert(surface->refs==0);
         ++cases;
     }

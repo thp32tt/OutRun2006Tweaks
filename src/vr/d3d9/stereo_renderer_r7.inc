@@ -2080,10 +2080,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		}
 
 		void NoteRestoreFailure(const char* what){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailureRestoreFailed);++RestoreFailures;if(!FirstRestoreFailureLogged){FirstRestoreFailureLogged=true;spdlog::warn("VR stereo: renderer state restore failed at {}; frame forced to mono fallback",what);}}
-        // Raw R29/R30 VB owners already selected the eye and shader state.
+        // Raw R29/R30 owners already selected the eye and shader state.
         // InternalStereoPass alone cannot identify the eye or mono backup.
         template<class DrawCall>
-        HRESULT R7ExecuteRawCandidateVb(IDirect3DDevice9* device,DrawCall&& drawCall) noexcept
+        HRESULT R7ExecuteRawCandidateVb(IDirect3DDevice9* device,DrawCall&& drawCall,
+            bool up=false,bool indexedUp=false) noexcept
         {
             if(!IsGameDevice(device)||ExternalAtomicReplayEpoch!=PresentEpoch){
                 RevokeDepthClearReplayBeforeLeftDraw(device);
@@ -2105,14 +2106,33 @@ if(WaitForEventQuery(slot.fence,1,0u))
             }
             RevokeDepthClearReplayBeforeLeftDraw(device,eye>=0);
             if(eye>=0){
+                // D3D9 UP raster clears stream 0 (and indices for indexed UP).
+                // Only the real live call may expose these side effects.
+                bool inputRestoreFailed=false;
+                auto candidateDraw=[&]() -> HRESULT {
+                    if(!up)return drawCall();
+                    IDirect3DVertexBuffer9* vb=nullptr;
+                    IDirect3DIndexBuffer9* ib=nullptr;
+                    UINT offset=0,stride=0;
+                    const bool captured=SUCCEEDED(device->GetStreamSource(0,&vb,&offset,&stride))&&
+                        (!indexedUp||SUCCEEDED(device->GetIndices(&ib)));
+                    if(!captured){ReleaseCom(ib);ReleaseCom(vb);return E_FAIL;}
+                    const HRESULT hr=drawCall();
+                    if(FAILED(device->SetStreamSource(0,vb,vb?offset:0u,vb?stride:0u)))
+                        inputRestoreFailed=true;
+                    if(indexedUp&&FAILED(device->SetIndices(ib)))inputRestoreFailed=true;
+                    ReleaseCom(ib);ReleaseCom(vb);
+                    return inputRestoreFailed?E_FAIL:hr;
+                };
                 const auto result=R7ReplayInactiveEye(device,
-                    static_cast<unsigned>(eye),rt,depth,drawCall);
+                    static_cast<unsigned>(eye),rt,depth,candidateDraw);
                 ReleaseCom(depth);ReleaseCom(rt);
                 if(result!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
-                if(result==R7CandidateSeedResult::DirtyRestore){
+                if(result==R7CandidateSeedResult::DirtyRestore||inputRestoreFailed){
+                    ExternalAtomicReplayEpoch=0;
                     LastMainDepthClearStamp.Invalidate();
                     RightDepthSynchronized=false;RightStencilSynchronized=false;
-                    NoteRestoreFailure("external inactive raw VB replay");
+                    NoteRestoreFailure("external inactive raw replay");
                     return E_FAIL; // attachment restoration not proven
                 }
             }else{
