@@ -320,7 +320,7 @@ int main(){
     std::cout<<"R7_EXPLICIT_SURFACE_WRITE_PASS "<<cases+1<<"\n";
 }
 '''
-for hook,index in (("StretchRect",34),("ColorFill",35)):
+for hook,index in (("UpdateSurface",30),("StretchRect",34),("ColorFill",35)):
     assert f"{hook}VtableIndex = {index};" in source
     assert f"{hook}Hook=safetyhook::create_inline(vtable[{hook}VtableIndex],{hook}Dest,disabled);" in source
     assert f"!{hook}Hook" in source and f"&{hook}Hook" in source and f"{hook}Hook = {{}};" in source
@@ -331,5 +331,74 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"explicit_surface.cpp"
     exe=Path(temp)/"explicit_surface"
     cpp.write_text(copy_stub+copy_owner+copy_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# UpdateSurface is a real base vtable owner. Compile its exact implementation,
+# not a duplicate policy, and inspect receipts inside the original trampoline.
+upload_owner=source[source.index("HRESULT __stdcall UpdateSurfaceDest("):
+                    source.index("void ReleaseStereoResources()")]
+upload_stub=r'''
+#define __stdcall
+struct RECT{int token;};struct POINT{int token;};
+const RECT rect{123};const POINT point{456};
+IDirect3DDevice9* expectedDevice=nullptr;
+IDirect3DSurface9 *expectedSource=nullptr,*expectedDestination=nullptr;
+const RECT* expectedRect=nullptr;const POINT* expectedPoint=nullptr;
+std::uint64_t expectedEpoch=0;
+unsigned expectedStamp=0,calls=0;
+HRESULT injected=S_OK;
+struct UploadHook{
+    template<class R> R stdcall(IDirect3DDevice9* device,IDirect3DSurface9* source,
+        const RECT* sr,IDirect3DSurface9* destination,const POINT* dp){
+        ++calls;
+        assert(device==expectedDevice&&source==expectedSource&&
+            sr==expectedRect&&destination==expectedDestination&&dp==expectedPoint);
+        assert(ExternalAtomicReplayEpoch==expectedEpoch);
+        assert(LastMainDepthClearStamp.count==expectedStamp);
+        return injected;
+    }
+} UpdateSurfaceHook;
+'''
+upload_cases=r'''
+int main(){
+    IDirect3DSurface9* surfaces[]{nullptr,&left,&right,&ld,&rd,&cl,&cr,&czl,&czr,&unknown};
+    unsigned cases=0;
+    for(unsigned si=0;si<10;++si)
+    for(unsigned di=0;di<10;++di)
+    for(unsigned mask=0;mask<128;++mask){
+        StereoBaseCallbacksArmed=!(mask&1);
+        expectedDevice=(mask&2)?&other:&game;
+        ExternalAtomicReplayEpoch=(mask&4)?0:((mask&8)?8:9);
+        expectedSource=surfaces[si];expectedDestination=surfaces[di];
+        expectedRect=(mask&16)?nullptr:&rect;
+        expectedPoint=(mask&32)?nullptr:&point;
+        injected=(mask&64)?E_FAIL:S_OK;
+        LastMainDepthClearStamp.count=0;calls=0;
+        const bool owned=!(mask&3);
+        expectedEpoch=owned&&di>=1&&di<=8?0:ExternalAtomicReplayEpoch;
+        expectedStamp=unsigned(owned&&di==3);
+        assert(UpdateSurfaceDest(expectedDevice,expectedSource,expectedRect,
+            expectedDestination,expectedPoint)==injected);
+        assert(calls==1&&ExternalAtomicReplayEpoch==expectedEpoch&&
+            LastMainDepthClearStamp.count==expectedStamp);
+        ++cases;
+    }
+    // Null unallocated candidate pointers must not classify null as protected.
+    ExternalAtomicCandidates.eyes[0]={nullptr,nullptr};
+    ExternalAtomicCandidates.eyes[1]={nullptr,nullptr};
+    StereoBaseCallbacksArmed=true;ExternalAtomicReplayEpoch=9;
+    expectedDevice=&game;expectedSource=&unknown;expectedDestination=nullptr;
+    expectedRect=nullptr;expectedPoint=nullptr;
+    expectedEpoch=9;expectedStamp=0;LastMainDepthClearStamp.count=0;calls=0;
+    assert(UpdateSurfaceDest(&game,&unknown,nullptr,nullptr,nullptr)==injected);
+    assert(calls==1&&ExternalAtomicReplayEpoch==9);
+    std::cout<<"R7_UPDATE_SURFACE_OWNER_PASS "<<cases+1<<"\n";
+}
+'''
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"update_surface.cpp"
+    exe=Path(temp)/"update_surface"
+    cpp.write_text(copy_stub+upload_stub+upload_owner+upload_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
