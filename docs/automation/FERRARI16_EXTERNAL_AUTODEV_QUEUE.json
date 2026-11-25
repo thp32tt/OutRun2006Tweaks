@@ -3485,7 +3485,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER49-R30-REJECTED-DESCRIPTOR-CACHE",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "D3D9 performance: repeated R30 VB/IB GetDesc, shadow registry lifetime, state churn and stereo replay",
           "source_material_sha": "57dad3ff8f0796bb9e5f488cc4916f0c794c072c",
           "source_blob_sha1": {
@@ -3536,20 +3536,102 @@
           "protected_v003": "Only automation branch source/test/CI; no stable release, native game assets, binary deployment, shader, menu, cockpit, dashboard or VR focus change.",
           "asset_validation": "Private source/processed model SHAs and 16-car UV/albedo/normal/PBR/wheel/interior QA remain unverified; candidate statuses and rights unchanged.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration48 credited once 2922+1=2923 ledger d53c9785be189e401c26feec6698169af292e78c",
-          "next_trace": "Verify iteration49 exact Win32 build and isolated x86/x64 package before credit. Trace R30 negative-registry insertion allocation failure, release-hook lifetime/epoch and actual replay state churn / GPU synchronization; inspect per-material OVC4 factor/sampler-to-DDS baking boundary independently. Do not bypass the atomic stereo gate or promote unverified vehicles."
+          "score_state": "CREDITED_ONCE_AI2_2923_PLUS_1_EQUALS_2924_LEDGER_5f96bebc70a50f0ee8d882642923049035c06720",
+          "next_trace": "Verify iteration49 exact Win32 build and isolated x86/x64 package before credit. Trace R30 negative-registry insertion allocation failure, release-hook lifetime/epoch and actual replay state churn / GPU synchronization; inspect per-material OVC4 factor/sampler-to-DDS baking boundary independently. Do not bypass the atomic stereo gate or promote unverified vehicles.",
+          "followup_exact_sha_ci": {
+            "sha": "57dad3ff8f0796bb9e5f488cc4916f0c794c072c",
+            "runs": [
+              {
+                "id": 45561379242,
+                "conclusion": "success"
+              },
+              {
+                "id": 45561379336,
+                "conclusion": "success"
+              },
+              {
+                "id": 45561379316,
+                "conclusion": "success"
+              },
+              {
+                "id": 45561379327,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "Exact head_sha verified."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER50-DEFERRED-GLASS-LIVE-CALLBACK-VETO",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Baseline v0.03 vs current driver cockpit, dashboard speed/RPM/gear and player overlays; new deferred owner counterexample",
+          "source_material_sha": "3589b6da66ddcead2679b7310cc06bdfdf482624",
+          "source_blob_sha1": {
+            "src/vr/game/quest_cockpit_v2_glass_hook.hpp": "5cd56970c1b257ea13803751c0e8c02c05628ebb",
+            "src/hooks_graphics.cpp": "f24ce1620b3b560a88f5802cfed8a1d27894b7d0",
+            "tests/external_car_original_wrapper_contract_test.cpp": "1a48b9484162a11258070a5cb465e14ad9c118ca",
+            ".github/workflows/ferrari16-multicar-regression.yml": "1f86354548a2d340d90100f4455ef3c45abf0c28"
+          },
+          "source_defect": "Previous iteration43 Immediate scope correctly rejects nested non-player/stale epoch, but OnMaterialBefore ORs the rejection with HasDeferredOwner. A previously matching deferred token retained in a callee-saved register can bypass a live rejected scope. Deterministic logic counterexample, not an observed retail register trace or proven HMD symptom cause.",
+          "source_fix": "Require no live callback scope and a nonzero epoch before deferred token lookup. Admitted current player retains immediate route; rejected/stale/nested nonplayer callback cannot regain ownership via deferred lookup. Preserve matching deferred route after unwind. No PMT body skip or shader/material flags changes.",
+          "positive_negative_regressions": [
+            "Extend external_car_original_wrapper_contract_test.cpp: 16 synthetic slot repetitions x matching/nonmatching deferred token, zero epoch, unadmitted outer, admitted player, stale epoch, nested nonplayer, nested admitted different epoch, parent restoration and final unwind. Assert both admission and exact deferred scan count. Production source-order assertion ties guard to HasDeferredOwner before material mutation.",
+            "Exact SHA all-car CI completed success including portable wrapper contract and source checks. Local container GitHub DNS unavailable; no N100 work needed because GitHub CI executed regression."
+          ],
+          "call_graph_trace": [
+            "v0.03 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 hooks_graphics blob 6b15c31c59995ca2061a44eb08a5b145278f6fdb: original wrapper always invoked; current OnPlayerCallback also always invokes CallOriginalPlayerWithGlassScope, scoped F0 snapshot/restore. Current external PrepareF50External and DrawPreparedF50External not called by wrapper, atomic stage still closed. Stock occupant and dashboard paths not replaced.",
+            "PlayerCallback -> ScopedPlayerCallbackOwner -> OnMaterialBefore -> Immediate or guarded HasDeferredOwner -> PMT exact material ownership -> OnMaterialAfter restore. New veto closes previous live-scope bypass; no new retail EXE/HMD observation.",
+            "PrepareF50External reads speed +1F8, gear +208, RPM +20C into frame/player latch; body receipt ExternalComplete plus matching overlay selection controls embedded speed/RPM and per-gear masks. Both needles still suppress unbound housing by existing explicit policy; no asset-level ownership evidence to alter this. OVC4 native/Python record mesh/kind/reserved/unique/pivot/needle validation compared, no new divergence established in this trace."
+          ],
+          "same_sha_ci": {
+            "sha": "3589b6da66ddcead2679b7310cc06bdfdf482624",
+            "runs": [
+              {
+                "id": 45564940204,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45564940266,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45564940233,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45564940208,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha verified with Actions API."
+          },
+          "protected_v003": "Only automation branch source/test/CI; stable release, deployment, stock wrapper, dashboard animation, PBR shader, model files, menu/host untouched. Conservative choice: live callback rejection takes precedence over deferred token; actual legitimate deferred draws inside rejected callback not physically assessed.",
+          "asset_validation": "No private model source/processed SHA or 16-car visual/material quality evidence; no promotions or rights changes.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration49 credited once 2923+1=2924 ledger 5f96bebc70a50f0ee8d882642923049035c06720",
+          "next_trace": "Verify iteration50 exact Windows DLL and x86/x64 package before credit. Revisit isolated bilateral body/dashboard staging and gear-only overlay housing ownership with explicit asset metadata; investigate per-player dashboard telemetry reset and OVC/DDS material parity. Keep original wrapper and atomic stage fence intact."
         }
       ],
-      "latest_material_sha": "57dad3ff8f0796bb9e5f488cc4916f0c794c072c",
-      "latest_static_ci": "Iteration49 extracted C++ descriptor regression and exact all-car CI PASS; exact Windows build/package pending at observation. Iteration48 three exact workflows success and credited once.",
-      "next_focus": "Verify iteration49 exact Win32 build and isolated x86/x64 package before credit. Trace R30 negative-registry insertion allocation failure, release-hook lifetime/epoch and actual replay state churn / GPU synchronization; inspect per-material OVC4 factor/sampler-to-DDS baking boundary independently. Do not bypass the atomic stereo gate or promote unverified vehicles."
+      "latest_material_sha": "3589b6da66ddcead2679b7310cc06bdfdf482624",
+      "latest_static_ci": "Iteration50 exact all-car CI PASS; Windows build/package pending at observation. Iteration49 four exact workflows success and credited once.",
+      "next_focus": "Verify iteration50 exact Windows DLL and x86/x64 package before credit. Revisit isolated bilateral body/dashboard staging and gear-only overlay housing ownership with explicit asset metadata; investigate per-player dashboard telemetry reset and OVC/DDS material parity. Keep original wrapper and atomic stage fence intact."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T15:34:00+09:00",
+  "last_updated_kst": "2026-11-25T16:02:17+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
