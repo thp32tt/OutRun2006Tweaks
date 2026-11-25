@@ -89,6 +89,7 @@ namespace OutRunVRStereo
 		constexpr std::size_t ResetVtableIndex = 16;
 		constexpr std::size_t PresentVtableIndex = 17;
 		constexpr std::size_t PresentExVtableIndex = 121;
+        constexpr std::size_t ResetExVtableIndex = 132;
 		constexpr std::size_t CreateDepthStencilSurfaceVtableIndex = 29;
 		constexpr std::size_t CreateDepthStencilSurfaceExVtableIndex = 131;
 		constexpr std::size_t UpdateSurfaceVtableIndex = 30;
@@ -114,6 +115,9 @@ namespace OutRunVRStereo
 		SafetyHookInline PresentHook{};
 		SafetyHookInline CandidatePresentExHook{};
         bool R7CandidatePresentBoundaryCovered=false;
+        SafetyHookInline CandidateResetExHook{};
+        bool R7CandidateResetBoundaryCovered=false;
+        thread_local unsigned R7CandidateResetInFlight=0;
 		SafetyHookInline CreateDepthRetentionHook{};
 		SafetyHookInline CreateDepthRetentionExHook{};
 		SafetyHookInline UpdateSurfaceHook{};
@@ -1777,6 +1781,29 @@ namespace OutRunVRStereo
         R7AtomicCandidatePair ExternalAtomicCandidates{};
         std::uint64_t ExternalAtomicAllocationAttemptEpoch=0;
 
+        // Direct ResetEx bypasses the classic Reset/R13 resource retirement.
+        // Own only inactive candidate lifetime here: nested classic owners still
+        // own stock teardown, notification and state replay.
+        HRESULT __stdcall R7CandidateResetExDest(IDirect3DDevice9Ex* device,
+            D3DPRESENT_PARAMETERS* params,D3DDISPLAYMODEEX* fullscreen)
+        {
+            if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))
+                return CandidateResetExHook.stdcall<HRESULT>(device,params,fullscreen);
+            ++R7CandidateResetInFlight;
+            ExternalAtomicReplayEpoch=0;
+            ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+            R7ForgetAutomaticDepthProof();
+            ExternalAtomicCandidates.Reset();
+            const HRESULT hr=CandidateResetExHook.stdcall<HRESULT>(device,params,fullscreen);
+            // A nested classic owner can reset the epoch and re-capture an
+            // automatic surface. ResetEx does not prove fresh depth identity.
+            ExternalAtomicReplayEpoch=0;
+            ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+            R7ForgetAutomaticDepthProof();
+            --R7CandidateResetInFlight;
+            return hr;
+        }
+
         // Direct PresentEx can bypass the R7/R9 Present epoch owner.
         // Retire the candidate BEFORE the driver sees the present, even on
         // failure, and do not create another candidate in that same epoch.
@@ -1862,8 +1889,8 @@ namespace OutRunVRStereo
         R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
             const D3DVIEWPORT9& viewport,DWORD flags,D3DCOLOR color,float z,DWORD stencil) noexcept
         {
-            if(!R7CandidatePresentBoundaryCovered||
-                ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
+            if(!R7CandidatePresentBoundaryCovered||!R7CandidateResetBoundaryCovered||
+                R7CandidateResetInFlight||ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             // RightEyeDepth is exclusively created by R7 with Discard=FALSE.
             // For game-owned LEFT depth, no unbind without creation proof.
@@ -3499,6 +3526,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			SetRenderTargetHook = {};
 			R7CandidatePresentBoundaryCovered=false;
 			CandidatePresentExHook = {};
+            R7CandidateResetBoundaryCovered=false;
+            CandidateResetExHook={};
 			PresentHook = {};
 			ResetHook = {};
 			StereoInstalledDevice.store(nullptr, std::memory_order_release);
@@ -3600,6 +3629,21 @@ if(WaitForEventQuery(slot.fence,1,0u))
                         if(CandidatePresentExHook&&!CandidatePresentExHook.enable().has_value())
                             CandidatePresentExHook={};
                         R7CandidatePresentBoundaryCovered=static_cast<bool>(CandidatePresentExHook);
+                    }
+                }
+                R7CandidateResetBoundaryCovered=exQuery==E_NOINTERFACE&&!ex;
+                if(SUCCEEDED(exQuery)&&ex&&static_cast<IDirect3DDevice9*>(ex)==device){
+                    void** exTable=*reinterpret_cast<void***>(ex);
+                    void* target=exTable?exTable[ResetExVtableIndex]:nullptr;
+                    // Reject ABI aliases with any other base/Ex entrypoint.
+                    for(unsigned slot=0;target&&slot<134;++slot)
+                        if(slot!=ResetExVtableIndex&&target==exTable[slot])target=nullptr;
+                    if(target){
+                        CandidateResetExHook=safetyhook::create_inline(
+                            target,R7CandidateResetExDest,disabled);
+                        if(CandidateResetExHook&&!CandidateResetExHook.enable().has_value())
+                            CandidateResetExHook={};
+                        R7CandidateResetBoundaryCovered=static_cast<bool>(CandidateResetExHook);
                     }
                 }
                 ReleaseCom(ex);

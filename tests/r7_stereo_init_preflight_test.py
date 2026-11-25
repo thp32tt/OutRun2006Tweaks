@@ -541,6 +541,8 @@ struct Pair{
 } ExternalAtomicCandidates;
 std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
 bool R7CandidatePresentBoundaryCovered=true;
+bool R7CandidateResetBoundaryCovered=true;
+unsigned R7CandidateResetInFlight=0;
 bool FormatHasStencil(D3DFORMAT){return false;}
 struct InternalPassScope{InternalPassScope(){}~InternalPassScope(){}};
 struct Hook{template<class R,class... A>R stdcall(A...){return S_OK;}}
@@ -610,6 +612,12 @@ int main(){
     assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Unavailable);
     assert(rasterCalls==0&&ExternalAtomicCandidates.allocations==0);
     R7CandidatePresentBoundaryCovered=true;
+    R7CandidateResetBoundaryCovered=false;
+    assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Unavailable);
+    R7CandidateResetBoundaryCovered=true;R7CandidateResetInFlight=1;
+    assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Unavailable);
+    assert(rasterCalls==0&&ExternalAtomicCandidates.allocations==0);
+    R7CandidateResetInFlight=0;
     assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Seeded);
     assert(rasterCalls==1&&ExternalAtomicReplayEpoch==PresentEpoch);
     unsigned draws=0;auto draw=[&](){++draws;return S_OK;};
@@ -712,5 +720,78 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"present_ex.cpp"
     exe=Path(temp)/"present_ex"
     cpp.write_text(present_ex_stub+present_ex+present_ex_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# Iter80: ResetEx may bypass classic Reset resource retirement.
+reset_ex=source[source.index("HRESULT __stdcall R7CandidateResetExDest("):
+                source.index("// Direct PresentEx can bypass")]
+reset_ex_stub=r'''
+#include <cassert>
+#include <atomic>
+#include <cstdint>
+#include <iostream>
+#define __stdcall
+using HRESULT=int;
+struct D3DPRESENT_PARAMETERS{int value;};
+struct D3DDISPLAYMODEEX{int value;};
+struct IDirect3DDevice9Ex{bool game=true;};
+std::atomic<bool> StereoBaseCallbacksArmed{true};
+bool IsGameDevice(IDirect3DDevice9Ex* d){return d&&d->game;}
+std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
+unsigned R7CandidateResetInFlight=0,proof=1,resets=0,calls=0;
+bool allocated=true,owned=false,nested=false;
+void R7ForgetAutomaticDepthProof(){++proof;}
+struct Pair{void Reset(){++resets;allocated=false;}} ExternalAtomicCandidates;
+IDirect3DDevice9Ex* expectedDevice=nullptr;
+D3DPRESENT_PARAMETERS* expectedParams=nullptr;
+D3DDISPLAYMODEEX* expectedMode=nullptr;
+HRESULT result=0;
+struct Hook{
+    template<class R> R stdcall(IDirect3DDevice9Ex* d,D3DPRESENT_PARAMETERS* p,D3DDISPLAYMODEEX* m){
+        ++calls;assert(d==expectedDevice&&p==expectedParams&&m==expectedMode);
+        if(owned){
+            assert(!allocated&&resets==1&&proof==2&&R7CandidateResetInFlight==1);
+            assert(ExternalAtomicReplayEpoch==0&&ExternalAtomicAllocationAttemptEpoch==PresentEpoch);
+            if(nested){PresentEpoch=1;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=1;}
+        }else{
+            assert(allocated&&resets==0&&proof==1&&R7CandidateResetInFlight==0);
+        }
+        return result;
+    }
+} CandidateResetExHook;
+'''
+reset_ex_cases=r'''
+int main(){
+    IDirect3DDevice9Ex game,other;other.game=false;
+    D3DPRESENT_PARAMETERS pp{7};D3DDISPLAYMODEEX mode{8};
+    for(unsigned mask=0;mask<256;++mask){
+        StereoBaseCallbacksArmed=!(mask&1);
+        expectedDevice=(mask&2)?&other:&game;
+        if(mask&4)expectedDevice=nullptr;
+        expectedParams=(mask&8)?&pp:nullptr;expectedMode=(mask&16)?&mode:nullptr;
+        nested=mask&32;result=(mask&64)?-1:0;owned=!(mask&7);
+        const std::uint64_t initialReplay=(mask&128)?9:0;
+        PresentEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=initialReplay;
+        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;allocated=true;
+        assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
+        assert(calls==1&&R7CandidateResetInFlight==0);
+        assert(PresentEpoch==(owned&&nested?1u:9u));
+        assert(ExternalAtomicReplayEpoch==(owned?0:initialReplay));
+        assert(ExternalAtomicAllocationAttemptEpoch==(owned?PresentEpoch:0));
+        assert(resets==(owned?1u:0u)&&proof==(owned?3u:1u)&&allocated==!owned);
+    }
+    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 256\n";
+}
+'''
+assert "ResetExVtableIndex = 132;" in source
+assert "target,R7CandidateResetExDest,disabled" in source
+assert "R7CandidateResetBoundaryCovered=static_cast<bool>(CandidateResetExHook);" in source
+assert "R7CandidateResetBoundaryCovered=false;\n            CandidateResetExHook={};" in source
+assert "R7CandidateResetInFlight||ExternalAtomicAllocationAttemptEpoch==PresentEpoch" in source
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"reset_ex.cpp"
+    exe=Path(temp)/"reset_ex"
+    cpp.write_text(reset_ex_stub+reset_ex+reset_ex_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
