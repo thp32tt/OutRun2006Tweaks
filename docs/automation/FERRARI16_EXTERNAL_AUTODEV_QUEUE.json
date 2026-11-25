@@ -2785,20 +2785,87 @@
           "protected_v003": "Offline verification only, no runtime/ABI/host/menu/model changes or asset promotion; original fallback remains fenced. Counts alone cannot prove per-face identity or alpha pixel fidelity; MASK rejection is conservative approval policy, not runtime feature.",
           "asset_validation": "No actual private source or processed assets or licensing evidence read or approved; all 16 remain unverified in this cycle.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration37 credited once AI2 2912 ledger bdaef964c1cbb6cc893b2ac8d3fc1df9a0b13af2",
-          "next_trace": "Trace graphics performance and external per-eye state churn, allocation, replay and synchronization without inventing FPS or enabling unsafe raster. Later review source-to-OVC material scalar/sampler and per-mesh alpha identity beyond aggregate counts, and real private exact-variant SHA/rights. Confirm iteration38 exact-SHA CI before credit."
+          "score_state": "CREDITED_ONCE_AI2_2912_PLUS_1_EQUALS_2913_LEDGER_cc5f8e45d2324105fb55a1bb91db5f6a9a62792d",
+          "next_trace": "Trace graphics performance and external per-eye state churn, allocation, replay and synchronization without inventing FPS or enabling unsafe raster. Later review source-to-OVC material scalar/sampler and per-mesh alpha identity beyond aggregate counts, and real private exact-variant SHA/rights. Confirm iteration38 exact-SHA CI before credit.",
+          "followup_exact_sha_ci": {
+            "sha": "a1b54b4c44a078f20fce388cba0fc2c2d0bb8b61",
+            "runs": [
+              {
+                "id": 45522542846,
+                "conclusion": "success"
+              },
+              {
+                "id": 45522542898,
+                "conclusion": "success"
+              },
+              {
+                "id": 45522542956,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER39-FIXED-SPRITE-PREFLIGHT",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Graphics performance: R33 to R30 fixed sprite candidate preflight before R29 stability checks",
+          "source_material_sha": "334133503b34186c8a971c6dc857e19901fee341",
+          "source_blob_sha1": {
+            "src/vr/game/rank_marker_fixedfn_r62.hpp": "618bf91ce0f26b7582aac853ebe5e4412b8032f2",
+            "src/vr/d3d9/stereo_renderer_r30.cpp": "5e1511d69205771b06196016e1a0fd131a8ae963",
+            "tests/r84_fixed_sprite_preflight_test.cpp": "cd72a3bd68b06adf04a0c1aaa48e55f38d81cbb1",
+            ".github/workflows/ferrari16-multicar-regression.yml": "18d7f07abd0ad511e7b64b9f8db8dd5340c8417f"
+          },
+          "source_defect": "R33 active primitive dispatch probes R30TryFixedFunctionOriginalSpriteStereo for four draw families. R30 previously called R29OwnerTargetIsBackBuffer and R29OwnerStableStereoBase before semantic ownership rejection. Unowned world draws thus repeated target/base checks; R29StableStereoBase can arm two-Present mono safety on hazards even when sprite candidate has no ownership. R33 actual world/HUD routes independently check stable stereo.",
+          "source_fix": "ExactR84FixedFnSpritePreflight rejects missing device, non-triangle list, missing projected anchor or unowned HUD/pause source before invoking target and stateful stable callbacks. Actual admitted sprite path retains same live shader/FVF, resource, pose and draw/restore checks. No changes to external atomic gate, R29 actual world/hazard checks or protected release.",
+          "positive_negative_regressions": [
+            "4096 synthetic combinations (256 boolean combinations repeated for 16 slots) check unchanged owner admission, exact target/stability invocation counts and injected mono-arm side effects. Old order example invokes guard for non-owner; new order zero calls. Exact-source C++17 -O2 -Wall -Wextra -Werror -pedantic compiled and passed on N100 single small harness after local GitHub DNS failed. No full N100 build.",
+            "CI source assertion binds helper before live shader query and enforces one R29 stability callback. No actual GPU timing or per-car runtime evidence."
+          ],
+          "same_sha_ci": {
+            "sha": "334133503b34186c8a971c6dc857e19901fee341",
+            "runs": [
+              {
+                "id": 45526479493,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45526479617,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45526479510,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45526479718,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "Automation branch only. Existing whole-car native callback fence prevents sidecar GPU allocation/submission; no assumption that this is measured cause of reported FPS regression. No changes to model bytes, PBR, host or release. Actual raw/mono fallback still governed by owner; HMD/visual regression not tested.",
+          "asset_validation": "No actual private model source or processed bytes/rights reviewed or promoted.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration38 credited once AI2 2913 ledger cc5f8e45d2324105fb55a1bb91db5f6a9a62792d",
+          "next_trace": "Trace baseline vs latest native player/occupant callbacks and dashboard overlay or sky/flare ownership; verify remaining whole-car bilateral staging and stock-fallback requirements; continue measured performance diagnosis, including redundant state reads only when safe, and verify iteration39 exact-SHA CI. No physical runtime claim."
         }
       ],
-      "latest_material_sha": "a1b54b4c44a078f20fce388cba0fc2c2d0bb8b61",
-      "latest_static_ci": "Iteration38 exact SHA multicar/HLSL workflow success; Win32 and package pending; iteration37 all three success and credited once",
-      "next_focus": "Trace graphics performance and external per-eye state churn, allocation, replay and synchronization without inventing FPS or enabling unsafe raster. Later review source-to-OVC material scalar/sampler and per-mesh alpha identity beyond aggregate counts, and real private exact-variant SHA/rights. Confirm iteration38 exact-SHA CI before credit."
+      "latest_material_sha": "334133503b34186c8a971c6dc857e19901fee341",
+      "latest_static_ci": "Iteration39 portable C++ synthetic preflight 4096 cases PASS; four exact-SHA workflows pending; iteration38 all three success and credited once",
+      "next_focus": "Trace baseline vs latest native player/occupant callbacks and dashboard overlay or sky/flare ownership; verify remaining whole-car bilateral staging and stock-fallback requirements; continue measured performance diagnosis, including redundant state reads only when safe, and verify iteration39 exact-SHA CI. No physical runtime claim."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 10:00:00+09:00",
+  "last_updated_kst": "2026-11-25 10:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
