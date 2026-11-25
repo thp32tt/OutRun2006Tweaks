@@ -2984,20 +2984,90 @@
           "protected_v003": "Automation branch only. No changes to protected v0.03 release, external raster gate, x86 callback ABI, host, menu, PBR shaders, assets or deployment. No new GPU clear added. No proof for raw R30/R33 physical routes bypassing R7, offscreen sync identity or whole-vehicle stereo staging. Local GitHub DNS unavailable; N100 limited to small C++ test and read-only public fetches; no full build.",
           "asset_validation": "No private model source/processed SHA or rights verified, no asset promotion. 16 labels are synthetic test repetitions, not actual vehicle asset checks.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; previous iterations39/40 credited once 2913+1+1=2915 ledger 5dec317141941aad79f84ae8c4641c8e5ca1b463",
-          "next_trace": "Trace R30/R33 raw draw paths bypassing R7 and their depth/stencil ownership; inspect offscreen depth identity transitions, bootstrap restoration failure and right-eye failure after physical LEFT. Never enable external raster without whole-car isolated bilateral color/depth transaction. Confirm iteration41 exact SHA Windows CI."
+          "score_state": "CREDITED_ONCE_AI2_2915_PLUS_1_EQUALS_2916_LEDGER_d9c596972af6324ad80d1a4d2d862a92296c3e97",
+          "next_trace": "Trace R30/R33 raw draw paths bypassing R7 and their depth/stencil ownership; inspect offscreen depth identity transitions, bootstrap restoration failure and right-eye failure after physical LEFT. Never enable external raster without whole-car isolated bilateral color/depth transaction. Confirm iteration41 exact SHA Windows CI.",
+          "followup_exact_sha_ci": {
+            "sha": "75d2c79dc57e538e6bd3474a187e5c8599991dac",
+            "runs": [
+              {
+                "id": 45533607232,
+                "conclusion": "success"
+              },
+              {
+                "id": 45533607222,
+                "conclusion": "success"
+              },
+              {
+                "id": 45533607186,
+                "conclusion": "success"
+              },
+              {
+                "id": 45533607175,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER42-R29-RAW-DEPTH-RECEIPT",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "R30/R33 direct/raw Draw and DIP bypass; HRESULT, state and fallback preservation",
+          "source_material_sha": "97a8f99a528ed3d32a1cb460963860df0cac6e97",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r29.cpp": "3a37b39d494fb382afca8c5cd5efa8a73084b76a",
+            ".github/workflows/ferrari16-multicar-regression.yml": "0b10dde207d2474c30413ba8cf1b86f6c8b159f4",
+            "tests/r29_raw_depth_receipt_test.py": "148ab7a9159bb06bc6b5114c14498043f464f179"
+          },
+          "source_defect": "R33/R32/R30 raw helpers reach four R29OwnerCallRawDraw* wrappers which directly invoke original Hook.stdcall without ExecuteStereoDraw or R7 clear-receipt revocation. R9NoteMainDepthContentWrite increments R9MainDepthContentSerial only, not LastMainDepthClearStamp. A potential LEFT write through raw boundary can leave a stale same-Present clear replay stamp, including failed HRESULT. Reproduced with actual extracted wrapper and R7 helper functions plus mock physical calls.",
+          "source_fix": "Call existing R7 RevokeDepthClearReplayBeforeLeftDraw(d) immediately before each of four R29 raw original draw hooks. Keep exactly one original invocation, unchanged arguments and HRESULT. Existing helper skips internal RIGHT, other devices and no-current-receipt; independently revokes possible depth/stencil writes. CI allowlist adds R29 only with byte-for-byte baseline comparison permitting exactly four reviewed insertions; all existing guards retained.",
+          "positive_negative_regressions": [
+            "1536 cases: four primitive families x internal/external x device identity x present epoch x four receipt masks x four write masks x three injected HRESULT outcomes; extracted production wrappers and existing R7 helper compiled with fake D3D9 hooks and actual DepthClearReplayStamp header. Verify receipt at hook entry, call count 1, HRESULT identity, read-only/non-game/internal/stale-epoch negatives and state probe counts.",
+            "Mutation removing four helper calls fails regression; first mutation failed missing state probes; isolated mutation disabling only the probe-count assertion reproduces stale receipt assertion at physical hook entry. Exact source blob hashes verified from committed GitHub raw bytes. No real GPU failure injection or model rendering."
+          ],
+          "same_sha_ci": {
+            "sha": "97a8f99a528ed3d32a1cb460963860df0cac6e97",
+            "runs": [
+              {
+                "id": 45537212663,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45537212611,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45537212586,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45537212656,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "Only four reviewed R29 wrapper insertions plus test and CI exact-source guard on automation branch. Protected v0.03 release, ABI, host, PBR shaders, assets, deployment and external live-raster fence unchanged. R7 helper can add state probes only with current receipt. Internal LEFT under other scopes and whole-car atomic fallback remain to be audited; no runtime or FPS claim. Local DNS failed; N100 used only for small isolated C++ test and read-only fetches, no full build.",
+          "asset_validation": "No private source/processed asset SHA, 16 actual vehicle geometry/material/rights validation or promotion. Synthetic boundary tests are not per-vehicle QA.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; previous iteration41 credited once 2915+1=2916 ledger d9c596972af6324ad80d1a4d2d862a92296c3e97",
+          "next_trace": "Trace R29/R30/R33 InternalStereoPass ownership and restoration failure after actual LEFT/RIGHT, including R30 deferred particle draw accounting and direct offscreen depth attachment transitions. Confirm iteration42 exact SHA Windows CI. Preserve external raster fence until whole-vehicle isolated bilateral color/depth staging is proven."
         }
       ],
-      "latest_material_sha": "75d2c79dc57e538e6bd3474a187e5c8599991dac",
-      "latest_static_ci": "Iteration41 384 portable synthetic cases PASS, exact blob hashes verified, multicar/HLSL PASS; Windows build/package and inspector pending. Iteration40 all exact SHA CI success.",
-      "next_focus": "Trace R30/R33 raw draw paths bypassing R7 and their depth/stencil ownership; inspect offscreen depth identity transitions, bootstrap restoration failure and right-eye failure after physical LEFT. Never enable external raster without whole-car isolated bilateral color/depth transaction. Confirm iteration41 exact SHA Windows CI."
+      "latest_material_sha": "97a8f99a528ed3d32a1cb460963860df0cac6e97",
+      "latest_static_ci": "Iteration42 1536 mock physical-boundary cases PASS, old-wrapper mutation reproduces defect, exact blob hashes verified, Windows and all four workflows pending. Iteration41 all exact SHA CI success.",
+      "next_focus": "Trace R29/R30/R33 InternalStereoPass ownership and restoration failure after actual LEFT/RIGHT, including R30 deferred particle draw accounting and direct offscreen depth attachment transitions. Confirm iteration42 exact SHA Windows CI. Preserve external raster fence until whole-vehicle isolated bilateral color/depth staging is proven."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 11:30:00+09:00",
+  "last_updated_kst": "2026-11-25 12:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
