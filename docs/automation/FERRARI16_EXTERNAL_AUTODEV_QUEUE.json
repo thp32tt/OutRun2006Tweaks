@@ -4116,7 +4116,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER57-PE-SECTION-OVERLAP",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_APPLICABLE_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "Windows x86 DLL+x64 host exact-SHA tests: 16-car corrupt input negatives, packaging, isolated launch and reversible rollback",
           "source_material_sha": "95e16cd0c36100db29e683aa34384f854329a6d4",
           "source_blob_sha1": {
@@ -4162,20 +4162,90 @@
           "protected_v003": "Automation branch only, no stable release, launch, native x86 player ABI, host, render or deployment changes. No game or third-party binary uploads.",
           "asset_validation": "No actual private 16 GLB/OVC/DDS SHA or per-car UV/normal/PBR/wheel/instrument/rights validation; no promotion.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_ITER57_SCORE_PENDING_EXACT_SHA_CI; iteration56 credited once AI2 2929+1=2930 ledger 48375e9753dcbf8ded643f12ade9b7ab702f1f6a",
-          "next_trace": "Verify iteration57 exact SHA Windows build, all-car and isolated package. Trace PREPARE recursive copy below top-level reparse guard, launcher INI mutation and rollback failure/partial restore receipts; independently inspect extracted installer architecture validation parity and R7 atomic staging. Preserve official v0.03 and no private model upload."
+          "score_state": "CREDITED_ONCE_AI2_2930_PLUS_1_EQUALS_2931_LEDGER_1cacfc99d8d802f55033f9258b22fb91f9601add",
+          "next_trace": "Verify iteration57 exact SHA Windows build, all-car and isolated package. Trace PREPARE recursive copy below top-level reparse guard, launcher INI mutation and rollback failure/partial restore receipts; independently inspect extracted installer architecture validation parity and R7 atomic staging. Preserve official v0.03 and no private model upload.",
+          "followup_exact_sha_ci": {
+            "sha": "95e16cd0c36100db29e683aa34384f854329a6d4",
+            "runs": [
+              {
+                "id": 45595721351,
+                "conclusion": "success"
+              },
+              {
+                "id": 45595721403,
+                "conclusion": "success"
+              },
+              {
+                "id": 45595721412,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "Actions API exact head_sha verified; HLSL, multicar, Win32 Release, x86 DLL/x64 host build and synthetic install/restore jobs confirmed."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER58-GLB-SCENE-MESH-PROVENANCE",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Slot provenance and optional exact 328 GTS / 575 SA / F430 Spider / Testarossa Spider: source-to-OVC quality without unsupported asset promotion",
+          "source_material_sha": "8fb5bb9de5f6c000efd7355ca673c7043a9b316d",
+          "source_blob_sha1": {
+            "tools/ferrari16/exact_variant_quality_gate.py": "5083cff42b917a6d4a8b0a86eb6face101e9b6f1",
+            "tests/ferrari16_exact_variant_quality_gate_test.py": "6b4e62bacddf17381660bb2a577a7d06fa83c832"
+          },
+          "source_defect": "GLB stats counted every mesh definition without checking nodes reachable in the selected scene. A converted file with an unreferenced mesh, mesh only in nonselected scene, repeated mesh instance, broken reference, cyclic graph, missing/ambiguous scene or GPU instancing could retain one counted triangle and pass metadata checks. Old helper accepted nine synthetic examples; no actual asset observed.",
+          "source_fix": "Traverse selected scene graph, require valid roots/node and mesh references and no cycles/shared nodes. Require exactly one reachable instance per mesh definition, reject EXT_mesh_gpu_instancing; allow implicit single scene, valid nesting. Conservative static admission policy: legitimate multi-instance or unused-definition GLBs require flattening/cleanup and review; not general glTF validation or proof of transforms.",
+          "positive_negative_regressions": [
+            "4 exact slots x 2 normal scene forms = 8 positive; 4 slots x 9 bad scene cases x 2 evidence sides = 72 negative. Full existing Python exact-variant suite PASS.",
+            "Exact Git blob SHA-1 verified for both changed files, three dependencies and old gate. N100 lightweight Python test plus 9 direct old/new counterexamples PASS."
+          ],
+          "call_graph_trace": [
+            "audit_manifest -> validate_one -> slot/body/roof and manual/rights evidence SHA -> source/converted glb_stats -> selected scene_meshes -> accessor/material/texture parity -> inspect OVC4 -> alpha and opaque PBR/normal coverage.",
+            "OVC has no scene graph instancing, so require flattened one-instance evidence instead of counting unreachable definitions. Actual transform baking, image pixel decode, per-material correspondence and physical likeness remain unproven.",
+            "No changes to renderer, fallback, licensing, dashboards, menus or any real asset. EXT16-003 remains BLOCKED."
+          ],
+          "same_sha_ci": {
+            "sha": "8fb5bb9de5f6c000efd7355ca673c7043a9b316d",
+            "runs": [
+              {
+                "id": 45600447063,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45600447070,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45600447196,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha verified via Actions API; full applicable CI not yet confirmed."
+          },
+          "protected_v003": "Automation branch only. No native runtime, ABI, release, launcher, host, deployment or model binary changes.",
+          "asset_validation": "No current private source/converted GLB/OVC4/DDS SHA or license/preview evidence, no actual 16-car material/UV/normal/wheel/instrument QA. All four exact candidates remain optional/nonpromoted, Testarossa one-off 62897 requirement unchanged.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_ITER58_SCORE_PENDING_EXACT_SHA_CI; iteration57 credited once AI2 2930+1=2931 ledger 1cacfc99d8d802f55033f9258b22fb91f9601add",
+          "next_trace": "Confirm iteration58 exact SHA Windows build, all-car and isolated package. Trace GLB selected scene node transform, morph targets and skin/deformation baking versus final OVC geometry; separately validate actual embedded image integrity and preview/rights evidence without inferring rights from hashes. Continue R7 initial allocation/restore and whole-vehicle pair-atomic staging. No unsupported exact asset promotion."
         }
       ],
-      "latest_material_sha": "95e16cd0c36100db29e683aa34384f854329a6d4",
-      "latest_static_ci": "Iteration57 exact blob 11/11 Python tests and 4 old/new counterexamples PASS; all three exact workflows in_progress. Iteration56 three applicable exact workflows success, credited once.",
-      "next_focus": "Verify iteration57 exact SHA Windows build, all-car and isolated package. Trace PREPARE recursive copy below top-level reparse guard, launcher INI mutation and rollback failure/partial restore receipts; independently inspect extracted installer architecture validation parity and R7 atomic staging. Preserve official v0.03 and no private model upload."
+      "latest_material_sha": "8fb5bb9de5f6c000efd7355ca673c7043a9b316d",
+      "latest_static_ci": "Iteration58 exact blob Python exact-variant suite PASS including 80 new scene fixtures, nine old/new counterexamples; three exact workflows in_progress. Iteration57 applicable exact CI success credited once.",
+      "next_focus": "Confirm iteration58 exact SHA Windows build, all-car and isolated package. Trace GLB selected scene node transform, morph targets and skin/deformation baking versus final OVC geometry; separately validate actual embedded image integrity and preview/rights evidence without inferring rights from hashes. Continue R7 initial allocation/restore and whole-vehicle pair-atomic staging. No unsupported exact asset promotion."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T19:30:00+09:00",
+  "last_updated_kst": "2026-11-25T20:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
