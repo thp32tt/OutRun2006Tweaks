@@ -3646,7 +3646,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER51-R7-DEPTH-BOOTSTRAP-RESTORE",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "DX9Ex R7 left/right depth bootstrap, dirty restore and raw fallback; failure injection",
           "source_material_sha": "f5f1f65fe4403d331898899ea250ffa07d2f1955",
           "source_blob_sha1": {
@@ -3701,20 +3701,103 @@
           "protected_v003": "Automation branch only; no stable release/deployment changes. N100 bounded source copies and tiny portable fault-injection compile only. Returning E_FAIL on dirty bootstrap is conservative; no actual game recovery or FPS claim.",
           "asset_validation": "No private source/processed SHA, actual 16-car UV/albedo/normal/PBR, cockpit or rights validation. No model promotion.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration50 credited once 2924+1=2925 ledger 27ffc491b7cad20f6fd0f4c2ef8090efbbc13725",
-          "next_trace": "Verify iteration51 exact SHA Windows x86 DLL/x64 host package and all-car regression. Implement explicit dirty-bootstrap result propagation through R29Owner/R30Support/R32Review/R33, including no raw fallback on dirty target and device-state recovery before later raster; investigate EnsureStereoResources allocation/initialization restore errors and offscreen depth-binding transitions. Actual isolated L/R color+depth publication and right-DIP fault injection remain required before external admission."
+          "score_state": "CREDITED_ONCE_AI2_2925_PLUS_1_EQUALS_2926_LEDGER_8059b1a6d5298e15813eeef0885002724d52b6b4",
+          "next_trace": "Verify iteration51 exact SHA Windows x86 DLL/x64 host package and all-car regression. Implement explicit dirty-bootstrap result propagation through R29Owner/R30Support/R32Review/R33, including no raw fallback on dirty target and device-state recovery before later raster; investigate EnsureStereoResources allocation/initialization restore errors and offscreen depth-binding transitions. Actual isolated L/R color+depth publication and right-DIP fault injection remain required before external admission.",
+          "followup_exact_sha_ci": {
+            "sha": "f5f1f65fe4403d331898899ea250ffa07d2f1955",
+            "runs": [
+              {
+                "id": 45569014395,
+                "conclusion": "success"
+              },
+              {
+                "id": 45569014291,
+                "conclusion": "success"
+              },
+              {
+                "id": 45569014276,
+                "conclusion": "success"
+              },
+              {
+                "id": 45569014401,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "Exact head_sha verified via Actions API."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER52-UPPER-DEPTH-BOOTSTRAP-OWNERSHIP",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "R30/R33 direct/raw DIP bypass, HRESULT recovery, state restoration and original fallback",
+          "source_material_sha": "867abc65b033281d9856c69810dd91c74d022ba6",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r29.cpp": "021dac2c7a1e2f436b46cafd35ecdc159a306afe",
+            "src/vr/d3d9/stereo_renderer_r30.cpp": "a68eca05ff7cb8fd688ffb829b2e2a5b4582d57f",
+            "src/vr/d3d9/stereo_renderer_r32.cpp": "cb83b119900ef8666b7f4ce59cc3ba4cfe92673f",
+            "src/vr/d3d9/stereo_renderer_r33.cpp": "6f93608908171d6568fd91a163414db69e2a25b3",
+            "tests/r7_depth_bootstrap_restore_test.py": "5a2faca736ff2dfdede20d136873ca6325817102"
+          },
+          "source_defect": "Iteration51 R7 dirty-restore result lost at R29Owner/R30Support/R32Review bool bridge; R30 XYZRHW, fixed-screen and R33 HUD/fast-world could decline and execute lower/raw fallback on unproven RT/DS/viewport, or continue stereo with depth/stencil disabled.",
+          "source_fix": "Explicit out-parameter across three bridges and headers; R30 XYZRHW/fixed-function five caller branches preserve releases and return Handled(E_FAIL) on dirty bootstrap; screen route same; R33 shared preparation refuses dirty restore before attachment resampling or live depth-test predicates, HUD and fast-world return owned E_FAIL rather than decline. Normal clean setup/clear miss remains decline or allowed depthless route. CI exact bridge byte guard admits only these signatures and forwarders.",
+          "positive_negative_regressions": [
+            "Downloaded exact committed source only and executed existing extracted R7 C++ injection plus new extracted R33 readiness function on N100; R7_DEPTH_BOOTSTRAP_RESTORE_PASS and R33_DEPTH_BOOTSTRAP_BRIDGE_PASS. 128 combinations repeated for 16 synthetic slot indices = 2048 executions; 128 unique readiness combinations (not real 16-car model tests).",
+            "Static source checks for all five R30 caller return branches, screen route and both R33 owned results, plus full existing R7 fault injection. All-car workflow success at exact SHA. R33 mock does not execute physical DIP or real D3D restoration."
+          ],
+          "call_graph_trace": [
+            "R7 TryBootstrapRightDepthFromRecentClear -> R29Owner -> R30Support -> R32Review -> R33PrepareRightDepthStereo -> R33TryFastWorld/R33TryHud -> handled result -> dispatch returns HRESULT before original fallback.",
+            "R30ConfigureXyzrhwWorldEffect -> state.bootstrapRestoreFailed -> four VB/UP and one fixed-function attempt branches; R30TryScreenSpaceFovDraw -> handled failure -> R30GuardScreenSpace returns hr before R29 fallback. Traced actual dispatch return sites at committed SHA.",
+            "Dirty same-call veto only. Subsequent top-level call recovery and real D3D binding restoration remain open. Telemetry route may label an owned failure as selected stereo route; not proof of completed stereo. No change to atomic external admission or stock callback."
+          ],
+          "same_sha_ci": {
+            "sha": "867abc65b033281d9856c69810dd91c74d022ba6",
+            "runs": [
+              {
+                "id": 45572924603,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "id": 45572924706,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45572924793,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45572924773,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha confirmed through Actions API."
+          },
+          "protected_v003": "Automation branch only; original release, host, model files, shader, PBR, dashboard and menu unchanged. Conservative same-call E_FAIL on dirty binding; actual subsequent game recovery remains untested. Local GitHub DNS unavailable, N100 bounded source download and small C++ probes only. N100 ledger push failed authentication; GitHub connector fetch_blob + update_file succeeded instead.",
+          "asset_validation": "No private source/processed model SHA, actual 16-car UV/albedo/normal/PBR/rights evidence, no promotions.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration51 credited once 2925+1=2926 ledger 8059b1a6d5298e15813eeef0885002724d52b6b4",
+          "next_trace": "Verify iteration52 exact SHA x86 DLL+x64 host package before credit. Trace persistent dirty binding recovery at R33 top-level dispatch and EnsureStereoResources initialization restoration, including next draw and reset/Present recovery; investigate whether the current poisoned-frame flag can permit later raw draw before authoritative attachment/state reconciliation. Preserve clean fallback, original callback and closed atomic external gate. Actual bilateral staging/right-DIP fault injection still required."
         }
       ],
-      "latest_material_sha": "f5f1f65fe4403d331898899ea250ffa07d2f1955",
-      "latest_static_ci": "Iteration51 extracted actual R7 bootstrap restore fault injection PASS; exact SHA workflows pending at observation. Iteration50 four exact workflows success and credited once.",
-      "next_focus": "Verify iteration51 exact SHA Windows x86 DLL/x64 host package and all-car regression. Implement explicit dirty-bootstrap result propagation through R29Owner/R30Support/R32Review/R33, including no raw fallback on dirty target and device-state recovery before later raster; investigate EnsureStereoResources allocation/initialization restore errors and offscreen depth-binding transitions. Actual isolated L/R color+depth publication and right-DIP fault injection remain required before external admission."
+      "latest_material_sha": "867abc65b033281d9856c69810dd91c74d022ba6",
+      "latest_static_ci": "Iteration52 exact committed portable R7/R33 fault injection PASS; all-car regression success; Windows Build/HUD Inspector/package pending. Iteration51 four exact workflows success, credited once.",
+      "next_focus": "Verify iteration52 exact SHA x86 DLL+x64 host package before credit. Trace persistent dirty binding recovery at R33 top-level dispatch and EnsureStereoResources initialization restoration, including next draw and reset/Present recovery; investigate whether the current poisoned-frame flag can permit later raw draw before authoritative attachment/state reconciliation. Preserve clean fallback, original callback and closed atomic external gate. Actual bilateral staging/right-DIP fault injection still required."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T16:33:38+09:00",
+  "last_updated_kst": "2026-11-25T17:04:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
