@@ -89,6 +89,7 @@ namespace OutRunVRStereo
 		constexpr std::size_t ResetVtableIndex = 16;
 		constexpr std::size_t PresentVtableIndex = 17;
 		constexpr std::size_t CreateDepthStencilSurfaceVtableIndex = 29;
+		constexpr std::size_t CreateDepthStencilSurfaceExVtableIndex = 131;
 		constexpr std::size_t UpdateSurfaceVtableIndex = 30;
 		constexpr std::size_t StretchRectVtableIndex = 34;
 		constexpr std::size_t ColorFillVtableIndex = 35;
@@ -111,6 +112,7 @@ namespace OutRunVRStereo
 		SafetyHookInline ResetHook{};
 		SafetyHookInline PresentHook{};
 		SafetyHookInline CreateDepthRetentionHook{};
+		SafetyHookInline CreateDepthRetentionExHook{};
 		SafetyHookInline UpdateSurfaceHook{};
 		SafetyHookInline StretchRectHook{};
 		SafetyHookInline ColorFillHook{};
@@ -1662,13 +1664,35 @@ namespace OutRunVRStereo
                 R7MarkDepthRetention(depth,R7AutomaticDepthGeneration);
             ReleaseCom(depth);
         }
+        // Base and Ex creation can delegate to each other inside the driver.
+        // Only the outer API contract may prove retention; never let a nested
+        // FALSE call mark a surface returned by an outer discard/failure call.
+        thread_local unsigned R7DepthCreationNesting=0;
+        struct R7DepthCreationScope {
+            bool outer;
+            R7DepthCreationScope() noexcept:outer(R7DepthCreationNesting++==0){}
+            ~R7DepthCreationScope(){--R7DepthCreationNesting;}
+        };
         HRESULT __stdcall CreateDepthRetentionDest(IDirect3DDevice9* device,
             UINT width,UINT height,D3DFORMAT format,D3DMULTISAMPLE_TYPE samples,
             DWORD quality,BOOL discard,IDirect3DSurface9** out,HANDLE* shared)
         {
+            R7DepthCreationScope scope;
             const HRESULT hr=CreateDepthRetentionHook.stdcall<HRESULT>(device,
                 width,height,format,samples,quality,discard,out,shared);
-            if(SUCCEEDED(hr)&&!discard&&out&&*out&&
+            if(scope.outer&&SUCCEEDED(hr)&&!discard&&!shared&&out&&*out&&
+                StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&IsGameDevice(device))
+                R7MarkDepthRetention(*out,0);
+            return hr;
+        }
+        HRESULT __stdcall CreateDepthRetentionExDest(IDirect3DDevice9Ex* device,
+            UINT width,UINT height,D3DFORMAT format,D3DMULTISAMPLE_TYPE samples,
+            DWORD quality,BOOL discard,IDirect3DSurface9** out,HANDLE* shared,DWORD usage)
+        {
+            R7DepthCreationScope scope;
+            const HRESULT hr=CreateDepthRetentionExHook.stdcall<HRESULT>(device,
+                width,height,format,samples,quality,discard,out,shared,usage);
+            if(scope.outer&&SUCCEEDED(hr)&&!discard&&!shared&&out&&*out&&
                 StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&IsGameDevice(device))
                 R7MarkDepthRetention(*out,0);
             return hr;
@@ -3448,6 +3472,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			ColorFillHook = {};
 			StretchRectHook = {};
 			UpdateSurfaceHook = {};
+			CreateDepthRetentionExHook = {};
 			CreateDepthRetentionHook = {};
 			SetRenderTargetHook = {};
 			PresentHook = {};
@@ -3514,6 +3539,22 @@ if(WaitForEventQuery(slot.fence,1,0u))
                     vtable[CreateDepthStencilSurfaceVtableIndex],CreateDepthRetentionDest,disabled);
                 if(CreateDepthRetentionHook&&!CreateDepthRetentionHook.enable().has_value())
                     CreateDepthRetentionHook={};
+                // Query the real Ex interface before indexing its extended
+                // vtable. If identity/target is ambiguous, leave it unhooked.
+                IDirect3DDevice9Ex* ex=nullptr;
+                if(CreateDepthRetentionHook&&SUCCEEDED(device->QueryInterface(
+                    __uuidof(IDirect3DDevice9Ex),reinterpret_cast<void**>(&ex)))&&
+                    ex&&static_cast<IDirect3DDevice9*>(ex)==device){
+                    void** exTable=*reinterpret_cast<void***>(ex);
+                    if(exTable&&exTable[CreateDepthStencilSurfaceExVtableIndex]&&
+                        exTable[CreateDepthStencilSurfaceExVtableIndex]!=vtable[CreateDepthStencilSurfaceVtableIndex]){
+                        CreateDepthRetentionExHook=safetyhook::create_inline(
+                            exTable[CreateDepthStencilSurfaceExVtableIndex],CreateDepthRetentionExDest,disabled);
+                        if(CreateDepthRetentionExHook&&!CreateDepthRetentionExHook.enable().has_value())
+                            CreateDepthRetentionExHook={};
+                    }
+                }
+                ReleaseCom(ex);
                 if(freshDevice)R7CaptureFreshAutomaticDepth(device);
             }
 			IDirect3DVertexShader9*shader=nullptr;

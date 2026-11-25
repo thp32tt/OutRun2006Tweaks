@@ -510,6 +510,21 @@ struct CreateHook{
         return createHr;
     }
 } CreateDepthRetentionHook;
+struct IDirect3DDevice9Ex:IDirect3DDevice9{};
+HRESULT __stdcall CreateDepthRetentionDest(IDirect3DDevice9*,UINT,UINT,D3DFORMAT,
+    D3DMULTISAMPLE_TYPE,DWORD,BOOL,IDirect3DSurface9**,HANDLE*);
+bool delegateBase=false;unsigned exCreates=0;HRESULT exHr=S_OK;
+HANDLE* expectedShared=nullptr;DWORD expectedUsage=0;
+struct ExHook{
+    template<class R>R stdcall(IDirect3DDevice9Ex* d,UINT w,UINT h,D3DFORMAT f,
+        D3DMULTISAMPLE_TYPE m,DWORD q,BOOL,IDirect3DSurface9** out,HANDLE* shared,DWORD usage){
+        assert(w==1920&&h==1080&&f==3&&m==4&&q==1);
+        assert(shared==expectedShared&&usage==expectedUsage);++exCreates;
+        if(delegateBase)CreateDepthRetentionDest(d,w,h,f,m,q,0,out,shared);
+        else if(out)*out=created;
+        return exHr;
+    }
+} CreateDepthRetentionExHook;
 '''
 entry_stub=r'''
 enum class R7CandidateSeedResult{Unavailable,Seeded,DirtyRestore};
@@ -563,6 +578,29 @@ int main(){
         R7ForgetAutomaticDepthProof();
         assert(R7DepthRetentionProven(&surface)==(mask==0));++cases;
     }
+    // Direct Ex API and nested base delegation: only outer success,
+    // non-discard, private resource and owned device can certify retention.
+    HANDLE sharedHandle=nullptr;
+    for(unsigned mask=0;mask<512;++mask){
+        IDirect3DDevice9Ex ex;IDirect3DSurface9 surface;IDirect3DSurface9* out=nullptr;
+        ex.game=!(mask&1);StereoBaseCallbacksArmed=!(mask&2);
+        exHr=(mask&4)?E_FAIL:S_OK;created=(mask&8)?nullptr:&surface;
+        surface.writeFail=mask&16;delegateBase=mask&128;
+        expectedShared=(mask&256)?&sharedHandle:nullptr;
+        expectedUsage=0x1000u;creates=0;exCreates=0;createHr=S_OK;
+        const auto hr=CreateDepthRetentionExDest(&ex,1920,1080,3,4,1,(mask&32)?1:0,
+            (mask&64)?nullptr:&out,expectedShared,expectedUsage);
+        assert(hr==exHr&&exCreates==1&&creates==unsigned(delegateBase));
+        assert(R7DepthCreationNesting==0);
+        const bool expected=(mask&~128u)==0;
+        assert(R7DepthRetentionProven(&surface)==expected);
+        assert(surface.writes<=1);R7ForgetAutomaticDepthProof();
+        assert(R7DepthRetentionProven(&surface)==expected);++cases;
+    }
+    {IDirect3DDevice9 ex;IDirect3DSurface9 surface;IDirect3DSurface9* out=nullptr;
+     StereoBaseCallbacksArmed=true;created=&surface;createHr=S_OK;
+     assert(CreateDepthRetentionDest(&ex,1920,1080,3,4,1,0,&out,&sharedHandle)==S_OK);
+     assert(!R7DepthRetentionProven(&surface)&&surface.writes==0);}
     IDirect3DDevice9 d;D3DVIEWPORT9 vp;
     assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Unavailable);
     assert(rasterCalls==0&&ExternalAtomicCandidates.allocations==0);
@@ -590,6 +628,10 @@ r13=(Path("src/vr/d3d9/stereo_renderer_r13.cpp").read_text())
 assert "R7ForgetAutomaticDepthProof();\n            ReleaseStereoResources();" in r13
 assert "InstallStereoHooks(device,true);" in source
 assert "CreateDepthStencilSurfaceVtableIndex = 29;" in source
+assert "CreateDepthStencilSurfaceExVtableIndex = 131;" in source
+assert "CreateDepthRetentionExHook = {};" in source
+assert "exTable[CreateDepthStencilSurfaceExVtableIndex]!=vtable[CreateDepthStencilSurfaceVtableIndex]" in source
+assert "exTable[CreateDepthStencilSurfaceExVtableIndex],CreateDepthRetentionExDest,disabled" in source
 with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"depth_retention.cpp"
     exe=Path(temp)/"depth_retention"
