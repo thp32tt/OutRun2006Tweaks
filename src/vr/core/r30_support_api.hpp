@@ -243,7 +243,7 @@ namespace OutRunVRStereo
     // The R9/R22 resource owner and depth-stencil safety predicates keep
     // their original failure and D3D9 state handling; no eager allocation.
     bool R30SupportEnsureStereoResources(IDirect3DDevice9* device) noexcept;
-    bool R30SupportTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept;
+    bool R30SupportTryBootstrapRightDepth(IDirect3DDevice9* device, bool* restoreFailed) noexcept;
     bool R30SupportDepthTestActive(IDirect3DDevice9* device) noexcept;
     bool R30SupportStencilTestActive(IDirect3DDevice9* device) noexcept;
     // Raw lower-hook dispatch for R32 stereo target switches. The original

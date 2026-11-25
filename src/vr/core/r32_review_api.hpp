@@ -146,7 +146,7 @@ namespace OutRunVRStereo
     IDirect3DSurface9* R32ReviewRightEyeSurface() noexcept;
     IDirect3DSurface9* R32ReviewRightEyeDepth() noexcept;
     bool R32ReviewEnsureStereoResources(IDirect3DDevice9* device) noexcept;
-    bool R32ReviewTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept;
+    bool R32ReviewTryBootstrapRightDepth(IDirect3DDevice9* device, bool* restoreFailed) noexcept;
     bool R32ReviewDepthTestActive(IDirect3DDevice9* device) noexcept;
     bool R32ReviewStencilTestActive(IDirect3DDevice9* device) noexcept;
     HRESULT R32ReviewSetRenderTarget(

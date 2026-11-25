@@ -523,8 +523,9 @@ namespace OutRunVRStereo
 
         // Single shared depth/stencil readiness path for world and HUD.
         // Normal synchronized draws make only one read of each sync bit.
-        bool R33PrepareRightDepthStereo(IDirect3DDevice9* device) noexcept
+        bool R33PrepareRightDepthStereo(IDirect3DDevice9* device, bool& restoreFailed) noexcept
         {
+            restoreFailed = false;
             if (!R32ReviewTrackedDepthStencil())
                 return true;
 
@@ -532,7 +533,9 @@ namespace OutRunVRStereo
             bool stencilInSync = R32ReviewRightStencilInSync();
             if (!depthInSync || !stencilInSync)
             {
-                R32ReviewTryBootstrapRightDepth(device);
+                R32ReviewTryBootstrapRightDepth(device, &restoreFailed);
+                if (restoreFailed)
+                    return false;
                 // Bootstrap can change depth ownership; preserve the original
                 // post-bootstrap tracked-attachment and live-test veto.
                 if (!R32ReviewTrackedDepthStencil())
@@ -692,8 +695,10 @@ namespace OutRunVRStereo
                 return {};
             // Avoid redundant cross-TU sync reads on the stereo draw path;
             // the helper resamples after bootstrap and keeps the live vetoes.
-            if (!R33PrepareRightDepthStereo(device))
-                return {};
+            bool bootstrapRestoreFailed = false;
+            if (!R33PrepareRightDepthStereo(device, bootstrapRestoreFailed))
+                return bootstrapRestoreFailed ? R32ReviewOwnedResult{true, E_FAIL}
+                                              : R32ReviewOwnedResult{};
 
             // Read the one BeginScene-latched pose in place: avoid copying both
             // eye transforms for every world/HUD primitive. This pointer is
@@ -883,8 +888,10 @@ namespace OutRunVRStereo
                 return {};
             // Avoid redundant cross-TU sync reads on the stereo draw path;
             // the helper resamples after bootstrap and keeps the live vetoes.
-            if (!R33PrepareRightDepthStereo(device))
-                return {};
+            bool bootstrapRestoreFailed = false;
+            if (!R33PrepareRightDepthStereo(device, bootstrapRestoreFailed))
+                return bootstrapRestoreFailed ? R32ReviewOwnedResult{true, E_FAIL}
+                                              : R32ReviewOwnedResult{};
 
             // Read the one BeginScene-latched pose in place: avoid copying both
             // eye transforms for every world/HUD primitive. This pointer is

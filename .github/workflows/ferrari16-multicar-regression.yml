@@ -411,6 +411,10 @@ jobs:
           assert expected29.count(marker29) == 1
           patch29 = nl29.join([b'                bool bootstrapRestoreFailed = false;', b'                TryBootstrapRightDepthFromRecentClear(device, &bootstrapRestoreFailed);', b'                if (bootstrapRestoreFailed)', b'                {', b'                    R29ArmMonoSafety();', b'                    return E_FAIL;', b'                }'])
           expected29 = expected29.replace(marker29,patch29,1)
+          # Iter52: exact dirty-bootstrap result forwarding; no other bytes allowed.
+          for before, after in [(b'R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept', b'R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device, bool* restoreFailed) noexcept'), (b'return TryBootstrapRightDepthFromRecentClear(device);', b'return TryBootstrapRightDepthFromRecentClear(device, restoreFailed);')]:
+              assert expected29.count(before) == 1
+              expected29 = expected29.replace(before, after, 1)
           assert Path(r29path).read_bytes() == expected29, 'Unreviewed R29 change'
           paths = {
               'src/vr/d3d9/stereo_renderer_r32.cpp': ('R32Review', False),
@@ -436,6 +440,15 @@ jobs:
                   assert result.count(marker) == 1
                   newline = b'\r\n' if b'\r\n' in result else b'\n'
                   result = result.replace(marker, marker + newline + b'#include "../game/stereo_lower_draw_result.hpp"', 1)
+              arg = 'device' if header else 'd'
+              before = (prefix + 'TryBootstrapRightDepth(IDirect3DDevice9* ' + arg + ') noexcept').encode()
+              after = (prefix + 'TryBootstrapRightDepth(IDirect3DDevice9* ' + arg + ', bool* restoreFailed) noexcept').encode()
+              assert result.count(before) == 1
+              result = result.replace(before, after, 1)
+              if not header:
+                  before = b'return R30SupportTryBootstrapRightDepth(d);'
+                  assert result.count(before) == 1
+                  result = result.replace(before, b'return R30SupportTryBootstrapRightDepth(d, restoreFailed);', 1)
               return result
           for path, (prefix, header) in paths.items():
               old = subprocess.check_output(['git','show',base+':'+path])

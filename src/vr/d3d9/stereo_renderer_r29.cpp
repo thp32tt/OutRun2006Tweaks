@@ -1221,9 +1221,9 @@ namespace OutRunVRStereo
         return EnsureStereoResources(device);
     }
 
-    bool R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept
+    bool R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device, bool* restoreFailed) noexcept
     {
-        return TryBootstrapRightDepthFromRecentClear(device);
+        return TryBootstrapRightDepthFromRecentClear(device, restoreFailed);
     }
 
     bool R29OwnerDepthTestActive(IDirect3DDevice9* device) noexcept

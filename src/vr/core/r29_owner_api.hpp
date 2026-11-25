@@ -69,7 +69,7 @@ namespace OutRunVRStereo
     // Consolidated lower draw/depth/restore services. These forward existing
     // R9/R23 behavior without creating a second owner or hook instance.
     bool R29OwnerEnsureStereoResources(IDirect3DDevice9* device) noexcept;
-    bool R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept;
+    bool R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device, bool* restoreFailed) noexcept;
     bool R29OwnerDepthTestActive(IDirect3DDevice9* device) noexcept;
     bool R29OwnerStencilTestActive(IDirect3DDevice9* device) noexcept;
     bool R29OwnerLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept;

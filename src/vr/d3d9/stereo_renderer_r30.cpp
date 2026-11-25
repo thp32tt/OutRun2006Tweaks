@@ -3274,6 +3274,7 @@ namespace OutRunVRStereo
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
+            bool bootstrapRestoreFailed = false;
             bool projectedWorldMarker = false;
             // Only RankMarkerSprani/RankMarkerClipSprite own the new physical
             // vehicle depth. RivalMarkerSprani deliberately preserves the
@@ -4564,7 +4565,9 @@ namespace OutRunVRStereo
             if (frame.trackedDepthStencil &&
                 (!frame.rightDepthSynchronized || !frame.rightStencilSynchronized))
             {
-                R29OwnerTryBootstrapRightDepth(device);
+                R29OwnerTryBootstrapRightDepth(device, &state.bootstrapRestoreFailed);
+                if (state.bootstrapRestoreFailed)
+                    return false;
                 // Resample synchronization bits after bootstrap.
                 frame = R29OwnerCaptureFrameSnapshot();
             }
@@ -6645,7 +6648,9 @@ namespace OutRunVRStereo
                     device, data, vertexCount, stride, state))
             {
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                return state.bootstrapRestoreFailed
+                    ? OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Handled(E_FAIL)
+                    : OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             R30ScratchLease lease;
@@ -6917,7 +6922,9 @@ namespace OutRunVRStereo
                     &scratch.upTouched))
             {
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                return state.bootstrapRestoreFailed
+                    ? OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Handled(E_FAIL)
+                    : OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             if (!R30TransformXyzrhwStereo(
@@ -7024,7 +7031,9 @@ namespace OutRunVRStereo
             {
                 vb->Release();
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                return state.bootstrapRestoreFailed
+                    ? OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Handled(E_FAIL)
+                    : OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             bool leftAttempted = false;
@@ -7147,7 +7156,9 @@ namespace OutRunVRStereo
                     device, nullptr, 0u, 0u, state) ||
                 (projected && !state.projectedWorldMarker) ||
                 ((exactHud || pauseOverlay) && !state.stageExtensionEyePlane))
-                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                return state.bootstrapRestoreFailed
+                    ? OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Handled(E_FAIL)
+                    : OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
 
             D3DMATRIX originalProjection{};
             if (FAILED(device->GetTransform(
@@ -7588,7 +7599,9 @@ namespace OutRunVRStereo
                 ib->Release();
                 vb->Release();
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
-                return OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
+                return state.bootstrapRestoreFailed
+                    ? OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Handled(E_FAIL)
+                    : OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Declined();
             }
 
             bool leftAttempted = false;
@@ -8234,7 +8247,10 @@ namespace OutRunVRStereo
             if (frame.trackedDepthStencil &&
                 (!frame.rightDepthSynchronized || !frame.rightStencilSynchronized))
             {
-                R29OwnerTryBootstrapRightDepth(device);
+                bool bootstrapRestoreFailed = false;
+                R29OwnerTryBootstrapRightDepth(device, &bootstrapRestoreFailed);
+                if (bootstrapRestoreFailed)
+                    return R30ScreenDrawAttempt::Handled(E_FAIL);
                 // Resample synchronization bits after bootstrap.
                 frame = R29OwnerCaptureFrameSnapshot();
             }
@@ -9412,9 +9428,9 @@ namespace OutRunVRStereo
         return R29OwnerEnsureStereoResources(device);
     }
 
-    bool R30SupportTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept
+    bool R30SupportTryBootstrapRightDepth(IDirect3DDevice9* device, bool* restoreFailed) noexcept
     {
-        return R29OwnerTryBootstrapRightDepth(device);
+        return R29OwnerTryBootstrapRightDepth(device, restoreFailed);
     }
 
     bool R30SupportDepthTestActive(IDirect3DDevice9* device) noexcept

@@ -109,3 +109,64 @@ with tempfile.TemporaryDirectory() as directory:
                     "-Wno-unused-variable","-I",str(root / "src/vr/d3d9"),
                     str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
     subprocess.run([str(p/"probe")],check=True)
+
+# Iter52: verify upper dispatch handles dirty restoration, never declines to a
+# raw/lower draw. Compile the actual R33 readiness function and exercise every
+# readiness combination, including depthless draws after a dirty restoration.
+r30 = (root / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text()
+r32 = (root / "src/vr/d3d9/stereo_renderer_r32.cpp").read_text()
+r33 = (root / "src/vr/d3d9/stereo_renderer_r33.cpp").read_text()
+assert "return TryBootstrapRightDepthFromRecentClear(device, restoreFailed);" in r29
+assert "return R29OwnerTryBootstrapRightDepth(device, restoreFailed);" in r30
+assert "return R30SupportTryBootstrapRightDepth(d, restoreFailed);" in r32
+assert r30.count("return state.bootstrapRestoreFailed") == 5
+assert r30.count("? OutRunVR::StereoLowerDraw::Attempt<HRESULT>::Handled(E_FAIL)") >= 5
+assert "if (state.bootstrapRestoreFailed)\n                    return false;" in r30
+assert "if (bootstrapRestoreFailed)\n                    return R30ScreenDrawAttempt::Handled(E_FAIL);" in r30
+assert r33.count("return bootstrapRestoreFailed ? R32ReviewOwnedResult{true, E_FAIL}") == 2
+start = r33.index("bool R33PrepareRightDepthStereo(")
+end = r33.index("\n        }", start) + len("\n        }")
+body = r33[start:end]
+prefix = r'''
+#include <cassert>
+#include <iostream>
+struct IDirect3DDevice9{};
+bool tracked,depthSync,stencilSync,depthTest,stencilTest,dirty,detach;
+unsigned calls;
+bool R32ReviewTrackedDepthStencil(){return tracked;}
+bool R32ReviewRightDepthInSync(){return depthSync;}
+bool R32ReviewRightStencilInSync(){return stencilSync;}
+bool R32ReviewDepthTestActive(IDirect3DDevice9*){return depthTest;}
+bool R32ReviewStencilTestActive(IDirect3DDevice9*){return stencilTest;}
+bool R32ReviewTryBootstrapRightDepth(IDirect3DDevice9*,bool* failed){
+    ++calls; *failed=dirty;
+    if(detach)tracked=false;
+    return false;
+}
+'''
+suffix = r'''
+int main(){
+    IDirect3DDevice9 d;
+    for(unsigned slot=0;slot<16;++slot)
+    for(unsigned mask=0;mask<128;++mask){
+        tracked=mask&1; depthSync=mask&2; stencilSync=mask&4;
+        depthTest=mask&8; stencilTest=mask&16; dirty=mask&32; detach=mask&64;
+        const bool attempt=tracked&&(!depthSync||!stencilSync);
+        const bool expectedDirty=attempt&&dirty;
+        const bool expectedReady=!expectedDirty&&
+            (!tracked||(attempt&&detach)||((depthSync||!depthTest)&&(stencilSync||!stencilTest)));
+        calls=0; bool failed=true;
+        const bool ready=R33PrepareRightDepthStereo(&d,failed);
+        assert(ready==expectedReady && failed==expectedDirty && calls==unsigned(attempt));
+        // A declined route may fallback; a dirty result is owned failure.
+        assert((!ready&&!failed)==(!expectedReady&&!expectedDirty));
+    }
+    std::cout<<"R33_DEPTH_BOOTSTRAP_BRIDGE_PASS\n";
+}
+'''
+with tempfile.TemporaryDirectory() as directory:
+    p = Path(directory)
+    (p / "probe.cpp").write_text(prefix + body + suffix)
+    subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror",
+                    str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
+    subprocess.run([str(p/"probe")],check=True)
