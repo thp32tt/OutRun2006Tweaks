@@ -2852,20 +2852,84 @@
           "protected_v003": "Automation branch only. Existing whole-car native callback fence prevents sidecar GPU allocation/submission; no assumption that this is measured cause of reported FPS regression. No changes to model bytes, PBR, host or release. Actual raw/mono fallback still governed by owner; HMD/visual regression not tested.",
           "asset_validation": "No actual private model source or processed bytes/rights reviewed or promoted.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration38 credited once AI2 2913 ledger cc5f8e45d2324105fb55a1bb91db5f6a9a62792d",
-          "next_trace": "Trace baseline vs latest native player/occupant callbacks and dashboard overlay or sky/flare ownership; verify remaining whole-car bilateral staging and stock-fallback requirements; continue measured performance diagnosis, including redundant state reads only when safe, and verify iteration39 exact-SHA CI. No physical runtime claim."
+          "score_state": "ELIGIBLE_FOR_SINGLE_DELAYED_CREDIT; authoritative ledger still 2913; connector returned empty contents for large scoreboard; local ledger commit 7980cc0 not pushed (GitHub HTTPS authentication unavailable); reconcile remote before credit, no duplicate",
+          "next_trace": "Trace baseline vs latest native player/occupant callbacks and dashboard overlay or sky/flare ownership; verify remaining whole-car bilateral staging and stock-fallback requirements; continue measured performance diagnosis, including redundant state reads only when safe, and verify iteration39 exact-SHA CI. No physical runtime claim.",
+          "followup_exact_sha_ci": {
+            "sha": "334133503b34186c8a971c6dc857e19901fee341",
+            "runs": [
+              {
+                "id": 45526479493,
+                "conclusion": "success"
+              },
+              {
+                "id": 45526479617,
+                "conclusion": "success"
+              },
+              {
+                "id": 45526479510,
+                "conclusion": "success"
+              },
+              {
+                "id": 45526479718,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER40-DASHBOARD-FLOAT32-PARITY",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "v0.03 vs latest native player callback; speed/RPM dashboard OVC4 calibration and float32 parser parity",
+          "source_material_sha": "48de3cd1700b5a917d0ff9e1f8d0240da780a2c5",
+          "source_blob_sha1": {
+            "tools/ferrari16/verify_all_car_ovc.py": "9baa683f723211e651b6aa93a6dc0aefd7b4d4c7"
+          },
+          "source_defect": "Protected v0.03 hooks have no PrepareF50External/DrawPreparedF50External/dashboard latch or external overlay GPU owner. Latest PrepareF50External reads native +1F8/+208/+20C and captures by epoch/player; DrawPreparedF50External -> GpuOwner -> parsed DashboardBinding -> DashboardWorldMatrix. Native ValidDashboardBinding accepts float32 1.001f axis component; Python inspect compared binary64 1.001 and rejected CRC-valid OVC4. Native sequential float32 len2 lower boundary also differs from Python double sum. Reproduced previous inspect rejecting valid (1.001,0,0) and native C++ accepting.",
+          "source_fix": "Match float32 axis/angle constants and sequential float32 square/add in offline OVC4 verifier; retain finite, component, length, calibration, CRC and PBR checks. No runtime or native fallback change.",
+          "positive_negative_regressions": [
+            "256 CRC-valid fixtures across 16 canonical slots, two needle kinds, four valid and four invalid axes each. Exact committed verifier --self-test PASS, including all earlier PBR and corruption checks.",
+            "Old inspect injected into new exact fixture suite fails at slot 0 speed needle axis (1.001,0,0). Exact native header compiled g++ C++17 -O2 -Wall -Wextra -Werror; all 16 native speed/RPM fixture combinations PASS. Git blob SHA verified for exact fetched sources."
+          ],
+          "same_sha_ci": {
+            "sha": "48de3cd1700b5a917d0ff9e1f8d0240da780a2c5",
+            "runs": [
+              {
+                "id": 45530019293,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "id": 45530019275,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45530019291,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "Offline verifier/self-test only on automation branch. No changes to original callback, runtime renderer, x86 ABI, host, menu, overlay, PBR shaders, deployment or asset bytes. Local DNS unavailable; N100 limited to tiny synthetic Python/C++ harness, read-only CI and isolated score clone; no full build.",
+          "asset_validation": "Synthetic data only; no actual 16 private assets, exact variants or license approval. No model promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; authoritative 2913; prior iteration39 eligible but remote ledger write blocked; no duplicate credit.",
+          "next_trace": "Trace per-eye body/dashboard staged ownership and native 49F3E0/49A650 original fallback, especially a gear-only overlay with body needle coverage and partial-eye failure. Verify current exact-SHA Windows CI and reconcile pending previous score only once. Do not open atomic raster fence without whole-car proof."
         }
       ],
-      "latest_material_sha": "334133503b34186c8a971c6dc857e19901fee341",
-      "latest_static_ci": "Iteration39 portable C++ synthetic preflight 4096 cases PASS; four exact-SHA workflows pending; iteration38 all three success and credited once",
-      "next_focus": "Trace baseline vs latest native player/occupant callbacks and dashboard overlay or sky/flare ownership; verify remaining whole-car bilateral staging and stock-fallback requirements; continue measured performance diagnosis, including redundant state reads only when safe, and verify iteration39 exact-SHA CI. No physical runtime claim."
+      "latest_material_sha": "48de3cd1700b5a917d0ff9e1f8d0240da780a2c5",
+      "latest_static_ci": "Iteration40 exact-source verifier self-test and native float32 boundary crosscheck PASS; old verifier mutation fails; multicar/HLSL exact SHA success, Windows build/package pending. Iter39 four recorded runs success.",
+      "next_focus": "Trace per-eye body/dashboard staged ownership and native 49F3E0/49A650 original fallback, especially a gear-only overlay with body needle coverage and partial-eye failure. Verify current exact-SHA Windows CI and reconcile pending previous score only once. Do not open atomic raster fence without whole-car proof."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 10:30:00+09:00",
+  "last_updated_kst": "2026-11-25 11:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
