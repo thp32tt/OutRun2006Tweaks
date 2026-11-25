@@ -659,7 +659,7 @@
     {
       "id": "EXT16-011",
       "priority": 0,
-      "title": "Continuous Ferrari16 external source trace, regression debugging and real fixes every :00/:30",
+      "title": "P0 IMPLEMENT ATOMIC STEREO BACKEND: first unfinished A1-A6 milestone, real renderer code every :00/:30",
       "stage": "source_fix",
       "status": "ACTIVE",
       "continuous_debug": true,
@@ -675,10 +675,11 @@
         "EXT16-010"
       ],
       "acceptance": [
-        "Trace a distinct concrete render/loader/ABI/OVC/PBR path per cycle even when no new source fault is found",
-        "Fix confirmed defects with positive/negative regressions, source SHA and exact-SHA CI; never change code just to fabricate progress",
-        "When no change is warranted, preserve current behavior, record trace evidence/failed hypotheses and rotate next focus without closing the continuous task",
-        "Protect v0.03, x86 player, Quest3 physical QA, current model licensing, approved rights and deployment isolation"
+        "OVERRIDING PRIORITY: follow queue.atomic_stereo_plan; first unfinished A1-A6, starting A1 actual R7 D3D9 isolated left/right color+depth resource ownership and transaction entrypoint. Implement production backend, not another pure policy predicate or unrelated validator.",
+        "While A1-A4 incomplete, do NOT rotate to independent OVC/GLB/PBR/packaging fixes. Only investigate defects directly preventing current backend implementation. Existing ROTATING_FOCUS or generic defect-first wording is subordinate to this P0 plan.",
+        "Make a real source slice plus positive/negative regression and exact-SHA CI; advance milestone only with concrete production integration evidence. If blocked, implement smaller dependency/alternative in same milestone; after two no-implementation cycles switch approach, not topic.",
+        "Never blindly turn RuntimeExternalCarAtomicStageReady true. Implement real isolated whole-vehicle L/R color+depth stage, pair publication and native body-only callback integration before opt-in activation. Preserve stock both-eye fallback and scene depth, reset, state restoration, passengers, HUD and v0.03.",
+        "Keep EXT16-011 ACTIVE, record milestone evidence and next source slice. No new TASK_ID, no duplicate scores, no private asset upload, no automatic Quest3 pass."
       ],
       "do_not_autoclose": true,
       "do_not_mark_complete_static": true,
@@ -4389,14 +4390,14 @@
       ],
       "latest_material_sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
       "latest_static_ci": "Iteration60 strict dashboard PBR test amended after initial exact CI legacy missing-body assertion failure; final exact SHA CI as recorded. Iteration59 all four applicable exact workflows success and credited once.",
-      "next_focus": "Confirm iteration60 exact SHA CI. Trace R7 initial dirty RT/depth/viewport restore ownership (pending iteration59 hypothesis), plus whole-vehicle pair-atomic staging backend and overlay lifecycle; maintain hard disabled external live-eye gate until proven. Inspect overlay-specific material/gear visual quality only with private asset evidence."
+      "next_focus": "A1: implement actual isolated R7 candidate color/depth pair ownership and lifecycle in production renderer; identify viable depth handling (replay/frame staging if not copyable), real entrypoint and fault-injected tests. Read atomic_stereo_plan before coding."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
-  "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
+  "priority_rule": "P0: implement the missing whole-vehicle atomic stereo renderer before unrelated validation or asset cleanup. While A1-A4 incomplete, only backend implementation or tests/defects directly blocking its milestones count as primary work; no rotating off to independent OVC/GLB/PBR/package validators. CI follow-up is secondary.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T21:00:00+09:00",
+  "last_updated_kst": "2026-11-25T21:29:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
@@ -4425,7 +4426,7 @@
   "continuous_debug_policy": {
     "enabled": true,
     "work_id": "EXT16-011",
-    "mode": "RECURRING_SOURCE_TRACE_AND_DEFECT_FIX",
+    "mode": "PRIORITY_ATOMIC_STEREO_IMPLEMENTATION",
     "schedule_kst_minutes": [
       0,
       30
@@ -4438,6 +4439,12 @@
     "scope": "Only Ferrari16 external 3D model, DX9Ex stereo/PBR/normal maps/materials, engine draw parity and safe packaging",
     "completion_rule": "Keep EXT16-011 ACTIVE and active_work_id EXT16-011 until operator explicitly disables recurring debug; material CI does not complete physical Quest3 QA",
     "focus_rotation": [
+      "P0 ATOMIC_STEREO_BACKEND: implement first unfinished A1-A6 milestone in queue.atomic_stereo_plan; A1 real R7 isolated L/R color+depth ownership -> A2 whole vehicle staging -> A3 atomic pair publication -> A4 native callback integration. No unrelated validation rotation until A1-A4 done."
+    ],
+    "no_fake_modifications": true,
+    "no_duplicate_ai_points": true,
+    "no_auto_claim_quest3_success": true,
+    "previous_focus_rotation": [
       "DX9Ex R7: left/right raster staging, texture/depth ownership, proof of all-or-stock transaction, failing right-eye injection",
       "D3D9 R30/R33: direct/raw DIP bypass, HRESULT recovery, state restoration and original fallback",
       "Retail x86 body wrapper ABI 46BD30/469600: preserve stock dashboard, shadow, passengers and glass, positive/negative call graph",
@@ -4448,15 +4455,86 @@
       "Slot provenance and optional exact 328 GTS / 575 SA / F430 Spider / Testarossa Spider: source-to-OVC quality without unsupported asset promotion",
       "Graphics performance diagnosis: D3D9 render pass duplication, stereo replay, state churn, GPU synchronization and allocation; do not guess FPS",
       "Repeat previous blocked hypotheses with new counterexamples: baseline vs latest branch for driver cockpit, speed/RPM gear, player overlays"
-    ],
-    "no_fake_modifications": true,
-    "no_duplicate_ai_points": true,
-    "no_auto_claim_quest3_success": true
+    ]
   },
   "resumed_after_stall": {
     "date_kst": "2026-11-24T14:11+09:00",
     "observed_last_sent_at": "2026-11-24T09:37:59.530142+09:00",
     "observed_last_material_commit": "6060d985399fa3c39bf80e5ed1ec2ea6d9e4a87c",
     "fix": "Do not terminate Ferrari16 code debugging upon HMD-only stage or absence of new commit; rotating evidence-driven diagnostics until explicit operator stop"
+  },
+  "atomic_stereo_plan": {
+    "revision": "20261125-P0",
+    "operator_request": "Stop spending cycles on unrelated checks while external render is hard disabled; implement the missing executable renderer first.",
+    "active_milestone": "A1",
+    "milestones": [
+      {
+        "id": "A1",
+        "status": "NEXT",
+        "deliverable": "Implement actual R7 isolated left/right color+depth candidate resource ownership, device/reset generation, descriptors, compatible MSAA and viewport. Reuse resources; no per-mesh allocation.",
+        "gate": "Compiled production D3D9 backend called by a real transaction entrypoint; failure injection on allocation/bind/restore; no mutation of live pair on abort. If depth cannot be copied with D3D9, use proven depth replay or frame-level isolation; never assume StretchRect copies depth."
+      },
+      {
+        "id": "A2",
+        "status": "PENDING",
+        "deliverable": "Implement whole-vehicle per-eye stage render with explicit matrices, one latched frame/pose/player, opaque PBR and ordered glass/dashboard meshes; avoid recursive automatic duplicate DIP or deferred R29/R30/R33 route.",
+        "gate": "All required mesh receipts both eyes, fail-left/right/mid-mesh/reset/epoch mismatch abort; no live draws."
+      },
+      {
+        "id": "A3",
+        "status": "PENDING",
+        "deliverable": "Implement pair publication at actual renderer/present ownership boundary using an inactive complete pair and single generation/descriptor selection; retain old stock pair on every failure. Preserve scene depth and subsequent occlusion. No two sequential live copies called atomic.",
+        "gate": "Both eyes and depth remain coherent including later world draws; failed publication cannot expose one eye; reset/restore failure discards candidate or frame, never certifies."
+      },
+      {
+        "id": "A4",
+        "status": "PENDING",
+        "deliverable": "Wire native player callback body-only replacement at proven x86 leaf (46BD30/469600 trace), preserve passengers/shadows/dashboard/stock side effects; actual production caller for Prepare/DrawPrepared or successor. Enable ONLY opt-in on dedicated branch via live backend capability proof.",
+        "gate": "No unconditional false->true or fake proof; original native body exactly once on abort and not over external success. Menu/other players/reflections excluded; positive and negative integration tests using actual code."
+      },
+      {
+        "id": "A5",
+        "status": "PENDING",
+        "deliverable": "Produce isolated one-car executable package (F50 known good source), exact SHA Windows x86 DLL+x64 host, runtime trace of external selected/committed/fallback plus both-eye captures and frame timing instrumentation.",
+        "gate": "No stable release overwrite; explicit Quest3 WAITING_USER_HMD; physical pass only user. Continue software diagnostics without pretending hardware success."
+      },
+      {
+        "id": "A6",
+        "status": "PENDING",
+        "deliverable": "After one-car renderer executable route exists, expand to all 16 using shared backend; installed-only eligibility, PBR maps/UV/tangent, wheels/floor, instruments/alpha, exact model rights.",
+        "gate": "Per-car source and converted SHA, actual materials, no low quality promotion; regression and isolated package; user headset QA separate."
+      }
+    ],
+    "previous_policy": {
+      "title": "Continuous Ferrari16 external source trace, regression debugging and real fixes every :00/:30",
+      "acceptance": [
+        "Trace a distinct concrete render/loader/ABI/OVC/PBR path per cycle even when no new source fault is found",
+        "Fix confirmed defects with positive/negative regressions, source SHA and exact-SHA CI; never change code just to fabricate progress",
+        "When no change is warranted, preserve current behavior, record trace evidence/failed hypotheses and rotate next focus without closing the continuous task",
+        "Protect v0.03, x86 player, Quest3 physical QA, current model licensing, approved rights and deployment isolation"
+      ],
+      "focus_rotation": [
+        "DX9Ex R7: left/right raster staging, texture/depth ownership, proof of all-or-stock transaction, failing right-eye injection",
+        "D3D9 R30/R33: direct/raw DIP bypass, HRESULT recovery, state restoration and original fallback",
+        "Retail x86 body wrapper ABI 46BD30/469600: preserve stock dashboard, shadow, passengers and glass, positive/negative call graph",
+        "v0.03 versus latest: 4:3 theatre/menu fullscreen, initial OpenXR focus and VDXR eye projections, no 2D fallback",
+        "Actual 16 car material contracts: OVC4 mesh integrity, DDS mip chains, tangent/UV, per-material normal+ORM and CRC",
+        "Glass transparency and PBR shading: alpha sort in both eyes, normal-map shader paths, reflections and depth write regression",
+        "Windows x86 DLL+x64 host exact-SHA tests: 16-car corrupt input negatives, packaging, isolated launch and reversible rollback",
+        "Slot provenance and optional exact 328 GTS / 575 SA / F430 Spider / Testarossa Spider: source-to-OVC quality without unsupported asset promotion",
+        "Graphics performance diagnosis: D3D9 render pass duplication, stereo replay, state churn, GPU synchronization and allocation; do not guess FPS",
+        "Repeat previous blocked hypotheses with new counterexamples: baseline vs latest branch for driver cockpit, speed/RPM gear, player overlays"
+      ],
+      "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden."
+    },
+    "execution_contract": [
+      "Every :00/:30 cycle re-read latest HEAD and this plan; implement first unfinished milestone, not a new rotating topic. Start with production D3D9 code, not another boolean proof model.",
+      "Commit one meaningful backend slice with regression and exact SHA CI; continue next slice from actual source. If blocked, identify exact D3D9 call/ownership constraint and implement a smaller directly useful dependency or alternate viable approach inside same milestone; no docs-only completion.",
+      "After two consecutive cycles without implementation progress on a milestone, explicitly change architecture or approach within P0; do not merely rerun the same trace. Do not claim progress by weakening gates.",
+      "Advance milestone only on concrete production implementation plus appropriate tests and exact-SHA evidence; partial milestones stay IN_PROGRESS, track source SHA and remaining gap. Keep EXT16-011 ACTIVE and same ID.",
+      "RuntimeExternalCarAtomicStageReady must ultimately be backed by actual capability/transaction ownership; keep fail-closed on unsupported paths. Never remove guard as substitute for renderer.",
+      "Synthetic mock tests do not prove GPU physical behavior; runtime and user headset QA remain UNTESTED. Protect v0.03, ABI, private assets and N100 resource limits."
+    ],
+    "unrelated_validation_deferred_until": "A1-A4 source integration and exact-SHA CI complete"
   }
 }
