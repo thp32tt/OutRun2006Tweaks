@@ -77,7 +77,45 @@ static void TestImmediateGlassOwnerScope(){
         }
     }
 }
+static void TestDeferredGlassCannotOverrideLiveCallback(){
+    using namespace OutRunVR::QuestCockpitV2::Glass;
+    using Scope=ScopedPlayerCallbackOwner;
+    Scope* current=nullptr;
+    // A valid older deferred token can still be in a callee-saved register.
+    // Its match must not be evaluated during any live callback, even a
+    // non-player or stale-epoch callback nested under the player.
+    for(unsigned slot=0;slot<16;++slot) {
+        for(bool matchingToken:{false,true}) {
+            unsigned scans=0;
+            const auto admitted=[&](std::uint64_t epoch) {
+                return Scope::Immediate(current,epoch) ||
+                    (Scope::MayLookupDeferred(current,epoch) &&
+                     (++scans,matchingToken));
+            };
+            assert(!admitted(0) && scans==0);
+            assert(admitted(7)==matchingToken && scans==1);
+            {
+                Scope outer(current);
+                assert(!admitted(7) && scans==1);
+                outer.Admit(7);
+                assert(admitted(7) && scans==1);
+                assert(!admitted(8) && scans==1);
+                {
+                    Scope inner(current);
+                    assert(!admitted(7) && scans==1);
+                    inner.Admit(8);
+                    assert(!admitted(7) && scans==1);
+                    assert(admitted(8) && scans==1);
+                }
+                assert(admitted(7) && scans==1);
+            }
+            assert(current==nullptr);
+            assert(admitted(7)==matchingToken && scans==2);
+        }
+    }
+}
 int main(){
+    TestDeferredGlassCannotOverrideLiveCallback();
     TestDeferredGlassOwnerRefresh();
     TestImmediateGlassOwnerScope();
     static_assert(!MaySkipRetailPlayerWrapper(),

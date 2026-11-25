@@ -29,6 +29,13 @@ public:
                           std::uint64_t epoch) noexcept {
         return current && epoch && current->epoch_==epoch;
     }
+    // A live callback is authoritative, including a rejected or stale
+    // callback. Its callee-saved registers may still contain an older
+    // deferred player entry, which must not override that rejection.
+    static bool MayLookupDeferred(const ScopedPlayerCallbackOwner* current,
+                                  std::uint64_t epoch) noexcept {
+        return current==nullptr && epoch!=0;
+    }
     bool CanCapture(std::uint64_t epoch) const noexcept {
         // An outer queue delta may contain another vehicle's entries.
         return current_==this && !nested_ && Immediate(this,epoch);

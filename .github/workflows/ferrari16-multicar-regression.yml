@@ -98,6 +98,9 @@ jobs:
           assert 'owner.Admit(epoch);' in glass_scope
           assert 'if(!admitted||!owner.CanCapture(epoch))return;' in glass_scope
           assert 'PlayerOwnerScope::Immediate(CurrentPlayerOwner,epoch)' in source
+          material=source[source.index('static void OnMaterialBefore('):source.index('static void OnMaterialAfter(')]
+          assert 'const bool owner=immediateOwner ||\n        (PlayerOwnerScope::MayLookupDeferred(CurrentPlayerOwner,epoch) &&\n         HasDeferredOwner(ctx,epoch));' in material
+          assert material.index('MayLookupDeferred(CurrentPlayerOwner,epoch)') < material.index('HasDeferredOwner(ctx,epoch)') < material.index('if(!owner)return;')
           assert 'PlayerDepth' not in source
           abi=Path('src/vr/game/external_car_original_wrapper_contract.hpp').read_text()
           assert 'MaySkipRetailPlayerWrapper() noexcept {return false;}' in abi

@@ -368,7 +368,9 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
     const auto* cam=Game::camera();
     if(!cam||cam->cam_mode_34A!=1||!Game::pl_car())return;
     const bool immediateOwner=PlayerOwnerScope::Immediate(CurrentPlayerOwner,epoch);
-    const bool owner=immediateOwner||HasDeferredOwner(ctx,epoch);
+    const bool owner=immediateOwner ||
+        (PlayerOwnerScope::MayLookupDeferred(CurrentPlayerOwner,epoch) &&
+         HasDeferredOwner(ctx,epoch));
     if(!owner)return;
     // PC retail 4048F2/4048F5 material provenance: ESI points to the
     // relocated 0x3C-byte PmtObject; EDX to its indexed 0x58 PmtMaterial.
