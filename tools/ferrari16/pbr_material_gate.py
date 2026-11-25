@@ -70,10 +70,12 @@ def triangle_source_tangent_collapsed(positions, uvs, normals) -> bool:
 
     For a nondegenerate triangle the derivative tangent is proportional to
     AB*dv2 - AC*dv1. If all imported normals point along that same line
-    and have the same sign, interpolated N is parallel to T throughout
-    the triangle. The SM3 Gram-Schmidt step T -= N*dot(N,T) collapses.
-    Zero normals are deliberately excluded: native repair/face fallback
-    may provide a valid basis. Mixed normals are not certified by this test.
+    (including opposite signs), interpolated N remains on that line.
+    Away from a near-zero interpolation locus, the SM3 Gram-Schmidt step
+    T -= N*dot(N,T) collapses. The face-normal fallback at that locus
+    cannot rescue the rest of the triangle. Zero-length source normals
+    are deliberately excluded: native repair may provide a valid basis.
+    Non-collinear source normals are not certified by this test.
     """
     p0, p1, p2 = positions
     uv0, uv1, uv2 = uvs
@@ -84,7 +86,6 @@ def triangle_source_tangent_collapsed(positions, uvs, normals) -> bool:
               for i in range(3))
     if not any(t):
         return False
-    sign = None
     for n in normals:
         # Match the runtime's usable imported normal threshold. Exact
         # collinearity is a conservative source-space failure witness.
@@ -95,8 +96,4 @@ def triangle_source_tangent_collapsed(positions, uvs, normals) -> bool:
                  n[0]*t[1] - n[1]*t[0])
         if any(cross):
             return False
-        positive = sum(n[i]*t[i] for i in range(3)) > 0
-        if sign is not None and sign != positive:
-            return False
-        sign = positive
-    return sign is not None
+    return True

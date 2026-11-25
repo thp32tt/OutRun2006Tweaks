@@ -542,6 +542,40 @@ def self_test() -> None:
                 assert details["pbr_uncovered"]["collapsed_source_tangent"] == (
                     [] if expected else [0])
                 assert pbr_map_coverage(details) == expected, (car_id, normal)
+        # Opposite-sign normals on one tangent line used to bypass the
+        # strict gate. The native repair preserves all three usable
+        # normals; the shader's near-zero fallback only helps locally.
+        # Exercise every slot and both native index widths with full
+        # DDS chains and recomputed CRC, without changing structural acceptance.
+        for car_id, _ in CARS:
+            slot_path = Path(directory) / f"car_id_{car_id:02d}.ovc"
+            for width, fmt in ((2, "<3H"), (4, "<3I")):
+                for normals, expected in (
+                    (((1.,0.,0.),(-2.,0.,0.),(1.,0.,0.)), False),
+                    (((-1.,0.,0.),(2.,0.,0.),(-1.,0.,0.)), False),
+                    (((1.,0.,0.),(-2.,0.,0.),(0.,0.,1.)), True),
+                    (((1.,0.,0.),(0.,0.,0.),(1.,0.,0.)), True),
+                    (((0.,0.,1.),(0.,0.,-1.),(0.,0.,1.)), True),
+                ):
+                    fixture = bytearray(
+                        struct.pack("<HHIII", len(name), 0, 3, 3, width)
+                        + name + verts + struct.pack(fmt, 0, 1, 2)
+                        + mapped[len(group):])
+                    for vertex, normal in enumerate(normals):
+                        struct.pack_into("<3f", fixture,
+                                         16 + len(name) + vertex * 32 + 12,
+                                         *normal)
+                    fixture_header = b"OVRCABH4" + struct.pack(
+                        "<7I", 4, 1, 1, 3, 1, len(fixture),
+                        zlib.crc32(fixture) & 0xffffffff)
+                    slot_path.write_bytes(fixture_header + fixture)
+                    details = inspect(slot_path)
+                    assert details["normal_maps"] == details["orm_maps"] == 1
+                    assert details["usable_uv_materials"] == [0]
+                    assert details["pbr_uncovered"]["collapsed_source_tangent"] == (
+                        [] if expected else [0])
+                    assert pbr_map_coverage(details) == expected, (
+                        car_id, width, normals)
         # A good sibling mesh on the same material must not hide a bad one.
         broken = bytearray(group)
         for vertex in range(3):

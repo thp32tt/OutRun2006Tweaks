@@ -65,8 +65,17 @@ def main() -> None:
             positions, uvs, ((0., 0., 0.),)*3)
         assert not triangle_source_tangent_collapsed(
             positions, uvs, (tangent, (0., 0., 1.), tangent))
+        # All nonzero normals on the tangent line remain parallel after
+        # interpolation, even when signs disagree. A near-zero locus can
+        # use the face fallback but does not restore the rest of the map.
+        for mask in range(8):
+            signed = tuple(tuple((-2 if mask & (1 << i) else 1)*x
+                                 for x in tangent) for i in range(3))
+            assert triangle_source_tangent_collapsed(positions, uvs, signed)
         assert not triangle_source_tangent_collapsed(
-            positions, uvs, (tangent, tuple(-x for x in tangent), tangent))
+            positions, uvs, (tangent, (0., 0., 0.), tangent))
+        assert not triangle_source_tangent_collapsed(
+            positions, uvs, (tangent, tuple(-x for x in tangent), (0., 0., 1.)))
     print("FERRARI16_PBR_PER_OPAQUE_MATERIAL_POSITIVE_NEGATIVE_PASS")
 
 
