@@ -3,16 +3,31 @@
 [CmdletBinding()]
 param([Parameter(Mandatory=$true)][string]$GameRoot,[switch]$Install)
 $ErrorActionPreference='Stop'
+# A lexical path/manifest match is not physical isolation on Windows.
+# Reject junctions/symlinks (including ancestors) before reads or writes.
+function Assert-NoReparsePath([string]$p) {
+    $current=[IO.Path]::GetFullPath($p)
+    while($current) {
+        $item=Get-Item -LiteralPath $current -Force -ErrorAction Stop
+        if($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+            throw "Reparse point is not allowed in isolated path: $current"
+        }
+        $current=[IO.Path]::GetDirectoryName($current)
+    }
+}
 function Hash([string]$p) {
     if(!(Test-Path -LiteralPath $p -PathType Leaf)){throw "Missing file: $p"}
+    Assert-NoReparsePath $p
     return (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 $root=(Resolve-Path -LiteralPath $GameRoot).Path.TrimEnd('\','/')
+Assert-NoReparsePath $root
 $package=Split-Path -Parent $PSCommandPath
 $markerPath=Join-Path $root '.ferrari16-isolated.json'
 if(!(Test-Path -LiteralPath $markerPath -PathType Leaf)){
     throw 'No isolated marker. Never install directly into the working release.'
 }
+Assert-NoReparsePath $markerPath
 $m=Get-Content -LiteralPath $markerPath -Raw|ConvertFrom-Json
 if($m.Schema -ne 1 -or $m.Purpose -ne 'FERRARI16_ISOLATED_V003_TEST_COPY' -or
    ![string]::Equals([string]$m.TestRoot,$root,[StringComparison]::OrdinalIgnoreCase) -or
@@ -20,6 +35,7 @@ if($m.Schema -ne 1 -or $m.Purpose -ne 'FERRARI16_ISOLATED_V003_TEST_COPY' -or
     throw 'Invalid isolation marker.'
 }
 $qaPath=Join-Path $package 'QA.json'
+Assert-NoReparsePath $qaPath
 $qa=Get-Content -LiteralPath $qaPath -Raw|ConvertFrom-Json
 if($qa.Schema -ne 1 -or $qa.TaskId -ne 'EXT16-005' -or
    $qa.PackageType -ne 'FERRARI16_ISOLATED_STATIC_TEST_ONLY' -or

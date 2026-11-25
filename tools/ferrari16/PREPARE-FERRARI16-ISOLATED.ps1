@@ -5,8 +5,21 @@
 param([Parameter(Mandatory=$true)][string]$SourceRoot,
       [Parameter(Mandatory=$true)][string]$TestRoot)
 $ErrorActionPreference='Stop'
+# A lexical path/manifest match is not physical isolation on Windows.
+# Reject junctions/symlinks (including ancestors) before reads or writes.
+function Assert-NoReparsePath([string]$p) {
+    $current=[IO.Path]::GetFullPath($p)
+    while($current) {
+        $item=Get-Item -LiteralPath $current -Force -ErrorAction Stop
+        if($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+            throw "Reparse point is not allowed in isolated path: $current"
+        }
+        $current=[IO.Path]::GetDirectoryName($current)
+    }
+}
 function Hash([string]$p) {
     if(!(Test-Path -LiteralPath $p -PathType Leaf)){throw "Required file missing: $p"}
+    Assert-NoReparsePath $p
     return (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 $known=[ordered]@{
@@ -23,6 +36,14 @@ if([string]::Equals($source,$dest,[StringComparison]::OrdinalIgnoreCase) -or
     throw 'Source/test folders must be separate; neither may be inside the other.'
 }
 if(Test-Path -LiteralPath $dest){throw 'Test folder must NOT exist; refusing overwrite.'}
+Assert-NoReparsePath $source
+# A non-existing destination can still be under an existing junction.
+$existingParent=[IO.Path]::GetDirectoryName($dest)
+while($existingParent -and !(Test-Path -LiteralPath $existingParent)){
+    $existingParent=[IO.Path]::GetDirectoryName($existingParent)
+}
+if(!$existingParent){throw 'No existing test destination ancestor.'}
+Assert-NoReparsePath $existingParent
 if(@(Get-Process -Name 'OR2006C2C','outrun-vr-host' -ErrorAction SilentlyContinue).Count){
     throw 'Close game and VR host before preparing an isolated test.'
 }

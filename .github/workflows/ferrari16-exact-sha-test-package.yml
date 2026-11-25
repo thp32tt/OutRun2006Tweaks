@@ -111,6 +111,45 @@ jobs:
           $marker=[ordered]@{Schema=1;Purpose='FERRARI16_ISOLATED_V003_TEST_COPY'
             TestRoot=$game;SourceRoot='SYNTHETIC_ONLY_SOURCE_NOT_REAL';OriginalHashes=$hashes}
           ($marker|ConvertTo-Json -Depth 5)|Set-Content -LiteralPath (Join-Path $game '.ferrari16-isolated.json') -Encoding UTF8
+          # A valid lexical marker on a junction alias must not authorize
+          # installation into its physical target. Exercise the real PS5.1.
+          $alias=Join-Path $env:RUNNER_TEMP 'Ferrari16GameJunction'
+          New-Item -ItemType Junction -Path $alias -Target $game -ErrorAction Stop|Out-Null
+          $markerPath=Join-Path $game '.ferrari16-isolated.json'
+          $markerBytes=[IO.File]::ReadAllBytes($markerPath)
+          try {
+            $aliasMarker=[ordered]@{Schema=1;Purpose='FERRARI16_ISOLATED_V003_TEST_COPY'
+              TestRoot=$alias;SourceRoot=$game;OriginalHashes=$hashes}
+            ($aliasMarker|ConvertTo-Json -Depth 5)|Set-Content -LiteralPath $markerPath -Encoding UTF8
+            foreach($installMode in @($false,$true)){
+              $extra=@()
+              if($installMode){$extra=@('-Install')}
+              $result=& powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $alias @extra 2>&1
+              if($LASTEXITCODE -eq 0 -or ($result|Out-String) -notmatch 'Reparse point is not allowed'){
+                throw "JUNCTION INSTALL NOT REJECTED: install=$installMode"
+              }
+            }
+            $prepare=Join-Path $out 'PREPARE-FERRARI16-ISOLATED.ps1'
+            $inside=Join-Path $alias 'new-test'
+            $result=& powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $prepare -SourceRoot $game -TestRoot $inside 2>&1
+            if($LASTEXITCODE -eq 0 -or ($result|Out-String) -notmatch 'Reparse point is not allowed'){
+              throw 'JUNCTION DESTINATION ANCESTOR NOT REJECTED'
+            }
+            if(Test-Path -LiteralPath (Join-Path $game 'new-test')){throw 'Prepare wrote through junction'}
+            foreach($name in $hashes.Keys){
+              if((Get-FileHash -LiteralPath (Join-Path $game $name)).Hash.ToLowerInvariant() -ne $hashes[$name]){
+                throw "Junction negative modified $name"
+              }
+            }
+            if(@(Get-ChildItem -LiteralPath $game -Filter 'FERRARI16_BACKUP_*').Count -or
+               @(Get-ChildItem -LiteralPath $game -Filter 'RUN-FERRARI16-V003-*.cmd').Count){
+              throw 'Junction negative created backup or launcher'
+            }
+          } finally {
+            [IO.File]::WriteAllBytes($markerPath,$markerBytes)
+            [IO.Directory]::Delete($alias)
+          }
+          Write-Host 'PS51_JUNCTION_INSTALL_PREPARE_NEGATIVE_3_PASS'
           'tamper' | Add-Content -LiteralPath (Join-Path $game 'OutRun2006Tweaks.ini')
           & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -GameRoot $game -Install *> $null
           if($LASTEXITCODE -eq 0){throw 'TAMPERED TEST COPY WAS ACCEPTED'}
@@ -171,6 +210,28 @@ jobs:
           $backup=Get-ChildItem -LiteralPath $game -Directory -Filter 'FERRARI16_BACKUP_*' |
             Select-Object -First 1
           if(!$backup){throw 'No real rollback backup'}
+          # An alias with the required backup prefix formerly passed the
+          # lexical parent check and could restore from a different tree.
+          $backupAlias=Join-Path $game 'FERRARI16_BACKUP_JUNCTION_NEGATIVE'
+          New-Item -ItemType Junction -Path $backupAlias -Target $backup.FullName -ErrorAction Stop|Out-Null
+          try {
+            $beforeAlias=@{}
+            foreach($name in @('dinput8.dll','outrun-vr-host.exe','RUN-FERRARI16-V003-ALL-CARS.cmd')){
+              $beforeAlias[$name]=(Get-FileHash -LiteralPath (Join-Path $game $name)).Hash
+            }
+            $result=& powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backupAlias 2>&1
+            if($LASTEXITCODE -eq 0 -or ($result|Out-String) -notmatch 'Reparse point is not allowed'){
+              throw 'JUNCTION ROLLBACK NOT REJECTED'
+            }
+            foreach($name in $beforeAlias.Keys){
+              if((Get-FileHash -LiteralPath (Join-Path $game $name)).Hash -ne $beforeAlias[$name]){
+                throw "Junction rollback modified $name"
+              }
+            }
+          } finally {
+            [IO.Directory]::Delete($backupAlias)
+          }
+          Write-Host 'PS51_JUNCTION_ROLLBACK_NEGATIVE_PASS'
           $dll=Join-Path $game 'dinput8.dll'
           [IO.File]::WriteAllBytes($dll,[byte[]](1,1,1))
           & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $restorer -GameRoot $game -BackupPath $backup.FullName *> $null
