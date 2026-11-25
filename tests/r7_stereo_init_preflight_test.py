@@ -632,6 +632,7 @@ assert "CreateDepthStencilSurfaceExVtableIndex = 131;" in source
 assert "CreateDepthRetentionExHook = {};" in source
 assert "exTable[CreateDepthStencilSurfaceExVtableIndex]!=vtable[CreateDepthStencilSurfaceVtableIndex]" in source
 assert "exTable[CreateDepthStencilSurfaceExVtableIndex],CreateDepthRetentionExDest,disabled" in source
+assert "if(!CreateDepthRetentionExHook&&(exQuery!=E_NOINTERFACE||ex))\n                    CreateDepthRetentionHook={};" in source
 with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"depth_retention.cpp"
     exe=Path(temp)/"depth_retention"

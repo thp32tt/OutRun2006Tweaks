@@ -3542,8 +3542,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 // Query the real Ex interface before indexing its extended
                 // vtable. If identity/target is ambiguous, leave it unhooked.
                 IDirect3DDevice9Ex* ex=nullptr;
-                if(CreateDepthRetentionHook&&SUCCEEDED(device->QueryInterface(
-                    __uuidof(IDirect3DDevice9Ex),reinterpret_cast<void**>(&ex)))&&
+                const HRESULT exQuery=device->QueryInterface(
+                    __uuidof(IDirect3DDevice9Ex),reinterpret_cast<void**>(&ex));
+                if(CreateDepthRetentionHook&&SUCCEEDED(exQuery)&&
                     ex&&static_cast<IDirect3DDevice9*>(ex)==device){
                     void** exTable=*reinterpret_cast<void***>(ex);
                     if(exTable&&exTable[CreateDepthStencilSurfaceExVtableIndex]&&
@@ -3554,6 +3555,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                             CreateDepthRetentionExHook={};
                     }
                 }
+                // With only a base hook on an Ex device, a direct Ex call
+                // could delegate into base and impersonate the outer API.
+                // Retire the base hook too unless classic D3D9 is confirmed.
+                if(!CreateDepthRetentionExHook&&(exQuery!=E_NOINTERFACE||ex))
+                    CreateDepthRetentionHook={};
                 ReleaseCom(ex);
                 if(freshDevice)R7CaptureFreshAutomaticDepth(device);
             }
