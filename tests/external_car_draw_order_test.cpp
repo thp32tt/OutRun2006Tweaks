@@ -134,6 +134,37 @@ int main() {
             }
         }
     }
+    // A successful DIP can still write no MSAA samples, or only wireframe
+    // edges, when the previous native pass left those states behind.
+    // Exercise both mesh passes, 16 synthetic slots, single/MSAA targets,
+    // all inherited states, setter failures, and restoration on both paths.
+    for(unsigned slot=0;slot<16u;++slot)
+        for(bool glassPass:{false,true})
+            for(unsigned samples:{1u,2u,4u,8u,16u})
+                for(bool oldSolid:{false,true})
+                    for(unsigned oldMask:{0u,1u,0x55u,0xffffffffu})
+                        for(unsigned fail=0;fail<=2u;++fail) {
+                            bool solid=oldSolid;
+                            unsigned mask=oldMask,calls=0;
+                            const unsigned full=(1u<<samples)-1u;
+                            // Single-sample targets ignore the mask.
+                            const unsigned before=samples==1u?1u:mask&full;
+                            if(samples>1u && oldMask==0u)assert(before==0u);
+                            const bool ready=OutRunVR::DinoSidecar::ConfigureExternalRasterCoverage(
+                                [&]() { if(calls++==fail)return false;solid=true;return true; },
+                                [&]() { if(calls++==fail)return false;mask=0xffffffffu;return true; });
+                            assert(ready==(fail==2u));
+                            assert(calls==(fail==0u?1u:2u));
+                            const bool submit=ready && MeshInDrawPass(glassPass,glassPass?1u:0u);
+                            assert(submit==(fail==2u));
+                            if(submit) {
+                                assert(solid);
+                                assert((samples==1u?1u:mask&full)==full);
+                            }
+                            // Model unconditional captured state restoration.
+                            solid=oldSolid;mask=oldMask;
+                            assert(solid==oldSolid && mask==oldMask);
+                        }
     // All-opaque and all-glass OVCs do not produce spurious extra draws.
     for (bool isGlass:{false,true}) {
         unsigned count=0;

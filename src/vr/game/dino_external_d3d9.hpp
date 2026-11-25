@@ -758,6 +758,11 @@ public:
            FAILED(device->SetRenderState(D3DRS_VERTEXBLEND,D3DVBF_DISABLE)) ||
            FAILED(device->SetRenderState(D3DRS_INDEXEDVERTEXBLENDENABLE,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE)) ||
+           !ConfigureExternalRasterCoverage(
+               [&]() { return SUCCEEDED(device->SetRenderState(
+                   D3DRS_FILLMODE,D3DFILL_SOLID)); },
+               [&]() { return SUCCEEDED(device->SetRenderState(
+                   D3DRS_MULTISAMPLEMASK,0xffffffffu)); }) ||
            FAILED(device->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE)) ||
            FAILED(device->SetRenderState(D3DRS_LIGHTING,FALSE)) ||
            FAILED(device->SetRenderState(D3DRS_COLORWRITEENABLE,

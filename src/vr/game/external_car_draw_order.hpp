@@ -45,6 +45,14 @@ inline void SortGlassBackToFront(GlassDepthItem* items,
         return a.viewZ==b.viewZ ? a.index<b.index : a.viewZ>b.viewZ;
     });
 }
+// The external triangles must not inherit a debug/previous pass fill mode
+// or a partial/zero MSAA sample-write mask. Both fixed-function and PBR
+// passes use this transaction before any DIP; the caller restores its state.
+template<class SetSolid,class SetAllSamples>
+inline bool ConfigureExternalRasterCoverage(SetSolid setSolid,
+                                            SetAllSamples setAllSamples) noexcept {
+    return setSolid() && setAllSamples();
+}
 // The source owns UV interpolation; sampler ADDRESS_WRAP is independent.
 // Stage 0 is the final fixed-function stage, so its output must be CURRENT.
 // Shader TEXCOORD0/1/2 carry world position, normal and UV respectively.

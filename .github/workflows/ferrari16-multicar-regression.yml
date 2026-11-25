@@ -192,6 +192,11 @@ jobs:
           assert 'projection._34' in glass_sort
           assert 'DashboardOverlayMeshVisible(' in glass_sort
           assert 'if(!RuntimeExternalCarAtomicStageReady())return result;' in native
+          raster_setup=native[native.index('HRESULT hr=S_OK;'):native.index('std::array<GlassDepthItem,MaxGroups>')]
+          assert '!ConfigureExternalRasterCoverage(' in raster_setup
+          assert 'D3DRS_FILLMODE,D3DFILL_SOLID' in raster_setup
+          assert 'D3DRS_MULTISAMPLEMASK,0xffffffffu' in raster_setup
+          assert 'const HRESULT restore=saved->Apply();' in native
           assert 'D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE' in native
           assert 'D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE' in native
           assert 'RuntimeExternalCarAtomicStageReady()' in native
