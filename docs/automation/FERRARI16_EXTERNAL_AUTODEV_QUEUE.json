@@ -3156,7 +3156,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER44-ISOLATED-GAME-HOST-SCAN",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "v0.03 versus latest: 4:3 theatre/menu fullscreen, initial OpenXR focus and VDXR eye projections, no 2D fallback",
           "source_material_sha": "6ddd2352709f769aa18385b857606b7c80ffc086",
           "source_blob_sha1": {
@@ -3201,20 +3201,90 @@
           "protected_v003": "Only isolated launcher and existing test file changes, no Start-OutRun.cmd, VR host source, D3D9 renderer, ABI, PBR, deployment or asset changes. ChatGPT local GitHub DNS unavailable; N100 used only for small Python test and read-only CI query. No full build.",
           "asset_validation": "No actual 16 private models, source/processed asset SHA, licensing or quality promotion. No actual HMD render or measured FPS.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration43 credited once 2917+1=2918 ledger 3a60227b08ce60a98c8e69cb897781c81678a6b1",
-          "next_trace": "Trace all 16 OVC4 material-to-mesh DDS mip, tangent/UV, alpha and normal+ORM binding integrity, with exact positive and corrupt inputs; confirm iteration44 exact SHA Windows CMD/x86/x64 CI. Independently investigate R7 Present transition snapshot and direct GPU last-safe projection identity; do not enable unimplemented bilateral staging."
+          "score_state": "CREDITED_ONCE_AI2_2918_PLUS_1_EQUALS_2919_LEDGER_b01397e9912677cea460cf2accf51382b43faf56",
+          "next_trace": "Trace all 16 OVC4 material-to-mesh DDS mip, tangent/UV, alpha and normal+ORM binding integrity, with exact positive and corrupt inputs; confirm iteration44 exact SHA Windows CMD/x86/x64 CI. Independently investigate R7 Present transition snapshot and direct GPU last-safe projection identity; do not enable unimplemented bilateral staging.",
+          "followup_exact_sha_ci": {
+            "sha": "6ddd2352709f769aa18385b857606b7c80ffc086",
+            "runs": [
+              {
+                "id": 45543918228,
+                "conclusion": "success"
+              },
+              {
+                "id": 45543918230,
+                "conclusion": "success"
+              },
+              {
+                "id": 45543918177,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "All three returned push workflows completed successfully; no HUD inspector run returned for this exact SHA."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER45-INDEXED-FLOOR-GLASS-BOUNDS",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Actual 16 car material contracts: OVC4 mesh integrity, DDS mip chains, tangent/UV, per-material normal+ORM and CRC",
+          "source_material_sha": "362c7a9e96c0403dcc4df5b72991077e92096d30",
+          "source_blob_sha1": {
+            "src/vr/game/dino_external_sidecar.hpp": "207c0df16aca56aa811891e8e2dc0bca716d5e58",
+            "src/vr/game/dino_external_d3d9.hpp": "aec4323541e33b294be6862ac50ca849834b012b",
+            "src/vr/game/external_car_ground.hpp": "607c50f059281055398475080ca50ce0fa0497ef",
+            "tests/external_car_ground_test.cpp": "c924e97375c2741e24cb2ce9bc5d085fba39971a",
+            "tools/ferrari16/verify_all_car_ovc.py": "67920d2ef141aa30da2cb0796ce764b250c68e6e",
+            ".github/workflows/ferrari16-multicar-regression.yml": "1ea81b9f66e6dc3d5e38b46531f4b8d777ca4b2c"
+          },
+          "source_defect": "Native CPU load floor minimum and GPU glass bbox center considered all vertices, including those absent from the index stream. A CRC-correct drawable mesh can contain unused outliers: old minimum -100 rejects a car whose indexed minimum is -0.3; unused x=100 shifts glass bbox center from x=1 to x=50. Python offline preflight repeated the same all-vertex floor error. No private model is known to contain these outliers and no actual HMD symptom causality is claimed.",
+          "source_fix": "Portable ComputeIndexedMeshBounds checks index range and finite referenced positions, commits bounds only on success. CPU load uses indexed minimum, glass upload uses indexed bbox center; parser still validates every vertex and all indices, CRC, DDS and PBR. Python inspect computes floor minimum from indexed triangle positions only, retains full vertex and normal validation. Existing index-referenced degenerate/helper triangles remain included; no change to native PMT, alpha blend, shader, staging or asset admission policy beyond corrected geometry bounds.",
+          "positive_negative_regressions": [
+            "Exact committed six test/dependency file bytes independently checked using Git blob framing. N100 minimal g++ C++17 -Wall -Wextra -Werror -pedantic ASan/UBSan ground test passes 16 synthetic slot labels x 2 index widths, indexed floor/center, old all-vertex counterexample, referenced outlier, invalid index, empty indices, nonfinite referenced vertex and transactional output.",
+            "Full Python OVC self-test PASS; 16 synthetic slots x 2 widths x body/dashboard overlay x referenced/unreferenced outlier = 128 CRC-correct cases; referenced outlier fails expected envelope, unused outlier leaves floor at zero. Existing DDS/PBR/CRC tests run unchanged. CI source integration assertions bind both native consumers to helper. No native Windows or GPU execution in local checks."
+          ],
+          "call_graph_trace": [
+            "Read native ParseDds/Parse OVC4 CRC, vertex/UV/index bounds, material and normal/ORM records; read Python inspect and strict uncovered map gate, compare to shader normal/ORM and GPU uploader. Confirmed source-space coverage tests already protect missing/orphan/incomplete maps, disabled normal strength and exact collapsed tangent witness.",
+            "Read async GpuOwner::EnsureLoaded -> Parse -> RepairExternalModelNormals -> indexed floor -> ComputeExternalFloorLift -> GPU mesh upload glass center -> AnimatedWorld camera-forward depth sort -> DrawIndexedPrimitive. Prior floor and glass center used every vertex instead of index stream. No changes to native callback, dashboard animation, stereo draw or source asset bytes."
+          ],
+          "same_sha_ci": {
+            "sha": "362c7a9e96c0403dcc4df5b72991077e92096d30",
+            "runs": [
+              {
+                "id": 45547388880,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45547388868,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45547388701,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Read-only Actions API verified head_sha; no HUD run returned at snapshot."
+          },
+          "protected_v003": "Automation branch only. Stable v0.03, host, menu, renderer bridge, native ABI, PBR shader, physical stereo receipt, atomic live external gate and deployment unchanged. Extra indexed scan occurs during async CPU load and glass upload, not each frame. ChatGPT local GitHub DNS failed; N100 used one small C++/Python test and read-only CI query only; no full build. Bounds remain conservative for referenced degenerate triangles; actual car dimensions and suspension clearance unmeasured.",
+          "asset_validation": "No private model SHA, 16 real car materials, DDS decoded texture semantics, manual quality or rights proof. Synthetic fixtures are not vehicle acceptance and no candidate promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration44 credited once 2918+1=2919 ledger b01397e9912677cea460cf2accf51382b43faf56",
+          "next_trace": "Trace GLB used material scalar factor and texture sampler parity through OVC4 baking, especially normal strength, metallic/roughness multipliers and glass alpha; reproduce mismatches before changes. Confirm iteration45 exact SHA Windows build/package and multicar CI. Audit per-eye glass ordering and source normal/ORM role correspondence without enabling live external raster or promoting unverified assets."
         }
       ],
-      "latest_material_sha": "6ddd2352709f769aa18385b857606b7c80ffc086",
-      "latest_static_ci": "Iteration44 52 source model cases PASS, full launcher Python suite 9 pass/2 Windows CMD skips, 5 exact blob hashes verified. Three exact SHA workflows in progress in API snapshot. Iteration43 four exact SHA workflows success.",
-      "next_focus": "Trace all 16 OVC4 material-to-mesh DDS mip, tangent/UV, alpha and normal+ORM binding integrity, with exact positive and corrupt inputs; confirm iteration44 exact SHA Windows CMD/x86/x64 CI. Independently investigate R7 Present transition snapshot and direct GPU last-safe projection identity; do not enable unimplemented bilateral staging."
+      "latest_material_sha": "362c7a9e96c0403dcc4df5b72991077e92096d30",
+      "latest_static_ci": "Iteration45 exact committed portable ground ASan/UBSan test and full OVC Python self-test PASS; 32 C++ and 128 OVC synthetic slot combinations; three exact SHA workflows in progress. Iteration44 three exact SHA workflows success.",
+      "next_focus": "Trace GLB used material scalar factor and texture sampler parity through OVC4 baking, especially normal strength, metallic/roughness multipliers and glass alpha; reproduce mismatches before changes. Confirm iteration45 exact SHA Windows build/package and multicar CI. Audit per-eye glass ordering and source normal/ORM role correspondence without enabling live external raster or promoting unverified assets."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 13:00:00+09:00",
+  "last_updated_kst": "2026-11-25 13:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
