@@ -88,6 +88,7 @@ namespace OutRunVRStereo
 	{
 		constexpr std::size_t ResetVtableIndex = 16;
 		constexpr std::size_t PresentVtableIndex = 17;
+		constexpr std::size_t PresentExVtableIndex = 121;
 		constexpr std::size_t CreateDepthStencilSurfaceVtableIndex = 29;
 		constexpr std::size_t CreateDepthStencilSurfaceExVtableIndex = 131;
 		constexpr std::size_t UpdateSurfaceVtableIndex = 30;
@@ -111,6 +112,8 @@ namespace OutRunVRStereo
 
 		SafetyHookInline ResetHook{};
 		SafetyHookInline PresentHook{};
+		SafetyHookInline CandidatePresentExHook{};
+        bool R7CandidatePresentBoundaryCovered=false;
 		SafetyHookInline CreateDepthRetentionHook{};
 		SafetyHookInline CreateDepthRetentionExHook{};
 		SafetyHookInline UpdateSurfaceHook{};
@@ -1774,6 +1777,24 @@ namespace OutRunVRStereo
         R7AtomicCandidatePair ExternalAtomicCandidates{};
         std::uint64_t ExternalAtomicAllocationAttemptEpoch=0;
 
+        // Direct PresentEx can bypass the R7/R9 Present epoch owner.
+        // Retire the candidate BEFORE the driver sees the present, even on
+        // failure, and do not create another candidate in that same epoch.
+        // Do not advance the stock epoch or notify the host a second time:
+        // base Present may itself call PresentEx.
+        HRESULT __stdcall R7CandidatePresentExDest(IDirect3DDevice9Ex* device,
+            const RECT* sourceRect,const RECT* destRect,HWND window,
+            const RGNDATA* dirty,DWORD flags)
+        {
+            if(StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&IsGameDevice(device)){
+                ExternalAtomicReplayEpoch=0;
+                ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+            }
+            return CandidatePresentExHook.stdcall<HRESULT>(device,sourceRect,destRect,
+                window,dirty,flags);
+        }
+
+
         enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
 
         // Capture actual attachments, not just the hook's shadow. No clear
@@ -1841,7 +1862,8 @@ namespace OutRunVRStereo
         R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
             const D3DVIEWPORT9& viewport,DWORD flags,D3DCOLOR color,float z,DWORD stencil) noexcept
         {
-            if(ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
+            if(!R7CandidatePresentBoundaryCovered||
+                ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             // RightEyeDepth is exclusively created by R7 with Discard=FALSE.
             // For game-owned LEFT depth, no unbind without creation proof.
@@ -3475,6 +3497,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			CreateDepthRetentionExHook = {};
 			CreateDepthRetentionHook = {};
 			SetRenderTargetHook = {};
+			R7CandidatePresentBoundaryCovered=false;
+			CandidatePresentExHook = {};
 			PresentHook = {};
 			ResetHook = {};
 			StereoInstalledDevice.store(nullptr, std::memory_order_release);
@@ -3560,6 +3584,24 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 // Retire the base hook too unless classic D3D9 is confirmed.
                 if(!CreateDepthRetentionExHook&&(exQuery!=E_NOINTERFACE||ex))
                     CreateDepthRetentionHook={};
+                // Classic devices have only base Present; Ex must also own
+                // the direct entrypoint. If optional installation fails, the
+                // established renderer continues but candidate seeding stops.
+                R7CandidatePresentBoundaryCovered=exQuery==E_NOINTERFACE&&!ex;
+                if(SUCCEEDED(exQuery)&&ex&&static_cast<IDirect3DDevice9*>(ex)==device){
+                    void** exTable=*reinterpret_cast<void***>(ex);
+                    void* target=exTable?exTable[PresentExVtableIndex]:nullptr;
+                    // Reject shared entrypoints with incompatible signatures.
+                    for(unsigned slot=0;target&&slot<119;++slot)
+                        if(target==vtable[slot])target=nullptr;
+                    if(target&&target!=exTable[CreateDepthStencilSurfaceExVtableIndex]){
+                        CandidatePresentExHook=safetyhook::create_inline(
+                            target,R7CandidatePresentExDest,disabled);
+                        if(CandidatePresentExHook&&!CandidatePresentExHook.enable().has_value())
+                            CandidatePresentExHook={};
+                        R7CandidatePresentBoundaryCovered=static_cast<bool>(CandidatePresentExHook);
+                    }
+                }
                 ReleaseCom(ex);
                 if(freshDevice)R7CaptureFreshAutomaticDepth(device);
             }
