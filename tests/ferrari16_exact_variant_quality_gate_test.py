@@ -124,6 +124,41 @@ def glb(path: Path, *, triangles: int = 1, width: int = 2,
         second = copy.deepcopy(primitive)
         second["material"] = 1
         doc["meshes"][0]["primitives"].append(second)
+    elif defect == "default-factors":
+        material["pbrMetallicRoughness"].update(
+            baseColorFactor=[1., 1., 1., 1.], metallicFactor=1., roughnessFactor=1.)
+        material["normalTexture"]["scale"] = 1.
+        material["emissiveFactor"] = [0., 0., 0.]
+        material["doubleSided"] = False
+        doc["samplers"] = [{"wrapS": 10497, "wrapT": 10497}]
+        doc["textures"][0]["sampler"] = 0
+    elif defect == "normal-scale":
+        material["normalTexture"]["scale"] = 0.
+    elif defect == "metallic-factor":
+        material["pbrMetallicRoughness"]["metallicFactor"] = 0.25
+    elif defect == "roughness-factor":
+        material["pbrMetallicRoughness"]["roughnessFactor"] = 0.5
+    elif defect == "alpha-factor":
+        material["pbrMetallicRoughness"]["baseColorFactor"] = [1, 1, 1, .2]
+    elif defect == "emissive-factor":
+        material["emissiveFactor"] = [.5, 0, 0]
+    elif defect == "double-sided":
+        material["doubleSided"] = True
+    elif defect == "invalid-factor":
+        material["pbrMetallicRoughness"]["metallicFactor"] = True
+    elif defect == "nonfinite-factor":
+        material["normalTexture"]["scale"] = float("nan")
+    elif defect == "clamp-sampler":
+        doc["samplers"] = [{"wrapS": 33071}]
+        doc["textures"][0]["sampler"] = 0
+    elif defect == "nearest-sampler":
+        doc["samplers"] = [{"magFilter": 9728}]
+        doc["textures"][0]["sampler"] = 0
+    elif defect == "invalid-sampler":
+        doc["textures"][0]["sampler"] = 99
+    elif defect == "invalid-filter":
+        doc["samplers"] = [{"minFilter": 1234}]
+        doc["textures"][0]["sampler"] = 0
     elif defect == "reorder-textures":
         doc["textures"].reverse()
         material["normalTexture"]["index"] = 1
@@ -244,6 +279,31 @@ def main() -> None:
             glb(converted, defect="reorder-textures")
             candidate["converted_glb"] = hashed(converted)
             assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+            glb(converted, defect="default-factors")
+            candidate["converted_glb"] = hashed(converted)
+            assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+            # Preserve identical non-default settings, but reject silent
+            # edits with unchanged texture names, dimensions and geometry.
+            for defect in ("normal-scale", "metallic-factor", "roughness-factor",
+                           "alpha-factor", "emissive-factor", "double-sided",
+                           "clamp-sampler", "nearest-sampler"):
+                glb(converted, defect=defect)
+                candidate["converted_glb"] = hashed(converted)
+                expected_fail(candidate, root, "material texture binding/triangle mismatch")
+                glb(source, defect=defect)
+                candidate["source_glb"] = hashed(source)
+                assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+                glb(source)
+                candidate["source_glb"] = hashed(source)
+            for defect, reason in (
+                ("invalid-factor", "invalid material factor"),
+                ("nonfinite-factor", "invalid material factor"),
+                ("invalid-sampler", "sampler reference"),
+                ("invalid-filter", "sampler filter"),
+            ):
+                glb(converted, defect=defect)
+                candidate["converted_glb"] = hashed(converted)
+                expected_fail(candidate, root, reason)
             glb(converted, defect="strided-position")
             candidate["converted_glb"] = hashed(converted)
             assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"

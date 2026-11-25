@@ -96,6 +96,42 @@ def image_dimensions(data: bytes) -> tuple[int, int]:
     raise GateError("unsupported/malformed embedded image (PNG/JPEG required)")
 
 
+def material_number(value: object, label: str, bounded: bool = True) -> float:
+    require(type(value) in (int, float) and math.isfinite(value) and
+            (not bounded or 0 <= value <= 1), "GLB invalid material factor: " + label)
+    return float(value)
+
+
+def material_vector(value: object, length: int, label: str) -> tuple:
+    require(isinstance(value, list) and len(value) == length,
+            "GLB invalid material factor: " + label)
+    return tuple(material_number(x, label) for x in value)
+
+
+def sampler_signature(doc: dict, texture: dict) -> tuple:
+    # glTF defaults to REPEAT wrapping. Omitted filters are implementation
+    # choices, not aliases for a particular explicitly requested filter.
+    sampler = {}
+    if "sampler" in texture:
+        idx = texture["sampler"]
+        samplers = doc.get("samplers", [])
+        require(type(idx) is int and 0 <= idx < len(samplers),
+                "GLB sampler reference")
+        sampler = samplers[idx]
+        require(isinstance(sampler, dict), "GLB sampler object")
+    wrap_s, wrap_t = sampler.get("wrapS", 10497), sampler.get("wrapT", 10497)
+    mag, minify = sampler.get("magFilter"), sampler.get("minFilter")
+    for value in (wrap_s, wrap_t):
+        require(type(value) is int and value in (33071, 33648, 10497),
+                "GLB sampler wrap")
+    for key, value, allowed in (
+            ("magFilter", mag, (9728, 9729)),
+            ("minFilter", minify, (9728, 9729, 9984, 9985, 9986, 9987))):
+        require(key not in sampler or (type(value) is int and value in allowed),
+                "GLB sampler filter")
+    return wrap_s, wrap_t, mag, minify
+
+
 def material_binding(doc: dict, primitive: dict) -> tuple:
     """Resolve actual used texture roles, not the inventory of embedded images.
 
@@ -122,7 +158,18 @@ def material_binding(doc: dict, primitive: dict) -> tuple:
         ("occlusion", material.get("occlusionTexture")),
         ("emissive", material.get("emissiveTexture")),
     )
-    bindings = []
+    # Texture inventory and role names alone miss scalar/color edits. Compare
+    # the effective core material parameters (explicit defaults == omitted).
+    double_sided = material.get("doubleSided", False)
+    require(type(double_sided) is bool, "GLB invalid material doubleSided")
+    factors = (
+        material_vector(pbr.get("baseColorFactor", [1, 1, 1, 1]), 4, "baseColor"),
+        material_number(pbr.get("metallicFactor", 1), "metallic"),
+        material_number(pbr.get("roughnessFactor", 1), "roughness"),
+        material_vector(material.get("emissiveFactor", [0, 0, 0]), 3, "emissive"),
+        double_sided,
+    )
+    bindings = [("factors", factors)]
     for role, info in roles:
         if info is None:
             require(alpha == "BLEND" or role not in ("normal", "metallic_roughness"),
@@ -145,7 +192,12 @@ def material_binding(doc: dict, primitive: dict) -> tuple:
                 "GLB texture image reference: " + role)
         name = images[image_index].get("name")
         require(isinstance(name, str) and bool(name), "GLB texture image name")
-        bindings.append((role, name))
+        strength = None
+        if role == "normal":
+            strength = material_number(info.get("scale", 1), "normal scale", False)
+        elif role == "occlusion":
+            strength = material_number(info.get("strength", 1), "occlusion strength")
+        bindings.append((role, name, strength, sampler_signature(doc, texture)))
     return alpha, tuple(bindings)
 
 
