@@ -110,6 +110,97 @@ with tempfile.TemporaryDirectory() as directory:
                     str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
     subprocess.run([str(p/"probe")],check=True)
 
+# Iter54: exercise the actual ClearDest body with the same mocked driver
+# and actual RestoreRightPassState. A color-only clear must also revoke
+# both depth/stencil proofs when restoration is dirty.
+clear_body = r7[r7.index("HRESULT __stdcall ClearDest("):
+                r7.index("HRESULT __stdcall SetRenderTargetDest(")]
+clear_prefix = prefix + r'''
+#include <atomic>
+#define __stdcall
+using D3DCOLOR=unsigned;
+constexpr DWORD D3DCLEAR_TARGET=1;
+constexpr HRESULT D3D_OK=0;
+std::atomic<bool> StereoBaseCallbacksArmed{true};
+bool InternalStereoPass=false, wanted=true, backbuffer=true,
+    mrt=false, resources=true, coverage=true, FrameRightDrawFailed=false;
+unsigned coverageCalls=0, poisons=0;
+namespace OutRunVR {
+enum Failure {StereoFailureMrtActive, StereoFailureResourceUnavailable,
+    StereoFailureClearFailed, StereoFailureViewportUnavailable};
+}
+void PoisonFrame(OutRunVR::Failure){++poisons;}
+bool IsGameDevice(IDirect3DDevice9* d){return d!=nullptr;}
+bool StereoWanted(){return wanted;}
+bool TargetIsBackBuffer(){return backbuffer;}
+bool AnyAuxRenderTargetActive(){return mrt;}
+bool EnsureStereoResources(IDirect3DDevice9*){return resources;}
+bool SurfaceHasStencil(IDirect3DSurface9* s){return s!=nullptr;}
+bool ClearCoversStereoBackbuffer(IDirect3DDevice9*,DWORD,const D3DRECT*){
+    ++coverageCalls;return coverage;
+}
+void RecordFullMainDepthClear(IDirect3DDevice9*,DWORD,const D3DRECT*,DWORD flags,float,DWORD){
+    const auto bits=flags&(D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL);
+    if(bits&&backbuffer&&coverage)LastMainDepthClearStamp.Record(PresentEpoch,bits);
+}
+'''
+clear_suffix = r'''
+void ResetProbe(unsigned failure){
+    step=clearCalls=notes=poisons=coverageCalls=0;failAt=failure;
+    RightDepthSynchronized=RightStencilSynchronized=true;
+    FrameRightDrawFailed=false;
+    LastMainDepthClearStamp.Record(PresentEpoch,6);
+    wanted=backbuffer=resources=coverage=true;mrt=false;
+}
+int main(){
+    IDirect3DDevice9 dev;
+    // LEFT clear, then RIGHT RT/depth/viewport/clear, then all three
+    // restore calls. For setup failures all restore calls still run.
+    for(DWORD flags:{1u,2u,4u,6u,7u})
+        for(unsigned failure=0;failure<=8;++failure){
+            ResetProbe(failure);
+            const HRESULT hr=ClearDest(&dev,0,nullptr,flags,0,1.f,0);
+            const bool dirty=failure>=6;
+            assert(hr==((failure==1||dirty)?E_FAIL:D3D_OK));
+            assert(notes==unsigned(dirty));
+            assert(coverageCalls==unsigned(failure==0));
+            if(dirty){
+                assert(!RightDepthSynchronized&&!RightStencilSynchronized);
+                assert(!LastMainDepthClearStamp.Current(PresentEpoch));
+                const unsigned before=step;
+                bool restoreFailed=true;
+                assert(!TryBootstrapRightDepthFromRecentClear(&dev,&restoreFailed));
+                assert(!restoreFailed&&step==before);
+            }else if(failure>=2){
+                assert(RightDepthSynchronized==!(flags&D3DCLEAR_ZBUFFER));
+                assert(RightStencilSynchronized==!(flags&D3DCLEAR_STENCIL));
+                assert(FrameRightDrawFailed&&poisons==1);
+                assert(LastMainDepthClearStamp.Current(PresentEpoch));
+            }else if(failure==0){
+                assert(RightDepthSynchronized&&RightStencilSynchronized);
+                assert(LastMainDepthClearStamp.Current(PresentEpoch));
+            }
+            assert(step==(failure==1?1:failure>=2&&failure<=4?failure+3:8));
+        }
+    ResetProbe(0);wanted=false;
+    assert(ClearDest(&dev,0,nullptr,6,0,1.f,0)==D3D_OK&&step==1&&notes==0);
+    ResetProbe(0);backbuffer=false;
+    assert(ClearDest(&dev,0,nullptr,6,0,1.f,0)==D3D_OK&&step==1&&notes==0);
+    ResetProbe(0);mrt=true;
+    assert(ClearDest(&dev,0,nullptr,6,0,1.f,0)==D3D_OK&&step==1&&poisons==1);
+    ResetProbe(0);resources=false;
+    assert(ClearDest(&dev,0,nullptr,6,0,1.f,0)==D3D_OK&&step==1&&poisons==1);
+    std::cout<<"R7_CLEAR_RESTORE_RECEIPT_PASS\n";
+}
+'''
+with tempfile.TemporaryDirectory() as directory:
+    p = Path(directory)
+    (p / "probe.cpp").write_text(clear_prefix + body + clear_body + clear_suffix)
+    subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror",
+                    "-Wno-unused-variable","-I",str(root / "src/vr/d3d9"),
+                    str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
+    subprocess.run([str(p/"probe")],check=True)
+
 # Iter52: verify upper dispatch handles dirty restoration, never declines to a
 # raw/lower draw. Compile the actual R33 readiness function and exercise every
 # readiness combination, including depthless draws after a dirty restoration.
