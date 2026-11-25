@@ -3295,7 +3295,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER46-RASTER-COVERAGE-STATE",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "Glass transparency and PBR shading: alpha sort in both eyes, normal-map shader paths, reflections and depth write regression",
           "source_material_sha": "7214c47c43cf010f8d9b3664f270119680e23e2d",
           "source_blob_sha1": {
@@ -3341,20 +3341,87 @@
           "protected_v003": "Automation branch only; no stable release, native callback, shader, menu, host, deployment, or asset changes. ChatGPT local GitHub DNS unavailable; N100 minimal portable test and read-only API only. Two new state setters before per-scene mesh loop, no measured FPS impact. Atomic live external raster fence remains closed.",
           "asset_validation": "No actual 16 private model/source/processed SHA or rights verification; no candidate promotion; no actual HMD image, physical sample mask state or FPS.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration45 credited once 2919+1=2920 ledger a661bfd2591ab08d3113efd3174ab1291c265442",
-          "next_trace": "Inspect exact-SHA Win32/x64 isolated package outcomes and actual Windows negative tests; trace source GLB sampler/factor to OVC4 texture bake and whether per-eye view sorting must change for canted/asymmetric eye poses. No unsafe live raster enable, no candidate promotion."
+          "score_state": "CREDITED_ONCE_AI2_2920_PLUS_1_EQUALS_2921_LEDGER_d2bfc996795fed667bedf702f98359a8507f1a84",
+          "next_trace": "Inspect exact-SHA Win32/x64 isolated package outcomes and actual Windows negative tests; trace source GLB sampler/factor to OVC4 texture bake and whether per-eye view sorting must change for canted/asymmetric eye poses. No unsafe live raster enable, no candidate promotion.",
+          "followup_exact_sha_ci": {
+            "sha": "7214c47c43cf010f8d9b3664f270119680e23e2d",
+            "runs": [
+              {
+                "id": 45550826133,
+                "conclusion": "success"
+              },
+              {
+                "id": 45550826135,
+                "conclusion": "success"
+              },
+              {
+                "id": 45550826182,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "All returned push workflows exact head_sha verified using read-only Actions API."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER47-HARDLINK-OVERWRITE-ISOLATION",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Windows x86 DLL+x64 host exact-SHA tests: 16-car corrupt input negatives, packaging, isolated launch and reversible rollback",
+          "source_material_sha": "2b5691701a0aeaf67657edfca765d974fd5a359d",
+          "source_blob_sha1": {
+            "tools/ferrari16/INSTALL-FERRARI16-ISOLATED.ps1": "9b66a3e39176f4c8de4443447bae43b245f92426",
+            "tools/ferrari16/RESTORE-FERRARI16-ISOLATED.ps1": "b114616e6d236a3cb3785936e43f6b14c69d39e9",
+            ".github/workflows/ferrari16-exact-sha-test-package.yml": "4d8badbc08ffed31b6eb1d351dbb57f8984d9428"
+          },
+          "source_defect": "Hard-linked DLL/host target has ordinary file attributes and matching SHA256, so reparse and hash guards do not establish overwrite isolation. Copy-Item -Force may overwrite shared file contents outside test root. No actual user's files accessed or damage observed.",
+          "source_fix": "Both installer verify-only/install and rollback preflight both mutable payload destinations using Windows GetFileInformationByHandle NumberOfLinks == 1, fail on query error, preserve path/hash/manifest/process gates. New C# P/Invoke type is embedded in each script; no package allowlist expansion.",
+          "positive_negative_regressions": [
+            "Added Windows PS5.1 actual hardlink fixture, each of DLL and host in verify-only/install mode (4 negative cases) and rollback mode (2 negative cases). Require specific hardlink error and unchanged outside alias and tracked game bytes; no install backup/launcher creation. Remove only test alias then existing ordinary install/rollback positive runs.",
+            "Exact commit readback verified all three blob identifiers and both preflight call positions before overwrite/backup; native execution pending Windows CI. ChatGPT local GitHub DNS unavailable; no local PowerShell. N100 used read-only CI query only."
+          ],
+          "call_graph_trace": [
+            "Trace ZIP allowlist, PE architecture envelope, exact SHA manifest, installer preflight -> original backup -> force overwrite -> catch restore; restorer marker -> backup+patched hashes -> force overwrite -> remove launcher. Reparse and hash guards miss hardlink identity; both target checks now precede any mutation.",
+            "Preserved existing per-car OVC, PBR, stereo, menu and host gates. No changes to binary payload or private assets. No claim of 16-car runtime acceptance."
+          ],
+          "same_sha_ci": {
+            "sha": "2b5691701a0aeaf67657edfca765d974fd5a359d",
+            "runs": [
+              {
+                "id": 45554158619,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45554158645,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45554158583,
+                "name": "Build",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Actions API head_sha verified, native negative cases not yet certified."
+          },
+          "protected_v003": "Automation branch only; no game/host binaries, assets, stable release, live deployment or shader changes. Point-in-time link count does not guarantee protection from concurrent relinking (TOCTOU). Partial restore transaction and recursive source copy remain separate investigations.",
+          "asset_validation": "No private GLB/OVC/DDS source/processed SHA, actual vehicle quality or rights evidence; no candidate promotions.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration46 credited once 2920+1=2921 ledger d2bfc996795fed667bedf702f98359a8507f1a84",
+          "next_trace": "Confirm iteration47 Windows PS5.1 hardlink native tests and exact SHA package/build; trace per-slot provenance and exact-model quality contract, GLB sampler/factor bake; maintain candidate nonpromotion and investigate rollback TOCTOU/partial restoration separately."
         }
       ],
-      "latest_material_sha": "7214c47c43cf010f8d9b3664f270119680e23e2d",
-      "latest_static_ci": "Iteration46 exact committed portable UBSan draw-order test PASS, 3840 new synthetic cases; exact SHA multicar/HLSL success, Win32 build and isolated x86/x64 package pending. Iteration45 three exact SHA workflows success.",
-      "next_focus": "Inspect exact-SHA Win32/x64 isolated package outcomes and actual Windows negative tests; trace source GLB sampler/factor to OVC4 texture bake and whether per-eye view sorting must change for canted/asymmetric eye poses. No unsafe live raster enable, no candidate promotion."
+      "latest_material_sha": "2b5691701a0aeaf67657edfca765d974fd5a359d",
+      "latest_static_ci": "Iteration47 exact commit readback and preflight order checked; three exact SHA workflows in progress; native hardlink negatives not yet executed/confirmed. Iteration46 three workflows success.",
+      "next_focus": "Confirm iteration47 Windows PS5.1 hardlink native tests and exact SHA package/build; trace per-slot provenance and exact-model quality contract, GLB sampler/factor bake; maintain candidate nonpromotion and investigate rollback TOCTOU/partial restoration separately."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 14:00:00+09:00",
+  "last_updated_kst": "2026-11-25 14:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
