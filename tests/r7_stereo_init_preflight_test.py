@@ -245,3 +245,87 @@ assert "InternalStereoPass&&!OutRunVR::DinoSidecar::ActiveExternalStereoMesh" in
 assert "[&](){return drawCall();},eye,1,false);" in source
 assert "if(changed)ExternalAtomicReplayEpoch=0;" in source
 assert "ExternalAtomicReplayEpoch=0;" in clear
+
+# Iter72: execute the actual raw explicit-surface write owner with fault
+# injection; unknown source/depth/private writes cannot retain a receipt.
+copy_owner=source[source.index("template<class Write>\n        HRESULT R7ExecuteAtomicSurfaceWrite("):source.index("HRESULT __stdcall StretchRectDest(")]
+copy_stub=r'''
+#include <cassert>
+#include <atomic>
+#include <cstdint>
+#include <iostream>
+using HRESULT=int;
+constexpr HRESULT S_OK=0,E_FAIL=-1;
+bool FAILED(HRESULT h){return h<0;}
+struct IDirect3DDevice9{};struct IDirect3DSurface9{};
+IDirect3DDevice9 game,other;
+IDirect3DSurface9 left,right,ld,rd,cl,cr,czl,czr,unknown;
+auto* BackBuffer=&left;auto* RightEyeSurface=&right;
+auto* TrackedDepthStencil=&ld;auto* RightEyeDepth=&rd;
+struct Pair{struct Eye{IDirect3DSurface9* color;IDirect3DSurface9* depth;};
+    Eye eyes[2]{{&cl,&czl},{&cr,&czr}};IDirect3DDevice9* device=&game;
+} ExternalAtomicCandidates;
+struct Stamp{unsigned count=0;void Invalidate(){++count;}} LastMainDepthClearStamp;
+std::atomic<bool> StereoBaseCallbacksArmed{true};
+std::uint64_t ExternalAtomicReplayEpoch=9,PresentEpoch=9;
+bool FrameStereoIncomplete=false,FrameRightDrawFailed=false;
+bool IsGameDevice(IDirect3DDevice9* d){return d==&game;}
+'''
+copy_cases=r'''
+int main(){
+    IDirect3DSurface9* surfaces[]{nullptr,&left,&right,&ld,&rd,&cl,&cr,&czl,&czr,&unknown};
+    unsigned cases=0;
+    for(unsigned mode=0;mode<2;++mode)
+    for(unsigned si=0;si<10;++si)
+    for(unsigned di=0;di<10;++di)
+    for(unsigned mask=0;mask<128;++mask){
+        auto* device=(mask&1)?&other:&game;
+        StereoBaseCallbacksArmed=!(mask&2);
+        ExternalAtomicReplayEpoch=(mask&4)?0:9;
+        FrameStereoIncomplete=mask&8;FrameRightDrawFailed=mask&16;
+        ExternalAtomicCandidates.device=&game;
+        LastMainDepthClearStamp.count=0;
+        auto* s=mode?nullptr:surfaces[si];auto* d=surfaces[di];
+        const bool enabled=!(mask&3),active=enabled&&!(mask&4);
+        const bool eye=di==1||di==2,known=mode||si==1||si==2;
+        const bool protectedWrite=di>=3&&di<=8;
+        const bool liveFail=mask&32,replayFail=mask&64;
+        const bool mirror=active&&eye&&known&&!(mask&24)&&!liveFail;
+        unsigned calls=0;
+        auto write=[&](IDirect3DSurface9* a,IDirect3DSurface9* b){
+            ++calls;
+            if(calls==1){assert(a==s&&b==d);return liveFail?E_FAIL:S_OK;}
+            assert(mirror&&calls==2&&b==(di==1?&cl:&cr));
+            assert(a==(mode?nullptr:(si==1?&cl:&cr)));
+            return replayFail?E_FAIL:S_OK;
+        };
+        const auto hr=R7ExecuteAtomicSurfaceWrite(device,s,d,mode!=0,write);
+        assert(hr==(liveFail?E_FAIL:S_OK)&&calls==1u+unsigned(mirror));
+        const bool invalid=active&&(protectedWrite||(eye&&(!mirror||replayFail)));
+        assert(ExternalAtomicReplayEpoch==((mask&4)||invalid?0u:9u));
+        assert(LastMainDepthClearStamp.count==unsigned(enabled&&di==3));
+        ++cases;
+    }
+    // Wrong allocation generation/device must not receive a second write.
+    StereoBaseCallbacksArmed=true;FrameStereoIncomplete=FrameRightDrawFailed=false;
+    ExternalAtomicReplayEpoch=9;ExternalAtomicCandidates.device=&other;
+    unsigned calls=0;
+    assert(R7ExecuteAtomicSurfaceWrite(&game,nullptr,&left,true,
+        [&](auto*,auto*){++calls;return S_OK;})==S_OK);
+    assert(calls==1&&ExternalAtomicReplayEpoch==0);
+    std::cout<<"R7_EXPLICIT_SURFACE_WRITE_PASS "<<cases+1<<"\n";
+}
+'''
+for hook,index in (("StretchRect",34),("ColorFill",35)):
+    assert f"{hook}VtableIndex = {index};" in source
+    assert f"{hook}Hook=safetyhook::create_inline(vtable[{hook}VtableIndex],{hook}Dest,disabled);" in source
+    assert f"!{hook}Hook" in source and f"&{hook}Hook" in source and f"{hook}Hook = {{}};" in source
+assert "R7ExecuteAtomicSurfaceWrite(device,source,destination,false," in source
+assert "R7ExecuteAtomicSurfaceWrite(device,nullptr,destination,true," in source
+assert "FrameStereoMetadata={};ExternalAtomicReplayEpoch=0;if(++PresentEpoch" in source
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"explicit_surface.cpp"
+    exe=Path(temp)/"explicit_surface"
+    cpp.write_text(copy_stub+copy_owner+copy_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
