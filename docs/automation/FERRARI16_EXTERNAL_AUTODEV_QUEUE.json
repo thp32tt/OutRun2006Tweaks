@@ -4256,7 +4256,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER59-R7-INIT-ATTACHMENT-PREFLIGHT",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_APPLICABLE_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "Graphics performance diagnosis: D3D9 render pass duplication, stereo replay, state churn, GPU synchronization and allocation; do not guess FPS",
           "source_material_sha": "38bd044a137cdd08f270442f9531cc8377a0465c",
           "source_blob_sha1": {
@@ -4309,20 +4309,94 @@
           "protected_v003": "Automation branch only; native x86 wrapper ABI, official release, launch, host and deployment unchanged. No external model binary uploads.",
           "asset_validation": "No actual private model source/converted SHA or 16-car UV/normal/PBR/mesh/wheel/instrument rights QA, no exact candidate promotion.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_ITER59_SCORE_PENDING_EXACT_SHA_CI; iteration58 credited once AI2 2931+1=2932 ledger f9d5f100909a46aa6ece369920f60a2c3b3efaca",
-          "next_trace": "Trace R7 initial RIGHT RT/depth/viewport restore failure ownership independently; unlike preflight failure, dirty restoration must not allow same-call native raster or certification. Examine Reset/ResetEx and Present caller propagation and R29/R30/R33 boundaries. Profile actual frame timing only with runtime evidence; preserve atomic whole-vehicle staging and private-asset rights."
+          "score_state": "CREDITED_ONCE_AI2_2932_PLUS_1_EQUALS_2933_LEDGER_2f0ecb147e95fe321c8ecea9c4bc90f4d91cf2cb",
+          "next_trace": "Trace R7 initial RIGHT RT/depth/viewport restore failure ownership independently; unlike preflight failure, dirty restoration must not allow same-call native raster or certification. Examine Reset/ResetEx and Present caller propagation and R29/R30/R33 boundaries. Profile actual frame timing only with runtime evidence; preserve atomic whole-vehicle staging and private-asset rights.",
+          "followup_exact_sha_ci": {
+            "sha": "38bd044a137cdd08f270442f9531cc8377a0465c",
+            "runs": [
+              {
+                "id": 45605418311,
+                "conclusion": "success"
+              },
+              {
+                "id": 45605418203,
+                "conclusion": "success"
+              },
+              {
+                "id": 45605418171,
+                "conclusion": "success"
+              },
+              {
+                "id": 45605417973,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "Actions API exact head_sha and workflow conclusions verified."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER60-DASHBOARD-STRICT-PBR-COVERAGE",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Repeat previous blocked hypotheses with new counterexamples: baseline vs latest branch for driver cockpit, speed/RPM gear, player overlays",
+          "source_material_sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
+          "source_blob_sha1": {
+            "tools/ferrari16/verify_all_car_ovc.py": "71f0e75d065a2cc8567b4cebd9ed3e93ba187f03",
+            "tests/ferrari16_overlay_status_test.py": "88c08367cec3e647d212e7e30bb07bdfe3ee37ae"
+          },
+          "source_defect": "audit(require_pbr_maps=True) checked body pbr_map_coverage only. An installed dashboard OVC with missing normal/ORM, zero normal strength or degenerate UV could report PASS v4 and whole vehicle PASS despite strict policy. GPU owner uses same optional PBR path for vehicle and dashboard.",
+          "source_fix": "Apply existing strict per-opaque-material gate independently to installed dashboard OVC and use existing overlay error aggregation. No changes to optional missing overlay or default structural mode, runtime rendering, animation, gear mask, shader or native fallback. Strict policy is conservative, including existing rejection of no opaque materials.",
+          "positive_negative_regressions": [
+            "16 slots x 2 positive strict cases (absent overlay, covered overlay); 16 x 5 invalid overlay fixtures with structural PASS and strict FAIL; 16 x 2 combined/missing body diagnostics. Fixture normal faces XY plane. Existing CRC and pivot tests retained.",
+            "Initial SHA 1e82f93dbb8754b6fe298136bef4b4673a4ec345 exact all-car CI failed at missing-body assertion because legacy GTO/F40 also report absent legacy file; corrected only assertion in final SHA. No score for retry or initial SHA."
+          ],
+          "call_graph_trace": [
+            "Baseline v0.03 SHA 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 and current hooks_graphics.cpp both call original full player wrapper exactly once per wrapper invocation; current Prepare/DrawPrepared functions definitions have no call sites and RuntimeExternalCarAtomicStageReady() returns false. No external live raster, overlay draw or asset IO is enabled by this change.",
+            "PrepareF50External -> dashboard selection, DashboardFrameLatch speed/RPM/gear -> DrawNativeScene body -> ChooseOriginalCarRoute -> optional overlay only on ExternalComplete and matching canonical selection. Existing individual needle and gear masks preserved.",
+            "Separate static path audit -> inspect(body) -> pbr_map_coverage -> inspect(overlay, dashboard_overlay=True) -> same pbr_map_coverage -> aggregate reasons. No claim of real model map pixels or visual calibration."
+          ],
+          "same_sha_ci": {
+            "sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
+            "runs": [
+              {
+                "id": 45609997564,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45609997557,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45609997629,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress",
+                "conclusion": null
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha queried; final retry CI status as observed, not inferred from initial SHA."
+          },
+          "protected_v003": "Automation branch only; source change is offline Python audit and fixture. Stable native x86 wrapper, host, release and deployment unchanged. No game or third-party binary uploads.",
+          "asset_validation": "No private 16-car original/converted SHA, per-car actual PBR/UV/normal/wheel/instrument/rights QA; no promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_ITER60_SCORE_PENDING_EXACT_SHA_CI; iteration59 credited once AI2 2932+1=2933 ledger 2f0ecb147e95fe321c8ecea9c4bc90f4d91cf2cb",
+          "next_trace": "Confirm iteration60 exact SHA CI. Trace R7 initial dirty RT/depth/viewport restore ownership (pending iteration59 hypothesis), plus whole-vehicle pair-atomic staging backend and overlay lifecycle; maintain hard disabled external live-eye gate until proven. Inspect overlay-specific material/gear visual quality only with private asset evidence."
         }
       ],
-      "latest_material_sha": "38bd044a137cdd08f270442f9531cc8377a0465c",
-      "latest_static_ci": "Iteration59 exact source extracted C++ mock positive/negative/retry PASS; all-car exact SHA success; remaining CI observed separately. Iteration58 applicable exact CI success and credited once.",
-      "next_focus": "Trace R7 initial RIGHT RT/depth/viewport restore failure ownership independently; unlike preflight failure, dirty restoration must not allow same-call native raster or certification. Examine Reset/ResetEx and Present caller propagation and R29/R30/R33 boundaries. Profile actual frame timing only with runtime evidence; preserve atomic whole-vehicle staging and private-asset rights."
+      "latest_material_sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
+      "latest_static_ci": "Iteration60 strict dashboard PBR test amended after initial exact CI legacy missing-body assertion failure; final exact SHA CI as recorded. Iteration59 all four applicable exact workflows success and credited once.",
+      "next_focus": "Confirm iteration60 exact SHA CI. Trace R7 initial dirty RT/depth/viewport restore ownership (pending iteration59 hypothesis), plus whole-vehicle pair-atomic staging backend and overlay lifecycle; maintain hard disabled external live-eye gate until proven. Inspect overlay-specific material/gear visual quality only with private asset evidence."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T20:30:00+09:00",
+  "last_updated_kst": "2026-11-25T21:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
