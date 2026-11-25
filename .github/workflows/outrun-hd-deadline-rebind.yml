@@ -1,0 +1,129 @@
+name: OutRun HD Nov29 Deadline Source Rebind
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: [".github/workflows/outrun-hd-deadline-rebind.yml"]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: outrun-hd-deadline-rebind
+  cancel-in-progress: false
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      OMP_THREAD_LIMIT: "1"
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization
+            localization/automation_inputs/candidate_outputs
+            localization/automation_inputs/qa_rework/approved
+            localization/automation_inputs/native_source_owner_canary
+            localization/automation_inputs/hd_original_png_source_plan.json
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
+            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install offline source text locator and image tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-eng
+          python -m pip install --disable-pip-version-check Pillow==11.3.0 numpy==2.3.4
+      - name: Check exact text matching and monotone atlas selection
+        working-directory: tools/localization
+        run: |
+          python -m unittest -v test_hd_cleanplate_repair
+          python - <<'PY'
+          import hd_exact_text_rebind as m
+          from hd_deadline_preserve_baseline import select
+          lines=[[("Keep",96,[10,10,35,30]),("control!",95,[40,10,90,30])]]
+          assert m.matches(lines,"Keep control!")==[([10,10,90,30],95.5)]
+          assert not m.matches(lines,"Hold the line!")
+          assert not m.matches([[("Keep",96,[10,10,35,30]),("control!",95,[400,10,450,30])]],"Keep control!")
+          a={"target":"a","source_dds_sha256":"a"*64,"native_size":[100,100],"orientation":"NORMAL","roi_count":2}
+          x=dict(a,painted=[{"roi_id":"1"}],holds=[{"roi_id":"2"}])
+          y=dict(a,painted=[{"roi_id":"2"}],holds=[{"roi_id":"1"}])
+          z=dict(a,painted=[{"roi_id":"1"},{"roi_id":"2"}],holds=[])
+          assert select(x,y) is x and select(x,z) is z
+          print("EXACT_TEXT_AND_NO_BASELINE_LOSS_TESTS_PASS")
+          PY
+      - name: Recover exact source glyph boxes for all 104 original atlases
+        run: python tools/localization/hd_exact_text_rebind.py --repo-root . --out "$RUNNER_TEMP/ocr_proposals.json"
+      - name: Download pinned previous cleanplate result and visual evidence
+        run: |
+          gh run download 45333597142 -R "$GITHUB_REPOSITORY" -n outrun-hd-cleanplate-repair-dds-45333597142 -D "$RUNNER_TEMP/old-build"
+          gh run download 45333597142 -R "$GITHUB_REPOSITORY" -n outrun-hd-cleanplate-vision-45333597142 -D "$RUNNER_TEMP/old-vision"
+      - name: Rebuild with precise coordinates and existing native CLEAN gates
+        run: |
+          python tools/localization/hd_cleanplate_repair.py --repo-root . --asset-sha "$(git rev-parse HEAD)" --out "$RUNNER_TEMP/trial" --feedback "$RUNNER_TEMP/ocr_proposals.json"
+      - name: Select only strictly improved atlases; keep baseline wherever any repair was lost
+        run: |
+          python tools/localization/hd_deadline_preserve_baseline.py --old-build "$RUNNER_TEMP/old-build" --old-vision "$RUNNER_TEMP/old-vision" --new-root "$RUNNER_TEMP/trial" --out "$RUNNER_TEMP/final"
+          cp "$RUNNER_TEMP/ocr_proposals.json" "$RUNNER_TEMP/final/build/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-hd-deadline-repair-${{ github.run_id }}
+          path: ${{ runner.temp }}/final/build/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        id: vision
+        with:
+          name: outrun-hd-deadline-vision-${{ github.run_id }}
+          path: ${{ runner.temp }}/final/vision/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Promote only an actual gain when old GPT queue has not started
+        run: |
+          python - <<'PY'
+          import os,sys,json
+          from pathlib import Path
+          sys.path.insert(0,"tools/localization")
+          import hd_cleanplate_repair_control as ctl
+          p=Path(os.environ["RUNNER_TEMP"])/"final/vision/manifest.json"
+          d=json.loads(p.read_text())
+          pointer,_=ctl.read(ctl.ROOT+"/latest.json")
+          if not pointer or pointer["run_id"]!=45333597142 or d["additional_painted"]<=0:
+              print("KEEP_EXISTING_QUEUE_NO_PROVEN_GAIN_OR_CHANGED_POINTER");sys.exit(0)
+          state,_=ctl.read(ctl.ROOT+"/visual/run-45333597142.json")
+          if state and state.get("records"):
+              print("KEEP_EXISTING_ACTIVE_GPT_QUEUE");sys.exit(0)
+          ctl.publish(d["asset_sha"],int(os.environ["GITHUB_RUN_ID"]),int("${{ steps.vision.outputs.artifact-id }}"),1,p)
+          PY
+  preserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Preserve previous full test candidate and cleanplate evidence in private draft release
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=outrun-hd-localization-handoff-20261125
+          root="$RUNNER_TEMP/handoff"
+          mkdir -p "$root/full" "$root/clean" "$root/vision"
+          gh run download 44977233106 -R "$GITHUB_REPOSITORY" -n outrun-hd-korean-coverage-first-44977233106 -D "$root/full"
+          gh run download 45333597142 -R "$GITHUB_REPOSITORY" -n outrun-hd-cleanplate-repair-dds-45333597142 -D "$root/clean"
+          gh run download 45333597142 -R "$GITHUB_REPOSITORY" -n outrun-hd-cleanplate-vision-45333597142 -D "$root/vision"
+          cd "$root"
+          zip -q -r full-104-TEST_ONLY.zip full
+          zip -q -r cleanplate-74-TEST_ONLY.zip clean
+          zip -q -r source-clean-final-104-QA.zip vision
+          sha256sum full-104-TEST_ONLY.zip cleanplate-74-TEST_ONLY.zip source-clean-final-104-QA.zip > SHA256SUMS.txt
+          if ! gh release view "$tag" -R "$GITHUB_REPOSITORY" --json isDraft > "$RUNNER_TEMP/draft.json" 2>/dev/null; then
+            gh release create "$tag" -R "$GITHUB_REPOSITORY" --draft --title "OutRun HD Korean localization handoff - TEST_ONLY" --notes "Unpublished handoff backup. Original 104-atlas coverage test, 74-atlas strict partial repair, 104 visual evidence triplets. 343/954 strict-painted, 611 held. No game/runtime or C3 approval. Do not publish as a finished localization. Existing assets and controller branches are the source of truth." --target master
+          fi
+          test "$(gh release view "$tag" -R "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)" = true
+          gh release upload "$tag" -R "$GITHUB_REPOSITORY" full-104-TEST_ONLY.zip cleanplate-74-TEST_ONLY.zip source-clean-final-104-QA.zip SHA256SUMS.txt --clobber
+          gh release view "$tag" -R "$GITHUB_REPOSITORY" --json isDraft,url,assets
