@@ -2176,11 +2176,33 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			if(savedViewport.X!=0||savedViewport.Y!=0||
 				savedViewport.Width!=BackBufferDesc.Width||
 				savedViewport.Height!=BackBufferDesc.Height)return false;
-			// The bootstrap raw RIGHT clear is not a mirrored scene replay.
-            // Retire the candidate receipt before any possible live write.
-            ExternalAtomicReplayEpoch=0;
-            IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT clearHr=E_FAIL;bool restoreOk=true;{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&SUCCEEDED(device->SetViewport(&savedViewport)))clearHr=ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),replayFlags,0,LastMainDepthClearZ,LastMainDepthClearStencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}
-			// A failed restore is not an ordinary unavailable depth replay.
+			// Mirror the bootstrap while the actual RIGHT attachments are bound.
+            // An unavailable candidate may fall back to the stock clear, but
+            // dirty candidate restoration must not write to an unknown target.
+            IDirect3DSurface9* savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;
+            HRESULT clearHr=E_FAIL;
+            bool restoreOk=true,candidateDirty=false;
+            {
+                InternalPassScope guard;
+                if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&
+                    SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&
+                    SUCCEEDED(device->SetViewport(&savedViewport))){
+                    auto clearRight=[&](){return ClearHook.stdcall<HRESULT>(device,0u,
+                        static_cast<const D3DRECT*>(nullptr),replayFlags,0,
+                        LastMainDepthClearZ,LastMainDepthClearStencil);};
+                    if(ExternalAtomicReplayEpoch&&ExternalAtomicReplayEpoch==PresentEpoch){
+                        const auto replay=R7ReplayInactiveEye(device,1,RightEyeSurface,RightEyeDepth,clearRight);
+                        candidateDirty=replay==R7CandidateSeedResult::DirtyRestore;
+                        if(replay!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
+                    }
+                    if(!candidateDirty)clearHr=clearRight();
+                }
+                // Always attempt outer recovery, even after candidate failure.
+                restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);
+            }
+            if(FAILED(clearHr)||!restoreOk||candidateDirty)ExternalAtomicReplayEpoch=0;
+            if(candidateDirty)restoreOk=false;
+            // A failed restore is not an ordinary unavailable depth replay.
 			// The live device may still target RIGHT; never certify this frame
 			// or retry the clear from the same now-untrusted receipt.
 			if(!restoreOk){

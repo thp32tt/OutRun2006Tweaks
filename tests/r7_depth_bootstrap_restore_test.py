@@ -36,6 +36,9 @@ struct IDirect3DSurface9 {
 };
 struct D3DVIEWPORT9 { unsigned X=0,Y=0,Width=100,Height=100; };
 unsigned step=0,failAt=0,clearCalls=0,restoreCalls=0,notes=0;
+unsigned bootstrapCandidateClears=0;
+bool inCandidate=false;
+HRESULT candidateClearHr=0;
 HRESULT call(){return ++step==failAt?E_FAIL:0;}
 struct IDirect3DDevice9 {
     HRESULT GetViewport(D3DVIEWPORT9* v){*v={};return 0;}
@@ -46,6 +49,7 @@ struct Hook {
     unsigned kind;
     explicit operator bool()const{return true;}
     template<class R,class... Args> R stdcall(Args...){
+        if(kind==2&&inCandidate){++bootstrapCandidateClears;return candidateClearHr;}
         if(kind==2)++clearCalls;
         return call();
     }
@@ -61,6 +65,19 @@ bool RightDepthSynchronized=false,RightStencilSynchronized=false,FirstDepthBoots
 unsigned DepthBootstrapAttempts=0,DepthBootstrapSuccesses=0;
 std::uint64_t PresentEpoch=7;
 std::uint64_t ExternalAtomicReplayEpoch=0;
+enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
+R7CandidateSeedResult bootstrapReplay=R7CandidateSeedResult::Unavailable;
+unsigned bootstrapReplayCalls=0;
+template<class Call> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9*,
+    unsigned eye,IDirect3DSurface9* rt,IDirect3DSurface9* depth,Call& clear){
+    assert(eye==1&&rt==RightEyeSurface&&depth==RightEyeDepth);
+    ++bootstrapReplayCalls;
+    if(bootstrapReplay==R7CandidateSeedResult::Seeded){
+        inCandidate=true;const auto hr=clear();inCandidate=false;
+        return FAILED(hr)?R7CandidateSeedResult::Unavailable:bootstrapReplay;
+    }
+    return bootstrapReplay;
+}
 float LastMainDepthClearZ=1;
 DWORD LastMainDepthClearStencil=0;
 bool DepthDescMatches(const D3DSURFACE_DESC& a,const D3DSURFACE_DESC& b){
@@ -99,6 +116,39 @@ int main(){
             assert(!dirty && step==before); // invalidated receipt cannot replay
         }
     }
+    // Exact bootstrap body: candidate RIGHT replay precedes live Clear;
+    // unavailable/failed candidate permits stock, dirty restore vetoes live.
+    for(auto result:{R7CandidateSeedResult::Seeded,R7CandidateSeedResult::Unavailable,
+                     R7CandidateSeedResult::DirtyRestore})
+    for(unsigned failure:{0u,1u,4u,5u})
+    for(HRESULT candidateHr:{0,E_FAIL}){
+        step=clearCalls=notes=DepthBootstrapSuccesses=0;
+        bootstrapReplayCalls=bootstrapCandidateClears=0;
+        failAt=failure;bootstrapReplay=result;candidateClearHr=candidateHr;
+        RightDepthSynchronized=RightStencilSynchronized=false;
+        LastMainDepthClearStamp.Record(7,6);ExternalAtomicReplayEpoch=7;
+        bool dirty=false;
+        const bool reached=failure!=1;
+        const bool innerDirty=reached&&result==R7CandidateSeedResult::DirtyRestore;
+        const bool outerDirty=(failure==5&&!innerDirty) || (failure==4&&innerDirty);
+        const bool ok=TryBootstrapRightDepthFromRecentClear(&dev,&dirty);
+        assert(bootstrapReplayCalls==unsigned(reached));
+        assert(bootstrapCandidateClears==unsigned(reached&&result==R7CandidateSeedResult::Seeded));
+        assert(clearCalls==unsigned(reached&&!innerDirty));
+        assert(dirty==(innerDirty||outerDirty));
+        assert(notes==unsigned(dirty));
+        assert(ok==(failure==0&&!innerDirty));
+        assert(RightDepthSynchronized==ok&&RightStencilSynchronized==ok);
+        assert(LastMainDepthClearStamp.Current(7)==!dirty);
+        const bool retained=ok&&result==R7CandidateSeedResult::Seeded&&candidateHr==0;
+        assert(ExternalAtomicReplayEpoch==(retained?7u:0u));
+    }
+    // No opt-in/receipt: do not perform any candidate operations.
+    step=clearCalls=notes=bootstrapReplayCalls=bootstrapCandidateClears=0;
+    failAt=0;RightDepthSynchronized=RightStencilSynchronized=false;
+    LastMainDepthClearStamp.Record(7,6);ExternalAtomicReplayEpoch=0;
+    assert(TryBootstrapRightDepthFromRecentClear(&dev));
+    assert(bootstrapReplayCalls==0&&bootstrapCandidateClears==0&&clearCalls==1&&step==7);
     LastMainDepthClearStamp.Record(7,6);
     TrackedRenderTarget=nullptr;step=0;bool dirty=true;
     assert(!TryBootstrapRightDepthFromRecentClear(&dev,&dirty)&&!dirty&&step==0);
@@ -135,7 +185,6 @@ template<class Call> HRESULT R7ExecuteRawCandidateVb(IDirect3DDevice9*,Call&& ca
     return call();
 }
 namespace Settings { bool VRExternalFerrariTest=false,VRF50ExternalModel=false; }
-enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
 R7CandidateSeedResult candidateResult=R7CandidateSeedResult::Unavailable;
 R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9*,
     const D3DVIEWPORT9&,DWORD,D3DCOLOR,float,DWORD){
