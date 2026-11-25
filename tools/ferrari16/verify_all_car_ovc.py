@@ -370,7 +370,12 @@ def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
         if overlay.exists():
             try:
                 od = inspect(overlay, dashboard_overlay=True)
-                overlay_status = f"PASS v{od['version']}"
+                if require_pbr_maps and not pbr_map_coverage(od):
+                    overlay_status = (
+                        "FAIL: required per-opaque-material normal/ORM/UV/full-mip coverage: " +
+                        json.dumps(od["pbr_uncovered"], sort_keys=True))
+                else:
+                    overlay_status = f"PASS v{od['version']}"
             except (OvcError, OSError, struct.error) as error:
                 overlay_status = f"FAIL: {error}"
         else:
@@ -766,7 +771,7 @@ def main() -> int:
     parser.add_argument("--json-out", type=Path)
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--require-pbr-maps", action="store_true",
-                        help="fail each installed car lacking PBR normal or ORM maps")
+                        help="require PBR coverage for installed bodies and dashboard overlays")
     args = parser.parse_args()
     if args.self_test:
         self_test()
