@@ -3547,6 +3547,27 @@ def check_r30_pre_draw_accounting(xyz, shader):
 xyz_body = function_body(r30_r84_admission, 'HRESULT R30ExecuteXyzrhwStereo(')
 screen_body = function_body(r30_r84_admission, 'R30ScreenDrawAttempt R30TryScreenSpaceFovDraw(')
 check_r30_pre_draw_accounting(xyz_body, screen_body)
+
+def check_r30_bootstrap_veto(shader):
+    require_order(shader, 'R30 dirty bootstrap must veto before resampling',
+                  'R29OwnerTryBootstrapRightDepth(device, &bootstrapRestoreFailed);',
+                  'if (bootstrapRestoreFailed)',
+                  'return R30ScreenDrawAttempt::Handled(E_FAIL);',
+                  'frame = R29OwnerCaptureFrameSnapshot();')
+    # Check the actual failure branch, not the later c64 rollback return.
+    branch = shader[shader.index('if (bootstrapRestoreFailed)'):]
+    if not branch.lstrip().startswith('if (bootstrapRestoreFailed)\n                    return R30ScreenDrawAttempt::Handled(E_FAIL);'):
+        raise SystemExit('R30 dirty bootstrap can decline or continue drawing')
+
+check_r30_bootstrap_veto(screen_body)
+try:
+    check_r30_bootstrap_veto(screen_body.replace(
+        'return R30ScreenDrawAttempt::Handled(E_FAIL);',
+        'return R30ScreenDrawAttempt::Declined();', 1))
+except SystemExit:
+    pass
+else:
+    raise SystemExit('R30 dirty bootstrap mutation survived')
 for desc, mutant_xyz, mutant_shader in (
     ('premature XYZRHW accounting',
      xyz_body.replace('R29OwnerNoteStereoDrawWithoutMonoBackup();', '', 1)
@@ -3563,8 +3584,10 @@ for desc, mutant_xyz, mutant_shader in (
     ('missing shader depth generation', xyz_body,
      screen_body.replace('R29OwnerNoteMainDepthContentWrite();', '', 1)),
     ('dirty shader rollback incorrectly permits lower draw', xyz_body,
-     screen_body.replace('return R30ScreenDrawAttempt::Handled(E_FAIL);',
-                         'return R30ScreenDrawAttempt::Declined();', 1)),
+     screen_body[:screen_body.index('if (!leftWvpOk)')] +
+     screen_body[screen_body.index('if (!leftWvpOk)'):].replace(
+         'return R30ScreenDrawAttempt::Handled(E_FAIL);',
+         'return R30ScreenDrawAttempt::Declined();', 1)),
     ('spurious native pre-draw undo', xyz_body,
      screen_body.replace('const HRESULT leftHr = actualDraw();',
                          'R29OwnerUndoStereoDrawCount();\n'

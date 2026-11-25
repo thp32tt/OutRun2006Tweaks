@@ -217,7 +217,10 @@ struct Token {
     const CullingNode* node=nullptr;
     std::uint64_t epoch=0;
 };
-struct QueueCount { int before=-1; DrawBuffer* buffer=nullptr; };
+struct QueueCount {
+    DrawBuffer* buffer=nullptr;
+    OutRunVR::QuestCockpitV2::Glass::DeferredQueueSnapshot before{};
+};
 struct Pending {
     float* rgba=nullptr;
     std::array<float,18> saved{};
@@ -262,20 +265,34 @@ static void OnNewNativeFrame() noexcept {
 static QueueCount CaptureBefore(DrawBuffer* q) noexcept {
     QueueCount out{};
     if(!Memory(q,sizeof(DrawBuffer)))return out;
-    const int count=q->NumBuffers_0,limit=q->MaxBuffers_4;
-    if(count<0||limit<=0||limit>16384||count>limit)return out;
-    out.buffer=q;out.before=count;return out;
+    out.before={q->BufferPtrs_10,q->NumBuffers_0,q->MaxBuffers_4};
+    if(out.before.Valid())out.buffer=q;
+    return out;
 }
 static void CaptureAfter(const QueueCount& before,std::uint64_t epoch) noexcept {
     if(!epoch||epoch!=OutRunVR::QuestCockpitV2::NativeFrameTrace().ActiveEpoch()||
-       TooMany||before.before<0||!before.buffer||
-       !Memory(before.buffer,sizeof(DrawBuffer)))return;
+       TooMany||!before.buffer)return;
     const DrawBuffer* q=before.buffer;
-    const int count=q->NumBuffers_0;
-    if(count<before.before||count>q->MaxBuffers_4||count>16384||
-       !Memory(q->BufferPtrs_10,
-           static_cast<std::size_t>(count)*sizeof(DrawEntry*)))return;
-    for(int i=before.before;i<count;++i){
+    if(!Memory(q,sizeof(DrawBuffer))) {
+        TooMany=true;TokenCount=0;return;
+    }
+    const OutRunVR::QuestCockpitV2::Glass::DeferredQueueSnapshot current{
+        q->BufferPtrs_10,q->NumBuffers_0,q->MaxBuffers_4};
+    if(!OutRunVR::QuestCockpitV2::Glass::SameDeferredQueueAppend(
+           before.before,current)) {
+        // The former tokens and append range cannot be trusted after a
+        // storage replacement, capacity change or count reset. Disable
+        // deferred ownership until the next native frame; immediate scope
+        // and the original draw callback remain unaffected.
+        TooMany=true;TokenCount=0;return;
+    }
+    const int count=current.count;
+    if(count==before.before.count)return;
+    if(!Memory(q->BufferPtrs_10,
+           static_cast<std::size_t>(count)*sizeof(DrawEntry*))) {
+        TooMany=true;TokenCount=0;return;
+    }
+    for(int i=before.before.count;i<count;++i){
         const DrawEntry* e=q->BufferPtrs_10[i];
         if(!Memory(e,sizeof(DrawEntry)))continue;
         // Original PC DrawEntry is 0x3C; +0x38 is the queued object ID.

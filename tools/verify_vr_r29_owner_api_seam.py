@@ -71,7 +71,7 @@ LOWER_SERVICES = {
     "R29OwnerCallOriginalSetDepthStencilSurface(": "SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)",
     "R29OwnerRestoreRightPassState(": "return RestoreRightPassState(",
     "R29OwnerEnsureStereoResources(": "return EnsureStereoResources(device);",
-    "R29OwnerTryBootstrapRightDepth(": "return TryBootstrapRightDepthFromRecentClear(device);",
+    "R29OwnerTryBootstrapRightDepth(": "return TryBootstrapRightDepthFromRecentClear(device, restoreFailed);",
     "R29OwnerDepthTestActive(": "return DepthTestActive(device);",
     "R29OwnerStencilTestActive(": "return StencilTestActive(device);",
     "R29OwnerLeftDrawMayWriteDepth(": "return LeftDrawMayWriteDepth(device);",

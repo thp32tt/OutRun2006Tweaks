@@ -41,6 +41,22 @@ public:
         return current_==this && !nested_ && Immediate(this,epoch);
     }
 };
+// A before/after append delta is only attributable to the callback when
+// the same queue storage and capacity survive, with a valid monotonic count.
+// Replacement or reset can otherwise label pre-existing unrelated entries.
+struct DeferredQueueSnapshot {
+    const void* storage=nullptr;
+    int count=-1;
+    int limit=0;
+    bool Valid() const noexcept {
+        return storage && count>=0 && limit>0 && limit<=16384 && count<=limit;
+    }
+};
+inline bool SameDeferredQueueAppend(const DeferredQueueSnapshot& before,
+    const DeferredQueueSnapshot& after) noexcept {
+    return before.Valid() && after.Valid() && before.storage==after.storage &&
+        before.limit==after.limit && after.count>=before.count;
+}
 // The retail deferred draw queue can reuse a descriptor address. A newly
 // captured player descriptor supersedes the old identity in the same epoch.
 // Keep capacity bounded; never grant ownership from an address alone.

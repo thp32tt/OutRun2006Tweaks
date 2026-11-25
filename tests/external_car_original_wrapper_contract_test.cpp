@@ -47,6 +47,30 @@ static void TestDeferredGlassOwnerRefresh(){
     assert(!RememberDeferredOwner(tokens,count,Token{&entry,11,&nodeB,0}));
     assert(count==1 && DeferredOwnerMatches(tokens[0],reused));
 }
+static void TestDeferredQueueAppendProvenance(){
+    using namespace OutRunVR::QuestCockpitV2::Glass;
+    int storageA=0,storageB=0;
+    const DeferredQueueSnapshot before{&storageA,4,16};
+    assert(SameDeferredQueueAppend(before,{&storageA,4,16}));
+    assert(SameDeferredQueueAppend(before,{&storageA,16,16}));
+    assert(!SameDeferredQueueAppend(before,{&storageB,5,16}));
+    assert(!SameDeferredQueueAppend(before,{&storageA,3,16}));
+    assert(!SameDeferredQueueAppend(before,{&storageA,5,32}));
+    assert(!SameDeferredQueueAppend(before,{&storageA,17,16}));
+    assert(!SameDeferredQueueAppend(before,{nullptr,5,16}));
+    assert(!SameDeferredQueueAppend(before,{&storageA,5,16385}));
+    assert(!SameDeferredQueueAppend({&storageA,-1,16},before));
+    assert(!SameDeferredQueueAppend({&storageA,0,0},before));
+    for(unsigned slot=0;slot<16;++slot)
+        for(bool sameStorage:{false,true})
+            for(bool sameLimit:{false,true})
+                for(int count:{-1,0,3,4,5,16,17}) {
+                    const DeferredQueueSnapshot after{
+                        sameStorage?&storageA:&storageB,count,sameLimit?16:32};
+                    assert(SameDeferredQueueAppend(before,after)==
+                        (sameStorage&&sameLimit&&count>=4&&count<=16));
+                }
+}
 static void TestImmediateGlassOwnerScope(){
     using namespace OutRunVR::QuestCockpitV2::Glass;
     ScopedPlayerCallbackOwner* current=nullptr;
@@ -115,6 +139,7 @@ static void TestDeferredGlassCannotOverrideLiveCallback(){
     }
 }
 int main(){
+    TestDeferredQueueAppendProvenance();
     TestDeferredGlassCannotOverrideLiveCallback();
     TestDeferredGlassOwnerRefresh();
     TestImmediateGlassOwnerScope();
