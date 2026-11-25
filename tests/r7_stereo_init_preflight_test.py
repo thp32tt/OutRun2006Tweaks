@@ -88,7 +88,11 @@ owner_end=source.index("R7AtomicCandidatePair ExternalAtomicCandidates",owner_be
 owner=source[owner_begin:owner_end]
 assert "ExternalAtomicCandidates.Reset();" in source[source.index("void ReleaseStereoResources()"):source.index("bool CreateRightDepthForTracked(")]
 clear=source[source.index("HRESULT __stdcall ClearDest("):source.index("HRESULT __stdcall SetRenderTargetDest(")]
-assert clear.index("if(!restoreOk)") < clear.index("R7BeginExternalAtomicResourceTransaction(device,savedViewport,flags,color,z,stencil)")
+assert clear.index("if(!restoreOk||candidateDirty)") < clear.index("R7BeginExternalAtomicResourceTransaction(device,savedViewport,flags,color,z,stencil)")
+assert clear.index("R7ReplayInactiveEye(device,0") < clear.index("const HRESULT leftHr=clearCall();")
+assert clear.index("R7ReplayInactiveEye(device,1") < clear.index("if(SUCCEEDED(rightHr)&&!candidateDirty)rightHr=clearCall();")
+assert clear.index("if(SUCCEEDED(rightHr)&&!candidateDirty)rightHr=clearCall();") < clear.index("restoreOk=RestoreRightPassState(")
+assert "if(ExternalAtomicReplayEpoch!=PresentEpoch&&!FrameStereoIncomplete&&!FrameRightDrawFailed&&" in clear
 assert "Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel" in clear
 assert "SetRenderTarget" not in owner and "SetDepthStencilSurface" not in owner and "StretchRect" not in owner
 atomic_stub=r'''
