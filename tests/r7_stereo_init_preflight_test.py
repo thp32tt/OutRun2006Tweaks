@@ -543,6 +543,8 @@ std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtom
 bool R7CandidatePresentBoundaryCovered=true;
 bool R7CandidateResetBoundaryCovered=true;
 unsigned R7CandidateResetInFlight=0;
+bool chainCovered=true;
+bool R7CandidateSwapChainCovered(IDirect3DDevice9*){return chainCovered;}
 bool FormatHasStencil(D3DFORMAT){return false;}
 struct InternalPassScope{InternalPassScope(){}~InternalPassScope(){}};
 struct Hook{template<class R,class... A>R stdcall(A...){return S_OK;}}
@@ -618,6 +620,10 @@ int main(){
     assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Unavailable);
     assert(rasterCalls==0&&ExternalAtomicCandidates.allocations==0);
     R7CandidateResetInFlight=0;
+    chainCovered=false;
+    assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Unavailable);
+    assert(rasterCalls==0&&ExternalAtomicCandidates.allocations==0);
+    ++PresentEpoch;chainCovered=true;
     assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Seeded);
     assert(rasterCalls==1&&ExternalAtomicReplayEpoch==PresentEpoch);
     unsigned draws=0;auto draw=[&](){++draws;return S_OK;};
@@ -793,5 +799,98 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"reset_ex.cpp"
     exe=Path(temp)/"reset_ex"
     cpp.write_text(reset_ex_stub+reset_ex+reset_ex_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# Iter81: direct implicit chain Present and additional-chain creation are
+# independent physical owners. Execute production callbacks with COM mocks.
+chain_owner=source[source.index("HRESULT __stdcall R7CandidateAdditionalSwapChainDest("):
+                   source.index("// Direct ResetEx bypasses")]
+chain_stub=r'''
+#include <cassert>
+#include <atomic>
+#include <cstdint>
+#include <iostream>
+#define __stdcall
+using HRESULT=int;using DWORD=unsigned;using HWND=void*;
+bool SUCCEEDED(HRESULT hr){return hr>=0;}
+struct RECT{};struct RGNDATA{};struct D3DPRESENT_PARAMETERS{};
+struct IDirect3DDevice9{bool game=true;unsigned refs=0;void Release(){assert(refs);--refs;}};
+struct IDirect3DSwapChain9{
+    IDirect3DDevice9* owner=nullptr;HRESULT getHr=0;unsigned gets=0;
+    HRESULT GetDevice(IDirect3DDevice9** out){++gets;*out=owner;if(owner)++owner->refs;return getHr;}
+};
+template<class T>void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
+bool IsGameDevice(IDirect3DDevice9* d){return d&&d->game;}
+std::atomic<bool> StereoBaseCallbacksArmed{true};
+std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=9;
+bool R7CandidateAdditionalChainSeen=false;
+std::uint64_t expectedReplay=0,expectedAttempt=0;
+bool expectedAdditional=false;unsigned calls=0;HRESULT result=0;
+IDirect3DDevice9* expectedDevice=nullptr;
+IDirect3DSwapChain9* expectedChain=nullptr;
+D3DPRESENT_PARAMETERS* expectedParams=nullptr;IDirect3DSwapChain9** expectedOut=nullptr;
+const RECT *expectedSrc=nullptr,*expectedDst=nullptr;const RGNDATA* expectedDirty=nullptr;
+HWND expectedWindow=nullptr;DWORD expectedFlags=0;
+void Check(){++calls;assert(PresentEpoch==9&&ExternalAtomicReplayEpoch==expectedReplay&&
+    ExternalAtomicAllocationAttemptEpoch==expectedAttempt&&R7CandidateAdditionalChainSeen==expectedAdditional);}
+struct AdditionalHook{
+    template<class R>R stdcall(IDirect3DDevice9* d,D3DPRESENT_PARAMETERS* p,IDirect3DSwapChain9** out){
+        assert(d==expectedDevice&&p==expectedParams&&out==expectedOut);Check();return result;}
+} CandidateAdditionalSwapChainHook;
+struct PresentHook{
+    template<class R>R stdcall(IDirect3DSwapChain9* c,const RECT* s,const RECT* d,HWND w,
+        const RGNDATA* dirty,DWORD flags){
+        assert(c==expectedChain&&s==expectedSrc&&d==expectedDst&&w==expectedWindow&&
+            dirty==expectedDirty&&flags==expectedFlags);Check();
+        if(c&&c->owner)assert(!c->owner->refs);
+        return result;}
+} CandidateSwapChainPresentHook;
+'''
+chain_cases=r'''
+int main(){
+    IDirect3DDevice9 game,other;other.game=false;
+    IDirect3DSwapChain9 chain;IDirect3DSwapChain9* output=nullptr;
+    RECT src,dst;RGNDATA dirty;D3DPRESENT_PARAMETERS params;int window=0;
+    for(unsigned mask=0;mask<2048;++mask){
+        StereoBaseCallbacksArmed=!(mask&1);chain.owner=(mask&2)?&other:&game;
+        if(mask&4)chain.owner=nullptr;
+        chain.getHr=(mask&8)?-1:0;expectedChain=(mask&16)?nullptr:&chain;
+        expectedSrc=(mask&32)?&src:nullptr;expectedDst=(mask&64)?&dst:nullptr;
+        expectedWindow=(mask&128)?&window:nullptr;expectedDirty=(mask&256)?&dirty:nullptr;
+        result=(mask&512)?-1:0;expectedFlags=mask;
+        ExternalAtomicReplayEpoch=(mask&1024)?0:9;ExternalAtomicAllocationAttemptEpoch=0;
+        R7CandidateAdditionalChainSeen=false;expectedAdditional=false;calls=0;chain.gets=0;
+        bool retire=!(mask&1)&&(!expectedChain||chain.getHr<0||!chain.owner||chain.owner->game);
+        expectedReplay=retire?0:ExternalAtomicReplayEpoch;expectedAttempt=retire?9:0;
+        assert(R7CandidateSwapChainPresentDest(expectedChain,expectedSrc,expectedDst,
+            expectedWindow,expectedDirty,expectedFlags)==result);
+        assert(calls==1&&chain.gets==unsigned(!(mask&1)&&expectedChain)&&!game.refs&&!other.refs);
+    }
+    for(unsigned mask=0;mask<128;++mask){
+        StereoBaseCallbacksArmed=!(mask&1);expectedDevice=(mask&2)?&other:&game;
+        if(mask&4)expectedDevice=nullptr;
+        expectedParams=(mask&8)?&params:nullptr;expectedOut=(mask&16)?&output:nullptr;
+        result=(mask&32)?-1:0;ExternalAtomicReplayEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;
+        R7CandidateAdditionalChainSeen=bool(mask&64);calls=0;
+        bool retire=!(mask&7);
+        expectedReplay=retire?0:9;expectedAttempt=retire?9:0;
+        expectedAdditional=retire||R7CandidateAdditionalChainSeen;
+        assert(R7CandidateAdditionalSwapChainDest(expectedDevice,expectedParams,expectedOut)==result);
+        assert(calls==1&&R7CandidateAdditionalChainSeen==expectedAdditional);
+    }
+    std::cout<<"R7_SWAPCHAIN_PHYSICAL_OWNER_PASS 2176\n";
+}
+'''
+assert "SwapChainPresentVtableIndex = 3;" in source
+assert "CreateAdditionalSwapChainVtableIndex = 13;" in source
+assert "chainTarget,R7CandidateSwapChainPresentDest,disabled" in source
+assert "additionalTarget,R7CandidateAdditionalSwapChainDest,disabled" in source
+assert "R7GetImplicitChainPresentTarget(device)==R7CandidateSwapChainPresentTarget" in source
+assert "if(!R7CandidateSwapChainCovered(device))return R7CandidateSeedResult::Unavailable;" in source
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"swapchain.cpp"
+    exe=Path(temp)/"swapchain"
+    cpp.write_text(chain_stub+chain_owner+chain_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)

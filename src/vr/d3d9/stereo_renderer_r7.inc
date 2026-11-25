@@ -87,6 +87,8 @@ namespace OutRunVRStereo
 	namespace
 	{
 		constexpr std::size_t ResetVtableIndex = 16;
+        constexpr std::size_t CreateAdditionalSwapChainVtableIndex = 13;
+        constexpr std::size_t SwapChainPresentVtableIndex = 3;
 		constexpr std::size_t PresentVtableIndex = 17;
 		constexpr std::size_t PresentExVtableIndex = 121;
         constexpr std::size_t ResetExVtableIndex = 132;
@@ -118,6 +120,9 @@ namespace OutRunVRStereo
         SafetyHookInline CandidateResetExHook{};
         bool R7CandidateResetBoundaryCovered=false;
         thread_local unsigned R7CandidateResetInFlight=0;
+        SafetyHookInline CandidateSwapChainPresentHook{},CandidateAdditionalSwapChainHook{};
+        void* R7CandidateSwapChainPresentTarget=nullptr;
+        bool R7CandidateAdditionalChainSeen=false;
 		SafetyHookInline CreateDepthRetentionHook{};
 		SafetyHookInline CreateDepthRetentionExHook{};
 		SafetyHookInline UpdateSurfaceHook{};
@@ -1781,6 +1786,76 @@ namespace OutRunVRStereo
         R7AtomicCandidatePair ExternalAtomicCandidates{};
         std::uint64_t ExternalAtomicAllocationAttemptEpoch=0;
 
+        // Resolve the implicit chain's actual Present entrypoint each seed.
+        // Reset can replace the chain. Never assume a cached COM pointer or
+        // a different implementation is covered by an existing inline hook.
+        void* R7GetImplicitChainPresentTarget(IDirect3DDevice9* device) noexcept
+        {
+            if(!device||device->GetNumberOfSwapChains()!=1)return nullptr;
+            IDirect3DSwapChain9* chain=nullptr;
+            void* target=nullptr;
+            if(SUCCEEDED(device->GetSwapChain(0,&chain))&&chain){
+                void** table=*reinterpret_cast<void***>(chain);
+                target=table?table[SwapChainPresentVtableIndex]:nullptr;
+                for(unsigned slot=0;target&&slot<10;++slot)
+                    if(slot!=SwapChainPresentVtableIndex&&target==table[slot])target=nullptr;
+                // Ex exposes the inherited Present on its own interface.
+                // A distinct target or ambiguous QI must not escape coverage.
+                IDirect3DSwapChain9Ex* ex=nullptr;
+                const HRESULT qi=chain->QueryInterface(__uuidof(IDirect3DSwapChain9Ex),
+                    reinterpret_cast<void**>(&ex));
+                if(SUCCEEDED(qi)&&ex){
+                    void** exTable=*reinterpret_cast<void***>(ex);
+                    if(!exTable||exTable[SwapChainPresentVtableIndex]!=target)target=nullptr;
+                    for(unsigned slot=0;target&&slot<13;++slot)
+                        if(slot!=SwapChainPresentVtableIndex&&target==exTable[slot])target=nullptr;
+                }else if(qi!=E_NOINTERFACE||ex)target=nullptr;
+                ReleaseCom(ex);
+            }
+            ReleaseCom(chain);
+            return target;
+        }
+
+        bool R7CandidateSwapChainCovered(IDirect3DDevice9* device) noexcept
+        {
+            return !R7CandidateAdditionalChainSeen&&R7CandidateSwapChainPresentTarget&&
+                R7GetImplicitChainPresentTarget(device)==R7CandidateSwapChainPresentTarget;
+        }
+
+        // An additional chain may have an entirely different vtable.
+        // Retire the current receipt before the driver can create it; once
+        // one has been exposed, keep candidate staging disabled for this
+        // device lifetime until a multi-chain owner is implemented.
+        HRESULT __stdcall R7CandidateAdditionalSwapChainDest(IDirect3DDevice9* device,
+            D3DPRESENT_PARAMETERS* params,IDirect3DSwapChain9** out)
+        {
+            if(StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&IsGameDevice(device)){
+                ExternalAtomicReplayEpoch=0;
+                ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+                R7CandidateAdditionalChainSeen=true;
+            }
+            return CandidateAdditionalSwapChainHook.stdcall<HRESULT>(device,params,out);
+        }
+
+        // Device Present may delegate here, or the game may call the chain
+        // directly. Do not notify the host or advance the stock epoch twice.
+        HRESULT __stdcall R7CandidateSwapChainPresentDest(IDirect3DSwapChain9* chain,
+            const RECT* sourceRect,const RECT* destRect,HWND window,
+            const RGNDATA* dirty,DWORD flags)
+        {
+            if(StereoBaseCallbacksArmed.load(std::memory_order_acquire)){
+                IDirect3DDevice9* owner=nullptr;
+                const bool known=chain&&SUCCEEDED(chain->GetDevice(&owner))&&owner;
+                if(!known||IsGameDevice(owner)){
+                    ExternalAtomicReplayEpoch=0;
+                    ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+                }
+                ReleaseCom(owner);
+            }
+            return CandidateSwapChainPresentHook.stdcall<HRESULT>(chain,sourceRect,destRect,
+                window,dirty,flags);
+        }
+
         // Direct ResetEx bypasses the classic Reset/R13 resource retirement.
         // Own only inactive candidate lifetime here: nested classic owners still
         // own stock teardown, notification and state replay.
@@ -1892,6 +1967,7 @@ namespace OutRunVRStereo
             if(!R7CandidatePresentBoundaryCovered||!R7CandidateResetBoundaryCovered||
                 R7CandidateResetInFlight||ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+            if(!R7CandidateSwapChainCovered(device))return R7CandidateSeedResult::Unavailable;
             // RightEyeDepth is exclusively created by R7 with Discard=FALSE.
             // For game-owned LEFT depth, no unbind without creation proof.
             if(!R7DepthRetentionProven(TrackedDepthStencil))
@@ -3528,6 +3604,10 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			CandidatePresentExHook = {};
             R7CandidateResetBoundaryCovered=false;
             CandidateResetExHook={};
+            R7CandidateSwapChainPresentTarget=nullptr;
+            R7CandidateAdditionalChainSeen=false;
+            CandidateAdditionalSwapChainHook={};
+            CandidateSwapChainPresentHook={};
 			PresentHook = {};
 			ResetHook = {};
 			StereoInstalledDevice.store(nullptr, std::memory_order_release);
@@ -3647,6 +3727,28 @@ if(WaitForEventQuery(slot.fence,1,0u))
                     }
                 }
                 ReleaseCom(ex);
+                void* chainTarget=R7GetImplicitChainPresentTarget(device);
+                void* additionalTarget=vtable[CreateAdditionalSwapChainVtableIndex];
+                // Device and chain callbacks have different ABI signatures.
+                for(unsigned slot=0;slot<119;++slot){
+                    if(chainTarget&&chainTarget==vtable[slot])chainTarget=nullptr;
+                    if(slot!=CreateAdditionalSwapChainVtableIndex&&additionalTarget==vtable[slot])
+                        additionalTarget=nullptr;
+                }
+                if(chainTarget&&additionalTarget){
+                    CandidateSwapChainPresentHook=safetyhook::create_inline(
+                        chainTarget,R7CandidateSwapChainPresentDest,disabled);
+                    CandidateAdditionalSwapChainHook=safetyhook::create_inline(
+                        additionalTarget,R7CandidateAdditionalSwapChainDest,disabled);
+                    if(CandidateSwapChainPresentHook&&CandidateAdditionalSwapChainHook&&
+                        CandidateSwapChainPresentHook.enable().has_value()&&
+                        CandidateAdditionalSwapChainHook.enable().has_value())
+                        R7CandidateSwapChainPresentTarget=chainTarget;
+                    else{
+                        CandidateAdditionalSwapChainHook={};
+                        CandidateSwapChainPresentHook={};
+                    }
+                }
                 if(freshDevice)R7CaptureFreshAutomaticDepth(device);
             }
 			IDirect3DVertexShader9*shader=nullptr;
