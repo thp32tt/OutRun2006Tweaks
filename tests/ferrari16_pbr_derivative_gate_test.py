@@ -43,6 +43,19 @@ def safe_unit(v: tuple[float, float, float],
     return tuple(x / sqrt(max(length_sq, floor)) for x in v)
 
 
+def basis_handedness(n, t, b):
+    # T is already Gram-Schmidt projected, N is unit length.
+    cross = (n[1]*t[2]-n[2]*t[1], n[2]*t[0]-n[0]*t[2],
+             n[0]*t[1]-n[1]*t[0])
+    orientation = sum(x*y for x, y in zip(cross, b))
+    tsq = sum(x*x for x in t)
+    bsq = sum(x*x for x in b)
+    if not (tsq > 1.e-12 and bsq > 1.e-12 and
+            orientation*orientation > tsq*bsq*1.e-8):
+        return 0  # keep base normal, no normal-map perturbation
+    return -1 if orientation < 0 else 1
+
+
 def main() -> None:
     shader = SHADER.read_text()
     assert "o.worldNormal = normalize(mul(" not in shader
@@ -79,13 +92,34 @@ def main() -> None:
     assert "det*det > gradientArea2*1.e-8" in shader
     assert "abs(det) > 0.0000001" not in shader
     assert "tangentSq > 1.e-12" in shader
-    assert "dot(derivativeB,derivativeB) > 1.e-12" in shader
+    assert "float bitangentSq = dot(derivativeB,derivativeB);" in shader
+    assert "float orientation = dot(cross(N,T),derivativeB);" in shader
+    assert "bitangentSq > 1.e-12" in shader
+    assert "orientation*orientation > tangentSq*bitangentSq*1.e-8" in shader
     assert "T *= rsqrt(tangentSq);" in shader
-    assert "handedness = dot(cross(N,T),derivativeB) < 0" in shader
+    assert "handedness = orientation < 0" in shader
+    assert "handedness = dot(cross(N,T),derivativeB) < 0" not in shader
+    for _car in (*range(15), 28):
+        for _eye in (0, 1):
+            for scale in (.01, 1., 100.):
+                t = (scale, 0., 0.)
+                # Valid ordinary and mirrored UVs, including skewed B.
+                assert basis_handedness((0., 0., 1.), t, (0., scale, 0.)) == 1
+                assert basis_handedness((0., 0., 1.), t, (0., -scale, 0.)) == -1
+                assert basis_handedness((0., 0., 1.), t, (scale, scale, 0.)) == 1
+                # XY surface with imported normal along Y: T and B are
+                # individually nonzero but N/T/B span only two dimensions.
+                assert basis_handedness((0., 1., 0.), t, (0., scale, 0.)) == 0
+                assert basis_handedness((0., 1., 0.), t, (0., -scale, 0.)) == 0
+                assert basis_handedness((0., 0., 1.), t, (scale, 0., 0.)) == 0
+                assert basis_handedness((0., 0., 1.), t, (scale, scale*1.e-6, 0.)) == 0
+                assert basis_handedness((0., 0., 1.), t, (0., 0., 0.)) == 0
+                assert basis_handedness((0., 0., 1.), (0., 0., 0.), (0., scale, 0.)) == 0
     assert "mapN.xy *= factors.z;" in shader
     strength_gate = shader.index("if (factors.w > 0.5 && factors.z > 0.0 &&")
     sample_pos = shader.index("tex2D(normalMap,input.uv)")
-    assert strength_gate < sample_pos
+    orientation_gate = shader.index("orientation*orientation > tangentSq*bitangentSq*1.e-8")
+    assert strength_gate < orientation_gate < sample_pos
     assert "float3 mappedN = mapN.x*T+mapN.y*B+mapN.z*N;" in shader
     assert "float mappedSq = dot(mappedN,mappedN);" in shader
     assert "if (mappedSq > 1.e-12) N = mappedN * rsqrt(mappedSq);" in shader

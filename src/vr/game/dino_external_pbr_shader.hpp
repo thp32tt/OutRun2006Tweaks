@@ -107,9 +107,15 @@ float4 mainPS(PixelIn input) : COLOR0 {
         T = T-N*dot(N,T);
         float tangentSq = dot(T,T);
         float3 derivativeB = (dpdy*dtdx.x-dpdx*dtdy.x)/det;
-        if (tangentSq > 1.e-12 && dot(derivativeB,derivativeB) > 1.e-12) {
+        // A nonzero B derivative alone does not establish handedness:
+        // it may lie in the N/T plane when imported normals are tangential.
+        // Reject an ambiguous orientation instead of inventing a positive sign.
+        float bitangentSq = dot(derivativeB,derivativeB);
+        float orientation = dot(cross(N,T),derivativeB);
+        if (tangentSq > 1.e-12 && bitangentSq > 1.e-12 &&
+            orientation*orientation > tangentSq*bitangentSq*1.e-8) {
             T *= rsqrt(tangentSq);
-            float handedness = dot(cross(N,T),derivativeB) < 0 ? -1.0 : 1.0;
+            float handedness = orientation < 0 ? -1.0 : 1.0;
             float3 B = normalize(cross(N,T))*handedness;
             float3 mapN = tex2D(normalMap,input.uv).xyz*2.0-1.0;
             mapN.xy *= factors.z;
