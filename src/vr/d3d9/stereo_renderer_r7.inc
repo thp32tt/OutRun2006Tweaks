@@ -2112,7 +2112,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
         // InternalStereoPass alone cannot identify the eye or mono backup.
         template<class DrawCall>
         HRESULT R7ExecuteRawCandidateVb(IDirect3DDevice9* device,DrawCall&& drawCall,
-            bool up=false,bool indexedUp=false) noexcept
+            bool up=false,bool indexedUp=false,DWORD clearFlags=0) noexcept
         {
             if(!IsGameDevice(device)||ExternalAtomicReplayEpoch!=PresentEpoch){
                 RevokeDepthClearReplayBeforeLeftDraw(device);
@@ -2133,6 +2133,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 else if(rt==RightEyeSurface&&depth==RightEyeDepth)eye=1;
             }
             RevokeDepthClearReplayBeforeLeftDraw(device,eye>=0);
+            // Internal Clear may write LEFT depth regardless of the current
+            // depth/stencil render-state write masks. Only proven RIGHT
+            // attachment identity exempts the previous LEFT clear receipt.
+            if(clearFlags&&eye!=1)
+                LastMainDepthClearStamp.OnPotentialWrite(clearFlags&(D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL));
             if(eye>=0){
                 const auto result=R7ReplayInactiveDraw(device,
                     static_cast<unsigned>(eye),rt,depth,drawCall,up,indexedUp);
@@ -2171,7 +2176,10 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			if(savedViewport.X!=0||savedViewport.Y!=0||
 				savedViewport.Width!=BackBufferDesc.Width||
 				savedViewport.Height!=BackBufferDesc.Height)return false;
-			IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT clearHr=E_FAIL;bool restoreOk=true;{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&SUCCEEDED(device->SetViewport(&savedViewport)))clearHr=ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),replayFlags,0,LastMainDepthClearZ,LastMainDepthClearStencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}
+			// The bootstrap raw RIGHT clear is not a mirrored scene replay.
+            // Retire the candidate receipt before any possible live write.
+            ExternalAtomicReplayEpoch=0;
+            IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT clearHr=E_FAIL;bool restoreOk=true;{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&SUCCEEDED(device->SetViewport(&savedViewport)))clearHr=ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),replayFlags,0,LastMainDepthClearZ,LastMainDepthClearStencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}
 			// A failed restore is not an ordinary unavailable depth replay.
 			// The live device may still target RIGHT; never certify this frame
 			// or retry the clear from the same now-untrusted receipt.
@@ -2845,7 +2853,16 @@ if(WaitForEventQuery(slot.fence,1,0u))
 
 		HRESULT __stdcall ClearDest(IDirect3DDevice9*device,DWORD count,const D3DRECT*rects,DWORD flags,D3DCOLOR color,float z,DWORD stencil)
 		{
-			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device)||InternalStereoPass)return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);
+			if(!IsGameDevice(device))
+                return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);
+            if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)){
+                ExternalAtomicReplayEpoch=0;
+                return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);
+            }
+            if(InternalStereoPass){
+                auto call=[&](){return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);};
+                return R7ExecuteRawCandidateVb(device,call,false,false,flags);
+            }
             // Revoke old receipts even for partial/offscreen or failed LEFT clears.
             // Only a subsequent successful full main clear can record a new one.
             ExternalAtomicReplayEpoch=0;

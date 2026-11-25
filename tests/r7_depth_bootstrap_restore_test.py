@@ -60,6 +60,7 @@ OutRunVR::DepthClearReplayStamp LastMainDepthClearStamp{};
 bool RightDepthSynchronized=false,RightStencilSynchronized=false,FirstDepthBootstrapLogged=true;
 unsigned DepthBootstrapAttempts=0,DepthBootstrapSuccesses=0;
 std::uint64_t PresentEpoch=7;
+std::uint64_t ExternalAtomicReplayEpoch=0;
 float LastMainDepthClearZ=1;
 DWORD LastMainDepthClearStencil=0;
 bool DepthDescMatches(const D3DSURFACE_DESC& a,const D3DSURFACE_DESC& b){
@@ -81,7 +82,9 @@ int main(){
         RightDepthSynchronized=RightStencilSynchronized=false;
         LastMainDepthClearStamp.Record(7,6);
         bool dirty=true;
+        ExternalAtomicReplayEpoch=7;
         const bool ok=TryBootstrapRightDepthFromRecentClear(&dev,&dirty);
+        assert(ExternalAtomicReplayEpoch==0);
         assert(ok==(failure==0));
         const bool restoreFailed=failure>=5;
         assert(dirty==restoreFailed && notes==unsigned(restoreFailed));
@@ -125,7 +128,12 @@ std::atomic<bool> StereoBaseCallbacksArmed{true};
 bool InternalStereoPass=false, wanted=true, backbuffer=true,
     mrt=false, resources=true, coverage=true, FrameRightDrawFailed=false;
 unsigned coverageCalls=0, poisons=0, candidateCalls=0;
-std::uint64_t ExternalAtomicReplayEpoch=0;
+unsigned internalClearCalls=0;
+DWORD internalClearFlags=0;
+template<class Call> HRESULT R7ExecuteRawCandidateVb(IDirect3DDevice9*,Call&& call,bool up,bool indexed,DWORD flags){
+    assert(!up&&!indexed);++internalClearCalls;internalClearFlags=flags;
+    return call();
+}
 namespace Settings { bool VRExternalFerrariTest=false,VRF50ExternalModel=false; }
 enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
 R7CandidateSeedResult candidateResult=R7CandidateSeedResult::Unavailable;
@@ -161,6 +169,8 @@ void ResetProbe(unsigned failure){
     FrameRightDrawFailed=false;
     LastMainDepthClearStamp.Record(PresentEpoch,6);
     wanted=backbuffer=resources=coverage=true;mrt=false;
+    InternalStereoPass=false;StereoBaseCallbacksArmed=true;
+    internalClearCalls=internalClearFlags=0;ExternalAtomicReplayEpoch=0;
 }
 int main(){
     IDirect3DDevice9 dev;
@@ -212,6 +222,15 @@ int main(){
     assert(ClearDest(&dev,0,nullptr,1,0,1.f,0)==D3D_OK&&candidateCalls==0);
     ResetProbe(5);Settings::VRF50ExternalModel=true;
     assert(ClearDest(&dev,0,nullptr,7,0,1.f,0)==D3D_OK&&candidateCalls==0);
+    for(DWORD flags:{1u,2u,4u,7u})
+        for(unsigned failure:{0u,1u}){
+            ResetProbe(failure);InternalStereoPass=true;ExternalAtomicReplayEpoch=7;
+            assert(ClearDest(&dev,0,nullptr,flags,0,1.f,0)==(failure?E_FAIL:D3D_OK));
+            assert(step==1&&internalClearCalls==1&&internalClearFlags==flags);
+        }
+    ResetProbe(0);StereoBaseCallbacksArmed=false;ExternalAtomicReplayEpoch=7;
+    assert(ClearDest(&dev,0,nullptr,7,0,1.f,0)==D3D_OK);
+    assert(step==1&&internalClearCalls==0&&ExternalAtomicReplayEpoch==0);
     std::cout<<"R7_CLEAR_RESTORE_RECEIPT_PASS\n";
 }
 '''

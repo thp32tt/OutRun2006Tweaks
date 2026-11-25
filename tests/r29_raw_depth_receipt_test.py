@@ -331,6 +331,50 @@ int main() {
         for(auto* surface:{&leftColor,&leftDepth,&rightColor,&rightDepth,&otherColor,&otherDepth})assert(surface->refs==0);
         ++cases;
     }
+    // Actual raw replay owner used by the internal Clear entrypoint.
+    // Clear flags, not render-state masks, govern the LEFT receipt.
+    for(DWORD flags:{1u,2u,4u,7u})
+    for(unsigned scenario=0;scenario<10;++scenario){
+        game.rt=&leftColor;game.depth=&leftDepth;
+        game.rtFail=game.depthFail=false;aux=false;mainTarget=true;
+        FrameStereoIncomplete=FrameRightDrawFailed=false;
+        ActiveOcclusionQueries=0;OcclusionQueryTrackingUnavailable=false;
+        OutRunVR::DinoSidecar::ActiveExternalStereoMesh=false;
+        InternalStereoPass=true;ExternalAtomicReplayEpoch=77;
+        LastMainDepthClearStamp.Record(77,6);writes=0;
+        replayCalls=calls=restoreFailures=0;replayEye=99;
+        RightDepthSynchronized=RightStencilSynchronized=true;
+        replayResult=R7CandidateSeedResult::Seeded;injected=candidateInjected=0;
+        switch(scenario){
+        case 1:game.rt=&rightColor;game.depth=&rightDepth;break;
+        case 2:game.depth=&rightDepth;break;
+        case 3:game.rtFail=true;break;
+        case 4:replayResult=R7CandidateSeedResult::Unavailable;break;
+        case 5:replayResult=R7CandidateSeedResult::DirtyRestore;break;
+        case 6:injected=-17;break;
+        case 7:candidateInjected=-17;break;
+        case 8:ActiveOcclusionQueries=1;break;
+        case 9:ExternalAtomicReplayEpoch=0;break;
+        }
+        unsigned candidateClears=0;
+        auto clear=[&](){
+            if(inReplay){++candidateClears;return candidateInjected;}
+            ++calls;return injected;
+        };
+        const auto hr=R7ExecuteRawCandidateVb(&game,clear,false,false,flags);
+        const bool dirty=scenario==5;
+        const bool replay=scenario<=1||(scenario>=4&&scenario<=7);
+        assert(replayCalls==unsigned(replay));
+        assert(candidateClears==unsigned(replay&&scenario!=4&&scenario!=5));
+        assert(calls==unsigned(!dirty)&&restoreFailures==unsigned(dirty));
+        assert(hr==(dirty?E_FAIL:injected));
+        assert(ExternalAtomicReplayEpoch==(scenario<=1?77u:0u));
+        const DWORD expected=dirty?0u:(scenario==1||scenario==9?6u:(6u&~flags));
+        assert(LastMainDepthClearStamp.flags==expected);
+        assert(RightDepthSynchronized==!dirty&&RightStencilSynchronized==!dirty);
+        for(auto* surface:{&leftColor,&leftDepth,&rightColor,&rightDepth,&otherColor,&otherDepth})assert(surface->refs==0);
+        ++cases;
+    }
     std::cout << "R29_RAW_DEPTH_RECEIPT_PASS " << cases << "\\n";
 }
 '''
