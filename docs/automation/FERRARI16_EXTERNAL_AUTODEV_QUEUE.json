@@ -3011,7 +3011,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER42-R29-RAW-DEPTH-RECEIPT",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "R30/R33 direct/raw Draw and DIP bypass; HRESULT, state and fallback preservation",
           "source_material_sha": "97a8f99a528ed3d32a1cb460963860df0cac6e97",
           "source_blob_sha1": {
@@ -3054,20 +3054,95 @@
           "protected_v003": "Only four reviewed R29 wrapper insertions plus test and CI exact-source guard on automation branch. Protected v0.03 release, ABI, host, PBR shaders, assets, deployment and external live-raster fence unchanged. R7 helper can add state probes only with current receipt. Internal LEFT under other scopes and whole-car atomic fallback remain to be audited; no runtime or FPS claim. Local DNS failed; N100 used only for small isolated C++ test and read-only fetches, no full build.",
           "asset_validation": "No private source/processed asset SHA, 16 actual vehicle geometry/material/rights validation or promotion. Synthetic boundary tests are not per-vehicle QA.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; previous iteration41 credited once 2915+1=2916 ledger d9c596972af6324ad80d1a4d2d862a92296c3e97",
-          "next_trace": "Trace R29/R30/R33 InternalStereoPass ownership and restoration failure after actual LEFT/RIGHT, including R30 deferred particle draw accounting and direct offscreen depth attachment transitions. Confirm iteration42 exact SHA Windows CI. Preserve external raster fence until whole-vehicle isolated bilateral color/depth staging is proven."
+          "score_state": "CREDITED_ONCE_AI2_2916_PLUS_1_EQUALS_2917_LEDGER_2c7cf574628b8f7f0220fec7479d5ce161a22934",
+          "next_trace": "Trace R29/R30/R33 InternalStereoPass ownership and restoration failure after actual LEFT/RIGHT, including R30 deferred particle draw accounting and direct offscreen depth attachment transitions. Confirm iteration42 exact SHA Windows CI. Preserve external raster fence until whole-vehicle isolated bilateral color/depth staging is proven.",
+          "followup_exact_sha_ci": {
+            "sha": "97a8f99a528ed3d32a1cb460963860df0cac6e97",
+            "runs": [
+              {
+                "id": 45537212663,
+                "conclusion": "success"
+              },
+              {
+                "id": 45537212611,
+                "conclusion": "success"
+              },
+              {
+                "id": 45537212586,
+                "conclusion": "success"
+              },
+              {
+                "id": 45537212656,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success"
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER43-RETAIL-GLASS-CALLBACK-SCOPE",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Retail x86 body wrapper ABI 46BD30/469600: preserve stock dashboard, shadow, passengers and glass",
+          "source_material_sha": "9a5266e7694768805c594b56e752b6bd58e254b5",
+          "source_blob_sha1": {
+            "src/vr/game/quest_cockpit_v2_glass_hook.hpp": "23eb5c17c3ba99e80b2a764fa64d10fcb0ef8aae",
+            "src/hooks_graphics.cpp": "734174b34876b40b4f3d39513154e13a3dc5723c",
+            "tests/external_car_original_wrapper_contract_test.cpp": "58691aac7ffc994c4a6c9f4b2bfb079b004dd415",
+            ".github/workflows/ferrari16-multicar-regression.yml": "d647ac0b77d578b9465c9e441bc4ec5a97960351"
+          },
+          "source_defect": "Immediate glass material owner was PlayerDepth>0 regardless of the live native epoch or whether a nested original vehicle callback was admitted. Source-level counterexamples: stale epoch 8 while an epoch-7 scope remains on stack; nested non-player callback while outer player scope active. An outer queue delta can also claim nested nonplayer entries. No evidence these conditions occur in canonical retail gameplay or caused user-visible stereo/FPS regression.",
+          "source_fix": "Replace depth-only TLS with ScopedPlayerCallbackOwner RAII chain. Each nested callback masks outer immediate ownership even if not admitted; only an admitted same-epoch callback is immediate owner; unwind restores outer pointer. Reject outer queue delta capture after nested callbacks because ownership cannot be separated. Existing exact deferred-token checks and CaptureAfter active-epoch gate remain. Original trampoline runs once unchanged. Add positive/negative helper regression and exact production integration assertions to existing CI.",
+          "positive_negative_regressions": [
+            "Local g++ C++17 -Wall -Wextra -Werror -pedantic ASan/UBSan compiled and ran manually copied new scope helper and test fragment: 16 synthetic labels x two nested-owner cases, normal admission, unadmitted scope, epoch 0 and changed epoch rejection, nested player/nonplayer masking, ambiguous outer capture rejection, restored parent and null final owner. Old nonzero-depth predicate counterexamples reproduced for stale epoch and nested nonplayer. No full locally compiled committed suite or live game execution.",
+            "Fetched exact committed GitHub blobs; checked original trampoline exactly once, no old PlayerDepth, new epoch predicate present. Existing CI invokes full wrapper suite and adds source assertions."
+          ],
+          "call_graph_trace": [
+            "Read r4dius/outrun2-decomp@e1e1c592b802a6f3f7020a676abd3ba1be479e62 pc_vehicle_display.cpp lines 71-104 and vehicle_model_draw.cpp lines 386-450. 46BD30 changes lighting and matrix then 469600 emits PMT and shadow queue leaves; layout+0 in vm=1, alternative layout+4 in vm=2, steering/roof/shadow separately recorded. No part/material-specific attestation sufficient for independent body replacement.",
+            "49F3E0 -> 46BD30 and 49A650 remains one original cdecl trampoline per wrapper. No new retail EXE read or new body-only hook; passenger, stock dashboard and shadow callbacks not suppressed."
+          ],
+          "same_sha_ci": {
+            "sha": "9a5266e7694768805c594b56e752b6bd58e254b5",
+            "runs": [
+              {
+                "id": 45540750918,
+                "name": "Build",
+                "status": "in_progress"
+              },
+              {
+                "id": 45540750890,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress"
+              },
+              {
+                "id": 45540751010,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress"
+              },
+              {
+                "id": 45540751011,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress"
+              }
+            ],
+            "conclusion": "PENDING"
+          },
+          "protected_v003": "Automation branch only. No stable release, x86 trampoline ABI, game PMT geometry, passenger/shadow/dashboard renderer, PBR shaders, host, launcher, models or deployment changes. Ambiguous nested outer glass entries are conservatively left stock; actual nested frequency and appearance unmeasured. Live external raster gate still false. Local GitHub DNS failed; N100 used only for read-only exact-SHA CI API query, no build.",
+          "asset_validation": "No private source/processed asset SHA or rights inspected; 16 repetitions are synthetic, not individual asset QA. No model promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration42 credited once 2916+1=2917 ledger 2c7cf574628b8f7f0220fec7479d5ce161a22934",
+          "next_trace": "Trace v0.03 vs current menu/theatre focus and native frame begin/end plus R29/R30/R33 direct offscreen depth ownership. Review exact SHA iteration43 CI; continue separately with per-slot PBR and isolated whole-vehicle L/R color/depth staging; never promote body-only substitution without verified leaf ownership."
         }
       ],
-      "latest_material_sha": "97a8f99a528ed3d32a1cb460963860df0cac6e97",
-      "latest_static_ci": "Iteration42 1536 mock physical-boundary cases PASS, old-wrapper mutation reproduces defect, exact blob hashes verified, Windows and all four workflows pending. Iteration41 all exact SHA CI success.",
-      "next_focus": "Trace R29/R30/R33 InternalStereoPass ownership and restoration failure after actual LEFT/RIGHT, including R30 deferred particle draw accounting and direct offscreen depth attachment transitions. Confirm iteration42 exact SHA Windows CI. Preserve external raster fence until whole-vehicle isolated bilateral color/depth staging is proven."
+      "latest_material_sha": "9a5266e7694768805c594b56e752b6bd58e254b5",
+      "latest_static_ci": "Iteration43 local scoped helper ASan/UBSan pass; exact committed source integration checks pass; all four exact SHA workflows in progress. Iteration42 exact SHA all four success.",
+      "next_focus": "Trace v0.03 vs current menu/theatre focus and native frame begin/end plus R29/R30/R33 direct offscreen depth ownership. Review exact SHA iteration43 CI; continue separately with per-slot PBR and isolated whole-vehicle L/R color/depth staging; never promote body-only substitution without verified leaf ownership."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25 12:00:00+09:00",
+  "last_updated_kst": "2026-11-25 12:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
