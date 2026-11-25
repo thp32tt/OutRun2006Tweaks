@@ -1517,15 +1517,17 @@ namespace OutRunVRStereo
     HRESULT R29OwnerCallRawDrawPrimitive(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
     {
-        RevokeDepthClearReplayBeforeLeftDraw(d);
-        return DrawPrimitiveHook.stdcall<HRESULT>(d, t, s, p);
+        return R7ExecuteRawCandidateVb(d,[&](){
+            return DrawPrimitiveHook.stdcall<HRESULT>(d, t, s, p);
+        });
     }
     HRESULT R29OwnerCallRawDrawIndexedPrimitive(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, INT b,
         UINT m, UINT n, UINT s, UINT p) noexcept
     {
-        RevokeDepthClearReplayBeforeLeftDraw(d);
-        return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);
+        return R7ExecuteRawCandidateVb(d,[&](){
+            return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);
+        });
     }
     HRESULT R29OwnerCallRawDrawPrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,

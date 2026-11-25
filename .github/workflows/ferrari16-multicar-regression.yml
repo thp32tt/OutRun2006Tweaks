@@ -422,6 +422,11 @@ jobs:
           for before, after in [(b'R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept', b'R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device, bool* restoreFailed) noexcept'), (b'return TryBootstrapRightDepthFromRecentClear(device);', b'return TryBootstrapRightDepthFromRecentClear(device, restoreFailed);')]:
               assert expected29.count(before) == 1
               expected29 = expected29.replace(before, after, 1)
+          # Iter65: raw VB calls use attachment-identified R7 replay; UP revocation remains exact.
+          for before, after in [(b'        RevokeDepthClearReplayBeforeLeftDraw(d);\n        return DrawPrimitiveHook.stdcall<HRESULT>(d, t, s, p);', b'        return R7ExecuteRawCandidateVb(d,[&](){\n            return DrawPrimitiveHook.stdcall<HRESULT>(d, t, s, p);\n        });'), (b'        RevokeDepthClearReplayBeforeLeftDraw(d);\n        return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);', b'        return R7ExecuteRawCandidateVb(d,[&](){\n            return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);\n        });')]:
+              before, after = before.replace(b'\n',nl29), after.replace(b'\n',nl29)
+              assert expected29.count(before) == 1
+              expected29 = expected29.replace(before,after,1)
           assert Path(r29path).read_bytes() == expected29, 'Unreviewed R29 change'
           paths = {
               'src/vr/d3d9/stereo_renderer_r32.cpp': ('R32Review', False),

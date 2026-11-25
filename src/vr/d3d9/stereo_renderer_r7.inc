@@ -2080,6 +2080,49 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		}
 
 		void NoteRestoreFailure(const char* what){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailureRestoreFailed);++RestoreFailures;if(!FirstRestoreFailureLogged){FirstRestoreFailureLogged=true;spdlog::warn("VR stereo: renderer state restore failed at {}; frame forced to mono fallback",what);}}
+        // Raw R29/R30 VB owners already selected the eye and shader state.
+        // InternalStereoPass alone cannot identify the eye or mono backup.
+        template<class DrawCall>
+        HRESULT R7ExecuteRawCandidateVb(IDirect3DDevice9* device,DrawCall&& drawCall) noexcept
+        {
+            if(!IsGameDevice(device)||ExternalAtomicReplayEpoch!=PresentEpoch){
+                RevokeDepthClearReplayBeforeLeftDraw(device);
+                return drawCall();
+            }
+            IDirect3DSurface9* rt=nullptr;
+            IDirect3DSurface9* depth=nullptr;
+            int eye=-1;
+            if(!FrameStereoIncomplete&&!FrameRightDrawFailed&&
+                !AnyAuxRenderTargetActive()&&
+                !OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)&&
+                ActiveOcclusionQueries.load(std::memory_order_acquire)==0&&
+                !OutRunVR::DinoSidecar::ActiveExternalStereoMesh&&
+                TargetIsBackBuffer()&&
+                SUCCEEDED(device->GetRenderTarget(0,&rt))&&rt&&
+                SUCCEEDED(device->GetDepthStencilSurface(&depth))&&depth){
+                if(rt==TrackedRenderTarget&&depth==TrackedDepthStencil)eye=0;
+                else if(rt==RightEyeSurface&&depth==RightEyeDepth)eye=1;
+            }
+            RevokeDepthClearReplayBeforeLeftDraw(device,eye>=0);
+            if(eye>=0){
+                const auto result=R7ReplayInactiveEye(device,
+                    static_cast<unsigned>(eye),rt,depth,drawCall);
+                ReleaseCom(depth);ReleaseCom(rt);
+                if(result!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
+                if(result==R7CandidateSeedResult::DirtyRestore){
+                    LastMainDepthClearStamp.Invalidate();
+                    RightDepthSynchronized=false;RightStencilSynchronized=false;
+                    NoteRestoreFailure("external inactive raw VB replay");
+                    return E_FAIL; // attachment restoration not proven
+                }
+            }else{
+                ReleaseCom(depth);ReleaseCom(rt);
+            }
+            const HRESULT hr=drawCall();
+            if(FAILED(hr))ExternalAtomicReplayEpoch=0;
+            return hr;
+        }
+
 		bool RestoreRightPassState(IDirect3DDevice9* device,IDirect3DSurface9* savedRt,IDirect3DSurface9* savedDepth,const D3DVIEWPORT9& savedViewport,const float* originalConstants,bool restoreWvp){bool ok=true;if(savedRt&&FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,savedRt)))ok=false;const HRESULT depthHr=SetDepthStencilSurfaceHook?SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,savedDepth):device->SetDepthStencilSurface(savedDepth);if(FAILED(depthHr))ok=false;if(FAILED(device->SetViewport(&savedViewport)))ok=false;if(restoreWvp&&!RestoreWvpOneRegisterAtATime(device,originalConstants))ok=false;return ok;}
 		bool TryBootstrapRightDepthFromRecentClear(IDirect3DDevice9*device,
 			bool* restoreFailed=nullptr)
