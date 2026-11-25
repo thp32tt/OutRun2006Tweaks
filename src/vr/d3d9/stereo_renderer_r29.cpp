@@ -547,7 +547,13 @@ namespace OutRunVRStereo
             if (TrackedDepthStencil &&
                 (!RightDepthSynchronized || !RightStencilSynchronized))
             {
-                TryBootstrapRightDepthFromRecentClear(device);
+                bool bootstrapRestoreFailed = false;
+                TryBootstrapRightDepthFromRecentClear(device, &bootstrapRestoreFailed);
+                if (bootstrapRestoreFailed)
+                {
+                    R29ArmMonoSafety();
+                    return E_FAIL;
+                }
                 if ((!RightDepthSynchronized && DepthTestActive(device)) ||
                     (!RightStencilSynchronized && StencilTestActive(device)))
                 {

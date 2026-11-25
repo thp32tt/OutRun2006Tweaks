@@ -25,6 +25,7 @@ jobs:
           python3 tools/ferrari16/verify_original_player_callback_abi.py --self-test
           python3 tests/r29_raw_depth_receipt_test.py
           python3 tests/r30_shadow_descriptor_cache_test.py
+          python3 tests/r7_depth_bootstrap_restore_test.py
           python3 tests/ferrari16_pbr_material_gate_test.py
           python3 tests/ferrari16_pbr_derivative_gate_test.py
           python3 tests/ferrari16_overlay_status_test.py
@@ -404,7 +405,13 @@ jobs:
           import re
           raw29, count29 = re.subn(rb'(?m)^        return Draw(?:Indexed)?Primitive(?:UP)?Hook\.stdcall<HRESULT>\(', lambda m: b'        RevokeDepthClearReplayBeforeLeftDraw(d);'+nl29+m.group(0),raw29)
           assert count29 == 4
-          assert Path(r29path).read_bytes() == old29[:begin29]+raw29+old29[end29:], 'Unreviewed R29 change'
+          expected29 = old29[:begin29]+raw29+old29[end29:]
+          # Iter51: exact dirty-bootstrap veto; keep all other R29 bytes pinned.
+          marker29 = b'                TryBootstrapRightDepthFromRecentClear(device);'
+          assert expected29.count(marker29) == 1
+          patch29 = nl29.join([b'                bool bootstrapRestoreFailed = false;', b'                TryBootstrapRightDepthFromRecentClear(device, &bootstrapRestoreFailed);', b'                if (bootstrapRestoreFailed)', b'                {', b'                    R29ArmMonoSafety();', b'                    return E_FAIL;', b'                }'])
+          expected29 = expected29.replace(marker29,patch29,1)
+          assert Path(r29path).read_bytes() == expected29, 'Unreviewed R29 change'
           paths = {
               'src/vr/d3d9/stereo_renderer_r32.cpp': ('R32Review', False),
               'src/vr/core/r32_review_api.hpp': ('R32Review', True),

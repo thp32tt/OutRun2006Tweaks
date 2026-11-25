@@ -1849,10 +1849,12 @@ if(WaitForEventQuery(slot.fence,1,0u))
 
 		void NoteRestoreFailure(const char* what){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailureRestoreFailed);++RestoreFailures;if(!FirstRestoreFailureLogged){FirstRestoreFailureLogged=true;spdlog::warn("VR stereo: renderer state restore failed at {}; frame forced to mono fallback",what);}}
 		bool RestoreRightPassState(IDirect3DDevice9* device,IDirect3DSurface9* savedRt,IDirect3DSurface9* savedDepth,const D3DVIEWPORT9& savedViewport,const float* originalConstants,bool restoreWvp){bool ok=true;if(savedRt&&FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,savedRt)))ok=false;const HRESULT depthHr=SetDepthStencilSurfaceHook?SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,savedDepth):device->SetDepthStencilSurface(savedDepth);if(FAILED(depthHr))ok=false;if(FAILED(device->SetViewport(&savedViewport)))ok=false;if(restoreWvp&&!RestoreWvpOneRegisterAtATime(device,originalConstants))ok=false;return ok;}
-		bool TryBootstrapRightDepthFromRecentClear(IDirect3DDevice9*device)
+		bool TryBootstrapRightDepthFromRecentClear(IDirect3DDevice9*device,
+			bool* restoreFailed=nullptr)
 		{
+			if(restoreFailed)*restoreFailed=false;
 			++DepthBootstrapAttempts;
-			if(!device||!RightEyeSurface||!RightEyeDepth||!TrackedDepthStencil||!LastMainDepthClearStamp.Current(PresentEpoch))return false;
+			if(!device||!RightEyeSurface||!RightEyeDepth||!TrackedRenderTarget||!TrackedDepthStencil||!LastMainDepthClearStamp.Current(PresentEpoch))return false;
 			D3DSURFACE_DESC leftDesc{},rightDesc{};if(FAILED(TrackedDepthStencil->GetDesc(&leftDesc))||FAILED(RightEyeDepth->GetDesc(&rightDesc)))return false;
 			if(!DepthDescMatches(leftDesc,rightDesc)||!DepthDescMatches(leftDesc,LastMainDepthClearDesc))return false;
 			DWORD replayFlags=0;if(!RightDepthSynchronized&&(LastMainDepthClearStamp.flags&D3DCLEAR_ZBUFFER))replayFlags|=D3DCLEAR_ZBUFFER;if(!RightStencilSynchronized&&(LastMainDepthClearStamp.flags&D3DCLEAR_STENCIL)&&FormatHasStencil(leftDesc.Format))replayFlags|=D3DCLEAR_STENCIL;if(!replayFlags)return false;
@@ -1864,7 +1866,18 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			if(savedViewport.X!=0||savedViewport.Y!=0||
 				savedViewport.Width!=BackBufferDesc.Width||
 				savedViewport.Height!=BackBufferDesc.Height)return false;
-			IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT clearHr=E_FAIL;bool restoreOk=true;{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&SUCCEEDED(device->SetViewport(&savedViewport)))clearHr=ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),replayFlags,0,LastMainDepthClearZ,LastMainDepthClearStencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}if(FAILED(clearHr)||!restoreOk)return false;
+			IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT clearHr=E_FAIL;bool restoreOk=true;{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&SUCCEEDED(device->SetViewport(&savedViewport)))clearHr=ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),replayFlags,0,LastMainDepthClearZ,LastMainDepthClearStencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}
+			// A failed restore is not an ordinary unavailable depth replay.
+			// The live device may still target RIGHT; never certify this frame
+			// or retry the clear from the same now-untrusted receipt.
+			if(!restoreOk){
+				if(restoreFailed)*restoreFailed=true;
+				RightDepthSynchronized=false;RightStencilSynchronized=false;
+				LastMainDepthClearStamp.Invalidate();
+				NoteRestoreFailure("right-eye depth bootstrap");
+				return false;
+			}
+			if(FAILED(clearHr))return false;
 			if(replayFlags&D3DCLEAR_ZBUFFER)RightDepthSynchronized=true;if(replayFlags&D3DCLEAR_STENCIL)RightStencilSynchronized=true;++DepthBootstrapSuccesses;if(!FirstDepthBootstrapLogged){FirstDepthBootstrapLogged=true;spdlog::info("VR stereo: bootstrapped right-eye depth from same-Present full main clear flags=0x{:x} epoch={}",static_cast<unsigned>(replayFlags),PresentEpoch);}return true;
 		}
 		std::uint32_t NextStereoFrameId(){if(++StereoFrameCounter==0)++StereoFrameCounter;return StereoFrameCounter;}
@@ -1975,9 +1988,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			return success&&restoreOk;
 		}
 
-		bool PrepareDuplicatedDraw(IDirect3DDevice9* device,DrawStereoState& draw)
+		bool PrepareDuplicatedDraw(IDirect3DDevice9* device,DrawStereoState& draw,
+			bool& bootstrapRestoreFailed)
 		{
-			if(InternalStereoPass||!StereoWanted()||!TargetIsBackBuffer())return false;if(OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)){PoisonFrame(OutRunVR::StereoFailureOcclusionQueryActive);++OcclusionStereoRejects;if(!FirstOcclusionTrackingUnavailableLogged){FirstOcclusionTrackingUnavailableLogged=true;spdlog::error("VR stereo: occlusion-query Issue tracking unavailable; stereo duplication fails closed to single-execution mono until tracking recovers");}return false;}if(AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);++MrtRejectedDraws;if(!FirstMrtRejectLogged){FirstMrtRejectLogged=true;spdlog::info("VR stereo: auxiliary MRT active; current Present is marked incomplete");}return false;}if(ActiveOcclusionQueries.load(std::memory_order_acquire)>0){++OcclusionStereoRejects;if(!FirstOcclusionRejectLogged){FirstOcclusionRejectLogged=true;spdlog::info("VR stereo: active D3D9 occlusion query kept single-eye; query result is shared without invalidating the stereo Present");}return false;}if(!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);return false;}if(TrackedDepthStencil&&(!RightDepthSynchronized||!RightStencilSynchronized))TryBootstrapRightDepthFromRecentClear(device);if(TrackedDepthStencil&&!RightDepthSynchronized&&DepthTestActive(device)){PoisonFrame(OutRunVR::StereoFailureDepthUnsynchronized);return false;}if(TrackedDepthStencil&&!RightStencilSynchronized&&StencilTestActive(device)){PoisonFrame(OutRunVR::StereoFailureStencilUnsynchronized);return false;}OutRunVRRenderer::LatchedStereoFrame stereo{};if(!OutRunVRRenderer::GetLatchedStereoFrame(stereo)){PoisonFrame(OutRunVR::StereoFailureMissingLatchedPose);return false;}draw.stereoFrame=stereo;const EyeBuildResult classification=BuildEyeConstants(device,stereo,draw);if(classification==EyeBuildResult::FatalError){++WorldClassificationFailures;PoisonFrame(OutRunVR::StereoFailureWorldClassificationFailed);if(!FirstClassificationFailureLogged){FirstClassificationFailureLogged=true;spdlog::warn("VR stereo: verified world draw could not be classified/transformed safely; frame forced to mono fallback");}return false;}return true;
+			bootstrapRestoreFailed=false;
+			if(InternalStereoPass||!StereoWanted()||!TargetIsBackBuffer())return false;if(OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)){PoisonFrame(OutRunVR::StereoFailureOcclusionQueryActive);++OcclusionStereoRejects;if(!FirstOcclusionTrackingUnavailableLogged){FirstOcclusionTrackingUnavailableLogged=true;spdlog::error("VR stereo: occlusion-query Issue tracking unavailable; stereo duplication fails closed to single-execution mono until tracking recovers");}return false;}if(AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);++MrtRejectedDraws;if(!FirstMrtRejectLogged){FirstMrtRejectLogged=true;spdlog::info("VR stereo: auxiliary MRT active; current Present is marked incomplete");}return false;}if(ActiveOcclusionQueries.load(std::memory_order_acquire)>0){++OcclusionStereoRejects;if(!FirstOcclusionRejectLogged){FirstOcclusionRejectLogged=true;spdlog::info("VR stereo: active D3D9 occlusion query kept single-eye; query result is shared without invalidating the stereo Present");}return false;}if(!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);return false;}if(TrackedDepthStencil&&(!RightDepthSynchronized||!RightStencilSynchronized)){TryBootstrapRightDepthFromRecentClear(device,&bootstrapRestoreFailed);if(bootstrapRestoreFailed)return false;}if(TrackedDepthStencil&&!RightDepthSynchronized&&DepthTestActive(device)){PoisonFrame(OutRunVR::StereoFailureDepthUnsynchronized);return false;}if(TrackedDepthStencil&&!RightStencilSynchronized&&StencilTestActive(device)){PoisonFrame(OutRunVR::StereoFailureStencilUnsynchronized);return false;}OutRunVRRenderer::LatchedStereoFrame stereo{};if(!OutRunVRRenderer::GetLatchedStereoFrame(stereo)){PoisonFrame(OutRunVR::StereoFailureMissingLatchedPose);return false;}draw.stereoFrame=stereo;const EyeBuildResult classification=BuildEyeConstants(device,stereo,draw);if(classification==EyeBuildResult::FatalError){++WorldClassificationFailures;PoisonFrame(OutRunVR::StereoFailureWorldClassificationFailed);if(!FirstClassificationFailureLogged){FirstClassificationFailureLogged=true;spdlog::warn("VR stereo: verified world draw could not be classified/transformed safely; frame forced to mono fallback");}return false;}return true;
 		}
 
 		struct R7VisualTraceContext
@@ -2162,8 +2177,13 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				return E_FAIL;
 			}
 			DrawStereoState draw{};
-			if(!PrepareDuplicatedDraw(device,draw))
+			bool bootstrapRestoreFailed=false;
+			if(!PrepareDuplicatedDraw(device,draw,bootstrapRestoreFailed))
 			{
+				if(bootstrapRestoreFailed){
+					OutRunVR::DinoSidecar::RecordExternalPreRasterRollback(false);
+					return E_FAIL; // no raw LEFT fallback on an unproven target
+				}
                 // A failed PBR classification is NOT permission for a mono
                 // fallback DIP; no pixels have been submitted yet.
                 if(OutRunVR::DinoSidecar::ActiveExternalStereoMesh) {
