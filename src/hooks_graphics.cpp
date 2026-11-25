@@ -229,7 +229,8 @@ struct Pending {
 inline thread_local std::array<Token,1024> Tokens{};
 inline thread_local std::size_t TokenCount=0;
 inline thread_local bool TooMany=false;
-inline thread_local unsigned PlayerDepth=0;
+using PlayerOwnerScope=OutRunVR::QuestCockpitV2::Glass::ScopedPlayerCallbackOwner;
+inline thread_local PlayerOwnerScope* CurrentPlayerOwner=nullptr;
 inline thread_local std::array<Pending,16> PendingStack{};
 inline thread_local unsigned PendingDepth=0,OverflowDepth=0;
 inline thread_local unsigned LogCount=0;
@@ -289,6 +290,7 @@ static void CaptureAfter(const QueueCount& before,std::uint64_t epoch) noexcept 
     }
 }
 struct PlayerCallback {
+    PlayerOwnerScope owner{CurrentPlayerOwner};
     bool admitted=false;
     QueueCount immediate{},after{};
     std::uint64_t epoch=0;
@@ -304,15 +306,14 @@ struct PlayerCallback {
         if(!admitted)return;
         immediate=CaptureBefore(Game::s_ImmDrawBuffer);
         after=CaptureBefore(Game::s_AftDrawBuffer);
-        ++PlayerDepth;
+        owner.Admit(epoch);
     }
     ~PlayerCallback() noexcept {
-        if(!admitted)return;
+        if(!admitted||!owner.CanCapture(epoch))return;
         // Persist exact descriptor pointers only, never borrow the vehicle
         // scope for unrelated draws after the callback unwinds.
         CaptureAfter(immediate,epoch);
         CaptureAfter(after,epoch);
-        --PlayerDepth;
     }
     PlayerCallback(const PlayerCallback&)=delete;
     PlayerCallback& operator=(const PlayerCallback&)=delete;
@@ -366,7 +367,8 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
        !epoch||OutRunVR::QuestCockpitV2::InSceneEffect())return;
     const auto* cam=Game::camera();
     if(!cam||cam->cam_mode_34A!=1||!Game::pl_car())return;
-    const bool owner=PlayerDepth>0||HasDeferredOwner(ctx,epoch);
+    const bool immediateOwner=PlayerOwnerScope::Immediate(CurrentPlayerOwner,epoch);
+    const bool owner=immediateOwner||HasDeferredOwner(ctx,epoch);
     if(!owner)return;
     // PC retail 4048F2/4048F5 material provenance: ESI points to the
     // relocated 0x3C-byte PmtObject; EDX to its indexed 0x58 PmtMaterial.
@@ -471,7 +473,7 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
             "originalAlpha={:.4f} appliedAlpha={:.4f} hidden={} "
             "reflectionOff={} originalShaderMode={} brightness={:.1f} "
             "restore=after_original_408C80 QuestWindowMesh=UNTESTED",
-            epoch,PlayerDepth?"player-callback":"matched-queue",
+            epoch,immediateOwner?"player-callback":"matched-queue",
             static_cast<const void*>(material),pending.saved[3],
             rgba[3],hide,noReflection,(attr>>19)&15u,brightness);
 }

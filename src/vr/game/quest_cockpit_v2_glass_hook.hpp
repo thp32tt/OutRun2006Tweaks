@@ -8,6 +8,32 @@
 #include <cstdint>
 
 namespace OutRunVR::QuestCockpitV2::Glass {
+// Scope is thread-local at the call site; each nested original callback
+// masks the parent, even when the nested callback is not the player.
+class ScopedPlayerCallbackOwner final {
+    ScopedPlayerCallbackOwner*& current_;
+    ScopedPlayerCallbackOwner* const parent_;
+    std::uint64_t epoch_=0;
+    bool nested_=false;
+public:
+    explicit ScopedPlayerCallbackOwner(ScopedPlayerCallbackOwner*& current) noexcept
+        :current_(current),parent_(current) {
+        if(parent_)parent_->nested_=true;
+        current_=this;
+    }
+    ~ScopedPlayerCallbackOwner() noexcept {current_=parent_;}
+    ScopedPlayerCallbackOwner(const ScopedPlayerCallbackOwner&)=delete;
+    ScopedPlayerCallbackOwner& operator=(const ScopedPlayerCallbackOwner&)=delete;
+    void Admit(std::uint64_t epoch) noexcept {epoch_=epoch;}
+    static bool Immediate(const ScopedPlayerCallbackOwner* current,
+                          std::uint64_t epoch) noexcept {
+        return current && epoch && current->epoch_==epoch;
+    }
+    bool CanCapture(std::uint64_t epoch) const noexcept {
+        // An outer queue delta may contain another vehicle's entries.
+        return current_==this && !nested_ && Immediate(this,epoch);
+    }
+};
 // The retail deferred draw queue can reuse a descriptor address. A newly
 // captured player descriptor supersedes the old identity in the same epoch.
 // Keep capacity bounded; never grant ownership from an address alone.

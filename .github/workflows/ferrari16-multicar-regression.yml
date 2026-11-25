@@ -91,6 +91,13 @@ jobs:
           assert 'PrepareF50External(player)' not in player_wrapper
           assert 'DrawPreparedF50External(f50)' not in player_wrapper
           assert 'return;' not in player_wrapper
+          assert player_wrapper.count('PlayerCallbackHook.ccall<void>(player);') == 1
+          glass_scope=source[source.index('struct PlayerCallback {'):source.index('static bool HasDeferredOwner(')]
+          assert 'PlayerOwnerScope owner{CurrentPlayerOwner};' in glass_scope
+          assert 'owner.Admit(epoch);' in glass_scope
+          assert 'if(!admitted||!owner.CanCapture(epoch))return;' in glass_scope
+          assert 'PlayerOwnerScope::Immediate(CurrentPlayerOwner,epoch)' in source
+          assert 'PlayerDepth' not in source
           abi=Path('src/vr/game/external_car_original_wrapper_contract.hpp').read_text()
           assert 'MaySkipRetailPlayerWrapper() noexcept {return false;}' in abi
           assert 'RetailPlayerFollowupCallVa=0x0049A650u' in abi

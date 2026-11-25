@@ -47,8 +47,39 @@ static void TestDeferredGlassOwnerRefresh(){
     assert(!RememberDeferredOwner(tokens,count,Token{&entry,11,&nodeB,0}));
     assert(count==1 && DeferredOwnerMatches(tokens[0],reused));
 }
+static void TestImmediateGlassOwnerScope(){
+    using namespace OutRunVR::QuestCockpitV2::Glass;
+    ScopedPlayerCallbackOwner* current=nullptr;
+    for(unsigned slot=0;slot<16;++slot) {
+        for(bool nestedPlayer:{false,true}) {
+            const std::uint64_t epoch=7;
+            assert(!ScopedPlayerCallbackOwner::Immediate(current,epoch));
+            {
+                ScopedPlayerCallbackOwner outer(current);
+                assert(!ScopedPlayerCallbackOwner::Immediate(current,epoch));
+                outer.Admit(epoch);
+                assert(ScopedPlayerCallbackOwner::Immediate(current,epoch));
+                assert(!ScopedPlayerCallbackOwner::Immediate(current,epoch+1));
+                assert(!ScopedPlayerCallbackOwner::Immediate(current,0));
+                assert(outer.CanCapture(epoch));
+                assert(!outer.CanCapture(epoch+1));
+                {
+                    ScopedPlayerCallbackOwner inner(current);
+                    if(nestedPlayer)inner.Admit(epoch);
+                    assert(ScopedPlayerCallbackOwner::Immediate(current,epoch)==nestedPlayer);
+                    assert(inner.CanCapture(epoch)==nestedPlayer);
+                    assert(!outer.CanCapture(epoch));
+                }
+                assert(ScopedPlayerCallbackOwner::Immediate(current,epoch));
+                assert(!outer.CanCapture(epoch));
+            }
+            assert(current==nullptr);
+        }
+    }
+}
 int main(){
     TestDeferredGlassOwnerRefresh();
+    TestImmediateGlassOwnerScope();
     static_assert(!MaySkipRetailPlayerWrapper(),
         "A proven two-call retail wrapper is not a body-only draw leaf");
     static_assert(!RuntimeExternalCarAtomicStageReady(),
