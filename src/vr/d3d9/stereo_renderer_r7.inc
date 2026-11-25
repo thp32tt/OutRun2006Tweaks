@@ -88,6 +88,7 @@ namespace OutRunVRStereo
 	{
 		constexpr std::size_t ResetVtableIndex = 16;
 		constexpr std::size_t PresentVtableIndex = 17;
+		constexpr std::size_t CreateDepthStencilSurfaceVtableIndex = 29;
 		constexpr std::size_t UpdateSurfaceVtableIndex = 30;
 		constexpr std::size_t StretchRectVtableIndex = 34;
 		constexpr std::size_t ColorFillVtableIndex = 35;
@@ -109,6 +110,7 @@ namespace OutRunVRStereo
 
 		SafetyHookInline ResetHook{};
 		SafetyHookInline PresentHook{};
+		SafetyHookInline CreateDepthRetentionHook{};
 		SafetyHookInline UpdateSurfaceHook{};
 		SafetyHookInline StretchRectHook{};
 		SafetyHookInline ColorFillHook{};
@@ -1620,6 +1622,58 @@ namespace OutRunVRStereo
 		}
 
 
+        // D3D9 Discard surfaces lose contents when unbound, even if the
+        // exact pointer is restored. Descriptors do not expose Discard.
+        // Record provenance on the COM resource itself, not a recyclable
+        // pointer in a process-lifetime map. Zero is explicit non-discard;
+        // automatic depth proof is scoped to the Create/Reset generation.
+        constexpr GUID R7DepthRetentionGuid{0x04e376c5,0x69df,0x43ad,{0xa0,0xd2,0x73,0x18,0x7e,0x11,0x75,0x9b}};
+        std::uint64_t R7AutomaticDepthGeneration=1;
+        void R7ForgetAutomaticDepthProof() noexcept
+        {
+            if(++R7AutomaticDepthGeneration==0)++R7AutomaticDepthGeneration;
+        }
+        void R7MarkDepthRetention(IDirect3DSurface9* surface,std::uint64_t proof) noexcept
+        {
+            if(surface)surface->SetPrivateData(R7DepthRetentionGuid,&proof,
+                static_cast<DWORD>(sizeof(proof)),0);
+        }
+        bool R7DepthRetentionProven(IDirect3DSurface9* surface) noexcept
+        {
+            std::uint64_t proof=0;
+            DWORD size=static_cast<DWORD>(sizeof(proof));
+            return surface&&SUCCEEDED(surface->GetPrivateData(R7DepthRetentionGuid,&proof,&size))&&
+                size==sizeof(proof)&&(proof==0||proof==R7AutomaticDepthGeneration);
+        }
+        // Only call at a fresh synchronous CreateDevice or classic Reset
+        // boundary: a late binding is not necessarily the automatic surface.
+        void R7CaptureFreshAutomaticDepth(IDirect3DDevice9* device) noexcept
+        {
+            if(!device||device->GetNumberOfSwapChains()!=1)return;
+            IDirect3DSwapChain9* chain=nullptr;
+            D3DPRESENT_PARAMETERS pp{};
+            const bool safe=SUCCEEDED(device->GetSwapChain(0,&chain))&&chain&&
+                SUCCEEDED(chain->GetPresentParameters(&pp))&&pp.EnableAutoDepthStencil&&
+                !(pp.Flags&D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL);
+            ReleaseCom(chain);
+            if(!safe)return;
+            IDirect3DSurface9* depth=nullptr;
+            if(SUCCEEDED(device->GetDepthStencilSurface(&depth))&&depth)
+                R7MarkDepthRetention(depth,R7AutomaticDepthGeneration);
+            ReleaseCom(depth);
+        }
+        HRESULT __stdcall CreateDepthRetentionDest(IDirect3DDevice9* device,
+            UINT width,UINT height,D3DFORMAT format,D3DMULTISAMPLE_TYPE samples,
+            DWORD quality,BOOL discard,IDirect3DSurface9** out,HANDLE* shared)
+        {
+            const HRESULT hr=CreateDepthRetentionHook.stdcall<HRESULT>(device,
+                width,height,format,samples,quality,discard,out,shared);
+            if(SUCCEEDED(hr)&&!discard&&out&&*out&&
+                StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&IsGameDevice(device))
+                R7MarkDepthRetention(*out,0);
+            return hr;
+        }
+
         // EXT16-011 A1: an inactive, renderer-owned pair. Allocation never
         // binds, clears, copies or publishes a live eye. Depth contents are
         // deliberately undefined until a future scene replay seeds them.
@@ -1630,6 +1684,7 @@ namespace OutRunVRStereo
                 IDirect3DSurface9* depth=nullptr;
             };
             Eye eyes[2]{};
+            IDirect3DSurface9* provenLiveDepth[2]{}; // borrowed from tracked live owners, same replay epoch only
             IDirect3DDevice9* device=nullptr; // non-owning; Reset retires pair
             D3DSURFACE_DESC colorDesc{},depthDesc{};
             UINT simultaneousTargets=0;
@@ -1641,6 +1696,7 @@ namespace OutRunVRStereo
             void Reset() noexcept {
                 for(auto& eye:eyes){ReleaseCom(eye.depth);ReleaseCom(eye.color);}
                 device=nullptr;colorDesc={};depthDesc={};simultaneousTargets=0;
+                provenLiveDepth[0]=provenLiveDepth[1]=nullptr;
                 if(++generation==0)++generation;
             }
             static bool Same(const D3DSURFACE_DESC& a,const D3DSURFACE_DESC& b) noexcept {
@@ -1763,6 +1819,10 @@ namespace OutRunVRStereo
         {
             if(ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+            // RightEyeDepth is exclusively created by R7 with Discard=FALSE.
+            // For game-owned LEFT depth, no unbind without creation proof.
+            if(!R7DepthRetentionProven(TrackedDepthStencil))
+                return R7CandidateSeedResult::Unavailable;
             if(!ExternalAtomicCandidates.Ensure(device,TrackedRenderTarget,
                 TrackedDepthStencil,RightEyeSurface,RightEyeDepth,viewport))
                 return R7CandidateSeedResult::Unavailable;
@@ -1774,7 +1834,11 @@ namespace OutRunVRStereo
                 [&](IDirect3DSurface9* s){return SetRenderTargetHook.stdcall<HRESULT>(device,0u,s);},
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
                 [&](){return ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),flags,color,z,stencil);});
-            if(result==R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=PresentEpoch;
+            if(result==R7CandidateSeedResult::Seeded){
+                ExternalAtomicCandidates.provenLiveDepth[0]=TrackedDepthStencil;
+                ExternalAtomicCandidates.provenLiveDepth[1]=RightEyeDepth;
+                ExternalAtomicReplayEpoch=PresentEpoch;
+            }
             if(result==R7CandidateSeedResult::DirtyRestore)ExternalAtomicCandidates.Reset();
             return result;
         }
@@ -1790,6 +1854,10 @@ namespace OutRunVRStereo
         {
             if(ExternalAtomicReplayEpoch!=PresentEpoch)
                 return R7CandidateSeedResult::Unavailable;
+            if(eye>=2||!liveDepth||liveDepth!=ExternalAtomicCandidates.provenLiveDepth[eye]){
+                ExternalAtomicReplayEpoch=0;
+                return R7CandidateSeedResult::Unavailable;
+            }
             InternalPassScope guard;
             const auto result=R7SeedInactivePair(ExternalAtomicCandidates,device,
                 liveColor,liveDepth,
@@ -3355,7 +3423,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};ExternalAtomicReplayEpoch=0;if(++PresentEpoch==0)PresentEpoch=1;return hr;
 		}
 
-		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;QuestNativePairLatch={};LastMainDepthClearStamp.Invalidate();LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
+		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();R7ForgetAutomaticDepthProof();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;QuestNativePairLatch={};LastMainDepthClearStamp.Invalidate();LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else {hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr))R7CaptureFreshAutomaticDepth(device);}if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
 
 		constexpr std::uint32_t StereoInstallPending = 0;
 		constexpr std::uint32_t StereoInstallReady = 1;
@@ -3380,13 +3448,14 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			ColorFillHook = {};
 			StretchRectHook = {};
 			UpdateSurfaceHook = {};
+			CreateDepthRetentionHook = {};
 			SetRenderTargetHook = {};
 			PresentHook = {};
 			ResetHook = {};
 			StereoInstalledDevice.store(nullptr, std::memory_order_release);
 		}
 
-		bool InstallStereoHooks(IDirect3DDevice9*device)
+		bool InstallStereoHooks(IDirect3DDevice9*device,bool freshDevice=false)
 		{
 			std::lock_guard<std::mutex> installLock(StereoInstallMutex);
 			if(StereoInstallState.load(std::memory_order_acquire)==StereoInstallReady)
@@ -3438,6 +3507,15 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					return false;
 				}
 			}
+            // Candidate provenance is optional: failure must not disable
+            // the established stock stereo renderer. No new hook in v0.03 mode.
+            if(Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel){
+                CreateDepthRetentionHook=safetyhook::create_inline(
+                    vtable[CreateDepthStencilSurfaceVtableIndex],CreateDepthRetentionDest,disabled);
+                if(CreateDepthRetentionHook&&!CreateDepthRetentionHook.enable().has_value())
+                    CreateDepthRetentionHook={};
+                if(freshDevice)R7CaptureFreshAutomaticDepth(device);
+            }
 			IDirect3DVertexShader9*shader=nullptr;
 			if(SUCCEEDED(device->GetVertexShader(&shader))&&shader)
 			{
@@ -3489,7 +3567,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 
 	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept
 	{
-		const bool installed=InstallStereoHooks(device);
+		const bool installed=InstallStereoHooks(device,true);
 		if(installed)
 			spdlog::info("VR stereo: synchronous CreateDevice-thread base hook handoff READY; promoted D3D9Ex device exposed only after Reset ownership transferred");
 		return installed;

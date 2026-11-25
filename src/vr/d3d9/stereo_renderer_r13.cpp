@@ -396,6 +396,7 @@ namespace OutRunVRStereo
             // recreated host/generation is observed through a fresh named
             // mapping instead of keeping the previous mapping object alive.
             R13ReleaseAckState();
+            R7ForgetAutomaticDepthProof();
             ReleaseStereoResources();
             AuxRenderTargetActive = {};
             ActiveOcclusionQueries.store(0, std::memory_order_release);

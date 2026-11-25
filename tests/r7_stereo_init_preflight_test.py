@@ -450,3 +450,149 @@ with tempfile.TemporaryDirectory() as temp:
     cpp.write_text(copy_stub+upload_stub+upload_owner+upload_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
+
+# Iter77: actual creation provenance and seed/replay entrypoints. No
+# synthetic discard policy substituted for the production callbacks.
+retention=source[source.index("constexpr GUID R7DepthRetentionGuid"):
+                 source.index("// EXT16-011 A1: an inactive")]
+entry=source[source.index("R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction("):
+             source.index("// Copy/fill methods write explicit surfaces")]
+retention_stub=r'''
+#define __stdcall
+#include <cassert>
+#include <atomic>
+#include <cstdint>
+#include <cstring>
+#include <iostream>
+using HRESULT=int;using DWORD=unsigned;using UINT=unsigned;using BOOL=int;
+using D3DFORMAT=int;using D3DMULTISAMPLE_TYPE=int;using D3DCOLOR=unsigned;
+using HANDLE=void*;
+constexpr HRESULT S_OK=0,E_FAIL=-1;
+constexpr DWORD D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL=2,D3DCLEAR_STENCIL=4;
+bool SUCCEEDED(HRESULT h){return h>=0;}
+struct GUID{unsigned a;unsigned short b,c;unsigned char d[8];};
+struct D3DPRESENT_PARAMETERS{BOOL EnableAutoDepthStencil=1;DWORD Flags=0;};
+struct D3DVIEWPORT9{};struct D3DRECT{};
+struct IDirect3DSurface9{
+    bool marked=false,writeFail=false,readFail=false;DWORD size=8;
+    std::uint64_t proof=0;unsigned refs=0,writes=0;
+    HRESULT SetPrivateData(const GUID&,const void* p,DWORD n,DWORD flags){
+        ++writes;assert(n==8&&!flags);if(writeFail)return E_FAIL;
+        std::memcpy(&proof,p,n);marked=true;return S_OK;
+    }
+    HRESULT GetPrivateData(const GUID&,void* p,DWORD* n){
+        if(!marked||readFail)return E_FAIL;
+        std::memcpy(p,&proof,8);*n=size;return S_OK;
+    }
+    void Release(){assert(refs);--refs;}
+};
+struct IDirect3DSwapChain9{
+    D3DPRESENT_PARAMETERS pp{};bool fail=false;unsigned refs=0;
+    HRESULT GetPresentParameters(D3DPRESENT_PARAMETERS* out){*out=pp;return fail?E_FAIL:S_OK;}
+    void Release(){assert(refs);--refs;}
+};
+template<class T>void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
+struct IDirect3DDevice9{
+    bool game=true,chainFail=false,depthFail=false,nullChain=false,nullDepth=false;
+    UINT chains=1;IDirect3DSwapChain9 chain;IDirect3DSurface9 depth;
+    UINT GetNumberOfSwapChains(){return chains;}
+    HRESULT GetSwapChain(UINT i,IDirect3DSwapChain9** out){assert(!i);*out=nullChain?nullptr:&chain;if(*out)++chain.refs;return chainFail?E_FAIL:S_OK;}
+    HRESULT GetDepthStencilSurface(IDirect3DSurface9** out){*out=nullDepth?nullptr:&depth;if(*out)++depth.refs;return depthFail?E_FAIL:S_OK;}
+};
+std::atomic<bool> StereoBaseCallbacksArmed{true};
+bool IsGameDevice(IDirect3DDevice9* d){return d&&d->game;}
+IDirect3DSurface9* created=nullptr;HRESULT createHr=S_OK;unsigned creates=0;
+struct CreateHook{
+    template<class R>R stdcall(IDirect3DDevice9*,UINT w,UINT h,D3DFORMAT f,
+        D3DMULTISAMPLE_TYPE m,DWORD q,BOOL,IDirect3DSurface9** out,HANDLE*){
+        assert(w==1920&&h==1080&&f==3&&m==4&&q==1);++creates;
+        if(out)*out=created;
+        return createHr;
+    }
+} CreateDepthRetentionHook;
+'''
+entry_stub=r'''
+enum class R7CandidateSeedResult{Unavailable,Seeded,DirtyRestore};
+IDirect3DSurface9 left,right,color,rc;
+IDirect3DSurface9 *TrackedDepthStencil=&left,*RightEyeDepth=&right,
+    *TrackedRenderTarget=&color,*RightEyeSurface=&rc;
+struct Pair{
+    struct Desc{D3DFORMAT Format=3;}depthDesc;
+    IDirect3DSurface9* provenLiveDepth[2]{};
+    unsigned allocations=0,resets=0;bool allow=true;
+    bool Ensure(IDirect3DDevice9*,IDirect3DSurface9*,IDirect3DSurface9*,
+        IDirect3DSurface9*,IDirect3DSurface9*,const D3DVIEWPORT9&){++allocations;return allow;}
+    void Reset(){++resets;provenLiveDepth[0]=provenLiveDepth[1]=nullptr;}
+} ExternalAtomicCandidates;
+std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
+bool FormatHasStencil(D3DFORMAT){return false;}
+struct InternalPassScope{InternalPassScope(){}~InternalPassScope(){}};
+struct Hook{template<class R,class... A>R stdcall(A...){return S_OK;}}
+    SetRenderTargetHook,SetDepthStencilSurfaceHook,ClearHook;
+unsigned rasterCalls=0;
+R7CandidateSeedResult seedResult=R7CandidateSeedResult::Seeded;
+template<class C,class D,class R>R7CandidateSeedResult R7SeedInactivePair(
+    Pair&,IDirect3DDevice9*,IDirect3DSurface9*,IDirect3DSurface9*,C,D,R raster,
+    unsigned=0,unsigned=2,bool=true){
+    ++rasterCalls;if(seedResult==R7CandidateSeedResult::Seeded)raster();return seedResult;
+}
+'''
+retention_cases=r'''
+int main(){
+    unsigned cases=0;
+    for(unsigned mask=0;mask<512;++mask){
+        IDirect3DDevice9 d;d.chains=(mask&1)?2:1;d.chainFail=mask&2;
+        d.nullChain=mask&4;d.chain.fail=mask&8;d.chain.pp.EnableAutoDepthStencil=!(mask&16);
+        d.chain.pp.Flags=(mask&32)?2:0;d.depthFail=mask&64;
+        d.nullDepth=mask&128;d.depth.writeFail=mask&256;
+        R7CaptureFreshAutomaticDepth(&d);
+        assert(R7DepthRetentionProven(&d.depth)==(mask==0));
+        assert(d.chain.refs==0&&d.depth.refs==0);
+        R7ForgetAutomaticDepthProof();
+        assert(!R7DepthRetentionProven(&d.depth));++cases;
+    }
+    for(unsigned mask=0;mask<128;++mask){
+        IDirect3DDevice9 d;IDirect3DSurface9 surface;IDirect3DSurface9* out=nullptr;
+        d.game=!(mask&1);StereoBaseCallbacksArmed=!(mask&2);
+        createHr=(mask&4)?E_FAIL:S_OK;created=(mask&8)?nullptr:&surface;
+        surface.writeFail=mask&16;creates=0;
+        auto hr=CreateDepthRetentionDest(&d,1920,1080,3,4,1,(mask&32)?1:0,
+            (mask&64)?nullptr:&out,nullptr);
+        assert(hr==createHr&&creates==1);
+        assert(R7DepthRetentionProven(&surface)==(mask==0));
+        R7ForgetAutomaticDepthProof();
+        assert(R7DepthRetentionProven(&surface)==(mask==0));++cases;
+    }
+    IDirect3DDevice9 d;D3DVIEWPORT9 vp;
+    assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Unavailable);
+    assert(rasterCalls==0&&ExternalAtomicCandidates.allocations==0);
+    ++PresentEpoch;R7MarkDepthRetention(&left,0);
+    assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Seeded);
+    assert(rasterCalls==1&&ExternalAtomicReplayEpoch==PresentEpoch);
+    unsigned draws=0;auto draw=[&](){++draws;return S_OK;};
+    assert(R7ReplayInactiveEye(&d,0,&color,&left,draw)==R7CandidateSeedResult::Seeded);
+    assert(R7ReplayInactiveEye(&d,1,&rc,&right,draw)==R7CandidateSeedResult::Seeded);
+    assert(draws==2);
+    assert(R7ReplayInactiveEye(&d,0,&color,&right,draw)==R7CandidateSeedResult::Unavailable);
+    assert(draws==2&&ExternalAtomicReplayEpoch==0);
+    for(unsigned eye: {0u,1u,2u}){
+        ExternalAtomicReplayEpoch=PresentEpoch;
+        assert(R7ReplayInactiveEye(&d,eye,&color,nullptr,draw)==R7CandidateSeedResult::Unavailable);
+        assert(draws==2&&ExternalAtomicReplayEpoch==0);
+    }
+    left.size=4;assert(!R7DepthRetentionProven(&left));
+    left.size=8;left.readFail=true;assert(!R7DepthRetentionProven(&left));
+    std::cout<<"R7_DEPTH_RETENTION_PROOF_PASS "<<cases<<" plus seed/replay and malformed tag cases\n";
+}
+'''
+assert "R7ForgetAutomaticDepthProof();ReleaseStereoResources();" in source
+r13=(Path("src/vr/d3d9/stereo_renderer_r13.cpp").read_text())
+assert "R7ForgetAutomaticDepthProof();\n            ReleaseStereoResources();" in r13
+assert "InstallStereoHooks(device,true);" in source
+assert "CreateDepthStencilSurfaceVtableIndex = 29;" in source
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"depth_retention.cpp"
+    exe=Path(temp)/"depth_retention"
+    cpp.write_text("#include <initializer_list>\n"+retention_stub+retention+entry_stub+entry+retention_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)

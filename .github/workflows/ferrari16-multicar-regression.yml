@@ -405,6 +405,10 @@ jobs:
           marker13 = b'            LastMainDepthClearEpoch = 0;' + newline13 + b'            LastMainDepthClearFlags = 0;'
           assert old13.count(marker13) == 1
           expected13 = old13.replace(marker13, b'            LastMainDepthClearStamp.Invalidate();', 1)
+          # Iter77: invalidate only the automatic depth creation proof before ResetEx.
+          markerDepth13 = b'            R13ReleaseAckState();' + newline13 + b'            ReleaseStereoResources();'
+          assert expected13.count(markerDepth13) == 1
+          expected13 = expected13.replace(markerDepth13, b'            R13ReleaseAckState();' + newline13 + b'            R7ForgetAutomaticDepthProof();' + newline13 + b'            ReleaseStereoResources();', 1)
           assert Path(r13path).read_bytes() == expected13, 'Unreviewed R13 change'
           # R29 raw wrappers bypass R7 ExecuteStereoDraw. Permit exactly
           # four calls to its existing LEFT receipt revocation helper.
