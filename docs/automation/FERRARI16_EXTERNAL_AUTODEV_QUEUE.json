@@ -4186,7 +4186,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER58-GLB-SCENE-MESH-PROVENANCE",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_APPLICABLE_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "Slot provenance and optional exact 328 GTS / 575 SA / F430 Spider / Testarossa Spider: source-to-OVC quality without unsupported asset promotion",
           "source_material_sha": "8fb5bb9de5f6c000efd7355ca673c7043a9b316d",
           "source_blob_sha1": {
@@ -4232,20 +4232,97 @@
           "protected_v003": "Automation branch only. No native runtime, ABI, release, launcher, host, deployment or model binary changes.",
           "asset_validation": "No current private source/converted GLB/OVC4/DDS SHA or license/preview evidence, no actual 16-car material/UV/normal/wheel/instrument QA. All four exact candidates remain optional/nonpromoted, Testarossa one-off 62897 requirement unchanged.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_ITER58_SCORE_PENDING_EXACT_SHA_CI; iteration57 credited once AI2 2930+1=2931 ledger 1cacfc99d8d802f55033f9258b22fb91f9601add",
-          "next_trace": "Confirm iteration58 exact SHA Windows build, all-car and isolated package. Trace GLB selected scene node transform, morph targets and skin/deformation baking versus final OVC geometry; separately validate actual embedded image integrity and preview/rights evidence without inferring rights from hashes. Continue R7 initial allocation/restore and whole-vehicle pair-atomic staging. No unsupported exact asset promotion."
+          "score_state": "CREDITED_ONCE_AI2_2931_PLUS_1_EQUALS_2932_LEDGER_f9d5f100909a46aa6ece369920f60a2c3b3efaca",
+          "next_trace": "Confirm iteration58 exact SHA Windows build, all-car and isolated package. Trace GLB selected scene node transform, morph targets and skin/deformation baking versus final OVC geometry; separately validate actual embedded image integrity and preview/rights evidence without inferring rights from hashes. Continue R7 initial allocation/restore and whole-vehicle pair-atomic staging. No unsupported exact asset promotion.",
+          "followup_exact_sha_ci": {
+            "sha": "8fb5bb9de5f6c000efd7355ca673c7043a9b316d",
+            "runs": [
+              {
+                "id": 45600447063,
+                "conclusion": "success"
+              },
+              {
+                "id": 45600447070,
+                "conclusion": "success"
+              },
+              {
+                "id": 45600447196,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "Actions API exact head_sha and workflow conclusions verified."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER59-R7-INIT-ATTACHMENT-PREFLIGHT",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Graphics performance diagnosis: D3D9 render pass duplication, stereo replay, state churn, GPU synchronization and allocation; do not guess FPS",
+          "source_material_sha": "38bd044a137cdd08f270442f9531cc8377a0465c",
+          "source_blob_sha1": {
+            "src/vr/d3d9/stereo_renderer_r7.inc": "3c9073eeb5551e7fc8b70f51648e51a964ec63b2",
+            "tests/r7_stereo_init_preflight_test.py": "503e7821aaba79eb706a316b1a6813e67007cc76",
+            ".github/workflows/ferrari16-multicar-regression.yml": "9ae70f667a787df824afc1dbe8ed4cac2b13b241"
+          },
+          "source_defect": "EnsureStereoResources retired prior resources and allocated right RT/depth plus two resolve textures before GetViewport; on viewport failure the entire allocation was thrown away. Failed GetRenderTarget was guessed to be the backbuffer and failed GetDepthStencilSurface other than NOTFOUND was treated as no depth. Incorrect original attachments could be restored after the one-time initialization clear.",
+          "source_fix": "Capture real backbuffer descriptor, RT0, depth (explicit D3DERR_NOTFOUND with null allowed), viewport before retirement/allocation; release temporary COM refs on all preflight failures. Keep proven references across resource retirement; preserve ready fast path and existing initialization/clear/restore sequence. Clean preflight failure can retry later; no frame-rate claim.",
+          "positive_negative_regressions": [
+            "Extract actual production preflight into fake D3D9 C++ executable, two normal cases, nine negative cases, transient failure then recovery. Assert original distinct RT and no-depth semantics, balanced refs and no viewport query after early failure.",
+            "Exact SHA all-car job 139174914850 log: R7 stereo initialization preflight: positive/negative/retry PASS; 16 canonical / 30 retail and existing scope/protected-v0.03 gates PASS."
+          ],
+          "call_graph_trace": [
+            "R7 ShouldDuplicate/clear/present/Reset -> EnsureStereoResources -> ready fast path or CaptureStereoInitState -> ReleaseStereoResources -> CreateRenderTarget/CreateRightDepthForTracked/CreateTexture x2 -> one-time clear/restore.",
+            "Failed GetViewport previously incurred full allocation/retirement; unknown attachment was guessed. No confirmed repeated per-draw allocation storm: ReleaseStereoResources nulls BackBuffer so TargetIsBackBuffer gates later draws. No measured FPS or GPU timing.",
+            "R30 shadow observed Lock/Unlock and descriptor cache inspected; no new patch there. Initial post-mutation restore-failure propagation remains separate next hypothesis."
+          ],
+          "same_sha_ci": {
+            "sha": "38bd044a137cdd08f270442f9531cc8377a0465c",
+            "runs": [
+              {
+                "id": 45605418311,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "id": 45605418171,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45605418203,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45605417973,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha queried; all-car complete success with new test log. Other workflows as observed."
+          },
+          "protected_v003": "Automation branch only; native x86 wrapper ABI, official release, launch, host and deployment unchanged. No external model binary uploads.",
+          "asset_validation": "No actual private model source/converted SHA or 16-car UV/normal/PBR/mesh/wheel/instrument rights QA, no exact candidate promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_ITER59_SCORE_PENDING_EXACT_SHA_CI; iteration58 credited once AI2 2931+1=2932 ledger f9d5f100909a46aa6ece369920f60a2c3b3efaca",
+          "next_trace": "Trace R7 initial RIGHT RT/depth/viewport restore failure ownership independently; unlike preflight failure, dirty restoration must not allow same-call native raster or certification. Examine Reset/ResetEx and Present caller propagation and R29/R30/R33 boundaries. Profile actual frame timing only with runtime evidence; preserve atomic whole-vehicle staging and private-asset rights."
         }
       ],
-      "latest_material_sha": "8fb5bb9de5f6c000efd7355ca673c7043a9b316d",
-      "latest_static_ci": "Iteration58 exact blob Python exact-variant suite PASS including 80 new scene fixtures, nine old/new counterexamples; three exact workflows in_progress. Iteration57 applicable exact CI success credited once.",
-      "next_focus": "Confirm iteration58 exact SHA Windows build, all-car and isolated package. Trace GLB selected scene node transform, morph targets and skin/deformation baking versus final OVC geometry; separately validate actual embedded image integrity and preview/rights evidence without inferring rights from hashes. Continue R7 initial allocation/restore and whole-vehicle pair-atomic staging. No unsupported exact asset promotion."
+      "latest_material_sha": "38bd044a137cdd08f270442f9531cc8377a0465c",
+      "latest_static_ci": "Iteration59 exact source extracted C++ mock positive/negative/retry PASS; all-car exact SHA success; remaining CI observed separately. Iteration58 applicable exact CI success and credited once.",
+      "next_focus": "Trace R7 initial RIGHT RT/depth/viewport restore failure ownership independently; unlike preflight failure, dirty restoration must not allow same-call native raster or certification. Examine Reset/ResetEx and Present caller propagation and R29/R30/R33 boundaries. Profile actual frame timing only with runtime evidence; preserve atomic whole-vehicle staging and private-asset rights."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T20:00:00+09:00",
+  "last_updated_kst": "2026-11-25T20:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
