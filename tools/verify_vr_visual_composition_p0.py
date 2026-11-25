@@ -3549,7 +3549,8 @@ screen_body = function_body(r30_r84_admission, 'R30ScreenDrawAttempt R30TryScree
 check_r30_pre_draw_accounting(xyz_body, screen_body)
 
 def check_r30_bootstrap_veto(shader):
-    require_order(shader, 'R30 dirty bootstrap must veto before resampling',
+    bootstrap = shader[shader.index('R29OwnerTryBootstrapRightDepth(device, &bootstrapRestoreFailed);'):]
+    require_order(bootstrap, 'R30 dirty bootstrap must veto before resampling',
                   'R29OwnerTryBootstrapRightDepth(device, &bootstrapRestoreFailed);',
                   'if (bootstrapRestoreFailed)',
                   'return R30ScreenDrawAttempt::Handled(E_FAIL);',
