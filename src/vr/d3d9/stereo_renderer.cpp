@@ -579,7 +579,8 @@ namespace OutRunVRStereo
 
 			if (R9DeferredDepth || !R9CurrentDepthCanMirror())
 			{
-				const HRESULT hr = ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+				const HRESULT hr = R7ExecuteUnmirroredGameRaster(device,
+                    [&](){return ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);},true,flags);
 				if (FrameHadDuplicatedDraw && SUCCEEDED(hr))
 					R9Poison(OutRunVR::StereoFailureDepthStateChanged, "Clear/transient-depth", hr);
 				return hr;
@@ -596,13 +597,15 @@ namespace OutRunVRStereo
 				if (!R9EnsureMonoResources(device))
 				{
 					R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Clear/mono-resources");
-					return ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+					return R7ExecuteUnmirroredGameRaster(device,
+                    [&](){return ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);},true,flags);
 				}
 				monoOk = R9ReplayMonoClear(device, count, rects, flags, color, z, stencil, monoHr);
 			}
 			const auto before = FrameFailureReason;
 			const HRESULT stereoHr = FrameStereoIncomplete
-				? ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil)
+				? R7ExecuteUnmirroredGameRaster(device,
+                    [&](){return ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);},true,flags)
 				: R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
 			R9ObserveLegacyFailure(before, "Clear/legacy-stereo", stereoHr);
 
@@ -665,7 +668,7 @@ namespace OutRunVRStereo
 			if (!R9StereoSeeded)
 			{
 				++R9MonoOnlyDraws;
-				return actualDraw();
+				return R7ExecuteUnmirroredGameRaster(device,actualDraw);
 			}
 
 			if (R9DeferredDepth || !R9CurrentDepthCanMirror())
@@ -673,7 +676,7 @@ namespace OutRunVRStereo
 				if (!FrameStereoIncomplete)
 					R9Poison(OutRunVR::StereoFailureDepthStateChanged, site, S_OK);
 				++R9MonoOnlyDraws;
-				return actualDraw();
+				return R7ExecuteUnmirroredGameRaster(device,actualDraw);
 			}
 
 			if (R9MonoElisionArmed)
@@ -688,7 +691,7 @@ namespace OutRunVRStereo
 				{
 					R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Draw/mono-resources");
 					++R9MonoOnlyDraws;
-					return actualDraw();
+					return R7ExecuteUnmirroredGameRaster(device,actualDraw);
 				}
 
 				HRESULT monoHr = E_FAIL;
@@ -698,7 +701,7 @@ namespace OutRunVRStereo
 					R9MonoBackupGap = true;
 					R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Draw/mono-shadow", monoHr);
 					++R9MonoOnlyDraws;
-					return actualDraw();
+					return R7ExecuteUnmirroredGameRaster(device,actualDraw);
 				}
 			}
 
@@ -710,7 +713,7 @@ namespace OutRunVRStereo
 			if (FrameStereoIncomplete)
 			{
 				++R9MonoOnlyDraws;
-				return actualDraw();
+				return R7ExecuteUnmirroredGameRaster(device,actualDraw);
 			}
 
 			const auto before = FrameFailureReason;

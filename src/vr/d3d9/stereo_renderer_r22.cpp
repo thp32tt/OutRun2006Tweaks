@@ -586,15 +586,19 @@ namespace OutRunVRStereo
                     device, count, rects, flags, color, z, stencil);
 
             if (!R22StereoCallbacksEligible())
-                return ClearHook.stdcall<HRESULT>(
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return ClearHook.stdcall<HRESULT>(
                     device, count, rects, flags, color, z, stencil);
+                },true,flags);
 
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {
                 R22FailClosedReplayState(device, "R22/Clear/scissor-capture");
-                return ClearHook.stdcall<HRESULT>(
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return ClearHook.stdcall<HRESULT>(
                     device, count, rects, flags, color, z, stencil);
+                },true,flags);
             }
 
             const bool mainBefore = TargetIsBackBuffer();
@@ -628,14 +632,18 @@ namespace OutRunVRStereo
                 return R22DrawPrimitiveR9Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             if (!R22StereoCallbacksEligible())
-                return DrawPrimitiveHook.stdcall<HRESULT>(
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return DrawPrimitiveHook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
+                });
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {
                 R22FailClosedReplayState(device, "R22/DrawPrimitive/scissor-capture");
-                return DrawPrimitiveHook.stdcall<HRESULT>(
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return DrawPrimitiveHook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
+                });
             }
             return R22DrawPrimitiveR9Hook.stdcall<HRESULT>(
                 device, type, startVertex, primitiveCount);
@@ -650,17 +658,21 @@ namespace OutRunVRStereo
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             if (!R22StereoCallbacksEligible())
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
+                });
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {
                 R22FailClosedReplayState(device,
                     "R22/DrawIndexedPrimitive/scissor-capture");
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
+                });
             }
             return R22DrawIndexedPrimitiveR9Hook.stdcall<HRESULT>(device, type,
                 baseVertexIndex, minVertexIndex, numVertices, startIndex,
@@ -675,15 +687,19 @@ namespace OutRunVRStereo
                 return R22DrawPrimitiveUPR9Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             if (!R22StereoCallbacksEligible())
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
+                });
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {
                 R22FailClosedReplayState(device,
                     "R22/DrawPrimitiveUP/scissor-capture");
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
+                });
             }
             return R22DrawPrimitiveUPR9Hook.stdcall<HRESULT>(
                 device, type, primitiveCount, data, stride);
@@ -699,17 +715,21 @@ namespace OutRunVRStereo
                     minVertexIndex, numVertices, primitiveCount, indexData,
                     indexFormat, vertexData, stride);
             if (!R22StereoCallbacksEligible())
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
                     minVertexIndex, numVertices, primitiveCount, indexData,
                     indexFormat, vertexData, stride);
+                });
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {
                 R22FailClosedReplayState(device,
                     "R22/DrawIndexedPrimitiveUP/scissor-capture");
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                return R7ExecuteUnmirroredGameRaster(device,[&](){
+                    return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
                     minVertexIndex, numVertices, primitiveCount, indexData,
                     indexFormat, vertexData, stride);
+                });
             }
             return R22DrawIndexedPrimitiveUPR9Hook.stdcall<HRESULT>(device, type,
                 minVertexIndex, numVertices, primitiveCount, indexData,

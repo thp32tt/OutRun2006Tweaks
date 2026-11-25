@@ -152,7 +152,8 @@ jobs:
           assert 'LeftDrawMayWriteDepth(device)' in revoke and 'LeftDrawMayWriteStencil(device)' in revoke
           assert 'LastMainDepthClearStamp.OnPotentialWrite(writes);' in revoke
           clear=r7[r7.index('HRESULT __stdcall ClearDest('):r7.index('HRESULT __stdcall SetRenderTargetDest(')]
-          assert clear.index('LastMainDepthClearStamp.OnPotentialWrite(flags&') < clear.index('if(StereoWanted()&&!TargetIsBackBuffer())')
+          assert clear.index('LastMainDepthClearStamp.OnPotentialWrite(flags&') < clear.index('const bool candidate=StereoWanted()&&TargetIsBackBuffer();')
+          assert clear.index('LastMainDepthClearStamp.OnPotentialWrite(flags&') < clear.index('const HRESULT leftHr=clearCall();')
           assert clear.index('LastMainDepthClearStamp.OnPotentialWrite(flags&') < clear.index('RecordFullMainDepthClear(')
           r13=Path('src/vr/d3d9/stereo_renderer_r13.cpp').read_text()
           assert 'LastMainDepthClearStamp.Invalidate();' in r13
@@ -371,17 +372,18 @@ jobs:
           git fetch --depth=1 origin 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7
           test -z "$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- vrhost src/vr/game/quest_cockpit_v2_runtime.hpp src/vr/game/quest_cockpit_v2_native_frame.hpp Start-OutRun.cmd)"
 
-      - name: Restrict stereo changes to reviewed R7 R30 R33, exact R9 R23 R29 and typed R32 bridge
+      - name: Restrict stereo changes to reviewed R7 R30 R33, exact R9 R22 R23 R29 and typed R32 bridge
         shell: bash
         run: |
           set -euo pipefail
           changed="$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- src/vr/d3d9)"
-          if grep -Ev '^src/vr/d3d9/(stereo_renderer(\.cpp|_r(7\.inc|13\.cpp|23\.cpp|29\.cpp|30\.cpp|32\.cpp|33\.cpp))|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
+          if grep -Ev '^src/vr/d3d9/(stereo_renderer(\.cpp|_r(7\.inc|13\.cpp|22\.cpp|23\.cpp|29\.cpp|30\.cpp|32\.cpp|33\.cpp))|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
             echo "$changed"
             exit 1
           fi
           # Iter71 R9/R23 baseline integration: allow only the exact reviewed blobs.
-          test "$(git hash-object src/vr/d3d9/stereo_renderer.cpp)" = 6ec2da912bfc49da8665203744a978af4cb55b0b
+          test "$(git hash-object src/vr/d3d9/stereo_renderer.cpp)" = aff192d9b6d4b0246a48572d24b3fc735c022b5c
+          test "$(git hash-object src/vr/d3d9/stereo_renderer_r22.cpp)" = 1899caef70c8f77c3248681b0f2414e7d8533443
           test "$(git hash-object src/vr/d3d9/stereo_renderer_r23.cpp)" = cfdeee7950b47432797784003371dd5230967b71
           # Only these exact reviewed R30 transaction helper blobs are allowed.
           # Further byte changes fail closed; the R32 bridge guard remains.

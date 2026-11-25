@@ -375,6 +375,33 @@ int main() {
         for(auto* surface:{&leftColor,&leftDepth,&rightColor,&rightDepth,&otherColor,&otherDepth})assert(surface->refs==0);
         ++cases;
     }
+    // Actual unmirrored raster helper, including failing stock calls.
+    unsigned fallbackCases=0;
+    for(bool gameDevice:{false,true})
+    for(bool clear:{false,true})
+    for(bool current:{false,true})
+    for(DWORD cleared:{0u,2u,4u,6u})
+    for(DWORD flags:{0u,1u,2u,4u,7u})
+    for(DWORD mask:{0u,2u,4u,6u})
+    for(HRESULT result:{0,-1,-17}){
+        InternalStereoPass=false;
+        LastMainDepthClearStamp.Record(current?77:76,cleared);
+        ExternalAtomicReplayEpoch=77;writes=mask;reads=calls=0;
+        const DWORD expected=gameDevice?(clear?(cleared&~flags):
+            (current?(cleared&~mask):cleared)):cleared;
+        auto rawWrite=[&](){
+            ++calls;
+            assert(ExternalAtomicReplayEpoch==(gameDevice?0u:77u));
+            assert(LastMainDepthClearStamp.flags==expected);
+            return result;
+        };
+        assert(R7ExecuteUnmirroredGameRaster(gameDevice?&game:&other,rawWrite,clear,flags)==result);
+        assert(calls==1);
+        assert(reads==unsigned(gameDevice&&!clear&&current)*
+            (unsigned((cleared&2)!=0)+unsigned((cleared&4)!=0)));
+        ++fallbackCases;
+    }
+    std::cout << "R7_UNMIRRORED_RASTER_PASS " << fallbackCases << "\n";
     std::cout << "R29_RAW_DEPTH_RECEIPT_PASS " << cases << "\\n";
 }
 '''
@@ -385,3 +412,95 @@ with tempfile.TemporaryDirectory() as directory:
                     "-Werror", "-pedantic", "-I", str(root / "src/vr/d3d9"),
                     str(p / "probe.cpp"), "-o", str(p / "probe")], check=True)
     subprocess.run([str(p / "probe")], check=True)
+
+# Exact R22 entrypoints and R9 raw/mono ownership wiring.
+r22=(root / "src/vr/d3d9/stereo_renderer_r22.cpp").read_text()
+r9=(root / "src/vr/d3d9/stereo_renderer.cpp").read_text()
+r9clear=r9[r9.index("HRESULT __stdcall ClearDestR9("):r9.index("template <typename ActualDraw, typename LegacyDraw>")]
+r9draw=r9[r9.index("HRESULT R9ExecuteDraw("):r9.index("HRESULT __stdcall DrawPrimitiveDestR9(")]
+assert r9clear.count("R7ExecuteUnmirroredGameRaster(device,")==3
+assert r9draw.count("return R7ExecuteUnmirroredGameRaster(device,actualDraw);")==5
+assert "R9ReplayMonoDraw(device, actualDraw, monoHr)" in r9draw
+assert "return actualDraw();" not in r9draw
+r22owner=r22[r22.index("HRESULT __stdcall ClearDestR22("):r22.index("void R22RollbackHooks()")]
+assert r22owner.count("R7ExecuteUnmirroredGameRaster(device,")==10
+assert r22owner.count("},true,flags);")==2
+r22stub=r'''
+#include "depth_clear_replay_stamp.hpp"
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <initializer_list>
+#define __stdcall
+using DWORD=unsigned;using UINT=unsigned;using INT=int;using HRESULT=int;
+using D3DCOLOR=unsigned;using D3DPRIMITIVETYPE=int;using D3DFORMAT=int;
+constexpr DWORD D3DCLEAR_ZBUFFER=2,D3DCLEAR_STENCIL=4;
+struct D3DRECT{};
+struct IDirect3DDevice9{bool game;};
+bool InternalStereoPass=false,eligible=true,captured=true;
+bool R9StereoSeeded=true,RightDepthSynchronized=true,RightStencilSynchronized=true;
+unsigned R22GameScissor=0;
+std::uint64_t ExternalAtomicReplayEpoch=77,PresentEpoch=77;
+OutRunVR::DepthClearReplayStamp LastMainDepthClearStamp{};
+bool IsGameDevice(IDirect3DDevice9* d){return d&&d->game;}
+bool LeftDrawMayWriteDepth(IDirect3DDevice9*){return true;}
+bool LeftDrawMayWriteStencil(IDirect3DDevice9*){return false;}
+bool R22StereoCallbacksEligible(){return eligible;}
+struct R22ReplayScope{bool stateValid;explicit R22ReplayScope(IDirect3DDevice9*):stateValid(captured){}};
+unsigned failures=0,calls=0,expectedFamily=0;bool expectRaw=false;HRESULT result=0;
+DWORD expectedStamp=6;
+void R22FailClosedReplayState(IDirect3DDevice9*,const char*){++failures;}
+bool TargetIsBackBuffer(){return true;}
+bool R22GameClearCoversBackbuffer(DWORD,const D3DRECT*,unsigned){return true;}
+void R22ObserveDepthBaseline(bool,bool,DWORD,HRESULT){}
+void R22CancelUnsafeFirstSeed(IDirect3DDevice9*,bool,bool){}
+bool SUCCEEDED(HRESULT h){return h>=0;}
+struct Hook{
+    unsigned family;bool raw;
+    template<class R,class... Args> R stdcall(IDirect3DDevice9*,Args...){
+        assert(family==expectedFamily&&raw==expectRaw);
+        assert(ExternalAtomicReplayEpoch==(raw?0u:77u));
+        assert(LastMainDepthClearStamp.flags==expectedStamp);
+        ++calls;return result;
+    }
+};
+Hook ClearHook{0,true},DrawPrimitiveHook{1,true},DrawIndexedPrimitiveHook{2,true},
+     DrawPrimitiveUPHook{3,true},DrawIndexedPrimitiveUPHook{4,true};
+Hook R22ClearR20Hook{0,false},R22DrawPrimitiveR9Hook{1,false},
+     R22DrawIndexedPrimitiveR9Hook{2,false},R22DrawPrimitiveUPR9Hook{3,false},
+     R22DrawIndexedPrimitiveUPR9Hook{4,false};
+'''
+r22cases=r'''
+int main(){
+    IDirect3DDevice9 game{true},other{false};
+    unsigned cases=0;
+    for(unsigned family=0;family<5;++family)
+    for(unsigned mask=0;mask<16;++mask)
+    for(HRESULT hr:{0,-1,-17}){
+        auto* d=(mask&1)?&other:&game;
+        InternalStereoPass=mask&2;eligible=!(mask&4);captured=!(mask&8);
+        const bool top=!(mask&3);
+        expectRaw=top&&(!eligible||!captured);
+        expectedFamily=family;result=hr;calls=failures=0;
+        ExternalAtomicReplayEpoch=77;LastMainDepthClearStamp.Record(77,6);
+        expectedStamp=expectRaw?4u:6u;
+        HRESULT got=-99;
+        switch(family){
+        case 0:got=ClearDestR22(d,0,nullptr,2,0,1.f,0);break;
+        case 1:got=DrawPrimitiveDestR22(d,0,0,1);break;
+        case 2:got=DrawIndexedPrimitiveDestR22(d,0,0,0,3,0,1);break;
+        case 3:got=DrawPrimitiveUPDestR22(d,0,1,nullptr,0);break;
+        case 4:got=DrawIndexedPrimitiveUPDestR22(d,0,0,3,1,nullptr,0,nullptr,0);break;
+        }
+        assert(got==hr&&calls==1&&failures==unsigned(top&&eligible&&!captured));
+        ++cases;
+    }
+    std::cout<<"R22_RAW_FALLBACK_ENTRYPOINTS_PASS "<<cases<<"\n";
+}
+'''
+with tempfile.TemporaryDirectory() as directory:
+    p=Path(directory)
+    (p/"probe.cpp").write_text(r22stub+helper+r22owner+r22cases)
+    subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror","-pedantic",
+                    "-I",str(root/"src/vr/d3d9"),str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
+    subprocess.run([str(p/"probe")],check=True)

@@ -1498,6 +1498,22 @@ namespace OutRunVRStereo
                 LeftDrawMayWriteStencil(device))writes|=D3DCLEAR_STENCIL;
             LastMainDepthClearStamp.OnPotentialWrite(writes);
         }
+        // Direct stock fallbacks bypass the R7 detour. Retire the inactive
+        // pair before the physical write, even on a failed driver call.
+        template<class Call>
+        HRESULT R7ExecuteUnmirroredGameRaster(IDirect3DDevice9* device,
+            Call&& call,bool clear=false,DWORD flags=0) noexcept
+        {
+            if(IsGameDevice(device)){
+                if(clear){
+                    ExternalAtomicReplayEpoch=0;
+                    LastMainDepthClearStamp.OnPotentialWrite(flags&(D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL));
+                }else{
+                    RevokeDepthClearReplayBeforeLeftDraw(device);
+                }
+            }
+            return call();
+        }
 		bool ViewportCoversStereoBackbuffer(IDirect3DDevice9* device) { if(!device||!BackBufferDesc.Width||!BackBufferDesc.Height)return false;D3DVIEWPORT9 viewport{};if(FAILED(device->GetViewport(&viewport)))return false;return viewport.X==0&&viewport.Y==0&&viewport.Width==BackBufferDesc.Width&&viewport.Height==BackBufferDesc.Height; }
 		bool ClearCoversStereoBackbuffer(IDirect3DDevice9* device,DWORD count,const D3DRECT* rects)
 		{
