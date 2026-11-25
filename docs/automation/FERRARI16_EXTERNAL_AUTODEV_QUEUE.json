@@ -3895,7 +3895,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER54-CLEAR-DIRTY-RESTORE-RECEIPT",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_SUCCESS_CONTINUE_ACTIVE",
           "rotating_focus": "v0.03 versus latest: 4:3 theatre/menu fullscreen, initial OpenXR focus and VDXR eye projections, no 2D fallback",
           "source_material_sha": "04efee0fd7262f552c7127df1a0fa817721aca68",
           "source_blob_sha1": {
@@ -3947,20 +3947,95 @@
           "protected_v003": "Only automation branch. Conservative E_FAIL when original LEFT clear succeeded but restore is dirty; real game recovery behavior not established. Stable release, original launcher, host, PBR, dashboards and model binaries unchanged.",
           "asset_validation": "No private source/processed model SHA, 16-car actual UV/albedo/normal/PBR/rights evidence, no promotions.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration53 credited once 2926+1=2927 ledger 4c5281084001662b020db350d7da8f85cf7761f4; iteration52 original HUD CI failure retained",
-          "next_trace": "Verify iteration54 exact SHA Windows DLL+x64 host and HUD Inspector. Trace EnsureStereoResources first allocation: current GetRenderTarget/GetDepthStencilSurface failures, private initialization clear, restoration failure versus ordinary resource miss, and lower raw fallback or persistent dirty binding before later raster. Preserve v0.03 gameplay/theatre classification and physical focus. Rotate to actual 16-car OVC4/material quality contracts and preserve original wrapper and atomic external gate."
+          "score_state": "CREDITED_ONCE_AI2_2927_PLUS_1_EQUALS_2928_LEDGER_163174097a5a5e42786bcda1576ac0e9d8ccce5a",
+          "next_trace": "Verify iteration54 exact SHA Windows DLL+x64 host and HUD Inspector. Trace EnsureStereoResources first allocation: current GetRenderTarget/GetDepthStencilSurface failures, private initialization clear, restoration failure versus ordinary resource miss, and lower raw fallback or persistent dirty binding before later raster. Preserve v0.03 gameplay/theatre classification and physical focus. Rotate to actual 16-car OVC4/material quality contracts and preserve original wrapper and atomic external gate.",
+          "followup_exact_sha_ci": {
+            "sha": "04efee0fd7262f552c7127df1a0fa817721aca68",
+            "runs": [
+              {
+                "id": 45581586110,
+                "conclusion": "success"
+              },
+              {
+                "id": 45581586191,
+                "conclusion": "success"
+              },
+              {
+                "id": 45581586356,
+                "conclusion": "success"
+              },
+              {
+                "id": 45581586085,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "success",
+            "note": "Exact head_sha verified via Actions API."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER55-MIXED-SIGN-COLLINEAR-NORMALS",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Actual 16 car material contracts: OVC4 mesh integrity, DDS mip chains, tangent/UV, per-material normal+ORM and CRC",
+          "source_material_sha": "4eff80258822045e77d608eeec8bf516cddd42e7",
+          "source_blob_sha1": {
+            "tools/ferrari16/pbr_material_gate.py": "bf484d59529f76d7223e0b932f17ccb14c71852d",
+            "tests/ferrari16_pbr_material_gate_test.py": "1884abc496e60c443ccbd6b39428beb50507585d",
+            "tools/ferrari16/verify_all_car_ovc.py": "4accd5a95a79350ac6ec088e42676672c52342a3"
+          },
+          "source_defect": "Strict OVC4 PBR QA falsely accepted all nonzero source normals collinear with the UV tangent if their signs differed. For example +X,-2X,+X on XY geometry and ordinary UV. Native RepairExternalMeshNormals preserves nonzero imported normals, VS normalizes each, PS interpolates along the same tangent line in the source-space/rigid transform case. Gram-Schmidt tangent collapses away from near-zero normal fallback locus. Fallback at cancellation does not rescue remaining pixels. This is an offline admission defect, not a proven cause of user FPS/stereo symptoms.",
+          "source_fix": "Remove same-sign restriction from the source tangent collapse witness. Retain nonzero-normal threshold, exact collinearity, UV/geometry basis, zero-source repair exemption and non-collinear exclusion. Strict QA rejects the material, structural parser still accepts renderable container. No shader/runtime/model modifications.",
+          "positive_negative_regressions": [
+            "Expanded helper regression: all 8 sign assignments on each of three UV/tangent arrangements, mirrored UV retained, zero-source and non-collinear exclusions preserved.",
+            "160 added CRC-valid synthetic OVC4 fixtures: 16 slots x 2 index widths x 5 normal patterns; 64 negative, 96 positive controls for this narrowly scoped gate. Existing map counts, valid UV and structural acceptance asserted. No synthetic fixture implies actual licensed asset QA.",
+            "Exact GitHub blob SHA-1 verified for all three changed Python files and old gate; bounded N100 Python execution: FERRARI16_PBR_PER_OPAQUE_MATERIAL_POSITIVE_NEGATIVE_PASS, FERRARI16_OVC_READONLY_PREFLIGHT_SELFTEST_PASS, EXACT_BLOB_SHA_AND_OLD_NEW_COUNTEREXAMPLE_PASS. Local GitHub DNS unavailable. Old helper returned False, patched returned True for +X,-2X,+X."
+          ],
+          "call_graph_trace": [
+            "inspect -> DDS header/mip length and CRC -> opaque triangle_has_pbr_basis -> triangle_source_tangent_collapsed -> collapsed_source_tangent -> pbr_map_coverage. Native ParseDds 2D/resource/mip size parity reviewed; no new concrete discrepancy in that path.",
+            "Native dino_external_d3d9.hpp -> RepairExternalModelNormals -> external_car_normal_repair.hpp only repairs <=1e-12 source normals -> dino_external_pbr_shader.hpp VS normalizes; PS raw normal fallback then Gram-Schmidt and tangentSq gate before normalMap sampling; ORM independent. The new witness only certifies rejection for exact source collinearity, not per-pixel TBN behavior or general normal quality."
+          ],
+          "same_sha_ci": {
+            "sha": "4eff80258822045e77d608eeec8bf516cddd42e7",
+            "runs": [
+              {
+                "id": 45586338531,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45586337870,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45586337897,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha verified via Actions API. HUD Inspector run not observed at snapshot; no claim of success."
+          },
+          "protected_v003": "Automation branch only. No native runtime/ABI, original PMT, model binary, stable release, launcher, dashboards, menu, stereo or deployment edit. Conservative QA gate only; zero-length repair and mixed non-collinear source normals not certified as visually valid.",
+          "asset_validation": "No private source/processed model SHA, actual 16-car materials/UV/normal/ORM/wheel/dashboard, exact variant or rights verification; no promotion or asset upload.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_ITER55_SCORE_PENDING_FULL_APPLICABLE_CI; iteration54 credited once 2927+1=2928 ledger 163174097a5a5e42786bcda1576ac0e9d8ccce5a",
+          "next_trace": "Verify iteration55 exact SHA Build and isolated x86 DLL/x64 host package. Trace shader derivative TBN relative determinant/tangentSq thresholds vs offline source-space UV threshold and per-material normal/ORM channel semantics; distinguish actual source-space failure witnesses from pixel coverage; inspect EnsureStereoResources initial dirty restoration if next rotation is renderer. Keep strict HQ admission conservative, stock fallback and all existing approvals unchanged."
         }
       ],
-      "latest_material_sha": "04efee0fd7262f552c7127df1a0fa817721aca68",
-      "latest_static_ci": "Iteration54 exact committed R7 Clear/Bootstrap and R33 readiness probes PASS, all-car CI success; Windows Build/HUD Inspector/package pending. Iteration53 four exact workflows success, credited once.",
-      "next_focus": "Verify iteration54 exact SHA Windows DLL+x64 host and HUD Inspector. Trace EnsureStereoResources first allocation: current GetRenderTarget/GetDepthStencilSurface failures, private initialization clear, restoration failure versus ordinary resource miss, and lower raw fallback or persistent dirty binding before later raster. Preserve v0.03 gameplay/theatre classification and physical focus. Rotate to actual 16-car OVC4/material quality contracts and preserve original wrapper and atomic external gate."
+      "latest_material_sha": "4eff80258822045e77d608eeec8bf516cddd42e7",
+      "latest_static_ci": "Iteration55 exact blob portable PBR and full OVC self-test PASS; Build in_progress; Ferrari16 EXT16-005 Exact SHA Isolated Test Package in_progress; Ferrari16 All-Car Sidecar Regression success. Iteration54 four exact workflows success, credited once.",
+      "next_focus": "Verify iteration55 exact SHA Build and isolated x86 DLL/x64 host package. Trace shader derivative TBN relative determinant/tangentSq thresholds vs offline source-space UV threshold and per-material normal/ORM channel semantics; distinguish actual source-space failure witnesses from pixel coverage; inspect EnsureStereoResources initial dirty restoration if next rotation is renderer. Keep strict HQ admission conservative, stock fallback and all existing approvals unchanged."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T18:03:14+09:00",
+  "last_updated_kst": "2026-11-25T18:30:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
