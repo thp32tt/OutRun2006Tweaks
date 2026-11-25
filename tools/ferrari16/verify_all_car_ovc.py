@@ -39,6 +39,11 @@ def require(ok: bool, message: str) -> None:
         raise OvcError(message)
 
 
+def f32(value: float) -> float:
+    """Round a bounded arithmetic result exactly as a float32 field."""
+    return struct.unpack("<f", struct.pack("<f", value))[0]
+
+
 def u16(data: bytes, offset: int) -> int:
     require(offset + 2 <= len(data), "short u16")
     return struct.unpack_from("<H", data, offset)[0]
@@ -281,12 +286,19 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
             if kind == 3:
                 require(gear <= 7, "gear bound")
             else:
+                # ValidDashboardBinding uses float32 constants and rounds
+                # each multiply/add in its sequential axisLen2 accumulation.
+                # Python binary64 comparisons reject valid boundary needles.
                 require(all(math.isfinite(x) for x in vals) and
-                        all(abs(x) <= 1.001 for x in axis) and
-                        0.9801 <= sum(x*x for x in axis) <= 1.0201 and
+                        all(abs(x) <= f32(1.001) for x in axis),
+                        "dashboard needle calibration")
+                axis_len2 = 0.0
+                for x in axis:
+                    axis_len2 = f32(axis_len2 + f32(x * x))
+                require(f32(0.9801) <= axis_len2 <= f32(1.0201) and
                         vals[7] > vals[6] and
-                        abs(vals[8]) <= 12.566371 and
-                        abs(vals[9]) <= 12.566371,
+                        abs(vals[8]) <= f32(12.566371) and
+                        abs(vals[9]) <= f32(12.566371),
                         "dashboard needle calibration")
             at += 56
     require(at == len(data), "OVC trailing bytes")
@@ -402,6 +414,39 @@ def self_test() -> None:
         path.write_bytes(header + payload)
         assert inspect(path)["triangles"] == 1
         assert inspect(path)["zero_normal_vertices"] == 0
+        # All 16 slots, speed and RPM: valid float32 boundary values must
+        # agree with native ValidDashboardBinding, not binary64 literals.
+        # Preserve strict PBR/geometry checks and reject invalid axes.
+        for car_id, _ in CARS:
+            slot_path = Path(directory) / f"car_id_{car_id:02d}.ovc"
+            for kind in (1, 2):
+                for axis, expected in (
+                    ((1., 0., 0.), True),
+                    ((1.001, 0., 0.), True),
+                    ((-1.001, 0., 0.), True),
+                    ((0.001, 0.9899994730949402, 0.), True),
+                    ((1.0011, 0., 0.), False),
+                    ((0., 0., 0.9899), False),
+                    ((0.8, 0.8, 0.), False),
+                    ((float("nan"), 0., 0.), False),
+                ):
+                    fixture = (payload[:-4] + struct.pack("<I", 1) +
+                               struct.pack("<4I10f", 0, kind, 0, 0,
+                                           0., 0., 0., *axis,
+                                           0., 320., -1., 1.))
+                    fixture_header = b"OVRCABH4" + struct.pack(
+                        "<7I", 4, 1, 1, 3, 1, len(fixture),
+                        zlib.crc32(fixture) & 0xffffffff)
+                    slot_path.write_bytes(fixture_header + fixture)
+                    try:
+                        details = inspect(slot_path)
+                    except OvcError as error:
+                        assert not expected and str(error) == "dashboard needle calibration", (
+                            car_id, kind, axis, str(error))
+                    else:
+                        assert expected and details["dashboard_bindings"] == 1, (
+                            car_id, kind, axis)
+        path.write_bytes(header + payload)
         # Recalculate CRC to prove geometry, not corruption, rejects blank body.
         repeated = bytearray(header + payload)
         index_offset = 36 + 16 + len(name) + len(verts)
