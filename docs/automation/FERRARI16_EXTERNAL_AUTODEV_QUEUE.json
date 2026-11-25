@@ -3729,7 +3729,7 @@
         },
         {
           "cycle_key": "EXT16-011-ITER52-UPPER-DEPTH-BOOTSTRAP-OWNERSHIP",
-          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "status": "PATCHED_EXACT_SHA_CI_FAILURE_CONTINUE_ACTIVE",
           "rotating_focus": "R30/R33 direct/raw DIP bypass, HRESULT recovery, state restoration and original fallback",
           "source_material_sha": "867abc65b033281d9856c69810dd91c74d022ba6",
           "source_blob_sha1": {
@@ -3784,20 +3784,103 @@
           "protected_v003": "Automation branch only; original release, host, model files, shader, PBR, dashboard and menu unchanged. Conservative same-call E_FAIL on dirty binding; actual subsequent game recovery remains untested. Local GitHub DNS unavailable, N100 bounded source download and small C++ probes only. N100 ledger push failed authentication; GitHub connector fetch_blob + update_file succeeded instead.",
           "asset_validation": "No private source/processed model SHA, actual 16-car UV/albedo/normal/PBR/rights evidence, no promotions.",
           "runtime_validation": "UNTESTED",
-          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration51 credited once 2925+1=2926 ledger 8059b1a6d5298e15813eeef0885002724d52b6b4",
-          "next_trace": "Verify iteration52 exact SHA x86 DLL+x64 host package before credit. Trace persistent dirty binding recovery at R33 top-level dispatch and EnsureStereoResources initialization restoration, including next draw and reset/Present recovery; investigate whether the current poisoned-frame flag can permit later raw draw before authoritative attachment/state reconciliation. Preserve clean fallback, original callback and closed atomic external gate. Actual bilateral staging/right-DIP fault injection still required."
+          "score_state": "NO_NEW_SCORE_EXACT_SHA_CI_FAILURE; revalidate descendant with fixed gates, no duplicate credit",
+          "next_trace": "Verify iteration52 exact SHA x86 DLL+x64 host package before credit. Trace persistent dirty binding recovery at R33 top-level dispatch and EnsureStereoResources initialization restoration, including next draw and reset/Present recovery; investigate whether the current poisoned-frame flag can permit later raw draw before authoritative attachment/state reconciliation. Preserve clean fallback, original callback and closed atomic external gate. Actual bilateral staging/right-DIP fault injection still required.",
+          "followup_exact_sha_ci": {
+            "sha": "867abc65b033281d9856c69810dd91c74d022ba6",
+            "runs": [
+              {
+                "id": 45572924603,
+                "conclusion": "success"
+              },
+              {
+                "id": 45572924706,
+                "conclusion": "failure"
+              },
+              {
+                "id": 45572924793,
+                "conclusion": "success"
+              },
+              {
+                "id": 45572924773,
+                "conclusion": "success"
+              }
+            ],
+            "conclusion": "failure",
+            "note": "HUD Inspector job 139063729641: P0 visual composition mutation targeting first Handled(E_FAIL) now mutates earlier dirty bootstrap branch rather than intended c64 rollback. Original SHA failed, do not relabel it PASS. Iter53 fixes distinct branch-targeting and adds separate mutation; R29 seam expectation updated to preserve failure out parameter."
+          }
+        },
+        {
+          "cycle_key": "EXT16-011-ITER53-DEFERRED-QUEUE-APPEND-PROVENANCE",
+          "status": "PATCHED_EXACT_SHA_CI_IN_PROGRESS_CONTINUE_ACTIVE",
+          "rotating_focus": "Retail x86 body wrapper ABI 46BD30/469600: preserve stock dashboard, shadow, passengers and glass, positive/negative call graph",
+          "source_material_sha": "ed448a0550152d6a5fb463a810f338c68d19b86b",
+          "source_blob_sha1": {
+            "src/hooks_graphics.cpp": "c09769ffd4d494497777b9c0a7378d346ce9d96c",
+            "src/vr/game/quest_cockpit_v2_glass_hook.hpp": "b9ec70677c75ff0a4615f639182047cb06bd4c5e",
+            "tests/external_car_original_wrapper_contract_test.cpp": "9ab04f7d60fbafdbc3cff6e1fbf5bf4a61e1e300",
+            "tools/verify_vr_visual_composition_p0.py": "c28df7568724450c8b616ef059f401a96021e376",
+            "tools/verify_vr_r29_owner_api_seam.py": "2ae25540114dfa1ea866a9b90fc05d2aaa91d26e"
+          },
+          "source_defect": "CaptureBefore saved only count and DrawBuffer object pointer; CaptureAfter accepted different backing pointer or capacity, or silently returned on a count regression without revoking older tokens. Counterexample: count 4, storage A, limit 16 before player; count 5, storage B, limit 16 after, old code reads B[4] as player despite no append lineage. This is conditional; no live evidence of queue replacement or user symptom causality. Iter52 HUD verifier also mutated first identical failure return after new bootstrap guard; intended shader rollback mutation became ineffective.",
+          "source_fix": "Capture storage/count/capacity as DeferredQueueSnapshot; require valid same-storage/same-capacity monotonic append before any descriptor scan. For observed invalid post-state or unreadable span, revoke token table and disable deferred lookup until next native frame. Zero delta exits without scan. Immediate player owner and complete original wrapper unchanged. Separate c64 rollback and bootstrap mutation checks, restrict resampling check to after bootstrap, and update R29 seam exact forwarding expectation. Initial commit 2c495f37c6ae15dc910ae1f1420d8d00cf8830e2 followed by precise verifier scope correction; only final material SHA assessed.",
+          "positive_negative_regressions": [
+            "Exact committed wrapper C++ test compiled with -std=c++17 -O2 -Wall -Wextra -Werror -pedantic and passed on bounded N100 source-only probe. New 28 unique combinations repeated for 16 synthetic slot iterations (448) plus 10 explicit positive/negative cases; existing wrapper/call targets and owner tests retained.",
+            "Extracted actual P0 pre-draw accounting + bootstrap mutation suite passed and full R29/R30 owner ABI verifier passed. Full HUD Inspector CI still pending at observation. CI source assertions require provenance gate before token registration and revocation before scan. No real queue reset injection on x86 retail or private asset verification."
+          ],
+          "call_graph_trace": [
+            "49F3E0 -> original 46BD30 -> 469600; wrapper still invokes original cdecl trampoline once; known 49A650 RET follow-up retained. Prior decomp/retail signature evidence preserved, no new EXE byte acquisition.",
+            "PlayerCallback -> CaptureBefore immediate/after -> original callback -> CaptureAfter -> SameDeferredQueueAppend -> RememberDeferredOwner -> OnMaterialBefore live/deferred ownership gate -> OnMaterialAfter restore. New veto prevents ambiguous delta ownership; same-address in-place replacement with unchanged capacity/count and live callee register assumptions are still unproven. No shader/geometry or stock dashboard/shadow/passenger suppression.",
+            "No external PrepareF50External activation; atomic live raster remains closed. No private 16-slot PBR/UV/normal/model QA."
+          ],
+          "same_sha_ci": {
+            "sha": "ed448a0550152d6a5fb463a810f338c68d19b86b",
+            "runs": [
+              {
+                "id": 45577119779,
+                "name": "Build",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45577119745,
+                "name": "Ferrari16 All-Car Sidecar Regression",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45577119725,
+                "name": "Ferrari16 EXT16-005 Exact SHA Isolated Test Package",
+                "status": "in_progress",
+                "conclusion": null
+              },
+              {
+                "id": 45577119739,
+                "name": "OutRun EXE HUD Inspector CI",
+                "status": "in_progress",
+                "conclusion": null
+              }
+            ],
+            "conclusion": "PENDING",
+            "note": "Exact head_sha verified via Actions API."
+          },
+          "protected_v003": "Automation branch only. Conservative decision: on observed queue drift disable both deferred queue token sets for that frame, which can temporarily leave stock glass tint/reflection unchanged. Immediate scope and original wrapper remain. No asset, release, host or shader changes. Local GitHub DNS unavailable; bounded N100 source copies and portable probe only.",
+          "asset_validation": "No private model source/processed SHA or actual 16-car visual/material/rights verification; no promotion.",
+          "runtime_validation": "UNTESTED",
+          "score_state": "NO_NEW_SCORE_PENDING_EXACT_SHA_CI; iteration52 HUD CI failed, previous confirmed AI2 2926 unchanged",
+          "next_trace": "Verify iteration53 exact SHA Windows Build, isolated x86/x64 package, full HUD Inspector and all-car workflows. Examine deferred queue in-place descriptor replacement with unchanged backing/count, actual live register owner provenance, and scoped PMT material rollback under nested invocation. Do not introduce leaf suppression without retail ownership and whole-car atomic stage; trace persistent R33 dirty binding recovery and v0.03 theatre/focus parity on next applicable rotation."
         }
       ],
-      "latest_material_sha": "867abc65b033281d9856c69810dd91c74d022ba6",
-      "latest_static_ci": "Iteration52 exact committed portable R7/R33 fault injection PASS; all-car regression success; Windows Build/HUD Inspector/package pending. Iteration51 four exact workflows success, credited once.",
-      "next_focus": "Verify iteration52 exact SHA x86 DLL+x64 host package before credit. Trace persistent dirty binding recovery at R33 top-level dispatch and EnsureStereoResources initialization restoration, including next draw and reset/Present recovery; investigate whether the current poisoned-frame flag can permit later raw draw before authoritative attachment/state reconciliation. Preserve clean fallback, original callback and closed atomic external gate. Actual bilateral staging/right-DIP fault injection still required."
+      "latest_material_sha": "ed448a0550152d6a5fb463a810f338c68d19b86b",
+      "latest_static_ci": "Iteration53 portable wrapper test and extracted P0 mutation suite + R29 owner seam PASS; four exact-SHA workflows pending. Iteration52 three exact workflows success, HUD Inspector failure preserved.",
+      "next_focus": "Verify iteration53 exact SHA Windows Build, isolated x86/x64 package, full HUD Inspector and all-car workflows. Examine deferred queue in-place descriptor replacement with unchanged backing/count, actual live register owner provenance, and scoped PMT material rollback under nested invocation. Do not introduce leaf suppression without retail ownership and whole-car atomic stage; trace persistent R33 dirty binding recovery and v0.03 theatre/focus parity on next applicable rotation."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T17:04:00+09:00",
+  "last_updated_kst": "2026-11-25T17:33:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
