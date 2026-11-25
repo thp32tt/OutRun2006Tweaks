@@ -94,7 +94,36 @@ def glb(path: Path, *, triangles: int = 1, width: int = 2,
         }],
         "accessors": accessors,
         "meshes": [{"primitives": [primitive]}],
+        "nodes": [{"mesh": 0}],
+        "scenes": [{"nodes": [0]}],
+        "scene": 0,
     }
+    if defect == "scene-nested":
+        doc["nodes"] = [{"children": [1]}, {"mesh": 0}]
+    elif defect == "scene-single-implicit":
+        del doc["scene"]
+    elif defect == "scene-unreferenced":
+        doc["nodes"] = [{}]
+    elif defect == "scene-other-only":
+        doc["nodes"] = [{"mesh": 0}, {}]
+        doc["scenes"] = [{"nodes": [0]}, {"nodes": [1]}]
+        doc["scene"] = 1
+    elif defect == "scene-duplicate-instance":
+        doc["nodes"].append({"mesh": 0})
+        doc["scenes"][0]["nodes"].append(1)
+    elif defect == "scene-cycle":
+        doc["nodes"][0]["children"] = [0]
+    elif defect == "scene-bad-node":
+        doc["scenes"][0]["nodes"] = [99]
+    elif defect == "scene-bad-mesh":
+        doc["nodes"][0]["mesh"] = 99
+    elif defect == "scene-ambiguous":
+        doc["scenes"].append({"nodes": [0]})
+        del doc["scene"]
+    elif defect == "scene-missing":
+        del doc["scenes"]
+    elif defect == "scene-gpu-instance":
+        doc["nodes"][0]["extensions"] = {"EXT_mesh_gpu_instancing": {"attributes": {"TRANSLATION": 0}}}
     material = doc["materials"][0]
     if defect == "missing-material":
         del primitive["material"]
@@ -282,6 +311,31 @@ def main() -> None:
             glb(converted, defect="default-factors")
             candidate["converted_glb"] = hashed(converted)
             assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+            # Definition inventory cannot stand in for the selected scene.
+            for defect in ("scene-nested", "scene-single-implicit"):
+                glb(converted, defect=defect)
+                candidate["converted_glb"] = hashed(converted)
+                assert validate_one(candidate, root)["status"] == "PASS_STATIC_SOURCE_ONLY"
+            for defect, reason in (
+                ("scene-unreferenced", "unreferenced mesh"),
+                ("scene-other-only", "unreferenced mesh"),
+                ("scene-duplicate-instance", "instancing requires flattening"),
+                ("scene-cycle", "cycle or shared node"),
+                ("scene-bad-node", "scene node reference"),
+                ("scene-bad-mesh", "scene mesh reference"),
+                ("scene-ambiguous", "default scene ambiguous"),
+                ("scene-missing", "scene mesh provenance missing"),
+                ("scene-gpu-instance", "GPU mesh instancing requires flattening"),
+            ):
+                for target, key in ((source, "source_glb"), (converted, "converted_glb")):
+                    glb(source)
+                    glb(converted)
+                    glb(target, defect=defect)
+                    candidate["source_glb"] = hashed(source)
+                    candidate["converted_glb"] = hashed(converted)
+                    expected_fail(candidate, root, reason)
+            glb(source)
+            candidate["source_glb"] = hashed(source)
             # Preserve identical non-default settings, but reject silent
             # edits with unchanged texture names, dimensions and geometry.
             for defect in ("normal-scale", "metallic-factor", "roughness-factor",

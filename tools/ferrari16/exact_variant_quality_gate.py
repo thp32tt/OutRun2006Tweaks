@@ -201,6 +201,47 @@ def material_binding(doc: dict, primitive: dict) -> tuple:
     return alpha, tuple(bindings)
 
 
+def scene_meshes(doc: dict) -> list:
+    """Require a single flattened mesh instance per definition in the chosen scene.
+
+    OVC has no scene graph/instancing. Reject unproven flattening rather
+    than count unused definitions or silently ignore repeated instances.
+    """
+    meshes, nodes, scenes = (doc.get(k) for k in ("meshes", "nodes", "scenes"))
+    require(all(isinstance(x, list) and x for x in (meshes, nodes, scenes)),
+            "GLB scene mesh provenance missing")
+    scene_index = doc.get("scene", 0 if len(scenes) == 1 else None)
+    require(type(scene_index) is int and 0 <= scene_index < len(scenes),
+            "GLB default scene ambiguous or invalid")
+    scene = scenes[scene_index]
+    require(isinstance(scene, dict) and isinstance(scene.get("nodes"), list)
+            and scene["nodes"], "GLB scene roots missing")
+    pending = list(scene["nodes"])
+    visited = set()
+    mesh_ids = set()
+    while pending:
+        idx = pending.pop()
+        require(type(idx) is int and 0 <= idx < len(nodes),
+                "GLB scene node reference")
+        require(idx not in visited, "GLB scene cycle or shared node")
+        visited.add(idx)
+        node = nodes[idx]
+        require(isinstance(node, dict), "GLB scene node object")
+        children = node.get("children", [])
+        require(isinstance(children, list), "GLB scene children")
+        pending.extend(children)
+        if "mesh" in node:
+            mid = node["mesh"]
+            require(type(mid) is int and 0 <= mid < len(meshes),
+                    "GLB scene mesh reference")
+            require(mid not in mesh_ids, "GLB mesh instancing requires flattening")
+            require("EXT_mesh_gpu_instancing" not in node.get("extensions", {}),
+                    "GLB GPU mesh instancing requires flattening")
+            mesh_ids.add(mid)
+    require(len(mesh_ids) == len(meshes), "GLB unreferenced mesh in selected scene")
+    return meshes
+
+
 def glb_stats(path: Path) -> dict:
     with path.open("rb") as f:
         header = f.read(20)
@@ -311,7 +352,7 @@ def glb_stats(path: Path) -> dict:
             return count, start + offset, component, element
         triangles = 0
         material_triangles = Counter()
-        for mesh in doc.get("meshes", []):
+        for mesh in scene_meshes(doc):
             for p in mesh.get("primitives", []):
                 require(p.get("mode", 4) == 4, "non-triangle GLB primitive")
                 attributes = p.get("attributes", {})
