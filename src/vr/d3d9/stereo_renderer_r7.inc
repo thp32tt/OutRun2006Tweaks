@@ -1834,9 +1834,66 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			return false;
 		}
 
+		// Capture real LEFT attachments before retiring or allocating anything.
+		// A failed getter is not evidence of the default RT or no depth surface.
+		bool CaptureStereoInitState(IDirect3DDevice9* device,
+			IDirect3DSurface9*& back, IDirect3DSurface9*& rt,
+			IDirect3DSurface9*& depth, D3DSURFACE_DESC& desc,
+			D3DVIEWPORT9& viewport)
+		{
+			const auto fail = [&]() {
+				ReleaseCom(depth);
+				ReleaseCom(rt);
+				ReleaseCom(back);
+				return false;
+			};
+			if (FAILED(device->GetBackBuffer(0,0,D3DBACKBUFFER_TYPE_MONO,&back)) ||
+				!back || FAILED(back->GetDesc(&desc)))
+				return fail();
+			if (FAILED(device->GetRenderTarget(0,&rt)) || !rt)
+				return fail();
+			const HRESULT depthHr = device->GetDepthStencilSurface(&depth);
+			if (depthHr == D3DERR_NOTFOUND)
+			{
+				if (depth)
+					return fail();
+			}
+			else if (FAILED(depthHr) || !depth)
+				return fail();
+			if (FAILED(device->GetViewport(&viewport)))
+				return fail();
+			return true;
+		}
+
 		bool EnsureStereoResources(IDirect3DDevice9* device)
 		{
-			if(!device)return false;if(StereoResourcesReady&&BackBuffer&&RightEyeSurface&&LeftResolveSurface&&RightResolveSurface)return true;IDirect3DSurface9*newBackBuffer=nullptr;if(FAILED(device->GetBackBuffer(0,0,D3DBACKBUFFER_TYPE_MONO,&newBackBuffer))||!newBackBuffer)return false;D3DSURFACE_DESC desc{};if(FAILED(newBackBuffer->GetDesc(&desc))){newBackBuffer->Release();return false;}ReleaseStereoResources();BackBuffer=newBackBuffer;BackBufferDesc=desc;IDirect3DSurface9*currentRt=nullptr;if(SUCCEEDED(device->GetRenderTarget(0,&currentRt))&&currentRt)TrackedRenderTarget=currentRt;else ReplaceSurfaceRef(TrackedRenderTarget,BackBuffer);IDirect3DSurface9*currentDepth=nullptr;const HRESULT depthStateHr=device->GetDepthStencilSurface(&currentDepth);if(SUCCEEDED(depthStateHr)&&currentDepth)TrackedDepthStencil=currentDepth;else if(depthStateHr==D3DERR_NOTFOUND)TrackedDepthStencil=nullptr;InitializeAuxRenderTargetState(device);if(FAILED(device->CreateRenderTarget(desc.Width,desc.Height,desc.Format,desc.MultiSampleType,desc.MultiSampleQuality,FALSE,&RightEyeSurface,nullptr))||!CreateRightDepthForTracked(device)){ReleaseStereoResources();return false;}if(FAILED(device->CreateTexture(desc.Width,desc.Height,1,D3DUSAGE_RENDERTARGET,desc.Format,D3DPOOL_DEFAULT,&LeftResolveTexture,nullptr))||FAILED(LeftResolveTexture->GetSurfaceLevel(0,&LeftResolveSurface))||FAILED(device->CreateTexture(desc.Width,desc.Height,1,D3DUSAGE_RENDERTARGET,desc.Format,D3DPOOL_DEFAULT,&RightResolveTexture,nullptr))||FAILED(RightResolveTexture->GetSurfaceLevel(0,&RightResolveSurface))){ReleaseStereoResources();return false;}D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport))){ReleaseStereoResources();return false;}
+			if (!device) return false;
+			if (StereoResourcesReady && BackBuffer && RightEyeSurface &&
+				LeftResolveSurface && RightResolveSurface) return true;
+			IDirect3DSurface9* newBackBuffer=nullptr;
+			IDirect3DSurface9* currentRt=nullptr;
+			IDirect3DSurface9* currentDepth=nullptr;
+			D3DSURFACE_DESC desc{};
+			D3DVIEWPORT9 savedViewport{};
+			if (!CaptureStereoInitState(device,newBackBuffer,currentRt,
+				currentDepth,desc,savedViewport)) return false;
+			ReleaseStereoResources();
+			BackBuffer=newBackBuffer;
+			BackBufferDesc=desc;
+			TrackedRenderTarget=currentRt;
+			TrackedDepthStencil=currentDepth;
+			InitializeAuxRenderTargetState(device);
+			if (FAILED(device->CreateRenderTarget(desc.Width,desc.Height,desc.Format,
+				desc.MultiSampleType,desc.MultiSampleQuality,FALSE,&RightEyeSurface,nullptr)) ||
+				!CreateRightDepthForTracked(device)) {ReleaseStereoResources();return false;}
+			if (FAILED(device->CreateTexture(desc.Width,desc.Height,1,D3DUSAGE_RENDERTARGET,
+				desc.Format,D3DPOOL_DEFAULT,&LeftResolveTexture,nullptr)) ||
+				FAILED(LeftResolveTexture->GetSurfaceLevel(0,&LeftResolveSurface)) ||
+				FAILED(device->CreateTexture(desc.Width,desc.Height,1,D3DUSAGE_RENDERTARGET,
+				desc.Format,D3DPOOL_DEFAULT,&RightResolveTexture,nullptr)) ||
+				FAILED(RightResolveTexture->GetSurfaceLevel(0,&RightResolveSurface))) {
+				ReleaseStereoResources();return false;
+			}
 			// 01515: a newly allocated RIGHT color/depth surface must have
 			// every pixel initialized even if the game has a cropped viewport.
 			// Change only the one-time allocation clear, then restore the
