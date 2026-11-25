@@ -1740,8 +1740,8 @@ namespace OutRunVRStereo
             return result;
         }
 
-        // Replay one physical indexed or non-indexed VB draw while its exact eye transforms and
-        // shaders are still bound. No UP replay (UP changes stream state).
+        // Replay one physical draw while its exact eye transforms and shaders are bound.
+        // UP callers must isolate input state via R7ReplayInactiveDraw.
         // A missing route invalidates the seed; this is NOT a complete scene
         // receipt until every physical owner is covered.
         template<class DrawCall>
@@ -2080,6 +2080,34 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		}
 
 		void NoteRestoreFailure(const char* what){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailureRestoreFailed);++RestoreFailures;if(!FirstRestoreFailureLogged){FirstRestoreFailureLogged=true;spdlog::warn("VR stereo: renderer state restore failed at {}; frame forced to mono fallback",what);}}
+        // Candidate UP draws must not expose D3D9's input-unbind side effects.
+        // The physical live draw alone owns those effects, even on the right eye.
+        template<class DrawCall>
+        R7CandidateSeedResult R7ReplayInactiveDraw(IDirect3DDevice9* device,
+            unsigned eye,IDirect3DSurface9* color,IDirect3DSurface9* depth,
+            DrawCall& drawCall,bool up,bool indexedUp) noexcept
+        {
+            bool inputRestoreFailed=false;
+            auto candidateDraw=[&]() -> HRESULT {
+                if(!up)return drawCall();
+                IDirect3DVertexBuffer9* vb=nullptr;
+                IDirect3DIndexBuffer9* ib=nullptr;
+                UINT offset=0,stride=0;
+                const bool captured=SUCCEEDED(device->GetStreamSource(0,&vb,&offset,&stride))&&
+                    (!indexedUp||SUCCEEDED(device->GetIndices(&ib)));
+                if(!captured){ReleaseCom(ib);ReleaseCom(vb);return E_FAIL;}
+                const HRESULT hr=drawCall();
+                if(FAILED(device->SetStreamSource(0,vb,vb?offset:0u,vb?stride:0u)))
+                    inputRestoreFailed=true;
+                if(indexedUp&&FAILED(device->SetIndices(ib)))inputRestoreFailed=true;
+                ReleaseCom(ib);ReleaseCom(vb);
+                return inputRestoreFailed?E_FAIL:hr;
+            };
+            const auto result=R7ReplayInactiveEye(device,eye,color,depth,candidateDraw);
+            if(inputRestoreFailed||result!=R7CandidateSeedResult::Seeded)
+                ExternalAtomicReplayEpoch=0;
+            return inputRestoreFailed?R7CandidateSeedResult::DirtyRestore:result;
+        }
         // Raw R29/R30 owners already selected the eye and shader state.
         // InternalStereoPass alone cannot identify the eye or mono backup.
         template<class DrawCall>
@@ -2106,29 +2134,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
             }
             RevokeDepthClearReplayBeforeLeftDraw(device,eye>=0);
             if(eye>=0){
-                // D3D9 UP raster clears stream 0 (and indices for indexed UP).
-                // Only the real live call may expose these side effects.
-                bool inputRestoreFailed=false;
-                auto candidateDraw=[&]() -> HRESULT {
-                    if(!up)return drawCall();
-                    IDirect3DVertexBuffer9* vb=nullptr;
-                    IDirect3DIndexBuffer9* ib=nullptr;
-                    UINT offset=0,stride=0;
-                    const bool captured=SUCCEEDED(device->GetStreamSource(0,&vb,&offset,&stride))&&
-                        (!indexedUp||SUCCEEDED(device->GetIndices(&ib)));
-                    if(!captured){ReleaseCom(ib);ReleaseCom(vb);return E_FAIL;}
-                    const HRESULT hr=drawCall();
-                    if(FAILED(device->SetStreamSource(0,vb,vb?offset:0u,vb?stride:0u)))
-                        inputRestoreFailed=true;
-                    if(indexedUp&&FAILED(device->SetIndices(ib)))inputRestoreFailed=true;
-                    ReleaseCom(ib);ReleaseCom(vb);
-                    return inputRestoreFailed?E_FAIL:hr;
-                };
-                const auto result=R7ReplayInactiveEye(device,
-                    static_cast<unsigned>(eye),rt,depth,candidateDraw);
+                const auto result=R7ReplayInactiveDraw(device,
+                    static_cast<unsigned>(eye),rt,depth,drawCall,up,indexedUp);
                 ReleaseCom(depth);ReleaseCom(rt);
                 if(result!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
-                if(result==R7CandidateSeedResult::DirtyRestore||inputRestoreFailed){
+                if(result==R7CandidateSeedResult::DirtyRestore){
                     ExternalAtomicReplayEpoch=0;
                     LastMainDepthClearStamp.Invalidate();
                     RightDepthSynchronized=false;RightStencilSynchronized=false;
@@ -2424,7 +2434,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		}
 
 		template <typename DrawCall>
-		HRESULT ExecuteStereoDraw(IDirect3DDevice9* device,DrawCall&& drawCall,bool candidateVb=false)
+		HRESULT ExecuteStereoDraw(IDirect3DDevice9* device,DrawCall&& drawCall,bool candidateVb=false,
+            bool up=false,bool indexedUp=false)
 		{
 			const auto visualTrace=R7CaptureVisualTrace();
 			const auto failureAtEntry=FrameFailureReason;
@@ -2580,15 +2591,16 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					return hr;
 				}
 			}
-            // Candidate replay only on the regular two-eye VB path. All
+            // Candidate replay only on the regular two-eye physical path. All
             // fallback draws above use the invalidating raw boundary.
             const bool mirrorCandidate=candidateVb && !InternalStereoPass &&
+                !FrameStereoIncomplete && !FrameRightDrawFailed &&
                 !OutRunVR::DinoSidecar::ActiveExternalStereoMesh &&
                 ExternalAtomicReplayEpoch==PresentEpoch;
             RevokeDepthClearReplayBeforeLeftDraw(device,mirrorCandidate);
             if(mirrorCandidate){
-                const auto replay=R7ReplayInactiveEye(device,0,TrackedRenderTarget,
-                    TrackedDepthStencil,drawCall);
+                const auto replay=R7ReplayInactiveDraw(device,0,TrackedRenderTarget,
+                    TrackedDepthStencil,drawCall,up,indexedUp);
                 if(replay==R7CandidateSeedResult::DirtyRestore){
                     if(draw.worldStereo){
                         InternalPassScope guard;
@@ -2658,7 +2670,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					}
 				}
                 if(SUCCEEDED(rightHr)&&mirrorCandidate&&ExternalAtomicReplayEpoch==PresentEpoch){
-                    const auto replay=R7ReplayInactiveEye(device,1,RightEyeSurface,RightEyeDepth,drawCall);
+                    const auto replay=R7ReplayInactiveDraw(device,1,RightEyeSurface,RightEyeDepth,
+                        drawCall,up,indexedUp);
                     if(replay==R7CandidateSeedResult::DirtyRestore){
                         rightFailure=OutRunVR::StereoFailureRestoreFailed;
                         rightHr=E_FAIL;
@@ -2815,8 +2828,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			}
 			return result;
 		}
-		HRESULT __stdcall DrawPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT primitiveCount,const void*data,UINT stride){if(InternalStereoPass)return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);auto call=[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);};return ExecuteStereoDraw(device,call);}
-		HRESULT __stdcall DrawIndexedPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT minVertexIndex,UINT numVertices,UINT primitiveCount,const void*indexData,D3DFORMAT indexFormat,const void*vertexData,UINT stride){auto call=[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device,type,minVertexIndex,numVertices,primitiveCount,indexData,indexFormat,vertexData,stride);};return ExecuteStereoDraw(device,call);}
+		HRESULT __stdcall DrawPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT primitiveCount,const void*data,UINT stride){if(InternalStereoPass)return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);auto call=[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);};return ExecuteStereoDraw(device,call,true,true);}
+		HRESULT __stdcall DrawIndexedPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT minVertexIndex,UINT numVertices,UINT primitiveCount,const void*indexData,D3DFORMAT indexFormat,const void*vertexData,UINT stride){auto call=[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device,type,minVertexIndex,numVertices,primitiveCount,indexData,indexFormat,vertexData,stride);};return ExecuteStereoDraw(device,call,true,true,true);}
 
 		HRESULT __stdcall ClearDest(IDirect3DDevice9*device,DWORD count,const D3DRECT*rects,DWORD flags,D3DCOLOR color,float z,DWORD stencil)
 		{

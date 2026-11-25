@@ -14,7 +14,16 @@ raw = r29[r29.index("    HRESULT R29OwnerCallRawDrawPrimitive("):
           r29.index("    HRESULT R29OwnerCallRawPresent(")]
 helper = r7[r7.index("void RevokeDepthClearReplayBeforeLeftDraw("):
             r7.index("bool ViewportCoversStereoBackbuffer(")]
-raw_vb = r7[r7.index("template<class DrawCall>\n        HRESULT R7ExecuteRawCandidateVb("):r7.index("bool RestoreRightPassState(")]
+raw_vb = r7[r7.index("template<class DrawCall>\n        R7CandidateSeedResult R7ReplayInactiveDraw("):r7.index("bool RestoreRightPassState(")]
+# Both base R7 eye calls must route through the very helper compiled below.
+base_draw = r7[r7.index("HRESULT ExecuteStereoDraw("):r7.index("HRESULT __stdcall DrawPrimitiveDest(")]
+assert "R7ReplayInactiveDraw(device,0,TrackedRenderTarget,\n                    TrackedDepthStencil,drawCall,up,indexedUp)" in base_draw
+assert "R7ReplayInactiveDraw(device,1,RightEyeSurface,RightEyeDepth,\n                        drawCall,up,indexedUp)" in base_draw
+assert base_draw.count("replay==R7CandidateSeedResult::DirtyRestore") == 2
+base_up = r7[r7.index("HRESULT __stdcall DrawPrimitiveUPDest("):r7.index("HRESULT __stdcall DrawIndexedPrimitiveUPDest(")]
+base_iup = r7[r7.index("HRESULT __stdcall DrawIndexedPrimitiveUPDest("):].split("\n",1)[0]
+assert "ExecuteStereoDraw(device,call,true,true);" in base_up
+assert "ExecuteStereoDraw(device,call,true,true,true);" in base_iup
 prefix = r'''
 #include "depth_clear_replay_stamp.hpp"
 #include <cassert>
@@ -234,6 +243,40 @@ int main() {
         assert(RightDepthSynchronized==!dirty&&RightStencilSynchronized==!dirty);
         if(!dirty){assert(!game.vb);assert(game.ib==(family==3?nullptr:expectedIb));}
         for(auto* surface:{&leftColor,&leftDepth,&rightColor,&rightDepth,&otherColor,&otherDepth})assert(surface->refs==0);
+        ++cases;
+    }
+    // Base R7 calls the shared candidate helper directly with already-bound eye state.
+    // Unlike the raw owner, it must not execute a live draw from this helper.
+    for(unsigned family=2;family<4;++family)
+    for(unsigned eye=0;eye<2;++eye)
+    for(bool bound:{false,true})
+    for(unsigned scenario=0;scenario<7;++scenario){
+        game.rt=eye?&rightColor:&leftColor;game.depth=eye?&rightDepth:&leftDepth;
+        game.vb=bound?&vertexBuffer:nullptr;game.ib=bound?&indexBuffer:nullptr;
+        game.offset=bound?12u:0u;game.stride=bound?32u:0u;
+        game.streamGetFail=scenario==1;game.indexGetFail=scenario==2;
+        game.streamSetFail=scenario==3;game.indexSetFail=scenario==4;
+        candidateInjected=scenario==5?-17:0;
+        replayResult=scenario==6?R7CandidateSeedResult::DirtyRestore:R7CandidateSeedResult::Seeded;
+        ExternalAtomicReplayEpoch=77;LastMainDepthClearStamp.Record(77,0);
+        expectedAtCall=0;expectedHook=family;calls=replayCalls=0;
+        game.streamSets=game.indexSets=0;
+        auto physical=[&](){return family==2?
+            DrawPrimitiveUPHook.stdcall<HRESULT>(&game,0,1,nullptr,0):
+            DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(&game,0,0,3,1,nullptr,0,nullptr,0);};
+        const auto result=R7ReplayInactiveDraw(&game,eye,game.rt,game.depth,physical,true,family==3);
+        const bool dirty=scenario==3||(family==3&&scenario==4)||scenario==6;
+        const bool clean=scenario==0||(family==2&&(scenario==2||scenario==4));
+        assert(result==(dirty?R7CandidateSeedResult::DirtyRestore:
+            (clean?R7CandidateSeedResult::Seeded:R7CandidateSeedResult::Unavailable)));
+        assert(ExternalAtomicReplayEpoch==(clean?77u:0u));
+        assert(calls==0&&replayCalls==1&&replayEye==eye);
+        assert(vertexBuffer.refs==0&&indexBuffer.refs==0);
+        if(!dirty){
+            assert(game.vb==(bound?&vertexBuffer:nullptr));
+            assert(game.ib==(bound?&indexBuffer:nullptr));
+            assert(game.offset==(bound?12u:0u)&&game.stride==(bound?32u:0u));
+        }
         ++cases;
     }
     std::cout << "R29_RAW_DEPTH_RECEIPT_PASS " << cases << "\\n";
