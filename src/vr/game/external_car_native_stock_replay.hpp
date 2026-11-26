@@ -7,6 +7,14 @@ namespace OutRunVR::DinoSidecar {
 // Verified retail 46BF8C -> 469600; only the three model queues are
 // eligible. The original function, its state updates, shadows, lighting,
 // and all original physical draws remain running exactly once.
+// 405220..405249 initializes the 256-entry queue; 405047..405076
+// appends exactly one 0x3c-byte record and its sorted-list pointer.
+// Use the populated record count, not the allocation capacity.
+constexpr bool NativeQueueEntryInPool(std::uint32_t count,std::uint32_t capacity,
+    std::uintptr_t pool,std::uintptr_t entry) noexcept {
+    return count&&count<=capacity&&capacity<=0x100u&&pool&&entry>=pool&&
+        (entry-pool)%0x3cu==0&&(entry-pool)/0x3cu<count;
+}
 struct NativeVehicleStockReplay {
     IsolatedVehicleKey key{};
     unsigned opened=0,closed=0,physicalDepth=0,physicalEntries=0;
@@ -67,7 +75,12 @@ struct ScopedNativeVehicleStockReplay {
 };
 struct ScopedNativeVehiclePhysical {
     NativeVehicleStockReplay* replay;
-    explicit ScopedNativeVehiclePhysical(bool owned) noexcept:replay(ActiveNativeVehicleStockReplay) {
+    explicit ScopedNativeVehiclePhysical(bool owned) noexcept:
+        replay(ActiveNativeVehicleStockReplay&&ActiveNativeVehicleStockReplay->group?
+            ActiveNativeVehicleStockReplay:nullptr) {
+        // Native shadows and other legitimate draws between model groups
+        // must be replayed in both scenes, not interpreted as failed body
+        // ownership. Only a physical entry INSIDE a model group can omit.
         if(replay)replay->EnterPhysical(owned);
     }
     ~ScopedNativeVehiclePhysical(){if(replay)replay->LeavePhysical();}

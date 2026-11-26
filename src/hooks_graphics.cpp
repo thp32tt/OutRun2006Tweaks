@@ -1330,13 +1330,23 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     static bool NativeModelQueueEmpty() noexcept
     {
         const auto* q=Module::exe_ptr<const std::uint32_t>(0x464ef8);
-        return QuestCockpitGlassLive::Memory(q,7u*sizeof(std::uint32_t))&&q[0]==0u;
+        // 405333..405342 clears count, auxiliary count, and restoration
+        // count and restores the immediate-submit mode.
+        const auto* mode=Module::exe_ptr<const std::uint32_t>(0x4999b0);
+        return QuestCockpitGlassLive::Memory(q,8u*sizeof(std::uint32_t))&&
+            QuestCockpitGlassLive::Memory(mode,sizeof(*mode))&&
+            q[0]==0u&&q[2]==0u&&q[7]==0u&&*mode==1u;
     }
     static void __cdecl NativeModelQueueBegin()
     {
         using namespace OutRunVR::DinoSidecar;
         if(auto* replay=ActiveNativeVehicleStockReplay)replay->Open(NativeModelQueueEmpty());
         Module::fn_ptr<void(__cdecl*)()>(0x52B0)();
+        if(auto* replay=ActiveNativeVehicleStockReplay){
+            const auto* mode=Module::exe_ptr<const std::uint32_t>(0x4999b0);
+            if(!QuestCockpitGlassLive::Memory(mode,sizeof(*mode))||*mode!=0u)
+                replay->failed=true;
+        }
     }
     static void __cdecl NativeModelQueueEnd()
     {
@@ -3112,6 +3122,42 @@ class VRLensFlareProjected2D : public Hook
     using LensOpaqueFlushFn = void(__cdecl*)();
     using LensOpaquePmtEntryFn = void(__cdecl*)(const std::uint32_t*);
 
+    static bool NativeVehicleQueueEntryOwned(const std::uint32_t* entry,
+        bool specialAlpha) noexcept
+    {
+        using namespace OutRunVR::DinoSidecar;
+        auto* replay=ActiveNativeVehicleStockReplay;
+        if(!replay||!replay->group)return false;
+        const auto* q=Module::exe_ptr<const std::uint32_t>(0x464ef8);
+        if(!QuestCockpitGlassLive::Memory(q,8u*sizeof(std::uint32_t))||
+            !NativeQueueEntryInPool(q[0],q[1],q[5],reinterpret_cast<std::uintptr_t>(entry))||
+            !QuestCockpitGlassLive::Memory(entry,0x3cu)||
+            entry[8]>1u||!entry[5]||!entry[6]||!entry[7]||
+            !replay->OwnsObject(entry[14]))return false;
+        // 4058FE/405A9C select pass bits from the node flags; the
+        // separate 405BE4 branch is pass 1 with bit 0x200 set.
+        const auto* flags=reinterpret_cast<const std::uint32_t*>(entry[6]);
+        if(!QuestCockpitGlassLive::Memory(flags,sizeof(*flags)))return false;
+        const auto f=*flags;
+        return specialAlpha?(entry[8]==1u&&(f&0x202u)==0x202u):
+            ((f&(1u<<entry[8]))!=0u&&(entry[8]==0u||!(f&0x200u)));
+    }
+    static void __cdecl TraceNativeVehicleSortedAlpha(const std::uint32_t* entry)
+    {
+        // Canonical 405BE4 -> 405CF0 owns sorted triangle rendering and
+        // emits raw indexed draws (405ECF), bypassing both 404700 edges.
+        // Keep the actual sorter, texture binding and all stock DIPs.
+        OutRunVR::DinoSidecar::ScopedNativeVehiclePhysical stockOnly(
+            NativeVehicleQueueEntryOwned(entry,true));
+        Module::fn_ptr<void(__cdecl*)(const std::uint32_t*)>(0x5CF0)(entry);
+    }
+    static bool NativeSortedAlphaEdgeCanonical() noexcept
+    {
+        const auto* call=Module::exe_ptr<const std::uint8_t>(0x5BE4);
+        constexpr std::array<std::uint8_t,5> expected{{0xE8,0x07,0x01,0x00,0x00}};
+        return QuestCockpitGlassLive::Memory(call,expected.size())&&
+            std::memcmp(call,expected.data(),expected.size())==0;
+    }
     static void __cdecl TraceLensOpaquePmtEntry(
         const std::uint32_t* entry)
     {
@@ -3172,23 +3218,8 @@ class VRLensFlareProjected2D : public Hook
                         Name(CurrentRenderProducerToken()),
                         QueueRenderActive());
             }
-            // The 469600 model groups begin with an empty queue. Validate
-            // the actual physical entry belongs to that live queue before
-            // letting the private replay omit any native triangles.
-            bool nativeOwned=false;
-            if(auto* replay=OutRunVR::DinoSidecar::ActiveNativeVehicleStockReplay){
-                const auto* q=Module::exe_ptr<const std::uint32_t>(0x464ef8);
-                if(replay->group&&QuestCockpitGlassLive::Memory(q,7u*sizeof(std::uint32_t))&&
-                    q[0]<=q[1]&&q[1]<=0x100u&&q[5]&&entry&&
-                    QuestCockpitGlassLive::Memory(entry,0x3cu)){
-                    const auto base=static_cast<std::uintptr_t>(q[5]);
-                    const auto addr=reinterpret_cast<std::uintptr_t>(entry);
-                    nativeOwned=addr>=base&&addr-base<static_cast<std::uintptr_t>(q[0])*0x3cu&&
-                        (addr-base)%0x3cu==0&&entry[8]<=1u&&entry[5]&&entry[6]&&entry[7]&&
-                        replay->OwnsObject(entry[14]);
-                }
-            }
-            OutRunVR::DinoSidecar::ScopedNativeVehiclePhysical stockOnly(nativeOwned);
+            OutRunVR::DinoSidecar::ScopedNativeVehiclePhysical stockOnly(
+                NativeVehicleQueueEntryOwned(entry,false));
             Module::fn_ptr<LensOpaquePmtEntryFn>(0x4700)(entry);
             if(queuedSkyIndex>=0 && entry)
                 OutRunVR::WorldSkyOpaqueQueue::Complete(
@@ -3896,7 +3927,15 @@ public:
             Memory::VP::InjectHook(
                 Module::exe_ptr(0x5C44), TraceLensOpaquePmtEntry,
                 Memory::HookType::Call);
-            OutRunVR::DinoSidecar::NativeVehiclePmtConsumerReady.store(true,std::memory_order_release);
+            // The two ordinary PMT edges alone are not complete coverage:
+            // special alpha takes an entirely different physical path.
+            if(NativeSortedAlphaEdgeCanonical()){
+                Memory::VP::InjectHook(Module::exe_ptr(0x5BE4),
+                    TraceNativeVehicleSortedAlpha,Memory::HookType::Call);
+                OutRunVR::DinoSidecar::NativeVehiclePmtConsumerReady.store(true,std::memory_order_release);
+            }else{
+                spdlog::warn("VR external atomic native model: sorted alpha edge unavailable; original retained");
+            }
         } else {
             spdlog::warn(
                 "VR PMT ENTRY: canonical 405890->404700 call edges mismatch; "

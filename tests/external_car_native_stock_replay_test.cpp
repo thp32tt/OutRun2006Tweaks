@@ -31,6 +31,26 @@ int main(){
         assert(!r.OwnsObject(0x570008u));
         assert(!r.OwnsObject(prefix|0xffffu));++cases;
     }
+    for(unsigned count:{0u,1u,3u,256u,257u})for(unsigned index:{0u,1u,2u,255u,256u})
+    for(unsigned offset:{0u,1u,59u}){
+        const auto address=0x1000u+0x3cu*index+offset;
+        assert(NativeQueueEntryInPool(count,256,0x1000,address)==
+            (count<=256&&index<count&&offset==0));++cases;
+    }
+    assert(!NativeQueueEntryInPool(1,256,0x1000,0xfff));
+    assert(!NativeQueueEntryInPool(1,257,0x1000,0x1000));
+    assert(!NativeQueueEntryInPool(1,256,0,0));
+    // Between all three real queue groups, independent native shadow/
+    // passenger draws do not enter or invalidate the body transaction.
+    {NativeVehicleStockReplay a{};a.key={1,2,3,4,5,6};ScopedNativeVehicleStockReplay owner(a);
+     for(unsigned group=0;group<3;++group){
+        {ScopedNativeVehiclePhysical unrelated(false);assert(!a.StockOnly()&&!a.failed&&!a.physicalDepth);}
+        a.Open(true);
+        {ScopedNativeVehiclePhysical ordinary(true);assert(a.StockOnly());++a.omitted[0];++a.omitted[1];}
+        {ScopedNativeVehiclePhysical sortedAlpha(true);assert(a.StockOnly());++a.omitted[0];++a.omitted[1];}
+        a.Close(true);
+     }
+     assert(a.Ready()&&a.physicalEntries==6);++cases;}
     NativeVehicleStockReplay r{};r.key={1,2,3,4,5,6};
     {ScopedNativeVehicleStockReplay owner(r);r.Open(true);
      {ScopedNativeVehiclePhysical p(false);assert(!r.StockOnly());}

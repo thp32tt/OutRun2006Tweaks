@@ -101,8 +101,11 @@ jobs:
           assert 'PrepareF50External(player)' in model and 'BeginNativeVehicleReplacement(' in model
           assert 'ScopedNativeVehicleStockReplay stock(replay);' in model
           assert model.index('ScopedNativeVehicleStockReplay stock(replay);') < model.index('original(player,model,variant); // native geometry') < model.index('FinishNativeVehicleReplacement(')
-          assert 'ScopedNativeVehiclePhysical stockOnly(nativeOwned);' in source
-          assert 'replay->OwnsObject(entry[14]);' in source
+          assert 'NativeVehicleQueueEntryOwned(entry,false)' in source
+          assert 'NativeVehicleQueueEntryOwned(entry,true)' in source
+          assert 'replay->OwnsObject(entry[14])' in source
+          assert 'Module::exe_ptr(0x5BE4)' in source
+          assert 'TraceNativeVehicleSortedAlpha,Memory::HookType::Call' in source
           assert 'R7NativeCompletedVehicle.Same(key)' in r7
           assert 'R7RecordNativeStockOmission(eye,result)' in r7
           safe=Path('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp').read_text()
