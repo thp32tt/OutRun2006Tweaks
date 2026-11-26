@@ -277,7 +277,7 @@ bool IsGameDevice(IDirect3DDevice9* d){return d!=nullptr;}
 bool StereoWanted(){return wanted;}
 bool TargetIsBackBuffer(){return backbuffer;}
 bool AnyAuxRenderTargetActive(){return mrt;}
-bool EnsureStereoResources(IDirect3DDevice9*){return resources;}
+bool EnsureStereoResources(IDirect3DDevice9*,bool* retired){*retired=false;return resources;}
 bool SurfaceHasStencil(IDirect3DSurface9* s){return s!=nullptr;}
 bool ClearCoversStereoBackbuffer(IDirect3DDevice9*,DWORD,const D3DRECT*){
     ++coverageCalls;return coverage;
@@ -732,8 +732,16 @@ FirstOcclusionRejectLogged,FirstClassificationFailureLogged;
 bool AnyAuxRenderTargetActive(){return false;}
 void PoisonFrame(OutRunVR::Failure){++poisons;}
 void NoteRestoreFailure(const char*){++notes;}
-bool EnsureStereoResources(IDirect3DDevice9*){if(initialAllocation)++generation;return step();}
 bool TrackedDepthStencil=true,RightDepthSynchronized,RightStencilSynchronized;
+bool EnsureStereoResources(IDirect3DDevice9*,bool* retired){
+    *retired=false;
+    if(initialAllocation)++generation;
+    const auto before=generation;
+    const bool ok=step();
+    if(before!=generation){*retired=true;++notes;ExternalAtomicReplayEpoch=0;
+        RightDepthSynchronized=false;RightStencilSynchronized=false;return false;}
+    return ok;
+}
 struct Stamp {unsigned count=0;void Invalidate(){++count;}} LastMainDepthClearStamp;
 bool TryBootstrapRightDepthFromRecentClear(IDirect3DDevice9*,bool* failed){
     step();*failed=bootstrapDirty;if(*failed)++notes;return false;
@@ -773,6 +781,9 @@ int main(){
         assert(ExternalAtomicReplayEpoch==(interrupted?0u:17u));
         ++cases;
     }
+    calls=notes=0;retireAt=1;failAt=0;bootstrapDirty=false;
+    {DrawStereoState state;bool dirty=false;
+    assert(!PrepareDuplicatedDraw(&dev,state,dirty)&&dirty&&calls==1&&notes==1);}
     calls=notes=0;retireAt=failAt=0;bootstrapDirty=true;
     DrawStereoState state;bool dirty=false;
     assert(!PrepareDuplicatedDraw(&dev,state,dirty)&&dirty&&calls==2&&notes==1);

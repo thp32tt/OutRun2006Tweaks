@@ -11,7 +11,10 @@ init = source[end:source.index("void NoteRestoreFailure(", end)]
 # Failed preflight must precede retirement, allocation and any state mutation.
 guard = init.index("if (!CaptureStereoInitState(")
 assert guard < init.index("ReleaseStereoResources();") < init.index("device->CreateRenderTarget(")
-assert init.index("currentDepth,desc,savedViewport)) return false;") < init.index("ReleaseStereoResources();")
+assert init.index("currentDepth,desc,savedViewport,retired))") < init.index("ReleaseStereoResources();")
+assert init.index("if(captureRetired)*captureRetired=true;") < init.index("ReleaseStereoResources();")
+assert "EnsureStereoResources(device,&bootstrapRestoreFailed)" in source
+assert "if(captureRetired)return E_FAIL;" in source
 assert "TrackedRenderTarget=currentRt;" in init
 assert "TrackedDepthStencil=currentDepth;" in init
 assert "GetViewport(" not in init
@@ -19,6 +22,13 @@ assert "ReplaceSurfaceRef(TrackedRenderTarget,BackBuffer)" not in init
 
 stub = r'''
 #include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <initializer_list>
+std::uint64_t generation=1;
+unsigned calls=0,retireAt=0,releaseRetireAt=0,releases=0;
+std::uint64_t R7EyeStateGeneration(){return generation;}
+void step(){if(++calls==retireAt)++generation;}
 using HRESULT = int;
 constexpr HRESULT D3DERR_NOTFOUND=-2, E_FAIL=-1, S_OK=0;
 constexpr int D3DBACKBUFFER_TYPE_MONO=0;
@@ -27,8 +37,8 @@ struct D3DSURFACE_DESC { int width=0; };
 struct D3DVIEWPORT9 { int width=0; };
 struct IDirect3DSurface9 {
     int refs=0; HRESULT descHr=S_OK;
-    HRESULT GetDesc(D3DSURFACE_DESC* d) { d->width=1920; return descHr; }
-    void Release() { assert(refs>0); --refs; }
+    HRESULT GetDesc(D3DSURFACE_DESC* d) { step(); d->width=1920; return descHr; }
+    void Release() { assert(refs>0); --refs; if(++releases==releaseRetireAt)++generation; }
 };
 template<class T> void ReleaseCom(T*& p) { if(p) {p->Release();p=nullptr;} }
 struct IDirect3DDevice9 {
@@ -37,19 +47,21 @@ struct IDirect3DDevice9 {
     bool noBack=false,noRt=false,noDepth=false;
     int viewCalls=0;
     static HRESULT get(IDirect3DSurface9** out,IDirect3DSurface9& s,HRESULT hr,bool empty) {
-        *out=empty?nullptr:&s; if(*out) ++s.refs; return hr;
+        step(); *out=empty?nullptr:&s; if(*out) ++s.refs; return hr;
     }
     HRESULT GetBackBuffer(int,int,int,IDirect3DSurface9** out) {return get(out,back,backHr,noBack);}
     HRESULT GetRenderTarget(int,IDirect3DSurface9** out) {return get(out,rt,rtHr,noRt);}
     HRESULT GetDepthStencilSurface(IDirect3DSurface9** out) {return get(out,depth,depthHr,noDepth);}
-    HRESULT GetViewport(D3DVIEWPORT9* v) {++viewCalls;v->width=800;return viewHr;}
+    HRESULT GetViewport(D3DVIEWPORT9* v) {step();++viewCalls;v->width=800;return viewHr;}
 };
 '''
 cases = r'''
 void run(IDirect3DDevice9& d,bool expected,bool depthExpected=false) {
     IDirect3DSurface9 *b=nullptr,*r=nullptr,*z=nullptr;
     D3DSURFACE_DESC desc{}; D3DVIEWPORT9 view{};
-    assert(CaptureStereoInitState(&d,b,r,z,desc,view)==expected);
+    bool retired=false;
+    assert(CaptureStereoInitState(&d,b,r,z,desc,view,retired)==expected);
+    assert(!retired);
     if(expected) {
         assert(b==&d.back && r==&d.rt && b!=r);
         assert((z==&d.depth)==depthExpected);
@@ -72,6 +84,40 @@ int main() {
     {IDirect3DDevice9 d;d.viewHr=E_FAIL;run(d,false);}
     // Retry after a transient getter failure is still permitted.
     {IDirect3DDevice9 d;d.rtHr=E_FAIL;run(d,false);d.rtHr=S_OK;run(d,true,true);}
+    unsigned cases=0;
+    for(unsigned phase=1;phase<=5;++phase)
+    for(bool failing:{false,true}){
+        IDirect3DDevice9 d;
+        if(failing){
+            switch(phase){
+            case 1:d.backHr=E_FAIL;break;
+            case 2:d.back.descHr=E_FAIL;break;
+            case 3:d.rtHr=E_FAIL;break;
+            case 4:d.depthHr=E_FAIL;break;
+            case 5:d.viewHr=E_FAIL;break;
+            }
+        }
+        calls=releases=0;retireAt=phase;releaseRetireAt=0;
+        IDirect3DSurface9 *b=nullptr,*r=nullptr,*z=nullptr;
+        D3DSURFACE_DESC desc{};D3DVIEWPORT9 view{};bool retired=false;
+        assert(!CaptureStereoInitState(&d,b,r,z,desc,view,retired)&&retired);
+        assert(calls==phase&&!b&&!r&&!z);
+        assert(!d.back.refs&&!d.rt.refs&&!d.depth.refs);
+        ++cases;
+    }
+    for(unsigned release=1;release<=3;++release){
+        IDirect3DDevice9 d;d.viewHr=E_FAIL;
+        calls=releases=retireAt=0;releaseRetireAt=release;
+        IDirect3DSurface9 *b=nullptr,*r=nullptr,*z=nullptr;
+        D3DSURFACE_DESC desc{};D3DVIEWPORT9 view{};bool retired=false;
+        assert(!CaptureStereoInitState(&d,b,r,z,desc,view,retired)&&retired);
+        assert(calls==5&&releases==3&&!b&&!r&&!z);
+        assert(!d.back.refs&&!d.rt.refs&&!d.depth.refs);
+        ++cases;
+    }
+    calls=releases=retireAt=releaseRetireAt=0;
+    {IDirect3DDevice9 d;run(d,true,true);}
+    std::cout<<"R7_INIT_CAPTURE_GENERATION_PASS "<<cases<<" + fresh retry\\n";
 }
 '''
 with tempfile.TemporaryDirectory() as temp:
