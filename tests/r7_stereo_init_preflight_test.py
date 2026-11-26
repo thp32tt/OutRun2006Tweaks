@@ -745,10 +745,11 @@ struct IDirect3DDevice9Ex{bool game=true;};
 std::atomic<bool> StereoBaseCallbacksArmed{true};
 bool IsGameDevice(IDirect3DDevice9Ex* d){return d&&d->game;}
 std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
-unsigned R7CandidateResetInFlight=0,proof=1,resets=0,calls=0;
+unsigned R7CandidateResetInFlight=0,proof=1,resets=0,calls=0,r9Retires=0;
 bool allocated=true,owned=false,nested=false;
 void R7ForgetAutomaticDepthProof(){++proof;}
-bool R7RetireDirectResetCore(){return false;}
+void R9RetireDirectResetResources(){assert(R7CandidateResetInFlight==1);++r9Retires;}
+bool R7RetireDirectResetCore(){assert(r9Retires==1);return false;}
 struct Pair{void Reset(){++resets;allocated=false;}} ExternalAtomicCandidates;
 IDirect3DDevice9Ex* expectedDevice=nullptr;
 D3DPRESENT_PARAMETERS* expectedParams=nullptr;
@@ -757,6 +758,7 @@ HRESULT result=0;
 struct Hook{
     template<class R> R stdcall(IDirect3DDevice9Ex* d,D3DPRESENT_PARAMETERS* p,D3DDISPLAYMODEEX* m){
         ++calls;assert(d==expectedDevice&&p==expectedParams&&m==expectedMode);
+        assert(r9Retires==unsigned(owned));
         if(owned){
             assert(!allocated&&resets==1&&proof==2&&R7CandidateResetInFlight==1);
             assert(ExternalAtomicReplayEpoch==0&&ExternalAtomicAllocationAttemptEpoch==PresentEpoch);
@@ -780,7 +782,7 @@ int main(){
         nested=mask&32;result=(mask&64)?-1:0;owned=!(mask&7);
         const std::uint64_t initialReplay=(mask&128)?9:0;
         PresentEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=initialReplay;
-        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;allocated=true;
+        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;allocated=true;
         assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
         assert(calls==1&&R7CandidateResetInFlight==0);
         assert(PresentEpoch==(owned&&nested?1u:9u));
@@ -959,5 +961,60 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"direct_reset_core.cpp"
     exe=Path(temp)/"direct_reset_core"
     cpp.write_text(direct_core_stub+direct_reset_core+direct_core_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# Iter83: exercise actual R9 independent ownership cleanup, including a
+# R7-empty / R9-still-owned generation and repeated nested retirement.
+r9_source=Path("src/vr/d3d9/stereo_renderer.cpp").read_text(encoding="utf-8")
+r9_retire=r9_source[r9_source.index("void R9ReleaseMonoResources()"):
+                    r9_source.index("bool R9CaptureMainDepth(")]
+r9_stub=r'''
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+struct Surface{unsigned releases=0;};
+template<class T> void ReleaseCom(T*& ptr){if(ptr){++ptr->releases;ptr=nullptr;}}
+Surface *R9MonoDepth=nullptr,*R9MonoSurface=nullptr,
+    *R9DeferredDepthIdentity=nullptr,*R9MainDepthIdentity=nullptr;
+struct Desc{int width=0;} R9MainDepthDesc;
+std::uint64_t R9MonoResourceGeneration=0,R9FirstFailureEpoch=0;
+bool R9MonoSeeded=false,R9MonoBackupGap=false,R9MainDepthKnown=false,
+    R9DeferredDepth=false,R9StereoSeeded=false,R9MonoElisionArmed=false,
+    R9ExpectMainDepthAfterReset=false;
+unsigned R9MonoElisionFailureStreak=0;
+'''
+r9_cases=r'''
+int main(){
+    for(unsigned mask=0;mask<1024;++mask){
+        Surface md,mc,dd,main;
+        R9MonoDepth=(mask&1)?&md:nullptr;
+        R9MonoSurface=(mask&2)?&mc:nullptr;
+        R9DeferredDepthIdentity=(mask&4)?&dd:nullptr;
+        R9MainDepthIdentity=(mask&8)?&main:nullptr;
+        R9MonoSeeded=bool(mask&16);R9MonoBackupGap=bool(mask&32);
+        R9MainDepthKnown=bool(mask&64);R9DeferredDepth=bool(mask&128);
+        R9StereoSeeded=bool(mask&256);R9MonoElisionArmed=bool(mask&512);
+        R9MainDepthDesc.width=1920;R9MonoResourceGeneration=12;
+        R9FirstFailureEpoch=9;R9MonoElisionFailureStreak=3;
+        R9ExpectMainDepthAfterReset=false;
+        for(int repeat=0;repeat<2;++repeat){
+            R9RetireDirectResetResources();
+            assert(!R9MonoDepth&&!R9MonoSurface&&!R9DeferredDepthIdentity&&!R9MainDepthIdentity);
+            assert(!R9MonoSeeded&&!R9MonoBackupGap&&!R9MainDepthKnown&&!R9DeferredDepth);
+            assert(!R9StereoSeeded&&!R9MonoElisionArmed&&R9ExpectMainDepthAfterReset);
+            assert(!R9MainDepthDesc.width&&!R9MonoResourceGeneration&&!R9FirstFailureEpoch&&!R9MonoElisionFailureStreak);
+            assert(md.releases==unsigned(bool(mask&1))&&mc.releases==unsigned(bool(mask&2)));
+            assert(dd.releases==unsigned(bool(mask&4))&&main.releases==unsigned(bool(mask&8)));
+        }
+    }
+    std::cout<<"R9_DIRECT_RESET_RETIRE_PASS 1024\\n";
+}
+'''
+assert reset_callback.index("R9RetireDirectResetResources();") < reset_callback.index("if(!R7RetireDirectResetCore())")
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"r9_direct_reset.cpp"
+    exe=Path(temp)/"r9_direct_reset"
+    cpp.write_text(r9_stub+r9_retire+r9_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)

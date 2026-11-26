@@ -1857,6 +1857,7 @@ namespace OutRunVRStereo
         }
 
         void ReleaseStereoResources();
+        void R9RetireDirectResetResources() noexcept;
 
         // R13's normal reset path retires core attachments before calling
         // ResetEx. A direct call can still reach the driver with the old
@@ -1891,6 +1892,8 @@ namespace OutRunVRStereo
             ExternalAtomicReplayEpoch=0;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             R7ForgetAutomaticDepthProof();
+            // R9 holds independent COM references even if R7 has no core.
+            R9RetireDirectResetResources();
             if(!R7RetireDirectResetCore())ExternalAtomicCandidates.Reset();
             // ReleaseStereoResources also clears the allocation attempt epoch.
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;

@@ -198,6 +198,20 @@ namespace OutRunVRStereo
 			R9DeferredDepth = false;
 		}
 
+		// Direct ResetEx bypasses ResetDestR9 and R13ResetCommonPre.
+		// Release independent default-pool surfaces and depth identity before
+		// the physical call, even if the R7 core was already retired.
+		void R9RetireDirectResetResources() noexcept
+		{
+			R9ReleaseMonoResources();
+			R9ReleaseDepthIdentity();
+			R9StereoSeeded = false;
+			R9MonoElisionArmed = false;
+			R9MonoElisionFailureStreak = 0;
+			R9ExpectMainDepthAfterReset = true;
+			R9FirstFailureEpoch = 0;
+		}
+
 		bool R9CaptureMainDepth(IDirect3DSurface9* surface, const char* why)
 		{
 			if (!surface)
