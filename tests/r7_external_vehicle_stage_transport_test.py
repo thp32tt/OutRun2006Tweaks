@@ -20,7 +20,7 @@ a=r7.index("const char* NativeVehicleReplacementBlockReason()",a)
 native_api=r7[a:r7.index("void R7SetDirectResetRasterOwner(",a)]
 a=r7.index("bool R7NativeStockOnlyDraw()")
 native_omit=r7[a:r7.index("template<class DrawCall>",a)]
-a=gpu.index("struct IsolatedEyeRaster")
+a=gpu.index("enum class IsolatedMeshPass")
 types=gpu[a:gpu.index("class GpuOwner",a)]
 stub=r'''
 #include <cassert>
