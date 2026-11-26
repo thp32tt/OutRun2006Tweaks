@@ -2745,17 +2745,54 @@ if(WaitForEventQuery(slot.fence,1,0u))
             return hr;
         }
 
-		bool RestoreRightPassState(IDirect3DDevice9* device,IDirect3DSurface9* savedRt,IDirect3DSurface9* savedDepth,const D3DVIEWPORT9& savedViewport,const float* originalConstants,bool restoreWvp){bool ok=true;if(savedRt&&FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,savedRt)))ok=false;const HRESULT depthHr=SetDepthStencilSurfaceHook?SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,savedDepth):device->SetDepthStencilSurface(savedDepth);if(FAILED(depthHr))ok=false;if(FAILED(device->SetViewport(&savedViewport)))ok=false;if(restoreWvp&&!RestoreWvpOneRegisterAtATime(device,originalConstants))ok=false;return ok;}
+		bool RestoreRightPassState(IDirect3DDevice9* device,IDirect3DSurface9* savedRt,
+            IDirect3DSurface9* savedDepth,const D3DVIEWPORT9& savedViewport,
+            const float* originalConstants,bool restoreWvp,std::uint64_t generation)
+        {
+            auto current=[&](){return ExternalAtomicCandidates.generation==generation;};
+            bool ok=true;
+            // A normal HRESULT failure still requires independent recovery.
+            // A retired generation, however, must never receive old bindings.
+            if(!current()||(savedRt&&FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,savedRt))))ok=false;
+            if(!current())return false;
+            const HRESULT depthHr=SetDepthStencilSurfaceHook?
+                SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,savedDepth):device->SetDepthStencilSurface(savedDepth);
+            if(FAILED(depthHr))ok=false;
+            if(!current())return false;
+            if(FAILED(device->SetViewport(&savedViewport)))ok=false;
+            if(!current())return false;
+            if(restoreWvp&&!RestoreWvpOneRegisterAtATime(device,originalConstants))ok=false;
+            return ok&&current();
+        }
 		bool TryBootstrapRightDepthFromRecentClear(IDirect3DDevice9*device,
 			bool* restoreFailed=nullptr)
 		{
 			if(restoreFailed)*restoreFailed=false;
 			++DepthBootstrapAttempts;
 			if(!device||!RightEyeSurface||!RightEyeDepth||!TrackedRenderTarget||!TrackedDepthStencil||!LastMainDepthClearStamp.Current(PresentEpoch))return false;
-			D3DSURFACE_DESC leftDesc{},rightDesc{};if(FAILED(TrackedDepthStencil->GetDesc(&leftDesc))||FAILED(RightEyeDepth->GetDesc(&rightDesc)))return false;
+			const auto generation=ExternalAtomicCandidates.generation;
+            auto current=[&](){return ExternalAtomicCandidates.generation==generation;};
+            auto dirty=[&](){
+                ExternalAtomicReplayEpoch=0;
+                if(restoreFailed)*restoreFailed=true;
+                RightDepthSynchronized=false;RightStencilSynchronized=false;
+                LastMainDepthClearStamp.Invalidate();
+                NoteRestoreFailure("right-eye depth bootstrap");
+                return false;
+            };
+            D3DSURFACE_DESC leftDesc{},rightDesc{};
+            const HRESULT leftDescHr=TrackedDepthStencil->GetDesc(&leftDesc);
+            if(!current())return dirty();
+            if(FAILED(leftDescHr))return false;
+            const HRESULT rightDescHr=RightEyeDepth->GetDesc(&rightDesc);
+            if(!current())return dirty();
+            if(FAILED(rightDescHr))return false;
 			if(!DepthDescMatches(leftDesc,rightDesc)||!DepthDescMatches(leftDesc,LastMainDepthClearDesc))return false;
 			DWORD replayFlags=0;if(!RightDepthSynchronized&&(LastMainDepthClearStamp.flags&D3DCLEAR_ZBUFFER))replayFlags|=D3DCLEAR_ZBUFFER;if(!RightStencilSynchronized&&(LastMainDepthClearStamp.flags&D3DCLEAR_STENCIL)&&FormatHasStencil(leftDesc.Format))replayFlags|=D3DCLEAR_STENCIL;if(!replayFlags)return false;
-			D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport)))return false;
+			D3DVIEWPORT9 savedViewport{};
+            const HRESULT viewportHr=device->GetViewport(&savedViewport);
+            if(!current())return dirty();
+            if(FAILED(viewportHr))return false;
 			// 01513: Clear(count=0) covers only the active viewport. Never
 			// certify whole-surface RIGHT depth/stencil sync from a cropped
 			// replay. Preserve the original viewport and fail closed instead
@@ -2771,9 +2808,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
             bool restoreOk=true,candidateDirty=false;
             {
                 InternalPassScope guard;
-                if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&
-                    SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&
-                    SUCCEEDED(device->SetViewport(&savedViewport))){
+                if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&current()&&
+                    SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&current()&&
+                    SUCCEEDED(device->SetViewport(&savedViewport))&&current()){
                     auto clearRight=[&](){return ClearHook.stdcall<HRESULT>(device,0u,
                         static_cast<const D3DRECT*>(nullptr),replayFlags,0,
                         LastMainDepthClearZ,LastMainDepthClearStencil);};
@@ -2782,23 +2819,17 @@ if(WaitForEventQuery(slot.fence,1,0u))
                         candidateDirty=replay==R7CandidateSeedResult::DirtyRestore;
                         if(replay!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
                     }
-                    if(!candidateDirty)clearHr=clearRight();
+                    if(!candidateDirty&&current())clearHr=clearRight();
                 }
                 // Always attempt outer recovery, even after candidate failure.
-                restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);
+                restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false,generation);
             }
             if(FAILED(clearHr)||!restoreOk||candidateDirty)ExternalAtomicReplayEpoch=0;
             if(candidateDirty)restoreOk=false;
             // A failed restore is not an ordinary unavailable depth replay.
 			// The live device may still target RIGHT; never certify this frame
 			// or retry the clear from the same now-untrusted receipt.
-			if(!restoreOk){
-				if(restoreFailed)*restoreFailed=true;
-				RightDepthSynchronized=false;RightStencilSynchronized=false;
-				LastMainDepthClearStamp.Invalidate();
-				NoteRestoreFailure("right-eye depth bootstrap");
-				return false;
-			}
+			if(!restoreOk)return dirty();
 			if(FAILED(clearHr))return false;
 			if(replayFlags&D3DCLEAR_ZBUFFER)RightDepthSynchronized=true;
 			if(replayFlags&D3DCLEAR_STENCIL)RightStencilSynchronized=true;
@@ -3285,7 +3316,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					failureAtEntry,FrameFailureReason);
 				return leftHr;
 			}
-			IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;
+			const auto rightGeneration=ExternalAtomicCandidates.generation;
+            auto rightCurrent=[&](){return ExternalAtomicCandidates.generation==rightGeneration;};
+            IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;
 			HRESULT rightHr=D3D_OK;
 			OutRunVR::StereoFailureReason rightFailure=OutRunVR::StereoFailureRightStateFailed;
 			bool restoreOk=true;
@@ -3293,10 +3326,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			{
 				InternalPassScope guard;
 				rightHr=SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface);
-				if(SUCCEEDED(rightHr))
+				if(SUCCEEDED(rightHr)&&rightCurrent())
 					rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);
-				if(SUCCEEDED(rightHr))
+				if(SUCCEEDED(rightHr)&&rightCurrent())
 					rightHr=device->SetViewport(&savedViewport);
+                if(!rightCurrent())rightHr=E_FAIL;
 				if(SUCCEEDED(rightHr)&&draw.worldStereo)
 				{
 					const bool eyeOk=draw.externalPbrWorld ?
@@ -3310,6 +3344,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 						rightHr=E_FAIL;
 					}
 				}
+                if(!rightCurrent())rightHr=E_FAIL;
                 if(SUCCEEDED(rightHr)&&mirrorCandidate&&ExternalAtomicReplayEpoch==PresentEpoch){
                     const auto replay=R7ReplayInactiveDraw(device,1,RightEyeSurface,RightEyeDepth,
                         drawCall,up,indexedUp);
@@ -3321,6 +3356,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                         NoteRestoreFailure("external inactive right replay");
                     }
                 }
+				if(!rightCurrent())rightHr=E_FAIL;
 				if(SUCCEEDED(rightHr))
 				{
 					rightFailure=OutRunVR::StereoFailureRightDrawFailed;
@@ -3329,12 +3365,14 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				}
 				restoreOk=RestoreRightPassState(device,savedRt,savedDepth,
 					savedViewport,draw.originalConstants,
-					draw.worldStereo&&!draw.fixedFunctionWorld);
-				if(draw.externalPbrWorld) {
+					draw.worldStereo&&!draw.fixedFunctionWorld,rightGeneration);
+				if(!rightCurrent())restoreOk=false;
+                else if(draw.externalPbrWorld) {
                     if(!RestoreExternalPbrConstants(device,draw))restoreOk=false;
                 } else if(draw.fixedFunctionWorld &&
                           !RestoreFixedFunctionTransforms(device,draw))
                     restoreOk=false;
+                if(!rightCurrent())restoreOk=false;
 			}
 			if(FAILED(rightHr)||!restoreOk)ExternalAtomicReplayEpoch=0;
 			FrameHadDuplicatedDraw=true;
@@ -3539,21 +3577,25 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 if((flags&D3DCLEAR_STENCIL)&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;
                 PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);return leftHr;
             }
+            const auto rightGeneration=ExternalAtomicCandidates.generation;
+            auto rightCurrent=[&](){return ExternalAtomicCandidates.generation==rightGeneration;};
             IDirect3DSurface9* savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;
             HRESULT rightHr=D3D_OK;
             bool restoreOk=true,candidateDirty=false;
             {
                 InternalPassScope guard;
                 rightHr=SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface);
-                if(SUCCEEDED(rightHr))rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);
-                if(SUCCEEDED(rightHr))rightHr=device->SetViewport(&savedViewport);
+                if(SUCCEEDED(rightHr)&&rightCurrent())rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);
+                if(SUCCEEDED(rightHr)&&rightCurrent())rightHr=device->SetViewport(&savedViewport);
+                if(!rightCurrent())rightHr=E_FAIL;
                 if(SUCCEEDED(rightHr)&&ExternalAtomicReplayEpoch==PresentEpoch){
                     const auto replay=R7ReplayInactiveEye(device,1,RightEyeSurface,RightEyeDepth,clearCall);
                     if(replay!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
                     candidateDirty=replay==R7CandidateSeedResult::DirtyRestore;
                 }
+                if(!rightCurrent())rightHr=E_FAIL;
                 if(SUCCEEDED(rightHr)&&!candidateDirty)rightHr=clearCall();
-                restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);
+                restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false,rightGeneration);
             }
             if(FAILED(rightHr)||!restoreOk||candidateDirty)ExternalAtomicReplayEpoch=0;
             // A dirty RT/depth/viewport restore invalidates attachment identity,

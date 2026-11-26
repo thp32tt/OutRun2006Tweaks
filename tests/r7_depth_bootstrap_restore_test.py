@@ -30,9 +30,13 @@ constexpr HRESULT E_FAIL=-1;
 constexpr DWORD D3DCLEAR_ZBUFFER=2,D3DCLEAR_STENCIL=4;
 struct D3DRECT{};
 struct D3DSURFACE_DESC { unsigned Width=100,Height=100,Format=1,MultiSampleType=0,MultiSampleQuality=0; };
+struct CandidatePairMock {std::uint64_t generation=1;} ExternalAtomicCandidates;
+unsigned probeStep=0,retireProbe=0,retireStep=0;
+bool retireCandidate=false;
+void probe(){if(++probeStep==retireProbe)++ExternalAtomicCandidates.generation;}
 struct IDirect3DSurface9 {
     D3DSURFACE_DESC desc{};
-    HRESULT GetDesc(D3DSURFACE_DESC* d){*d=desc;return 0;}
+    HRESULT GetDesc(D3DSURFACE_DESC* d){*d=desc;probe();return 0;}
 };
 struct D3DVIEWPORT9 { unsigned X=0,Y=0,Width=100,Height=100; };
 unsigned step=0,failAt=0,clearCalls=0,restoreCalls=0,notes=0;
@@ -42,9 +46,9 @@ bool testingFollowup=false;
 unsigned followupCalls[2]{},followupClears[2]{};
 
 HRESULT candidateClearHr=0;
-HRESULT call(){return ++step==failAt?E_FAIL:0;}
+HRESULT call(){++step;if(step==retireStep)++ExternalAtomicCandidates.generation;return step==failAt?E_FAIL:0;}
 struct IDirect3DDevice9 {
-    HRESULT GetViewport(D3DVIEWPORT9* v){*v={};return 0;}
+    HRESULT GetViewport(D3DVIEWPORT9* v){*v={};probe();return 0;}
     HRESULT SetViewport(const D3DVIEWPORT9*){return call();}
     HRESULT SetDepthStencilSurface(IDirect3DSurface9*){return call();}
 };
@@ -86,6 +90,7 @@ template<class Call> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9*
     }
     assert(eye==1&&rt==RightEyeSurface&&depth==RightEyeDepth);
     ++bootstrapReplayCalls;
+    if(retireCandidate)++ExternalAtomicCandidates.generation;
     if(bootstrapReplay==R7CandidateSeedResult::Seeded){
         inCandidate=true;const auto hr=clear();inCandidate=false;
         return FAILED(hr)?R7CandidateSeedResult::Unavailable:bootstrapReplay;
@@ -157,6 +162,34 @@ int main(){
         const bool retained=ok&&result==R7CandidateSeedResult::Seeded&&candidateHr==0;
         assert(ExternalAtomicReplayEpoch==(retained?7u:0u));
     }
+    // Generation retirement at each getter, setter, inner replay, live
+    // clear and restore must stop further calls on the retired device.
+    unsigned retirementCases=0;
+    for(unsigned phase=0;phase<=11;++phase)
+    for(bool failing:{false,true}){
+        step=probeStep=clearCalls=notes=DepthBootstrapSuccesses=0;
+        bootstrapReplayCalls=bootstrapCandidateClears=0;
+        retireProbe=phase<=3?phase:0;
+        retireStep=phase>=4&&phase<=10?phase-3:0;
+        retireCandidate=phase==11;
+        failAt=failing?retireStep:0;
+        bootstrapReplay=R7CandidateSeedResult::Unavailable;
+        RightDepthSynchronized=RightStencilSynchronized=false;
+        LastMainDepthClearStamp.Record(7,6);ExternalAtomicReplayEpoch=7;
+        bool dirty=false;
+        const bool ok=TryBootstrapRightDepthFromRecentClear(&dev,&dirty);
+        assert(ok==(phase==0)&&dirty==(phase!=0));
+        assert(notes==unsigned(phase!=0)&&DepthBootstrapSuccesses==unsigned(ok));
+        assert(RightDepthSynchronized==ok&&RightStencilSynchronized==ok);
+        assert(LastMainDepthClearStamp.Current(7)==ok);
+        assert(probeStep==(phase>=1&&phase<=3?phase:3u));
+        assert(step==(phase>=1&&phase<=3?0u:phase>=4&&phase<=10?phase-3:phase==11?3u:7u));
+        assert(clearCalls==unsigned(phase==0||(phase>=7&&phase<=10)));
+        assert(ExternalAtomicReplayEpoch==0);
+        ++retirementCases;
+    }
+    retireProbe=retireStep=0;retireCandidate=false;
+    std::cout<<"R7_BOOTSTRAP_GENERATION_PASS "<<retirementCases<<"\n";
     // No opt-in/receipt: do not perform any candidate operations.
     step=clearCalls=notes=bootstrapReplayCalls=bootstrapCandidateClears=0;
     failAt=0;RightDepthSynchronized=RightStencilSynchronized=false;
@@ -326,6 +359,19 @@ int main(){
         assert(ClearDest(&dev,0,nullptr,2,0,1.f,0)==D3D_OK);
         assert(!ExternalAtomicReplayEpoch&&!followupCalls[0]&&!followupCalls[1]);++cases;
     }
+    unsigned retireCases=0;
+    for(unsigned phase=2;phase<=8;++phase)
+    for(bool failing:{false,true}){
+        ResetProbe(failing?phase:0);
+        retireStep=phase;
+        const auto hr=ClearDest(&dev,0,nullptr,7,0,1.f,0);
+        assert(hr==E_FAIL&&step==phase&&notes==1);
+        assert(!RightDepthSynchronized&&!RightStencilSynchronized&&!LastMainDepthClearStamp.Current(PresentEpoch));
+        assert(!ExternalAtomicReplayEpoch&&coverageCalls==0);
+        retireStep=0;
+        ++retireCases;
+    }
+    std::cout<<"R7_CLEAR_GENERATION_PASS "<<retireCases<<"\n";
     std::cout<<"R7_FOLLOWUP_CLEAR_PASS "<<cases<<"\n";
     std::cout<<"R7_CLEAR_RESTORE_RECEIPT_PASS\n";
 }
