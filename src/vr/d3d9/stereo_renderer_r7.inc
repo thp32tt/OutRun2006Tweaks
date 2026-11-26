@@ -2203,8 +2203,17 @@ namespace OutRunVRStereo
                 if(s==RightEyeSurface)return 1;
                 return -1;
             };
+            const auto generation=pair.generation;
+            const auto epoch=PresentEpoch;
+            const auto boundary=R7CandidateBoundarySerial;
             const int dstEye=eyeFor(destination);
             const int srcEye=eyeFor(source);
+            auto current=[&](){return pair.generation==generation&&pair.device==device&&
+                PresentEpoch==epoch&&ExternalAtomicReplayEpoch==epoch&&
+                R7CandidateBoundarySerial==boundary;};
+            auto liveMatches=[&](int eye,IDirect3DSurface9* surface){
+                return eye>=0&&pair.provenLiveColor[eye]==surface&&eyeFor(surface)==eye;
+            };
             const bool protectedDepth=destination&&
                 (destination==TrackedDepthStencil||destination==RightEyeDepth);
             const bool privateWrite=destination&&
@@ -2215,14 +2224,14 @@ namespace OutRunVRStereo
             // private replay cannot change bindings, viewport or input state.
             const HRESULT hr=write(source,destination);
             if(dstEye<0)return hr;
-            if(FAILED(hr)||ExternalAtomicReplayEpoch!=PresentEpoch||
-                pair.device!=device||FrameStereoIncomplete||FrameRightDrawFailed||
-                !pair.eyes[dstEye].color||
-                (!fill&&(srcEye<0||!pair.eyes[srcEye].color))){
+            if(FAILED(hr)||!current()||FrameStereoIncomplete||FrameRightDrawFailed||
+                !liveMatches(dstEye,destination)||!pair.eyes[dstEye].color||
+                (!fill&&(!liveMatches(srcEye,source)||!pair.eyes[srcEye].color))){
                 ExternalAtomicReplayEpoch=0;
                 return hr;
             }
-            if(FAILED(write(fill?nullptr:pair.eyes[srcEye].color,pair.eyes[dstEye].color)))
+            if(FAILED(write(fill?nullptr:pair.eyes[srcEye].color,pair.eyes[dstEye].color))||
+                !current()||!liveMatches(dstEye,destination)||(!fill&&!liveMatches(srcEye,source)))
                 ExternalAtomicReplayEpoch=0;
             return hr;
         }

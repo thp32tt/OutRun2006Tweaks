@@ -84,6 +84,8 @@ void NoteRestoreFailure(const char*){++restoreFailures;}
 enum class R7CandidateSeedResult { Unavailable, Seeded, DirtyRestore };
 R7CandidateSeedResult replayResult=R7CandidateSeedResult::Seeded;
 unsigned replayCalls=0, replayEye=99; bool inReplay=false;
+struct CandidatePairMock {std::uint64_t generation=1;IDirect3DDevice9* device=nullptr;} ExternalAtomicCandidates;
+std::uint64_t R7CandidateBoundarySerial=0;
 bool InternalStereoPass = false;
 std::uint64_t PresentEpoch = 77;
 std::uint64_t ExternalAtomicReplayEpoch=0;
@@ -117,6 +119,7 @@ Hook DrawPrimitiveHook{0}, DrawIndexedPrimitiveHook{1},
      DrawPrimitiveUPHook{2}, DrawIndexedPrimitiveUPHook{3};
 template<class DrawCall> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9* d,unsigned eye,IDirect3DSurface9* rt,IDirect3DSurface9* depth,DrawCall& draw){
     assert(d->rt==rt&&d->depth==depth);++replayCalls;replayEye=eye;
+    ExternalAtomicCandidates.device=d;
     if(replayResult==R7CandidateSeedResult::Seeded){
         inReplay=true;const HRESULT hr=draw();inReplay=false;
         if(FAILED(hr))return R7CandidateSeedResult::Unavailable;

@@ -385,10 +385,12 @@ auto* BackBuffer=&left;auto* RightEyeSurface=&right;
 auto* TrackedDepthStencil=&ld;auto* RightEyeDepth=&rd;
 struct Pair{struct Eye{IDirect3DSurface9* color;IDirect3DSurface9* depth;};
     Eye eyes[2]{{&cl,&czl},{&cr,&czr}};IDirect3DDevice9* device=&game;
+    std::uint64_t generation=1;
+    IDirect3DSurface9* provenLiveColor[2]{&left,&right};
 } ExternalAtomicCandidates;
 struct Stamp{unsigned count=0;void Invalidate(){++count;}} LastMainDepthClearStamp;
 std::atomic<bool> StereoBaseCallbacksArmed{true};
-std::uint64_t ExternalAtomicReplayEpoch=9,PresentEpoch=9;
+std::uint64_t ExternalAtomicReplayEpoch=9,PresentEpoch=9,R7CandidateBoundarySerial=0;
 bool FrameStereoIncomplete=false,FrameRightDrawFailed=false;
 bool IsGameDevice(IDirect3DDevice9* d){return d==&game;}
 '''
@@ -434,7 +436,42 @@ int main(){
     assert(R7ExecuteAtomicSurfaceWrite(&game,nullptr,&left,true,
         [&](auto*,auto*){++calls;return S_OK;})==S_OK);
     assert(calls==1&&ExternalAtomicReplayEpoch==0);
-    std::cout<<"R7_EXPLICIT_SURFACE_WRITE_PASS "<<cases+1<<"\n";
+    // A successful physical call may retire or replace the pair before
+    // returning, even if a new receipt uses the same numeric epoch.
+    unsigned interruptions=0;
+    for(unsigned fill=0;fill<2;++fill)
+    for(unsigned phase=1;phase<=2;++phase)
+    for(unsigned mode=0;mode<6;++mode){
+        ExternalAtomicCandidates.device=&game;
+        ExternalAtomicCandidates.provenLiveColor[0]=&left;
+        ExternalAtomicCandidates.provenLiveColor[1]=&right;
+        BackBuffer=&left;RightEyeSurface=&right;
+        PresentEpoch=ExternalAtomicReplayEpoch=9;
+        calls=0;
+        auto write=[&](IDirect3DSurface9* a,IDirect3DSurface9* b){
+            ++calls;
+            if(calls==1){assert(a==(fill?nullptr:&left)&&b==&right);}
+            else{assert(a==(fill?nullptr:&cl)&&b==&cr);}
+            if(calls==phase){
+                switch(mode){
+                case 0:++ExternalAtomicCandidates.generation;break;
+                case 1:++R7CandidateBoundarySerial;break;
+                case 2:++PresentEpoch;ExternalAtomicReplayEpoch=PresentEpoch;break;
+                case 3:RightEyeSurface=&unknown;break;
+                case 4:ExternalAtomicCandidates.provenLiveColor[1]=&unknown;break;
+                case 5:ExternalAtomicCandidates.provenLiveColor[0]=&unknown;break;
+                }
+            }
+            return S_OK;
+        };
+        assert(R7ExecuteAtomicSurfaceWrite(&game,fill?nullptr:&left,&right,fill,write)==S_OK);
+        const bool relevant=!(fill&&mode==5);
+        assert(calls==(phase==1&&relevant?1u:2u));
+        assert(ExternalAtomicReplayEpoch==(relevant?0u:9u));
+        ++interruptions;
+    }
+    assert(interruptions==24);
+    std::cout<<"R7_EXPLICIT_SURFACE_WRITE_PASS "<<cases+1+interruptions<<"\n";
 }
 '''
 for hook,index in (("UpdateSurface",30),("StretchRect",34),("ColorFill",35)):
