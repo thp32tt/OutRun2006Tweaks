@@ -1776,21 +1776,24 @@ namespace OutRunVRStereo
                     a.MultiSampleType==b.MultiSampleType &&
                     a.MultiSampleQuality==b.MultiSampleQuality;
             }
+            template<class LiveCurrent>
             bool Ensure(IDirect3DDevice9* d,IDirect3DSurface9* lc,IDirect3DSurface9* ld,
-                IDirect3DSurface9* rc,IDirect3DSurface9* rd,const D3DVIEWPORT9& vp) noexcept {
+                IDirect3DSurface9* rc,IDirect3DSurface9* rd,const D3DVIEWPORT9& vp,
+                LiveCurrent liveCurrent) noexcept {
+                if(!liveCurrent())return false;
                 if(device && device!=d){
                     const auto retiredGeneration=Reset();
-                    if(generation!=retiredGeneration)return false;
+                    if(generation!=retiredGeneration||!liveCurrent())return false;
                 }
                 // A driver call can synchronously retire this pair (ResetEx).
                 // Stop before dereferencing the next borrowed live attachment.
                 const auto descriptorGeneration=generation;
                 D3DSURFACE_DESC c{},z{},otherC{},otherZ{};
                 if(!d||!lc||!ld||!rc||!rd||lc==rc||ld==rd||
-                    FAILED(lc->GetDesc(&c))||generation!=descriptorGeneration||
-                    FAILED(ld->GetDesc(&z))||generation!=descriptorGeneration||
-                    FAILED(rc->GetDesc(&otherC))||generation!=descriptorGeneration||
-                    FAILED(rd->GetDesc(&otherZ))||generation!=descriptorGeneration||
+                    FAILED(lc->GetDesc(&c))||(generation!=descriptorGeneration||!liveCurrent())||
+                    FAILED(ld->GetDesc(&z))||(generation!=descriptorGeneration||!liveCurrent())||
+                    FAILED(rc->GetDesc(&otherC))||(generation!=descriptorGeneration||!liveCurrent())||
+                    FAILED(rd->GetDesc(&otherZ))||(generation!=descriptorGeneration||!liveCurrent())||
                     !Same(c,otherC)||!Same(z,otherZ)||!c.Width||!c.Height||
                     z.Width<c.Width||z.Height<c.Height||
                     c.MultiSampleType!=z.MultiSampleType||
@@ -1798,35 +1801,35 @@ namespace OutRunVRStereo
                     !vp.Width||!vp.Height||vp.X>=c.Width||vp.Y>=c.Height||
                     vp.Width>c.Width-vp.X||vp.Height>c.Height-vp.Y) {
                     // Do not retire resources owned by a newer transaction.
-                    if(generation==descriptorGeneration)Reset();
+                    if(generation==descriptorGeneration&&liveCurrent())Reset();
                     return false;
                 }
                 if(device==d && Same(colorDesc,c)&&Same(depthDesc,z)&&
                     eyes[0].color&&eyes[0].depth&&eyes[1].color&&eyes[1].depth)return true;
                 const auto allocationGeneration=Reset();
-                if(generation!=allocationGeneration)return false;
+                if((generation!=allocationGeneration||!liveCurrent()))return false;
                 // Cache the immutable device limit with the allocation.
                 // Unknown/unsupported caps cannot establish RT isolation.
                 D3DCAPS9 caps{};
-                if(FAILED(d->GetDeviceCaps(&caps))||generation!=allocationGeneration||
+                if(FAILED(d->GetDeviceCaps(&caps))||(generation!=allocationGeneration||!liveCurrent())||
                     !caps.NumSimultaneousRTs||caps.NumSimultaneousRTs>4)return false;
                 R7AtomicCandidatePair pending;
                 for(auto& eye:pending.eyes){
                     if(FAILED(d->CreateRenderTarget(c.Width,c.Height,c.Format,
                         c.MultiSampleType,c.MultiSampleQuality,FALSE,&eye.color,nullptr))||
-                        !eye.color||generation!=allocationGeneration||
+                        !eye.color||(generation!=allocationGeneration||!liveCurrent())||
                         FAILED(d->CreateDepthStencilSurface(z.Width,z.Height,z.Format,
                         z.MultiSampleType,z.MultiSampleQuality,FALSE,&eye.depth,nullptr))||
-                        !eye.depth||generation!=allocationGeneration)return false;
+                        !eye.depth||(generation!=allocationGeneration||!liveCurrent()))return false;
                     D3DSURFACE_DESC actualC{},actualZ{};
-                    if(FAILED(eye.color->GetDesc(&actualC))||generation!=allocationGeneration||
-                        FAILED(eye.depth->GetDesc(&actualZ))||generation!=allocationGeneration||
+                    if(FAILED(eye.color->GetDesc(&actualC))||(generation!=allocationGeneration||!liveCurrent())||
+                        FAILED(eye.depth->GetDesc(&actualZ))||(generation!=allocationGeneration||!liveCurrent())||
                         !Same(c,actualC)||!Same(z,actualZ))return false;
                 }
                 // A reset during a successful allocation must not repopulate
                 // the retired cache with pre-reset resources. Pending owns all
                 // partial allocations and releases them on every failure.
-                if(generation!=allocationGeneration)return false;
+                if((generation!=allocationGeneration||!liveCurrent()))return false;
                 for(unsigned i=0;i<2;++i){
                     eyes[i]=pending.eyes[i];pending.eyes[i]={};
                 }
@@ -2114,7 +2117,6 @@ namespace OutRunVRStereo
             const auto epoch=PresentEpoch;
             const auto boundary=R7CandidateBoundarySerial;
             ExternalAtomicAllocationAttemptEpoch=epoch;
-            if(!R7CandidateSwapChainCovered(device))return R7CandidateSeedResult::Unavailable;
             // RightEyeDepth is exclusively created by R7 with Discard=FALSE.
             // For game-owned LEFT depth, no unbind without creation proof.
             auto* const lc=TrackedRenderTarget;
@@ -2127,13 +2129,17 @@ namespace OutRunVRStereo
                 R7CandidateBoundarySerial==boundary&&!R7CandidateResetInFlight&&
                 TrackedRenderTarget==lc&&TrackedDepthStencil==ld&&
                 RightEyeSurface==rc&&RightEyeDepth==rd;};
+            const auto chainGeneration=ExternalAtomicCandidates.generation;
+            if(!ownershipCurrent()||!R7CandidateSwapChainCovered(device)||
+                !ownershipCurrent()||ExternalAtomicCandidates.generation!=chainGeneration)
+                return R7CandidateSeedResult::Unavailable;
             auto current=[&](){
                 const auto proofGeneration=ExternalAtomicCandidates.generation;
                 return ownershipCurrent()&&R7DepthRetentionProven(ld)&&
                     ownershipCurrent()&&ExternalAtomicCandidates.generation==proofGeneration;
             };
             if(!current())return R7CandidateSeedResult::Unavailable;
-            if(!ExternalAtomicCandidates.Ensure(device,lc,ld,rc,rd,viewport))
+            if(!ExternalAtomicCandidates.Ensure(device,lc,ld,rc,rd,viewport,ownershipCurrent))
                 return R7CandidateSeedResult::Unavailable;
             if(FormatHasStencil(ExternalAtomicCandidates.depthDesc.Format)&&
                 !(flags&D3DCLEAR_STENCIL))return R7CandidateSeedResult::Unavailable;

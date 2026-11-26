@@ -171,7 +171,7 @@ int main(){
     D3DVIEWPORT9 vp{0,0,1920,1080};
     IDirect3DDevice9 d;
     R7AtomicCandidatePair pair;
-    auto ensure=[&](){return pair.Ensure(&d,&lc,&ld,&rc,&rd,vp);};
+    auto ensure=[&](){return pair.Ensure(&d,&lc,&ld,&rc,&rd,vp,[]{return true;});};
     assert(ensure()&&d.calls==4);
     assert(pair.eyes[0].color!=pair.eyes[1].color&&pair.eyes[0].depth!=pair.eyes[1].depth);
     assert(pair.eyes[0].color!=&lc&&pair.eyes[1].depth!=&rd);
@@ -181,18 +181,18 @@ int main(){
     assert(ensure()&&d.calls==8);pair.Reset();d.empty();
     for(unsigned k=1;k<=4;++k){
         IDirect3DDevice9 fail;fail.failAt=k;
-        assert(!pair.Ensure(&fail,&lc,&ld,&rc,&rd,vp));fail.empty();
+        assert(!pair.Ensure(&fail,&lc,&ld,&rc,&rd,vp,[]{return true;}));fail.empty();
         assert(!pair.device&&!pair.eyes[0].color&&!pair.eyes[1].depth);
         IDirect3DDevice9 null;null.nullAt=k;
-        assert(!pair.Ensure(&null,&lc,&ld,&rc,&rd,vp));null.empty();
+        assert(!pair.Ensure(&null,&lc,&ld,&rc,&rd,vp,[]{return true;}));null.empty();
         IDirect3DDevice9 mismatch;mismatch.mismatchAt=k;
-        assert(!pair.Ensure(&mismatch,&lc,&ld,&rc,&rd,vp));mismatch.empty();
+        assert(!pair.Ensure(&mismatch,&lc,&ld,&rc,&rd,vp,[]{return true;}));mismatch.empty();
     }
     rd.desc.MultiSampleQuality=1;assert(!ensure()&&d.calls==8);
     rd=ld;vp.X=1;assert(!ensure()&&d.calls==8);vp.X=0;
-    assert(!pair.Ensure(&d,&lc,&ld,&lc,&rd,vp)&&d.calls==8);
+    assert(!pair.Ensure(&d,&lc,&ld,&lc,&rd,vp,[]{return true;})&&d.calls==8);
     assert(ensure());IDirect3DDevice9 other;
-    assert(pair.Ensure(&other,&lc,&ld,&rc,&rd,vp));d.empty();
+    assert(pair.Ensure(&other,&lc,&ld,&rc,&rd,vp,[]{return true;}));d.empty();
     pair.Reset();other.empty();
     assert(lc.refs==0&&ld.refs==0&&rc.refs==0&&rd.refs==0);
     assert(ensure());
@@ -266,7 +266,7 @@ int main(){
     for(unsigned mode=0;mode<3;++mode)
     for(unsigned phase=0;phase<=4;++phase){
         IDirect3DDevice9 oldDevice,replacement;
-        assert(pair.Ensure(&oldDevice,&lc,&ld,&rc,&rd,vp));
+        assert(pair.Ensure(&oldDevice,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         pair.provenLiveColor[0]=&lc;pair.provenLiveDepth[1]=&rd;
         releaseGeneration=pair.generation;releaseCallbacks=0;
         if(phase)oldDevice.made[phase-1].onRelease=duringRelease;
@@ -274,14 +274,14 @@ int main(){
         ++newLc.desc.Format;++newRc.desc.Format;
         if(mode==0)pair.Reset();
         else if(mode==1)
-            assert(pair.Ensure(&replacement,&lc,&ld,&rc,&rd,vp)==(phase==0));
+            assert(pair.Ensure(&replacement,&lc,&ld,&rc,&rd,vp,[]{return true;})==(phase==0));
         else
-            assert(pair.Ensure(&oldDevice,&newLc,&ld,&newRc,&rd,vp)==(phase==0));
+            assert(pair.Ensure(&oldDevice,&newLc,&ld,&newRc,&rd,vp,[]{return true;})==(phase==0));
         assert(releaseCallbacks==unsigned(phase!=0));
         for(unsigned i=0;i<4;++i)assert(oldDevice.made[i].refs==0);
         if(phase||mode==0){
             assert(!pair.device&&replacement.calls==0&&oldDevice.calls==4);
-            assert(pair.Ensure(&replacement,&lc,&ld,&rc,&rd,vp)&&replacement.calls==4);
+            assert(pair.Ensure(&replacement,&lc,&ld,&rc,&rd,vp,[]{return true;})&&replacement.calls==4);
         }else{
             assert(pair.device==(mode==1?&replacement:&oldDevice));
             assert(replacement.calls==(mode==1?4u:0u)&&oldDevice.calls==(mode==2?8u:4u));
@@ -290,16 +290,72 @@ int main(){
     }
     assert(releaseCases==15);
     IDirect3DSurface9* live[]{&lc,&ld,&rc,&rd};
+    // Present does not necessarily retire the candidate generation.
+    // Likewise, replacing a borrowed live attachment can leave the cache
+    // generation unchanged. Stop at the first affected driver boundary.
+    static bool liveOwned=true;
+    static unsigned lostMode=0,readCount=0,interruptRead=0;
+    auto loseOwnership=+[](){
+        if(lostMode==0)liveOwned=false;
+        else ++R7CandidateBoundarySerial;
+    };
+    auto readLive=+[](){
+        if(++readCount==interruptRead){
+            if(lostMode==0)liveOwned=false;
+            else ++R7CandidateBoundarySerial;
+        }
+    };
+    unsigned ownershipCases=0;
+    for(lostMode=0;lostMode<2;++lostMode)
+    for(unsigned phase=0;phase<=13;++phase){
+        IDirect3DDevice9 allocating;
+        liveOwned=true;readCount=0;interruptRead=phase<=4?phase:0;
+        for(auto* surf:live)surf->onDesc=readLive;
+        allocating.onRetire=loseOwnership;
+        allocating.retireCaps=phase==5;
+        if(phase>=6&&phase<=9)allocating.retireAt=phase-5;
+        if(phase>=10)allocating.retireDescAt=phase-9;
+        const auto boundary=R7CandidateBoundarySerial;
+        const auto owned=[&](){return liveOwned&&boundary==R7CandidateBoundarySerial;};
+        assert(pair.Ensure(&allocating,&lc,&ld,&rc,&rd,vp,owned)==(phase==0));
+        for(auto* surf:live)surf->onDesc=nullptr;
+        assert(readCount==(phase>=1&&phase<=4?phase:4u));
+        assert(allocating.capsCalls==unsigned(phase==0||phase>=5));
+        const unsigned expected=phase==0?4u:phase<=5?0u:phase<=9?phase-5:phase<=11?2u:4u;
+        assert(allocating.calls==expected);
+        if(phase){assert(!pair.device);allocating.empty();}
+        pair.Reset();allocating.empty();++ownershipCases;
+    }
+    assert(ownershipCases==28);
+    // A cached pair may be retired while replacing its descriptors/device.
+    for(lostMode=0;lostMode<2;++lostMode)
+    for(unsigned mode=0;mode<2;++mode)
+    for(unsigned phase=0;phase<=4;++phase){
+        IDirect3DDevice9 oldDevice,replacement;
+        assert(pair.Ensure(&oldDevice,&lc,&ld,&rc,&rd,vp,[]{return true;}));
+        if(phase)oldDevice.made[phase-1].onRelease=loseOwnership;
+        liveOwned=true;const auto boundary=R7CandidateBoundarySerial;
+        const auto owned=[&](){return liveOwned&&boundary==R7CandidateBoundarySerial;};
+        auto newLc=lc,newRc=rc;++newLc.desc.Format;++newRc.desc.Format;
+        const bool ok=mode?pair.Ensure(&oldDevice,&newLc,&ld,&newRc,&rd,vp,owned):
+            pair.Ensure(&replacement,&lc,&ld,&rc,&rd,vp,owned);
+        assert(ok==(phase==0));
+        assert(oldDevice.calls==(mode&&!phase?8u:4u));
+        assert(replacement.calls==(!mode&&!phase?4u:0u));
+        if(phase)assert(!pair.device);
+        pair.Reset();oldDevice.empty();replacement.empty();++ownershipCases;
+    }
+    assert(ownershipCases==48);
     for(unsigned k=0;k<4;++k){
         IDirect3DDevice9 interruptedDevice;
-        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp));
+        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         const auto beforeGeneration=pair.generation;
         live[k]->onDesc=retire;
-        assert(!pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp));
+        assert(!pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         live[k]->onDesc=nullptr;
         assert(pair.generation!=beforeGeneration&&!pair.device&&interruptedDevice.calls==4);
         interruptedDevice.empty();
-        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp)&&interruptedDevice.calls==8);
+        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp,[]{return true;})&&interruptedDevice.calls==8);
         pair.Reset();interruptedDevice.empty();
     }
     for(unsigned phase=0;phase<9;++phase){
@@ -308,14 +364,14 @@ int main(){
         interruptedDevice.retireCaps=phase==0;
         if(phase>=1&&phase<=4)interruptedDevice.retireAt=phase;
         if(phase>=5)interruptedDevice.retireDescAt=phase-4;
-        assert(!pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp));
+        assert(!pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         assert(!pair.device&&!pair.eyes[0].color&&!pair.eyes[1].depth);
         interruptedDevice.empty();
         const unsigned expected=phase==0?0u:phase<=4?phase:phase<=6?2u:4u;
         assert(interruptedDevice.calls==expected);
         interruptedDevice.retireCaps=false;
         interruptedDevice.retireAt=interruptedDevice.retireDescAt=0;
-        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp));
+        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         assert(interruptedDevice.calls==expected+4);
         pair.Reset();interruptedDevice.empty();
     }
@@ -323,14 +379,14 @@ int main(){
     for(unsigned limit: {0u,5u,4u}){
         IDirect3DDevice9 bad;
         bad.capsTargets=limit;bad.capsHr=limit==4?E_FAIL:S_OK;
-        assert(!pair.Ensure(&bad,&lc,&ld,&rc,&rd,vp));
+        assert(!pair.Ensure(&bad,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         assert(bad.calls==0&&bad.capsCalls==1&&!pair.device&&pair.simultaneousTargets==0);
     }
     IDirect3DSurface9 auxSurface{};
     unsigned mrtCases=0;
     for(unsigned limit=1;limit<=4;++limit){
         IDirect3DDevice9 multi;multi.capsTargets=limit;
-        assert(pair.Ensure(&multi,&lc,&ld,&rc,&rd,vp));
+        assert(pair.Ensure(&multi,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         assert(pair.simultaneousTargets==limit&&multi.capsCalls==1);
         // 3 states (unbound, S_OK null, failure) plus bound with each HRESULT.
         for(unsigned mask=0;mask<216;++mask){
@@ -364,7 +420,7 @@ int main(){
     for(unsigned mode=0;mode<2;++mode)
     for(unsigned phase=0;phase<=7;++phase){
         IDirect3DDevice9 capture;capture.capsTargets=4;
-        assert(pair.Ensure(&capture,&lc,&ld,&rc,&rd,vp));
+        assert(pair.Ensure(&capture,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         capture.rt=capture.liveRt=&lc;capture.depth=capture.liveDepth=&ld;
         capture.interruptIo=phase<=4?phase:0;
         capture.interruptAux=phase>4?phase-4:0;
@@ -389,7 +445,7 @@ int main(){
     for(unsigned mode=0;mode<2;++mode)
     for(unsigned phase=16;phase<=23;++phase){
         IDirect3DDevice9 recovery;
-        assert(pair.Ensure(&recovery,&lc,&ld,&rc,&rd,vp));
+        assert(pair.Ensure(&recovery,&lc,&ld,&rc,&rd,vp,[]{return true;}));
         recovery.rt=recovery.liveRt=&lc;recovery.depth=recovery.liveDepth=&ld;
         auto interrupt=mode?+[](){++R7CandidateBoundarySerial;}:retire;
         recovery.onInterrupt=interrupt;
@@ -414,7 +470,7 @@ int main(){
     // Reset/retire during the first raster: stop before eye 2 and never
     // restore stale attachments into the new generation.
     IDirect3DDevice9 retiring;
-    assert(pair.Ensure(&retiring,&lc,&ld,&rc,&rd,vp));
+    assert(pair.Ensure(&retiring,&lc,&ld,&rc,&rd,vp,[]{return true;}));
     retiring.rt=retiring.liveRt=&lc;retiring.depth=retiring.liveDepth=&ld;
     unsigned rasters=0;
     const auto interrupted=R7SeedInactivePair(pair,&retiring,&lc,&ld,
@@ -426,7 +482,7 @@ int main(){
     retiring.empty();
     // A physical present is not a reset: stop raster, but restore saved live state.
     IDirect3DDevice9 presenting;
-    assert(pair.Ensure(&presenting,&lc,&ld,&rc,&rd,vp));
+    assert(pair.Ensure(&presenting,&lc,&ld,&rc,&rd,vp,[]{return true;}));
     presenting.rt=presenting.liveRt=&lc;presenting.depth=presenting.liveDepth=&ld;
     rasters=0;
     assert(R7SeedInactivePair(pair,&presenting,&lc,&ld,
@@ -745,8 +801,12 @@ struct Pair{
     IDirect3DSurface9* provenLiveDepth[2]{};
     std::uint64_t generation=1;
     unsigned allocations=0,resets=0;bool allow=true;
+    void (*onEnsure)()=nullptr;
+    template<class LiveCurrent>
     bool Ensure(IDirect3DDevice9*,IDirect3DSurface9*,IDirect3DSurface9*,
-        IDirect3DSurface9*,IDirect3DSurface9*,const D3DVIEWPORT9&){++allocations;return allow;}
+        IDirect3DSurface9*,IDirect3DSurface9*,const D3DVIEWPORT9&,LiveCurrent current){
+        assert(current());++allocations;if(onEnsure)onEnsure();return allow&&current();
+    }
     void Reset(){++resets;++generation;provenLiveColor[0]=provenLiveColor[1]=nullptr;provenLiveDepth[0]=provenLiveDepth[1]=nullptr;}
 } ExternalAtomicCandidates;
 std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
@@ -755,7 +815,8 @@ bool R7CandidatePresentBoundaryCovered=true;
 bool R7CandidateResetBoundaryCovered=true;
 unsigned R7CandidateResetInFlight=0;
 bool chainCovered=true;
-bool R7CandidateSwapChainCovered(IDirect3DDevice9*){return chainCovered;}
+void (*onChain)()=nullptr;
+bool R7CandidateSwapChainCovered(IDirect3DDevice9*){if(onChain)onChain();return chainCovered;}
 bool FormatHasStencil(D3DFORMAT){return false;}
 struct InternalPassScope{InternalPassScope(){}~InternalPassScope(){}};
 struct Hook{template<class R,class... A>R stdcall(A...){return S_OK;}}
@@ -934,6 +995,36 @@ int main(){
     assert(proofCases==24);
     left.onRead=nullptr;R7CandidateResetInFlight=0;
     TrackedRenderTarget=&color;TrackedDepthStencil=&left;RightEyeDepth=&right;
+    // Both the swap-chain coverage query and allocator must respect the
+    // real transaction's ownership snapshot, before any raster.
+    static unsigned ownershipMode=0;
+    auto interruptOwnership=+[](){
+        switch(ownershipMode){
+        case 1:++PresentEpoch;break;
+        case 2:++R7CandidateBoundarySerial;break;
+        case 3:TrackedRenderTarget=&rc;break;
+        case 4:RightEyeDepth=&left;break;
+        case 5:R7CandidateResetInFlight=1;break;
+        }
+    };
+    unsigned entryOwnershipCases=0;
+    for(unsigned location=0;location<2;++location)
+    for(ownershipMode=0;ownershipMode<=5;++ownershipMode){
+        ++PresentEpoch;ExternalAtomicReplayEpoch=0;
+        TrackedRenderTarget=&color;RightEyeDepth=&right;R7CandidateResetInFlight=0;
+        onChain=location?nullptr:interruptOwnership;
+        ExternalAtomicCandidates.onEnsure=location?interruptOwnership:nullptr;
+        const auto allocations=ExternalAtomicCandidates.allocations,rasters=rasterCalls;
+        assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==
+            (ownershipMode?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded));
+        assert(ExternalAtomicCandidates.allocations==allocations+unsigned(location||!ownershipMode));
+        assert(rasterCalls==rasters+unsigned(!ownershipMode));
+        assert(ExternalAtomicReplayEpoch==(ownershipMode?0u:PresentEpoch));
+        ++entryOwnershipCases;
+    }
+    assert(entryOwnershipCases==12);
+    onChain=nullptr;ExternalAtomicCandidates.onEnsure=nullptr;
+    TrackedRenderTarget=&color;RightEyeDepth=&right;R7CandidateResetInFlight=0;
     // Dirty restore retires only the pair owned by this transaction.
     // A newer generation may have appeared before the old call unwinds.
     for(unsigned mode=0;mode<3;++mode){
