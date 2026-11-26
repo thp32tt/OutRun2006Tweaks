@@ -8,6 +8,7 @@
 #include <d3d9.h>
 #include <d3dcompiler.h>
 #include <cstring>
+#include <cstdint>
 #include "external_car_pbr_eye_math.hpp"
 #include "external_car_pbr_normal_math.hpp"
 
@@ -16,6 +17,7 @@ class PbrShaders final {
     IDirect3DVertexShader9* vs_=nullptr;
     IDirect3DPixelShader9* ps_=nullptr;
     bool attempted_=false;
+    std::uint64_t generation_=1;
     static constexpr const char* VertexSource() noexcept {
         return R"HLSL(
 row_major float4x4 world : register(c0);
@@ -168,16 +170,20 @@ public:
     PbrShaders(const PbrShaders&)=delete;
     PbrShaders& operator=(const PbrShaders&)=delete;
     void Release() noexcept {
-        if(vs_){vs_->Release();vs_=nullptr;}
-        if(ps_){ps_->Release();ps_=nullptr;}
-        attempted_=false;
+        auto* vs=vs_;auto* ps=ps_;
+        vs_=nullptr;ps_=nullptr;attempted_=false;
+        if(++generation_==0)++generation_;
+        if(vs)vs->Release();
+        if(ps)ps->Release();
     }
     bool Ensure(IDirect3DDevice9* device) noexcept {
         if(!device)return false;
         if(attempted_)return vs_ && ps_;
         attempted_=true; // never retry shader compilation every stereo eye
+        const auto generation=generation_;
+        const auto current=[&](){return generation_==generation;};
         D3DCAPS9 caps{};
-        if(FAILED(device->GetDeviceCaps(&caps)) ||
+        if(FAILED(device->GetDeviceCaps(&caps)) || !current() ||
            caps.VertexShaderVersion<D3DVS_VERSION(3,0) ||
            caps.PixelShaderVersion<D3DPS_VERSION(3,0))return false;
         HMODULE dll=LoadLibraryW(L"d3dcompiler_47.dll");
@@ -198,20 +204,23 @@ public:
                        "DinoPbrPS",nullptr,nullptr,"mainPS","ps_3_0",
                        flags,0,&psCode,&errors);
         if(errors)errors->Release();
-        if(SUCCEEDED(hr) && vsCode && psCode)
+        IDirect3DVertexShader9* pendingVs=nullptr;
+        IDirect3DPixelShader9* pendingPs=nullptr;
+        if(SUCCEEDED(hr) && vsCode && psCode&&current())
             hr=device->CreateVertexShader(
-                static_cast<const DWORD*>(vsCode->GetBufferPointer()),&vs_);
-        if(SUCCEEDED(hr) && vs_ && psCode)
+                static_cast<const DWORD*>(vsCode->GetBufferPointer()),&pendingVs);
+        if(SUCCEEDED(hr) && pendingVs && psCode&&current())
             hr=device->CreatePixelShader(
-                static_cast<const DWORD*>(psCode->GetBufferPointer()),&ps_);
+                static_cast<const DWORD*>(psCode->GetBufferPointer()),&pendingPs);
         if(vsCode)vsCode->Release();
         if(psCode)psCode->Release();
         FreeLibrary(dll);
-        if(FAILED(hr)||!vs_||!ps_) {
-            if(vs_){vs_->Release();vs_=nullptr;}
-            if(ps_){ps_->Release();ps_=nullptr;}
+        if(FAILED(hr)||!pendingVs||!pendingPs||!current()) {
+            if(pendingVs)pendingVs->Release();
+            if(pendingPs)pendingPs->Release();
             return false;
         }
+        vs_=pendingVs;ps_=pendingPs;
         return true;
     }
     template<class Current>

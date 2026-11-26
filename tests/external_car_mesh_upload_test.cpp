@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
+#include <initializer_list>
 
 struct Buffer {
     bool lockOk=true, nullData=false, unlockOk=true;
@@ -40,5 +41,27 @@ int main() {
         assert(ib.unlocks==unsigned(vGood && ib.lockOk));
         assert(ib.copies==unsigned(vGood && ib.lockOk && !ib.nullData));
         assert(ib.value==(ib.copies?456u:0u));
+    }
+    // Actual upload helper: reset before Lock, inside Lock/Copy/Unlock.
+    for(unsigned fault=0;fault<5;++fault){
+        bool current=fault!=1;
+        unsigned locks=0,copies=0,unlocks=0;
+        std::uint32_t data=0;
+        const bool ok=OutRunVR::DinoSidecar::UploadExternalMeshBuffer(
+            [&](void** p){++locks;*p=&data;if(fault==2)current=false;return true;},
+            [&](void* p){++copies;*static_cast<std::uint32_t*>(p)=5;if(fault==3)current=false;},
+            [&](){++unlocks;if(fault==4)current=false;return true;},
+            [&](){return current;});
+        assert(ok==(fault==0));
+        assert(locks==unsigned(fault!=1)&&unlocks==locks);
+        assert(copies==unsigned(fault==0||fault==3||fault==4));
+    }
+    struct Resource {unsigned releases=0;void Release(){++releases;}};
+    for(bool current:{false,true}){
+        Resource resource;Resource* pending=&resource;Resource* published=nullptr;
+        assert(OutRunVR::DinoSidecar::PublishExternalGpuResource(pending,
+            [&](){return current;},[&](auto* p){published=p;})==current);
+        assert(!pending&&resource.releases==unsigned(!current));
+        assert(published==(current?&resource:nullptr));
     }
 }

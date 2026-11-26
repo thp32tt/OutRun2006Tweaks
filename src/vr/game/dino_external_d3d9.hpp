@@ -141,6 +141,14 @@ class GpuOwner final {
     PbrShaders pbrShaders_{};
     bool pbrReady_=false;
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
+    std::uint64_t gpuGeneration_=1;
+    bool gpuBusy_=false;
+    unsigned gpuRetirementDepth_=0;
+    struct GpuOperation {
+        bool& busy;
+        explicit GpuOperation(bool& flag) noexcept:busy(flag){busy=true;}
+        ~GpuOperation(){busy=false;}
+    };
     bool loaded_=false,loadAttempted_=false;
     struct CpuLoad {
         Model model{};
@@ -186,9 +194,10 @@ class GpuOwner final {
         out=std::move(b);
         return true;
     }
+    template<class Current>
     static bool UploadDDS(IDirect3DDevice9* dev,const Texture& texture,
-                          IDirect3DTexture9** out) noexcept {
-        if(!dev || !out || texture.dds.size()<128 || !texture.width ||
+                          IDirect3DTexture9** out,Current current) noexcept {
+        if(!current() || !dev || !out || texture.dds.size()<128 || !texture.width ||
            !texture.height || !texture.mips)return false;
         *out=nullptr;
         const D3DFORMAT format=texture.format==TextureFormat::DXT1?D3DFMT_DXT1:
@@ -197,12 +206,13 @@ class GpuOwner final {
             texture.format==TextureFormat::DXT5?16u:0u;
         IDirect3DTexture9* staging=nullptr;
         if(FAILED(dev->CreateTexture(texture.width,texture.height,texture.mips,0,
-                                     format,D3DPOOL_SYSTEMMEM,&staging,nullptr))||!staging) {
+                                     format,D3DPOOL_SYSTEMMEM,&staging,nullptr))||!staging||!current()) {
             if(staging)staging->Release();
             return false;
         }
         std::size_t pos=128;
         for(UINT mip=0;mip<texture.mips;++mip) {
+            if(!current()){staging->Release();return false;}
             const unsigned width=(texture.width>>mip)?(texture.width>>mip):1u;
             const unsigned height=(texture.height>>mip)?(texture.height>>mip):1u;
             const unsigned rows=blockBytes?(((height+3u)/4u)?(height+3u)/4u:1u):height;
@@ -218,36 +228,37 @@ class GpuOwner final {
             // A successful LockRect must be paired with exactly one unlock.
             // Failed unlock means this mip was not safely committed: never
             // allocate/publish the default-pool texture from this staging data.
-            if(!CopyAndUnlockDdsMip(locked.pBits,locked.Pitch,
+            if(!CopyAndUnlockDdsMip(current()?locked.pBits:nullptr,locked.Pitch,
                     texture.dds.data()+pos,rows,row,[&]() noexcept {
                         return SUCCEEDED(staging->UnlockRect(mip));
-                    })) {
+                    })||!current()) {
                 staging->Release();return false;
             }
             pos+=std::size_t(rows)*row;
         }
-        HRESULT hr=dev->CreateTexture(texture.width,texture.height,texture.mips,0,
-            format,D3DPOOL_DEFAULT,out,nullptr);
-        if(SUCCEEDED(hr) && *out)hr=dev->UpdateTexture(staging,*out);
+        HRESULT hr=current()?dev->CreateTexture(texture.width,texture.height,texture.mips,0,
+            format,D3DPOOL_DEFAULT,out,nullptr):E_FAIL;
+        if(SUCCEEDED(hr) && *out&&current())hr=dev->UpdateTexture(staging,*out);
+        else hr=E_FAIL;
         staging->Release();
-        if(FAILED(hr) || !*out) {
+        if(FAILED(hr) || !*out || !current()) {
             if(*out) {(*out)->Release();*out=nullptr;}
             return false;
         }
         return true;
     }
-    void ReleaseGpu() noexcept {
-        for(auto& m:meshes_) {
-            if(m.vb)m.vb->Release();
-            if(m.ib)m.ib->Release();
-        }
-        meshes_.clear();
-        for(auto& texture:textures_) {if(texture)texture->Release();texture=nullptr;}
-        textures_.clear();
-        for(auto& t:normals_)if(t)t->Release();
-        for(auto& t:orms_)if(t)t->Release();
-        normals_.clear();orms_.clear();
-        pbrShaders_.Release();
+    std::uint64_t ReleaseGpu() noexcept {
+        // Detach all published ownership before calling any driver Release.
+        // Nested Reset sees empty containers, not the objects being retired.
+        ++gpuRetirementDepth_;
+        if(++gpuGeneration_==0)++gpuGeneration_;
+        const auto retiredGeneration=gpuGeneration_;
+        std::vector<GpuMesh> retiredMeshes;
+        std::vector<IDirect3DTexture9*> retiredTextures,retiredNormals,retiredOrms;
+        retiredMeshes.swap(meshes_);
+        retiredTextures.swap(textures_);
+        retiredNormals.swap(normals_);
+        retiredOrms.swap(orms_);
         pbrReady_=false;
         pbrPrepared_=false;
         nextTexture_=nextMesh_=nextPbrMap_=0;
@@ -255,13 +266,25 @@ class GpuOwner final {
            preparation_==Preparation::Ready)
             preparation_=loaded_?Preparation::CpuReady:Preparation::Cold;
         owner_=nullptr;
+        pbrShaders_.Release();
+        for(auto& mesh:retiredMeshes){
+            if(mesh.vb)mesh.vb->Release();
+            if(mesh.ib)mesh.ib->Release();
+        }
+        for(auto* texture:retiredTextures)if(texture)texture->Release();
+        for(auto* texture:retiredNormals)if(texture)texture->Release();
+        for(auto* texture:retiredOrms)if(texture)texture->Release();
+        --gpuRetirementDepth_;
+        return retiredGeneration;
     }
     bool RejectGpu(IDirect3DDevice9* device,
                    const char* reason="GPU_RESOURCE_FAILURE") noexcept {
-        ReleaseGpu();
-        gpuFailure_=reason;
-        gpuRetry_.NoteFailure(device);
-        preparation_=Preparation::Failed;
+        const auto retired=ReleaseGpu();
+        if(gpuGeneration_==retired){
+            gpuFailure_=reason;
+            gpuRetry_.NoteFailure(device);
+            preparation_=Preparation::Failed;
+        }
         return false;
     }
     // Diagnostic A/B only: reproduce the known-working single-F50
@@ -276,10 +299,12 @@ class GpuOwner final {
     // Stop retries until the real D3D9 Reset, preventing another partial
     // submission in subsequent frames.
     void QuarantineFailedSubmission(IDirect3DDevice9* device) noexcept {
-        ReleaseGpu();
-        gpuRetry_.NoteFailure(device);
-        gpuFailure_="GPU_PARTIAL_SUBMISSION";
-        preparation_=Preparation::Failed;
+        const auto retired=ReleaseGpu();
+        if(gpuGeneration_==retired){
+            gpuRetry_.NoteFailure(device);
+            gpuFailure_="GPU_PARTIAL_SUBMISSION";
+            preparation_=Preparation::Failed;
+        }
     }
     bool BuildSidecarPath(wchar_t (&path)[MAX_PATH]) const noexcept {
         const DWORD n=GetModuleFileNameW(nullptr,path,MAX_PATH);
@@ -425,7 +450,8 @@ class GpuOwner final {
         if(!gpuRetry_.CanAttempt(dev))return false;
         if(owner_==dev && preparation_==Preparation::Ready)return true;
         if(owner_!=dev) {
-            ReleaseGpu();
+            const auto retired=ReleaseGpu();
+            if(gpuGeneration_!=retired)return false;
             owner_=dev;
             // Preallocate before any COM allocation: no failure may strand a
             // GPU mesh outside the owned vector.
@@ -433,12 +459,19 @@ class GpuOwner final {
             textures_.resize(cpu_.textures.size(),nullptr);
             preparation_=Preparation::Uploading;
         }
+        const auto generation=gpuGeneration_;
+        const auto current=[&](){return gpuGeneration_==generation&&owner_==dev&&!gpuRetirementDepth_;};
+        const auto reject=[&](const char* reason){return current()?RejectGpu(dev,reason):false;};
         // The original car stays active until the LAST upload succeeds.
         // Keep each frame's preparation to one DDS or one mesh allocation.
         if(nextTexture_<cpu_.textures.size()) {
-            const auto material=nextTexture_++;
-            if(!UploadDDS(dev,cpu_.textures[material],&textures_[material]))
-                return RejectGpu(dev,"ALBEDO_DDS_UPLOAD_FAILED");
+            const auto material=nextTexture_;
+            IDirect3DTexture9* pending=nullptr;
+            if(!UploadDDS(dev,cpu_.textures[material],&pending,current))
+                return reject("ALBEDO_DDS_UPLOAD_FAILED");
+            PublishExternalGpuResource(pending,current,[&](auto* texture){
+                textures_[material]=texture;++nextTexture_;
+            });
             return false;
         }
         // Optional PBR allocations must never prevent a working legacy draw.
@@ -452,22 +485,26 @@ class GpuOwner final {
             if(orms_.size()!=count)orms_.resize(count,nullptr);
             // Only one actual PBR map upload per player callback.
             while(nextPbrMap_<count*2u) {
-                const std::size_t index=nextPbrMap_++;
+                const std::size_t index=nextPbrMap_;
                 const auto material=index/2u;
                 const bool normal=(index%2u)==0u;
                 const auto& src=normal ? cpu_.pbrMaterials[material].normal
                                        : cpu_.pbrMaterials[material].orm;
-                if(src.dds.empty())continue;
-                IDirect3DTexture9** dst=normal ? &normals_[material]
-                                              : &orms_[material];
-                if(!UploadDDS(dev,src,dst))
-                    return RejectGpu(dev,normal ? "NORMAL_DDS_UPLOAD_FAILED"
-                                                : "ORM_DDS_UPLOAD_FAILED");
+                if(src.dds.empty()){++nextPbrMap_;continue;}
+                IDirect3DTexture9* pending=nullptr;
+                if(!UploadDDS(dev,src,&pending,current))
+                    return reject(normal?"NORMAL_DDS_UPLOAD_FAILED":"ORM_DDS_UPLOAD_FAILED");
+                PublishExternalGpuResource(pending,current,[&](auto* texture){
+                    (normal?normals_[material]:orms_[material])=texture;
+                    ++nextPbrMap_;
+                });
                 return false;
             }
             // Bind only after every normal/ORM allocation succeeded.
-            pbrReady_=pbrShaders_.Ensure(dev);
-            if(!pbrReady_)return RejectGpu(dev,"PBR_SHADER_UNAVAILABLE");
+            const bool shaderReady=pbrShaders_.Ensure(dev);
+            if(!current())return false;
+            pbrReady_=shaderReady;
+            if(!pbrReady_)return reject("PBR_SHADER_UNAVAILABLE");
         }
         pbrPrepared_=true;
         if(nextMesh_<cpu_.meshes.size()) {
@@ -485,7 +522,7 @@ class GpuOwner final {
             if(next.glass) {
                 IndexedMeshBounds bounds{};
                 if(!ComputeIndexedMeshBounds(m,bounds))
-                    return RejectGpu(dev,"GLASS_INDEXED_BOUNDS_INVALID");
+                    return reject("GLASS_INDEXED_BOUNDS_INVALID");
                 for(unsigned k=0;k<3;++k)
                     next.glassCenter[k]=bounds.low[k]*0.5f+bounds.high[k]*0.5f;
             }
@@ -493,14 +530,14 @@ class GpuOwner final {
             next.indexCount=static_cast<UINT>(m.indices.size());
             const UINT vertexBytes=next.vertexCount*sizeof(Vertex);
             const UINT indexBytes=next.indexCount*(m.index32?4u:2u);
-            if(FAILED(dev->CreateVertexBuffer(vertexBytes,D3DUSAGE_WRITEONLY,
-                    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,D3DPOOL_DEFAULT,&next.vb,nullptr)) || !next.vb ||
+            if(!current()||FAILED(dev->CreateVertexBuffer(vertexBytes,D3DUSAGE_WRITEONLY,
+                    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,D3DPOOL_DEFAULT,&next.vb,nullptr)) || !next.vb || !current() ||
                FAILED(dev->CreateIndexBuffer(indexBytes,D3DUSAGE_WRITEONLY,
                     m.index32?D3DFMT_INDEX32:D3DFMT_INDEX16,
-                    D3DPOOL_DEFAULT,&next.ib,nullptr)) || !next.ib) {
+                    D3DPOOL_DEFAULT,&next.ib,nullptr)) || !next.ib || !current()) {
                 if(next.vb)next.vb->Release();
                 if(next.ib)next.ib->Release();
-                return RejectGpu(dev);
+                return reject("GPU_MESH_ALLOCATION_FAILED");
             }
             if(!UploadExternalMeshBuffer(
                     [&](void** data) noexcept {
@@ -509,9 +546,9 @@ class GpuOwner final {
                     [&](void* data) noexcept {
                         std::memcpy(data,m.vertices.data(),vertexBytes);
                     },
-                    [&]() noexcept {return SUCCEEDED(next.vb->Unlock());})) {
+                    [&]() noexcept {return SUCCEEDED(next.vb->Unlock());},current)) {
                 next.vb->Release();next.ib->Release();
-                return RejectGpu(dev,"VERTEX_BUFFER_UPLOAD_FAILED");
+                return reject("VERTEX_BUFFER_UPLOAD_FAILED");
             }
             if(!UploadExternalMeshBuffer(
                     [&](void** data) noexcept {
@@ -527,14 +564,17 @@ class GpuOwner final {
                                 indexOut[i]=static_cast<std::uint16_t>(m.indices[i]);
                         }
                     },
-                    [&]() noexcept {return SUCCEEDED(next.ib->Unlock());})) {
+                    [&]() noexcept {return SUCCEEDED(next.ib->Unlock());},current)) {
                 next.vb->Release();next.ib->Release();
-                return RejectGpu(dev,"INDEX_BUFFER_UPLOAD_FAILED");
+                return reject("INDEX_BUFFER_UPLOAD_FAILED");
             }
+            // Both buffers are local and their final Unlock was fenced.
+            // No driver call occurs before this owner-local publication.
             meshes_.push_back(next);
             ++nextMesh_;
             return false;
         }
+        if(!current())return false;
         preparation_=Preparation::Ready;
         return true;
     }
@@ -573,6 +613,8 @@ public:
         if(next==FerrariModelSlot::GenericId && nextCarId>=30u)
             return false;
         if(next==selectedSlot_ && nextCarId==selectedCarId_)return false;
+        if(gpuBusy_||gpuRetirementDepth_)return false;
+        GpuOperation operation(gpuBusy_);
         // No blocking wait on the player callback: a large old OVC parse
         // must finish asynchronously while native PMT is still displayed.
         // Re-attempt the pending selection on the next native callback.
@@ -583,7 +625,8 @@ public:
         // A ready future is safe to destroy without waiting; do not let a
         // stale old-car payload migrate to the new selection.
         cpuLoad_=std::future<CpuLoad>{};
-        ReleaseGpu();
+        const auto retired=ReleaseGpu();
+        if(gpuGeneration_!=retired)return false;
         cpu_=Model{};
         normalRepairStats_={};
         cpuLoadFailure_.clear();
@@ -726,7 +769,11 @@ public:
         }
     }
     bool EnsureResources(IDirect3DDevice9* device) noexcept {
-        try{return EnsureGpu(device);}catch(...){return RejectGpu(device);}
+        if(gpuBusy_||gpuRetirementDepth_)return false;
+        GpuOperation operation(gpuBusy_);
+        try{return EnsureGpu(device);}catch(...){
+            return owner_==device&&device?RejectGpu(device):false;
+        }
     }
     // Call exactly once from the verified original player world-render scope.
     // The existing Quest/R26 D3D9 renderer remains the sole stereo owner and
@@ -742,22 +789,26 @@ public:
                      const IsolatedEyeRaster* isolated=nullptr,
                      IsolatedMeshPass phase=IsolatedMeshPass::All) noexcept {
         GpuDrawResult result{};
-        auto current=[&](){return !isolated||isolated->Current();};
-        auto restorable=[&](){return !isolated||isolated->Restorable();};
+        if(gpuBusy_||gpuRetirementDepth_)return result;
         // First-party safety gate, independent of whether R7/R30/R33
         // vtable hooks installed successfully. No whole-vehicle isolated
         // L/R color+depth stage and pair-atomic publication exists yet.
         // Return BEFORE D3D state setup, resource creation or any DIP so
         // the original 49F3E0 player callback remains the sole raster owner.
         if(!isolated){if(phase!=IsolatedMeshPass::All||!RuntimeExternalCarAtomicStageReady())return result;}
-        else if(!current())return result;
+        else if(!isolated->Current())return result;
         // A stale/invalid ticket must not consume retry budget or start
         // any expensive DDS/mesh preparation.
         if(!device || expectedNativeFrame==0 || expectedPose==0)return result;
         if(!isolated) {
             if(!stereoRetry_.AllowNativeAttempt())return result;
             if(!EnsureResources(device))return result;
-        } else if(owner_!=device||preparation_!=Preparation::Ready||!current())return result;
+        } else if(owner_!=device||preparation_!=Preparation::Ready||!isolated->Current())return result;
+        GpuOperation operation(gpuBusy_);
+        const auto generation=gpuGeneration_;
+        auto owned=[&](){return gpuGeneration_==generation&&owner_==device&&!gpuRetirementDepth_;};
+        auto current=[&](){return owned()&&(!isolated||isolated->Current())&&owned();};
+        auto restorable=[&](){return owned()&&(!isolated||isolated->Restorable())&&owned();};
         for(const auto& mesh:meshes_) {
             if((phase==IsolatedMeshPass::OpaqueOnly&&mesh.glass)||
                 (phase==IsolatedMeshPass::GlassOnly&&!mesh.glass))continue;
