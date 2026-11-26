@@ -113,8 +113,9 @@ struct IDirect3DSurface9 {
     D3DSURFACE_DESC desc{};
     int refs=0;
     void (*onDesc)()=nullptr;
+    void (*onRelease)()=nullptr;
     HRESULT GetDesc(D3DSURFACE_DESC* d){*d=desc;if(onDesc)onDesc();return S_OK;}
-    void Release(){assert(refs>0);--refs;}
+    void Release(){assert(refs>0);--refs;if(onRelease)onRelease();}
 };
 template<class T> void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
 struct IDirect3DDevice9 {
@@ -328,8 +329,8 @@ int main(){
         capture.interruptAux=phase>4?phase-4:0;
         capture.onInterrupt=mode?+[](){++R7CandidateBoundarySerial;}:retire;
         const auto result=R7SeedInactivePair(pair,&capture,&lc,&ld,
-            [&](auto* a){return capture.bindColor(a);},
-            [&](auto* a){return capture.bindDepth(a);},
+            [&](IDirect3DSurface9* a){return capture.bindColor(a);},
+            [&](IDirect3DSurface9* a){return capture.bindDepth(a);},
             [&](){return capture.clear();});
         assert(result==(phase?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded));
         assert(capture.io==(phase?(phase<=4?phase:4u):21u));
@@ -339,6 +340,36 @@ int main(){
         pair.Reset();capture.empty();++captureCases;
     }
     assert(captureCases==16);
+    // Physical present during each restore operation still requires full
+    // recovery but must not return a successful raster receipt. Retirement
+    // stops before any subsequent old-generation setter. Include both
+    // final saved COM releases as possible synchronous boundaries.
+    unsigned restoreBoundaryCases=0;
+    for(unsigned mode=0;mode<2;++mode)
+    for(unsigned phase=16;phase<=23;++phase){
+        IDirect3DDevice9 recovery;
+        assert(pair.Ensure(&recovery,&lc,&ld,&rc,&rd,vp));
+        recovery.rt=recovery.liveRt=&lc;recovery.depth=recovery.liveDepth=&ld;
+        auto interrupt=mode?+[](){++R7CandidateBoundarySerial;}:retire;
+        recovery.onInterrupt=interrupt;
+        recovery.interruptIo=phase>=17&&phase<=21?phase:0;
+        if(phase==22)ld.onRelease=interrupt;
+        if(phase==23)lc.onRelease=interrupt;
+        const auto result=R7SeedInactivePair(pair,&recovery,&lc,&ld,
+            [&](IDirect3DSurface9* a){return recovery.bindColor(a);},
+            [&](IDirect3DSurface9* a){return recovery.bindDepth(a);},
+            [&](){return recovery.clear();});
+        ld.onRelease=lc.onRelease=nullptr;
+        const auto expected=phase==16?R7CandidateSeedResult::Seeded:
+            mode?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::DirtyRestore;
+        assert(result==expected&&recovery.clearCalls==2&&recovery.liveWrites==0);
+        assert(recovery.io==(!mode&&phase>=17&&phase<=21?phase:21u));
+        if(mode||phase==16||phase>=22)
+            assert(recovery.rt==&lc&&recovery.depth==&ld&&recovery.viewport.Width==vp.Width&&recovery.scissor.left==4);
+        assert(lc.refs==0&&ld.refs==0);
+        pair.Reset();recovery.empty();++restoreBoundaryCases;
+    }
+    assert(restoreBoundaryCases==16);
     // Reset/retire during the first raster: stop before eye 2 and never
     // restore stale attachments into the new generation.
     IDirect3DDevice9 retiring;
@@ -862,6 +893,21 @@ int main(){
     assert(proofCases==24);
     left.onRead=nullptr;R7CandidateResetInFlight=0;
     TrackedRenderTarget=&color;TrackedDepthStencil=&left;RightEyeDepth=&right;
+    // Dirty restore retires only the pair owned by this transaction.
+    // A newer generation may have appeared before the old call unwinds.
+    for(unsigned mode=0;mode<3;++mode){
+        ++PresentEpoch;ExternalAtomicReplayEpoch=0;
+        seedResult=mode?R7CandidateSeedResult::DirtyRestore:R7CandidateSeedResult::Seeded;
+        interruptRaster=mode==2?2:0;
+        const auto before=ExternalAtomicCandidates.generation;
+        const auto resets=ExternalAtomicCandidates.resets;
+        const auto got=R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0);
+        assert(got==seedResult);
+        assert(ExternalAtomicCandidates.generation==before+unsigned(mode!=0));
+        assert(ExternalAtomicCandidates.resets==resets+unsigned(mode!=0));
+        assert(ExternalAtomicReplayEpoch==(mode?0u:PresentEpoch));
+    }
+    interruptRaster=0;seedResult=R7CandidateSeedResult::Seeded;
     left.size=4;assert(!R7DepthRetentionProven(&left));
     left.size=8;left.readFail=true;assert(!R7DepthRetentionProven(&left));
     std::cout<<"R7_DEPTH_RETENTION_PROOF_PASS "<<cases<<" plus seed/replay and malformed tag cases\n";

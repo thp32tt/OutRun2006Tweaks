@@ -2088,8 +2088,11 @@ namespace OutRunVRStereo
             if(!current()||FAILED(d->SetScissorRect(&scissor)))restored=false;
             if(!current())restored=false;
             ReleaseCom(depth);ReleaseCom(rt);
-            if(!restored)return R7CandidateSeedResult::DirtyRestore;
-            return seeded?R7CandidateSeedResult::Seeded:R7CandidateSeedResult::Unavailable;
+            // Even the final restore setter or Release can retire ownership.
+            // Present alone keeps saved attachments valid but ends the raster
+            // receipt; a generation change cannot prove a usable live target.
+            if(!restored||!current())return R7CandidateSeedResult::DirtyRestore;
+            return seeded&&rasterCurrent()?R7CandidateSeedResult::Seeded:R7CandidateSeedResult::Unavailable;
         }
 
         // A successful seed is ONLY the initial clear, not the current scene
@@ -2147,7 +2150,13 @@ namespace OutRunVRStereo
                 ExternalAtomicCandidates.provenLiveDepth[1]=rd;
                 ExternalAtomicReplayEpoch=epoch;
             }
-            if(result==R7CandidateSeedResult::DirtyRestore)ExternalAtomicCandidates.Reset();
+            if(result==R7CandidateSeedResult::DirtyRestore){
+                ExternalAtomicReplayEpoch=0;
+                // ResetEx may already have retired the old owner. Do not
+                // destroy a newer pair from an unwinding old transaction.
+                if(ExternalAtomicCandidates.generation==generation)
+                    ExternalAtomicCandidates.Reset();
+            }
             return result;
         }
 
