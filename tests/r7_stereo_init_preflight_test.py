@@ -1570,3 +1570,103 @@ assert r13_dest.index("R7ResetNotificationScope notification;") < r13_dest.index
 classic_reset=source[source.index("HRESULT __stdcall ResetDest("):source.index("constexpr std::uint32_t StereoInstallPending")]
 assert classic_reset.index("R7ResetNotificationScope notification;") < classic_reset.index("notification.Notify();") < classic_reset.index("ResetCompatDevice(device,params,hr)")
 assert reset_ex.index("notification.Notify();") < reset_ex.index("R7RetireDirectResetFrameIdentity();") < reset_ex.rindex("CandidateResetExHook.stdcall<HRESULT>")
+
+
+# Iter93: exercise the real UP input-state transaction, with a minimal
+# attachment owner mock that reports retired generation as DirtyRestore.
+up_start=source.index("template<class DrawCall>\n        R7CandidateSeedResult R7ReplayInactiveDraw(")
+up_owner=source[up_start:source.index("// Raw R29/R30 owners",up_start)]
+up_input_stub=r'''
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+using HRESULT=int;using UINT=unsigned;
+constexpr HRESULT S_OK=0,E_FAIL=-1;
+bool SUCCEEDED(HRESULT hr){return hr>=0;}
+bool FAILED(HRESULT hr){return hr<0;}
+enum class R7CandidateSeedResult {Unavailable,Seeded,DirtyRestore};
+struct IDirect3DSurface9{};
+struct Buffer {unsigned refs=0;void Release(){assert(refs);--refs;}};
+using IDirect3DVertexBuffer9=Buffer;
+using IDirect3DIndexBuffer9=Buffer;
+template<class T>void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
+struct IDirect3DDevice9;
+struct Pair {std::uint64_t generation=1;IDirect3DDevice9* device=nullptr;} ExternalAtomicCandidates;
+std::uint64_t R7CandidateBoundarySerial=0,ExternalAtomicReplayEpoch=9;
+struct IDirect3DDevice9{
+    Buffer vb,ib;
+    unsigned phase=0,mode=0,streamGets=0,indexGets=0,draws=0,streamSets=0,indexSets=0;
+    bool indexed=false,nullVb=false,nullIb=false;
+    HRESULT event(unsigned step){
+        if(phase!=step)return S_OK;
+        if(mode==1){++ExternalAtomicCandidates.generation;ExternalAtomicCandidates.device=nullptr;}
+        if(mode==2)++R7CandidateBoundarySerial;
+        return mode==3?E_FAIL:S_OK;
+    }
+    HRESULT GetStreamSource(UINT stream,Buffer** b,UINT* offset,UINT* stride){
+        assert(stream==0);++streamGets;*b=nullVb?nullptr:&vb;if(*b)++(*b)->refs;
+        *offset=12;*stride=32;return event(1);
+    }
+    HRESULT GetIndices(Buffer** b){assert(indexed);++indexGets;*b=nullIb?nullptr:&ib;if(*b)++(*b)->refs;return event(2);}
+    HRESULT Draw(){++draws;return event(3);}
+    HRESULT SetStreamSource(UINT stream,Buffer* b,UINT offset,UINT stride){
+        assert(ExternalAtomicCandidates.device==this&&stream==0);
+        assert(b==(nullVb?nullptr:&vb)&&offset==(nullVb?0u:12u)&&stride==(nullVb?0u:32u));
+        ++streamSets;return event(4);
+    }
+    HRESULT SetIndices(Buffer* b){
+        assert(ExternalAtomicCandidates.device==this&&indexed&&b==(nullIb?nullptr:&ib));
+        ++indexSets;return event(5);
+    }
+};
+template<class DrawCall>R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9* d,unsigned,
+    IDirect3DSurface9*,IDirect3DSurface9*,DrawCall& draw){
+    const auto gen=ExternalAtomicCandidates.generation,serial=R7CandidateBoundarySerial;
+    const auto hr=draw();
+    if(ExternalAtomicCandidates.generation!=gen||ExternalAtomicCandidates.device!=d)
+        return R7CandidateSeedResult::DirtyRestore;
+    if(FAILED(hr)||R7CandidateBoundarySerial!=serial)return R7CandidateSeedResult::Unavailable;
+    return R7CandidateSeedResult::Seeded;
+}
+'''
+up_input_cases=r'''
+int main(){
+    unsigned cases=0;
+    for(unsigned indexed=0;indexed<2;++indexed)
+    for(unsigned nulls=0;nulls<4;++nulls)
+    for(unsigned phase=0;phase<=5;++phase)
+    for(unsigned mode=1;mode<=3;++mode){
+        IDirect3DDevice9 d;d.indexed=indexed;d.nullVb=nulls&1;d.nullIb=nulls&2;
+        d.phase=phase;d.mode=mode;
+        ExternalAtomicCandidates={1,&d};R7CandidateBoundarySerial=0;ExternalAtomicReplayEpoch=9;
+        auto draw=[&](){return d.Draw();};
+        const auto result=R7ReplayInactiveDraw(&d,0,nullptr,nullptr,draw,true,indexed);
+        const bool reached=phase!=0&&(indexed||(phase!=2&&phase!=5));
+        const bool captureAbort=reached&&phase<=2;
+        const bool reset=reached&&mode==1;
+        const bool drawExpected=!captureAbort;
+        const bool streamExpected=drawExpected&&!(reset&&phase==3);
+        const bool indexExpected=streamExpected&&indexed&&!(reset&&phase==4);
+        assert(d.streamGets==1&&d.indexGets==unsigned(indexed&&!(captureAbort&&phase==1)));
+        assert(d.draws==unsigned(drawExpected)&&d.streamSets==unsigned(streamExpected)&&d.indexSets==unsigned(indexExpected));
+        const bool dirty=reset||(reached&&mode==3&&phase>=4);
+        const auto expected=dirty?R7CandidateSeedResult::DirtyRestore:
+            reached?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded;
+        assert(result==expected&&ExternalAtomicReplayEpoch==(reached?0u:9u));
+        assert(d.vb.refs==0&&d.ib.refs==0);
+        ++cases;
+    }
+    // Non-UP draws do not capture or restore input state.
+    IDirect3DDevice9 d;ExternalAtomicCandidates={1,&d};ExternalAtomicReplayEpoch=9;
+    auto draw=[&](){return d.Draw();};
+    assert(R7ReplayInactiveDraw(&d,0,nullptr,nullptr,draw,false,false)==R7CandidateSeedResult::Seeded);
+    assert(d.draws==1&&!d.streamGets&&!d.indexGets&&!d.streamSets&&!d.indexSets);
+    std::cout<<"R7_UP_GENERATION_RESTORE_PASS "<<cases+1<<"\n";
+}
+'''
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"up_generation.cpp"
+    exe=Path(temp)/"up_generation"
+    cpp.write_text(up_input_stub+up_owner+up_input_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)

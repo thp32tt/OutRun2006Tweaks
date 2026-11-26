@@ -2604,13 +2604,27 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 IDirect3DVertexBuffer9* vb=nullptr;
                 IDirect3DIndexBuffer9* ib=nullptr;
                 UINT offset=0,stride=0;
+                // UP draws clear stream zero (and the index binding for
+                // indexed UP). Do not restore pre-reset COM objects into a
+                // retired device generation, even if the draw returned S_OK.
+                const auto generation=ExternalAtomicCandidates.generation;
+                const auto boundary=R7CandidateBoundarySerial;
+                auto current=[&](){return ExternalAtomicCandidates.generation==generation&&
+                    ExternalAtomicCandidates.device==device;};
+                auto rasterCurrent=[&](){return current()&&R7CandidateBoundarySerial==boundary;};
                 const bool captured=SUCCEEDED(device->GetStreamSource(0,&vb,&offset,&stride))&&
-                    (!indexedUp||SUCCEEDED(device->GetIndices(&ib)));
+                    rasterCurrent()&&(!indexedUp||SUCCEEDED(device->GetIndices(&ib)))&&
+                    rasterCurrent();
                 if(!captured){ReleaseCom(ib);ReleaseCom(vb);return E_FAIL;}
                 const HRESULT hr=drawCall();
-                if(FAILED(device->SetStreamSource(0,vb,vb?offset:0u,vb?stride:0u)))
+                // A Present alone interrupts raster but does not invalidate
+                // saved input ownership. Still restore on that boundary.
+                // Check again between independent recovery operations.
+                if(!current()||FAILED(device->SetStreamSource(0,vb,vb?offset:0u,vb?stride:0u)))
                     inputRestoreFailed=true;
-                if(indexedUp&&FAILED(device->SetIndices(ib)))inputRestoreFailed=true;
+                if(indexedUp&&(!current()||FAILED(device->SetIndices(ib))))
+                    inputRestoreFailed=true;
+                if(!current())inputRestoreFailed=true;
                 ReleaseCom(ib);ReleaseCom(vb);
                 return inputRestoreFailed?E_FAIL:hr;
             };
