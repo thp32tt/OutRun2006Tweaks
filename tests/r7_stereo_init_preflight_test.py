@@ -2023,3 +2023,73 @@ with tempfile.TemporaryDirectory() as temp:
     cpp.write_text(up_input_stub+up_owner+up_input_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
+
+
+# Iter106: actual initial RIGHT bind/clear and shared restore transaction.
+init_tx_begin=source.index("bool R7InitializeRightAttachments(")
+init_tx=source[init_tx_begin:source.index("// Capture real LEFT attachments",init_tx_begin)]
+restore_begin=source.index("bool RestoreRightPassState(")
+restore_tx=source[restore_begin:source.index("bool TryBootstrapRightDepthFromRecentClear(",restore_begin)]
+assert "R7InitializeRightAttachments(device,RightEyeSurface,RightEyeDepth," in init
+assert init.index("if(!R7InitializeRightAttachments(") < init.index("if(dirty)") < init.index("StereoResourcesReady=true")
+assert "if(R7EyeStateGeneration()==generation)ReleaseStereoResources();" in init
+assert "NoteRestoreFailure(\"R7 initial RIGHT attachment transaction\");" in init
+init_tx_stub=r'''
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+using HRESULT=int;using DWORD=unsigned;
+constexpr HRESULT S_OK=0,E_FAIL=-1;
+constexpr DWORD D3DCLEAR_TARGET=1,D3DCLEAR_ZBUFFER=2,D3DCLEAR_STENCIL=4;
+#define D3DCOLOR_XRGB(r,g,b) 0u
+bool SUCCEEDED(HRESULT hr){return hr>=0;} bool FAILED(HRESULT hr){return hr<0;}
+std::uint64_t generation=1;
+std::uint64_t R7EyeStateGeneration(){return generation;}
+struct D3DRECT{};struct D3DVIEWPORT9{unsigned Width;};struct D3DSURFACE_DESC{unsigned Format;};
+unsigned calls=0,failAt=0,retireAt=0,scope=0,clearCount=0,flagsSeen=0,restoreMask=0;
+HRESULT step(){assert(scope);++calls;if(calls==retireAt)++generation;return calls==failAt?E_FAIL:S_OK;}
+struct IDirect3DSurface9{unsigned format=1;HRESULT GetDesc(D3DSURFACE_DESC* d){auto hr=step();d->Format=format;return hr;}};
+struct IDirect3DDevice9{
+ IDirect3DSurface9 *rt=nullptr,*depth=nullptr,*savedRt=nullptr,*savedDepth=nullptr;
+ D3DVIEWPORT9 view{800};
+ HRESULT SetDepthStencilSurface(IDirect3DSurface9* s){if(s==savedDepth)restoreMask|=2;auto hr=step();if(SUCCEEDED(hr))depth=s;return hr;}
+ HRESULT SetViewport(const D3DVIEWPORT9* v){if(v->Width==800)restoreMask|=4;auto hr=step();if(SUCCEEDED(hr))view=*v;return hr;}
+};
+struct InternalPassScope{InternalPassScope(){++scope;}~InternalPassScope(){--scope;}};
+bool FormatHasStencil(unsigned f){return f==1;}
+struct RtHook{template<class H>H stdcall(IDirect3DDevice9* d,unsigned,IDirect3DSurface9* s){if(s==d->savedRt)restoreMask|=1;auto hr=step();if(SUCCEEDED(hr))d->rt=s;return hr;}} SetRenderTargetHook;
+struct DsHook{bool enabled=true;explicit operator bool()const{return enabled;}template<class H>H stdcall(IDirect3DDevice9* d,IDirect3DSurface9* s){return d->SetDepthStencilSurface(s);}} SetDepthStencilSurfaceHook;
+struct ClHook{template<class H>H stdcall(IDirect3DDevice9*,unsigned,const D3DRECT*,DWORD flags,DWORD,float,unsigned){++clearCount;flagsSeen=flags;return step();}} ClearHook;
+struct Candidate{std::uint64_t& generation;} ExternalAtomicCandidates{generation};
+bool RestoreWvpOneRegisterAtATime(IDirect3DDevice9*,const float*){assert(false);return false;}
+'''
+init_tx_cases=r'''
+int main(){
+ unsigned cases=0;
+ for(bool depth:{false,true})for(bool stencil:{false,true})for(bool hook:{false,true}){
+  const unsigned clearAt=depth?5:4,total=clearAt+3;
+  for(unsigned phase=0;phase<=total;++phase)for(unsigned mode=0;mode<3;++mode){
+   IDirect3DSurface9 left,z,right,rz;rz.format=stencil?1:2;
+   IDirect3DDevice9 d;d.rt=d.savedRt=&left;d.depth=d.savedDepth=&z;
+   generation=1;calls=clearCount=flagsSeen=restoreMask=0;failAt=mode==1||mode==2?phase:0;retireAt=mode==0||mode==2?phase:0;SetDepthStencilSurfaceHook.enabled=hook;
+   bool dirty=false;const bool ok=R7InitializeRightAttachments(&d,&right,depth?&rz:nullptr,&left,&z,{1920},{800},1,dirty);
+   const bool fault=phase!=0;const bool retired=fault&&mode!=1;
+   assert(ok==!fault);assert(dirty==(retired||(fault&&phase>clearAt)));
+   if(retired)assert(calls==phase);else if(fault&&phase<=clearAt)assert(calls==phase+3);else assert(calls==total);
+   if(!dirty){assert(d.rt==&left&&d.depth==&z&&d.view.Width==800&&restoreMask==7);}
+   if(!retired)assert(restoreMask==7);
+   assert(clearCount==unsigned(!fault||phase>=clearAt));
+   if(clearCount)assert(flagsSeen==(D3DCLEAR_TARGET|(depth?D3DCLEAR_ZBUFFER:0u)|(depth&&stencil?D3DCLEAR_STENCIL:0u)));
+   assert(scope==0);++cases;
+  }
+ }
+ bool dirty=false;IDirect3DDevice9 d;calls=0;generation=2;assert(!R7InitializeRightAttachments(&d,nullptr,nullptr,nullptr,nullptr,{1920},{800},1,dirty)&&dirty&&!calls);
+ std::cout<<"R7_INIT_ATTACHMENT_TRANSACTION_PASS "<<cases+1<<'\n';
+}
+'''
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"init_attachment_transaction.cpp"
+    exe=Path(temp)/"init_attachment_transaction"
+    cpp.write_text(init_tx_stub+restore_tx+init_tx+init_tx_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)

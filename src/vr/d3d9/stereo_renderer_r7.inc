@@ -2590,6 +2590,48 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			return false;
 		}
 
+        bool
+        RestoreRightPassState(IDirect3DDevice9* device,IDirect3DSurface9* savedRt,
+            IDirect3DSurface9* savedDepth,const D3DVIEWPORT9& savedViewport,
+            const float* originalConstants,bool restoreWvp,std::uint64_t generation);
+
+        // Initialization is a real attachment transaction, not just an allocation.
+        // A failed restore must never allow the caller to raster into the wrong eye.
+        bool R7InitializeRightAttachments(IDirect3DDevice9* device,
+            IDirect3DSurface9* rightColor,IDirect3DSurface9* rightDepth,
+            IDirect3DSurface9* savedRt,IDirect3DSurface9* savedDepth,
+            const D3DVIEWPORT9& initViewport,const D3DVIEWPORT9& savedViewport,
+            std::uint64_t generation,bool& dirty)
+        {
+            auto current=[&](){return R7EyeStateGeneration()==generation;};
+            dirty=false;
+            if(!current()){dirty=true;return false;}
+            InternalPassScope guard;
+            bool ok=SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,rightColor));
+            if(ok&&current()){
+                const HRESULT hr=SetDepthStencilSurfaceHook?
+                    SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,rightDepth):device->SetDepthStencilSurface(rightDepth);
+                ok=SUCCEEDED(hr);
+            }
+            if(ok&&current())ok=SUCCEEDED(device->SetViewport(&initViewport));
+            DWORD flags=D3DCLEAR_TARGET;
+            if(ok&&current()&&rightDepth){
+                D3DSURFACE_DESC desc{};
+                ok=SUCCEEDED(rightDepth->GetDesc(&desc));
+                if(ok&&current()){
+                    flags|=D3DCLEAR_ZBUFFER;
+                    if(FormatHasStencil(desc.Format))flags|=D3DCLEAR_STENCIL;
+                }
+            }
+            if(ok&&current())ok=SUCCEEDED(ClearHook.stdcall<HRESULT>(device,0u,
+                static_cast<const D3DRECT*>(nullptr),flags,D3DCOLOR_XRGB(0,0,0),1.0f,0u));
+            // Independent recovery after HRESULT failure; no stale setters after Reset.
+            const bool restored=RestoreRightPassState(device,savedRt,savedDepth,
+                savedViewport,nullptr,false,generation);
+            dirty=!restored||!current();
+            return ok&&!dirty;
+        }
+
 		// Capture real LEFT attachments before retiring or allocating anything.
 		// A failed getter is not evidence of the default RT or no depth surface.
         void NoteRestoreFailure(const char* what);
@@ -2674,7 +2716,22 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			D3DVIEWPORT9 initViewport=savedViewport;
 			initViewport.X=0;initViewport.Y=0;
 			initViewport.Width=desc.Width;initViewport.Height=desc.Height;
-			bool initOk=true;{InternalPassScope guard;if(FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface)))initOk=false;if(initOk){const HRESULT depthHr=SetDepthStencilSurfaceHook?SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth):device->SetDepthStencilSurface(RightEyeDepth);if(FAILED(depthHr))initOk=false;}if(initOk&&FAILED(device->SetViewport(&initViewport)))initOk=false;DWORD clearFlags=D3DCLEAR_TARGET;if(RightEyeDepth){D3DSURFACE_DESC depthDesc{};if(FAILED(RightEyeDepth->GetDesc(&depthDesc)))initOk=false;else{clearFlags|=D3DCLEAR_ZBUFFER;if(FormatHasStencil(depthDesc.Format))clearFlags|=D3DCLEAR_STENCIL;}}if(initOk&&FAILED(ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),clearFlags,D3DCOLOR_XRGB(0,0,0),1.0f,0u)))initOk=false;if(TrackedRenderTarget&&FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,TrackedRenderTarget)))initOk=false;const HRESULT restoreDepthHr=SetDepthStencilSurfaceHook?SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,TrackedDepthStencil):device->SetDepthStencilSurface(TrackedDepthStencil);if(FAILED(restoreDepthHr))initOk=false;if(FAILED(device->SetViewport(&savedViewport)))initOk=false;}if(!initOk){ReleaseStereoResources();return false;}StereoResourcesReady=true;spdlog::info("VR stereo: full-size eye surfaces ready {}x{} format={} msaa={} quality={}",desc.Width,desc.Height,static_cast<int>(desc.Format),static_cast<int>(desc.MultiSampleType),desc.MultiSampleQuality);return true;
+            const auto generation=R7EyeStateGeneration();
+            bool dirty=false;
+            if(!R7InitializeRightAttachments(device,RightEyeSurface,RightEyeDepth,
+                TrackedRenderTarget,TrackedDepthStencil,initViewport,savedViewport,generation,dirty)){
+                // A retired owner may already have a different resource set.
+                if(R7EyeStateGeneration()==generation)ReleaseStereoResources();
+                if(dirty){
+                    if(captureRetired)*captureRetired=true;
+                    ExternalAtomicReplayEpoch=0;
+                    RightDepthSynchronized=false;RightStencilSynchronized=false;
+                    LastMainDepthClearStamp.Invalidate();
+                    NoteRestoreFailure("R7 initial RIGHT attachment transaction");
+                }
+                return false;
+            }
+            StereoResourcesReady=true;spdlog::info("VR stereo: full-size eye surfaces ready {}x{} format={} msaa={} quality={}",desc.Width,desc.Height,static_cast<int>(desc.Format),static_cast<int>(desc.MultiSampleType),desc.MultiSampleQuality);return true;
 		}
 
 		void NoteRestoreFailure(const char* what){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailureRestoreFailed);++RestoreFailures;if(!FirstRestoreFailureLogged){FirstRestoreFailureLogged=true;spdlog::warn("VR stereo: renderer state restore failed at {}; frame forced to mono fallback",what);}}
