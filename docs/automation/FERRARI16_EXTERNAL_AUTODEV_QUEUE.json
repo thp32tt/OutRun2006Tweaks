@@ -4465,7 +4465,7 @@
   "atomic_stereo_plan": {
     "revision": "20261126-P0-BATCH-IMPLEMENTATION",
     "operator_request": "Prioritize cohesive implementation over repeated verification and single tiny fixes. Develop A2/A3/A4 against existing inactive A1 backend now; preserve fail-closed runtime admission.",
-    "active_milestone": "A1",
+    "active_milestone": "A2",
     "milestones": [
       {
         "id": "A1",
@@ -4588,7 +4588,7 @@
         "A3",
         "A4"
       ],
-      "note": "A1 remains IN_PROGRESS; A2 starts against existing actual inactive R7 surface/replay interface. Development may proceed before preceding milestone is certified; admission and completion still require all dependencies."
+      "note": "Active implementation milestone is A2. A1 remains IN_PROGRESS as an outstanding dependency; fix A1 only when directly needed to wire A2. A3/A4 can be developed inactive before dependency certification, but no activation or acceptance without actual gates."
     }
   },
   "development_batch_policy": {
