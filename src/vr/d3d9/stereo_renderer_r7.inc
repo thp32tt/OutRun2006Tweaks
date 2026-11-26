@@ -2065,7 +2065,14 @@ namespace OutRunVRStereo
                 viewport.Height<=pair.colorDesc.Height-viewport.Y&&
                 (!requireFullViewport||(viewport.X==0&&viewport.Y==0&&
                  viewport.Width==pair.colorDesc.Width&&viewport.Height==pair.colorDesc.Height));
-            if(!captured){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
+            // A failed read is a clean decline only while the saved live
+            // generation survives, including COM cleanup. A synchronous
+            // reset must veto the caller's subsequent physical draw.
+            auto declineCapture=[&](){
+                ReleaseCom(depth);ReleaseCom(rt);
+                return current()?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::DirtyRestore;
+            };
+            if(!captured)return declineCapture();
             // The shadow MRT flags are not a physical binding proof. Leaving
             // any auxiliary target attached would let the replay write into
             // the live scene, even though RT0 and depth are private.
@@ -2077,7 +2084,7 @@ namespace OutRunVRStereo
                 ReleaseCom(aux);
                 isolated=isolated&&rasterCurrent();
             }
-            if(!isolated||!rasterCurrent()){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
+            if(!isolated||!rasterCurrent())return declineCapture();
             bool seeded=true;
             for(unsigned i=firstEye;i<firstEye+eyeCount;++i){
                 const auto& eye=pair.eyes[i];

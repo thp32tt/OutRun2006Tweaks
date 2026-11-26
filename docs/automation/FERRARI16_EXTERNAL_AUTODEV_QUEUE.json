@@ -4390,14 +4390,14 @@
       ],
       "latest_material_sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
       "latest_static_ci": "Iteration60 strict dashboard PBR test amended after initial exact CI legacy missing-body assertion failure; final exact SHA CI as recorded. Iteration59 all four applicable exact workflows success and credited once.",
-      "next_focus": "A1: verify iteration98 exact SHA CI; complete live attachment lifetime and whole-vehicle transaction entrypoint. Keep guard false."
+      "next_focus": "A1: verify iteration99 exact SHA CI; fence raw R29/R30 attachment identity capture and COM cleanup against retirement before physical fallback, then continue real whole-vehicle transaction entrypoint. Keep guard false."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
   "priority_rule": "P0: implement the missing whole-vehicle atomic stereo renderer before unrelated validation or asset cleanup. While A1-A4 incomplete, only backend implementation or tests/defects directly blocking its milestones count as primary work; no rotating off to independent OVC/GLB/PBR/package validators. CI follow-up is secondary.",
   "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-25T21:29:00+09:00",
+  "last_updated_kst": "2026-11-26T17:00:00+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
@@ -4510,7 +4510,8 @@
         "iteration97_evidence": "Production R7 candidate Reset previously released COM members before clearing pair ownership or advancing generation, permitting nested retirement to release the same member again. Detach all four references and clear proof/device/descriptors before Release; return the retirement generation and abort device/descriptor replacement allocation if Release triggers newer retirement. Added 15 extracted allocator cases across normal reset, device replacement and descriptor replacement, with each of four Release callbacks reentering Reset; assert no duplicate release or allocation, and clean retry. Iter96 push CI not visible in PR-only connector; iter97 exact CI pending. A1 stays IN_PROGRESS; no activation/publication.",
         "iteration98_evidence": "Actual R7 allocator now takes the transaction's live ownership snapshot check, fences every borrowed descriptor, caps, create, created descriptor, and replacement Release boundary against same-generation Present/attachment changes, and stops before later driver calls. The real transaction captures attachments before swap-chain coverage and rechecks ownership/generation after it. Added 48 actual allocator positive/negative cases and 12 actual entrypoint cases. A1 remains IN_PROGRESS; no publication or activation. Exact SHA CI pending.",
         "deliverable": "Implement actual R7 isolated left/right color+depth candidate resource ownership, device/reset generation, descriptors, compatible MSAA and viewport. Reuse resources; no per-mesh allocation.",
-        "gate": "Compiled production D3D9 backend called by a real transaction entrypoint; failure injection on allocation/bind/restore; no mutation of live pair on abort. If depth cannot be copied with D3D9, use proven depth replay or frame-level isolation; never assume StretchRect copies depth."
+        "gate": "Compiled production D3D9 backend called by a real transaction entrypoint; failure injection on allocation/bind/restore; no mutation of live pair on abort. If depth cannot be copied with D3D9, use proven depth replay or frame-level isolation; never assume StretchRect copies depth.",
+        "iteration99_evidence": "Actual R7 inactive pair capture/MRT preflight now distinguishes a clean decline from generation retirement during a getter or final saved COM Release. Return DirtyRestore when ownership has retired, so existing production replay callers veto same-call physical draw instead of falling through on stale attachments; same-generation Present remains Unavailable. Changed 16 existing actual capture boundary cases and added 30 actual cleanup fault cases. Exact-SHA CI pending; no publication or activation. A1 remains IN_PROGRESS."
       },
       {
         "id": "A2",

@@ -429,7 +429,8 @@ int main(){
             [&](IDirect3DSurface9* a){return capture.bindColor(a);},
             [&](IDirect3DSurface9* a){return capture.bindDepth(a);},
             [&](){return capture.clear();});
-        assert(result==(phase?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded));
+        const auto expected=phase?(mode?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::DirtyRestore):R7CandidateSeedResult::Seeded;
+        assert(result==expected);
         assert(capture.io==(phase?(phase<=4?phase:4u):21u));
         assert(capture.auxCalls==(phase?(phase<=4?0u:phase-4):3u));
         assert(capture.clearCalls==(phase?0u:2u)&&capture.liveWrites==0);
@@ -437,6 +438,32 @@ int main(){
         pair.Reset();capture.empty();++captureCases;
     }
     assert(captureCases==16);
+    // Even an ordinary failed getter can retire live ownership while its
+    // acquired references are released. No stale live fallback or setters.
+    unsigned captureCleanupCases=0;
+    for(unsigned mode=0;mode<3;++mode)
+    for(unsigned phase=1;phase<=5;++phase)
+    for(unsigned releaseDepth=0;releaseDepth<2;++releaseDepth){
+        IDirect3DDevice9 capture;capture.capsTargets=2;
+        assert(pair.Ensure(&capture,&lc,&ld,&rc,&rd,vp,[]{return true;}));
+        capture.rt=capture.liveRt=&lc;capture.depth=capture.liveDepth=&ld;
+        capture.ioFail=phase<=4?phase:0;
+        if(phase==5)capture.auxHr[1]=E_FAIL;
+        auto* released=releaseDepth?&ld:&lc;
+        released->onRelease=mode==1?retire:mode==2?+[](){++R7CandidateBoundarySerial;}:nullptr;
+        const auto result=R7SeedInactivePair(pair,&capture,&lc,&ld,
+            [&](IDirect3DSurface9* a){return capture.bindColor(a);},
+            [&](IDirect3DSurface9* a){return capture.bindDepth(a);},
+            [&](){return capture.clear();});
+        released->onRelease=nullptr;
+        const bool retired=mode==1&&(!releaseDepth||phase>=2);
+        assert(result==(retired?R7CandidateSeedResult::DirtyRestore:R7CandidateSeedResult::Unavailable));
+        assert(capture.io==(phase<=4?phase:4u)&&capture.auxCalls==unsigned(phase==5));
+        assert(!capture.clearCalls&&!capture.liveWrites&&lc.refs==0&&ld.refs==0);
+        assert(capture.rt==&lc&&capture.depth==&ld);
+        pair.Reset();capture.empty();++captureCleanupCases;
+    }
+    assert(captureCleanupCases==30);
     // Physical present during each restore operation still requires full
     // recovery but must not return a successful raster receipt. Retirement
     // stops before any subsequent old-generation setter. Include both
