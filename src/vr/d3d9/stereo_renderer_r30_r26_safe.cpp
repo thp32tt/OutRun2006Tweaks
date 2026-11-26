@@ -69,6 +69,17 @@ namespace OutRunVRStereo
 {
     namespace
     {
+        // Default R26+HUD raw screen routes also need candidate replay.
+        // When no private scene is seeded, execute the exact stock call.
+        template<class Draw>
+        HRESULT R30SafeCandidateRaw(IDirect3DDevice9* device,Draw&& draw,
+            bool up=false,bool indexedUp=false) noexcept
+        {
+            if(!ExternalAtomicReplayEpoch||ExternalAtomicReplayEpoch!=PresentEpoch)
+                return draw();
+            return R7ExecuteRawCandidateVb(device,draw,up,indexedUp);
+        }
+
         // R26-safe comparison owner: R26 remains the world/effect authority;
         // only R30 HUD, XYZRHW correction and stereo SkyGlow are layered above.
         std::uint64_t R30SafeTwoEyeDraws = 0;
@@ -5055,14 +5066,14 @@ namespace OutRunVRStereo
             }
 
             auto leftDraw = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R30SafeCandidateRaw(device,[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount,
-                    scratch.left.data(), stride);
+                    scratch.left.data(), stride);},true);
             };
             auto rightDraw = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R30SafeCandidateRaw(device,[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount,
-                    scratch.right.data(), stride);
+                    scratch.right.data(), stride);},true);
             };
             const auto sourceCommand =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
@@ -5224,16 +5235,16 @@ namespace OutRunVRStereo
                 drawIndices = scratch.indexSource.data();
             }
             auto leftDraw = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, drawMinVertex, numVertices,
                     primitiveCount, drawIndices, indexFormat,
-                    scratch.left.data(), stride);
+                    scratch.left.data(), stride);},true,true);
             };
             auto rightDraw = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, drawMinVertex, numVertices,
                     primitiveCount, drawIndices, indexFormat,
-                    scratch.right.data(), stride);
+                    scratch.right.data(), stride);},true,true);
             };
             const auto visualRoute = R30CaptureVisualRouteTrace();
             R30StereoPassTrace physicalTrace{};
@@ -5326,14 +5337,14 @@ namespace OutRunVRStereo
             }
 
             auto leftDraw = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R30SafeCandidateRaw(device,[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount,
-                    scratch.left.data(), stride);
+                    scratch.left.data(), stride);},true);
             };
             auto rightDraw = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R30SafeCandidateRaw(device,[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount,
-                    scratch.right.data(), stride);
+                    scratch.right.data(), stride);},true);
             };
             const auto visualRoute = R30CaptureVisualRouteTrace();
             R30StereoPassTrace physicalTrace{};
@@ -5595,14 +5606,14 @@ namespace OutRunVRStereo
             }
 
             auto leftDraw = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, 0u, vertexCount, primitiveCount,
-                    rebased, ibDesc.Format, scratch.left.data(), stride);
+                    rebased, ibDesc.Format, scratch.left.data(), stride);},true,true);
             };
             auto rightDraw = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, 0u, vertexCount, primitiveCount,
-                    rebased, ibDesc.Format, scratch.right.data(), stride);
+                    rebased, ibDesc.Format, scratch.right.data(), stride);},true,true);
             };
             const auto visualRoute = R30CaptureVisualRouteTrace();
             R30StereoPassTrace physicalTrace{};
@@ -9027,9 +9038,9 @@ namespace OutRunVRStereo
         {
             return R62TryFixedFunctionSpriteStereo(device, type, primitiveCount,
                 [&]() {
-                    return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                    return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
                         device, type, baseVertexIndex, minVertexIndex,
-                        numVertices, startIndex, primitiveCount);
+                        numVertices, startIndex, primitiveCount);});
                 }, "DIP");
         }
 
@@ -9072,8 +9083,8 @@ namespace OutRunVRStereo
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT stageFixedFn = R62TryStageExtensionFixedFunction(
                 device, type, primitiveCount, [&]() {
-                    return DrawPrimitiveHook.stdcall<HRESULT>(
-                        device, type, startVertex, primitiveCount);
+                    return R30SafeCandidateRaw(device,[&](){return DrawPrimitiveHook.stdcall<HRESULT>(
+                        device, type, startVertex, primitiveCount);});
                 }, "DP");
             if (stageFixedFn != E_NOTIMPL)
                 return stageFixedFn;
@@ -9083,8 +9094,8 @@ namespace OutRunVRStereo
                 return xyzrhw;
 
             auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
+                return R30SafeCandidateRaw(device,[&](){return DrawPrimitiveHook.stdcall<HRESULT>(
+                    device, type, startVertex, primitiveCount);});
             };
             auto r29 = [&]() {
                 return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
@@ -9122,9 +9133,9 @@ namespace OutRunVRStereo
             // DrawIndexedPrimitive, never XYZRHW or a vertex shader.
             const HRESULT externalImGui = R30TryExternalImGuiIndexed(
                 device, [&]() {
-                    return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                    return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
                         device, type, baseVertexIndex, minVertexIndex,
-                        numVertices, startIndex, primitiveCount);
+                        numVertices, startIndex, primitiveCount);});
                 });
             if (externalImGui != E_NOTIMPL)
                 return externalImGui;
@@ -9179,9 +9190,9 @@ namespace OutRunVRStereo
                 return xyzrhw;
 
             auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
+                    primitiveCount);});
             };
             auto r29 = [&]() {
                 return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device, type,
@@ -9224,8 +9235,8 @@ namespace OutRunVRStereo
             {
                 const HRESULT stageFixedFn = R62TryStageExtensionFixedFunction(
                     device, type, primitiveCount, [&]() {
-                        return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                            device, type, primitiveCount, data, stride);
+                        return R30SafeCandidateRaw(device,[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                            device, type, primitiveCount, data, stride);},true);
                     }, "DPUP");
                 if (stageFixedFn != E_NOTIMPL)
                     return stageFixedFn;
@@ -9236,8 +9247,8 @@ namespace OutRunVRStereo
                 return xyzrhw;
 
             auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
+                return R30SafeCandidateRaw(device,[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                    device, type, primitiveCount, data, stride);},true);
             };
             auto r29 = [&]() {
                 return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
@@ -9277,9 +9288,9 @@ namespace OutRunVRStereo
             {
                 const HRESULT stageFixedFn = R62TryStageExtensionFixedFunction(
                     device, type, primitiveCount, [&]() {
-                        return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                        return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                             device, type, minVertexIndex, numVertices, primitiveCount,
-                            indexData, indexFormat, vertexData, stride);
+                            indexData, indexFormat, vertexData, stride);},true,true);
                     }, "DIPUP");
                 if (stageFixedFn != E_NOTIMPL)
                     return stageFixedFn;
@@ -9291,9 +9302,9 @@ namespace OutRunVRStereo
                 return xyzrhw;
 
             auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                return R30SafeCandidateRaw(device,[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
                     minVertexIndex, numVertices, primitiveCount, indexData,
-                    indexFormat, vertexData, stride);
+                    indexFormat, vertexData, stride);},true,true);
             };
             auto r29 = [&]() {
                 return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,

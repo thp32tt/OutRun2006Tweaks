@@ -1314,6 +1314,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input) noexcept
     {
         using namespace OutRunVR::QuestCockpitV2;
+        if(!Game::current_mode||*Game::current_mode!=STATE_GAME||
+            !NativeFrameTrace().Active()||!NativeModelPlayer||InSceneEffect())return false;
         const auto* eye=OutRunVRRenderer::GetLatchedStereoFrameView();
         const auto* player=Game::pl_car();
         const auto* camera=Game::camera();
@@ -1346,6 +1348,8 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         using namespace OutRunVR::DinoSidecar;
         const auto original=Module::fn_ptr<void(__cdecl*)(EVWORK_CAR*,int,int)>(0x69600);
+        if(NativeModelPlayer&&NativeModelPlayer==player)
+            OutRunVRStereo::RetireRepeatedNativeVehicle(reinterpret_cast<std::uintptr_t>(player));
         // First runtime integration deliberately uses only exact F50 native
         // layouts (2/17) in ordinary mode-1, no faded alternate vehicle.
         if(!NativeModelPlayer||NativeModelPlayer!=player||!player||variant!=0||
@@ -1363,8 +1367,15 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         auto& overlay=GlobalDashboardGpu();
         const bool includeDashboard=overlay.SelectionMatches(FerrariModelSlot::GenericId,ticket.carId)&&
             overlay.Installed();
-        if((includeDashboard&&!overlay.EnsureResources(ticket.device))||
-            (!includeDashboard&&GlobalGpu().HasEmbeddedSpeedAndRpm()!=3u)){
+        if(includeDashboard&&!overlay.EnsureResources(ticket.device)){
+            original(player,model,variant);return;
+        }
+        const unsigned needles=GlobalGpu().DashboardNeedleCoverage()|
+            (includeDashboard?overlay.DashboardNeedleCoverage():0u);
+        const unsigned gears=GlobalGpu().DashboardGearCoverage()|
+            (includeDashboard?overlay.DashboardGearCoverage():0u);
+        if(!ticket.dashboard.valid||needles!=DashboardBothNeedles||
+            ticket.dashboard.gear>7u||!(gears&(1u<<ticket.dashboard.gear))){
             original(player,model,variant);return;
         }
         ExternalVehicleStageInput input{};
@@ -1376,6 +1387,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(!OutRunVRStereo::BeginNativeVehicleReplacement(ticket.device,input,replay)){
             original(player,model,variant);return;
         }
+        replay.model=model;
         {
             ScopedNativeVehicleStockReplay stock(replay);
             original(player,model,variant); // native geometry/side effects exactly once
@@ -3146,7 +3158,8 @@ class VRLensFlareProjected2D : public Hook
                     const auto base=static_cast<std::uintptr_t>(q[5]);
                     const auto addr=reinterpret_cast<std::uintptr_t>(entry);
                     nativeOwned=addr>=base&&addr-base<static_cast<std::uintptr_t>(q[0])*0x3cu&&
-                        (addr-base)%0x3cu==0&&entry[8]<=1u&&entry[5]&&entry[6]&&entry[7];
+                        (addr-base)%0x3cu==0&&entry[8]<=1u&&entry[5]&&entry[6]&&entry[7]&&
+                        replay->OwnsObject(entry[14]);
                 }
             }
             OutRunVR::DinoSidecar::ScopedNativeVehiclePhysical stockOnly(nativeOwned);

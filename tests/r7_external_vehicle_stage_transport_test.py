@@ -16,6 +16,10 @@ a=r7.index("struct R7StagedTransfer")
 transfer=r7[a:r7.index("bool ResolveDirectTransport(",a)]
 a=r7.index("OutRunVR::DinoSidecar::IsolatedStageResult StageExternalVehiclePair(")
 stage=r7[a:r7.index("bool NativeVehicleReplacementBackendReady()",a)]
+a=r7.index("bool NativeVehicleReplacementBackendReady()",a)
+native_api=r7[a:r7.index("void R7SetDirectResetRasterOwner(",a)]
+a=r7.index("bool R7NativeStockOnlyDraw()")
+native_omit=r7[a:r7.index("template<class DrawCall>",a)]
 a=gpu.index("struct IsolatedEyeRaster")
 types=gpu[a:gpu.index("class GpuOwner",a)]
 stub=r'''
@@ -24,7 +28,7 @@ stub=r'''
 #include <cstdint>
 #include <cstring>
 #include <iostream>
-#include "src/vr/game/external_car_isolated_transaction.hpp"
+#include "src/vr/game/external_car_native_stock_replay.hpp"
 #include "src/vr/game/external_car_eye_transform_proof.hpp"
 using HRESULT=int;using UINT=unsigned;using DWORD=unsigned;
 constexpr HRESULT S_OK=0,E_FAIL=-1,D3DERR_NOTFOUND=-2;
@@ -68,7 +72,10 @@ bool nativeEyesAvailable=true;
 const NativeEyeMatrices* GetQuestNativeEyePairForPresent(std::uint32_t pose){
     return nativeEyesAvailable&&pose==FrameStereoPoseSequence?&nativeEyes:nullptr;
 }
-std::atomic<bool> OcclusionQueryTrackingUnavailable{false};std::atomic<unsigned> ActiveOcclusionQueries{0};
+std::atomic<bool> OcclusionQueryTrackingUnavailable{false},StereoBaseCallbacksArmed{true};std::atomic<unsigned> ActiveOcclusionQueries{0};
+bool R7CandidatePresentBoundaryCovered=true,R7CandidateResetBoundaryCovered=true;
+namespace Settings {bool VRExternalFerrariTest=true,VRF50ExternalModel=false,VRDirectGpuOnly=true;}
+bool HostDirectTransportReady(){return true;}
 IDirect3DSurface9 *BackBuffer=nullptr,*TrackedRenderTarget=nullptr,*TrackedDepthStencil=nullptr,*RightEyeSurface=nullptr,*RightEyeDepth=nullptr;
 struct Stamp {unsigned invalidated=0;void Invalidate(){++invalidated;}} LastMainDepthClearStamp;
 bool RightDepthSynchronized=true,RightStencilSynchronized=true;
@@ -167,6 +174,7 @@ struct Fixture {
         FrameStereoMetadata.valid=true;FrameStereoMetadata.poseSequence=7;DirectTransportResourcesReady=true;
         rawCalls=rawFail=rawReset=rawPresent=copyCalls=copyFail=fenceCalls=fenceRevoke=restoreErrors=0;
         nativeValid=allowPublication=true;overlayDirty=false;
+        NativeVehicleModelEdgesReady=true;NativeVehiclePmtConsumerReady=true;R7NativeCompletedVehicle={};
         input.nativeFrame=12;input.pose=7;input.player=55;input.includeDashboard=true;
         input.nativeCurrent=[](const ExternalVehicleStageInput&) noexcept {return nativeValid;};
     }
@@ -174,6 +182,28 @@ struct Fixture {
         const auto r=StageExternalVehiclePair(&d,input);
         R7NativeCompletedVehicle=(r==IsolatedStageResult::Complete&&allowPublication)?R7StagedVehicle:IsolatedVehicleKey{};
         return r;
+    }
+    IsolatedStageResult NativeStage(unsigned fault=0){
+        NativeVehicleStockReplay receipt{};
+        if(!BeginNativeVehicleReplacement(&d,input,receipt))return IsolatedStageResult::Unavailable;
+        receipt.model=2;
+        {
+            ScopedNativeVehicleStockReplay owner(receipt);
+            for(unsigned group=1;group<=3;++group){
+                receipt.Open(true);
+                {
+                    ScopedNativeVehiclePhysical p(receipt.OwnsObject(0x30000u|(group==1?0x11u:group==2?0u:1u))&&!(fault==1&&group==2));
+                    for(unsigned eye=0;eye<2;++eye){
+                        if(R7NativeStockOnlyDraw()&&!(fault==2&&group==2&&eye==1))
+                            R7RecordNativeStockOmission(eye,R7CandidateSeedResult::Seeded);
+                        ++stock[eye].draws;++stockZ[eye].draws;
+                    }
+                }
+                receipt.Close(true);
+            }
+        }
+        if(fault==3)++R7CandidateBoundarySerial;
+        return FinishNativeVehicleReplacement(&d,input,receipt);
     }
     R7StagedTransfer Transfer(){return R7TransferStagedVehicle(&d,slot,&stock[0],&stock[1],D3DTEXF_NONE);}
     void LiveUnchanged(){assert(!stock[0].draws&&!stock[1].draws&&!stockZ[0].draws&&!stockZ[1].draws);}
@@ -204,11 +234,26 @@ int main(){
     {Fixture f;nativeEyes[1][12]=0.f;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
     {Fixture f;nativeEyesAvailable=false;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
     {Fixture f;FrameStereoMetadata.poseSequence=8;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    // Actual A4 begin/finish and stock-only decision with A2/A3.
+    for(unsigned fault=0;fault<=3;++fault){
+        Fixture f;const auto r=f.NativeStage(fault);
+        assert(f.stock[0].draws==3&&f.stock[1].draws==3);
+        if(fault==0){
+            assert(r==IsolatedStageResult::Complete&&rawCalls==10);
+            auto t=f.Transfer();assert(t.handled&&SUCCEEDED(t.hr)&&f.output[0].pixels==2&&f.output[1].pixels==2);
+            RetireRepeatedNativeVehicle(f.input.player);
+            assert(!f.Transfer().handled&&!ExternalAtomicReplayEpoch);
+        }else{
+            assert(r==IsolatedStageResult::Unavailable&&!rawCalls&&!f.Transfer().handled);
+        }
+        ++cases;
+    }
+    {Fixture f;NativeVehiclePmtConsumerReady=false;assert(f.NativeStage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
     std::cout<<"R7_ACTUAL_ISOLATED_STAGE_TRANSPORT_PASS "<<cases<<"\n";
 }
 '''
 with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"stage.cpp";exe=Path(temp)/"stage"
-    cpp.write_text(stub+types+gpu_stub+seed+transfer+stage+cases)
+    cpp.write_text(stub+types+gpu_stub+seed+native_omit+transfer+stage+native_api+cases)
     subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror","-pedantic","-I",str(root),str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)

@@ -4541,6 +4541,16 @@ if(WaitForEventQuery(slot.fence,1,0u))
             !OutRunVR::State::StateBlockTracker::Recording()&&
             !ActiveNativeVehicleStockReplay;
     }
+    void RetireRepeatedNativeVehicle(std::uintptr_t player) noexcept
+    {
+        const auto& key=R7NativeCompletedVehicle;
+        if(player&&key.player==player&&key.present==PresentEpoch&&
+            key.resource==ExternalAtomicCandidates.generation&&
+            key.boundary==R7CandidateBoundarySerial){
+            ExternalAtomicReplayEpoch=0;
+            R7NativeCompletedVehicle={};
+        }
+    }
     bool BeginNativeVehicleReplacement(IDirect3DDevice9* device,
         const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input,
         OutRunVR::DinoSidecar::NativeVehicleStockReplay& replay) noexcept
@@ -4550,7 +4560,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
             ExternalAtomicCandidates.device!=device||!input.nativeCurrent||
             !input.nativeCurrent(input)||!NativeVehicleReplacementBackendReady()||
             FrameStereoPoseSequence!=input.pose||!input.nativeFrame||!input.player||
-            R7StagedVehicle.present==PresentEpoch)return false;
+            (R7StagedVehicle.present==PresentEpoch&&
+             R7StagedVehicle.resource==ExternalAtomicCandidates.generation&&
+             R7StagedVehicle.boundary==R7CandidateBoundarySerial))return false;
         replay={};
         replay.key={ExternalAtomicCandidates.generation,R7CandidateBoundarySerial,
             PresentEpoch,input.nativeFrame,input.pose,input.player};

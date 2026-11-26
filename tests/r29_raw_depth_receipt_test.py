@@ -40,6 +40,7 @@ using HRESULT = int;
 using D3DPRIMITIVETYPE = int;
 using D3DFORMAT = int;
 constexpr DWORD D3DCLEAR_ZBUFFER = 2, D3DCLEAR_STENCIL = 4;
+constexpr HRESULT S_OK=0;
 struct IDirect3DSurface9 {
     int refs=0; void (*onRelease)()=nullptr;
     void Release(){assert(refs>0);--refs;if(onRelease)onRelease();}

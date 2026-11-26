@@ -23,6 +23,14 @@ int main(){
         assert(r.Ready()==(missing==0&&invalid==0&&mismatch==0));
         ++cases;
     }
+    for(int model:{2,17,5})for(unsigned group=1;group<=3;++group){
+        NativeVehicleStockReplay r{};r.model=model;r.opened=group;r.group=true;
+        const auto prefix=model==2?0x30000u:0x1500000u;
+        const unsigned part=group==1?0x11u:group==2?0u:1u;
+        assert(r.OwnsObject(prefix|part)==(model!=5));
+        assert(!r.OwnsObject(0x570008u));
+        assert(!r.OwnsObject(prefix|0xffffu));++cases;
+    }
     NativeVehicleStockReplay r{};r.key={1,2,3,4,5,6};
     {ScopedNativeVehicleStockReplay owner(r);r.Open(true);
      {ScopedNativeVehiclePhysical p(false);assert(!r.StockOnly());}

@@ -680,6 +680,14 @@ public:
             DashboardNeedleMask(cpu_.dashboardBindings.data(),
                                 cpu_.dashboardBindings.size()) : 0u;
     }
+    unsigned DashboardNeedleCoverage() const noexcept {
+        return loaded_?DashboardNeedleMask(cpu_.dashboardBindings.data(),
+            cpu_.dashboardBindings.size()):0u;
+    }
+    unsigned DashboardGearCoverage() const noexcept {
+        return loaded_?DashboardGearMask(cpu_.dashboardBindings.data(),
+            cpu_.dashboardBindings.size()):0u;
+    }
     // Only body-owned gear bindings can suppress a matching overlay gear.
     unsigned EmbeddedGearMask() const noexcept {
         return role_==SidecarRole::Vehicle && loaded_ ?
@@ -1019,6 +1027,7 @@ namespace OutRunVRStereo {
 // Native replacement is deliberately separate from the permanently disabled
 // legacy live-DIP path. Admission requires an actual private scene receipt.
 bool NativeVehicleReplacementBackendReady() noexcept;
+void RetireRepeatedNativeVehicle(std::uintptr_t player) noexcept;
 bool BeginNativeVehicleReplacement(IDirect3DDevice9* device,
     const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input,
     OutRunVR::DinoSidecar::NativeVehicleStockReplay& replay) noexcept;

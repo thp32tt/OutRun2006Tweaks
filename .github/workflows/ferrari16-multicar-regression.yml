@@ -101,6 +101,12 @@ jobs:
           assert 'ScopedNativeVehicleStockReplay stock(replay);' in model
           assert model.index('ScopedNativeVehicleStockReplay stock(replay);') < model.index('original(player,model,variant); // native geometry') < model.index('FinishNativeVehicleReplacement(')
           assert 'ScopedNativeVehiclePhysical stockOnly(nativeOwned);' in source
+          assert 'replay->OwnsObject(entry[14]);' in source
+          assert 'R7NativeCompletedVehicle.Same(key)' in r7
+          assert 'R7RecordNativeStockOmission(eye,result)' in r7
+          safe=Path('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp').read_text()
+          assert safe.count('return R30SafeCandidateRaw(device,') == 17
+          assert 'return R7ExecuteRawCandidateVb(device,draw,up,indexedUp);' in safe
           assert 'NativeVehiclePmtConsumerReady.store(true,' in source
           glass_scope=source[source.index('struct PlayerCallback {'):source.index('static bool HasDeferredOwner(')]
           assert 'PlayerOwnerScope owner{CurrentPlayerOwner};' in glass_scope
@@ -407,8 +413,8 @@ jobs:
           test "$(git hash-object src/vr/d3d9/stereo_renderer.cpp)" = 62dd2e7fee54b7735fd4520ddf4dd0673ad536f9
           test "$(git hash-object src/vr/d3d9/stereo_renderer_r22.cpp)" = 98fdd61cadf8fac632bde296047a8f2b8bf8f18e
           test "$(git hash-object src/vr/d3d9/stereo_renderer_r23.cpp)" = cfdeee7950b47432797784003371dd5230967b71
-          # Iter102: three R30 safe owners now pass the pre-bind generation to R7.
-          test "$(git hash-object src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp)" = b8d6d80ac87e9129eb6f268c33fac17abab977d9
+          # A4: exact reviewed R30-safe raw candidate integration, including HUD/UP.
+          test "$(git hash-object src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp)" = 470b73a895bce433d46acc1e988aaf3a8f51f5fb
           # Only these exact reviewed R30 transaction helper blobs are allowed.
           # Further byte changes fail closed; the R32 bridge guard remains.
           test "$(git hash-object src/vr/d3d9/r30_particle_dual_eye_ring.hpp)" = 55832210c09cff2c4940d7a06745b15f09284243
