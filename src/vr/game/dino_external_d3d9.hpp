@@ -315,7 +315,7 @@ class GpuOwner final {
                     return false;
                 suffix=genericSuffix;
                 // Prefer the exact canonical per-car asset for all 16 models.
-                // Legacy 288gto.ovc/f40.ovc remains a fallback only if that
+                // Legacy F50/GTO/F40 files remain a fallback only if that
                 // canonical filename is genuinely absent (not malformed).
                 // This path is resolved at cold load, never scanned on GPU.
                 if(const wchar_t* legacy=LegacyFerrariCarSuffix(canonicalId)) {

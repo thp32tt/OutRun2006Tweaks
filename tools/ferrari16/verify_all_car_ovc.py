@@ -20,7 +20,8 @@ CARS = (
     (12, "550 Barchetta"), (13, "F430 Coupe"), (14, "Enzo / FX"),
     (28, "F430 Spider"),
 )
-LEGACY = {7: "288gto.ovc", 11: "f40.ovc"}
+LEGACY = {2: "F50_External_Test.ovc", 7: "ExternalCars/288gto.ovc",
+          11: "ExternalCars/f40.ovc"}
 MAX_FILE = 128 * 1024 * 1024
 MAX_GPU = 112 * 1024 * 1024
 # Match the C++ loader's 0.04f, not Python's binary64 literal 0.04.
@@ -264,6 +265,8 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                         orm_materials.add(material_id)
                 require(gpu_bytes <= MAX_GPU, "PBR GPU budget")
     dashboards = 0
+    needles: set[int] = set()
+    gears: set[int] = set()
     if version == 4:
         require(data[at:at + 8] == b"OVCDASH4", "dashboard header")
         dashboards = u32(data, at + 8)
@@ -287,7 +290,9 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
                     "dashboard pivot bounds")
             if kind == 3:
                 require(gear <= 7, "gear bound")
+                gears.add(gear)
             else:
+                needles.add(kind)
                 # ValidDashboardBinding uses float32 constants and rounds
                 # each multiply/add in its sequential axisLen2 accumulation.
                 # Python binary64 comparisons reject valid boundary needles.
@@ -334,7 +339,9 @@ def inspect(path: Path, dashboard_overlay: bool = False) -> dict:
             "pbr_uncovered": uncovered,
             "pbr_all_opaque_covered": not any(uncovered.values()),
             "ovc_sha256": hashlib.sha256(data).hexdigest(),
-            "dashboard_bindings": dashboards, "floor_min_y": round(min_y, 4)}
+            "dashboard_bindings": dashboards,
+            "dashboard_needles": sorted(needles), "dashboard_gears": sorted(gears),
+            "floor_min_y": round(min_y, 4)}
 
 
 def pbr_map_coverage(details: dict) -> bool:
@@ -344,15 +351,35 @@ def pbr_map_coverage(details: dict) -> bool:
             details.get("pbr_all_opaque_covered", False) is True)
 
 
-def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
+def select_model(game_root: Path, car_id: int) -> Path:
+    canonical = game_root / "ExternalCars" / f"car_id_{car_id:02d}.ovc"
+    if car_id not in LEGACY:
+        return canonical
+    try:
+        canonical.stat()
+    except FileNotFoundError:
+        return game_root / LEGACY[car_id]
+    except OSError:
+        # Access/sharing/IO errors are not evidence the canonical file is absent.
+        return canonical
+    return canonical
+
+
+def audit(game_root: Path, require_pbr_maps: bool = False,
+          only_car: int | None = None) -> list[dict]:
     results = []
     for car_id, name in CARS:
-        canonical = game_root / "ExternalCars" / f"car_id_{car_id:02d}.ovc"
-        # Same preference as the runtime: a present but corrupt canonical
-        # file is NOT silently replaced with unrelated legacy contents.
-        legacy = game_root / "ExternalCars" / LEGACY[car_id] if car_id in LEGACY else None
-        model = canonical if canonical.exists() or legacy is None else legacy
-        if model == canonical and not model.exists():
+        if only_car is not None and car_id != only_car:
+            continue
+        model = select_model(game_root, car_id)
+        try:
+            model.stat()
+            missing = False
+        except FileNotFoundError:
+            missing = True
+        except OSError:
+            missing = False
+        if missing:
             status, details = "MISSING", {}
         else:
             try:
@@ -367,6 +394,7 @@ def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
             except (OvcError, OSError, struct.error) as error:
                 status, details = "FAIL", {"reason": str(error)}
         overlay = game_root / "ExternalCars" / "Dashboard" / f"car_id_{car_id:02d}.ovc"
+        od = {}
         if overlay.exists():
             try:
                 od = inspect(overlay, dashboard_overlay=True)
@@ -392,11 +420,34 @@ def audit(game_root: Path, require_pbr_maps: bool = False) -> list[dict]:
                 details = {**details, "reason": overlay_reason}
         results.append({"id": car_id, "car": name, "status": status,
                         "selected_asset": model.name, "body": details,
-                        "dashboard_overlay": overlay_status})
+                        "dashboard_overlay": overlay_status,
+                        "dashboard_needle_coverage": sorted(set(details.get("dashboard_needles", [])) |
+                                                            set(od.get("dashboard_needles", []))),
+                        "dashboard_gear_coverage": sorted(set(details.get("dashboard_gears", [])) |
+                                                          set(od.get("dashboard_gears", [])))})
     return results
 
 
 def self_test() -> None:
+    # Real resolver: legacy F50 is game-root only; canonical always wins,
+    # even a directory or corrupt file. Other IDs must not select it.
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        canonical = root / "ExternalCars" / "car_id_02.ovc"
+        legacy = root / "F50_External_Test.ovc"
+        canonical.parent.mkdir()
+        legacy.write_bytes(b"fixture")
+        assert select_model(root, 2) == legacy
+        assert select_model(root, 7) != legacy
+        assert select_model(root, 3) != legacy
+        canonical.mkdir()
+        assert select_model(root, 2) == canonical
+        canonical.rmdir()
+        canonical.write_bytes(b"corrupt canonical")
+        assert select_model(root, 2) == canonical
+        rows = audit(root, only_car=2)
+        assert len(rows) == 1 and rows[0]["status"] == "FAIL"
+        assert rows[0]["selected_asset"] == canonical.name
     # Tiny synthetic V4, one mesh and one 1x1 ARGB albedo.
     dds = bytearray(132)
     dds[:4] = b"DDS "
@@ -769,6 +820,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--game-root", type=Path, default=Path("."))
     parser.add_argument("--json-out", type=Path)
+    parser.add_argument("--car-id", type=int, choices=[i for i, _ in CARS],
+                        help="only preflight this canonical ID; F50=2")
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--require-pbr-maps", action="store_true",
                         help="require PBR coverage for installed bodies and dashboard overlays")
@@ -776,7 +829,8 @@ def main() -> int:
     if args.self_test:
         self_test()
         return 0
-    rows = audit(args.game_root, require_pbr_maps=args.require_pbr_maps)
+    rows = audit(args.game_root, require_pbr_maps=args.require_pbr_maps,
+                 only_car=args.car_id)
     for row in rows:
         print(f"{row['id']:02d} {row['car']:<19} {row['status']:<7} "
               f"{row['selected_asset']:<16} overlay={row['dashboard_overlay']}")
@@ -784,6 +838,8 @@ def main() -> int:
             body = row["body"]
             print("    PBR maps normal={normal_maps} ORM={orm_maps} "
                   "zeroNormals={zero_normal_vertices}".format(**body))
+            print("    Dashboard needles=", row["dashboard_needle_coverage"],
+                  "gears=", row["dashboard_gear_coverage"])
         if row["status"] == "FAIL":
             print("   ", row["body"]["reason"])
     counts = {status: sum(row["status"] == status for row in rows)
@@ -794,7 +850,7 @@ def main() -> int:
         args.json_out.write_text(json.dumps({"cars": rows, "counts": counts},
                                            indent=2, ensure_ascii=False),
                                  encoding="utf-8")
-    return 0 if counts["PASS"] == 16 else 2
+    return 0 if rows and counts["PASS"] == len(rows) else 2
 
 
 if __name__ == "__main__":

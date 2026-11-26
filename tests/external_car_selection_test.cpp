@@ -1,5 +1,6 @@
 #include <cassert>
 #include <initializer_list>
+#include <cwchar>
 #include "../src/vr/game/external_car_selection.hpp"
 using namespace OutRunVR::DinoSidecar;
 int main() {
@@ -24,5 +25,12 @@ int main() {
     assert(!MatchesFerrariSelection(255u,5));
     assert(MatchesFerrariSelection(5u,20));  // tuned alias -> base
     assert(MatchesFerrariSelection(20u,5));
+    for(unsigned id=0;id<256;++id){
+        const auto* suffix=LegacyFerrariCarSuffix(static_cast<unsigned char>(id));
+        if(id==2||id==17)assert(suffix&&std::wcscmp(suffix,L"F50_External_Test.ovc")==0);
+        else if(id==7||id==22)assert(suffix&&std::wcscmp(suffix,L"ExternalCars\\288gto.ovc")==0);
+        else if(id==11||id==26)assert(suffix&&std::wcscmp(suffix,L"ExternalCars\\f40.ovc")==0);
+        else assert(!suffix);
+    }
     return 0;
 }

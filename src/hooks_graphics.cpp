@@ -1419,9 +1419,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             static thread_local unsigned reports=0;
             if(reports++<32u||reports%180u==0u)
                 spdlog::info("VR EXTERNAL ATOMIC NATIVE F50: frame={} pose={} model={} groups={}/{} "
-                    "stockOnlyL={} stockOnlyR={} privateStage={} stockCpuMs={:.3f} stageCpuMs={:.3f} original=RETAINED",
+                    "stockOnlyL={} stockOnlyR={} privateStage={} material={} normalGpu={} ormGpu={} stockCpuMs={:.3f} stageCpuMs={:.3f} original=RETAINED",
                     input.nativeFrame,input.pose,model,replay.opened,replay.closed,
                     replay.omitted[0],replay.omitted[1],static_cast<unsigned>(result),
+                    GlobalGpu().MaterialModeName(),GlobalGpu().NormalMapsOnGpu(),GlobalGpu().OrmMapsOnGpu(),
                     timing&&stockQpc.QuadPart>=beginQpc.QuadPart?
                         1000.0*double(stockQpc.QuadPart-beginQpc.QuadPart)/double(frequency.QuadPart):-1.0,
                     timing&&endQpc.QuadPart>=stockQpc.QuadPart&&stockQpc.QuadPart!=0?

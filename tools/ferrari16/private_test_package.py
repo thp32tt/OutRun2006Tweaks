@@ -35,9 +35,11 @@ no original PMT and no third-party GLB/OVC/DDS models.
 3. After verifying QA.json SHA256 hashes, re-run with -Install.
 4. Launch from the isolated game folder using RUN-FERRARI16-V003-MODEL-OFF.cmd,
    then RUN-FERRARI16-V003-PBR-TRACE.cmd (F50 ONLY; select F50 in game).
-   Privately supply ExternalCars/car_id_02.ovc and, if required,
-   ExternalCars/Dashboard/car_id_02.ovc (both speed/RPM and current gear
-   must be covered). Tuned F50 ID 17 uses the same canonical files.
+   Privately supply ExternalCars/car_id_02.ovc or keep your existing
+   F50_External_Test.ovc at game root (only used if canonical is missing).
+   Also supply ExternalCars/Dashboard/car_id_02.ovc if required.
+   Both speed/RPM and current gear
+   must be covered. Tuned F50 ID 17 uses the same canonical files.
    Other cars remain stock; ALL-CARS legacy runners do not certify 16 cars.
    Compare both headset eyes and FPS with MODEL-OFF; collect private logs.
    Look for ATOMIC F50 FALLBACK, ATOMIC NATIVE F50 (CPU time), and

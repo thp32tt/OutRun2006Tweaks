@@ -23,13 +23,15 @@ constexpr bool MatchesFerrariSelection(unsigned char observedId,
 constexpr bool IsFerrari16CanonicalCarId(unsigned char carId) noexcept {
     return carId<=14u || carId==28u;
 }
-// Backwards compatibility for older private 288 GTO/F40 packages. Prefer a
+// Backwards compatibility for older private F50/288 GTO/F40 packages. Prefer a
 // canonical car_id_XX.ovc when present; only use these fixed legacy names if
 // the canonical file is missing. Never derive a path from untrusted input.
 constexpr const wchar_t* LegacyFerrariCarSuffix(
     unsigned char observedId) noexcept
 {
     switch(CanonicalFerrariExternalCarId(observedId)) {
+    // The actual previously distributed F50 body is at game root.
+    case 2u: return L"F50_External_Test.ovc";
     case 7u: return L"ExternalCars\\288gto.ovc";
     case 11u: return L"ExternalCars\\f40.ovc";
     default: return nullptr;
@@ -42,12 +44,14 @@ static_assert(IsFerrari16CanonicalCarId(0u) &&
               !IsFerrari16CanonicalCarId(29u) &&
               !IsFerrari16CanonicalCarId(30u),
               "16 canonical car model IDs");
-static_assert(LegacyFerrariCarSuffix(7u)!=nullptr &&
+static_assert(LegacyFerrariCarSuffix(2u)!=nullptr &&
+              LegacyFerrariCarSuffix(17u)!=nullptr &&
+              LegacyFerrariCarSuffix(7u)!=nullptr &&
               LegacyFerrariCarSuffix(22u)!=nullptr &&
               LegacyFerrariCarSuffix(11u)!=nullptr &&
               LegacyFerrariCarSuffix(26u)!=nullptr &&
               LegacyFerrariCarSuffix(5u)==nullptr,
-              "legacy GTO/F40 aliases only");
+              "legacy F50/GTO/F40 aliases only");
 static_assert(CanonicalFerrariExternalCarId(5u) == 5u &&
               CanonicalFerrariExternalCarId(20u) == 5u &&
               CanonicalFerrariExternalCarId(8u) == 8u &&
