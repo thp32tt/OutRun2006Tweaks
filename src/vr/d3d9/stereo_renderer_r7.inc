@@ -123,6 +123,7 @@ namespace OutRunVRStereo
         using R7DirectResetTransportOwnerFn=void(*)() noexcept;
         std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetTransportOwner{nullptr};
         std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetBaselineOwner{nullptr};
+        std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetRasterOwner{nullptr};
         SafetyHookInline CandidateSwapChainPresentHook{},CandidateAdditionalSwapChainHook{};
         void* R7CandidateSwapChainPresentTarget=nullptr;
         bool R7CandidateAdditionalChainSeen=false;
@@ -1892,6 +1893,11 @@ namespace OutRunVRStereo
             if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))
                 return CandidateResetExHook.stdcall<HRESULT>(device,params,fullscreen);
             ++R7CandidateResetInFlight;
+            // R33 is a separate translation unit in the normal R84 build.
+            // Invalidate its borrowed raster/depth caches on both sides of
+            // the physical call; callbacks during ResetEx may refill them.
+            const auto retireRaster=R7DirectResetRasterOwner.load(std::memory_order_acquire);
+            if(retireRaster)retireRaster();
             ExternalAtomicReplayEpoch=0;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             R7ForgetAutomaticDepthProof();
@@ -1912,6 +1918,7 @@ namespace OutRunVRStereo
             ExternalAtomicReplayEpoch=0;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             R7ForgetAutomaticDepthProof();
+            if(retireRaster)retireRaster();
             --R7CandidateResetInFlight;
             return hr;
         }
@@ -3836,6 +3843,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		}
 
 	}
+
+    void R7SetDirectResetRasterOwner(void(*owner)() noexcept) noexcept
+    {
+        R7DirectResetRasterOwner.store(owner,std::memory_order_release);
+    }
 
 	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept
 	{

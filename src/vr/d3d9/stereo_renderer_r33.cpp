@@ -66,6 +66,8 @@ namespace OutRunVRStereo
     inline void R33SynchronizeResetReplayGuardState(
         IDirect3DDevice9* device) noexcept;
     inline void FailClosedDepthStencilState() noexcept;
+    // R7 owns the physical ResetEx hook; this ABI also works in split builds.
+    void R7SetDirectResetRasterOwner(void(*owner)() noexcept) noexcept;
 
     namespace
     {
@@ -327,6 +329,15 @@ namespace OutRunVRStereo
         void R33InvalidateDepthStencilCache() noexcept
         {
             R33DepthStencilState.valid = false;
+        }
+
+        // Direct ResetEx can bypass ResetDestR33. These caches are borrowed
+        // identities, not COM references; invalidate without touching D3D.
+        void R33RetireDirectResetRaster() noexcept
+        {
+            R33InvalidateDepthStencilCache();
+            R33RightViewport = {};
+            R33SavedViewport = {};
         }
 
         // Preserve the original stencil-op semantics while removing repeated
@@ -2308,9 +2319,7 @@ namespace OutRunVRStereo
 
             if (gameDevice)
             {
-                R33InvalidateDepthStencilCache();
-                R33RightViewport = {};
-                R33SavedViewport = {};
+                R33RetireDirectResetRaster();
                 if (SUCCEEDED(hr))
                     ++R33ResetSuccesses;
                 else
@@ -2469,6 +2478,7 @@ namespace OutRunVRStereo
 
         void R33RollbackHooks() noexcept
         {
+            R7SetDirectResetRasterOwner(nullptr);
             R33RightViewport = {};
             R33SavedViewport = {};
             R33DrawIndexedPrimitiveUPR30Hook = {};
@@ -2552,6 +2562,7 @@ namespace OutRunVRStereo
                     if (installedDevice)
                         R33SynchronizeResetReplayGuardState(installedDevice);
 
+                    R7SetDirectResetRasterOwner(R33RetireDirectResetRaster);
                     R33ReportInstallResult(true);
                     spdlog::info(
                         "VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY; R32 is hook-free functional owner with no async install shim; top-level telemetry counted once when enabled; direct R31/R22/R13 prerequisite ownership + R22 Reset + R13 Present/DirectGPU + R30 draw dispatch ACTIVE");

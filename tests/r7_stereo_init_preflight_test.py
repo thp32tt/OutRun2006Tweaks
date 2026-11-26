@@ -384,8 +384,9 @@ with tempfile.TemporaryDirectory() as temp:
 
 # UpdateSurface is a real base vtable owner. Compile its exact implementation,
 # not a duplicate policy, and inspect receipts inside the original trampoline.
-upload_owner=source[source.index("HRESULT __stdcall UpdateSurfaceDest("):
-                    source.index("void ReleaseStereoResources()")]
+upload_start=source.index("HRESULT __stdcall UpdateSurfaceDest(")
+upload_owner=source[upload_start:source.index("void ReleaseStereoResources()",upload_start)]
+assert "return UpdateSurfaceHook.stdcall<HRESULT>" in upload_owner
 upload_stub=r'''
 #define __stdcall
 struct RECT{int token;};struct POINT{int token;};
@@ -756,6 +757,9 @@ std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetTransportOwner{nullptr};
 unsigned baselineRetires=0;
 void RetireBaseline() noexcept {assert(r9Retires==1&&transportRetires==0);++baselineRetires;}
 std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetBaselineOwner{nullptr};
+unsigned rasterRetires=0;bool rasterValid=true;
+void RetireRaster() noexcept {assert(R7CandidateResetInFlight==1);assert(rasterRetires==calls);++rasterRetires;rasterValid=false;}
+std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetRasterOwner{nullptr};
 bool R7RetireDirectResetCore(){assert(r9Retires==1);assert(transportRetires==unsigned(bool(R7DirectResetTransportOwner.load())));return false;}
 struct Pair{void Reset(){++resets;allocated=false;}} ExternalAtomicCandidates;
 IDirect3DDevice9Ex* expectedDevice=nullptr;
@@ -765,6 +769,10 @@ HRESULT result=0;
 struct Hook{
     template<class R> R stdcall(IDirect3DDevice9Ex* d,D3DPRESENT_PARAMETERS* p,D3DDISPLAYMODEEX* m){
         ++calls;assert(d==expectedDevice&&p==expectedParams&&m==expectedMode);
+        const bool rasterOwned=owned&&bool(R7DirectResetRasterOwner.load());
+        assert(rasterRetires==unsigned(rasterOwned)&&rasterValid!=rasterOwned);
+        // Simulate a reentrant getter repopulating old borrowed identities.
+        rasterValid=true;
         assert(r9Retires==unsigned(owned));
         assert(baselineRetires==unsigned(owned&&bool(R7DirectResetBaselineOwner.load())));
         assert(transportRetires==unsigned(owned&&bool(R7DirectResetTransportOwner.load())));
@@ -783,7 +791,8 @@ reset_ex_cases=r'''
 int main(){
     IDirect3DDevice9Ex game,other;other.game=false;
     D3DPRESENT_PARAMETERS pp{7};D3DDISPLAYMODEEX mode{8};
-    for(unsigned mask=0;mask<1024;++mask){
+    for(unsigned mask=0;mask<2048;++mask){
+        R7DirectResetRasterOwner=(mask&1024)?RetireRaster:nullptr;
         R7DirectResetBaselineOwner=(mask&512)?RetireBaseline:nullptr;
         R7DirectResetTransportOwner=(mask&256)?RetireTransport:nullptr;
         StereoBaseCallbacksArmed=!(mask&1);
@@ -793,15 +802,17 @@ int main(){
         nested=mask&32;result=(mask&64)?-1:0;owned=!(mask&7);
         const std::uint64_t initialReplay=(mask&128)?9:0;
         PresentEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=initialReplay;
-        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;baselineRetires=0;allocated=true;
+        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;baselineRetires=0;rasterRetires=0;rasterValid=true;allocated=true;
         assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
         assert(calls==1&&R7CandidateResetInFlight==0);
+        const bool rasterOwned=owned&&bool(R7DirectResetRasterOwner.load());
+        assert(rasterRetires==(rasterOwned?2u:0u)&&rasterValid!=rasterOwned);
         assert(PresentEpoch==(owned&&nested?1u:9u));
         assert(ExternalAtomicReplayEpoch==(owned?0:initialReplay));
         assert(ExternalAtomicAllocationAttemptEpoch==(owned?PresentEpoch:0));
         assert(resets==(owned?1u:0u)&&proof==(owned?3u:1u)&&allocated==!owned);
     }
-    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 1024\n";
+    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 2048\n";
 }
 '''
 assert "ResetExVtableIndex = 132;" in source
@@ -1176,5 +1187,68 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"r22_direct_reset.cpp"
     exe=Path(temp)/"r22_direct_reset"
     cpp.write_text(r22_stub+r22_baseline+r22_direct+r22_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# Iter86: actual R33 viewport elision must re-query recycled COM addresses.
+r33_source=Path("src/vr/d3d9/stereo_renderer_r33.cpp").read_text(encoding="utf-8")
+r33_view=r33_source[r33_source.index("struct R33RightViewportExtent"):
+                    r33_source.index("thread_local R33DepthStencilWriteState R33DepthStencilState")]
+r33_retire=r33_source[r33_source.index("void R33InvalidateDepthStencilCache()"):
+                      r33_source.index("// Preserve the original stencil-op semantics")]
+r33_stub=r'''
+#include <cassert>
+#include <iostream>
+using UINT=unsigned;
+struct D3DSURFACE_DESC { UINT Width=0,Height=0; };
+struct D3DVIEWPORT9 { UINT X=0,Y=0,Width=0,Height=0;float MinZ=0,MaxZ=1; };
+struct IDirect3DSurface9 {
+    UINT width=0,height=0,reads=0;bool fail=false;
+    int GetDesc(D3DSURFACE_DESC* d){++reads;if(fail)return -1;*d={width,height};return 0;}
+};
+bool FAILED(int hr){return hr<0;}
+struct DepthState { bool valid=false; } R33DepthStencilState;
+'''
+r33_cases=r'''
+int main(){
+    for(unsigned mask=0;mask<64;++mask){
+        R33RetireDirectResetRaster();
+        IDirect3DSurface9 right{640,480},saved{800,600};
+        const D3DVIEWPORT9 oldRight{0,0,640,480},oldSaved{0,0,800,600};
+        assert(R33TargetResetViewportMatches(&right,oldRight));
+        assert(R33SavedTargetResetViewportMatches(&saved,oldSaved));
+        R33DepthStencilState.valid=true;
+        right.width=(mask&1)?640:1280;saved.height=(mask&2)?600:900;
+        right.fail=bool(mask&4);saved.fail=bool(mask&8);
+        // Reset can recycle the same addresses with different descriptors.
+        R33RetireDirectResetRaster();
+        if(mask&16)R33RetireDirectResetRaster();
+        assert(!R33DepthStencilState.valid&&!R33RightViewport.valid&&!R33SavedViewport.valid);
+        assert(!R33RightViewport.surface&&!R33SavedViewport.surface);
+        const bool rightOld=R33TargetResetViewportMatches(&right,oldRight);
+        const bool savedOld=R33SavedTargetResetViewportMatches(&saved,oldSaved);
+        assert(rightOld==(!right.fail&&bool(mask&1)));
+        assert(savedOld==(!saved.fail&&bool(mask&2)));
+        assert(right.reads==2&&saved.reads==2);
+        if(mask&32){
+            right.fail=saved.fail=false;
+            const D3DVIEWPORT9 newRight{0,0,right.width,right.height};
+            const D3DVIEWPORT9 newSaved{0,0,saved.width,saved.height};
+            assert(R33TargetResetViewportMatches(&right,newRight));
+            assert(R33SavedTargetResetViewportMatches(&saved,newSaved));
+        }
+    }
+    std::cout<<"R33_DIRECT_RESET_RASTER_PASS 64\n";
+}
+'''
+assert "R7SetDirectResetRasterOwner(R33RetireDirectResetRaster);" in r33_source
+assert "R7SetDirectResetRasterOwner(nullptr);" in r33_source
+assert "R7DirectResetRasterOwner.store(owner,std::memory_order_release);" in source
+assert reset_callback.index("if(retireRaster)retireRaster();") < reset_callback.index("R9RetireDirectResetResources();")
+assert reset_callback.rindex("if(retireRaster)retireRaster();") > reset_callback.rindex("CandidateResetExHook.stdcall<HRESULT>")
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"r33_direct_reset.cpp"
+    exe=Path(temp)/"r33_direct_reset"
+    cpp.write_text(r33_stub+r33_view+r33_retire+r33_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
