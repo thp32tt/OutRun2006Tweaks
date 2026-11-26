@@ -2996,7 +2996,42 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			bool& bootstrapRestoreFailed)
 		{
 			bootstrapRestoreFailed=false;
-			if(InternalStereoPass||!StereoWanted()||!TargetIsBackBuffer())return false;if(OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)){PoisonFrame(OutRunVR::StereoFailureOcclusionQueryActive);++OcclusionStereoRejects;if(!FirstOcclusionTrackingUnavailableLogged){FirstOcclusionTrackingUnavailableLogged=true;spdlog::error("VR stereo: occlusion-query Issue tracking unavailable; stereo duplication fails closed to single-execution mono until tracking recovers");}return false;}if(AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);++MrtRejectedDraws;if(!FirstMrtRejectLogged){FirstMrtRejectLogged=true;spdlog::info("VR stereo: auxiliary MRT active; current Present is marked incomplete");}return false;}if(ActiveOcclusionQueries.load(std::memory_order_acquire)>0){++OcclusionStereoRejects;if(!FirstOcclusionRejectLogged){FirstOcclusionRejectLogged=true;spdlog::info("VR stereo: active D3D9 occlusion query kept single-eye; query result is shared without invalidating the stereo Present");}return false;}if(!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);return false;}if(TrackedDepthStencil&&(!RightDepthSynchronized||!RightStencilSynchronized)){TryBootstrapRightDepthFromRecentClear(device,&bootstrapRestoreFailed);if(bootstrapRestoreFailed)return false;}if(TrackedDepthStencil&&!RightDepthSynchronized&&DepthTestActive(device)){PoisonFrame(OutRunVR::StereoFailureDepthUnsynchronized);return false;}if(TrackedDepthStencil&&!RightStencilSynchronized&&StencilTestActive(device)){PoisonFrame(OutRunVR::StereoFailureStencilUnsynchronized);return false;}OutRunVRRenderer::LatchedStereoFrame stereo{};if(!OutRunVRRenderer::GetLatchedStereoFrame(stereo)){PoisonFrame(OutRunVR::StereoFailureMissingLatchedPose);return false;}draw.stereoFrame=stereo;const EyeBuildResult classification=BuildEyeConstants(device,stereo,draw);if(classification==EyeBuildResult::FatalError){++WorldClassificationFailures;PoisonFrame(OutRunVR::StereoFailureWorldClassificationFailed);if(!FirstClassificationFailureLogged){FirstClassificationFailureLogged=true;spdlog::warn("VR stereo: verified world draw could not be classified/transformed safely; frame forced to mono fallback");}return false;}return true;
+			if(InternalStereoPass||!StereoWanted()||!TargetIsBackBuffer())return false;if(OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)){PoisonFrame(OutRunVR::StereoFailureOcclusionQueryActive);++OcclusionStereoRejects;if(!FirstOcclusionTrackingUnavailableLogged){FirstOcclusionTrackingUnavailableLogged=true;spdlog::error("VR stereo: occlusion-query Issue tracking unavailable; stereo duplication fails closed to single-execution mono until tracking recovers");}return false;}if(AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);++MrtRejectedDraws;if(!FirstMrtRejectLogged){FirstMrtRejectLogged=true;spdlog::info("VR stereo: auxiliary MRT active; current Present is marked incomplete");}return false;}if(ActiveOcclusionQueries.load(std::memory_order_acquire)>0){++OcclusionStereoRejects;if(!FirstOcclusionRejectLogged){FirstOcclusionRejectLogged=true;spdlog::info("VR stereo: active D3D9 occlusion query kept single-eye; query result is shared without invalidating the stereo Present");}return false;}if(!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);return false;}
+            // Initial allocation legitimately changes the candidate generation.
+            // Once resources are ready, the entire preflight must use one owner.
+            const auto generation=R7EyeStateGeneration();
+            auto current=[&](){return R7EyeStateGeneration()==generation;};
+            auto retired=[&](){
+                bootstrapRestoreFailed=true;
+                ExternalAtomicReplayEpoch=0;
+                RightDepthSynchronized=false;RightStencilSynchronized=false;
+                LastMainDepthClearStamp.Invalidate();
+                NoteRestoreFailure("R7 draw preparation retired");
+                return false;
+            };
+            if(TrackedDepthStencil&&(!RightDepthSynchronized||!RightStencilSynchronized)){
+                TryBootstrapRightDepthFromRecentClear(device,&bootstrapRestoreFailed);
+                if(bootstrapRestoreFailed)return false;
+                if(!current())return retired();
+            }
+            if(TrackedDepthStencil&&!RightDepthSynchronized){
+                const bool depthTest=DepthTestActive(device);
+                if(!current())return retired();
+                if(depthTest){PoisonFrame(OutRunVR::StereoFailureDepthUnsynchronized);return false;}
+            }
+            if(TrackedDepthStencil&&!RightStencilSynchronized){
+                const bool stencilTest=StencilTestActive(device);
+                if(!current())return retired();
+                if(stencilTest){PoisonFrame(OutRunVR::StereoFailureStencilUnsynchronized);return false;}
+            }
+            OutRunVRRenderer::LatchedStereoFrame stereo{};
+            const bool latched=OutRunVRRenderer::GetLatchedStereoFrame(stereo);
+            if(!current())return retired();
+            if(!latched){PoisonFrame(OutRunVR::StereoFailureMissingLatchedPose);return false;}
+            draw.stereoFrame=stereo;
+            const EyeBuildResult classification=BuildEyeConstants(device,stereo,draw);
+            if(!current())return retired();
+            if(classification==EyeBuildResult::FatalError){++WorldClassificationFailures;PoisonFrame(OutRunVR::StereoFailureWorldClassificationFailed);if(!FirstClassificationFailureLogged){FirstClassificationFailureLogged=true;spdlog::warn("VR stereo: verified world draw could not be classified/transformed safely; frame forced to mono fallback");}return false;}return true;
 		}
 
 		struct R7VisualTraceContext
@@ -3183,7 +3218,19 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			}
 			DrawStereoState draw{};
 			bool bootstrapRestoreFailed=false;
-			if(!PrepareDuplicatedDraw(device,draw,bootstrapRestoreFailed))
+			const bool prepared=PrepareDuplicatedDraw(device,draw,bootstrapRestoreFailed);
+            // One owner from prepared state through fallback or both physical eyes.
+            const auto leftGeneration=ExternalAtomicCandidates.generation;
+            auto leftCurrent=[&](){return ExternalAtomicCandidates.generation==leftGeneration;};
+            auto retiredLeft=[&](){
+                ExternalAtomicReplayEpoch=0;
+                RightDepthSynchronized=false;RightStencilSynchronized=false;
+                LastMainDepthClearStamp.Invalidate();
+                NoteRestoreFailure("R7 left-eye owner retired");
+                OutRunVR::DinoSidecar::RecordExternalPreRasterRollback(false);
+                return E_FAIL;
+            };
+			if(!prepared)
 			{
 				if(bootstrapRestoreFailed){
 					OutRunVR::DinoSidecar::RecordExternalPreRasterRollback(false);
@@ -3197,8 +3244,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 }
 				if(StereoWanted()&&TargetIsBackBuffer())
 					InvalidateRightDepthStencilIfLeftMayWrite(device);
+                if(!leftCurrent())return retiredLeft();
 				RevokeDepthClearReplayBeforeLeftDraw(device);
+                if(!leftCurrent())return retiredLeft();
 				const HRESULT hr=drawCall();
+                if(!leftCurrent()){retiredLeft();return hr;}
 				R7TraceVisualEyes(visualTrace,"PREPARE_REJECT_SINGLE",false,false,false,0,
 					true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,true,
 					failureAtEntry,FrameFailureReason);
@@ -3219,17 +3269,6 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
                 return E_FAIL;
             }
-            // One owner from LEFT viewport capture through both physical eyes.
-            const auto leftGeneration=ExternalAtomicCandidates.generation;
-            auto leftCurrent=[&](){return ExternalAtomicCandidates.generation==leftGeneration;};
-            auto retiredLeft=[&](){
-                ExternalAtomicReplayEpoch=0;
-                RightDepthSynchronized=false;RightStencilSynchronized=false;
-                LastMainDepthClearStamp.Invalidate();
-                NoteRestoreFailure("R7 left-eye owner retired");
-                OutRunVR::DinoSidecar::RecordExternalPreRasterRollback(false);
-                return E_FAIL;
-            };
 			D3DVIEWPORT9 savedViewport{};
             const HRESULT viewportHr=device->GetViewport(&savedViewport);
             if(!leftCurrent())return retiredLeft();

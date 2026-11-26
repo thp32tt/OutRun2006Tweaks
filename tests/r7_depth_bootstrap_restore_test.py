@@ -695,3 +695,93 @@ with tempfile.TemporaryDirectory() as directory:
     subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror",
                     str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
     subprocess.run([str(p/"probe")],check=True)
+
+# Iter104: exercise the actual preflight owner after the initial allocation.
+# A clean classification decline can fallback; retirement must be owned failure.
+body = prepare
+fallback = draw[draw.index("const bool prepared=PrepareDuplicatedDraw"):draw.index("PREPARE_REJECT_SINGLE")]
+assert fallback.index("const auto leftGeneration=") < fallback.index("if(!prepared)")
+assert fallback.index("if(bootstrapRestoreFailed){") < fallback.index("RevokeDepthClearReplayBeforeLeftDraw(device);")
+assert "if(!leftCurrent())return retiredLeft();" in fallback
+assert fallback.index("if(!leftCurrent())return retiredLeft();",fallback.index("RevokeDepthClearReplayBeforeLeftDraw(device);")) < fallback.index("const HRESULT hr=drawCall();")
+prefix = r'''
+#include <atomic>
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+struct IDirect3DDevice9{};
+namespace OutRunVR {
+enum Failure {StereoFailureOcclusionQueryActive,StereoFailureMrtActive,
+StereoFailureResourceUnavailable,StereoFailureDepthUnsynchronized,
+StereoFailureStencilUnsynchronized,StereoFailureMissingLatchedPose,
+StereoFailureWorldClassificationFailed};
+}
+namespace spdlog {void error(const char*){} void info(const char*){} void warn(const char*){}}
+unsigned calls,retireAt,failAt,notes,poisons;
+bool initialAllocation,bootstrapDirty;
+std::uint64_t generation=1,ExternalAtomicReplayEpoch;
+std::uint64_t R7EyeStateGeneration(){return generation;}
+bool step(){++calls;if(calls==retireAt)++generation;return calls!=failAt;}
+bool InternalStereoPass=false;
+bool StereoWanted(){return true;} bool TargetIsBackBuffer(){return true;}
+std::atomic<bool> OcclusionQueryTrackingUnavailable{false};
+std::atomic<unsigned> ActiveOcclusionQueries{0};
+unsigned OcclusionStereoRejects,MrtRejectedDraws,WorldClassificationFailures;
+bool FirstOcclusionTrackingUnavailableLogged,FirstMrtRejectLogged,
+FirstOcclusionRejectLogged,FirstClassificationFailureLogged;
+bool AnyAuxRenderTargetActive(){return false;}
+void PoisonFrame(OutRunVR::Failure){++poisons;}
+void NoteRestoreFailure(const char*){++notes;}
+bool EnsureStereoResources(IDirect3DDevice9*){if(initialAllocation)++generation;return step();}
+bool TrackedDepthStencil=true,RightDepthSynchronized,RightStencilSynchronized;
+struct Stamp {unsigned count=0;void Invalidate(){++count;}} LastMainDepthClearStamp;
+bool TryBootstrapRightDepthFromRecentClear(IDirect3DDevice9*,bool* failed){
+    step();*failed=bootstrapDirty;if(*failed)++notes;return false;
+}
+bool DepthTestActive(IDirect3DDevice9*){return !step();}
+bool StencilTestActive(IDirect3DDevice9*){return !step();}
+namespace OutRunVRRenderer {
+struct LatchedStereoFrame {unsigned pose=42;};
+bool GetLatchedStereoFrame(LatchedStereoFrame&){return step();}
+}
+struct DrawStereoState{OutRunVRRenderer::LatchedStereoFrame stereoFrame{};};
+enum class EyeBuildResult {NonWorld,WorldStereo,FatalError};
+EyeBuildResult BuildEyeConstants(IDirect3DDevice9*,const OutRunVRRenderer::LatchedStereoFrame&,DrawStereoState&){
+    return step()?EyeBuildResult::WorldStereo:EyeBuildResult::FatalError;
+}
+'''
+suffix = r'''
+int main(){
+    IDirect3DDevice9 dev;
+    unsigned cases=0;
+    for(bool init:{false,true})
+    for(unsigned retire=0;retire<=6;++retire)
+    for(unsigned fail=0;fail<=6;++fail){
+        if(retire==1)continue; // initial allocation owner is a separate boundary
+        initialAllocation=init;retireAt=retire;failAt=fail;bootstrapDirty=false;
+        calls=notes=poisons=LastMainDepthClearStamp.count=0;
+        RightDepthSynchronized=RightStencilSynchronized=false;ExternalAtomicReplayEpoch=17;
+        DrawStereoState state;bool dirty=true;
+        const bool ready=PrepareDuplicatedDraw(&dev,state,dirty);
+        const unsigned ordinaryStop=(fail==2||!fail)?6:fail;
+        const unsigned stop=retire? (retire<ordinaryStop?retire:ordinaryStop):ordinaryStop;
+        const bool interrupted=retire&&retire<=ordinaryStop;
+        assert(calls==stop&&dirty==interrupted);
+        assert(ready==(!interrupted&&(!fail||fail==2)));
+        assert(notes==unsigned(interrupted));
+        assert(LastMainDepthClearStamp.count==unsigned(interrupted));
+        assert(ExternalAtomicReplayEpoch==(interrupted?0u:17u));
+        ++cases;
+    }
+    calls=notes=0;retireAt=failAt=0;bootstrapDirty=true;
+    DrawStereoState state;bool dirty=false;
+    assert(!PrepareDuplicatedDraw(&dev,state,dirty)&&dirty&&calls==2&&notes==1);
+    std::cout<<"R7_PREPARE_GENERATION_PASS "<<cases<<" + dirty bootstrap\\n";
+}
+'''
+with tempfile.TemporaryDirectory() as directory:
+    p = Path(directory)
+    (p/"probe.cpp").write_text(prefix+body+suffix)
+    subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror",
+                    str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
+    subprocess.run([str(p/"probe")],check=True)

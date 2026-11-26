@@ -142,7 +142,8 @@ jobs:
           assert 'LastMainDepthClearStamp.Record(PresentEpoch,depthFlags);' in r7
           left_draw=r7[r7.index('HRESULT ExecuteStereoDraw('):r7.index('HRESULT __stdcall DrawPrimitiveDest(')]
           import re
-          assert len(re.findall(r'RevokeDepthClearReplayBeforeLeftDraw\(device\);\s+const HRESULT hr=drawCall\(\);',left_draw)) == 5
+          assert len(re.findall(r'RevokeDepthClearReplayBeforeLeftDraw\(device\);\s+const HRESULT hr=drawCall\(\);',left_draw)) == 2
+          assert len(re.findall(r'RevokeDepthClearReplayBeforeLeftDraw\(device\);\s+if\(!leftCurrent\(\)\)return retiredLeft\(\);\s+const HRESULT hr=drawCall\(\);',left_draw)) == 3
           assert left_draw.count('const HRESULT leftHr=drawCall();') == 1
           assert left_draw.index('RevokeDepthClearReplayBeforeLeftDraw(device,mirrorCandidate);') < left_draw.index('R7ReplayInactiveDraw(device,0') < left_draw.index('const HRESULT leftHr=drawCall();')
           assert left_draw.index('R7ReplayInactiveDraw(device,1') < left_draw.index('rightHr=drawCall();')
