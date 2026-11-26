@@ -411,7 +411,8 @@ jobs:
           expected13 = expected13.replace(markerDepth13, b'            R13ReleaseAckState();' + newline13 + b'            R7ForgetAutomaticDepthProof();' + newline13 + b'            ReleaseStereoResources();', 1)
           # Iter88: exact reviewed R13 reset notification scope and pose-latch retirement, including
           # the prior clear receipt and automatic-depth invalidation changes.
-          assert subprocess.check_output(['git','hash-object',r13path]).strip() == b'756ebc97e9aa5f7ecc1242e8c2a7cc256810ed4d', 'Unreviewed R13 change'
+          # Iter91: reviewed prior-generation capture and retained-depth recovery only.
+          assert subprocess.check_output(['git','hash-object',r13path]).strip() == b'46e65bc206cfa2bec587da7c21e926047129670b', 'Unreviewed R13 change'
           # R29 raw wrappers bypass R7 ExecuteStereoDraw. Permit exactly
           # four calls to its existing LEFT receipt revocation helper.
           r29path = 'src/vr/d3d9/stereo_renderer_r29.cpp'
