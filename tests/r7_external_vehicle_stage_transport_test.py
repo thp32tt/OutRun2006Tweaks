@@ -15,8 +15,8 @@ seed=r7[a:r7.index("// A successful seed is ONLY",a)]
 a=r7.index("struct R7StagedTransfer")
 transfer=r7[a:r7.index("bool ResolveDirectTransport(",a)]
 a=r7.index("OutRunVR::DinoSidecar::IsolatedStageResult StageExternalVehiclePair(")
-stage=r7[a:r7.index("bool NativeVehicleReplacementBackendReady()",a)]
-a=r7.index("bool NativeVehicleReplacementBackendReady()",a)
+stage=r7[a:r7.index("const char* NativeVehicleReplacementBlockReason()",a)]
+a=r7.index("const char* NativeVehicleReplacementBlockReason()",a)
 native_api=r7[a:r7.index("void R7SetDirectResetRasterOwner(",a)]
 a=r7.index("bool R7NativeStockOnlyDraw()")
 native_omit=r7[a:r7.index("template<class DrawCall>",a)]
@@ -115,7 +115,8 @@ struct StretchHook {
     }
 } StretchRectHook;
 struct Event {HRESULT Issue(DWORD){++fenceCalls;if(fenceRevoke)ExternalAtomicReplayEpoch=0;return S_OK;}};
-struct DirectTransportSlot {IDirect3DSurface9 *leftSurface=nullptr,*rightSurface=nullptr;Event* fence=nullptr;bool published=false,producerPending=false;};
+struct DirectTransportSlot {IDirect3DSurface9 *leftSurface=nullptr,*rightSurface=nullptr;Event* fence=nullptr;bool published=false,producerPending=false;OutRunVR::DinoSidecar::IsolatedVehicleKey nativeVehicle{};};
+void R7ReportNativePair(const OutRunVR::DinoSidecar::IsolatedVehicleKey&,const char*,HRESULT){}
 namespace OutRunVR::State::StateBlockTracker {bool Recording(){return false;}}
 namespace OutRunVR::DinoSidecar {
     enum class FerrariModelSlot : unsigned char {F50,GenericId};
@@ -214,7 +215,7 @@ int main(){
     unsigned cases=0;
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete&&rawCalls==10);
      assert(f.priv[0].draws==5&&f.priv[1].draws==5&&f.privZ[0].draws==5&&f.privZ[1].draws==5);
-     f.LiveUnchanged();f.Restored();auto t=f.Transfer();assert(t.handled&&SUCCEEDED(t.hr)&&!t.copyFailed&&f.output[0].pixels==2&&f.output[1].pixels==2&&fenceCalls==1);++cases;}
+     f.LiveUnchanged();f.Restored();auto t=f.Transfer();assert(t.handled&&SUCCEEDED(t.hr)&&!t.copyFailed&&f.output[0].pixels==2&&f.output[1].pixels==2&&fenceCalls==1&&f.slot.nativeVehicle.Same(R7NativeCompletedVehicle));++cases;}
     for(unsigned failure=1;failure<=10;++failure)for(unsigned mode=0;mode<3;++mode){
         Fixture f;if(mode==0)rawFail=failure;if(mode==1)rawReset=failure;if(mode==2)rawPresent=failure;
         const auto r=f.Stage();assert(r!=IsolatedStageResult::Complete&&rawCalls==failure&&!ExternalAtomicReplayEpoch);
@@ -227,7 +228,7 @@ int main(){
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);allowPublication=false;R7NativeCompletedVehicle={};assert(!f.Transfer().handled&&!copyCalls);++cases;}
     for(unsigned fault=1;fault<=2;++fault){
         Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);copyFail=fault;
-        auto t=f.Transfer();assert(t.handled&&SUCCEEDED(t.hr)&&f.output[0].pixels==1&&f.output[1].pixels==1&&fenceCalls==1);
+        auto t=f.Transfer();assert(t.handled&&SUCCEEDED(t.hr)&&f.output[0].pixels==1&&f.output[1].pixels==1&&fenceCalls==1&&!f.slot.nativeVehicle.Same(f.slot.nativeVehicle));
         f.LiveUnchanged();++cases;
     }
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);fenceRevoke=1;auto t=f.Transfer();assert(t.handled&&FAILED(t.hr)&&!t.copyFailed&&fenceCalls==1);++cases;}
@@ -248,7 +249,12 @@ int main(){
         }
         ++cases;
     }
-    {Fixture f;NativeVehiclePmtConsumerReady=false;assert(f.NativeStage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;NativeVehiclePmtConsumerReady=false;assert(std::strcmp(NativeVehicleReplacementBlockReason(),"NATIVE_PMT_CONSUMER_MISSING")==0);assert(f.NativeStage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;assert(NativeVehicleReplacementBlockReason()==nullptr);ExternalAtomicReplayEpoch=0;
+     assert(std::strcmp(NativeVehicleReplacementBlockReason(),"PRIVATE_SCENE_NOT_SEEDED_OR_REVOKED")==0);
+     assert(f.NativeStage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;assert(f.NativeStage()==IsolatedStageResult::Complete);assert(f.Transfer().handled&&f.slot.nativeVehicle.Same(R7NativeCompletedVehicle));
+     ExternalAtomicReplayEpoch=0;assert(!f.Transfer().handled&&!f.slot.nativeVehicle.Same(f.slot.nativeVehicle));++cases;}
     std::cout<<"R7_ACTUAL_ISOLATED_STAGE_TRANSPORT_PASS "<<cases<<"\n";
 }
 '''

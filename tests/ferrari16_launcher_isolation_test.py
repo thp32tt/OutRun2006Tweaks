@@ -292,6 +292,15 @@ class LauncherIsolationTest(unittest.TestCase):
                 self.assertIn("-VR.PreferD3D9Ex=true", source)
                 self.assertIn("-VR.DirectGpuOnly=true", source)
 
+    def test_f50_pbr_trace_is_one_car_only(self):
+        source = (ROOT / "RUN-FERRARI16-V003-PBR-TRACE.cmd").read_text(encoding="utf-8")
+        vr = source.split(":MODE_VR\n", 1)[1].split("\n:CHECK_HOST", 1)[0]
+        self.assertEqual(re.findall(r"-VR\.ExternalFerrariTestCarId=([^\s^]+)", vr), ["2"])
+        self.assertIn("-VR.ExternalFerrariTest=true", vr)
+        self.assertIn("-VR.F50ExternalModel=false", vr)
+        self.assertIn("-VR.ExternalFerrariNativeCallbackReplacement=true", vr)
+        self.assertIn("OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=1", vr)
+
     def test_negative_global_host_kill(self):
         source = (ROOT / LAUNCHERS[0]).read_text(encoding="utf-8")
         self.assertFalse(is_isolated_launcher(source + "\ntaskkill /IM outrun-vr-host.exe /F"))

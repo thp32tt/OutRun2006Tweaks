@@ -4545,9 +4545,11 @@
       },
       {
         "id": "A5",
-        "status": "PENDING",
+        "status": "IN_PROGRESS",
         "deliverable": "Produce isolated one-car executable package (F50 known good source), exact SHA Windows x86 DLL+x64 host, runtime trace of external selected/committed/fallback plus both-eye captures and frame timing instrumentation.",
-        "gate": "No stable release overwrite; explicit Quest3 WAITING_USER_HMD; physical pass only user. Continue software diagnostics without pretending hardware success."
+        "gate": "No stable release overwrite; explicit Quest3 WAITING_USER_HMD; physical pass only user. Continue software diagnostics without pretending hardware success.",
+        "implementation_state": "F50_PBR_TEST_LAUNCH_AND_RUNTIME_DIAGNOSTICS",
+        "evidence": "Existing isolated installer/rollback ZIP reused; PBR-TRACE now canonical ID 2 only (alias 17), exact private asset paths in README. Production logs admission reason, stock/stage CPU elapsed, candidate/stock pair event queued, and shared-frame publication only after published slot and exact frame/pose correlation. No private assets bundled; headset captures/FPS require user. Exact new SHA CI pending."
       },
       {
         "id": "A6",
@@ -4587,13 +4589,14 @@
     ],
     "unrelated_validation_deferred_until": "A1-A4 feature integration; full real asset verification and final packaging after one-car renderer route exists",
     "implementation_frontier": {
-      "primary": "A4",
+      "primary": "A5",
       "parallel_dependencies": [
         "A1",
         "A2",
-        "A3"
+        "A3",
+        "A4"
       ],
-      "note": "A1-A4 first F50 native model owner integrated; next exact SHA compile/real candidate replay coverage, one-car test package. Do not re-enter unrelated A1 micro-loop. No release promotion."
+      "note": "A4 source/multicar exact SHA 81b1e0359ed8b86d086b9ec8aeb98f18a69aba4f run 45912210055 SUCCESS; Windows x86/host pending at handoff. A5 F50-only PBR launcher and actual stage/fallback/shared-pair publication diagnostics. Continue first F50 physical admission failures rather than repeating A1 checks; no HMD PASS."
     }
   },
   "development_batch_policy": {

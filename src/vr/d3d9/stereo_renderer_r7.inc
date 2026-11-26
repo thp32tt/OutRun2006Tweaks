@@ -69,6 +69,7 @@ namespace Settings
     extern Setting<bool> VRQuestCockpitV2SkyProbe;
     extern Setting<bool> VRExternalFerrariTest;
     extern Setting<bool> VRF50ExternalModel;
+    extern Setting<bool> VRExternalFerrariDiag;
 }
 
 #ifndef OUTRUN_VR_BUILD_SHA
@@ -183,6 +184,9 @@ namespace OutRunVRStereo
 			// True only after the producer fence completed and this slot was
 			// advertised to the host. Unpublished timed-out slots need no ACK.
 			bool published = false;
+            // Diagnostic correlation only: assigned after both candidate
+            // copies and EVENT Issue; never authorizes presentation.
+            OutRunVR::DinoSidecar::IsolatedVehicleKey nativeVehicle{};
 		};
 
 		std::array<DirectTransportSlot, OutRunVR::RenderFrameRingSize> DirectTransportSlots{};
@@ -2498,6 +2502,18 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
 		}
         // A3: select the entire private pair only at the existing unpublished
         // DirectGPU slot boundary. No StretchRect to either live eye.
+        void R7ReportNativePair(const OutRunVR::DinoSidecar::IsolatedVehicleKey& key,
+            const char* phase,HRESULT hr) noexcept
+        {
+            if(!Settings::VRExternalFerrariDiag||!key.Same(key))return;
+            static thread_local std::uint64_t lastPresent=0;
+            static thread_local unsigned samples=0;
+            if(lastPresent!=key.present){lastPresent=key.present;++samples;}
+            if(samples<=24u||samples%180u==0u)
+                spdlog::info("VR EXTERNAL ATOMIC PAIR: phase={} present={} native={} pose={} generation={} hr=0x{:08X} source={} hmd=UNTESTED",
+                    phase,key.present,key.nativeFrame,key.pose,key.resource,
+                    static_cast<unsigned>(hr),OUTRUN_VR_BUILD_SHA);
+        }
         struct R7StagedTransfer {bool handled=false;HRESULT hr=E_FAIL;bool copyFailed=true;};
         bool R7StagedVehicleCurrent(IDirect3DDevice9* device) noexcept
         {
@@ -2522,8 +2538,14 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
             IDirect3DSurface9* stockRight,D3DTEXTUREFILTERTYPE filter) noexcept
         {
             using namespace OutRunVR::DinoSidecar;
+            slot.nativeVehicle={};
+            const auto key=R7NativeCompletedVehicle;
             if(stockLeft!=BackBuffer||stockRight!=RightEyeSurface||
-                !R7StagedVehicleCurrent(device))return {};
+                !R7StagedVehicleCurrent(device)){
+                if(key.present==PresentEpoch&&key.resource==ExternalAtomicCandidates.generation)
+                    R7ReportNativePair(key,"CANDIDATE_REVOKED_STOCK_ROUTE",S_OK);
+                return {};
+            }
             const auto generation=ExternalAtomicCandidates.generation;
             const auto boundary=R7CandidateBoundarySerial,epoch=PresentEpoch;
             const auto transport=DirectTransportGeneration;
@@ -2550,9 +2572,18 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
                     return SUCCEEDED(last);
                 },
                 [&](){last=event->Issue(D3DISSUE_END);return SUCCEEDED(last);});
-            if(result==IsolatedPairTransfer::Candidate||result==IsolatedPairTransfer::Stock)
+            if(result==IsolatedPairTransfer::Candidate){
+                slot.nativeVehicle=key;
+                R7ReportNativePair(key,"CANDIDATE_PAIR_EVENT_QUEUED",S_OK);
                 return {true,S_OK,false};
-            return {true,FAILED(last)?last:E_FAIL,result!=IsolatedPairTransfer::FenceFailed};
+            }
+            if(result==IsolatedPairTransfer::Stock){
+                R7ReportNativePair(key,"STOCK_PAIR_EVENT_QUEUED",S_OK);
+                return {true,S_OK,false};
+            }
+            const auto hr=FAILED(last)?last:E_FAIL;
+            R7ReportNativePair(key,"PAIR_REJECTED",hr);
+            return {true,hr,result!=IsolatedPairTransfer::FenceFailed};
         }
 		bool ResolveDirectTransport(IDirect3DDevice9* device,std::uint32_t frameId)
 		{
@@ -3085,6 +3116,17 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		void PublishRenderFrame(std::uint32_t state,std::uint32_t frameId,std::uint32_t sourcePoseSequence,std::int64_t presentQpc,OutRunVR::StereoFailureReason failureReason,const OutRunVRRenderer::LatchedStereoFrame* stereo,bool presentInFlight=false,bool directTransport=false)
 		{
 			if(!EnsureRenderFrameState())return;const std::uint32_t slotIndex=frameId?(frameId-1u)%OutRunVR::RenderFrameRingSize:(RenderFrameRing->latestSlot+1u)%OutRunVR::RenderFrameRingSize;auto&frame=RenderFrameRing->slots[slotIndex];LONG seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));if((seq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));MemoryBarrier();frame.magic=OutRunVR::RenderFrameMagic;frame.protocolVersion=OutRunVR::RenderFrameProtocolVersion;frame.structSize=sizeof(frame);frame.clientPid=GetCurrentProcessId();frame.state=state;frame.frameId=frameId;frame.sourcePoseSequence=sourcePoseSequence;frame.presentationMode=GameplayActive()?OutRunVR::PresentationGameplay:OutRunVR::PresentationTheater;frame.flags=presentInFlight?OutRunVR::RenderFramePresentInFlight:0;frame.failureReason=static_cast<std::uint32_t>(failureReason);const bool directSizedFrame=directTransport&&DirectTransportResourcesReady&&DirectTransportWidth&&DirectTransportHeight;frame.backbufferWidth=directSizedFrame?DirectTransportWidth:BackBufferDesc.Width;frame.backbufferHeight=directSizedFrame?DirectTransportHeight:BackBufferDesc.Height;frame.presentQpc=presentQpc;std::memset(frame.eye,0,sizeof(frame.eye));std::memset(frame.reserved,0,sizeof(frame.reserved));frame.reserved[OutRunVR::RenderFrameRunGenerationIndex]=RenderFrameRunGeneration;WriteGameBuildTag(frame);WriteGameMirrorClientRect(frame);frame.reserved[OutRunVR::RenderFrameCadenceRequestIndex]=OutRunVRRenderer::GetActiveCadenceRequestId();if(OutRunVR::Pacing::Enabled()&&!presentInFlight&&frameId){LARGE_INTEGER published{};QueryPerformanceCounter(&published);OutRunVR::Pacing::StampPublished(frame,published.QuadPart,false);}if(directTransport&&DirectTransportResourcesReady&&ActiveDirectTransportSlot<DirectTransportSlots.size()){const auto&transport=DirectTransportSlots[ActiveDirectTransportSlot];if(transport.leftHandle&&transport.rightHandle&&transport.frameId==frameId){frame.flags|=OutRunVR::RenderFrameDirectGpuTransport;frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.leftHandle));frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.rightHandle));frame.reserved[OutRunVR::RenderFrameDirectWidthIndex]=DirectTransportWidth;frame.reserved[OutRunVR::RenderFrameDirectHeightIndex]=DirectTransportHeight;frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]=static_cast<std::uint32_t>(DirectTransportFormat);frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex]=DirectTransportGeneration;frame.reserved[OutRunVR::RenderFrameDirectSlotIndex]=ActiveDirectTransportSlot;}}if(!presentInFlight&&state==OutRunVR::StereoSbsActive&&stereo&&stereo->valid&&frameId){const std::uint32_t transportFlag=frame.flags&OutRunVR::RenderFrameDirectGpuTransport;frame.flags=transportFlag|OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;for(int eye=0;eye<2;++eye){std::memcpy(frame.eye[eye].orientation,stereo->effectiveEyeOrientation[eye],sizeof(frame.eye[eye].orientation));std::memcpy(frame.eye[eye].position,stereo->effectiveEyePosition[eye],sizeof(frame.eye[eye].position));frame.eye[eye].fov=stereo->eyeFov[eye];}}MemoryBarrier();seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));if(seq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));LONG ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));if((ringSeq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));MemoryBarrier();RenderFrameRing->clientPid=GetCurrentProcessId();RenderFrameRing->latestSlot=slotIndex;MemoryBarrier();ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));if(ringSeq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+            // Only the real shared-frame publisher may label a candidate
+            // as published. Queued copies or a successful Issue are not
+            // equivalent to GPU completion or headset display.
+            if(!presentInFlight&&directTransport&&state==OutRunVR::StereoSbsActive&&
+                ActiveDirectTransportSlot<DirectTransportSlots.size()){
+                const auto& transport=DirectTransportSlots[ActiveDirectTransportSlot];
+                if(transport.published&&transport.frameId==frameId&&
+                    transport.nativeVehicle.pose==sourcePoseSequence&&
+                    transport.nativeVehicle.Same(transport.nativeVehicle))
+                    R7ReportNativePair(transport.nativeVehicle,"CANDIDATE_PAIR_SHARED_FRAME_PUBLISHED",S_OK);
+            }
 		}
 
         void R7RetireDirectResetFrameIdentity()
@@ -4519,27 +4561,31 @@ if(WaitForEventQuery(slot.fence,1,0u))
         return IsolatedStageResult::Complete;
     }
 
-    bool NativeVehicleReplacementBackendReady() noexcept
+    const char* NativeVehicleReplacementBlockReason() noexcept
     {
         using namespace OutRunVR::DinoSidecar;
-        // First integration is restricted to the existing explicit F50/
-        // multicar diagnostic opt-in, DirectGPU (not the SBS compositor),
-        // and the real seeded private replay owner. No legacy live DIP.
-        return NativeVehicleModelEdgesReady.load(std::memory_order_acquire)&&
-            NativeVehiclePmtConsumerReady.load(std::memory_order_acquire)&&
-            StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&
-            (Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel)&&
-            Settings::VRDirectGpuOnly&&HostDirectTransportReady()&&
-            GameplayActive()&&!InternalStereoPass&&!R7VehicleStageInFlight&&
-            !R7CandidateResetInFlight&&R7CandidatePresentBoundaryCovered&&
-            R7CandidateResetBoundaryCovered&&ExternalAtomicReplayEpoch!=0&&
-            ExternalAtomicReplayEpoch==PresentEpoch&&ExternalAtomicCandidates.device&&
-            FrameStereoMetadata.valid&&FrameStereoPoseSequence!=0&&
-            !FrameStereoIncomplete&&!FrameRightDrawFailed&&TargetIsBackBuffer()&&
-            !AnyAuxRenderTargetActive()&&!OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)&&
-            ActiveOcclusionQueries.load(std::memory_order_acquire)==0&&
-            !OutRunVR::State::StateBlockTracker::Recording()&&
-            !ActiveNativeVehicleStockReplay;
+        if(!(Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel))return "MODEL_OFF";
+        if(!NativeVehicleModelEdgesReady.load(std::memory_order_acquire))return "NATIVE_MODEL_EDGE_MISSING";
+        if(!NativeVehiclePmtConsumerReady.load(std::memory_order_acquire))return "NATIVE_PMT_CONSUMER_MISSING";
+        if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire))return "STEREO_HOOKS_NOT_READY";
+        if(!Settings::VRDirectGpuOnly||!HostDirectTransportReady())return "DIRECTGPU_NOT_READY";
+        if(!GameplayActive()||InternalStereoPass||R7VehicleStageInFlight||
+            ActiveNativeVehicleStockReplay)return "NOT_MAIN_GAMEPLAY_OWNER";
+        if(R7CandidateResetInFlight||!R7CandidatePresentBoundaryCovered||
+            !R7CandidateResetBoundaryCovered)return "BOUNDARY_NOT_READY";
+        if(!ExternalAtomicReplayEpoch||ExternalAtomicReplayEpoch!=PresentEpoch||
+            !ExternalAtomicCandidates.device)return "PRIVATE_SCENE_NOT_SEEDED_OR_REVOKED";
+        if(!FrameStereoMetadata.valid||!FrameStereoPoseSequence||
+            FrameStereoIncomplete||FrameRightDrawFailed)return "STEREO_FRAME_NOT_COMPLETE";
+        if(!TargetIsBackBuffer()||AnyAuxRenderTargetActive())return "NOT_MAIN_ATTACHMENT";
+        if(OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)||
+            ActiveOcclusionQueries.load(std::memory_order_acquire)!=0||
+            OutRunVR::State::StateBlockTracker::Recording())return "QUERY_OR_STATEBLOCK";
+        return nullptr;
+    }
+    bool NativeVehicleReplacementBackendReady() noexcept
+    {
+        return NativeVehicleReplacementBlockReason()==nullptr;
     }
     void RetireRepeatedNativeVehicle(std::uintptr_t player) noexcept
     {

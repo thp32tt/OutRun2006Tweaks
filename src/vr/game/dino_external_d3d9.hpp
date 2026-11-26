@@ -1027,6 +1027,7 @@ namespace OutRunVRStereo {
 // Native replacement is deliberately separate from the permanently disabled
 // legacy live-DIP path. Admission requires an actual private scene receipt.
 bool NativeVehicleReplacementBackendReady() noexcept;
+const char* NativeVehicleReplacementBlockReason() noexcept;
 void RetireRepeatedNativeVehicle(std::uintptr_t player) noexcept;
 bool BeginNativeVehicleReplacement(IDirect3DDevice9* device,
     const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input,

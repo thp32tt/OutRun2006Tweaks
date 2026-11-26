@@ -231,7 +231,7 @@ jobs:
           assert native.index('if(isolated) {', native.index('SortGlassBackToFront(')) < native.index('ExternalStereoMeshReceipt physical{};')
           assert 'isolated->draw(isolated->context,m.vertexCount,m.indexCount/3)' in native
           assert 'StageWholeIsolatedVehicle(current,' in r7
-          stage=r7[r7.index('IsolatedStageResult StageExternalVehiclePair('):r7.index('bool NativeVehicleReplacementBackendReady()')]
+          stage=r7[r7.index('IsolatedStageResult StageExternalVehiclePair('):r7.index('const char* NativeVehicleReplacementBlockReason()')]
           assert 'R7SeedInactivePair(ExternalAtomicCandidates,device,' in stage
           assert 'DrawIndexedPrimitiveHook.stdcall<HRESULT>(' in stage
           assert 'body.DrawNativeScene(' in stage and 'dash.DrawNativeScene(' in stage

@@ -46,7 +46,7 @@ start "" "%~dp0OR2006C2C.exe"
 exit /b 0
 
 :MODE_VR
-rem Ferrari16 isolated PBR/normal-map diagnostic, not a release launcher.
+rem EXT16-011 A5 F50-only isolated PBR/normal-map diagnostic, not a release launcher.
 rem Ferrari16 private diagnostic on unmodified v0.03 VR launch settings.
 rem No PowerShell script is required: all launch-only VR settings are passed here.
 rem A globally named taskkill would terminate even the working v0.03 host.
@@ -65,7 +65,8 @@ rem Neither flag is enabled by the protected v0.03 release launcher.
 set "OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=0"
 set "OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=1"
 
-rem Isolated sixteen-car driver-eye A/B only; never install into working v0.03.
+rem F50 retail ID 2 (tuned alias 17), canonical ExternalCars\car_id_02.ovc.
+rem Other cars stay stock. Never install into working v0.03.
 rem Match the proven diagnostic startup order: prepare the OpenXR host before the
 rem game process, and keep the host hidden so it cannot steal foreground focus.
 rem If PowerShell host prewarm is unavailable, the DLL AutoLaunchHost path below
@@ -138,7 +139,7 @@ start "" "%~dp0OR2006C2C.exe" ^
  -HudInspector=false ^
  -VR.FileLogging=true ^
  -VR.ExternalFerrariTest=true ^
- -VR.ExternalFerrariTestCarId=-1 ^
+ -VR.ExternalFerrariTestCarId=2 ^
  -VR.F50ExternalModel=false ^
  -VR.ExternalFerrariNativeCallbackReplacement=true ^
  -VR.F50ExternalStabilize=false ^

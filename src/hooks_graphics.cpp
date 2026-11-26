@@ -1350,25 +1350,40 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         const auto original=Module::fn_ptr<void(__cdecl*)(EVWORK_CAR*,int,int)>(0x69600);
         if(NativeModelPlayer&&NativeModelPlayer==player)
             OutRunVRStereo::RetireRepeatedNativeVehicle(reinterpret_cast<std::uintptr_t>(player));
-        // First runtime integration deliberately uses only exact F50 native
-        // layouts (2/17) in ordinary mode-1, no faded alternate vehicle.
+        // Do not poll diagnostics or sidecar files for the OFF run.
         if(!NativeModelPlayer||NativeModelPlayer!=player||!player||variant!=0||
             model!=static_cast<int>(player->car_kind_11)||(model!=2&&model!=17)||
-            !IsF50RetailCarId(player->car_id_10)||(player->flags_4&0xc000u)!=0x4000u||
-            !NativeModelQueueEmpty()||!OutRunVRStereo::NativeVehicleReplacementBackendReady()){
+            !IsF50RetailCarId(player->car_id_10)||
+            !(Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel)){
             original(player,model,variant);return;
+        }
+        auto fallback=[&](const char* reason){
+            if(Settings::VRExternalFerrariDiag){
+                static thread_local const char* previous=nullptr;
+                static thread_local unsigned repeat=0;
+                if(previous!=reason){previous=reason;repeat=0;}
+                if(repeat++<8u||repeat%180u==0u)
+                    spdlog::info("VR EXTERNAL ATOMIC F50 FALLBACK: model={} car={} reason={}",
+                        model,static_cast<unsigned>(player->car_id_10),reason);
+            }
+            original(player,model,variant);
+        };
+        // Native mode-1 only. Unknown / faded alternate body remains stock.
+        if((player->flags_4&0xc000u)!=0x4000u){fallback("NATIVE_MODE_NOT_ONE");return;}
+        if(!NativeModelQueueEmpty()){fallback("NATIVE_QUEUE_NOT_EMPTY");return;}
+        if(const char* reason=OutRunVRStereo::NativeVehicleReplacementBlockReason()){
+            fallback(reason);return;
         }
         auto ticket=PrepareF50External(player);
-        if(!ticket.valid||!GlobalGpu().EnsureResources(ticket.device)){
-            original(player,model,variant);return;
-        }
+        if(!ticket.valid){fallback("TICKET_OR_ASSET_NOT_READY");return;}
+        if(!GlobalGpu().EnsureResources(ticket.device)){fallback("BODY_GPU_NOT_READY");return;}
         // Never remove a stock dashboard without available replacements.
         // Embedded bindings or a valid independent overlay are mandatory.
         auto& overlay=GlobalDashboardGpu();
         const bool includeDashboard=overlay.SelectionMatches(FerrariModelSlot::GenericId,ticket.carId)&&
             overlay.Installed();
         if(includeDashboard&&!overlay.EnsureResources(ticket.device)){
-            original(player,model,variant);return;
+            fallback("DASHBOARD_GPU_NOT_READY");return;
         }
         const unsigned needles=GlobalGpu().DashboardNeedleCoverage()|
             (includeDashboard?overlay.DashboardNeedleCoverage():0u);
@@ -1376,7 +1391,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             (includeDashboard?overlay.DashboardGearCoverage():0u);
         if(!ticket.dashboard.valid||needles!=DashboardBothNeedles||
             ticket.dashboard.gear>7u||!(gears&(1u<<ticket.dashboard.gear))){
-            original(player,model,variant);return;
+            fallback("DASHBOARD_COVERAGE_MISSING");return;
         }
         ExternalVehicleStageInput input{};
         input.world=ticket.world;input.centerView=ticket.view;input.centerProjection=ticket.projection;
@@ -1385,22 +1400,32 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         input.nativeCurrent=NativeReplacementTicketCurrent;input.includeDashboard=includeDashboard;
         NativeVehicleStockReplay replay{};
         if(!OutRunVRStereo::BeginNativeVehicleReplacement(ticket.device,input,replay)){
-            original(player,model,variant);return;
+            fallback("NATIVE_TRANSACTION_NOT_ADMITTED");return;
         }
+        LARGE_INTEGER beginQpc{},stockQpc{},endQpc{},frequency{};
+        const bool timing=Settings::VRExternalFerrariDiag&&
+            QueryPerformanceFrequency(&frequency)&&frequency.QuadPart>0&&
+            QueryPerformanceCounter(&beginQpc);
         replay.model=model;
         {
             ScopedNativeVehicleStockReplay stock(replay);
             original(player,model,variant); // native geometry/side effects exactly once
         }
         if(!NativeModelQueueEmpty())replay.failed=true;
+        if(timing)QueryPerformanceCounter(&stockQpc);
         const auto result=OutRunVRStereo::FinishNativeVehicleReplacement(ticket.device,input,replay);
+        if(timing)QueryPerformanceCounter(&endQpc);
         if(Settings::VRExternalFerrariDiag){
             static thread_local unsigned reports=0;
             if(reports++<32u||reports%180u==0u)
                 spdlog::info("VR EXTERNAL ATOMIC NATIVE F50: frame={} pose={} model={} groups={}/{} "
-                    "stockOnlyL={} stockOnlyR={} privateStage={} original=RETAINED",
+                    "stockOnlyL={} stockOnlyR={} privateStage={} stockCpuMs={:.3f} stageCpuMs={:.3f} original=RETAINED",
                     input.nativeFrame,input.pose,model,replay.opened,replay.closed,
-                    replay.omitted[0],replay.omitted[1],static_cast<unsigned>(result));
+                    replay.omitted[0],replay.omitted[1],static_cast<unsigned>(result),
+                    timing&&stockQpc.QuadPart>=beginQpc.QuadPart?
+                        1000.0*double(stockQpc.QuadPart-beginQpc.QuadPart)/double(frequency.QuadPart):-1.0,
+                    timing&&endQpc.QuadPart>=stockQpc.QuadPart&&stockQpc.QuadPart!=0?
+                        1000.0*double(endQpc.QuadPart-stockQpc.QuadPart)/double(frequency.QuadPart):-1.0);
         }
     }
     static bool InstallNativeModelEdges() noexcept
