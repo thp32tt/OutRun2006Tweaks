@@ -43,6 +43,7 @@ jobs:
           source=Path('src/hooks_graphics.cpp').read_text()
           gpu=Path('src/vr/game/dino_external_d3d9.hpp').read_text()
           selection=Path('src/vr/game/external_car_selection.hpp').read_text()
+          r7=Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text()
           upload=gpu[gpu.index('static bool UploadDDS('):gpu.index('void ReleaseGpu()')]
           assert upload.index('if(!CopyAndUnlockDdsMip(') < upload.index('D3DPOOL_DEFAULT,out')
           assert 'return SUCCEEDED(staging->UnlockRect(mip));' in upload
