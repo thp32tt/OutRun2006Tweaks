@@ -1868,6 +1868,7 @@ namespace OutRunVRStereo
         std::uint64_t R7CandidateBoundarySerial=0;
         OutRunVR::DinoSidecar::IsolatedVehicleKey R7StagedVehicle{};
         OutRunVR::DinoSidecar::IsolatedVehicleKey R7NativeCompletedVehicle{};
+        OutRunVR::DinoSidecar::ExternalVehicleStageInput R7NativePublicationInput{};
         bool R7VehicleStageInFlight=false;
         std::uint64_t R7StagedTransportFaultGeneration=0;
 
@@ -2518,20 +2519,27 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
         bool R7StagedVehicleCurrent(IDirect3DDevice9* device) noexcept
         {
             using namespace OutRunVR::DinoSidecar;
-            const auto& key=R7StagedVehicle;
+            const auto key=R7StagedVehicle;
+            const auto input=R7NativePublicationInput;
             // Only the actual native model transaction can authorize a
-            // staged pair. The old direct-live external DIP gate stays false.
-            return R7NativeCompletedVehicle.Same(key)&&
-                key.Same({ExternalAtomicCandidates.generation,R7CandidateBoundarySerial,
-                    PresentEpoch,key.nativeFrame,FrameStereoPoseSequence,key.player})&&
-                ExternalAtomicReplayEpoch==PresentEpoch&&!R7VehicleStageInFlight&&
-                ExternalAtomicCandidates.device==device&&!FrameStereoIncomplete&&!FrameRightDrawFailed&&
-                ExternalAtomicCandidates.provenLiveColor[0]==BackBuffer&&
-                ExternalAtomicCandidates.provenLiveColor[1]==RightEyeSurface&&
-                ExternalAtomicCandidates.provenLiveDepth[0]==TrackedDepthStencil&&
-                ExternalAtomicCandidates.provenLiveDepth[1]==RightEyeDepth&&
-                ExternalAtomicCandidates.eyes[0].color&&ExternalAtomicCandidates.eyes[0].depth&&
-                ExternalAtomicCandidates.eyes[1].color&&ExternalAtomicCandidates.eyes[1].depth;
+            // staged pair. Validate the live native identity at each copy
+            // and again after EVENT Issue, not merely the stored key.
+            const auto current=[&](){
+                return R7NativeCompletedVehicle.Same(key)&&R7StagedVehicle.Same(key)&&
+                    key.Same({ExternalAtomicCandidates.generation,R7CandidateBoundarySerial,
+                        PresentEpoch,input.nativeFrame,FrameStereoPoseSequence,input.player})&&
+                    input.pose==key.pose&&FrameStereoMetadata.valid&&
+                    FrameStereoMetadata.poseSequence==key.pose&&
+                    ExternalAtomicReplayEpoch==PresentEpoch&&!R7VehicleStageInFlight&&
+                    ExternalAtomicCandidates.device==device&&!FrameStereoIncomplete&&!FrameRightDrawFailed&&
+                    ExternalAtomicCandidates.provenLiveColor[0]==BackBuffer&&
+                    ExternalAtomicCandidates.provenLiveColor[1]==RightEyeSurface&&
+                    ExternalAtomicCandidates.provenLiveDepth[0]==TrackedDepthStencil&&
+                    ExternalAtomicCandidates.provenLiveDepth[1]==RightEyeDepth&&
+                    ExternalAtomicCandidates.eyes[0].color&&ExternalAtomicCandidates.eyes[0].depth&&
+                    ExternalAtomicCandidates.eyes[1].color&&ExternalAtomicCandidates.eyes[1].depth;
+            };
+            return input.publishCurrent&&current()&&input.publishCurrent(input)&&current();
         }
         R7StagedTransfer R7TransferStagedVehicle(IDirect3DDevice9* device,
             DirectTransportSlot& slot,IDirect3DSurface9* stockLeft,
@@ -4489,7 +4497,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
         if(!current()||!body.SelectionMatches(input.slot,input.carId)||
             !body.EnsureResources(device)||!current()||
             (input.includeDashboard&&(!dash.SelectionMatches(FerrariModelSlot::GenericId,input.carId)||
-                !dash.EnsureResources(device)||!current())))
+                !dash.EnsureResources(device)||!current()||dash.HasGlassMeshes())))
             return abort(IsolatedStageResult::Unavailable);
         auto* const liveColor=TrackedRenderTarget;
         auto* const liveDepth=TrackedDepthStencil;
@@ -4538,8 +4546,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
                 [&]() -> HRESULT {
                     if(!current())return E_FAIL;
+                    // All opaque parts (including animated instruments)
+                    // must populate color/depth before translucent body glass.
                     const auto drawn=body.DrawNativeScene(device,input.world,eyeView[eye],
-                        eyeProjection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster);
+                        eyeProjection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster,
+                        input.includeDashboard?IsolatedMeshPass::OpaqueOnly:IsolatedMeshPass::All);
                     stateDirty=drawn.receipt.stateMayBeDirty;
                     if(!drawn.isolatedEyeComplete||!current())return E_FAIL;
                     if(input.includeDashboard){
@@ -4548,6 +4559,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                             input.nativeFrame,input.pose,body.EmbeddedGearMask(),&raster);
                         stateDirty=stateDirty||overlay.receipt.stateMayBeDirty;
                         if(!overlay.isolatedEyeComplete||!current())return E_FAIL;
+                        const auto glass=body.DrawNativeScene(device,input.world,eyeView[eye],
+                            eyeProjection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster,
+                            IsolatedMeshPass::GlassOnly);
+                        stateDirty=stateDirty||glass.receipt.stateMayBeDirty;
+                        if(!glass.isolatedEyeComplete||!current())return E_FAIL;
                     }
                     return S_OK;
                 },eye,1,false);
@@ -4595,6 +4611,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
             key.boundary==R7CandidateBoundarySerial){
             ExternalAtomicReplayEpoch=0;
             R7NativeCompletedVehicle={};
+            R7NativePublicationInput={};
         }
     }
     bool BeginNativeVehicleReplacement(IDirect3DDevice9* device,
@@ -4603,8 +4620,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
     {
         using namespace OutRunVR::DinoSidecar;
         if(!NativeVehicleReplacementBackendReady()||!IsGameDevice(device)||
-            ExternalAtomicCandidates.device!=device||!input.nativeCurrent||
-            !input.nativeCurrent(input)||!NativeVehicleReplacementBackendReady()||
+            ExternalAtomicCandidates.device!=device||!input.nativeCurrent||!input.publishCurrent||
+            !input.nativeCurrent(input)||!input.publishCurrent(input)||!NativeVehicleReplacementBackendReady()||
             FrameStereoPoseSequence!=input.pose||!input.nativeFrame||!input.player||
             (R7StagedVehicle.present==PresentEpoch&&
              R7StagedVehicle.resource==ExternalAtomicCandidates.generation&&
@@ -4627,6 +4644,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
             if(replay.key.resource==ExternalAtomicCandidates.generation&&
                 replay.key.present==PresentEpoch)ExternalAtomicReplayEpoch=0;
             R7NativeCompletedVehicle={};
+            R7NativePublicationInput={};
         };
         if(!replay.Ready()||!replay.key.Same(now)||!NativeVehicleReplacementBackendReady()){
             discard();return IsolatedStageResult::Unavailable;
@@ -4635,7 +4653,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
         if(result!=IsolatedStageResult::Complete||!R7StagedVehicle.Same(replay.key)){
             discard();return result==IsolatedStageResult::DirtyRestore?result:IsolatedStageResult::Unavailable;
         }
+        R7NativePublicationInput=input;
         R7NativeCompletedVehicle=R7StagedVehicle;
+        if(!R7StagedVehicleCurrent(device)){
+            discard();return IsolatedStageResult::Unavailable;
+        }
         return IsolatedStageResult::Complete;
     }
 

@@ -80,7 +80,8 @@ IDirect3DSurface9 *BackBuffer=nullptr,*TrackedRenderTarget=nullptr,*TrackedDepth
 struct Stamp {unsigned invalidated=0;void Invalidate(){++invalidated;}} LastMainDepthClearStamp;
 bool RightDepthSynchronized=true,RightStencilSynchronized=true;
 unsigned restoreErrors=0,rawCalls=0,rawFail=0,rawReset=0,rawPresent=0,copyCalls=0,copyFail=0,fenceCalls=0,fenceRevoke=0;
-bool nativeValid=true,allowPublication=true,overlayDirty=false;
+bool nativeValid=true,allowPublication=true,overlayDirty=false,overlayGlass=false,publishValid=true;
+unsigned stageTags[16]{},stageTagCount=0;
 bool IsGameDevice(IDirect3DDevice9* d){return d&&d==ExternalAtomicCandidates.device;}
 bool GameplayActive(){return true;}
 bool AnyAuxRenderTargetActive(){return false;}
@@ -127,15 +128,20 @@ namespace OutRunVR::DinoSidecar {
 gpu_stub=r'''
     struct MockGpu {
         unsigned count=3;bool dashboard=false;
+        bool HasGlassMeshes(){return dashboard&&overlayGlass;}
         bool SelectionMatches(FerrariModelSlot,unsigned char){return true;}
         bool EnsureResources(IDirect3DDevice9*){return true;}
         unsigned HasEmbeddedSpeedAndRpm(){return 0;}unsigned EmbeddedGearMask(){return 0;}
-        GpuDrawResult DrawNativeScene(IDirect3DDevice9* d,const D3DMATRIX&,const D3DMATRIX& view,const D3DMATRIX& projection,const DashboardTelemetry&,unsigned,std::uint64_t,std::uint64_t,unsigned,const IsolatedEyeRaster* raster){
+        GpuDrawResult DrawNativeScene(IDirect3DDevice9* d,const D3DMATRIX&,const D3DMATRIX& view,const D3DMATRIX& projection,const DashboardTelemetry&,unsigned,std::uint64_t,std::uint64_t,unsigned,const IsolatedEyeRaster* raster,IsolatedMeshPass phase=IsolatedMeshPass::All){
             GpuDrawResult r{};
             const bool right=d->rt==ExternalAtomicCandidates.eyes[1].color;
             assert(view.m[3][0]==(right?0.06f:0.f));
             assert(projection.m[2][0]==(right?1.f:-1.f));
-            for(unsigned i=0;i<count;++i){
+            const unsigned draws=phase==IsolatedMeshPass::All?count:
+                phase==IsolatedMeshPass::OpaqueOnly?count-1:1;
+            for(unsigned i=0;i<draws;++i){
+                assert(stageTagCount<16);
+                stageTags[stageTagCount++]=dashboard?1u:phase==IsolatedMeshPass::GlassOnly?2u:0u;
                 if(!raster->Current()||FAILED(raster->draw(raster->context,3,1))) {
                     r.receipt.stateMayBeDirty=!raster->Restorable();return r;
                 }
@@ -149,6 +155,7 @@ gpu_stub=r'''
     MockGpu& GlobalDashboardGpu(){static MockGpu g{2,true};return g;}
 }
 OutRunVR::DinoSidecar::IsolatedVehicleKey R7StagedVehicle{},R7NativeCompletedVehicle{};
+OutRunVR::DinoSidecar::ExternalVehicleStageInput R7NativePublicationInput{};
 '''
 cases=r'''
 using namespace OutRunVR::DinoSidecar;
@@ -174,14 +181,16 @@ struct Fixture {
         FrameStereoIncomplete=FrameRightDrawFailed=R7CandidateResetInFlight=InternalStereoPass=R7VehicleStageInFlight=false;
         FrameStereoMetadata.valid=true;FrameStereoMetadata.poseSequence=7;DirectTransportResourcesReady=true;
         rawCalls=rawFail=rawReset=rawPresent=copyCalls=copyFail=fenceCalls=fenceRevoke=restoreErrors=0;
-        nativeValid=allowPublication=true;overlayDirty=false;
+        nativeValid=allowPublication=publishValid=true;overlayDirty=overlayGlass=false;stageTagCount=0;R7NativePublicationInput={};
         NativeVehicleModelEdgesReady=true;NativeVehiclePmtConsumerReady=true;R7NativeCompletedVehicle={};
         input.nativeFrame=12;input.pose=7;input.player=55;input.includeDashboard=true;
         input.nativeCurrent=[](const ExternalVehicleStageInput&) noexcept {return nativeValid;};
+        input.publishCurrent=[](const ExternalVehicleStageInput&) noexcept {return publishValid;};
     }
     IsolatedStageResult Stage(){
         const auto r=StageExternalVehiclePair(&d,input);
         R7NativeCompletedVehicle=(r==IsolatedStageResult::Complete&&allowPublication)?R7StagedVehicle:IsolatedVehicleKey{};
+        R7NativePublicationInput=input;
         return r;
     }
     IsolatedStageResult NativeStage(unsigned fault=0){
@@ -215,6 +224,8 @@ int main(){
     unsigned cases=0;
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete&&rawCalls==10);
      assert(f.priv[0].draws==5&&f.priv[1].draws==5&&f.privZ[0].draws==5&&f.privZ[1].draws==5);
+     const unsigned order[]{0,0,1,1,2,0,0,1,1,2};
+     assert(stageTagCount==10&&std::memcmp(stageTags,order,sizeof(order))==0);
      f.LiveUnchanged();f.Restored();auto t=f.Transfer();assert(t.handled&&SUCCEEDED(t.hr)&&!t.copyFailed&&f.output[0].pixels==2&&f.output[1].pixels==2&&fenceCalls==1&&f.slot.nativeVehicle.Same(R7NativeCompletedVehicle));++cases;}
     for(unsigned failure=1;failure<=10;++failure)for(unsigned mode=0;mode<3;++mode){
         Fixture f;if(mode==0)rawFail=failure;if(mode==1)rawReset=failure;if(mode==2)rawPresent=failure;
@@ -223,7 +234,7 @@ int main(){
         if(mode==1)assert(r==IsolatedStageResult::DirtyRestore&&restoreErrors==1);
         f.LiveUnchanged();assert(!f.Transfer().handled&&!fenceCalls);++cases;
     }
-    {Fixture f;overlayDirty=true;assert(f.Stage()==IsolatedStageResult::DirtyRestore&&rawCalls==5&&restoreErrors==1);f.Restored();++cases;}
+    {Fixture f;overlayDirty=true;assert(f.Stage()==IsolatedStageResult::DirtyRestore&&rawCalls==4&&restoreErrors==1);f.Restored();++cases;}
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);assert(f.Stage()==IsolatedStageResult::Unavailable&&rawCalls==10&&!f.Transfer().handled);++cases;}
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);allowPublication=false;R7NativeCompletedVehicle={};assert(!f.Transfer().handled&&!copyCalls);++cases;}
     for(unsigned fault=1;fault<=2;++fault){
@@ -232,6 +243,14 @@ int main(){
         f.LiveUnchanged();++cases;
     }
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);fenceRevoke=1;auto t=f.Transfer();assert(t.handled&&FAILED(t.hr)&&!t.copyFailed&&fenceCalls==1);++cases;}
+    {Fixture f;overlayGlass=true;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;f.input.includeDashboard=false;assert(f.Stage()==IsolatedStageResult::Complete&&rawCalls==6);++cases;}
+    {Fixture f;assert(f.NativeStage()==IsolatedStageResult::Complete);publishValid=false;
+     assert(!f.Transfer().handled&&!copyCalls);++cases;}
+    {Fixture f;assert(f.NativeStage()==IsolatedStageResult::Complete);R7NativePublicationInput.nativeFrame++;
+     assert(!f.Transfer().handled&&!copyCalls);++cases;}
+    {Fixture f;assert(f.NativeStage()==IsolatedStageResult::Complete);FrameStereoMetadata.valid=false;
+     assert(!f.Transfer().handled&&!copyCalls);++cases;}
     {Fixture f;nativeEyes[1][12]=0.f;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
     {Fixture f;nativeEyesAvailable=false;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
     {Fixture f;FrameStereoMetadata.poseSequence=8;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}

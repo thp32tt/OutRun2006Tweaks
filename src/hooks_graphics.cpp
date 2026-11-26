@@ -1310,22 +1310,36 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     // Exact retail 46BF8C -> 469600 cdecl(car,model,variant).
     // Keep the complete original function; only omit its verified PMT
     // raster from the private candidate. The live pair is the fallback.
+    static bool NativePublicationTicketCurrent(
+        const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input) noexcept
+    {
+        using namespace OutRunVR::QuestCockpitV2;
+        using namespace OutRunVR::DinoSidecar;
+        if(!Settings::VREnabled||!Settings::VRStereo||!Settings::VRQuestCockpitV2Enabled||
+            !Settings::VRExternalFerrariNativeCallbackReplacement||
+            !Game::current_mode||*Game::current_mode!=STATE_GAME||InSceneEffect()||
+            NativeEpochCounter.load(std::memory_order_acquire)!=input.nativeFrame)return false;
+        const bool selected=input.slot==FerrariModelSlot::F50?
+            Settings::VRF50ExternalModel.get():
+            (Settings::VRExternalFerrariTest&&MatchesFerrariSelection(
+                input.carId,Settings::VRExternalFerrariTestCarId.get()));
+        if(!selected)return false;
+        const auto* player=Game::pl_car();
+        const auto* camera=Game::camera();
+        return player&&reinterpret_cast<std::uintptr_t>(player)==input.player&&
+            player->car_id_10==input.carId&&camera&&camera->cam_mode_34A==1&&
+            NativeEpochCounter.load(std::memory_order_acquire)==input.nativeFrame;
+    }
     static bool NativeReplacementTicketCurrent(
         const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input) noexcept
     {
         using namespace OutRunVR::QuestCockpitV2;
-        if(!Game::current_mode||*Game::current_mode!=STATE_GAME||
-            !NativeFrameTrace().Active()||!NativeModelPlayer||InSceneEffect())return false;
+        if(!NativeFrameTrace().Active()||!NativeModelPlayer||
+            NativeFrameTrace().ActiveEpoch()!=input.nativeFrame||
+            reinterpret_cast<std::uintptr_t>(NativeModelPlayer)!=input.player||
+            !NativePublicationTicketCurrent(input))return false;
         const auto* eye=OutRunVRRenderer::GetLatchedStereoFrameView();
-        const auto* player=Game::pl_car();
-        const auto* camera=Game::camera();
-        return Settings::VREnabled&&Settings::VRStereo&&Settings::VRQuestCockpitV2Enabled&&
-            Settings::VRExternalFerrariNativeCallbackReplacement&&
-            NativeFrameTrace().Active()&&NativeFrameTrace().ActiveEpoch()==input.nativeFrame&&
-            eye&&eye->valid&&eye->poseSequence==input.pose&&player&&
-            reinterpret_cast<std::uintptr_t>(player)==input.player&&player->car_id_10==input.carId&&
-            camera&&camera->cam_mode_34A==1&&Game::current_mode&&*Game::current_mode==STATE_GAME&&
-            !InSceneEffect()&&NativeModelPlayer==player;
+        return eye&&eye->valid&&eye->poseSequence==input.pose;
     }
     static bool NativeModelQueueEmpty() noexcept
     {
@@ -1395,6 +1409,11 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(includeDashboard&&!overlay.EnsureResources(ticket.device)){
             fallback("DASHBOARD_GPU_NOT_READY");return;
         }
+        // The one-car backend can order all opaque dashboard parts before
+        // body glass. An overlay with glass would require a merged sort.
+        if(includeDashboard&&overlay.HasGlassMeshes()){
+            fallback("DASHBOARD_GLASS_REQUIRES_MERGED_SORT");return;
+        }
         const unsigned needles=GlobalGpu().DashboardNeedleCoverage()|
             (includeDashboard?overlay.DashboardNeedleCoverage():0u);
         const unsigned gears=GlobalGpu().DashboardGearCoverage()|
@@ -1407,7 +1426,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         input.world=ticket.world;input.centerView=ticket.view;input.centerProjection=ticket.projection;
         input.dashboard=ticket.dashboard;input.slot=ticket.slot;input.carId=ticket.carId;
         input.nativeFrame=ticket.nativeFrame;input.pose=ticket.xrPose;input.player=ticket.originalPlayer;
-        input.nativeCurrent=NativeReplacementTicketCurrent;input.includeDashboard=includeDashboard;
+        input.nativeCurrent=NativeReplacementTicketCurrent;
+        input.publishCurrent=NativePublicationTicketCurrent;
+        input.includeDashboard=includeDashboard;
         NativeVehicleStockReplay replay{};
         if(!OutRunVRStereo::BeginNativeVehicleReplacement(ticket.device,input,replay)){
             fallback("NATIVE_TRANSACTION_NOT_ADMITTED");return;

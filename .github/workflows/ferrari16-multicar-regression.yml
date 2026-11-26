@@ -238,6 +238,9 @@ jobs:
           assert 'R7SeedInactivePair(ExternalAtomicCandidates,device,' in stage
           assert 'DrawIndexedPrimitiveHook.stdcall<HRESULT>(' in stage
           assert 'body.DrawNativeScene(' in stage and 'dash.DrawNativeScene(' in stage
+          assert stage.index('IsolatedMeshPass::OpaqueOnly') < stage.index('dash.DrawNativeScene(') < stage.index('IsolatedMeshPass::GlassOnly')
+          assert 'input.publishCurrent(input)' in r7
+          assert 'NativeEpochCounter.load(std::memory_order_acquire)!=input.nativeFrame' in source
           assert 'R7StagedVehicle={generation,boundary,epoch,input.nativeFrame,input.pose,input.player};' in stage
           assert 'TransferIsolatedPair(ownerCurrent,candidateCurrent,' in r7
           assert 'R7TransferStagedVehicle(' in r13

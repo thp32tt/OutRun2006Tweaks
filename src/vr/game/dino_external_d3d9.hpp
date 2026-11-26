@@ -89,6 +89,7 @@ inline bool PbrExternalStereoProbeActive() noexcept {
 }
 enum class FerrariModelSlot : unsigned char { F50, Gto288, F40, GenericId };
 enum class SidecarRole : unsigned char { Vehicle, DashboardOverlay };
+enum class IsolatedMeshPass : unsigned char { All, OpaqueOnly, GlassOnly };
 // Created by the R7 attachment transaction while its private eye is bound.
 // The raw raster callback bypasses recursive R29/R30/R33 stereo duplication.
 struct IsolatedEyeRaster {
@@ -110,6 +111,9 @@ struct ExternalVehicleStageInput {
     std::uintptr_t player=0;
     // The future body-only native owner must validate the original ticket.
     bool (*nativeCurrent)(const ExternalVehicleStageInput&) noexcept=nullptr;
+    // Present can follow native frame exit. This separate predicate checks
+    // the still-current native identity without requiring the callback TLS.
+    bool (*publishCurrent)(const ExternalVehicleStageInput&) noexcept=nullptr;
     bool includeDashboard=false;
 };
 struct GpuDrawResult final {
@@ -673,6 +677,10 @@ public:
         return count;
     }
     bool Loaded() const noexcept {return loaded_;}
+    bool HasGlassMeshes() const noexcept {
+        for(const auto& mesh:meshes_)if(mesh.glass)return true;
+        return false;
+    }
     // API name retained for the existing large game-hook call site: return
     // individual bit coverage (1=speed, 2=RPM), NOT a boolean pair flag.
     unsigned HasEmbeddedSpeedAndRpm() const noexcept {
@@ -731,7 +739,8 @@ public:
                      std::uint64_t expectedNativeFrame=0,
                      std::uint64_t expectedPose=0,
                      unsigned embeddedGearMask=0u,
-                     const IsolatedEyeRaster* isolated=nullptr) noexcept {
+                     const IsolatedEyeRaster* isolated=nullptr,
+                     IsolatedMeshPass phase=IsolatedMeshPass::All) noexcept {
         GpuDrawResult result{};
         auto current=[&](){return !isolated||isolated->Current();};
         auto restorable=[&](){return !isolated||isolated->Restorable();};
@@ -740,7 +749,7 @@ public:
         // L/R color+depth stage and pair-atomic publication exists yet.
         // Return BEFORE D3D state setup, resource creation or any DIP so
         // the original 49F3E0 player callback remains the sole raster owner.
-        if(!isolated){if(!RuntimeExternalCarAtomicStageReady())return result;}
+        if(!isolated){if(phase!=IsolatedMeshPass::All||!RuntimeExternalCarAtomicStageReady())return result;}
         else if(!current())return result;
         // A stale/invalid ticket must not consume retry budget or start
         // any expensive DDS/mesh preparation.
@@ -750,6 +759,8 @@ public:
             if(!EnsureResources(device))return result;
         } else if(owner_!=device||preparation_!=Preparation::Ready||!current())return result;
         for(const auto& mesh:meshes_) {
+            if((phase==IsolatedMeshPass::OpaqueOnly&&mesh.glass)||
+                (phase==IsolatedMeshPass::GlassOnly&&!mesh.glass))continue;
             const auto* binding=DashboardFor(mesh);
             if(DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask,embeddedGearMask))
                 ++result.receipt.expectedMeshes;
@@ -758,7 +769,8 @@ public:
         if(result.receipt.expectedMeshes==0) {
             // A dashboard overlay with all needles/gear already embedded is
             // a valid no-op. An empty vehicle body is never a valid stage.
-            if(isolated&&role_==SidecarRole::DashboardOverlay&&current()){
+            if(isolated&&(role_==SidecarRole::DashboardOverlay||
+                phase==IsolatedMeshPass::GlassOnly)&&current()){
                 result.isolatedEyeComplete=true;result.receipt.stateRestored=true;result.hr=S_OK;
             }
             return result;
@@ -881,7 +893,7 @@ public:
         // mesh limit, with no per-eye allocations or texture replacement.
         std::array<GlassDepthItem,MaxGroups> glassOrder{};
         unsigned glassCount=0u;
-        if(SUCCEEDED(hr)&&current())for(unsigned i=0;i<meshes_.size();++i) {
+        if(phase!=IsolatedMeshPass::OpaqueOnly&&SUCCEEDED(hr)&&current())for(unsigned i=0;i<meshes_.size();++i) {
             const auto& m=meshes_[i];
             if(m.glass && glassCount<glassOrder.size()) {
                 const auto* binding=DashboardFor(m);
@@ -895,7 +907,8 @@ public:
             }
         }
         SortGlassBackToFront(glassOrder.data(),glassCount);
-        if(SUCCEEDED(hr))for(unsigned pass=0;pass<2u && SUCCEEDED(hr);++pass)
+        if(SUCCEEDED(hr))for(unsigned pass=phase==IsolatedMeshPass::GlassOnly?1u:0u;
+            pass<(phase==IsolatedMeshPass::OpaqueOnly?1u:2u)&&SUCCEEDED(hr);++pass)
           for(unsigned order=0;order<(pass?glassCount:meshes_.size());++order) {
             if(!current()){hr=E_FAIL;break;}
             const auto& m=meshes_[pass?glassOrder[order].index:order];
