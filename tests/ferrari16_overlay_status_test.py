@@ -148,10 +148,10 @@ def main() -> None:
             body.unlink()
             row = entry(root, cid, True)
             assert row["status"] == "FAIL"
-            # GTO/F40 also report the absent legacy-body read failure.
+            # F50/GTO/F40 also report the absent legacy-body read failure.
             assert row["body"]["reason"].endswith(
                 "dashboard overlay: " + row["dashboard_overlay"][6:])
-            if cid in (7, 11):
+            if cid in (2, 7, 11):
                 assert "; dashboard overlay: " in row["body"]["reason"]
             else:
                 assert row["body"]["reason"].startswith("dashboard overlay: ")

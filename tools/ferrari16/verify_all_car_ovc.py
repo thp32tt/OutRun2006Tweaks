@@ -380,7 +380,12 @@ def audit(game_root: Path, require_pbr_maps: bool = False,
         except OSError:
             missing = False
         if missing:
-            status, details = "MISSING", {}
+            # A selected legacy route still owes its own missing-file reason.
+            # Preserve the independent body and dashboard failure evidence.
+            if car_id in LEGACY:
+                status, details = "FAIL", {"reason": "missing file"}
+            else:
+                status, details = "MISSING", {}
         else:
             try:
                 details = inspect(model)
