@@ -520,12 +520,13 @@ struct IDirect3DSwapChain9{
     void Release(){assert(refs);--refs;}
 };
 template<class T>void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
+void R7ForgetAutomaticDepthProof() noexcept;
 struct IDirect3DDevice9{
-    bool game=true,chainFail=false,depthFail=false,nullChain=false,nullDepth=false;
+    bool game=true,chainFail=false,depthFail=false,nullChain=false,nullDepth=false,interruptDepth=false;
     UINT chains=1;IDirect3DSwapChain9 chain;IDirect3DSurface9 depth;
     UINT GetNumberOfSwapChains(){return chains;}
     HRESULT GetSwapChain(UINT i,IDirect3DSwapChain9** out){assert(!i);*out=nullChain?nullptr:&chain;if(*out)++chain.refs;return chainFail?E_FAIL:S_OK;}
-    HRESULT GetDepthStencilSurface(IDirect3DSurface9** out){*out=nullDepth?nullptr:&depth;if(*out)++depth.refs;return depthFail?E_FAIL:S_OK;}
+    HRESULT GetDepthStencilSurface(IDirect3DSurface9** out){*out=nullDepth?nullptr:&depth;if(*out)++depth.refs;if(interruptDepth)R7ForgetAutomaticDepthProof();return depthFail?E_FAIL:S_OK;}
 };
 std::atomic<bool> StereoBaseCallbacksArmed{true};
 bool IsGameDevice(IDirect3DDevice9* d){return d&&d->game;}
@@ -609,6 +610,29 @@ int main(){
         R7ForgetAutomaticDepthProof();
         assert(!R7DepthRetentionProven(&d.depth));++cases;
     }
+    // ResetEx recovery must match the old resource-owned tag, not just PP.
+    for(unsigned mask=0;mask<256;++mask){
+        IDirect3DDevice9 d;
+        const auto previous=R7AutomaticDepthGeneration;
+        if(!(mask&1))R7MarkDepthRetention(&d.depth,(mask&2)?previous+9:previous);
+        R7ForgetAutomaticDepthProof();
+        d.chain.pp.Flags=(mask&4)?D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL:0;
+        d.chain.pp.EnableAutoDepthStencil=!(mask&8);
+        d.depthFail=mask&16;d.depth.writeFail=mask&32;
+        d.interruptDepth=mask&64;d.depth.readFail=mask&128;
+        const auto writes=d.depth.writes;
+        R7RevalidateRetainedAutomaticDepth(&d,previous);
+        assert(R7DepthRetentionProven(&d.depth)==(mask==0));
+        assert(d.depth.writes==writes+unsigned((mask&~32u)==0));
+        assert(!d.chain.refs&&!d.depth.refs);++cases;
+    }
+    {IDirect3DDevice9 d;d.interruptDepth=true;
+     R7CaptureFreshAutomaticDepth(&d);
+     assert(!R7DepthRetentionProven(&d.depth)&&!d.depth.writes&&!d.depth.refs);}
+    {IDirect3DDevice9 d;R7MarkDepthRetention(&d.depth,0);
+     const auto previous=R7AutomaticDepthGeneration;R7ForgetAutomaticDepthProof();
+     R7RevalidateRetainedAutomaticDepth(&d,previous);
+     assert(R7DepthRetentionProven(&d.depth)&&d.depth.writes==1&&d.depth.proof==0);}
     for(unsigned mask=0;mask<128;++mask){
         IDirect3DDevice9 d;IDirect3DSurface9 surface;IDirect3DSurface9* out=nullptr;
         d.game=!(mask&1);StereoBaseCallbacksArmed=!(mask&2);
@@ -704,6 +728,8 @@ int main(){
 assert "R7ForgetAutomaticDepthProof();ReleaseStereoResources();" in source
 r13=(Path("src/vr/d3d9/stereo_renderer_r13.cpp").read_text())
 assert "R7ForgetAutomaticDepthProof();\n            ReleaseStereoResources();" in r13
+assert r13.index("const auto previousDepthGeneration=R7AutomaticDepthGeneration;") < r13.index("R13ResetCommonPre(device,notification);") < r13.index("R7RevalidateRetainedAutomaticDepth(device,previousDepthGeneration);")
+assert "if(notification.outermost&&SUCCEEDED(hr))R7RevalidateRetainedAutomaticDepth(device,previousDepthGeneration);" in source
 assert "InstallStereoHooks(device,true);" in source
 assert "CreateDepthStencilSurfaceVtableIndex = 29;" in source
 assert "CreateDepthStencilSurfaceExVtableIndex = 131;" in source
@@ -810,9 +836,16 @@ struct IDirect3DDevice9Ex{bool game=true;};
 std::atomic<bool> StereoBaseCallbacksArmed{true};
 bool IsGameDevice(IDirect3DDevice9Ex* d){return d&&d->game;}
 std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
-unsigned R7CandidateResetInFlight=0,proof=1,resets=0,calls=0,r9Retires=0;
+unsigned R7CandidateResetInFlight=0,resets=0,calls=0,r9Retires=0;
+std::uint64_t proof=1;
 bool allocated=true,owned=false,nested=false;
+std::uint64_t& R7AutomaticDepthGeneration=proof;
 void R7ForgetAutomaticDepthProof(){++proof;}
+bool SUCCEEDED(HRESULT hr){return hr>=0;}
+unsigned depthRecoveries=0;
+void R7RevalidateRetainedAutomaticDepth(IDirect3DDevice9Ex* d,std::uint64_t previous){
+    assert(d&&d->game&&previous==1&&proof==3&&R7CandidateResetInFlight==1);++depthRecoveries;
+}
 void R9RetireDirectResetResources(){assert(R7CandidateResetInFlight==1);++r9Retires;}
 unsigned transportRetires=0;
 void RetireTransport() noexcept {assert(r9Retires==1);++transportRetires;}
@@ -909,7 +942,7 @@ int main(){
         nested=mask&32;result=(mask&64)?-1:0;owned=!(mask&7);
         const std::uint64_t initialReplay=(mask&128)?9:0;
         PresentEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=initialReplay;
-        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;baselineRetires=0;rasterRetires=0;rasterValid=true;allocated=true;lifecycleCalls=0;lifecycleResult=123;
+        R7CandidateResetInFlight=0;proof=1;depthRecoveries=0;resets=0;calls=0;r9Retires=0;transportRetires=0;baselineRetires=0;rasterRetires=0;rasterValid=true;allocated=true;lifecycleCalls=0;lifecycleResult=123;
         hostResets=0;framePublications=0;stereoPublications=0;renderInvalidations=0;
         QuestNativePairLatch={3};LastMainDepthClearStamp.valid=true;LastMainDepthClearDesc={4};
         FrameStereoMetadata={5};FrameStereoPoseSequence=42;LastBeginSceneCountAtPresent=3;
@@ -923,6 +956,7 @@ int main(){
         }else assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
         assert(calls==1&&R7CandidateResetInFlight==0&&R7ResetNotificationDepth==0);
         const bool direct=owned&&!classic;
+        assert(depthRecoveries==unsigned(direct&&result>=0));
         assert(hostResets==unsigned(owned||classic));
         assert(framePublications==unsigned(direct)&&renderInvalidations==unsigned(direct));
         assert(FrameStereoIncomplete==direct&&FrameStereoPoseSequence==(direct?0u:42u));

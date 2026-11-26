@@ -455,6 +455,7 @@ namespace OutRunVRStereo
 
             OutRunVRD3D9ExUpgradeR13::DisarmLegacyResetHook();
             R7ResetNotificationScope notification;
+            const auto previousDepthGeneration=R7AutomaticDepthGeneration;
             R13ResetCommonPre(device,notification);
 
             HRESULT hr = D3DERR_INVALIDCALL;
@@ -467,6 +468,8 @@ namespace OutRunVRStereo
 
             if (SUCCEEDED(hr))
             {
+                if(notification.outermost)
+                    R7RevalidateRetainedAutomaticDepth(device,previousDepthGeneration);
                 EnsureStereoResources(device);
                 if (TrackedDepthStencil)
                 {
