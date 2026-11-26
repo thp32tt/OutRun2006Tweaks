@@ -1982,6 +1982,7 @@ template<class DrawCall>R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevic
     return R7CandidateSeedResult::Seeded;
 }
 '''
+up_input_stub += "bool R7NativeStockOnlyDraw(){return false;}\nvoid R7RecordNativeStockOmission(unsigned,R7CandidateSeedResult){}\n"
 up_input_cases=r'''
 int main(){
     unsigned cases=0;

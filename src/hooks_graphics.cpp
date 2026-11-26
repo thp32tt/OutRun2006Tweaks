@@ -556,6 +556,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     static constexpr int PlayerCallbackRva=0x9F3E0;
     inline static SafetyHookMid FrameEnterHook{},FrameEndHook{};
     inline static SafetyHookInline PlayerCallbackHook{};
+    inline static thread_local EVWORK_CAR* NativeModelPlayer=nullptr;
     inline static thread_local bool F0CallbackActive=false;
     inline static thread_local bool F50GameplayResourceArmed=false;
     static void ReleaseExternalBeforeDeviceReset() noexcept
@@ -1021,7 +1022,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // or SafeFloorLift's async OVC parse; leave the stock callback intact.
         if(!OutRunVR::DinoSidecar::MayPrepareExternalCarAssets(
                ownerAuthorized,
-               OutRunVR::DinoSidecar::RuntimeExternalCarAtomicStageReady()))
+               OutRunVRStereo::NativeVehicleReplacementBackendReady()))
             return ticket;
         const auto* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
@@ -1306,6 +1307,116 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         }
         return suppressOriginal;
     }
+    // Exact retail 46BF8C -> 469600 cdecl(car,model,variant).
+    // Keep the complete original function; only omit its verified PMT
+    // raster from the private candidate. The live pair is the fallback.
+    static bool NativeReplacementTicketCurrent(
+        const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input) noexcept
+    {
+        using namespace OutRunVR::QuestCockpitV2;
+        const auto* eye=OutRunVRRenderer::GetLatchedStereoFrameView();
+        const auto* player=Game::pl_car();
+        const auto* camera=Game::camera();
+        return Settings::VREnabled&&Settings::VRStereo&&Settings::VRQuestCockpitV2Enabled&&
+            Settings::VRExternalFerrariNativeCallbackReplacement&&
+            NativeFrameTrace().Active()&&NativeFrameTrace().ActiveEpoch()==input.nativeFrame&&
+            eye&&eye->valid&&eye->poseSequence==input.pose&&player&&
+            reinterpret_cast<std::uintptr_t>(player)==input.player&&player->car_id_10==input.carId&&
+            camera&&camera->cam_mode_34A==1&&Game::current_mode&&*Game::current_mode==STATE_GAME&&
+            !InSceneEffect()&&NativeModelPlayer==player;
+    }
+    static bool NativeModelQueueEmpty() noexcept
+    {
+        const auto* q=Module::exe_ptr<const std::uint32_t>(0x464ef8);
+        return QuestCockpitGlassLive::Memory(q,7u*sizeof(std::uint32_t))&&q[0]==0u;
+    }
+    static void __cdecl NativeModelQueueBegin()
+    {
+        using namespace OutRunVR::DinoSidecar;
+        if(auto* replay=ActiveNativeVehicleStockReplay)replay->Open(NativeModelQueueEmpty());
+        Module::fn_ptr<void(__cdecl*)()>(0x52B0)();
+    }
+    static void __cdecl NativeModelQueueEnd()
+    {
+        using namespace OutRunVR::DinoSidecar;
+        Module::fn_ptr<void(__cdecl*)()>(0x52C0)();
+        if(auto* replay=ActiveNativeVehicleStockReplay)replay->Close(NativeModelQueueEmpty());
+    }
+    static void __cdecl OnNativeRaceModel(EVWORK_CAR* player,int model,int variant)
+    {
+        using namespace OutRunVR::DinoSidecar;
+        const auto original=Module::fn_ptr<void(__cdecl*)(EVWORK_CAR*,int,int)>(0x69600);
+        // First runtime integration deliberately uses only exact F50 native
+        // layouts (2/17) in ordinary mode-1, no faded alternate vehicle.
+        if(!NativeModelPlayer||NativeModelPlayer!=player||!player||variant!=0||
+            model!=static_cast<int>(player->car_kind_11)||(model!=2&&model!=17)||
+            !IsF50RetailCarId(player->car_id_10)||(player->flags_4&0xc000u)!=0x4000u||
+            !NativeModelQueueEmpty()||!OutRunVRStereo::NativeVehicleReplacementBackendReady()){
+            original(player,model,variant);return;
+        }
+        auto ticket=PrepareF50External(player);
+        if(!ticket.valid||!GlobalGpu().EnsureResources(ticket.device)){
+            original(player,model,variant);return;
+        }
+        // Never remove a stock dashboard without available replacements.
+        // Embedded bindings or a valid independent overlay are mandatory.
+        auto& overlay=GlobalDashboardGpu();
+        const bool includeDashboard=overlay.SelectionMatches(FerrariModelSlot::GenericId,ticket.carId)&&
+            overlay.Installed();
+        if((includeDashboard&&!overlay.EnsureResources(ticket.device))||
+            (!includeDashboard&&GlobalGpu().HasEmbeddedSpeedAndRpm()!=3u)){
+            original(player,model,variant);return;
+        }
+        ExternalVehicleStageInput input{};
+        input.world=ticket.world;input.centerView=ticket.view;input.centerProjection=ticket.projection;
+        input.dashboard=ticket.dashboard;input.slot=ticket.slot;input.carId=ticket.carId;
+        input.nativeFrame=ticket.nativeFrame;input.pose=ticket.xrPose;input.player=ticket.originalPlayer;
+        input.nativeCurrent=NativeReplacementTicketCurrent;input.includeDashboard=includeDashboard;
+        NativeVehicleStockReplay replay{};
+        if(!OutRunVRStereo::BeginNativeVehicleReplacement(ticket.device,input,replay)){
+            original(player,model,variant);return;
+        }
+        {
+            ScopedNativeVehicleStockReplay stock(replay);
+            original(player,model,variant); // native geometry/side effects exactly once
+        }
+        if(!NativeModelQueueEmpty())replay.failed=true;
+        const auto result=OutRunVRStereo::FinishNativeVehicleReplacement(ticket.device,input,replay);
+        if(Settings::VRExternalFerrariDiag){
+            static thread_local unsigned reports=0;
+            if(reports++<32u||reports%180u==0u)
+                spdlog::info("VR EXTERNAL ATOMIC NATIVE F50: frame={} pose={} model={} groups={}/{} "
+                    "stockOnlyL={} stockOnlyR={} privateStage={} original=RETAINED",
+                    input.nativeFrame,input.pose,model,replay.opened,replay.closed,
+                    replay.omitted[0],replay.omitted[1],static_cast<unsigned>(result));
+        }
+    }
+    static bool InstallNativeModelEdges() noexcept
+    {
+        using namespace OutRunVR::DinoSidecar;
+        // FNV-1a over the actual canonical function excluding the existing
+        // unrelated CalcPeraShadow hook at 469EB4. All seven exact CALL
+        // sites are covered by these ranges before any injection occurs.
+        const auto hash=[](int begin,int end,std::uint64_t expected){
+            const auto* bytes=Module::exe_ptr<const std::uint8_t>(begin);
+            const auto size=static_cast<std::size_t>(end-begin);
+            if(!QuestCockpitGlassLive::Memory(bytes,size))return false;
+            std::uint64_t h=1469598103934665603ull;
+            for(std::size_t i=0;i<size;++i){h^=bytes[i];h*=1099511628211ull;}
+            return h==expected;
+        };
+        if(!hash(0x69600,0x69eb4,0xb5b01a1f8d5c1408ull)||
+            !hash(0x69eb9,0x69fe9,0x94f41ce6fc172df6ull)||
+            !hash(0x6bf84,0x6bf96,0xa3bc29e0b6da25acull)||
+            !hash(0x52b0,0x52bb,0x097648dee5a37d8eull))return false;
+        Memory::VP::InjectHook(Module::exe_ptr(0x6bf8c),OnNativeRaceModel,Memory::HookType::Call);
+        for(int site:{0x697f1,0x698e1,0x69ec1})
+            Memory::VP::InjectHook(Module::exe_ptr(site),NativeModelQueueBegin,Memory::HookType::Call);
+        for(int site:{0x6989a,0x69cc4,0x69fdd})
+            Memory::VP::InjectHook(Module::exe_ptr(site),NativeModelQueueEnd,Memory::HookType::Call);
+        NativeVehicleModelEdgesReady.store(true,std::memory_order_release);
+        return true;
+    }
     static void CallOriginalPlayerWithGlassScope(EVWORK_CAR* player)
     {
         // EXT16-008: retail 49F3E0 calls 46BD30 then 49A650 (RET).
@@ -1319,6 +1430,12 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // on the still-disabled external path, restoring v0.03 frame cost.
         static_assert(!OutRunVR::DinoSidecar::MaySkipRetailPlayerWrapper());
         QuestCockpitGlassLive::PlayerCallback scope(player);
+        // Mark only the original owned player call, not reflections or
+        // unrelated vehicle callbacks. The exact 469600 edge decides stage.
+        struct Owner {EVWORK_CAR* previous;
+            explicit Owner(EVWORK_CAR* p):previous(NativeModelPlayer){NativeModelPlayer=previous?nullptr:p;}
+            ~Owner(){NativeModelPlayer=previous;}
+        } owner(player);
         PlayerCallbackHook.ccall<void>(player);
     }
     static void __cdecl OnPlayerCallback(EVWORK_CAR* player)
@@ -1454,6 +1571,8 @@ public:
         FrameEnterHook=std::move(first);
         FrameEndHook=std::move(last);
         PlayerCallbackHook=std::move(actor);
+        if(!InstallNativeModelEdges())
+            spdlog::warn("VR external atomic native model: canonical model edges unavailable; original retained");
         OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.store(true,std::memory_order_release);
         OutRunVR::GameResetEvents::Configure(&ReleaseExternalBeforeDeviceReset);
         if(!SyncNativeSeatProfile(false) &&
@@ -3015,6 +3134,22 @@ class VRLensFlareProjected2D : public Hook
                         Name(CurrentRenderProducerToken()),
                         QueueRenderActive());
             }
+            // The 469600 model groups begin with an empty queue. Validate
+            // the actual physical entry belongs to that live queue before
+            // letting the private replay omit any native triangles.
+            bool nativeOwned=false;
+            if(auto* replay=OutRunVR::DinoSidecar::ActiveNativeVehicleStockReplay){
+                const auto* q=Module::exe_ptr<const std::uint32_t>(0x464ef8);
+                if(replay->group&&QuestCockpitGlassLive::Memory(q,7u*sizeof(std::uint32_t))&&
+                    q[0]<=q[1]&&q[1]<=0x100u&&q[5]&&entry&&
+                    QuestCockpitGlassLive::Memory(entry,0x3cu)){
+                    const auto base=static_cast<std::uintptr_t>(q[5]);
+                    const auto addr=reinterpret_cast<std::uintptr_t>(entry);
+                    nativeOwned=addr>=base&&addr-base<static_cast<std::uintptr_t>(q[0])*0x3cu&&
+                        (addr-base)%0x3cu==0&&entry[8]<=1u&&entry[5]&&entry[6]&&entry[7];
+                }
+            }
+            OutRunVR::DinoSidecar::ScopedNativeVehiclePhysical stockOnly(nativeOwned);
             Module::fn_ptr<LensOpaquePmtEntryFn>(0x4700)(entry);
             if(queuedSkyIndex>=0 && entry)
                 OutRunVR::WorldSkyOpaqueQueue::Complete(
@@ -3722,6 +3857,7 @@ public:
             Memory::VP::InjectHook(
                 Module::exe_ptr(0x5C44), TraceLensOpaquePmtEntry,
                 Memory::HookType::Call);
+            OutRunVR::DinoSidecar::NativeVehiclePmtConsumerReady.store(true,std::memory_order_release);
         } else {
             spdlog::warn(
                 "VR PMT ENTRY: canonical 405890->404700 call edges mismatch; "

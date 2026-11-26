@@ -1863,6 +1863,7 @@ namespace OutRunVRStereo
         // Physical presentation may not advance the stock PresentEpoch.
         std::uint64_t R7CandidateBoundarySerial=0;
         OutRunVR::DinoSidecar::IsolatedVehicleKey R7StagedVehicle{};
+        OutRunVR::DinoSidecar::IsolatedVehicleKey R7NativeCompletedVehicle{};
         bool R7VehicleStageInFlight=false;
         std::uint64_t R7StagedTransportFaultGeneration=0;
 
@@ -2502,9 +2503,9 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
         {
             using namespace OutRunVR::DinoSidecar;
             const auto& key=R7StagedVehicle;
-            // A4 still owns live admission and stock-only native-body replay.
-            // A stage receipt by itself must not enable the external model.
-            return RuntimeExternalCarAtomicStageReady()&&
+            // Only the actual native model transaction can authorize a
+            // staged pair. The old direct-live external DIP gate stays false.
+            return R7NativeCompletedVehicle.Same(key)&&
                 key.Same({ExternalAtomicCandidates.generation,R7CandidateBoundarySerial,
                     PresentEpoch,key.nativeFrame,FrameStereoPoseSequence,key.player})&&
                 ExternalAtomicReplayEpoch==PresentEpoch&&!R7VehicleStageInFlight&&
@@ -2803,13 +2804,40 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		void NoteRestoreFailure(const char* what){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailureRestoreFailed);++RestoreFailures;if(!FirstRestoreFailureLogged){FirstRestoreFailureLogged=true;spdlog::warn("VR stereo: renderer state restore failed at {}; frame forced to mono fallback",what);}}
         // Candidate UP draws must not expose D3D9's input-unbind side effects.
         // The physical live draw alone owns those effects, even on the right eye.
+        bool R7NativeStockOnlyDraw() noexcept
+        {
+            using namespace OutRunVR::DinoSidecar;
+            auto* replay=ActiveNativeVehicleStockReplay;
+            if(!replay||!replay->group)return false;
+            if(!replay->StockOnly()||replay->key.resource!=ExternalAtomicCandidates.generation||
+                replay->key.boundary!=R7CandidateBoundarySerial||
+                replay->key.present!=PresentEpoch||replay->key.pose!=FrameStereoPoseSequence){
+                replay->failed=true;
+                ExternalAtomicReplayEpoch=0;
+                return false;
+            }
+            return true;
+        }
+        void R7RecordNativeStockOmission(unsigned eye,R7CandidateSeedResult result) noexcept
+        {
+            auto* replay=OutRunVR::DinoSidecar::ActiveNativeVehicleStockReplay;
+            if(!replay)return;
+            if(eye>=2||result!=R7CandidateSeedResult::Seeded||
+                !R7NativeStockOnlyDraw()){replay->failed=true;return;}
+            ++replay->omitted[eye];
+        }
         template<class DrawCall>
         R7CandidateSeedResult R7ReplayInactiveDraw(IDirect3DDevice9* device,
             unsigned eye,IDirect3DSurface9* color,IDirect3DSurface9* depth,
-            DrawCall& drawCall,bool up,bool indexedUp) noexcept
+            DrawCall& drawCall,bool up,bool indexedUp,bool allowStockOnly=true) noexcept
         {
+            const bool stockOnly=allowStockOnly&&R7NativeStockOnlyDraw();
             bool inputRestoreFailed=false;
             auto candidateDraw=[&]() -> HRESULT {
+                // The physical live draw still runs below the caller. Use
+                // the actual attachment transaction to prove both bindings
+                // and restoration, but omit native model triangles privately.
+                if(stockOnly)return S_OK;
                 if(!up)return drawCall();
                 IDirect3DVertexBuffer9* vb=nullptr;
                 IDirect3DIndexBuffer9* ib=nullptr;
@@ -2839,6 +2867,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 return inputRestoreFailed?E_FAIL:hr;
             };
             const auto result=R7ReplayInactiveEye(device,eye,color,depth,candidateDraw);
+            if(stockOnly)R7RecordNativeStockOmission(eye,result);
             if(inputRestoreFailed||result!=R7CandidateSeedResult::Seeded)
                 ExternalAtomicReplayEpoch=0;
             return inputRestoreFailed?R7CandidateSeedResult::DirtyRestore:result;
@@ -2886,7 +2915,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                     LastMainDepthClearStamp.OnPotentialWrite(clearFlags&(D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL));
                 if(eye>=0&&rasterCurrent())
                     result=R7ReplayInactiveDraw(device,
-                        static_cast<unsigned>(eye),rt,depth,drawCall,up,indexedUp);
+                        static_cast<unsigned>(eye),rt,depth,drawCall,up,indexedUp,clearFlags==0);
             }
             ReleaseCom(depth);ReleaseCom(rt);
             if(result!=R7CandidateSeedResult::Seeded||!rasterCurrent())
@@ -4487,6 +4516,68 @@ if(WaitForEventQuery(slot.fence,1,0u))
         });
         if(result!=IsolatedStageResult::Complete||!current())return abort(result);
         R7StagedVehicle={generation,boundary,epoch,input.nativeFrame,input.pose,input.player};
+        return IsolatedStageResult::Complete;
+    }
+
+    bool NativeVehicleReplacementBackendReady() noexcept
+    {
+        using namespace OutRunVR::DinoSidecar;
+        // First integration is restricted to the existing explicit F50/
+        // multicar diagnostic opt-in, DirectGPU (not the SBS compositor),
+        // and the real seeded private replay owner. No legacy live DIP.
+        return NativeVehicleModelEdgesReady.load(std::memory_order_acquire)&&
+            NativeVehiclePmtConsumerReady.load(std::memory_order_acquire)&&
+            StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&
+            (Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel)&&
+            Settings::VRDirectGpuOnly&&HostDirectTransportReady()&&
+            GameplayActive()&&!InternalStereoPass&&!R7VehicleStageInFlight&&
+            !R7CandidateResetInFlight&&R7CandidatePresentBoundaryCovered&&
+            R7CandidateResetBoundaryCovered&&ExternalAtomicReplayEpoch!=0&&
+            ExternalAtomicReplayEpoch==PresentEpoch&&ExternalAtomicCandidates.device&&
+            FrameStereoMetadata.valid&&FrameStereoPoseSequence!=0&&
+            !FrameStereoIncomplete&&!FrameRightDrawFailed&&TargetIsBackBuffer()&&
+            !AnyAuxRenderTargetActive()&&!OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)&&
+            ActiveOcclusionQueries.load(std::memory_order_acquire)==0&&
+            !OutRunVR::State::StateBlockTracker::Recording()&&
+            !ActiveNativeVehicleStockReplay;
+    }
+    bool BeginNativeVehicleReplacement(IDirect3DDevice9* device,
+        const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input,
+        OutRunVR::DinoSidecar::NativeVehicleStockReplay& replay) noexcept
+    {
+        using namespace OutRunVR::DinoSidecar;
+        if(!NativeVehicleReplacementBackendReady()||!IsGameDevice(device)||
+            ExternalAtomicCandidates.device!=device||!input.nativeCurrent||
+            !input.nativeCurrent(input)||!NativeVehicleReplacementBackendReady()||
+            FrameStereoPoseSequence!=input.pose||!input.nativeFrame||!input.player||
+            R7StagedVehicle.present==PresentEpoch)return false;
+        replay={};
+        replay.key={ExternalAtomicCandidates.generation,R7CandidateBoundarySerial,
+            PresentEpoch,input.nativeFrame,input.pose,input.player};
+        return true;
+    }
+    OutRunVR::DinoSidecar::IsolatedStageResult FinishNativeVehicleReplacement(
+        IDirect3DDevice9* device,const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input,
+        const OutRunVR::DinoSidecar::NativeVehicleStockReplay& replay) noexcept
+    {
+        using namespace OutRunVR::DinoSidecar;
+        const IsolatedVehicleKey now{ExternalAtomicCandidates.generation,R7CandidateBoundarySerial,
+            PresentEpoch,input.nativeFrame,input.pose,input.player};
+        auto discard=[&](){
+            // Only retire the frame whose native model was omitted; a reset
+            // may already have installed a different replay generation.
+            if(replay.key.resource==ExternalAtomicCandidates.generation&&
+                replay.key.present==PresentEpoch)ExternalAtomicReplayEpoch=0;
+            R7NativeCompletedVehicle={};
+        };
+        if(!replay.Ready()||!replay.key.Same(now)||!NativeVehicleReplacementBackendReady()){
+            discard();return IsolatedStageResult::Unavailable;
+        }
+        const auto result=StageExternalVehiclePair(device,input);
+        if(result!=IsolatedStageResult::Complete||!R7StagedVehicle.Same(replay.key)){
+            discard();return result==IsolatedStageResult::DirtyRestore?result:IsolatedStageResult::Unavailable;
+        }
+        R7NativeCompletedVehicle=R7StagedVehicle;
         return IsolatedStageResult::Complete;
     }
 

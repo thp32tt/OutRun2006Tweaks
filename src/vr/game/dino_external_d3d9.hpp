@@ -33,6 +33,7 @@
 #include "external_car_stereo_receipt.hpp"
 #include "external_car_atomic_precommit.hpp"
 #include "external_car_isolated_transaction.hpp"
+#include "external_car_native_stock_replay.hpp"
 #include "external_car_stereo_retry.hpp"
 #include "render_semantics.hpp"
 
@@ -1015,6 +1016,15 @@ inline GpuOwner& GlobalDashboardGpu() noexcept {
 } // OutRunVR::DinoSidecar
 
 namespace OutRunVRStereo {
+// Native replacement is deliberately separate from the permanently disabled
+// legacy live-DIP path. Admission requires an actual private scene receipt.
+bool NativeVehicleReplacementBackendReady() noexcept;
+bool BeginNativeVehicleReplacement(IDirect3DDevice9* device,
+    const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input,
+    OutRunVR::DinoSidecar::NativeVehicleStockReplay& replay) noexcept;
+OutRunVR::DinoSidecar::IsolatedStageResult FinishNativeVehicleReplacement(
+    IDirect3DDevice9* device,const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input,
+    const OutRunVR::DinoSidecar::NativeVehicleStockReplay& replay) noexcept;
 // A1/A2: renders the selected body/optional dashboard into the existing
 // replayed private scene pair. Never changes the live render target pixels.
 OutRunVR::DinoSidecar::IsolatedStageResult StageExternalVehiclePair(

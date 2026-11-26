@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test external_car_dds_upload_test external_car_mesh_upload_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test external_car_isolated_transaction_test depth_clear_replay_stamp_test stereo_lower_draw_result_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test r84_fixed_sprite_preflight_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test external_car_dds_upload_test external_car_mesh_upload_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test external_car_isolated_transaction_test external_car_native_stock_replay_test depth_clear_replay_stamp_test stereo_lower_draw_result_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test r84_fixed_sprite_preflight_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -57,7 +57,7 @@ jobs:
           # the atomic two-eye owner has not been implemented and admitted.
           assert 'MayPrepareExternalCarAssets(' in between
           guard=between.index('MayPrepareExternalCarAssets(')
-          assert 'RuntimeExternalCarAtomicStageReady()' in between[guard:guard+200]
+          assert 'NativeVehicleReplacementBackendReady()' in between[guard:guard+200]
           for costly in ('GetLatchedStereoFrameView()', 'Game::D3DDevice()',
                          'GlobalGpu()', 'SelectSidecar(', 'SafeFloorLift('):
               assert guard < between.index(costly), costly
@@ -96,6 +96,12 @@ jobs:
           assert 'DrawPreparedF50External(f50)' not in player_wrapper
           assert 'return;' not in player_wrapper
           assert player_wrapper.count('PlayerCallbackHook.ccall<void>(player);') == 1
+          model=source[source.index('static void __cdecl OnNativeRaceModel('):source.index('static bool InstallNativeModelEdges(')]
+          assert 'PrepareF50External(player)' in model and 'BeginNativeVehicleReplacement(' in model
+          assert 'ScopedNativeVehicleStockReplay stock(replay);' in model
+          assert model.index('ScopedNativeVehicleStockReplay stock(replay);') < model.index('original(player,model,variant); // native geometry') < model.index('FinishNativeVehicleReplacement(')
+          assert 'ScopedNativeVehiclePhysical stockOnly(nativeOwned);' in source
+          assert 'NativeVehiclePmtConsumerReady.store(true,' in source
           glass_scope=source[source.index('struct PlayerCallback {'):source.index('static bool HasDeferredOwner(')]
           assert 'PlayerOwnerScope owner{CurrentPlayerOwner};' in glass_scope
           assert 'owner.Admit(epoch);' in glass_scope
@@ -218,7 +224,7 @@ jobs:
           assert native.index('if(isolated) {', native.index('SortGlassBackToFront(')) < native.index('ExternalStereoMeshReceipt physical{};')
           assert 'isolated->draw(isolated->context,m.vertexCount,m.indexCount/3)' in native
           assert 'StageWholeIsolatedVehicle(current,' in r7
-          stage=r7[r7.index('IsolatedStageResult StageExternalVehiclePair('):r7.index('void R7SetDirectResetRasterOwner(')]
+          stage=r7[r7.index('IsolatedStageResult StageExternalVehiclePair('):r7.index('bool NativeVehicleReplacementBackendReady()')]
           assert 'R7SeedInactivePair(ExternalAtomicCandidates,device,' in stage
           assert 'DrawIndexedPrimitiveHook.stdcall<HRESULT>(' in stage
           assert 'body.DrawNativeScene(' in stage and 'dash.DrawNativeScene(' in stage

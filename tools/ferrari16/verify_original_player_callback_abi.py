@@ -67,6 +67,32 @@ def extract_canonical_exe(path: Path, va: int = CALLER, count_bytes: int = len(P
     raise ValueError("49F3E0 is unmapped in canonical EXE")
 
 
+MODEL_EDGES = {
+    0x46BF8C: 0x469600,
+    0x4697F1: 0x4052B0, 0x4698E1: 0x4052B0, 0x469EC1: 0x4052B0,
+    0x46989A: 0x4052C0, 0x469CC4: 0x4052C0, 0x469FDD: 0x4052C0,
+}
+MODEL_HASHES = (
+    (0x469600, 0x469EB4, 0xB5B01A1F8D5C1408),
+    (0x469EB9, 0x469FE9, 0x94F41CE6FC172DF6),
+    (0x46BF84, 0x46BF96, 0xA3BC29E0B6DA25AC),
+    (0x4052B0, 0x4052BB, 0x097648DEE5A37D8E),
+)
+def fnv64(blob: bytes) -> int:
+    h = 1469598103934665603
+    for v in blob:
+        h = ((h ^ v) * 1099511628211) & 0xffffffffffffffff
+    return h
+
+def verify_model_edges(path: Path) -> None:
+    for va, target in MODEL_EDGES.items():
+        if rel_target(extract_canonical_exe(path, va, 5), 0, va) != target:
+            raise ValueError(f"native model edge mismatch {va:x}")
+    for begin, end, digest in MODEL_HASHES:
+        if fnv64(extract_canonical_exe(path, begin, end-begin)) != digest:
+            raise ValueError(f"native model bytes mismatch {begin:x}")
+    print("EXT16_A4_EXACT_NATIVE_MODEL_QUEUE_EDGES_PASS")
+
 def self_test() -> None:
     verify(PREFIX)
     verify_followup(bytes.fromhex("c3"))
@@ -111,6 +137,7 @@ def main() -> None:
         # The decompiled PC x86 build identifies 49A650 as a bare RET.
         # Its identity does not turn 46BD30/469600 into a body-only leaf.
         verify_followup(extract_canonical_exe(options.exe, FOLLOWUP, 1))
+        verify_model_edges(options.exe)
         print("EXT16_008_EXACT_SHA_PE32_WRAPPER_TWO_CALL_EDGES_PASS",
               hex(CALLER), hex(FIRST), hex(FOLLOWUP))
     if not options.self_test and options.exe is None:

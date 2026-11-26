@@ -473,7 +473,7 @@ int main() {
 '''
 with tempfile.TemporaryDirectory() as directory:
     p = Path(directory)
-    (p / "probe.cpp").write_text(prefix + helper + raw_vb + raw + base_dispatch_stub + base_entrypoints + suffix)
+    (p / "probe.cpp").write_text(prefix + helper + "bool R7NativeStockOnlyDraw(){return false;}\nvoid R7RecordNativeStockOmission(unsigned,R7CandidateSeedResult){}\n"+raw_vb + raw + base_dispatch_stub + base_entrypoints + suffix)
     subprocess.run(["g++", "-std=c++17", "-O2", "-Wall", "-Wextra",
                     "-Werror", "-pedantic", "-I", str(root / "src/vr/d3d9"),
                     str(p / "probe.cpp"), "-o", str(p / "probe")], check=True)

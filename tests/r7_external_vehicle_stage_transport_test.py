@@ -15,7 +15,7 @@ seed=r7[a:r7.index("// A successful seed is ONLY",a)]
 a=r7.index("struct R7StagedTransfer")
 transfer=r7[a:r7.index("bool ResolveDirectTransport(",a)]
 a=r7.index("OutRunVR::DinoSidecar::IsolatedStageResult StageExternalVehiclePair(")
-stage=r7[a:r7.index("void R7SetDirectResetRasterOwner(",a)]
+stage=r7[a:r7.index("bool NativeVehicleReplacementBackendReady()",a)]
 a=gpu.index("struct IsolatedEyeRaster")
 types=gpu[a:gpu.index("class GpuOwner",a)]
 stub=r'''
@@ -140,7 +140,7 @@ gpu_stub=r'''
     MockGpu& GlobalGpu(){static MockGpu g{3,false};return g;}
     MockGpu& GlobalDashboardGpu(){static MockGpu g{2,true};return g;}
 }
-OutRunVR::DinoSidecar::IsolatedVehicleKey R7StagedVehicle{};
+OutRunVR::DinoSidecar::IsolatedVehicleKey R7StagedVehicle{},R7NativeCompletedVehicle{};
 '''
 cases=r'''
 using namespace OutRunVR::DinoSidecar;
@@ -170,7 +170,11 @@ struct Fixture {
         input.nativeFrame=12;input.pose=7;input.player=55;input.includeDashboard=true;
         input.nativeCurrent=[](const ExternalVehicleStageInput&) noexcept {return nativeValid;};
     }
-    IsolatedStageResult Stage(){return StageExternalVehiclePair(&d,input);}
+    IsolatedStageResult Stage(){
+        const auto r=StageExternalVehiclePair(&d,input);
+        R7NativeCompletedVehicle=(r==IsolatedStageResult::Complete&&allowPublication)?R7StagedVehicle:IsolatedVehicleKey{};
+        return r;
+    }
     R7StagedTransfer Transfer(){return R7TransferStagedVehicle(&d,slot,&stock[0],&stock[1],D3DTEXF_NONE);}
     void LiveUnchanged(){assert(!stock[0].draws&&!stock[1].draws&&!stockZ[0].draws&&!stockZ[1].draws);}
     void Restored(){assert(d.rt==&stock[0]&&d.depth==&stockZ[0]&&!InternalStereoPass&&!R7VehicleStageInFlight);}
@@ -190,7 +194,7 @@ int main(){
     }
     {Fixture f;overlayDirty=true;assert(f.Stage()==IsolatedStageResult::DirtyRestore&&rawCalls==5&&restoreErrors==1);f.Restored();++cases;}
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);assert(f.Stage()==IsolatedStageResult::Unavailable&&rawCalls==10&&!f.Transfer().handled);++cases;}
-    {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);allowPublication=false;assert(!f.Transfer().handled&&!copyCalls);++cases;}
+    {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);allowPublication=false;R7NativeCompletedVehicle={};assert(!f.Transfer().handled&&!copyCalls);++cases;}
     for(unsigned fault=1;fault<=2;++fault){
         Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);copyFail=fault;
         auto t=f.Transfer();assert(t.handled&&SUCCEEDED(t.hr)&&f.output[0].pixels==1&&f.output[1].pixels==1&&fenceCalls==1);

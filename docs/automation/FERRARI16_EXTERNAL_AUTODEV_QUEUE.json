@@ -4537,9 +4537,11 @@
       },
       {
         "id": "A4",
-        "status": "PENDING",
+        "status": "IN_PROGRESS",
         "deliverable": "Wire native player callback body-only replacement at proven x86 leaf (46BD30/469600 trace), preserve passengers/shadows/dashboard/stock side effects; actual production caller for Prepare/DrawPrepared or successor. Enable ONLY opt-in on dedicated branch via live backend capability proof.",
-        "gate": "No unconditional false->true or fake proof; original native body exactly once on abort and not over external success. Menu/other players/reflections excluded; positive and negative integration tests using actual code."
+        "gate": "No unconditional false->true or fake proof; original native body exactly once on abort and not over external success. Menu/other players/reflections excluded; positive and negative integration tests using actual code.",
+        "implementation_state": "NATIVE_MODEL_QUEUE_OWNER_CONNECTED_F50_EXPERIMENTAL",
+        "evidence": "Canonical EXE SHA 68ceb386... verified locally on user's N100 (read-only disassembly, no binary transfer). Exact 46BF8C->469600 and three 4052B0/4052C0 groups; retain original callback and model function, omit only physical PMT draw in private candidate, require three closed groups + equal eye omissions, then stage and publish only matching native receipt. F50 layouts 2/17 only, explicit opt-in/DirectGPU and available dashboard required. New source + CI pending; no runtime claim. A1-A4 still IN_PROGRESS until real source integration/CI and runtime coverage evidence."
       },
       {
         "id": "A5",
@@ -4591,7 +4593,7 @@
         "A2",
         "A3"
       ],
-      "note": "A1-A3 production backend batch integrated inactive; next implement actual native body-only leaf and stock-only replay ownership. Do not restart micro-fix-only A1 loops. No activation/acceptance without A1-A4 integration and exact-SHA gates."
+      "note": "A1-A4 first F50 native model owner integrated; next exact SHA compile/real candidate replay coverage, one-car test package. Do not re-enter unrelated A1 micro-loop. No release promotion."
     }
   },
   "development_batch_policy": {
