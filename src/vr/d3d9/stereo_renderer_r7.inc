@@ -1865,6 +1865,28 @@ namespace OutRunVRStereo
         void ReleaseStereoResources();
         void R9RetireDirectResetResources() noexcept;
 
+        // Both classic Reset owners may physically enter ResetEx. Keep the
+        // host's reset event single-owner for the entire synchronous call.
+        thread_local unsigned R7ResetNotificationDepth=0;
+        struct R7ResetNotificationScope
+        {
+            const bool outermost;
+            bool notified=false;
+            R7ResetNotificationScope() noexcept
+                : outermost(R7ResetNotificationDepth++==0) {}
+            ~R7ResetNotificationScope(){--R7ResetNotificationDepth;}
+            R7ResetNotificationScope(const R7ResetNotificationScope&)=delete;
+            R7ResetNotificationScope& operator=(const R7ResetNotificationScope&)=delete;
+            void Notify()
+            {
+                if(outermost&&!notified){
+                    notified=true;
+                    OutRunVRRenderer::NotifyGameReset();
+                }
+            }
+        };
+        void R7RetireDirectResetFrameIdentity();
+
         // R13's normal reset path retires core attachments before calling
         // ResetEx. A direct call can still reach the driver with the old
         // backbuffer, right eye and shared transport generation retained.
@@ -1895,6 +1917,7 @@ namespace OutRunVRStereo
             if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))
                 return CandidateResetExHook.stdcall<HRESULT>(device,params,fullscreen);
             ++R7CandidateResetInFlight;
+            R7ResetNotificationScope notification;
             // R33 is a separate translation unit in the normal R84 build.
             // Invalidate its borrowed raster/depth caches on both sides of
             // the physical call; callbacks during ResetEx may refill them.
@@ -1914,6 +1937,12 @@ namespace OutRunVRStereo
             if(const auto retire=R7DirectResetTransportOwner.load(std::memory_order_acquire))
                 retire();
             if(!R7RetireDirectResetCore())ExternalAtomicCandidates.Reset();
+            // The classic owners already retired the host/frame identity.
+            // Direct ResetEx must do the same even with no core resources.
+            if(notification.outermost){
+                notification.Notify();
+                R7RetireDirectResetFrameIdentity();
+            }
             // ReleaseStereoResources also clears the allocation attempt epoch.
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             const HRESULT hr=CandidateResetExHook.stdcall<HRESULT>(device,params,fullscreen);
@@ -2675,6 +2704,30 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		{
 			if(!EnsureRenderFrameState())return;const std::uint32_t slotIndex=frameId?(frameId-1u)%OutRunVR::RenderFrameRingSize:(RenderFrameRing->latestSlot+1u)%OutRunVR::RenderFrameRingSize;auto&frame=RenderFrameRing->slots[slotIndex];LONG seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));if((seq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));MemoryBarrier();frame.magic=OutRunVR::RenderFrameMagic;frame.protocolVersion=OutRunVR::RenderFrameProtocolVersion;frame.structSize=sizeof(frame);frame.clientPid=GetCurrentProcessId();frame.state=state;frame.frameId=frameId;frame.sourcePoseSequence=sourcePoseSequence;frame.presentationMode=GameplayActive()?OutRunVR::PresentationGameplay:OutRunVR::PresentationTheater;frame.flags=presentInFlight?OutRunVR::RenderFramePresentInFlight:0;frame.failureReason=static_cast<std::uint32_t>(failureReason);const bool directSizedFrame=directTransport&&DirectTransportResourcesReady&&DirectTransportWidth&&DirectTransportHeight;frame.backbufferWidth=directSizedFrame?DirectTransportWidth:BackBufferDesc.Width;frame.backbufferHeight=directSizedFrame?DirectTransportHeight:BackBufferDesc.Height;frame.presentQpc=presentQpc;std::memset(frame.eye,0,sizeof(frame.eye));std::memset(frame.reserved,0,sizeof(frame.reserved));frame.reserved[OutRunVR::RenderFrameRunGenerationIndex]=RenderFrameRunGeneration;WriteGameBuildTag(frame);WriteGameMirrorClientRect(frame);frame.reserved[OutRunVR::RenderFrameCadenceRequestIndex]=OutRunVRRenderer::GetActiveCadenceRequestId();if(OutRunVR::Pacing::Enabled()&&!presentInFlight&&frameId){LARGE_INTEGER published{};QueryPerformanceCounter(&published);OutRunVR::Pacing::StampPublished(frame,published.QuadPart,false);}if(directTransport&&DirectTransportResourcesReady&&ActiveDirectTransportSlot<DirectTransportSlots.size()){const auto&transport=DirectTransportSlots[ActiveDirectTransportSlot];if(transport.leftHandle&&transport.rightHandle&&transport.frameId==frameId){frame.flags|=OutRunVR::RenderFrameDirectGpuTransport;frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.leftHandle));frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.rightHandle));frame.reserved[OutRunVR::RenderFrameDirectWidthIndex]=DirectTransportWidth;frame.reserved[OutRunVR::RenderFrameDirectHeightIndex]=DirectTransportHeight;frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]=static_cast<std::uint32_t>(DirectTransportFormat);frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex]=DirectTransportGeneration;frame.reserved[OutRunVR::RenderFrameDirectSlotIndex]=ActiveDirectTransportSlot;}}if(!presentInFlight&&state==OutRunVR::StereoSbsActive&&stereo&&stereo->valid&&frameId){const std::uint32_t transportFlag=frame.flags&OutRunVR::RenderFrameDirectGpuTransport;frame.flags=transportFlag|OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;for(int eye=0;eye<2;++eye){std::memcpy(frame.eye[eye].orientation,stereo->effectiveEyeOrientation[eye],sizeof(frame.eye[eye].orientation));std::memcpy(frame.eye[eye].position,stereo->effectiveEyePosition[eye],sizeof(frame.eye[eye].position));frame.eye[eye].fov=stereo->eyeFov[eye];}}MemoryBarrier();seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));if(seq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));LONG ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));if((ringSeq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));MemoryBarrier();RenderFrameRing->clientPid=GetCurrentProcessId();RenderFrameRing->latestSlot=slotIndex;MemoryBarrier();ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));if(ringSeq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
 		}
+
+        void R7RetireDirectResetFrameIdentity()
+        {
+            // Do not reuse the pre-reset pose or certify a frame spanning reset.
+            // Ex can retain D3D state: do not invent a fresh viewport/depth proof.
+            if(++PresentEpoch==0)PresentEpoch=1;
+            QuestNativePairLatch={};
+            LastMainDepthClearStamp.Invalidate();
+            LastMainDepthClearZ=1.0f;
+            LastMainDepthClearStencil=0;
+            LastMainDepthClearDesc={};
+            LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();
+            InvalidateTrackedRenderStates();
+            FrameHadDuplicatedDraw=false;
+            FrameHadWorldStereo=false;
+            FrameRightDrawFailed=false;
+            FrameStereoPoseSequence=0;
+            FrameStereoMetadata={};
+            FramePoseMismatchLogged=false;
+            PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);
+            PublishStereoState(OutRunVR::StereoDisabled,false,0,0);
+            PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,
+                OutRunVR::StereoFailureResourceUnavailable,nullptr);
+        }
 
 		struct ScreenVertex{float x,y,z,rhw;float u,v;};
 		bool DrawTextureHalf(IDirect3DDevice9* device,IDirect3DTexture9* texture,bool right){if(!texture||!BackBufferDesc.Width||!BackBufferDesc.Height)return false;const float x0=right?static_cast<float>(BackBufferDesc.Width/2):0.0f;const float x1=right?static_cast<float>(BackBufferDesc.Width):static_cast<float>(BackBufferDesc.Width/2);const float y0=0.0f,y1=static_cast<float>(BackBufferDesc.Height);const ScreenVertex vertices[4]={{x0-0.5f,y0-0.5f,0.0f,1.0f,0.0f,0.0f},{x1-0.5f,y0-0.5f,0.0f,1.0f,1.0f,0.0f},{x0-0.5f,y1-0.5f,0.0f,1.0f,0.0f,1.0f},{x1-0.5f,y1-0.5f,0.0f,1.0f,1.0f,1.0f}};if(FAILED(device->SetTexture(0,texture)))return false;return SUCCEEDED(device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP,2,vertices,static_cast<UINT>(sizeof(ScreenVertex))));}
@@ -3621,7 +3674,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};ExternalAtomicReplayEpoch=0;if(++PresentEpoch==0)PresentEpoch=1;return hr;
 		}
 
-		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();R7ForgetAutomaticDepthProof();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;QuestNativePairLatch={};LastMainDepthClearStamp.Invalidate();LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else {hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr))R7CaptureFreshAutomaticDepth(device);}if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
+		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);R7ResetNotificationScope notification;InvalidateTrackedRenderStates();notification.Notify();R7ForgetAutomaticDepthProof();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;QuestNativePairLatch={};LastMainDepthClearStamp.Invalidate();LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else {hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr))R7CaptureFreshAutomaticDepth(device);}if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
 
 		constexpr std::uint32_t StereoInstallPending = 0;
 		constexpr std::uint32_t StereoInstallReady = 1;

@@ -733,6 +733,10 @@ with tempfile.TemporaryDirectory() as temp:
 # Iter80: ResetEx may bypass classic Reset resource retirement.
 reset_ex=source[source.index("HRESULT __stdcall R7CandidateResetExDest("):
                 source.index("// Direct PresentEx can bypass")]
+reset_notification=source[source.index("thread_local unsigned R7ResetNotificationDepth=0;"):
+                          source.index("void R7RetireDirectResetFrameIdentity();")]
+reset_frame=source[source.index("void R7RetireDirectResetFrameIdentity()\n"):
+                   source.index("struct ScreenVertex{")]
 reset_ex_stub=r'''
 #include <cassert>
 #include <atomic>
@@ -777,9 +781,38 @@ IDirect3DDevice9Ex* expectedDevice=nullptr;
 D3DPRESENT_PARAMETERS* expectedParams=nullptr;
 D3DDISPLAYMODEEX* expectedMode=nullptr;
 HRESULT result=0;
+unsigned hostResets=0,framePublications=0,stereoPublications=0,renderInvalidations=0;
+namespace OutRunVRRenderer {
+    void NotifyGameReset(){++hostResets;}
+    std::uint64_t GetBeginSceneCallCount(){return 17;}
+}
+namespace OutRunVR {
+    constexpr int StereoDisabled=0,StereoFailureResourceUnavailable=7;
+}
+struct Stamp{bool valid=true;void Invalidate(){valid=false;}} LastMainDepthClearStamp;
+struct Identity{int value=0;} QuestNativePairLatch,LastMainDepthClearDesc,FrameStereoMetadata;
+float LastMainDepthClearZ=0;
+unsigned LastMainDepthClearStencil=5,FrameStereoPoseSequence=42;
+std::uint64_t LastBeginSceneCountAtPresent=3;
+bool FrameHadDuplicatedDraw=true,FrameHadWorldStereo=true,FrameRightDrawFailed=true;
+bool FramePoseMismatchLogged=true,FrameStereoIncomplete=false;
+void InvalidateTrackedRenderStates(){++renderInvalidations;}
+void PoisonFrame(int reason){assert(reason==OutRunVR::StereoFailureResourceUnavailable);FrameStereoIncomplete=true;}
+void PublishStereoState(int state,bool world,unsigned pose,unsigned frame){
+    assert(state==0&&!world&&!pose&&!frame);++stereoPublications;
+}
+void PublishRenderFrame(int state,unsigned frame,unsigned pose,int qpc,int reason,void* stereo){
+    assert(state==0&&!frame&&!pose&&!qpc&&reason==7&&!stereo);
+    assert(FrameStereoIncomplete&&FrameStereoPoseSequence==0&&QuestNativePairLatch.value==0);
+    ++framePublications;
+}
+bool classic=false;
 struct Hook{
     template<class R> R stdcall(IDirect3DDevice9Ex* d,D3DPRESENT_PARAMETERS* p,D3DDISPLAYMODEEX* m){
         ++calls;assert(d==expectedDevice&&p==expectedParams&&m==expectedMode);
+        assert(hostResets==unsigned(owned||classic));
+        assert(framePublications==unsigned(owned&&!classic));
+        assert(stereoPublications==framePublications);
         const bool rasterOwned=owned&&bool(R7DirectResetRasterOwner.load());
         assert(lifecycleCalls==unsigned(owned&&bool(R7DirectResetLifecycleOwner.load())));
         assert(rasterRetires==unsigned(rasterOwned)&&rasterValid!=rasterOwned);
@@ -791,7 +824,7 @@ struct Hook{
         if(owned){
             assert(!allocated&&resets==1&&proof==2&&R7CandidateResetInFlight==1);
             assert(ExternalAtomicReplayEpoch==0&&ExternalAtomicAllocationAttemptEpoch==PresentEpoch);
-            if(nested){PresentEpoch=1;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=1;}
+            if(nested){R7ResetNotificationScope inner;inner.Notify();PresentEpoch=1;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=1;}
         }else{
             assert(allocated&&resets==0&&proof==1&&R7CandidateResetInFlight==0);
         }
@@ -803,7 +836,8 @@ reset_ex_cases=r'''
 int main(){
     IDirect3DDevice9Ex game,other;other.game=false;
     D3DPRESENT_PARAMETERS pp{7};D3DDISPLAYMODEEX mode{8};
-    for(unsigned mask=0;mask<4096;++mask){
+    for(unsigned mask=0;mask<8192;++mask){
+        classic=mask&4096;
         R7DirectResetLifecycleOwner=(mask&2048)?Lifecycle:nullptr;
         R7DirectResetRasterOwner=(mask&1024)?RetireRaster:nullptr;
         R7DirectResetBaselineOwner=(mask&512)?RetireBaseline:nullptr;
@@ -816,19 +850,38 @@ int main(){
         const std::uint64_t initialReplay=(mask&128)?9:0;
         PresentEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=initialReplay;
         R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;baselineRetires=0;rasterRetires=0;rasterValid=true;allocated=true;lifecycleCalls=0;lifecycleResult=123;
-        assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
-        assert(calls==1&&R7CandidateResetInFlight==0);
+        hostResets=0;framePublications=0;stereoPublications=0;renderInvalidations=0;
+        QuestNativePairLatch={3};LastMainDepthClearStamp.valid=true;LastMainDepthClearDesc={4};
+        FrameStereoMetadata={5};FrameStereoPoseSequence=42;LastBeginSceneCountAtPresent=3;
+        LastMainDepthClearZ=0;LastMainDepthClearStencil=5;
+        FrameHadDuplicatedDraw=true;FrameHadWorldStereo=true;FrameRightDrawFailed=true;
+        FramePoseMismatchLogged=true;FrameStereoIncomplete=false;
+        if(classic){
+            R7ResetNotificationScope outer;outer.Notify();
+            assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
+            outer.Notify(); // idempotent even if owner attempts to notify again
+        }else assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
+        assert(calls==1&&R7CandidateResetInFlight==0&&R7ResetNotificationDepth==0);
+        const bool direct=owned&&!classic;
+        assert(hostResets==unsigned(owned||classic));
+        assert(framePublications==unsigned(direct)&&renderInvalidations==unsigned(direct));
+        assert(FrameStereoIncomplete==direct&&FrameStereoPoseSequence==(direct?0u:42u));
+        assert(QuestNativePairLatch.value==(direct?0:3)&&LastMainDepthClearStamp.valid!=direct);
+        assert(FrameStereoMetadata.value==(direct?0:5)&&LastMainDepthClearDesc.value==(direct?0:4));
+        assert(LastMainDepthClearZ==(direct?1.0f:0.0f)&&LastMainDepthClearStencil==(direct?0u:5u));
+        assert(LastBeginSceneCountAtPresent==(direct?17u:3u));
+        assert(FrameHadDuplicatedDraw!=direct&&FrameHadWorldStereo!=direct&&FrameRightDrawFailed!=direct&&FramePoseMismatchLogged!=direct);
         const bool rasterOwned=owned&&bool(R7DirectResetRasterOwner.load());
         assert(rasterRetires==(rasterOwned?2u:0u)&&rasterValid!=rasterOwned);
         const bool lifecycleOwned=owned&&bool(R7DirectResetLifecycleOwner.load());
         assert(lifecycleCalls==(lifecycleOwned?2u:0u));
         assert(lifecycleResult==(lifecycleOwned?result:123));
-        assert(PresentEpoch==(owned&&nested?1u:9u));
+        assert(PresentEpoch==(owned&&nested?1u:(direct?10u:9u)));
         assert(ExternalAtomicReplayEpoch==(owned?0:initialReplay));
         assert(ExternalAtomicAllocationAttemptEpoch==(owned?PresentEpoch:0));
         assert(resets==(owned?1u:0u)&&proof==(owned?3u:1u)&&allocated==!owned);
     }
-    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 4096\n";
+    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 8192\n";
 }
 '''
 assert "ResetExVtableIndex = 132;" in source
@@ -839,7 +892,7 @@ assert "R7CandidateResetInFlight||ExternalAtomicAllocationAttemptEpoch==PresentE
 with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"reset_ex.cpp"
     exe=Path(temp)/"reset_ex"
-    cpp.write_text(reset_ex_stub+reset_ex+reset_ex_cases)
+    cpp.write_text(reset_ex_stub.replace('struct Hook{',reset_notification+reset_frame+'struct Hook{',1)+reset_ex+reset_ex_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
 
@@ -1368,3 +1421,13 @@ with tempfile.TemporaryDirectory() as temp:
     cpp.write_text(r32_stub+r32_identity+r32_reset+r32_direct+r32_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
+
+# Iter88: both classic owners hold the same notification scope through the physical call.
+r13_reset=Path("src/vr/d3d9/stereo_renderer_r13.cpp").read_text()
+r13_pre=r13_reset[r13_reset.index("void R13ResetCommonPre("):r13_reset.index("HRESULT __stdcall ResetDestR13(")]
+r13_dest=r13_reset[r13_reset.index("HRESULT __stdcall ResetDestR13("):r13_reset.index("template <typename DrawCall>",r13_reset.index("HRESULT __stdcall ResetDestR13("))]
+assert "notification.Notify();" in r13_pre and "QuestNativePairLatch = {};" in r13_pre
+assert r13_dest.index("R7ResetNotificationScope notification;") < r13_dest.index("R13ResetCommonPre(device,notification);") < r13_dest.index("ResetCompatDevice(device, params, hr)")
+classic_reset=source[source.index("HRESULT __stdcall ResetDest("):source.index("constexpr std::uint32_t StereoInstallPending")]
+assert classic_reset.index("R7ResetNotificationScope notification;") < classic_reset.index("notification.Notify();") < classic_reset.index("ResetCompatDevice(device,params,hr)")
+assert reset_ex.index("notification.Notify();") < reset_ex.index("R7RetireDirectResetFrameIdentity();") < reset_ex.rindex("CandidateResetExHook.stdcall<HRESULT>")

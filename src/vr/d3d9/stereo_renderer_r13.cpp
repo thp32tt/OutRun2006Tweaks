@@ -389,7 +389,7 @@ namespace OutRunVRStereo
             return true;
         }
 
-        void R13ResetCommonPre(IDirect3DDevice9*)
+        void R13ResetCommonPre(IDirect3DDevice9*,R7ResetNotificationScope& notification)
         {
             R13ForceMonoShadow = false;
             R13DirectCopyPathRejected = false;
@@ -402,7 +402,7 @@ namespace OutRunVRStereo
             R9ExpectMainDepthAfterReset = true;
             R9FirstFailureEpoch = 0;
 
-            OutRunVRRenderer::NotifyGameReset();
+            notification.Notify();
             // The dedicated host ACK mapping is transport-run state, not a
             // process-lifetime cache. Drop our view/handle at ResetEx so a
             // recreated host/generation is observed through a fresh named
@@ -421,6 +421,7 @@ namespace OutRunVRStereo
             FirstMainClearLogged = false;
             FirstDepthBootstrapLogged = false;
             PresentEpoch = 1;
+            QuestNativePairLatch = {};
             LastMainDepthClearStamp.Invalidate();
             LastMainDepthClearZ = 1.0f;
             LastMainDepthClearStencil = 0;
@@ -453,7 +454,8 @@ namespace OutRunVRStereo
                 return R13ResetR9Hook.stdcall<HRESULT>(device, params);
 
             OutRunVRD3D9ExUpgradeR13::DisarmLegacyResetHook();
-            R13ResetCommonPre(device);
+            R7ResetNotificationScope notification;
+            R13ResetCommonPre(device,notification);
 
             HRESULT hr = D3DERR_INVALIDCALL;
             if (!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device, params, hr))
