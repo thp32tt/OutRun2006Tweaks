@@ -209,7 +209,7 @@ jobs:
           assert 'if (hr != E_NOTIMPL)' not in screen
           native=gpu[gpu.index('GpuDrawResult DrawNativeScene('):gpu.index('inline GpuOwner& GlobalGpu()')]
           route=native.index('!ConfigureExternalTextureRouting(')
-          assert native.index('saved->Capture()') < route < native.index('if(SUCCEEDED(hr))for(unsigned pass=0;')
+          assert native.index('saved->Capture()') < route < native.index('if(SUCCEEDED(hr))for(unsigned pass=phase==IsolatedMeshPass::GlassOnly?1u:0u;')
           assert route < native.index('D3DTSS_RESULTARG,D3DTA_CURRENT') < native.index('D3DRS_WRAP0,D3DRS_WRAP1,D3DRS_WRAP2') < native.index('D3DTSS_COLOROP,D3DTOP_SELECTARG1')
           assert 'SetRenderState(states[coordinate],0u)' in native
           assert native.index('device->DrawIndexedPrimitive(') < native.index('saved->Apply()')
@@ -222,7 +222,7 @@ jobs:
           assert 'next.glassCenter[k]=bounds.low[k]*0.5f+bounds.high[k]*0.5f;' in gpu
           assert 'projection._34' in glass_sort
           assert 'DashboardOverlayMeshVisible(' in glass_sort
-          assert 'if(!RuntimeExternalCarAtomicStageReady())return result;' in native
+          assert '!RuntimeExternalCarAtomicStageReady())return result;' in native
           raster_setup=native[native.index('HRESULT hr=S_OK;'):native.index('std::array<GlassDepthItem,MaxGroups>')]
           assert '!ConfigureExternalRasterCoverage(' in raster_setup
           assert 'D3DRS_FILLMODE,D3DFILL_SOLID' in raster_setup
@@ -230,7 +230,7 @@ jobs:
           assert 'const HRESULT restore=saved->Apply();' in native
           # The isolated draw must bypass the live DIP receipt and must be
           # wired to the actual R7 private attachment transaction and transport.
-          assert 'if(!isolated){if(!RuntimeExternalCarAtomicStageReady())return result;}' in native
+          assert 'if(!isolated){if(phase!=IsolatedMeshPass::All||!RuntimeExternalCarAtomicStageReady())return result;}' in native
           assert native.index('if(isolated) {', native.index('SortGlassBackToFront(')) < native.index('ExternalStereoMeshReceipt physical{};')
           assert 'isolated->draw(isolated->context,m.vertexCount,m.indexCount/3)' in native
           assert 'StageWholeIsolatedVehicle(current,' in r7
