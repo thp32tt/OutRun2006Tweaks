@@ -73,6 +73,23 @@ def make_external_prompt(work: dict, queue: dict, source_sha: str, continuation:
                          debug_iteration: int = 0, debug_focus: str = "") -> str:
     task_id = work["id"]
     continuous = work.get("continuous_debug") is True
+    batch_policy = queue.get("development_batch_policy") or {}
+    if (continuous and batch_policy.get("enabled") is True
+            and batch_policy.get("work_id") == task_id):
+        # Operator's implementation-first contract takes precedence over
+        # the old generic "find one defect + test it" diagnostic template.
+        return "\n".join([
+            f"[자동개발 외부차량] TASK_ID={task_id}, MODE=FEATURE_BATCH, CONTINUATION={int(continuation)}, ITERATION={debug_iteration}",
+            f"GitHub SSOT={queue['repository']}@{queue['target_branch']}; BASE_HEAD={source_sha}. 실제 최신 HEAD와 직전 작업 인수부터 확인.",
+            f"QUEUE={EXTERNAL_QUEUE_PATH}; POLICY=development_batch_policy + atomic_stereo_plan. FOCUS={debug_focus}",
+            "구현 우선: 기존 A1의 모든 예외 검증을 기다리지 말고 A2 실제 차량 전체 양안 stage, 직접 호출부/수명/복구, 다음 가능한 A3/A4 비활성 기능을 개발. A1은 직접 선행 의존성만 수정.",
+            "이번 회차는 기능 묶음 개발이다. 작은 수정 하나, 첫 테스트 PASS, 첫 커밋으로 종료하지 마. 메인 구현 후 실제 호출 경로/연관 자원과 실패 경로까지 연결하고 다음 하위 구현을 같은 응답에서 계속해. 막히면 다음 독립적인 구현 의존성으로 전환.",
+            "가용 실행 예산 대부분을 소스 구현에 사용(목표 개발 80%, 변경 영역 검증 15%, 기록 5%). 시간 채우기/줄 수 할당 금지. 이미 확인한 동일 SHA, 전체 차량 자료, 과거 CI 반복 검증 금지.",
+            "한 기능 묶음 후 변경 영역 컴파일 및 핵심 양성/음성 테스트 1회. 관련 변경은 가능한 한 한 번에 커밋. 기존 자동 CI 유지; 개별 패치마다 전체 CI/패키지 완료를 기다리지 말고 다음 개발을 진행. 통합/배포 전 최종 exact-SHA 필수 검증은 유지.",
+            "기존 v0.03, 양안 원자성, 실제 장면 깊이, 원본 fallback/ABI 보호. 실제 생산 백엔드와 통합 증거 없이 guard 해제 금지. HMD는 UNTESTED; 사설 모델/원본 공개 금지. GitHub/ChatGPT 로컬 우선, N100 최소 사용.",
+            "EXT16-011 ACTIVE 유지. 작업 마무리는 실제 기능 묶음 구현과 연결 후 또는 불가피한 실행 한계에서만. 독립적으로 확인된 결함이 없으면 가짜 수정하지 말고 다음 실제 기능을 구현.",
+            f"짧은 인수 기록만: TASK_ID={task_id}, SOURCE_SHA, 실제 구현 기능/경로, 남은 연결, 변경영역 테스트와 CI 상태, NEXT_SOURCE_ACTION. 중복 점수 금지.",
+        ])
     preface = ([
         f"CONTINUOUS_DEBUG=1, DEBUG_ITERATION={debug_iteration}, ROTATING_FOCUS={debug_focus}",
         "영구 디버깅 큐: 기존 BLOCKED/COMPLETE_STATIC 근거를 보존하고 동일 EXT16-011 ID로 계속 추적한다. 원인을 못 찾았거나 이번 회차 코드 커밋이 없어도 작업을 종료/차단/완료로 바꾸지 마.",
