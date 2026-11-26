@@ -269,6 +269,19 @@ int main(){
         pair.Reset();multi.empty();assert(pair.simultaneousTargets==0);
     }
     assert(mrtCases==864);
+    // Reset/retire during the first raster: stop before eye 2 and never
+    // restore stale attachments into the new generation.
+    IDirect3DDevice9 retiring;
+    assert(pair.Ensure(&retiring,&lc,&ld,&rc,&rd,vp));
+    retiring.rt=retiring.liveRt=&lc;retiring.depth=retiring.liveDepth=&ld;
+    unsigned rasters=0;
+    const auto interrupted=R7SeedInactivePair(pair,&retiring,&lc,&ld,
+        [&](IDirect3DSurface9* a){return retiring.bindColor(a);},
+        [&](IDirect3DSurface9* a){return retiring.bindDepth(a);},
+        [&](){++rasters;pair.Reset();return S_OK;});
+    assert(interrupted==R7CandidateSeedResult::DirtyRestore&&rasters==1);
+    assert(retiring.io==9&&lc.refs==0&&ld.refs==0);
+    retiring.empty();
 }
 '''
 with tempfile.TemporaryDirectory() as temp:
@@ -534,11 +547,13 @@ IDirect3DSurface9 *TrackedDepthStencil=&left,*RightEyeDepth=&right,
     *TrackedRenderTarget=&color,*RightEyeSurface=&rc;
 struct Pair{
     struct Desc{D3DFORMAT Format=3;}depthDesc;
+    IDirect3DSurface9* provenLiveColor[2]{};
     IDirect3DSurface9* provenLiveDepth[2]{};
+    std::uint64_t generation=1;
     unsigned allocations=0,resets=0;bool allow=true;
     bool Ensure(IDirect3DDevice9*,IDirect3DSurface9*,IDirect3DSurface9*,
         IDirect3DSurface9*,IDirect3DSurface9*,const D3DVIEWPORT9&){++allocations;return allow;}
-    void Reset(){++resets;provenLiveDepth[0]=provenLiveDepth[1]=nullptr;}
+    void Reset(){++resets;++generation;provenLiveColor[0]=provenLiveColor[1]=nullptr;provenLiveDepth[0]=provenLiveDepth[1]=nullptr;}
 } ExternalAtomicCandidates;
 std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
 bool R7CandidatePresentBoundaryCovered=true;
@@ -551,11 +566,17 @@ struct InternalPassScope{InternalPassScope(){}~InternalPassScope(){}};
 struct Hook{template<class R,class... A>R stdcall(A...){return S_OK;}}
     SetRenderTargetHook,SetDepthStencilSurfaceHook,ClearHook;
 unsigned rasterCalls=0;
+unsigned interruptRaster=0;
 R7CandidateSeedResult seedResult=R7CandidateSeedResult::Seeded;
 template<class C,class D,class R>R7CandidateSeedResult R7SeedInactivePair(
     Pair&,IDirect3DDevice9*,IDirect3DSurface9*,IDirect3DSurface9*,C,D,R raster,
     unsigned=0,unsigned=2,bool=true){
-    ++rasterCalls;if(seedResult==R7CandidateSeedResult::Seeded)raster();return seedResult;
+    ++rasterCalls;if(seedResult==R7CandidateSeedResult::Seeded)raster();
+    if(interruptRaster==1)++PresentEpoch;
+    if(interruptRaster==2)ExternalAtomicCandidates.Reset();
+    if(interruptRaster==3)TrackedRenderTarget=&rc;
+    if(interruptRaster==4)ExternalAtomicReplayEpoch=0;
+    return seedResult;
 }
 '''
 retention_cases=r'''
@@ -638,6 +659,27 @@ int main(){
         assert(R7ReplayInactiveEye(&d,eye,&color,nullptr,draw)==R7CandidateSeedResult::Unavailable);
         assert(draws==2&&ExternalAtomicReplayEpoch==0);
     }
+    // Both eye identities must match the seeded receipt, not depth alone.
+    for(unsigned eye=0;eye<2;++eye){
+        ExternalAtomicReplayEpoch=PresentEpoch;
+        assert(R7ReplayInactiveEye(&d,eye,eye?&color:&rc,eye?&right:&left,draw)==R7CandidateSeedResult::Unavailable);
+        assert(draws==2&&ExternalAtomicReplayEpoch==0);
+    }
+    // Interrupt the production seed/replay at the physical raster boundary.
+    for(unsigned mode=1;mode<=4;++mode){
+        ++PresentEpoch;TrackedRenderTarget=&color;interruptRaster=0;
+        assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Seeded);
+        interruptRaster=mode;
+        const auto got=R7ReplayInactiveEye(&d,0,&color,&left,draw);
+        assert(got==R7CandidateSeedResult::Unavailable&&ExternalAtomicReplayEpoch==0);
+        TrackedRenderTarget=&color;ExternalAtomicReplayEpoch=0;
+        ++PresentEpoch;
+        if(mode!=4){
+            assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Unavailable);
+            assert(ExternalAtomicReplayEpoch==0);
+        }
+    }
+    interruptRaster=0;TrackedRenderTarget=&color;
     left.size=4;assert(!R7DepthRetentionProven(&left));
     left.size=8;left.readFail=true;assert(!R7DepthRetentionProven(&left));
     std::cout<<"R7_DEPTH_RETENTION_PROOF_PASS "<<cases<<" plus seed/replay and malformed tag cases\n";

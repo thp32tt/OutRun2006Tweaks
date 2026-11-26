@@ -1726,6 +1726,9 @@ namespace OutRunVRStereo
                 IDirect3DSurface9* depth=nullptr;
             };
             Eye eyes[2]{};
+            // Both attachments belong to the same eye/epoch. A matching depth
+            // alone cannot identify a color target with equivalent scene pixels.
+            IDirect3DSurface9* provenLiveColor[2]{};
             IDirect3DSurface9* provenLiveDepth[2]{}; // borrowed from tracked live owners, same replay epoch only
             IDirect3DDevice9* device=nullptr; // non-owning; Reset retires pair
             D3DSURFACE_DESC colorDesc{},depthDesc{};
@@ -1738,6 +1741,7 @@ namespace OutRunVRStereo
             void Reset() noexcept {
                 for(auto& eye:eyes){ReleaseCom(eye.depth);ReleaseCom(eye.color);}
                 device=nullptr;colorDesc={};depthDesc={};simultaneousTargets=0;
+                provenLiveColor[0]=provenLiveColor[1]=nullptr;
                 provenLiveDepth[0]=provenLiveDepth[1]=nullptr;
                 if(++generation==0)++generation;
             }
@@ -1991,6 +1995,8 @@ namespace OutRunVRStereo
                 !pair.eyes[0].color||!pair.eyes[0].depth||
                 !pair.eyes[1].color||!pair.eyes[1].depth)
                 return R7CandidateSeedResult::Unavailable;
+            const auto generation=pair.generation;
+            auto current=[&](){return pair.generation==generation&&pair.device==d;};
             IDirect3DSurface9* rt=nullptr;
             IDirect3DSurface9* depth=nullptr;
             D3DVIEWPORT9 viewport{};
@@ -2015,23 +2021,28 @@ namespace OutRunVRStereo
                 isolated=!aux&&(SUCCEEDED(hr)||hr==D3DERR_NOTFOUND);
                 ReleaseCom(aux);
             }
-            if(!isolated){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
+            if(!isolated||!current()){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
             bool seeded=true;
             for(unsigned i=firstEye;i<firstEye+eyeCount;++i){
                 const auto& eye=pair.eyes[i];
-                if(FAILED(bindDepth(nullptr))||FAILED(bindColor(eye.color))||
-                    FAILED(bindDepth(eye.depth))||FAILED(d->SetViewport(&viewport))||
-                    FAILED(d->SetScissorRect(&scissor))||FAILED(clearEye())){
+                if(!current()||FAILED(bindDepth(nullptr))||!current()||
+                    FAILED(bindColor(eye.color))||!current()||
+                    FAILED(bindDepth(eye.depth))||!current()||
+                    FAILED(d->SetViewport(&viewport))||!current()||
+                    FAILED(d->SetScissorRect(&scissor))||!current()||FAILED(clearEye())||!current()){
                     seeded=false;break;
                 }
             }
             // Never short-circuit recovery, including after a failed setter.
             bool restored=true;
-            if(FAILED(bindDepth(nullptr)))restored=false;
-            if(FAILED(bindColor(rt)))restored=false;
-            if(FAILED(bindDepth(depth)))restored=false;
-            if(FAILED(d->SetViewport(&viewport)))restored=false;
-            if(FAILED(d->SetScissorRect(&scissor)))restored=false;
+            // A reset/retirement invalidates saved attachment ownership.
+            // Do not bind old-generation objects into a replacement device.
+            if(!current()||FAILED(bindDepth(nullptr)))restored=false;
+            if(!current()||FAILED(bindColor(rt)))restored=false;
+            if(!current()||FAILED(bindDepth(depth)))restored=false;
+            if(!current()||FAILED(d->SetViewport(&viewport)))restored=false;
+            if(!current()||FAILED(d->SetScissorRect(&scissor)))restored=false;
+            if(!current())restored=false;
             ReleaseCom(depth);ReleaseCom(rt);
             if(!restored)return R7CandidateSeedResult::DirtyRestore;
             return seeded?R7CandidateSeedResult::Seeded:R7CandidateSeedResult::Unavailable;
@@ -2044,27 +2055,43 @@ namespace OutRunVRStereo
         {
             if(!R7CandidatePresentBoundaryCovered||!R7CandidateResetBoundaryCovered||
                 R7CandidateResetInFlight||ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
-            ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
+            const auto epoch=PresentEpoch;
+            ExternalAtomicAllocationAttemptEpoch=epoch;
             if(!R7CandidateSwapChainCovered(device))return R7CandidateSeedResult::Unavailable;
             // RightEyeDepth is exclusively created by R7 with Discard=FALSE.
             // For game-owned LEFT depth, no unbind without creation proof.
-            if(!R7DepthRetentionProven(TrackedDepthStencil))
+            auto* const lc=TrackedRenderTarget;
+            auto* const ld=TrackedDepthStencil;
+            auto* const rc=RightEyeSurface;
+            auto* const rd=RightEyeDepth;
+            if(!R7DepthRetentionProven(ld))
                 return R7CandidateSeedResult::Unavailable;
-            if(!ExternalAtomicCandidates.Ensure(device,TrackedRenderTarget,
-                TrackedDepthStencil,RightEyeSurface,RightEyeDepth,viewport))
+            if(!ExternalAtomicCandidates.Ensure(device,lc,ld,rc,rd,viewport))
                 return R7CandidateSeedResult::Unavailable;
             if(FormatHasStencil(ExternalAtomicCandidates.depthDesc.Format)&&
                 !(flags&D3DCLEAR_STENCIL))return R7CandidateSeedResult::Unavailable;
+            // Recheck ownership after allocation: it can call into the driver.
+            auto current=[&](){return PresentEpoch==epoch&&!R7CandidateResetInFlight&&
+                TrackedRenderTarget==lc&&TrackedDepthStencil==ld&&
+                RightEyeSurface==rc&&RightEyeDepth==rd&&R7DepthRetentionProven(ld);};
+            if(!current())return R7CandidateSeedResult::Unavailable;
+            const auto generation=ExternalAtomicCandidates.generation;
             InternalPassScope guard;
             const auto result=R7SeedInactivePair(ExternalAtomicCandidates,device,
-                TrackedRenderTarget,TrackedDepthStencil,
+                lc,ld,
                 [&](IDirect3DSurface9* s){return SetRenderTargetHook.stdcall<HRESULT>(device,0u,s);},
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
                 [&](){return ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),flags,color,z,stencil);});
             if(result==R7CandidateSeedResult::Seeded){
-                ExternalAtomicCandidates.provenLiveDepth[0]=TrackedDepthStencil;
-                ExternalAtomicCandidates.provenLiveDepth[1]=RightEyeDepth;
-                ExternalAtomicReplayEpoch=PresentEpoch;
+                if(ExternalAtomicCandidates.generation!=generation||!current()){
+                    ExternalAtomicReplayEpoch=0;
+                    return R7CandidateSeedResult::Unavailable;
+                }
+                ExternalAtomicCandidates.provenLiveColor[0]=lc;
+                ExternalAtomicCandidates.provenLiveColor[1]=rc;
+                ExternalAtomicCandidates.provenLiveDepth[0]=ld;
+                ExternalAtomicCandidates.provenLiveDepth[1]=rd;
+                ExternalAtomicReplayEpoch=epoch;
             }
             if(result==R7CandidateSeedResult::DirtyRestore)ExternalAtomicCandidates.Reset();
             return result;
@@ -2081,17 +2108,31 @@ namespace OutRunVRStereo
         {
             if(ExternalAtomicReplayEpoch!=PresentEpoch)
                 return R7CandidateSeedResult::Unavailable;
-            if(eye>=2||!liveDepth||liveDepth!=ExternalAtomicCandidates.provenLiveDepth[eye]){
+            if(eye>=2||!liveColor||!liveDepth||
+                liveColor!=ExternalAtomicCandidates.provenLiveColor[eye]||
+                liveDepth!=ExternalAtomicCandidates.provenLiveDepth[eye]){
                 ExternalAtomicReplayEpoch=0;
                 return R7CandidateSeedResult::Unavailable;
             }
+            const auto epoch=PresentEpoch;
+            const auto generation=ExternalAtomicCandidates.generation;
             InternalPassScope guard;
             const auto result=R7SeedInactivePair(ExternalAtomicCandidates,device,
                 liveColor,liveDepth,
                 [&](IDirect3DSurface9* s){return SetRenderTargetHook.stdcall<HRESULT>(device,0u,s);},
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
                 [&](){return drawCall();},eye,1,false);
-            if(result!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
+            if(result!=R7CandidateSeedResult::Seeded){
+                ExternalAtomicReplayEpoch=0;
+                return result;
+            }
+            if(PresentEpoch!=epoch||ExternalAtomicReplayEpoch!=epoch||
+                ExternalAtomicCandidates.generation!=generation||
+                liveColor!=(eye==0?TrackedRenderTarget:RightEyeSurface)||
+                liveDepth!=(eye==0?TrackedDepthStencil:RightEyeDepth)){
+                ExternalAtomicReplayEpoch=0;
+                return R7CandidateSeedResult::Unavailable;
+            }
             return result;
         }
 
