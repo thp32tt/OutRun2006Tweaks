@@ -733,6 +733,7 @@ class ChatBridge:
             except Exception:
                 pass
         # Second choice: a fresh tab in the SAME authenticated context/profile.
+        fresh=None
         try:
             fresh=await asyncio.wait_for(
                 self.context.new_page(), timeout=BROWSER_NEW_TAB_TIMEOUT_SECONDS)
@@ -740,7 +741,7 @@ class ChatBridge:
                              timeout=BROWSER_RELOAD_TIMEOUT_MS)
             if not await self._page_responsive(fresh):
                 try:
-                    await fresh.close()
+                    await asyncio.wait_for(fresh.close(),timeout=3)
                 except Exception:
                     pass
                 return "HOLD_BROWSER_FRESH_TAB_UNRESPONSIVE"
@@ -754,6 +755,13 @@ class ChatBridge:
                     pass
             return "BROWSER_FRESH_TAB_READY"
         except Exception as exc:
+            # Navigation can fail after new_page() succeeds. Close only the
+            # unadopted tab; retain the old role page and persistent login.
+            if fresh is not None and self.pages.get(role) is not fresh:
+                try:
+                    await asyncio.wait_for(fresh.close(),timeout=3)
+                except Exception:
+                    pass
             return "HOLD_BROWSER_FRESH_TAB_"+type(exc).__name__
 
     async def force_fresh_role_page(self, role, target=None):
@@ -770,6 +778,7 @@ class ChatBridge:
         if not (is_saved_chat_url(target) or
                 (isinstance(target,str) and target.rstrip("/")==PROJECT_URL.rstrip("/"))):
             target=PROJECT_URL
+        fresh=None
         try:
             fresh=await asyncio.wait_for(
                 self.context.new_page(), timeout=BROWSER_NEW_TAB_TIMEOUT_SECONDS)
@@ -777,7 +786,7 @@ class ChatBridge:
                              timeout=BROWSER_RELOAD_TIMEOUT_MS)
             if not await self._page_responsive(fresh):
                 try:
-                    await fresh.close()
+                    await asyncio.wait_for(fresh.close(),timeout=3)
                 except Exception:
                     pass
                 return "HOLD_BROWSER_FORCED_FRESH_TAB_UNRESPONSIVE"
@@ -788,7 +797,7 @@ class ChatBridge:
                             state="visible",timeout=15000)
                 except Exception:
                     try:
-                        await fresh.close()
+                        await asyncio.wait_for(fresh.close(),timeout=3)
                     except Exception:
                         pass
                     return "HOLD_BROWSER_FORCED_FRESH_COMPOSER_MISSING"
@@ -800,6 +809,11 @@ class ChatBridge:
                     pass
             return "BROWSER_FORCED_FRESH_TAB_READY"
         except Exception as exc:
+            if fresh is not None and self.pages.get(role) is not fresh:
+                try:
+                    await asyncio.wait_for(fresh.close(),timeout=3)
+                except Exception:
+                    pass
             return "HOLD_BROWSER_FORCED_FRESH_TAB_"+type(exc).__name__
 
     async def browser_watchdog(self):
@@ -853,12 +867,15 @@ class ChatBridge:
             try:
                 await pg.evaluate(
                     r"""() => {
-                      const all=[document.scrollingElement,...document.querySelectorAll('*')];
-                      let best=null,span=0;
-                      for(const e of all){
-                        if(!e||!e.scrollHeight||!e.clientHeight)continue;
-                        const d=e.scrollHeight-e.clientHeight;
-                        if(d>span){span=d;best=e;}
+                      // Bound layout reads to the current turn's ancestors;
+                      // scanning every DOM element is costly on long chats.
+                      const turns=document.querySelectorAll('[data-message-author-role], [data-testid^="conversation-turn-"]');
+                      let e=turns[turns.length-1] || document.querySelector('main');
+                      let best=document.scrollingElement;
+                      for(;e;e=e.parentElement){
+                        if(e.scrollHeight-e.clientHeight>1 && /^(auto|scroll|overlay)$/.test(getComputedStyle(e).overflowY)){
+                          best=e;break;
+                        }
                       }
                       if(best)best.scrollTop=best.scrollHeight;
                     }"""
