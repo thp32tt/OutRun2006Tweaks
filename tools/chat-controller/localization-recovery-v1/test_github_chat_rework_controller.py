@@ -706,6 +706,28 @@ class BrowserLivenessWatchdogTests(unittest.IsolatedAsyncioTestCase):
   fresh.goto.assert_awaited_once()
   old.close.assert_awaited_once()
 
+ async def test_navigation_failure_closes_only_unadopted_fresh_tab(self):
+  for method in ("refresh_or_replace_role_page","force_fresh_role_page"):
+   with self.subTest(method=method):
+    bridge=c.ChatBridge(MagicMock(),MagicMock())
+    bridge.ensure_context=AsyncMock()
+    old=MagicMock()
+    old.url=c.PROJECT_URL
+    old.is_closed.return_value=False
+    old.reload=AsyncMock(side_effect=TimeoutError("reload hung"))
+    old.close=AsyncMock()
+    fresh=MagicMock()
+    fresh.goto=AsyncMock(side_effect=TimeoutError("navigation hung"))
+    fresh.close=AsyncMock()
+    bridge.context=MagicMock()
+    bridge.context.new_page=AsyncMock(return_value=fresh)
+    bridge.pages["A"]=old
+    result=await getattr(bridge,method)("A",c.PROJECT_URL)
+    self.assertTrue(result.startswith("HOLD_BROWSER_"))
+    self.assertIs(bridge.pages["A"],old)
+    fresh.close.assert_awaited_once()
+    old.close.assert_not_awaited()
+
  def test_watchdog_is_independent_of_queue_poll_interval(self):
   self.assertEqual(c.POLL,600)
   self.assertEqual(c.BROWSER_HEARTBEAT_SECONDS,60)
