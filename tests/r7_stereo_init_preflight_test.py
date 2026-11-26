@@ -248,6 +248,47 @@ int main(){
     static R7AtomicCandidatePair* resetPair=nullptr;
     resetPair=&pair;
     auto retire=+[](){resetPair->Reset();};
+    // Release may synchronously enter Reset. All four references must
+    // already be detached, with a retired generation and no live proof.
+    // An interrupted replacement must not allocate in the newer generation.
+    static unsigned releaseCallbacks=0;
+    static std::uint64_t releaseGeneration=0;
+    auto duringRelease=+[](){
+        ++releaseCallbacks;
+        assert(resetPair->generation!=releaseGeneration&&!resetPair->device);
+        assert(!resetPair->eyes[0].color&&!resetPair->eyes[0].depth&&
+            !resetPair->eyes[1].color&&!resetPair->eyes[1].depth);
+        assert(!resetPair->provenLiveColor[0]&&!resetPair->provenLiveDepth[1]&&
+            resetPair->simultaneousTargets==0);
+        resetPair->Reset();
+    };
+    unsigned releaseCases=0;
+    for(unsigned mode=0;mode<3;++mode)
+    for(unsigned phase=0;phase<=4;++phase){
+        IDirect3DDevice9 oldDevice,replacement;
+        assert(pair.Ensure(&oldDevice,&lc,&ld,&rc,&rd,vp));
+        pair.provenLiveColor[0]=&lc;pair.provenLiveDepth[1]=&rd;
+        releaseGeneration=pair.generation;releaseCallbacks=0;
+        if(phase)oldDevice.made[phase-1].onRelease=duringRelease;
+        auto newLc=lc,newRc=rc;
+        ++newLc.desc.Format;++newRc.desc.Format;
+        if(mode==0)pair.Reset();
+        else if(mode==1)
+            assert(pair.Ensure(&replacement,&lc,&ld,&rc,&rd,vp)==(phase==0));
+        else
+            assert(pair.Ensure(&oldDevice,&newLc,&ld,&newRc,&rd,vp)==(phase==0));
+        assert(releaseCallbacks==unsigned(phase!=0));
+        for(unsigned i=0;i<4;++i)assert(oldDevice.made[i].refs==0);
+        if(phase||mode==0){
+            assert(!pair.device&&replacement.calls==0&&oldDevice.calls==4);
+            assert(pair.Ensure(&replacement,&lc,&ld,&rc,&rd,vp)&&replacement.calls==4);
+        }else{
+            assert(pair.device==(mode==1?&replacement:&oldDevice));
+            assert(replacement.calls==(mode==1?4u:0u)&&oldDevice.calls==(mode==2?8u:4u));
+        }
+        pair.Reset();oldDevice.empty();replacement.empty();++releaseCases;
+    }
+    assert(releaseCases==15);
     IDirect3DSurface9* live[]{&lc,&ld,&rc,&rd};
     for(unsigned k=0;k<4;++k){
         IDirect3DDevice9 interruptedDevice;

@@ -1758,12 +1758,18 @@ namespace OutRunVRStereo
             R7AtomicCandidatePair(const R7AtomicCandidatePair&)=delete;
             R7AtomicCandidatePair& operator=(const R7AtomicCandidatePair&)=delete;
             ~R7AtomicCandidatePair(){ Reset(); }
-            void Reset() noexcept {
-                for(auto& eye:eyes){ReleaseCom(eye.depth);ReleaseCom(eye.color);}
+            std::uint64_t Reset() noexcept {
+                // Detach ownership and invalidate receipts before entering
+                // the driver: Release may synchronously reenter retirement.
+                Eye retired[2]{eyes[0],eyes[1]};
+                eyes[0]=eyes[1]={};
                 device=nullptr;colorDesc={};depthDesc={};simultaneousTargets=0;
                 provenLiveColor[0]=provenLiveColor[1]=nullptr;
                 provenLiveDepth[0]=provenLiveDepth[1]=nullptr;
                 if(++generation==0)++generation;
+                const auto retiredGeneration=generation;
+                for(auto& eye:retired){ReleaseCom(eye.depth);ReleaseCom(eye.color);}
+                return retiredGeneration;
             }
             static bool Same(const D3DSURFACE_DESC& a,const D3DSURFACE_DESC& b) noexcept {
                 return a.Width==b.Width && a.Height==b.Height && a.Format==b.Format &&
@@ -1772,7 +1778,10 @@ namespace OutRunVRStereo
             }
             bool Ensure(IDirect3DDevice9* d,IDirect3DSurface9* lc,IDirect3DSurface9* ld,
                 IDirect3DSurface9* rc,IDirect3DSurface9* rd,const D3DVIEWPORT9& vp) noexcept {
-                if(device && device!=d)Reset();
+                if(device && device!=d){
+                    const auto retiredGeneration=Reset();
+                    if(generation!=retiredGeneration)return false;
+                }
                 // A driver call can synchronously retire this pair (ResetEx).
                 // Stop before dereferencing the next borrowed live attachment.
                 const auto descriptorGeneration=generation;
@@ -1794,8 +1803,8 @@ namespace OutRunVRStereo
                 }
                 if(device==d && Same(colorDesc,c)&&Same(depthDesc,z)&&
                     eyes[0].color&&eyes[0].depth&&eyes[1].color&&eyes[1].depth)return true;
-                Reset();
-                const auto allocationGeneration=generation;
+                const auto allocationGeneration=Reset();
+                if(generation!=allocationGeneration)return false;
                 // Cache the immutable device limit with the allocation.
                 // Unknown/unsupported caps cannot establish RT isolation.
                 D3DCAPS9 caps{};
