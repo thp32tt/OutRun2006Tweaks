@@ -564,8 +564,9 @@ with tempfile.TemporaryDirectory() as directory:
 
 # Iter103: execute the actual six R7 eye-state upload/restore functions.
 # Mock only driver calls and PBR camera math; no duplicate recovery model.
-body = r7[r7.index("bool SetWvpOneRegisterAtATime("):
-          r7.index("bool FormatHasStencil(")]
+eye_state_start = r7.index("bool SetWvpOneRegisterAtATime(")
+body = r7[eye_state_start:r7.index("bool FormatHasStencil(", eye_state_start)]
+assert "bool RestoreFixedFunctionTransforms(" in body
 assert "std::uint64_t R7EyeStateGeneration() noexcept {return ExternalAtomicCandidates.generation;}" in r7
 owner = draw[draw.index("const auto leftGeneration="):]
 assert owner.index("const auto leftGeneration=") < owner.index("device->GetViewport(&savedViewport)")
