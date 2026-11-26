@@ -98,6 +98,7 @@ assert "SetRenderTarget" not in owner and "SetDepthStencilSurface" not in owner 
 atomic_stub=r'''
 #include <cassert>
 #include <cstdint>
+std::uint64_t R7CandidateBoundarySerial=0;
 #include <initializer_list>
 using HRESULT=int;
 using UINT=unsigned;
@@ -282,6 +283,19 @@ int main(){
     assert(interrupted==R7CandidateSeedResult::DirtyRestore&&rasters==1);
     assert(retiring.io==9&&lc.refs==0&&ld.refs==0);
     retiring.empty();
+    // A physical present is not a reset: stop raster, but restore saved live state.
+    IDirect3DDevice9 presenting;
+    assert(pair.Ensure(&presenting,&lc,&ld,&rc,&rd,vp));
+    presenting.rt=presenting.liveRt=&lc;presenting.depth=presenting.liveDepth=&ld;
+    rasters=0;
+    assert(R7SeedInactivePair(pair,&presenting,&lc,&ld,
+        [&](IDirect3DSurface9* a){return presenting.bindColor(a);},
+        [&](IDirect3DSurface9* a){return presenting.bindDepth(a);},
+        [&](){++rasters;++R7CandidateBoundarySerial;return S_OK;})==R7CandidateSeedResult::Unavailable);
+    assert(rasters==1&&presenting.rt==&lc&&presenting.depth==&ld);
+    assert(presenting.viewport.Width==vp.Width&&presenting.scissor.left==4);
+    assert(lc.refs==0&&ld.refs==0);
+    pair.Reset();presenting.empty();
 }
 '''
 with tempfile.TemporaryDirectory() as temp:
@@ -556,6 +570,7 @@ struct Pair{
     void Reset(){++resets;++generation;provenLiveColor[0]=provenLiveColor[1]=nullptr;provenLiveDepth[0]=provenLiveDepth[1]=nullptr;}
 } ExternalAtomicCandidates;
 std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
+std::uint64_t R7CandidateBoundarySerial=0;
 bool R7CandidatePresentBoundaryCovered=true;
 bool R7CandidateResetBoundaryCovered=true;
 unsigned R7CandidateResetInFlight=0;
@@ -576,6 +591,7 @@ template<class C,class D,class R>R7CandidateSeedResult R7SeedInactivePair(
     if(interruptRaster==2)ExternalAtomicCandidates.Reset();
     if(interruptRaster==3)TrackedRenderTarget=&rc;
     if(interruptRaster==4)ExternalAtomicReplayEpoch=0;
+    if(interruptRaster==5){++R7CandidateBoundarySerial;ExternalAtomicReplayEpoch=0;ExternalAtomicAllocationAttemptEpoch=PresentEpoch;}
     return seedResult;
 }
 '''
@@ -666,7 +682,7 @@ int main(){
         assert(draws==2&&ExternalAtomicReplayEpoch==0);
     }
     // Interrupt the production seed/replay at the physical raster boundary.
-    for(unsigned mode=1;mode<=4;++mode){
+    for(unsigned mode=1;mode<=5;++mode){
         ++PresentEpoch;TrackedRenderTarget=&color;interruptRaster=0;
         assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Seeded);
         interruptRaster=mode;
@@ -718,6 +734,7 @@ struct IDirect3DDevice9Ex{bool game=true;};
 std::atomic<bool> StereoBaseCallbacksArmed{true};
 bool IsGameDevice(IDirect3DDevice9Ex* d){return d&&d->game;}
 std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=0;
+std::uint64_t R7CandidateBoundarySerial=0,expectedSerial=0;
 std::uint64_t expectedReplay=0,expectedAttempt=0;
 IDirect3DDevice9Ex* expectedDevice=nullptr;
 const RECT *expectedSource=nullptr,*expectedDest=nullptr;
@@ -730,7 +747,7 @@ struct PresentExHook{
         assert(d==expectedDevice&&src==expectedSource&&dst==expectedDest&&
             window==expectedWindow&&dirty==expectedDirty&&flags==expectedFlags);
         assert(ExternalAtomicReplayEpoch==expectedReplay&&
-            ExternalAtomicAllocationAttemptEpoch==expectedAttempt&&PresentEpoch==9);
+            ExternalAtomicAllocationAttemptEpoch==expectedAttempt&&PresentEpoch==9&&R7CandidateBoundarySerial==expectedSerial);
         return result;
     }
 } CandidatePresentExHook;
@@ -752,6 +769,7 @@ int main(){
         const bool owned=!(mask&7);
         expectedReplay=owned?0:ExternalAtomicReplayEpoch;
         expectedAttempt=owned?9:ExternalAtomicAllocationAttemptEpoch;
+        expectedSerial=R7CandidateBoundarySerial+unsigned(owned);
         assert(R7CandidatePresentExDest(expectedDevice,expectedSource,expectedDest,
             expectedWindow,expectedDirty,expectedFlags)==result);
         assert(calls==1&&PresentEpoch==9&&ExternalAtomicReplayEpoch==expectedReplay&&
@@ -961,6 +979,7 @@ bool IsGameDevice(IDirect3DDevice9* d){return d&&d->game;}
 std::atomic<bool> StereoBaseCallbacksArmed{true};
 std::uint64_t PresentEpoch=9,ExternalAtomicAllocationAttemptEpoch=0,ExternalAtomicReplayEpoch=9;
 bool R7CandidateAdditionalChainSeen=false;
+std::uint64_t R7CandidateBoundarySerial=0,expectedSerial=0;
 std::uint64_t expectedReplay=0,expectedAttempt=0;
 bool expectedAdditional=false;unsigned calls=0;HRESULT result=0;
 IDirect3DDevice9* expectedDevice=nullptr;
@@ -969,7 +988,7 @@ D3DPRESENT_PARAMETERS* expectedParams=nullptr;IDirect3DSwapChain9** expectedOut=
 const RECT *expectedSrc=nullptr,*expectedDst=nullptr;const RGNDATA* expectedDirty=nullptr;
 HWND expectedWindow=nullptr;DWORD expectedFlags=0;
 void Check(){++calls;assert(PresentEpoch==9&&ExternalAtomicReplayEpoch==expectedReplay&&
-    ExternalAtomicAllocationAttemptEpoch==expectedAttempt&&R7CandidateAdditionalChainSeen==expectedAdditional);}
+    ExternalAtomicAllocationAttemptEpoch==expectedAttempt&&R7CandidateAdditionalChainSeen==expectedAdditional&&R7CandidateBoundarySerial==expectedSerial);}
 struct AdditionalHook{
     template<class R>R stdcall(IDirect3DDevice9* d,D3DPRESENT_PARAMETERS* p,IDirect3DSwapChain9** out){
         assert(d==expectedDevice&&p==expectedParams&&out==expectedOut);Check();return result;}
@@ -999,6 +1018,7 @@ int main(){
         R7CandidateAdditionalChainSeen=false;expectedAdditional=false;calls=0;chain.gets=0;
         bool retire=!(mask&1)&&(!expectedChain||chain.getHr<0||!chain.owner||chain.owner->game);
         expectedReplay=retire?0:ExternalAtomicReplayEpoch;expectedAttempt=retire?9:0;
+        expectedSerial=R7CandidateBoundarySerial+unsigned(retire);
         assert(R7CandidateSwapChainPresentDest(expectedChain,expectedSrc,expectedDst,
             expectedWindow,expectedDirty,expectedFlags)==result);
         assert(calls==1&&chain.gets==unsigned(!(mask&1)&&expectedChain)&&!game.refs&&!other.refs);
@@ -1011,6 +1031,7 @@ int main(){
         R7CandidateAdditionalChainSeen=bool(mask&64);calls=0;
         bool retire=!(mask&7);
         expectedReplay=retire?0:9;expectedAttempt=retire?9:0;
+        expectedSerial=R7CandidateBoundarySerial+unsigned(retire);
         expectedAdditional=retire||R7CandidateAdditionalChainSeen;
         assert(R7CandidateAdditionalSwapChainDest(expectedDevice,expectedParams,expectedOut)==result);
         assert(calls==1&&R7CandidateAdditionalChainSeen==expectedAdditional);

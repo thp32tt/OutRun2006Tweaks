@@ -1795,6 +1795,8 @@ namespace OutRunVRStereo
         };
         R7AtomicCandidatePair ExternalAtomicCandidates{};
         std::uint64_t ExternalAtomicAllocationAttemptEpoch=0;
+        // Physical presentation may not advance the stock PresentEpoch.
+        std::uint64_t R7CandidateBoundarySerial=0;
 
         // Resolve the implicit chain's actual Present entrypoint each seed.
         // Reset can replace the chain. Never assume a cached COM pointer or
@@ -1840,6 +1842,7 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params,IDirect3DSwapChain9** out)
         {
             if(StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&IsGameDevice(device)){
+                ++R7CandidateBoundarySerial;
                 ExternalAtomicReplayEpoch=0;
                 ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
                 R7CandidateAdditionalChainSeen=true;
@@ -1857,6 +1860,7 @@ namespace OutRunVRStereo
                 IDirect3DDevice9* owner=nullptr;
                 const bool known=chain&&SUCCEEDED(chain->GetDevice(&owner))&&owner;
                 if(!known||IsGameDevice(owner)){
+                    ++R7CandidateBoundarySerial;
                     ExternalAtomicReplayEpoch=0;
                     ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
                 }
@@ -1971,6 +1975,7 @@ namespace OutRunVRStereo
             const RGNDATA* dirty,DWORD flags)
         {
             if(StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&IsGameDevice(device)){
+                ++R7CandidateBoundarySerial;
                 ExternalAtomicReplayEpoch=0;
                 ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             }
@@ -1996,7 +2001,9 @@ namespace OutRunVRStereo
                 !pair.eyes[1].color||!pair.eyes[1].depth)
                 return R7CandidateSeedResult::Unavailable;
             const auto generation=pair.generation;
+            const auto boundary=R7CandidateBoundarySerial;
             auto current=[&](){return pair.generation==generation&&pair.device==d;};
+            auto rasterCurrent=[&](){return current()&&R7CandidateBoundarySerial==boundary;};
             IDirect3DSurface9* rt=nullptr;
             IDirect3DSurface9* depth=nullptr;
             D3DVIEWPORT9 viewport{};
@@ -2021,15 +2028,15 @@ namespace OutRunVRStereo
                 isolated=!aux&&(SUCCEEDED(hr)||hr==D3DERR_NOTFOUND);
                 ReleaseCom(aux);
             }
-            if(!isolated||!current()){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
+            if(!isolated||!rasterCurrent()){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
             bool seeded=true;
             for(unsigned i=firstEye;i<firstEye+eyeCount;++i){
                 const auto& eye=pair.eyes[i];
-                if(!current()||FAILED(bindDepth(nullptr))||!current()||
-                    FAILED(bindColor(eye.color))||!current()||
-                    FAILED(bindDepth(eye.depth))||!current()||
-                    FAILED(d->SetViewport(&viewport))||!current()||
-                    FAILED(d->SetScissorRect(&scissor))||!current()||FAILED(clearEye())||!current()){
+                if(!rasterCurrent()||FAILED(bindDepth(nullptr))||!rasterCurrent()||
+                    FAILED(bindColor(eye.color))||!rasterCurrent()||
+                    FAILED(bindDepth(eye.depth))||!rasterCurrent()||
+                    FAILED(d->SetViewport(&viewport))||!rasterCurrent()||
+                    FAILED(d->SetScissorRect(&scissor))||!rasterCurrent()||FAILED(clearEye())||!rasterCurrent()){
                     seeded=false;break;
                 }
             }
@@ -2056,6 +2063,7 @@ namespace OutRunVRStereo
             if(!R7CandidatePresentBoundaryCovered||!R7CandidateResetBoundaryCovered||
                 R7CandidateResetInFlight||ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
             const auto epoch=PresentEpoch;
+            const auto boundary=R7CandidateBoundarySerial;
             ExternalAtomicAllocationAttemptEpoch=epoch;
             if(!R7CandidateSwapChainCovered(device))return R7CandidateSeedResult::Unavailable;
             // RightEyeDepth is exclusively created by R7 with Discard=FALSE.
@@ -2064,7 +2072,7 @@ namespace OutRunVRStereo
             auto* const ld=TrackedDepthStencil;
             auto* const rc=RightEyeSurface;
             auto* const rd=RightEyeDepth;
-            if(!R7DepthRetentionProven(ld))
+            if(!R7DepthRetentionProven(ld)||R7CandidateBoundarySerial!=boundary||PresentEpoch!=epoch)
                 return R7CandidateSeedResult::Unavailable;
             if(!ExternalAtomicCandidates.Ensure(device,lc,ld,rc,rd,viewport))
                 return R7CandidateSeedResult::Unavailable;
@@ -2073,7 +2081,8 @@ namespace OutRunVRStereo
             // Recheck ownership after allocation: it can call into the driver.
             auto current=[&](){return PresentEpoch==epoch&&!R7CandidateResetInFlight&&
                 TrackedRenderTarget==lc&&TrackedDepthStencil==ld&&
-                RightEyeSurface==rc&&RightEyeDepth==rd&&R7DepthRetentionProven(ld);};
+                RightEyeSurface==rc&&RightEyeDepth==rd&&R7DepthRetentionProven(ld)&&
+                R7CandidateBoundarySerial==boundary&&PresentEpoch==epoch;};
             if(!current())return R7CandidateSeedResult::Unavailable;
             const auto generation=ExternalAtomicCandidates.generation;
             InternalPassScope guard;
@@ -2115,6 +2124,7 @@ namespace OutRunVRStereo
                 return R7CandidateSeedResult::Unavailable;
             }
             const auto epoch=PresentEpoch;
+            const auto boundary=R7CandidateBoundarySerial;
             const auto generation=ExternalAtomicCandidates.generation;
             InternalPassScope guard;
             const auto result=R7SeedInactivePair(ExternalAtomicCandidates,device,
@@ -2126,7 +2136,7 @@ namespace OutRunVRStereo
                 ExternalAtomicReplayEpoch=0;
                 return result;
             }
-            if(PresentEpoch!=epoch||ExternalAtomicReplayEpoch!=epoch||
+            if(PresentEpoch!=epoch||ExternalAtomicReplayEpoch!=epoch||R7CandidateBoundarySerial!=boundary||
                 ExternalAtomicCandidates.generation!=generation||
                 liveColor!=(eye==0?TrackedRenderTarget:RightEyeSurface)||
                 liveDepth!=(eye==0?TrackedDepthStencil:RightEyeDepth)){
