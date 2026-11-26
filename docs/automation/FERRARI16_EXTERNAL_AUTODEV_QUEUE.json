@@ -659,7 +659,7 @@
     {
       "id": "EXT16-011",
       "priority": 0,
-      "title": "P0 IMPLEMENT ATOMIC STEREO BACKEND: first unfinished A1-A6 milestone, real renderer code every :00/:30",
+      "title": "IMPLEMENTATION FIRST: multi-step A2 whole-vehicle stereo feature batch; A1 direct dependencies only; continue A3/A4 without waiting for exhaustive validation",
       "stage": "source_fix",
       "status": "ACTIVE",
       "continuous_debug": true,
@@ -675,11 +675,10 @@
         "EXT16-010"
       ],
       "acceptance": [
-        "OVERRIDING PRIORITY: follow queue.atomic_stereo_plan; first unfinished A1-A6, starting A1 actual R7 D3D9 isolated left/right color+depth resource ownership and transaction entrypoint. Implement production backend, not another pure policy predicate or unrelated validator.",
-        "While A1-A4 incomplete, do NOT rotate to independent OVC/GLB/PBR/packaging fixes. Only investigate defects directly preventing current backend implementation. Existing ROTATING_FOCUS or generic defect-first wording is subordinate to this P0 plan.",
-        "Make a real source slice plus positive/negative regression and exact-SHA CI; advance milestone only with concrete production integration evidence. If blocked, implement smaller dependency/alternative in same milestone; after two no-implementation cycles switch approach, not topic.",
-        "Never blindly turn RuntimeExternalCarAtomicStageReady true. Implement real isolated whole-vehicle L/R color+depth stage, pair publication and native body-only callback integration before opt-in activation. Preserve stock both-eye fallback and scene depth, reset, state restoration, passengers, HUD and v0.03.",
-        "Keep EXT16-011 ACTIVE, record milestone evidence and next source slice. No new TASK_ID, no duplicate scores, no private asset upload, no automatic Quest3 pass."
+        "OVERRIDE all previous single-defect/verification prompts: read queue.development_batch_policy and atomic_stereo_plan. First open A2 actual whole-vehicle stage code and A1 existing inactive R7 pair API. Implement a cohesive feature batch (main code + dependent caller/lifetime/fallback + next feasible substep) in THIS turn, not just one small fix.",
+        "A1 remains IN_PROGRESS, but do not wait for exhaustive A1 checks to implement inactive A2/A3/A4. If blocked on one path, implement another direct dependency or next independent inactive feature. No fake line-count or arbitrary changes; do not finish after first patch/test/commit.",
+        "Use most available work budget for production code (target 80% implementation, 15% focused verification, 5% handoff). Skip repeated unrelated model scans, full previous-SHA CI rechecks and per-edit packaging. Run one focused changed-area compile/regression after batch; existing push CI remains; full exact-SHA acceptance at integration/package gates.",
+        "Keep stock fallback, original scene depth, both-eye atomic publication, ABI and v0.03 unchanged until actual integration proof. No fake readiness, no automatic HMD pass, no unlicensed assets. Keep EXT16-011 ACTIVE; short checkpoint SHA, changed paths, test status, next actual implementation."
       ],
       "do_not_autoclose": true,
       "do_not_mark_complete_static": true,
@@ -4390,14 +4389,14 @@
       ],
       "latest_material_sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
       "latest_static_ci": "Iteration60 strict dashboard PBR test amended after initial exact CI legacy missing-body assertion failure; final exact SHA CI as recorded. Iteration59 all four applicable exact workflows success and credited once.",
-      "next_focus": "A1: verify iter103 exact CI; trace remaining PrepareDuplicatedDraw preflight and R30 caller generation across LEFT preparation before whole-vehicle transaction. Keep gate false."
+      "next_focus": "A2 actual whole-vehicle staged render entrypoint + explicit eye/pose/mesh receipt and inactive RT/depth binding; implement caller/lifetime/fallback in one batch; A1 prerequisite fixes only."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
   "rights": "Do not fetch paid or gated assets without permission; no unauthorized redistribution of third-party binaries. Public GitHub contains only patches, scripts, manifests and permissible small evidence; private assets remain outside.",
-  "priority_rule": "P0: implement the missing whole-vehicle atomic stereo renderer before unrelated validation or asset cleanup. While A1-A4 incomplete, only backend implementation or tests/defects directly blocking its milestones count as primary work; no rotating off to independent OVC/GLB/PBR/package validators. CI follow-up is secondary.",
-  "no_progress_rule": "If source HEAD and queue fingerprint are unchanged across max_unchanged_dispatches, controller holds until GitHub SSOT changes; do not dispatch redundant chats.",
-  "last_updated_kst": "2026-11-26T19:00:00+09:00",
+  "priority_rule": "P0 implementation-first feature batches. A2/A3/A4 inactive production development may proceed with A1 IN_PROGRESS; no repeated full model verification before integration; no live activation until real gates.",
+  "no_progress_rule": "Continuous EXT16-011 never halts because of unchanged SHA; work on next distinct implementation dependency, no fake changes or repeated verification.",
+  "last_updated_kst": "2026-11-26T20:53+09:00",
   "post_static_hmd_work_id": "EXT16-006",
   "recovery_policy": {
     "reason": "2026-11-24 01:08 KST queue prematurely reached HMD-only EXT16-006 while EXT16-001/002/004 remained BLOCKED with independent actionable software defects",
@@ -4426,7 +4425,7 @@
   "continuous_debug_policy": {
     "enabled": true,
     "work_id": "EXT16-011",
-    "mode": "PRIORITY_ATOMIC_STEREO_IMPLEMENTATION",
+    "mode": "IMPLEMENTATION_FIRST_FEATURE_BATCH",
     "schedule_kst_minutes": [
       0,
       30
@@ -4439,7 +4438,7 @@
     "scope": "Only Ferrari16 external 3D model, DX9Ex stereo/PBR/normal maps/materials, engine draw parity and safe packaging",
     "completion_rule": "Keep EXT16-011 ACTIVE and active_work_id EXT16-011 until operator explicitly disables recurring debug; material CI does not complete physical Quest3 QA",
     "focus_rotation": [
-      "P0 ATOMIC_STEREO_BACKEND: implement first unfinished A1-A6 milestone in queue.atomic_stereo_plan; A1 real R7 isolated L/R color+depth ownership -> A2 whole vehicle staging -> A3 atomic pair publication -> A4 native callback integration. No unrelated validation rotation until A1-A4 done."
+      "A2 whole-vehicle isolated stereo feature batch, including real caller and state restore; A1 only direct blocking dependencies. Continue A3/A4 inactive implementation where feasible; see development_batch_policy."
     ],
     "no_fake_modifications": true,
     "no_duplicate_ai_points": true,
@@ -4464,8 +4463,8 @@
     "fix": "Do not terminate Ferrari16 code debugging upon HMD-only stage or absence of new commit; rotating evidence-driven diagnostics until explicit operator stop"
   },
   "atomic_stereo_plan": {
-    "revision": "20261125-P0",
-    "operator_request": "Stop spending cycles on unrelated checks while external render is hard disabled; implement the missing executable renderer first.",
+    "revision": "20261126-P0-BATCH-IMPLEMENTATION",
+    "operator_request": "Prioritize cohesive implementation over repeated verification and single tiny fixes. Develop A2/A3/A4 against existing inactive A1 backend now; preserve fail-closed runtime admission.",
     "active_milestone": "A1",
     "milestones": [
       {
@@ -4522,9 +4521,10 @@
       },
       {
         "id": "A2",
-        "status": "PENDING",
+        "status": "IN_PROGRESS",
         "deliverable": "Implement whole-vehicle per-eye stage render with explicit matrices, one latched frame/pose/player, opaque PBR and ordered glass/dashboard meshes; avoid recursive automatic duplicate DIP or deferred R29/R30/R33 route.",
-        "gate": "All required mesh receipts both eyes, fail-left/right/mid-mesh/reset/epoch mismatch abort; no live draws."
+        "gate": "All required mesh receipts both eyes, fail-left/right/mid-mesh/reset/epoch mismatch abort; no live draws.",
+        "admission_note": "Development opened by operator 2026-11-26; implementation not yet proven, A1 is an outstanding dependency. No completion or activation inferred."
       },
       {
         "id": "A3",
@@ -4574,13 +4574,78 @@
       "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden."
     },
     "execution_contract": [
-      "Every :00/:30 cycle re-read latest HEAD and this plan; implement first unfinished milestone, not a new rotating topic. Start with production D3D9 code, not another boolean proof model.",
-      "Commit one meaningful backend slice with regression and exact SHA CI; continue next slice from actual source. If blocked, identify exact D3D9 call/ownership constraint and implement a smaller directly useful dependency or alternate viable approach inside same milestone; no docs-only completion.",
-      "After two consecutive cycles without implementation progress on a milestone, explicitly change architecture or approach within P0; do not merely rerun the same trace. Do not claim progress by weakening gates.",
-      "Advance milestone only on concrete production implementation plus appropriate tests and exact-SHA evidence; partial milestones stay IN_PROGRESS, track source SHA and remaining gap. Keep EXT16-011 ACTIVE and same ID.",
-      "RuntimeExternalCarAtomicStageReady must ultimately be backed by actual capability/transaction ownership; keep fail-closed on unsupported paths. Never remove guard as substitute for renderer.",
-      "Synthetic mock tests do not prove GPU physical behavior; runtime and user headset QA remain UNTESTED. Protect v0.03, ABI, private assets and N100 resource limits."
+      "OVERRIDE previous single-slice workflow: every dispatch executes queue.development_batch_policy; start actual A2 feature work and A1 direct dependencies, not exhaustive A1 review.",
+      "Do not finish after one small fix; continue the dependent production code/caller integration and next feasible substep in the same turn. If genuinely blocked, switch to another independent implementation substep of A2/A3/A4.",
+      "Separate development readiness from final acceptance: unfinished A1 cannot block writing inactive A2/A3/A4 code. No live activation or claimed milestone pass until actual dependency gates and final exact-SHA CI are met.",
+      "Targeted changed-area test/compile once per cohesive batch, full CI at feature integration checkpoints; existing automated CI remains enabled. Do not wait/recheck unrelated full asset gates on each edit.",
+      "Keep EXT16-011 ACTIVE with same ID, preserve previous milestone evidence, record concise next production step. Never claim user HMD pass or enable external without real transaction proof."
     ],
-    "unrelated_validation_deferred_until": "A1-A4 source integration and exact-SHA CI complete"
+    "unrelated_validation_deferred_until": "A1-A4 feature integration; full real asset verification and final packaging after one-car renderer route exists",
+    "implementation_frontier": {
+      "primary": "A2",
+      "parallel_dependencies": [
+        "A1",
+        "A3",
+        "A4"
+      ],
+      "note": "A1 remains IN_PROGRESS; A2 starts against existing actual inactive R7 surface/replay interface. Development may proceed before preceding milestone is certified; admission and completion still require all dependencies."
+    }
+  },
+  "development_batch_policy": {
+    "revision": "20261126-IMPLEMENTATION-FIRST-V2",
+    "enabled": true,
+    "work_id": "EXT16-011",
+    "objective": "Build an executable opt-in external vehicle renderer; stop indefinite A1 micro-fix and validation-only loops.",
+    "target_work_budget": "Use the available turn predominantly for real production implementation; aim for a cohesive 20–25 minute development session when execution budget permits; never wait just to fill time.",
+    "work_allocation_guidance": {
+      "implementation_percent": 80,
+      "changed_area_verification_percent": 15,
+      "checkpoint_and_report_percent": 5
+    },
+    "first_action": "Read latest HEAD and last handoff, then open the actual production code for the next feature batch; no whole-repo review or repeated exact-SHA validation first.",
+    "batch_rules": [
+      "One dispatch is a FEATURE BATCH, not one bug or one function. Implement the main data/control flow AND its directly dependent callers/resource lifetime/fallback. Follow through to next unimplemented substep in the SAME response; do not finish after first small patch, first green test, or first commit.",
+      "If A1 is sufficiently usable as a development dependency, start A2/A3 against the actual inactive resource interface NOW. A1 stays IN_PROGRESS until its own gate passes. Do not require A1 exhaustive edge-case audit or final CI to START A2/A3. No activation/publication to live game until integration admission is actually proved.",
+      "For a genuine architectural blocker, implement the next independent productive dependency of A2/A3/A4 (inactive/opt-in code) rather than spend a whole dispatch on another A1 guard. If one approach stalls, change architecture or component immediately.",
+      "No mandatory line-count quota or fake changes; if no safe production implementation can be made, record concrete blocking call/contract, then work on independent next feature before ending.",
+      "Existing rights, v0.03 isolation, real two-eye transaction, correct original fallback, and HMD truthfulness remain mandatory. Do not change false to true as substitute for backend."
+    ],
+    "verification_rules": [
+      "Do not re-run all 16 OVC/GLB/DDS/material audits or full package/preflight at the start of every renderer development cycle. Only inspect asset data needed to develop the current feature.",
+      "Use one changed-area compile and focused positive/negative regression after a coherent source batch; reuse previous verified evidence; no repeated full-suite polling, no duplicate SHA revalidation. Fix compile/runtime-invariant failures in changed code, not unrelated test cleanup.",
+      "Keep existing GitHub Actions push triggers and required final gates. Batch related changes into one coherent push when practical. Do not synchronously wait for four workflows or run full local 16-car validation after each small edit. Review CI failures on latest relevant source at next dispatch, and run full exact-SHA integration gate at milestone A1-A4 integration / test package / final promotion. Do not suppress failures, skip required gates, or certify unverified runtime.",
+      "No broad source-string-only tests, huge new exhaustive mocks or workflow pin churn as the primary work. Prefer compact executable tests of actual changed owner and one integration regression; expand only when directly needed to reproduce a defect."
+    ],
+    "end_condition": "End only after cohesive production feature slice plus caller integration, or actual execution limit / concrete unavoidable blocker after trying a different productive substep. Record one short handoff: implemented function/path, remaining wiring, SHA, targeted test, CI status and next actual code change. No waiting for CI, no full-scoreboard scan or report padding as development work.",
+    "milestones_implementation_order": [
+      "A1 remaining direct prerequisite for A2 only",
+      "A2 whole-vehicle isolated production stage",
+      "A3 inactive-pair commit/presentation selection",
+      "A4 native body-only callback and actual external selection",
+      "A5 one-car F50 isolated package and instrumentation",
+      "A6 installed 16-car expansion and materials"
+    ],
+    "previous_policy": {
+      "revision": "20261125-P0",
+      "execution_contract": [
+        "Every :00/:30 cycle re-read latest HEAD and this plan; implement first unfinished milestone, not a new rotating topic. Start with production D3D9 code, not another boolean proof model.",
+        "Commit one meaningful backend slice with regression and exact SHA CI; continue next slice from actual source. If blocked, identify exact D3D9 call/ownership constraint and implement a smaller directly useful dependency or alternate viable approach inside same milestone; no docs-only completion.",
+        "After two consecutive cycles without implementation progress on a milestone, explicitly change architecture or approach within P0; do not merely rerun the same trace. Do not claim progress by weakening gates.",
+        "Advance milestone only on concrete production implementation plus appropriate tests and exact-SHA evidence; partial milestones stay IN_PROGRESS, track source SHA and remaining gap. Keep EXT16-011 ACTIVE and same ID.",
+        "RuntimeExternalCarAtomicStageReady must ultimately be backed by actual capability/transaction ownership; keep fail-closed on unsupported paths. Never remove guard as substitute for renderer.",
+        "Synthetic mock tests do not prove GPU physical behavior; runtime and user headset QA remain UNTESTED. Protect v0.03, ABI, private assets and N100 resource limits."
+      ],
+      "acceptance": [
+        "OVERRIDING PRIORITY: follow queue.atomic_stereo_plan; first unfinished A1-A6, starting A1 actual R7 D3D9 isolated left/right color+depth resource ownership and transaction entrypoint. Implement production backend, not another pure policy predicate or unrelated validator.",
+        "While A1-A4 incomplete, do NOT rotate to independent OVC/GLB/PBR/packaging fixes. Only investigate defects directly preventing current backend implementation. Existing ROTATING_FOCUS or generic defect-first wording is subordinate to this P0 plan.",
+        "Make a real source slice plus positive/negative regression and exact-SHA CI; advance milestone only with concrete production integration evidence. If blocked, implement smaller dependency/alternative in same milestone; after two no-implementation cycles switch approach, not topic.",
+        "Never blindly turn RuntimeExternalCarAtomicStageReady true. Implement real isolated whole-vehicle L/R color+depth stage, pair publication and native body-only callback integration before opt-in activation. Preserve stock both-eye fallback and scene depth, reset, state restoration, passengers, HUD and v0.03.",
+        "Keep EXT16-011 ACTIVE, record milestone evidence and next source slice. No new TASK_ID, no duplicate scores, no private asset upload, no automatic Quest3 pass."
+      ],
+      "priority_rule": "P0: implement the missing whole-vehicle atomic stereo renderer before unrelated validation or asset cleanup. While A1-A4 incomplete, only backend implementation or tests/defects directly blocking its milestones count as primary work; no rotating off to independent OVC/GLB/PBR/package validators. CI follow-up is secondary.",
+      "focus_rotation": [
+        "P0 ATOMIC_STEREO_BACKEND: implement first unfinished A1-A6 milestone in queue.atomic_stereo_plan; A1 real R7 isolated L/R color+depth ownership -> A2 whole vehicle staging -> A3 atomic pair publication -> A4 native callback integration. No unrelated validation rotation until A1-A4 done."
+      ]
+    }
   }
 }
