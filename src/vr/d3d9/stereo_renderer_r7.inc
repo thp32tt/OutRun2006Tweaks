@@ -122,6 +122,7 @@ namespace OutRunVRStereo
         thread_local unsigned R7CandidateResetInFlight=0;
         using R7DirectResetTransportOwnerFn=void(*)() noexcept;
         std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetTransportOwner{nullptr};
+        std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetBaselineOwner{nullptr};
         SafetyHookInline CandidateSwapChainPresentHook{},CandidateAdditionalSwapChainHook{};
         void* R7CandidateSwapChainPresentTarget=nullptr;
         bool R7CandidateAdditionalChainSeen=false;
@@ -1896,6 +1897,9 @@ namespace OutRunVRStereo
             R7ForgetAutomaticDepthProof();
             // R9 holds independent COM references even if R7 has no core.
             R9RetireDirectResetResources();
+            // Close the upper baseline before the driver can replace attachments.
+            if(const auto retire=R7DirectResetBaselineOwner.load(std::memory_order_acquire))
+                retire();
             // The installed R13 overlay owns its ACK mapping independently.
             if(const auto retire=R7DirectResetTransportOwner.load(std::memory_order_acquire))
                 retire();

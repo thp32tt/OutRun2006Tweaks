@@ -738,6 +738,7 @@ namespace OutRunVRStereo
 
         void R22RollbackHooks() noexcept
         {
+            R7DirectResetBaselineOwner.store(nullptr, std::memory_order_release);
             R22SetViewportHook = {};
             R22SetRenderStateHook = {};
             R22SetScissorRectHook = {};
@@ -770,6 +771,19 @@ namespace OutRunVRStereo
                     return false;
             }
             return true;
+        }
+
+        // Physical ResetEx need not traverse ResetDestR22. Retire the old
+        // baseline even on failure; a fresh Clear and live raster capture
+        // must establish eligibility again. No D3D calls at this boundary.
+        void R22RetireDirectResetBaseline() noexcept
+        {
+            if (R22InstallState.load(std::memory_order_acquire) !=
+                OutRunVR::RuntimeEligibility::InstallState::Ready)
+                return;
+            R22FailClosedEligibility();
+            R22ResetBaselineTracking();
+            R22ShadowState = {};
         }
 
         DWORD WINAPI R22InstallThread(void*)
@@ -882,6 +896,8 @@ namespace OutRunVRStereo
                             "VR R46 STATE: StateBlock creation hooks unavailable; periodic live raster validation retained");
                     }
 
+                    R7DirectResetBaselineOwner.store(
+                        R22RetireDirectResetBaseline, std::memory_order_release);
                     R22InstallState.store(State::Ready, std::memory_order_release);
                     spdlog::info(
                         "VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE");

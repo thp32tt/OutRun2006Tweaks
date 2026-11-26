@@ -753,6 +753,9 @@ unsigned transportRetires=0;
 void RetireTransport() noexcept {assert(r9Retires==1);++transportRetires;}
 using R7DirectResetTransportOwnerFn=void(*)() noexcept;
 std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetTransportOwner{nullptr};
+unsigned baselineRetires=0;
+void RetireBaseline() noexcept {assert(r9Retires==1&&transportRetires==0);++baselineRetires;}
+std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetBaselineOwner{nullptr};
 bool R7RetireDirectResetCore(){assert(r9Retires==1);assert(transportRetires==unsigned(bool(R7DirectResetTransportOwner.load())));return false;}
 struct Pair{void Reset(){++resets;allocated=false;}} ExternalAtomicCandidates;
 IDirect3DDevice9Ex* expectedDevice=nullptr;
@@ -763,6 +766,7 @@ struct Hook{
     template<class R> R stdcall(IDirect3DDevice9Ex* d,D3DPRESENT_PARAMETERS* p,D3DDISPLAYMODEEX* m){
         ++calls;assert(d==expectedDevice&&p==expectedParams&&m==expectedMode);
         assert(r9Retires==unsigned(owned));
+        assert(baselineRetires==unsigned(owned&&bool(R7DirectResetBaselineOwner.load())));
         assert(transportRetires==unsigned(owned&&bool(R7DirectResetTransportOwner.load())));
         if(owned){
             assert(!allocated&&resets==1&&proof==2&&R7CandidateResetInFlight==1);
@@ -779,7 +783,8 @@ reset_ex_cases=r'''
 int main(){
     IDirect3DDevice9Ex game,other;other.game=false;
     D3DPRESENT_PARAMETERS pp{7};D3DDISPLAYMODEEX mode{8};
-    for(unsigned mask=0;mask<512;++mask){
+    for(unsigned mask=0;mask<1024;++mask){
+        R7DirectResetBaselineOwner=(mask&512)?RetireBaseline:nullptr;
         R7DirectResetTransportOwner=(mask&256)?RetireTransport:nullptr;
         StereoBaseCallbacksArmed=!(mask&1);
         expectedDevice=(mask&2)?&other:&game;
@@ -788,7 +793,7 @@ int main(){
         nested=mask&32;result=(mask&64)?-1:0;owned=!(mask&7);
         const std::uint64_t initialReplay=(mask&128)?9:0;
         PresentEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=initialReplay;
-        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;allocated=true;
+        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;baselineRetires=0;allocated=true;
         assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
         assert(calls==1&&R7CandidateResetInFlight==0);
         assert(PresentEpoch==(owned&&nested?1u:9u));
@@ -796,7 +801,7 @@ int main(){
         assert(ExternalAtomicAllocationAttemptEpoch==(owned?PresentEpoch:0));
         assert(resets==(owned?1u:0u)&&proof==(owned?3u:1u)&&allocated==!owned);
     }
-    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 512\n";
+    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 1024\n";
 }
 '''
 assert "ResetExVtableIndex = 132;" in source
@@ -1077,5 +1082,99 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"r13_direct_reset.cpp"
     exe=Path(temp)/"r13_direct_reset"
     cpp.write_text(r13_stub+r13_retire+r13_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# Iter85: direct physical ResetEx invalidates the actual R22 baseline owner.
+r22_source=Path("src/vr/d3d9/stereo_renderer_r22.cpp").read_text(encoding="utf-8")
+r22_baseline=r22_source[r22_source.index("void R22FailClosedEligibility()"):
+                        r22_source.index("bool R22CaptureGameScissor(")]
+r22_direct=r22_source[r22_source.index("void R22RetireDirectResetBaseline()"):
+                      r22_source.index("DWORD WINAPI R22InstallThread(")]
+r22_stub=r'''
+#include <atomic>
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+namespace OutRunVR::RuntimeEligibility {
+enum class InstallState { Pending, Ready, Failed };
+unsigned calls=0;
+bool eligible=true;
+void FailClosed(){++calls;eligible=false;}
+}
+using State=OutRunVR::RuntimeEligibility::InstallState;
+std::atomic<State> R22InstallState{State::Pending};
+std::atomic<bool> R20StereoEligibilityGate{true};
+bool R9StereoSeeded=true,R9MonoSeeded=true;
+struct Shadow { bool valid=false; } R22ShadowState;
+std::uint64_t R20DepthClearEpoch=0;
+std::uint64_t R20DepthClearDrawSerial=0;
+std::uint64_t R20DepthClearGeneration=0;
+std::uint64_t R20StencilClearEpoch=0;
+std::uint64_t R20StencilClearDrawSerial=0;
+std::uint64_t R20StencilClearGeneration=0;
+std::uint64_t R22DepthClearEpoch=0;
+std::uint64_t R22DepthClearDrawSerial=0;
+std::uint64_t R22DepthClearGeneration=0;
+std::uint64_t R22StencilClearEpoch=0;
+std::uint64_t R22StencilClearDrawSerial=0;
+std::uint64_t R22StencilClearGeneration=0;
+'''
+r22_cases=r'''
+int main(){
+    using namespace OutRunVR::RuntimeEligibility;
+    for(auto state:{State::Pending,State::Ready,State::Failed}){
+        for(unsigned mask=0;mask<32;++mask){
+            R22InstallState=state;
+            calls=0;eligible=bool(mask&1);
+            R20StereoEligibilityGate=bool(mask&2);
+            R9StereoSeeded=bool(mask&4);R9MonoSeeded=bool(mask&8);
+            R22ShadowState.valid=bool(mask&16);
+            R20DepthClearEpoch=mask+1;
+            R20DepthClearDrawSerial=mask+2;
+            R20DepthClearGeneration=mask+3;
+            R20StencilClearEpoch=mask+4;
+            R20StencilClearDrawSerial=mask+5;
+            R20StencilClearGeneration=mask+6;
+            R22DepthClearEpoch=mask+7;
+            R22DepthClearDrawSerial=mask+8;
+            R22DepthClearGeneration=mask+9;
+            R22StencilClearEpoch=mask+10;
+            R22StencilClearDrawSerial=mask+11;
+            R22StencilClearGeneration=mask+12;
+            for(unsigned repeat=1;repeat<=2;++repeat){
+                R22RetireDirectResetBaseline();
+                const bool armed=state==State::Ready;
+                assert(calls==(armed?repeat:0));
+                assert(eligible==(!armed&&bool(mask&1)));
+                assert(R20StereoEligibilityGate==(!armed&&bool(mask&2)));
+                assert(R9StereoSeeded==(!armed&&bool(mask&4)));
+                assert(R9MonoSeeded==(!armed&&bool(mask&8)));
+                assert(R22ShadowState.valid==(!armed&&bool(mask&16)));
+                assert(R20DepthClearEpoch==(armed?0:mask+1));
+                assert(R20DepthClearDrawSerial==(armed?0:mask+2));
+                assert(R20DepthClearGeneration==(armed?0:mask+3));
+                assert(R20StencilClearEpoch==(armed?0:mask+4));
+                assert(R20StencilClearDrawSerial==(armed?0:mask+5));
+                assert(R20StencilClearGeneration==(armed?0:mask+6));
+                assert(R22DepthClearEpoch==(armed?0:mask+7));
+                assert(R22DepthClearDrawSerial==(armed?0:mask+8));
+                assert(R22DepthClearGeneration==(armed?0:mask+9));
+                assert(R22StencilClearEpoch==(armed?0:mask+10));
+                assert(R22StencilClearDrawSerial==(armed?0:mask+11));
+                assert(R22StencilClearGeneration==(armed?0:mask+12));
+            }
+        }
+    }
+    std::cout<<"R22_DIRECT_RESET_BASELINE_PASS 192\n";
+}
+'''
+assert reset_callback.index("R7DirectResetBaselineOwner.load(") < reset_callback.index("R7DirectResetTransportOwner.load(")
+assert "R7DirectResetBaselineOwner.store(\n                        R22RetireDirectResetBaseline," in r22_source
+assert "R7DirectResetBaselineOwner.store(nullptr," in r22_source
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"r22_direct_reset.cpp"
+    exe=Path(temp)/"r22_direct_reset"
+    cpp.write_text(r22_stub+r22_baseline+r22_direct+r22_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)

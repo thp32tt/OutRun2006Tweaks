@@ -383,7 +383,7 @@ jobs:
           fi
           # Iter71 R9/R23 baseline integration: allow only the exact reviewed blobs.
           test "$(git hash-object src/vr/d3d9/stereo_renderer.cpp)" = 62dd2e7fee54b7735fd4520ddf4dd0673ad536f9
-          test "$(git hash-object src/vr/d3d9/stereo_renderer_r22.cpp)" = 1899caef70c8f77c3248681b0f2414e7d8533443
+          test "$(git hash-object src/vr/d3d9/stereo_renderer_r22.cpp)" = 98fdd61cadf8fac632bde296047a8f2b8bf8f18e
           test "$(git hash-object src/vr/d3d9/stereo_renderer_r23.cpp)" = cfdeee7950b47432797784003371dd5230967b71
           # Only these exact reviewed R30 transaction helper blobs are allowed.
           # Further byte changes fail closed; the R32 bridge guard remains.
