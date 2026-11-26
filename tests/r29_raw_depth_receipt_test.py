@@ -40,7 +40,10 @@ using HRESULT = int;
 using D3DPRIMITIVETYPE = int;
 using D3DFORMAT = int;
 constexpr DWORD D3DCLEAR_ZBUFFER = 2, D3DCLEAR_STENCIL = 4;
-struct IDirect3DSurface9 { int refs=0; void Release(){assert(refs>0);--refs;} };
+struct IDirect3DSurface9 {
+    int refs=0; void (*onRelease)()=nullptr;
+    void Release(){assert(refs>0);--refs;if(onRelease)onRelease();}
+};
 struct IDirect3DVertexBuffer9 : IDirect3DSurface9 {};
 struct IDirect3DIndexBuffer9 : IDirect3DSurface9 {};
 IDirect3DVertexBuffer9 vertexBuffer;
@@ -49,6 +52,8 @@ struct IDirect3DDevice9 {
     bool game;
     IDirect3DSurface9 *rt=nullptr,*depth=nullptr;
     bool rtFail=false,depthFail=false;
+    unsigned rtGets=0,depthGets=0;
+    void (*onRtGet)()=nullptr;void (*onDepthGet)()=nullptr;
     IDirect3DVertexBuffer9* vb=nullptr;
     IDirect3DIndexBuffer9* ib=nullptr;
     UINT offset=0,stride=0;
@@ -62,8 +67,8 @@ struct IDirect3DDevice9 {
         ++streamSets;if(streamSetFail)return -1;vb=p;offset=o;stride=s;return 0;
     }
     HRESULT SetIndices(IDirect3DIndexBuffer9* p){++indexSets;if(indexSetFail)return -1;ib=p;return 0;}
-    HRESULT GetRenderTarget(unsigned,IDirect3DSurface9** out){*out=rt;if(rt)++rt->refs;return rtFail?-1:0;}
-    HRESULT GetDepthStencilSurface(IDirect3DSurface9** out){*out=depth;if(depth)++depth->refs;return depthFail?-1:0;}
+    HRESULT GetRenderTarget(unsigned,IDirect3DSurface9** out){++rtGets;*out=rt;if(rt)++rt->refs;if(onRtGet)onRtGet();return rtFail?-1:0;}
+    HRESULT GetDepthStencilSurface(IDirect3DSurface9** out){++depthGets;*out=depth;if(depth)++depth->refs;if(onDepthGet)onDepthGet();return depthFail?-1:0;}
 };
 template<class T> void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
 constexpr HRESULT E_FAIL=-1;
@@ -97,7 +102,8 @@ bool checkLiveInput=false;
 IDirect3DVertexBuffer9* expectedVb=nullptr;
 IDirect3DIndexBuffer9* expectedIb=nullptr;
 bool IsGameDevice(IDirect3DDevice9* d) { return d && d->game; }
-bool LeftDrawMayWriteDepth(IDirect3DDevice9*) { ++reads; return writes & 2; }
+void (*onDepthMask)()=nullptr;void (*onReplayEnd)()=nullptr;
+bool LeftDrawMayWriteDepth(IDirect3DDevice9*) { ++reads; if(onDepthMask)onDepthMask(); return writes & 2; }
 bool LeftDrawMayWriteStencil(IDirect3DDevice9*) { ++reads; return writes & 4; }
 struct Hook {
     unsigned id;
@@ -124,6 +130,7 @@ template<class DrawCall> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevi
         inReplay=true;const HRESULT hr=draw();inReplay=false;
         if(FAILED(hr))return R7CandidateSeedResult::Unavailable;
     }
+    if(onReplayEnd)onReplayEnd();
     return replayResult;
 }
 '''
@@ -378,6 +385,62 @@ int main() {
         for(auto* surface:{&leftColor,&leftDepth,&rightColor,&rightDepth,&otherColor,&otherDepth})assert(surface->refs==0);
         ++cases;
     }
+    // Actual outer raw transaction: retire at each driver boundary, even
+    // after a successful inner replay. Same-generation Present declines
+    // candidate raster but keeps one physical stock call and its HRESULT.
+    static unsigned interruptMode=0;
+    auto interrupt=+[](){
+        if(interruptMode==1)++ExternalAtomicCandidates.generation;
+        if(interruptMode==2)++R7CandidateBoundarySerial;
+        if(interruptMode==3)++PresentEpoch;
+    };
+    unsigned boundaryCases=0;
+    for(unsigned eye=0;eye<2;++eye)
+    for(unsigned phase=0;phase<=7;++phase)
+    for(interruptMode=1;interruptMode<=3;++interruptMode)
+    for(bool failedGetter:{false,true}){
+        game.rt=eye?&rightColor:&leftColor;game.depth=eye?&rightDepth:&leftDepth;
+        game.rtFail=failedGetter&&phase==1;game.depthFail=failedGetter&&phase==2;
+        game.rtGets=game.depthGets=0;
+        game.onRtGet=phase==1?interrupt:nullptr;
+        game.onDepthGet=phase==2?interrupt:nullptr;
+        onDepthMask=phase==3?interrupt:nullptr;
+        onReplayEnd=phase==4?interrupt:nullptr;
+        game.depth->onRelease=phase==5?interrupt:nullptr;
+        game.rt->onRelease=phase==6?interrupt:nullptr;
+        aux=false;mainTarget=true;FrameStereoIncomplete=FrameRightDrawFailed=false;
+        ActiveOcclusionQueries=0;OcclusionQueryTrackingUnavailable=false;
+        OutRunVR::DinoSidecar::ActiveExternalStereoMesh=false;
+        InternalStereoPass=eye!=0;
+        PresentEpoch=ExternalAtomicReplayEpoch=77;
+        ExternalAtomicCandidates.device=&game;
+        LastMainDepthClearStamp.Record(77,2);writes=0;
+        calls=replayCalls=restoreFailures=reads=0;
+        RightDepthSynchronized=RightStencilSynchronized=true;
+        replayResult=R7CandidateSeedResult::Seeded;
+        auto physical=[&](){
+            if(!inReplay){++calls;if(phase==7)interrupt();return -17;}
+            return 0;
+        };
+        const auto hr=R7ExecuteRawCandidateVb(&game,physical);
+        const bool reached=phase!=0&&!(eye&&phase==3);
+        const bool retired=reached&&interruptMode==1&&phase!=7;
+        const bool replay=!(reached&&phase<=3);
+        assert(game.rtGets==1&&game.depthGets==unsigned(phase!=1));
+        assert(replayCalls==unsigned(replay));
+        assert(calls==unsigned(!retired)&&hr==(retired?E_FAIL:-17));
+        assert(restoreFailures==unsigned(retired));
+        assert(RightDepthSynchronized==!retired&&RightStencilSynchronized==!retired);
+        assert(ExternalAtomicReplayEpoch==0);
+        if(retired)assert(LastMainDepthClearStamp.flags==0);
+        assert(game.rt->refs==0&&game.depth->refs==0);
+        game.onRtGet=game.onDepthGet=onDepthMask=onReplayEnd=nullptr;
+        game.rt->onRelease=game.depth->onRelease=nullptr;
+        ++boundaryCases;
+    }
+    assert(boundaryCases==96);
+    std::cout<<"R7_RAW_CAPTURE_GENERATION_PASS "<<boundaryCases<<"\n";
+    PresentEpoch=77;
     // Actual unmirrored raster helper, including failing stock calls.
     unsigned fallbackCases=0;
     for(bool gameDevice:{false,true})

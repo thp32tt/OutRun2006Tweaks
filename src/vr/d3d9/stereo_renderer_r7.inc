@@ -2693,6 +2693,15 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 RevokeDepthClearReplayBeforeLeftDraw(device);
                 return drawCall();
             }
+            // The outer raw owner also crosses driver boundaries outside
+            // the isolated raster transaction. A successful getter or Release
+            // can synchronously retire the generation before the stock draw.
+            const auto generation=ExternalAtomicCandidates.generation;
+            const auto boundary=R7CandidateBoundarySerial;
+            const auto epoch=PresentEpoch;
+            auto current=[&](){return ExternalAtomicCandidates.generation==generation;};
+            auto rasterCurrent=[&](){return current()&&R7CandidateBoundarySerial==boundary&&
+                PresentEpoch==epoch&&ExternalAtomicReplayEpoch==epoch;};
             IDirect3DSurface9* rt=nullptr;
             IDirect3DSurface9* depth=nullptr;
             int eye=-1;
@@ -2701,35 +2710,38 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 !OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)&&
                 ActiveOcclusionQueries.load(std::memory_order_acquire)==0&&
                 !OutRunVR::DinoSidecar::ActiveExternalStereoMesh&&
-                TargetIsBackBuffer()&&
-                SUCCEEDED(device->GetRenderTarget(0,&rt))&&rt&&
-                SUCCEEDED(device->GetDepthStencilSurface(&depth))&&depth){
+                TargetIsBackBuffer()&&rasterCurrent()&&
+                SUCCEEDED(device->GetRenderTarget(0,&rt))&&rt&&rasterCurrent()&&
+                SUCCEEDED(device->GetDepthStencilSurface(&depth))&&depth&&rasterCurrent()){
                 if(rt==TrackedRenderTarget&&depth==TrackedDepthStencil)eye=0;
                 else if(rt==RightEyeSurface&&depth==RightEyeDepth)eye=1;
             }
-            RevokeDepthClearReplayBeforeLeftDraw(device,eye>=0);
-            // Internal Clear may write LEFT depth regardless of the current
-            // depth/stencil render-state write masks. Only proven RIGHT
-            // attachment identity exempts the previous LEFT clear receipt.
-            if(clearFlags&&eye!=1)
-                LastMainDepthClearStamp.OnPotentialWrite(clearFlags&(D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL));
-            if(eye>=0){
-                const auto result=R7ReplayInactiveDraw(device,
-                    static_cast<unsigned>(eye),rt,depth,drawCall,up,indexedUp);
-                ReleaseCom(depth);ReleaseCom(rt);
-                if(result!=R7CandidateSeedResult::Seeded)ExternalAtomicReplayEpoch=0;
-                if(result==R7CandidateSeedResult::DirtyRestore){
-                    ExternalAtomicReplayEpoch=0;
-                    LastMainDepthClearStamp.Invalidate();
-                    RightDepthSynchronized=false;RightStencilSynchronized=false;
-                    NoteRestoreFailure("external inactive raw replay");
-                    return E_FAIL; // attachment restoration not proven
-                }
-            }else{
-                ReleaseCom(depth);ReleaseCom(rt);
+            auto result=R7CandidateSeedResult::Unavailable;
+            if(current()){
+                RevokeDepthClearReplayBeforeLeftDraw(device,eye>=0);
+                // Depth/stencil write-mask queries may themselves retire
+                // ownership or end the candidate frame.
+                if(!rasterCurrent())eye=-1;
+                if(clearFlags&&eye!=1)
+                    LastMainDepthClearStamp.OnPotentialWrite(clearFlags&(D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL));
+                if(eye>=0&&rasterCurrent())
+                    result=R7ReplayInactiveDraw(device,
+                        static_cast<unsigned>(eye),rt,depth,drawCall,up,indexedUp);
             }
+            ReleaseCom(depth);ReleaseCom(rt);
+            if(result!=R7CandidateSeedResult::Seeded||!rasterCurrent())
+                ExternalAtomicReplayEpoch=0;
+            if(!current()||result==R7CandidateSeedResult::DirtyRestore){
+                ExternalAtomicReplayEpoch=0;
+                LastMainDepthClearStamp.Invalidate();
+                RightDepthSynchronized=false;RightStencilSynchronized=false;
+                NoteRestoreFailure("external inactive raw replay");
+                return E_FAIL; // live attachment ownership not proven
+            }
+            // A same-generation Present invalidates replay, not the stock
+            // operation. A retirement before this point vetoes all live IO.
             const HRESULT hr=drawCall();
-            if(FAILED(hr))ExternalAtomicReplayEpoch=0;
+            if(FAILED(hr)||!rasterCurrent())ExternalAtomicReplayEpoch=0;
             return hr;
         }
 
