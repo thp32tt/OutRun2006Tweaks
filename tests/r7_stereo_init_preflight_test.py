@@ -124,6 +124,8 @@ struct IDirect3DDevice9 {
     bool retireCaps=false;
     void (*onRetire)()=nullptr;
     unsigned io=0,ioFail=0,clearCalls=0,liveWrites=0;
+    unsigned interruptIo=0,interruptAux=0;
+    void (*onInterrupt)()=nullptr;
     UINT capsTargets=1,capsCalls=0,auxCalls=0;
     HRESULT capsHr=S_OK,auxHr[4]{S_OK,D3DERR_NOTFOUND,D3DERR_NOTFOUND,D3DERR_NOTFOUND};
     IDirect3DSurface9* aux[4]{};
@@ -131,9 +133,11 @@ struct IDirect3DDevice9 {
     IDirect3DSurface9 *rt=nullptr,*depth=nullptr,*liveRt=nullptr,*liveDepth=nullptr;
     D3DVIEWPORT9 viewport{0,0,1920,1080};
     RECT scissor{4,5,1800,1000};
-    HRESULT op(){return ++io==ioFail?E_FAIL:S_OK;}
+    HRESULT op(){++io;if(io==interruptIo&&onInterrupt)onInterrupt();return io==ioFail?E_FAIL:S_OK;}
     HRESULT GetRenderTarget(unsigned slot,IDirect3DSurface9** s){
-        if(slot){assert(slot<capsTargets);++auxCalls;*s=aux[slot];if(*s)++(*s)->refs;return auxHr[slot];}
+        if(slot){assert(slot<capsTargets);++auxCalls;*s=aux[slot];if(*s)++(*s)->refs;
+            if(auxCalls==interruptAux&&onInterrupt)onInterrupt();
+            return auxHr[slot];}
         *s=rt;if(rt)++rt->refs;return op();
     }
     HRESULT GetDepthStencilSurface(IDirect3DSurface9** s){*s=depth;if(depth)++depth->refs;return op();}
@@ -312,6 +316,29 @@ int main(){
         pair.Reset();multi.empty();assert(pair.simultaneousTargets==0);
     }
     assert(mrtCases==864);
+    // Every physical capture getter is a reset/present boundary. Stop
+    // before the next getter and never bind or restore untouched state.
+    unsigned captureCases=0;
+    for(unsigned mode=0;mode<2;++mode)
+    for(unsigned phase=0;phase<=7;++phase){
+        IDirect3DDevice9 capture;capture.capsTargets=4;
+        assert(pair.Ensure(&capture,&lc,&ld,&rc,&rd,vp));
+        capture.rt=capture.liveRt=&lc;capture.depth=capture.liveDepth=&ld;
+        capture.interruptIo=phase<=4?phase:0;
+        capture.interruptAux=phase>4?phase-4:0;
+        capture.onInterrupt=mode?+[](){++R7CandidateBoundarySerial;}:retire;
+        const auto result=R7SeedInactivePair(pair,&capture,&lc,&ld,
+            [&](auto* a){return capture.bindColor(a);},
+            [&](auto* a){return capture.bindDepth(a);},
+            [&](){return capture.clear();});
+        assert(result==(phase?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded));
+        assert(capture.io==(phase?(phase<=4?phase:4u):21u));
+        assert(capture.auxCalls==(phase?(phase<=4?0u:phase-4):3u));
+        assert(capture.clearCalls==(phase?0u:2u)&&capture.liveWrites==0);
+        assert(capture.rt==&lc&&capture.depth==&ld&&lc.refs==0&&ld.refs==0);
+        pair.Reset();capture.empty();++captureCases;
+    }
+    assert(captureCases==16);
     // Reset/retire during the first raster: stop before eye 2 and never
     // restore stale attachments into the new generation.
     IDirect3DDevice9 retiring;
@@ -583,13 +610,14 @@ struct D3DVIEWPORT9{};struct D3DRECT{};
 struct IDirect3DSurface9{
     bool marked=false,writeFail=false,readFail=false;DWORD size=8;
     std::uint64_t proof=0;unsigned refs=0,writes=0;
+    void (*onRead)()=nullptr;
     HRESULT SetPrivateData(const GUID&,const void* p,DWORD n,DWORD flags){
         ++writes;assert(n==8&&!flags);if(writeFail)return E_FAIL;
         std::memcpy(&proof,p,n);marked=true;return S_OK;
     }
     HRESULT GetPrivateData(const GUID&,void* p,DWORD* n){
         if(!marked||readFail)return E_FAIL;
-        std::memcpy(p,&proof,8);*n=size;return S_OK;
+        std::memcpy(p,&proof,8);*n=size;if(onRead)onRead();return S_OK;
     }
     void Release(){assert(refs);--refs;}
 };
@@ -799,6 +827,41 @@ int main(){
         }
     }
     interruptRaster=0;TrackedRenderTarget=&color;
+    // Interrupt each of the three real GetPrivateData proof reads.
+    // Same-epoch attachment replacement and generation retirement must
+    // not lead to allocation, candidate raster or receipt publication.
+    static unsigned readCount=0,readPhase=0,readMode=0;
+    unsigned proofCases=0;
+    for(readMode=0;readMode<6;++readMode)
+    for(readPhase=0;readPhase<=3;++readPhase){
+        ++PresentEpoch;ExternalAtomicReplayEpoch=0;
+        TrackedRenderTarget=&color;TrackedDepthStencil=&left;
+        RightEyeSurface=&rc;RightEyeDepth=&right;
+        R7CandidateResetInFlight=0;readCount=0;
+        left.onRead=+[](){
+            if(++readCount!=readPhase)return;
+            switch(readMode){
+            case 0:TrackedRenderTarget=&rc;break;
+            case 1:TrackedDepthStencil=&right;break;
+            case 2:RightEyeDepth=&left;break;
+            case 3:ExternalAtomicCandidates.Reset();break;
+            case 4:++R7CandidateBoundarySerial;break;
+            case 5:R7CandidateResetInFlight=1;break;
+            }
+        };
+        const auto allocations=ExternalAtomicCandidates.allocations;
+        const auto rasters=rasterCalls;
+        const auto got=R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0);
+        assert(got==(readPhase?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded));
+        assert(readCount==(readPhase?readPhase:3u));
+        assert(ExternalAtomicCandidates.allocations==allocations+unsigned(readPhase!=1));
+        assert(rasterCalls==rasters+unsigned(readPhase==0||readPhase==3));
+        assert(ExternalAtomicReplayEpoch==(readPhase?0u:PresentEpoch));
+        ++proofCases;
+    }
+    assert(proofCases==24);
+    left.onRead=nullptr;R7CandidateResetInFlight=0;
+    TrackedRenderTarget=&color;TrackedDepthStencil=&left;RightEyeDepth=&right;
     left.size=4;assert(!R7DepthRetentionProven(&left));
     left.size=8;left.readFail=true;assert(!R7DepthRetentionProven(&left));
     std::cout<<"R7_DEPTH_RETENTION_PROOF_PASS "<<cases<<" plus seed/replay and malformed tag cases\n";

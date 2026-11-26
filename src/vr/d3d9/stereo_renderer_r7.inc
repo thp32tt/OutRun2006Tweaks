@@ -2043,9 +2043,10 @@ namespace OutRunVRStereo
             IDirect3DSurface9* depth=nullptr;
             D3DVIEWPORT9 viewport{};
             RECT scissor{};
-            const bool captured=SUCCEEDED(d->GetRenderTarget(0,&rt))&&rt==expectedRt&&
-                SUCCEEDED(d->GetDepthStencilSurface(&depth))&&depth==expectedDepth&&
-                SUCCEEDED(d->GetViewport(&viewport))&&SUCCEEDED(d->GetScissorRect(&scissor))&&
+            const bool captured=SUCCEEDED(d->GetRenderTarget(0,&rt))&&rasterCurrent()&&rt==expectedRt&&
+                SUCCEEDED(d->GetDepthStencilSurface(&depth))&&rasterCurrent()&&depth==expectedDepth&&
+                SUCCEEDED(d->GetViewport(&viewport))&&rasterCurrent()&&
+                SUCCEEDED(d->GetScissorRect(&scissor))&&rasterCurrent()&&
                 viewport.Width&&viewport.Height&&viewport.X<pair.colorDesc.Width&&
                 viewport.Y<pair.colorDesc.Height&&
                 viewport.Width<=pair.colorDesc.Width-viewport.X&&
@@ -2062,6 +2063,7 @@ namespace OutRunVRStereo
                 const HRESULT hr=d->GetRenderTarget(slot,&aux);
                 isolated=!aux&&(SUCCEEDED(hr)||hr==D3DERR_NOTFOUND);
                 ReleaseCom(aux);
+                isolated=isolated&&rasterCurrent();
             }
             if(!isolated||!rasterCurrent()){ReleaseCom(depth);ReleaseCom(rt);return R7CandidateSeedResult::Unavailable;}
             bool seeded=true;
@@ -2107,19 +2109,26 @@ namespace OutRunVRStereo
             auto* const ld=TrackedDepthStencil;
             auto* const rc=RightEyeSurface;
             auto* const rd=RightEyeDepth;
-            if(!R7DepthRetentionProven(ld)||R7CandidateBoundarySerial!=boundary||PresentEpoch!=epoch)
-                return R7CandidateSeedResult::Unavailable;
+            // GetPrivateData is a driver call too. Never use the borrowed
+            // attachments or certify a receipt after it changes ownership.
+            auto ownershipCurrent=[&](){return PresentEpoch==epoch&&
+                R7CandidateBoundarySerial==boundary&&!R7CandidateResetInFlight&&
+                TrackedRenderTarget==lc&&TrackedDepthStencil==ld&&
+                RightEyeSurface==rc&&RightEyeDepth==rd;};
+            auto current=[&](){
+                const auto proofGeneration=ExternalAtomicCandidates.generation;
+                return ownershipCurrent()&&R7DepthRetentionProven(ld)&&
+                    ownershipCurrent()&&ExternalAtomicCandidates.generation==proofGeneration;
+            };
+            if(!current())return R7CandidateSeedResult::Unavailable;
             if(!ExternalAtomicCandidates.Ensure(device,lc,ld,rc,rd,viewport))
                 return R7CandidateSeedResult::Unavailable;
             if(FormatHasStencil(ExternalAtomicCandidates.depthDesc.Format)&&
                 !(flags&D3DCLEAR_STENCIL))return R7CandidateSeedResult::Unavailable;
             // Recheck ownership after allocation: it can call into the driver.
-            auto current=[&](){return PresentEpoch==epoch&&!R7CandidateResetInFlight&&
-                TrackedRenderTarget==lc&&TrackedDepthStencil==ld&&
-                RightEyeSurface==rc&&RightEyeDepth==rd&&R7DepthRetentionProven(ld)&&
-                R7CandidateBoundarySerial==boundary&&PresentEpoch==epoch;};
-            if(!current())return R7CandidateSeedResult::Unavailable;
             const auto generation=ExternalAtomicCandidates.generation;
+            if(!current()||ExternalAtomicCandidates.generation!=generation)
+                return R7CandidateSeedResult::Unavailable;
             InternalPassScope guard;
             const auto result=R7SeedInactivePair(ExternalAtomicCandidates,device,
                 lc,ld,
@@ -2127,7 +2136,8 @@ namespace OutRunVRStereo
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
                 [&](){return ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),flags,color,z,stencil);});
             if(result==R7CandidateSeedResult::Seeded){
-                if(ExternalAtomicCandidates.generation!=generation||!current()){
+                if(ExternalAtomicCandidates.generation!=generation||!current()||
+                    ExternalAtomicCandidates.generation!=generation){
                     ExternalAtomicReplayEpoch=0;
                     return R7CandidateSeedResult::Unavailable;
                 }
