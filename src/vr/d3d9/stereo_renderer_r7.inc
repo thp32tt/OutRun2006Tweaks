@@ -1773,39 +1773,51 @@ namespace OutRunVRStereo
             bool Ensure(IDirect3DDevice9* d,IDirect3DSurface9* lc,IDirect3DSurface9* ld,
                 IDirect3DSurface9* rc,IDirect3DSurface9* rd,const D3DVIEWPORT9& vp) noexcept {
                 if(device && device!=d)Reset();
+                // A driver call can synchronously retire this pair (ResetEx).
+                // Stop before dereferencing the next borrowed live attachment.
+                const auto descriptorGeneration=generation;
                 D3DSURFACE_DESC c{},z{},otherC{},otherZ{};
                 if(!d||!lc||!ld||!rc||!rd||lc==rc||ld==rd||
-                    FAILED(lc->GetDesc(&c))||FAILED(ld->GetDesc(&z))||
-                    FAILED(rc->GetDesc(&otherC))||FAILED(rd->GetDesc(&otherZ))||
+                    FAILED(lc->GetDesc(&c))||generation!=descriptorGeneration||
+                    FAILED(ld->GetDesc(&z))||generation!=descriptorGeneration||
+                    FAILED(rc->GetDesc(&otherC))||generation!=descriptorGeneration||
+                    FAILED(rd->GetDesc(&otherZ))||generation!=descriptorGeneration||
                     !Same(c,otherC)||!Same(z,otherZ)||!c.Width||!c.Height||
                     z.Width<c.Width||z.Height<c.Height||
                     c.MultiSampleType!=z.MultiSampleType||
                     c.MultiSampleQuality!=z.MultiSampleQuality||
                     !vp.Width||!vp.Height||vp.X>=c.Width||vp.Y>=c.Height||
                     vp.Width>c.Width-vp.X||vp.Height>c.Height-vp.Y) {
-                    Reset();return false;
+                    // Do not retire resources owned by a newer transaction.
+                    if(generation==descriptorGeneration)Reset();
+                    return false;
                 }
                 if(device==d && Same(colorDesc,c)&&Same(depthDesc,z)&&
                     eyes[0].color&&eyes[0].depth&&eyes[1].color&&eyes[1].depth)return true;
                 Reset();
+                const auto allocationGeneration=generation;
                 // Cache the immutable device limit with the allocation.
                 // Unknown/unsupported caps cannot establish RT isolation.
                 D3DCAPS9 caps{};
-                if(FAILED(d->GetDeviceCaps(&caps))||
+                if(FAILED(d->GetDeviceCaps(&caps))||generation!=allocationGeneration||
                     !caps.NumSimultaneousRTs||caps.NumSimultaneousRTs>4)return false;
                 R7AtomicCandidatePair pending;
                 for(auto& eye:pending.eyes){
                     if(FAILED(d->CreateRenderTarget(c.Width,c.Height,c.Format,
                         c.MultiSampleType,c.MultiSampleQuality,FALSE,&eye.color,nullptr))||
-                        !eye.color||
+                        !eye.color||generation!=allocationGeneration||
                         FAILED(d->CreateDepthStencilSurface(z.Width,z.Height,z.Format,
                         z.MultiSampleType,z.MultiSampleQuality,FALSE,&eye.depth,nullptr))||
-                        !eye.depth)return false;
+                        !eye.depth||generation!=allocationGeneration)return false;
                     D3DSURFACE_DESC actualC{},actualZ{};
-                    if(FAILED(eye.color->GetDesc(&actualC))||
-                        FAILED(eye.depth->GetDesc(&actualZ))||
+                    if(FAILED(eye.color->GetDesc(&actualC))||generation!=allocationGeneration||
+                        FAILED(eye.depth->GetDesc(&actualZ))||generation!=allocationGeneration||
                         !Same(c,actualC)||!Same(z,actualZ))return false;
                 }
+                // A reset during a successful allocation must not repopulate
+                // the retired cache with pre-reset resources. Pending owns all
+                // partial allocations and releases them on every failure.
+                if(generation!=allocationGeneration)return false;
                 for(unsigned i=0;i<2;++i){
                     eyes[i]=pending.eyes[i];pending.eyes[i]={};
                 }

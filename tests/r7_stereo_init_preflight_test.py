@@ -112,18 +112,22 @@ struct RECT {int left=0,top=0,right=1920,bottom=1080;};
 struct IDirect3DSurface9 {
     D3DSURFACE_DESC desc{};
     int refs=0;
-    HRESULT GetDesc(D3DSURFACE_DESC* d){*d=desc;return S_OK;}
+    void (*onDesc)()=nullptr;
+    HRESULT GetDesc(D3DSURFACE_DESC* d){*d=desc;if(onDesc)onDesc();return S_OK;}
     void Release(){assert(refs>0);--refs;}
 };
 template<class T> void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
 struct IDirect3DDevice9 {
     IDirect3DSurface9 made[32]{};
     unsigned calls=0,failAt=0,nullAt=0,mismatchAt=0;
+    unsigned retireAt=0,retireDescAt=0;
+    bool retireCaps=false;
+    void (*onRetire)()=nullptr;
     unsigned io=0,ioFail=0,clearCalls=0,liveWrites=0;
     UINT capsTargets=1,capsCalls=0,auxCalls=0;
     HRESULT capsHr=S_OK,auxHr[4]{S_OK,D3DERR_NOTFOUND,D3DERR_NOTFOUND,D3DERR_NOTFOUND};
     IDirect3DSurface9* aux[4]{};
-    HRESULT GetDeviceCaps(D3DCAPS9* c){++capsCalls;c->NumSimultaneousRTs=capsTargets;return capsHr;}
+    HRESULT GetDeviceCaps(D3DCAPS9* c){++capsCalls;c->NumSimultaneousRTs=capsTargets;if(retireCaps&&onRetire)onRetire();return capsHr;}
     IDirect3DSurface9 *rt=nullptr,*depth=nullptr,*liveRt=nullptr,*liveDepth=nullptr;
     D3DVIEWPORT9 viewport{0,0,1920,1080};
     RECT scissor{4,5,1800,1000};
@@ -144,7 +148,10 @@ struct IDirect3DDevice9 {
         auto& s=made[calls++];assert(!s.refs);
         if(calls==nullAt){*out=nullptr;return S_OK;}
         s.desc={w,h,f,m,q};if(calls==mismatchAt)++s.desc.Width;
-        s.refs=1;*out=&s;return calls==failAt?E_FAIL:S_OK;
+        s.refs=1;*out=&s;
+        if(calls==retireDescAt)s.onDesc=onRetire;
+        if(calls==retireAt&&onRetire)onRetire();
+        return calls==failAt?E_FAIL:S_OK;
     }
     HRESULT CreateRenderTarget(UINT w,UINT h,UINT f,UINT m,UINT q,int,IDirect3DSurface9** out,void*){return create(w,h,f,m,q,out);}
     HRESULT CreateDepthStencilSurface(UINT w,UINT h,UINT f,UINT m,UINT q,int,IDirect3DSurface9** out,void*){return create(w,h,f,m,q,out);}
@@ -231,6 +238,41 @@ int main(){
     assert(R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,[&](){return d.clear();},2,1)==R7CandidateSeedResult::Unavailable);
     assert(d.io==before);
     pair.Reset();d.empty();
+    // Interrupt the exact allocator at every live descriptor, caps query,
+    // creation and created-descriptor query. No retired cache may reappear.
+    static R7AtomicCandidatePair* resetPair=nullptr;
+    resetPair=&pair;
+    auto retire=+[](){resetPair->Reset();};
+    IDirect3DSurface9* live[]{&lc,&ld,&rc,&rd};
+    for(unsigned k=0;k<4;++k){
+        IDirect3DDevice9 interruptedDevice;
+        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp));
+        const auto beforeGeneration=pair.generation;
+        live[k]->onDesc=retire;
+        assert(!pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp));
+        live[k]->onDesc=nullptr;
+        assert(pair.generation!=beforeGeneration&&!pair.device&&interruptedDevice.calls==4);
+        interruptedDevice.empty();
+        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp)&&interruptedDevice.calls==8);
+        pair.Reset();interruptedDevice.empty();
+    }
+    for(unsigned phase=0;phase<9;++phase){
+        IDirect3DDevice9 interruptedDevice;
+        interruptedDevice.onRetire=retire;
+        interruptedDevice.retireCaps=phase==0;
+        if(phase>=1&&phase<=4)interruptedDevice.retireAt=phase;
+        if(phase>=5)interruptedDevice.retireDescAt=phase-4;
+        assert(!pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp));
+        assert(!pair.device&&!pair.eyes[0].color&&!pair.eyes[1].depth);
+        interruptedDevice.empty();
+        const unsigned expected=phase==0?0u:phase<=4?phase:phase<=6?2u:4u;
+        assert(interruptedDevice.calls==expected);
+        interruptedDevice.retireCaps=false;
+        interruptedDevice.retireAt=interruptedDevice.retireDescAt=0;
+        assert(pair.Ensure(&interruptedDevice,&lc,&ld,&rc,&rd,vp));
+        assert(interruptedDevice.calls==expected+4);
+        pair.Reset();interruptedDevice.empty();
+    }
     // Caps failures must precede all allocations; valid limits are cached.
     for(unsigned limit: {0u,5u,4u}){
         IDirect3DDevice9 bad;
