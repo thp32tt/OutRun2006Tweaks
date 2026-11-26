@@ -1425,7 +1425,9 @@ assert "CreateAdditionalSwapChainVtableIndex = 13;" in source
 assert "chainTarget,R7CandidateSwapChainPresentDest,disabled" in source
 assert "additionalTarget,R7CandidateAdditionalSwapChainDest,disabled" in source
 assert "R7GetImplicitChainPresentTarget(device)==R7CandidateSwapChainPresentTarget" in source
-assert "if(!R7CandidateSwapChainCovered(device))return R7CandidateSeedResult::Unavailable;" in source
+chain_gate="if(!ownershipCurrent()||!R7CandidateSwapChainCovered(device)||\n                !ownershipCurrent()||ExternalAtomicCandidates.generation!=chainGeneration)\n                return R7CandidateSeedResult::Unavailable;"
+assert chain_gate in source
+assert source.index("const auto chainGeneration=ExternalAtomicCandidates.generation;") < source.index(chain_gate) < source.index("if(!ExternalAtomicCandidates.Ensure(device,lc,ld,rc,rd,viewport,ownershipCurrent))")
 with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"swapchain.cpp"
     exe=Path(temp)/"swapchain"
