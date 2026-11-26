@@ -1401,22 +1401,33 @@ namespace OutRunVRStereo
 			return FloatArrayNear(current, verified, 16, VerifiedWvpEpsilon);
 		}
 
-		bool SetWvpOneRegisterAtATime(IDirect3DDevice9* device, const float* constants)
-		{
-			for (UINT reg = 0; reg < OutRunWvpRegisterCount; ++reg)
-				if (FAILED(device->SetVertexShaderConstantF(OutRunWvpRegister + reg, constants + reg * 4, 1))) return false;
-			return true;
-		}
+        // Defined after the resource owner; eye-state helpers also serve R30.
+        std::uint64_t R7EyeStateGeneration() noexcept;
 
-		// Upload may stop on failure; rollback must attempt every original register.
-		bool RestoreWvpOneRegisterAtATime(IDirect3DDevice9* device, const float* constants)
-		{
-			return OutRunVR::DinoSidecar::RestoreStereoWvpRegisters(
-				OutRunWvpRegisterCount, [&](unsigned reg) {
-					return SUCCEEDED(device->SetVertexShaderConstantF(
-						OutRunWvpRegister + reg, constants + reg * 4, 1));
-				});
-		}
+        bool SetWvpOneRegisterAtATime(IDirect3DDevice9* device, const float* constants)
+        {
+            const auto generation=R7EyeStateGeneration();
+            for(UINT reg=0;reg<OutRunWvpRegisterCount;++reg){
+                if(R7EyeStateGeneration()!=generation ||
+                    FAILED(device->SetVertexShaderConstantF(
+                        OutRunWvpRegister+reg,constants+reg*4,1)))return false;
+            }
+            return R7EyeStateGeneration()==generation;
+        }
+
+        // Ordinary HRESULT failures require independent recovery. A reset
+        // retires the entire saved state: do not write it into the new owner.
+        bool RestoreWvpOneRegisterAtATime(IDirect3DDevice9* device, const float* constants)
+        {
+            const auto generation=R7EyeStateGeneration();
+            bool ok=true;
+            for(UINT reg=0;reg<OutRunWvpRegisterCount;++reg){
+                if(R7EyeStateGeneration()!=generation)return false;
+                if(FAILED(device->SetVertexShaderConstantF(
+                    OutRunWvpRegister+reg,constants+reg*4,1)))ok=false;
+            }
+            return ok&&R7EyeStateGeneration()==generation;
+        }
 
         // The PBR VS consumes c4/c8 directly (not D3DTS_VIEW/PROJECTION).
         // Its pixel shader also requires the matching per-eye camera position.
@@ -1425,54 +1436,62 @@ namespace OutRunVRStereo
         {
             if(!device || !draw.externalPbrWorld || eye<0 || eye>1)
                 return false;
+            const auto generation=R7EyeStateGeneration();
+            auto current=[&](){return R7EyeStateGeneration()==generation;};
             const auto& view=draw.fixedEyeView[eye];
             const auto& projection=draw.fixedEyeProjection[eye];
             float camera[4]{};
             if(!OutRunVR::DinoSidecar::ExternalPbrEyeConstants(
                     &view.m[0][0],draw.originalPbrEye[3],camera))
                 return false;
-            return SUCCEEDED(device->SetVertexShaderConstantF(
-                    4,&view.m[0][0],4)) &&
+            return current()&&SUCCEEDED(device->SetVertexShaderConstantF(
+                    4,&view.m[0][0],4)) && current() &&
                 SUCCEEDED(device->SetVertexShaderConstantF(
-                    8,&projection.m[0][0],4)) &&
-                SUCCEEDED(device->SetPixelShaderConstantF(1,camera,1));
+                    8,&projection.m[0][0],4)) && current() &&
+                SUCCEEDED(device->SetPixelShaderConstantF(1,camera,1))&&current();
         }
 
         bool RestoreExternalPbrConstants(IDirect3DDevice9* device,
             const DrawStereoState& draw)
         {
             if(!device || !draw.externalPbrWorld)return false;
-            // Always attempt all three restorations, even if one fails.
-            // A failed restoration quarantines the current external frame.
+            const auto generation=R7EyeStateGeneration();
+            auto current=[&](){return R7EyeStateGeneration()==generation;};
             const bool viewOk=SUCCEEDED(device->SetVertexShaderConstantF(
                 4,draw.originalPbrView,4));
+            if(!current())return false;
             const bool projOk=SUCCEEDED(device->SetVertexShaderConstantF(
                 8,draw.originalPbrProjection,4));
+            if(!current())return false;
             const bool eyeOk=SUCCEEDED(device->SetPixelShaderConstantF(
                 1,draw.originalPbrEye,1));
-            return viewOk && projOk && eyeOk;
+            return viewOk&&projOk&&eyeOk&&current();
         }
 
-		bool SetFixedFunctionEyeTransforms(IDirect3DDevice9* device,
-			const DrawStereoState& draw, int eye)
-		{
-			return device && eye >= 0 && eye < 2 &&
-				SUCCEEDED(device->SetTransform(
-					D3DTS_VIEW, &draw.fixedEyeView[eye])) &&
-				SUCCEEDED(device->SetTransform(
-					D3DTS_PROJECTION, &draw.fixedEyeProjection[eye]));
-		}
+        bool SetFixedFunctionEyeTransforms(IDirect3DDevice9* device,
+            const DrawStereoState& draw,int eye)
+        {
+            const auto generation=R7EyeStateGeneration();
+            auto current=[&](){return R7EyeStateGeneration()==generation;};
+            return device&&eye>=0&&eye<2&&
+                SUCCEEDED(device->SetTransform(
+                    D3DTS_VIEW,&draw.fixedEyeView[eye]))&&current()&&
+                SUCCEEDED(device->SetTransform(
+                    D3DTS_PROJECTION,&draw.fixedEyeProjection[eye]))&&current();
+        }
 
-		bool RestoreFixedFunctionTransforms(IDirect3DDevice9* device,
-			const DrawStereoState& draw)
-		{
-			if(!device)return false;
-			return OutRunVR::DinoSidecar::RestoreExternalStereoTransformPair(
-				[&]() { return SUCCEEDED(device->SetTransform(
-					D3DTS_VIEW, &draw.fixedOriginalView)); },
-				[&]() { return SUCCEEDED(device->SetTransform(
-					D3DTS_PROJECTION, &draw.fixedOriginalProjection)); });
-		}
+        bool RestoreFixedFunctionTransforms(IDirect3DDevice9* device,
+            const DrawStereoState& draw)
+        {
+            if(!device)return false;
+            const auto generation=R7EyeStateGeneration();
+            const bool viewOk=SUCCEEDED(device->SetTransform(
+                D3DTS_VIEW,&draw.fixedOriginalView));
+            if(R7EyeStateGeneration()!=generation)return false;
+            const bool projectionOk=SUCCEEDED(device->SetTransform(
+                D3DTS_PROJECTION,&draw.fixedOriginalProjection));
+            return viewOk&&projectionOk&&R7EyeStateGeneration()==generation;
+        }
 
 		bool FormatHasStencil(D3DFORMAT format)
 		{
@@ -1838,6 +1857,7 @@ namespace OutRunVRStereo
             }
         };
         R7AtomicCandidatePair ExternalAtomicCandidates{};
+        std::uint64_t R7EyeStateGeneration() noexcept {return ExternalAtomicCandidates.generation;}
         std::uint64_t ExternalAtomicAllocationAttemptEpoch=0;
         // Physical presentation may not advance the stock PresentEpoch.
         std::uint64_t R7CandidateBoundarySerial=0;
@@ -3199,8 +3219,21 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 OutRunVR::DinoSidecar::ProveExternalNoPhysicalDraw();
                 return E_FAIL;
             }
+            // One owner from LEFT viewport capture through both physical eyes.
+            const auto leftGeneration=ExternalAtomicCandidates.generation;
+            auto leftCurrent=[&](){return ExternalAtomicCandidates.generation==leftGeneration;};
+            auto retiredLeft=[&](){
+                ExternalAtomicReplayEpoch=0;
+                RightDepthSynchronized=false;RightStencilSynchronized=false;
+                LastMainDepthClearStamp.Invalidate();
+                NoteRestoreFailure("R7 left-eye owner retired");
+                OutRunVR::DinoSidecar::RecordExternalPreRasterRollback(false);
+                return E_FAIL;
+            };
 			D3DVIEWPORT9 savedViewport{};
-			if(FAILED(device->GetViewport(&savedViewport)))
+            const HRESULT viewportHr=device->GetViewport(&savedViewport);
+            if(!leftCurrent())return retiredLeft();
+			if(FAILED(viewportHr))
 			{
 				InvalidateRightDepthStencilIfLeftMayWrite(device);
 				PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);
@@ -3209,7 +3242,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
                     return E_FAIL;
                 }
 				RevokeDepthClearReplayBeforeLeftDraw(device);
+				if(!leftCurrent())return retiredLeft();
 				const HRESULT hr=drawCall();
+                if(!leftCurrent()){retiredLeft();return hr;}
 				R7TraceVisualEyes(visualTrace,"VIEWPORT_REJECT_SINGLE",true,
 					draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
 					true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,true,
@@ -3227,6 +3262,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                         SetFixedFunctionEyeTransforms(device,draw,0) :
                         SetWvpOneRegisterAtATime(device,draw.eyeConstants[0]));
 				}
+                if(!leftCurrent())return retiredLeft();
 				if(!leftEyeOk)
 				{
 					bool rolledBack=false;
@@ -3238,7 +3274,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
                             RestoreFixedFunctionTransforms(device,draw) :
                             RestoreWvpOneRegisterAtATime(device,draw.originalConstants));
 					}
+                    if(!leftCurrent())return retiredLeft();
 					InvalidateRightDepthStencilIfLeftMayWrite(device);
+                    if(!leftCurrent())return retiredLeft();
 					PoisonFrame(OutRunVR::StereoFailureLeftWvpUploadFailed);
 					if(!rolledBack)
 						NoteRestoreFailure(draw.fixedFunctionWorld?
@@ -3249,7 +3287,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
                         return E_FAIL;
                     }
 					RevokeDepthClearReplayBeforeLeftDraw(device);
+                    if(!leftCurrent())return retiredLeft();
 					const HRESULT hr=drawCall();
+                    if(!leftCurrent()){retiredLeft();return hr;}
                     // Partial LEFT-eye transform upload can fail during
                     // original transform rollback. An absent pair report
                     // would otherwise misclassify this as a safe soft retry.
@@ -3270,9 +3310,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 !OutRunVR::DinoSidecar::ActiveExternalStereoMesh &&
                 ExternalAtomicReplayEpoch==PresentEpoch;
             RevokeDepthClearReplayBeforeLeftDraw(device,mirrorCandidate);
+            if(!leftCurrent())return retiredLeft();
             if(mirrorCandidate){
                 const auto replay=R7ReplayInactiveDraw(device,0,TrackedRenderTarget,
                     TrackedDepthStencil,drawCall,up,indexedUp);
+                if(!leftCurrent())return retiredLeft();
                 if(replay==R7CandidateSeedResult::DirtyRestore){
                     if(draw.worldStereo){
                         InternalPassScope guard;
@@ -3280,17 +3322,21 @@ if(WaitForEventQuery(slot.fence,1,0u))
                         else if(draw.fixedFunctionWorld)RestoreFixedFunctionTransforms(device,draw);
                         else RestoreWvpOneRegisterAtATime(device,draw.originalConstants);
                     }
+                    if(!leftCurrent())return retiredLeft();
                     RightDepthSynchronized=false;RightStencilSynchronized=false;
                     LastMainDepthClearStamp.Invalidate();
                     NoteRestoreFailure("external inactive left replay");
                     return E_FAIL;
                 }
             }
+            if(!leftCurrent())return retiredLeft();
 			const HRESULT leftHr=drawCall();
+            if(!leftCurrent()){retiredLeft();return leftHr;}
 			if(FAILED(leftHr))
 			{
                 ExternalAtomicReplayEpoch=0;
 				InvalidateRightDepthStencilIfLeftMayWrite(device);
+                if(!leftCurrent()){retiredLeft();return leftHr;}
 				PoisonFrame(OutRunVR::StereoFailureLeftDrawFailed);
 				bool restored=true;
 				if(draw.worldStereo)
@@ -3304,6 +3350,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                             RestoreFixedFunctionTransforms(device,draw) :
                             RestoreWvpOneRegisterAtATime(device,draw.originalConstants));
 					}
+                    if(!leftCurrent()){retiredLeft();return leftHr;}
 					if(!restored)
 						NoteRestoreFailure(draw.fixedFunctionWorld?
 							"left draw fixed-function transforms":"left draw c64");
@@ -3316,7 +3363,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					failureAtEntry,FrameFailureReason);
 				return leftHr;
 			}
-			const auto rightGeneration=ExternalAtomicCandidates.generation;
+			const auto rightGeneration=leftGeneration;
             auto rightCurrent=[&](){return ExternalAtomicCandidates.generation==rightGeneration;};
             IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;
 			HRESULT rightHr=D3D_OK;

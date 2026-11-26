@@ -561,3 +561,136 @@ with tempfile.TemporaryDirectory() as directory:
     subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror",
                     str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
     subprocess.run([str(p/"probe")],check=True)
+
+# Iter103: execute the actual six R7 eye-state upload/restore functions.
+# Mock only driver calls and PBR camera math; no duplicate recovery model.
+body = r7[r7.index("bool SetWvpOneRegisterAtATime("):
+          r7.index("bool FormatHasStencil(")]
+assert "std::uint64_t R7EyeStateGeneration() noexcept {return ExternalAtomicCandidates.generation;}" in r7
+owner = draw[draw.index("const auto leftGeneration="):]
+assert owner.index("const auto leftGeneration=") < owner.index("device->GetViewport(&savedViewport)")
+assert owner.index("if(!leftCurrent())return retiredLeft();") < owner.index("if(FAILED(viewportHr))")
+assert "if(!leftCurrent())return retiredLeft();\n\t\t\t\tif(!leftEyeOk)" in owner
+assert "if(!leftCurrent())return retiredLeft();\n\t\t\tconst HRESULT leftHr=drawCall();" in owner
+assert "if(!leftCurrent()){retiredLeft();return leftHr;}" in owner
+assert owner.index("if(!leftCurrent()){retiredLeft();return leftHr;}") < owner.index("const auto rightGeneration=leftGeneration;")
+assert owner.index("R7ReplayInactiveDraw(device,0") < owner.index("if(!leftCurrent())return retiredLeft();",owner.index("R7ReplayInactiveDraw(device,0")) < owner.index("if(replay==R7CandidateSeedResult::DirtyRestore)")
+prefix = r'''
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using UINT=unsigned;using HRESULT=int;
+#define FAILED(x) ((x)<0)
+#define SUCCEEDED(x) ((x)>=0)
+constexpr UINT OutRunWvpRegister=64,OutRunWvpRegisterCount=4;
+constexpr unsigned D3DTS_VIEW=2,D3DTS_PROJECTION=3;
+struct Matrix {float m[4][4]{};};
+struct DrawStereoState{
+    bool externalPbrWorld=true;
+    Matrix fixedEyeView[2],fixedEyeProjection[2],fixedOriginalView,fixedOriginalProjection;
+    float originalPbrEye[4]{},originalPbrView[16]{},originalPbrProjection[16]{};
+};
+std::uint64_t generation=1;
+std::uint64_t R7EyeStateGeneration() noexcept{return generation;}
+unsigned failAt=0,retireAt=0;
+bool cameraOk=true;
+struct Write {unsigned kind,reg,count;float first;};
+std::vector<Write> writes;
+struct IDirect3DDevice9{
+    HRESULT call(unsigned kind,unsigned reg,unsigned count,float first){
+        writes.push_back({kind,reg,count,first});
+        if(writes.size()==retireAt)++generation;
+        return writes.size()==failAt?-1:0;
+    }
+    HRESULT SetVertexShaderConstantF(UINT reg,const float* p,UINT count){return call(0,reg,count,*p);}
+    HRESULT SetPixelShaderConstantF(UINT reg,const float* p,UINT count){return call(1,reg,count,*p);}
+    HRESULT SetTransform(unsigned reg,const Matrix* p){return call(2,reg,1,p->m[0][0]);}
+};
+namespace OutRunVR::DinoSidecar {
+bool ExternalPbrEyeConstants(const float* v,float alpha,float* camera){
+    camera[0]=v[0]+alpha;return cameraOk;
+}
+}
+'''
+suffix = r'''
+int main(){
+    IDirect3DDevice9 dev;
+    DrawStereoState d;
+    float wvp[16]{};
+    for(unsigned i=0;i<4;++i)wvp[4*i]=float(10+i);
+    for(int i=0;i<2;++i){
+        d.fixedEyeView[i].m[0][0]=float(20+i);
+        d.fixedEyeProjection[i].m[0][0]=float(30+i);
+    }
+    d.originalPbrEye[0]=40;d.originalPbrEye[3]=2;
+    d.originalPbrView[0]=50;d.originalPbrProjection[0]=60;
+    d.fixedOriginalView.m[0][0]=70;d.fixedOriginalProjection.m[0][0]=80;
+    unsigned cases=0;
+    // Both eye uploads, all restoration routes, failure and retirement
+    // independently injected at every physical write, including final write.
+    for(unsigned route=0;route<8;++route){
+        const bool restoring=route==1||route==4||route==7;
+        const unsigned n=route<2?4:route<5?3:2;
+        std::vector<Write> expected;
+        if(route<2){
+            for(unsigned i=0;i<4;++i)expected.push_back({0,64+i,1,float(10+i)});
+        }else if(route<4){
+            const float eye=float(route-2);
+            expected={{0,4,4,20+eye},{0,8,4,30+eye},{1,1,1,22+eye}};
+        }else if(route==4){
+            expected={{0,4,4,50},{0,8,4,60},{1,1,1,40}};
+        }else if(route<7){
+            const float eye=float(route-5);
+            expected={{2,D3DTS_VIEW,1,20+eye},{2,D3DTS_PROJECTION,1,30+eye}};
+        }else{
+            expected={{2,D3DTS_VIEW,1,70},{2,D3DTS_PROJECTION,1,80}};
+        }
+        for(unsigned fail=0;fail<=n;++fail)
+        for(unsigned retire=0;retire<=n;++retire){
+            writes.clear();failAt=fail;retireAt=retire;
+            const auto before=generation;
+            bool ok=false;
+            switch(route){
+                case 0:ok=SetWvpOneRegisterAtATime(&dev,wvp);break;
+                case 1:ok=RestoreWvpOneRegisterAtATime(&dev,wvp);break;
+                case 2:case 3:ok=SetExternalPbrEyeConstants(&dev,d,int(route-2));break;
+                case 4:ok=RestoreExternalPbrConstants(&dev,d);break;
+                case 5:case 6:ok=SetFixedFunctionEyeTransforms(&dev,d,int(route-5));break;
+                case 7:ok=RestoreFixedFunctionTransforms(&dev,d);break;
+            }
+            unsigned count=n;
+            if(!restoring&&fail)count=std::min(count,fail);
+            if(retire)count=std::min(count,retire);
+            assert(writes.size()==count&&ok==(!fail&&!retire));
+            assert(generation==before+unsigned(retire&&retire<=count));
+            for(unsigned i=0;i<count;++i){
+                const auto a=writes[i],b=expected[i];
+                assert(a.kind==b.kind&&a.reg==b.reg&&a.count==b.count&&a.first==b.first);
+            }
+            ++cases;
+        }
+    }
+    assert(cases==125);
+    failAt=retireAt=0;writes.clear();
+    assert(!SetExternalPbrEyeConstants(&dev,d,-1));
+    assert(!SetExternalPbrEyeConstants(&dev,d,2));
+    assert(!SetExternalPbrEyeConstants(nullptr,d,0));
+    cameraOk=false;
+    assert(!SetExternalPbrEyeConstants(&dev,d,0));
+    d.externalPbrWorld=false;
+    assert(!RestoreExternalPbrConstants(&dev,d));
+    assert(!SetFixedFunctionEyeTransforms(&dev,d,-1));
+    assert(!SetFixedFunctionEyeTransforms(&dev,d,2));
+    assert(!RestoreFixedFunctionTransforms(nullptr,d));
+    assert(writes.empty());
+    std::cout<<"R7_EYE_STATE_GENERATION_PASS "<<cases<<" + 8 invalid-input cases\n";
+}
+'''
+with tempfile.TemporaryDirectory() as directory:
+    p = Path(directory)
+    (p/"probe.cpp").write_text(prefix+body+suffix)
+    subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror",
+                    str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
+    subprocess.run([str(p/"probe")],check=True)
