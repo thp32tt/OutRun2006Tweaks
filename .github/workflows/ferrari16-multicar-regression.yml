@@ -377,7 +377,7 @@ jobs:
         run: |
           set -euo pipefail
           changed="$(git diff --name-only 2446269aa33bc3c90a2a57f36a650cdd4d4fd5d7 HEAD -- src/vr/d3d9)"
-          if grep -Ev '^src/vr/d3d9/(stereo_renderer(\.cpp|_r(7\.inc|13\.cpp|22\.cpp|23\.cpp|29\.cpp|30\.cpp|32\.cpp|33\.cpp))|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
+          if grep -Ev '^src/vr/d3d9/(stereo_renderer(\.cpp|_r(7\.inc|13\.cpp|22\.cpp|23\.cpp|29\.cpp|30\.cpp|30_r26_safe\.cpp|32\.cpp|33\.cpp))|r30_particle_(dual_eye_ring|upload_policy)\.hpp|depth_clear_replay_stamp\.hpp)$' <<< "$changed" | grep -q .; then
             echo "$changed"
             exit 1
           fi
@@ -385,6 +385,8 @@ jobs:
           test "$(git hash-object src/vr/d3d9/stereo_renderer.cpp)" = 62dd2e7fee54b7735fd4520ddf4dd0673ad536f9
           test "$(git hash-object src/vr/d3d9/stereo_renderer_r22.cpp)" = 98fdd61cadf8fac632bde296047a8f2b8bf8f18e
           test "$(git hash-object src/vr/d3d9/stereo_renderer_r23.cpp)" = cfdeee7950b47432797784003371dd5230967b71
+          # Iter102: three R30 safe owners now pass the pre-bind generation to R7.
+          test "$(git hash-object src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp)" = b8d6d80ac87e9129eb6f268c33fac17abab977d9
           # Only these exact reviewed R30 transaction helper blobs are allowed.
           # Further byte changes fail closed; the R32 bridge guard remains.
           test "$(git hash-object src/vr/d3d9/r30_particle_dual_eye_ring.hpp)" = 55832210c09cff2c4940d7a06745b15f09284243

@@ -3307,22 +3307,27 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
 
             R30CaptureSkyGlowSceneBeforeHud(device);
+            const auto rightGeneration = ExternalAtomicCandidates.generation;
+            auto rightCurrent = [&]() { return ExternalAtomicCandidates.generation == rightGeneration; };
             auto setEye = [&](int eye) {
                 InternalPassScope guard;
-                return SUCCEEDED(device->SetViewport(&eyeViewport)) &&
+                return rightCurrent() && SUCCEEDED(device->SetViewport(&eyeViewport)) && rightCurrent() &&
                        SUCCEEDED(device->SetTransform(
-                           D3DTS_PROJECTION, &eyeProjection[eye])) &&
-                       SUCCEEDED(device->SetScissorRect(&eyeScissors[eye]));
+                           D3DTS_PROJECTION, &eyeProjection[eye])) && rightCurrent() &&
+                       SUCCEEDED(device->SetScissorRect(&eyeScissors[eye])) && rightCurrent();
             };
             auto restoreRaster = [&]() {
                 InternalPassScope guard;
+                if (!rightCurrent()) return false;
                 const bool proj = SUCCEEDED(device->SetTransform(
                     D3DTS_PROJECTION, &stockProjection));
+                if (!rightCurrent()) return false;
                 const bool scissors = SUCCEEDED(
                     device->SetScissorRect(&stockScissor));
+                if (!rightCurrent()) return false;
                 const bool viewport = SUCCEEDED(
                     device->SetViewport(&state.viewport));
-                return proj && scissors && viewport;
+                return proj && scissors && viewport && rightCurrent();
             };
             if (!setEye(0))
             {
@@ -3347,6 +3352,11 @@ namespace OutRunVRStereo
                 return leftHr;
             }
 
+            if (!rightCurrent()) {
+                NoteRestoreFailure("R30/F11 retired eye owner");
+                R30ArmSafeFallback();
+                return E_FAIL;
+            }
             IDirect3DSurface9* const savedRt = TrackedRenderTarget;
             IDirect3DSurface9* const savedDepth = TrackedDepthStencil;
             HRESULT rightHr = D3D_OK;
@@ -3357,18 +3367,19 @@ namespace OutRunVRStereo
                 InternalPassScope guard;
                 rightHr = SetRenderTargetHook.stdcall<HRESULT>(
                     device, 0u, RightEyeSurface);
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && rightCurrent())
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
                         device, savedDepth ? RightEyeDepth : nullptr);
-                if (SUCCEEDED(rightHr) && !setEye(1))
+                if (SUCCEEDED(rightHr) && rightCurrent() && !setEye(1))
                     rightHr = E_FAIL;
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && rightCurrent())
                 {
                     rightReason = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = draw();
                 }
+                if (!rightCurrent()) rightHr = E_FAIL;
                 restored = RestoreRightPassState(device,
-                    savedRt, savedDepth, state.viewport, nullptr, false);
+                    savedRt, savedDepth, state.viewport, nullptr, false, rightGeneration);
             }
             restored = restoreRaster() && restored;
             // Review 01499: a failed RIGHT setter/draw or raster restore did
@@ -4780,6 +4791,8 @@ namespace OutRunVRStereo
                 return leftHr;
             }
 
+            const auto rightGeneration = ExternalAtomicCandidates.generation;
+            auto rightCurrent = [&]() { return ExternalAtomicCandidates.generation == rightGeneration; };
             IDirect3DSurface9* savedRt = TrackedRenderTarget;
             IDirect3DSurface9* savedDepth = TrackedDepthStencil;
             // Exact retail 418CF0 particles can issue thousands of tiny
@@ -4813,7 +4826,7 @@ namespace OutRunVRStereo
                     device, 0u, RightEyeSurface);
                 if (trace)
                     trace->rightTargetHr = rightHr;
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && rightCurrent())
                 {
                     if (!particleDepthFast)
                         rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
@@ -4821,7 +4834,7 @@ namespace OutRunVRStereo
                     if (trace)
                         trace->rightDepthHr = rightHr;
                 }
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && rightCurrent())
                 {
                     // SetRenderTarget(0) already resets to the full target
                     // viewport. Exact 418CF0 uses that full viewport, so the
@@ -4831,21 +4844,23 @@ namespace OutRunVRStereo
                     if (trace)
                         trace->rightViewportHr = rightHr;
                 }
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && rightCurrent())
                 {
                     rightFailure =
                         OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = rightDraw();
                 }
+                if (!rightCurrent()) rightHr = E_FAIL;
                 if (particleViewportFast || particleDepthFast)
                 {
                     // Mirror RestoreRightPassState, but omit only the state
                     // which is already correct by the exact fast-route proof.
                     restoreOk = true;
-                    if (savedRt && FAILED(SetRenderTargetHook.stdcall<HRESULT>(
+                    if (!rightCurrent()) restoreOk = false;
+                    if (rightCurrent() && savedRt && FAILED(SetRenderTargetHook.stdcall<HRESULT>(
                             device, 0u, savedRt)))
                         restoreOk = false;
-                    if (!particleDepthFast)
+                    if (rightCurrent() && !particleDepthFast)
                     {
                         const HRESULT depthHr =
                             SetDepthStencilSurfaceHook
@@ -4857,14 +4872,15 @@ namespace OutRunVRStereo
                     }
                     // Restoring RT0 resets to the full saved target viewport,
                     // which is exactly state.viewport under particleViewportFast.
-                    if (!particleViewportFast &&
+                    if (rightCurrent() && !particleViewportFast &&
                         FAILED(device->SetViewport(&state.viewport)))
                         restoreOk = false;
+                    if (!rightCurrent()) restoreOk = false;
                 }
                 else
                 {
                     restoreOk = RestoreRightPassState(device,
-                        savedRt, savedDepth, state.viewport, nullptr, false);
+                        savedRt, savedDepth, state.viewport, nullptr, false, rightGeneration);
                 }
             }
             if (trace)
@@ -7581,6 +7597,8 @@ namespace OutRunVRStereo
                 return leftHr;
             }
 
+            const auto rightGeneration = ExternalAtomicCandidates.generation;
+            auto rightCurrent = [&]() { return ExternalAtomicCandidates.generation == rightGeneration; };
             IDirect3DSurface9* savedRt = TrackedRenderTarget;
             IDirect3DSurface9* savedDepth = TrackedDepthStencil;
             std::uintptr_t lensLeftRtPtr = 0;
@@ -7604,7 +7622,7 @@ namespace OutRunVRStereo
                         lensLeftRtFormat = desc.Format;
                     }
                 }
-                if (RightEyeSurface)
+                if (rightCurrent() && RightEyeSurface)
                 {
                     lensRightRtPtr =
                         reinterpret_cast<std::uintptr_t>(RightEyeSurface);
@@ -7624,20 +7642,20 @@ namespace OutRunVRStereo
             {
                 InternalPassScope guard;
                 lensTransaction.rightStage = "RIGHT_RT";
-                rightHr = SetRenderTargetHook.stdcall<HRESULT>(
-                    device, 0u, RightEyeSurface);
-                if (SUCCEEDED(rightHr))
+                rightHr = rightCurrent() ? SetRenderTargetHook.stdcall<HRESULT>(
+                    device, 0u, RightEyeSurface) : E_FAIL;
+                if (SUCCEEDED(rightHr) && rightCurrent())
                 {
                     lensTransaction.rightStage = "RIGHT_DEPTH";
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
                         device, TrackedDepthStencil ? RightEyeDepth : nullptr);
                 }
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && rightCurrent())
                 {
                     lensTransaction.rightStage = "RIGHT_VIEWPORT";
                     rightHr = device->SetViewport(&savedViewport);
                 }
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && rightCurrent())
                 {
                     lensTransaction.rightStage = "RIGHT_WVP";
                     lensTransaction.rightWvpAttempted = true;
@@ -7650,21 +7668,24 @@ namespace OutRunVRStereo
                         rightHr = E_FAIL;
                     }
                 }
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && rightCurrent())
                 {
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     lensTransaction.rightStage = "RIGHT_DRAW";
                     if (lensTransaction.sample) lensTransaction.right.Capture(device);
-                    lensTransaction.rightDrawAttempted = true;
-                    rightHr = actualDraw();
+                    if (rightCurrent()) {
+                        lensTransaction.rightDrawAttempted = true;
+                        rightHr = actualDraw();
+                    } else rightHr = E_FAIL;
                     lensTransaction.rightDrawHr = rightHr;
                 }
+                if (!rightCurrent()) rightHr = E_FAIL;
                 lensTransaction.rightResultHr = rightHr;
                 restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
-                    savedViewport, original, true);
+                    savedViewport, original, true, rightGeneration);
                 lensTransaction.restoreAttempted = true;
                 lensTransaction.restoreOk = restoreOk;
-                if (lensTransaction.sample) lensTransaction.post.Capture(device);
+                if (rightCurrent() && lensTransaction.sample) lensTransaction.post.Capture(device);
             }
             lensTransaction.Emit(lensTransaction.rightStage, leftHr);
 

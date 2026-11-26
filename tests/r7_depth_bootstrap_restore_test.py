@@ -18,6 +18,21 @@ assert draw.index("if(bootstrapRestoreFailed){") < draw.index("return E_FAIL; //
 assert draw.index("return E_FAIL; // no raw LEFT fallback") < draw.index("PREPARE_REJECT_SINGLE")
 owner = r29[r29.index("HRESULT R29GuardStableDraw("):]
 assert owner.index("if (bootstrapRestoreFailed)") < owner.index("if ((!RightDepthSynchronized")
+# All three production R30 owners must pass the generation captured before
+# their RIGHT attachment setters, not re-snapshot at restore time.
+r30safe = (root / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text()
+import re
+owners = list(re.finditer(r"\bRestoreRightPassState\s*\((.*?)\);", r30safe, re.S))
+assert len(owners) == 3
+for call in owners:
+    assert call.group(1).rstrip().endswith(", rightGeneration")
+    snapshot = r30safe.rfind("const auto rightGeneration = ExternalAtomicCandidates.generation;", 0, call.start())
+    bind = r30safe.rfind("rightHr = ", snapshot, call.start())
+    assert 0 <= snapshot < bind < call.start()
+    section = r30safe[snapshot:call.start()]
+    assert "SetRenderTargetHook.stdcall<HRESULT>" in section
+    assert "rightCurrent()" in section
+    assert "ExternalAtomicCandidates.generation == rightGeneration" in section
 prefix = r'''
 #include "depth_clear_replay_stamp.hpp"
 #include <cassert>
@@ -110,6 +125,22 @@ namespace spdlog{template<class... T> void info(T...){}}
 suffix = r'''
 int main(){
     IDirect3DDevice9 dev;
+    // R30 owners share the actual seven-argument R7 recovery function.
+    // Ordinary HRESULT errors still attempt all setters; a retired owner
+    // must never write even the first saved binding or subsequent state.
+    unsigned outerRestoreCases=0;
+    for(unsigned phase=0;phase<=4;++phase)
+    for(unsigned failure=0;failure<=3;++failure){
+        step=0;failAt=failure;retireStep=phase<=3?phase:0;
+        const auto owner=ExternalAtomicCandidates.generation;
+        if(phase==4)++ExternalAtomicCandidates.generation;
+        const bool ok=RestoreRightPassState(&dev,&leftRt,&leftDepth,{},nullptr,false,owner);
+        assert(ok==(phase==0&&failure==0));
+        assert(step==(phase==4?0u:phase?phase:3u));
+        ++outerRestoreCases;
+    }
+    retireStep=failAt=0;
+    std::cout<<"R30_SHARED_RESTORE_GENERATION_PASS "<<outerRestoreCases<<"\n";
     // Setup RT, depth, viewport, clear; then independent RT/depth/viewport
     // restore attempts. On setup failure the restoration still runs.
     for(unsigned failure=0;failure<=7;++failure){
