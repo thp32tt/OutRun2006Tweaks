@@ -96,6 +96,18 @@ namespace OutRunVRStereo
             }
         }
 
+        // Direct ResetEx can bypass R13ResetCommonPre. This owner is also
+        // safe after the classic pre-reset path: null mapping/view are no-ops.
+        void R13RetireDirectResetTransport() noexcept
+        {
+            if (!R13OverlayReady.load(std::memory_order_acquire))
+                return;
+            R13ForceMonoShadow = false;
+            R13DirectCopyPathRejected = false;
+            R13DirectCopyRejectHr = D3D_OK;
+            R13ReleaseAckState();
+        }
+
         bool R13EnsureAckState() noexcept
         {
             if (R13AckState &&
@@ -751,6 +763,7 @@ namespace OutRunVRStereo
         void R13RollbackOverlayHooks() noexcept
         {
             R13OverlayReady.store(false, std::memory_order_release);
+            R7DirectResetTransportOwner.store(nullptr, std::memory_order_release);
             R13ResetR9Hook = {};
             R13ResolveDirectHook = {};
             R13PresentR9Hook = {};
@@ -820,6 +833,8 @@ namespace OutRunVRStereo
 
                     if (enabled)
                     {
+                        R7DirectResetTransportOwner.store(
+                            R13RetireDirectResetTransport, std::memory_order_release);
                         R13OverlayReady.store(true, std::memory_order_release);
                         R13InstallState.store(R13InstallReady, std::memory_order_release);
                         spdlog::info(

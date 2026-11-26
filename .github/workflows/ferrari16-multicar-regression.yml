@@ -409,7 +409,9 @@ jobs:
           markerDepth13 = b'            R13ReleaseAckState();' + newline13 + b'            ReleaseStereoResources();'
           assert expected13.count(markerDepth13) == 1
           expected13 = expected13.replace(markerDepth13, b'            R13ReleaseAckState();' + newline13 + b'            R7ForgetAutomaticDepthProof();' + newline13 + b'            ReleaseStereoResources();', 1)
-          assert Path(r13path).read_bytes() == expected13, 'Unreviewed R13 change'
+          # Iter84: exact reviewed R13 direct ResetEx transport owner, including
+          # the prior clear receipt and automatic-depth invalidation changes.
+          assert subprocess.check_output(['git','hash-object',r13path]).strip() == b'cee97bd821cb741f61ed0e865336428d04925bbb', 'Unreviewed R13 change'
           # R29 raw wrappers bypass R7 ExecuteStereoDraw. Permit exactly
           # four calls to its existing LEFT receipt revocation helper.
           r29path = 'src/vr/d3d9/stereo_renderer_r29.cpp'

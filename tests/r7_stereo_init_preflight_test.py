@@ -749,7 +749,11 @@ unsigned R7CandidateResetInFlight=0,proof=1,resets=0,calls=0,r9Retires=0;
 bool allocated=true,owned=false,nested=false;
 void R7ForgetAutomaticDepthProof(){++proof;}
 void R9RetireDirectResetResources(){assert(R7CandidateResetInFlight==1);++r9Retires;}
-bool R7RetireDirectResetCore(){assert(r9Retires==1);return false;}
+unsigned transportRetires=0;
+void RetireTransport() noexcept {assert(r9Retires==1);++transportRetires;}
+using R7DirectResetTransportOwnerFn=void(*)() noexcept;
+std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetTransportOwner{nullptr};
+bool R7RetireDirectResetCore(){assert(r9Retires==1);assert(transportRetires==unsigned(bool(R7DirectResetTransportOwner.load())));return false;}
 struct Pair{void Reset(){++resets;allocated=false;}} ExternalAtomicCandidates;
 IDirect3DDevice9Ex* expectedDevice=nullptr;
 D3DPRESENT_PARAMETERS* expectedParams=nullptr;
@@ -759,6 +763,7 @@ struct Hook{
     template<class R> R stdcall(IDirect3DDevice9Ex* d,D3DPRESENT_PARAMETERS* p,D3DDISPLAYMODEEX* m){
         ++calls;assert(d==expectedDevice&&p==expectedParams&&m==expectedMode);
         assert(r9Retires==unsigned(owned));
+        assert(transportRetires==unsigned(owned&&bool(R7DirectResetTransportOwner.load())));
         if(owned){
             assert(!allocated&&resets==1&&proof==2&&R7CandidateResetInFlight==1);
             assert(ExternalAtomicReplayEpoch==0&&ExternalAtomicAllocationAttemptEpoch==PresentEpoch);
@@ -774,7 +779,8 @@ reset_ex_cases=r'''
 int main(){
     IDirect3DDevice9Ex game,other;other.game=false;
     D3DPRESENT_PARAMETERS pp{7};D3DDISPLAYMODEEX mode{8};
-    for(unsigned mask=0;mask<256;++mask){
+    for(unsigned mask=0;mask<512;++mask){
+        R7DirectResetTransportOwner=(mask&256)?RetireTransport:nullptr;
         StereoBaseCallbacksArmed=!(mask&1);
         expectedDevice=(mask&2)?&other:&game;
         if(mask&4)expectedDevice=nullptr;
@@ -782,7 +788,7 @@ int main(){
         nested=mask&32;result=(mask&64)?-1:0;owned=!(mask&7);
         const std::uint64_t initialReplay=(mask&128)?9:0;
         PresentEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=initialReplay;
-        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;allocated=true;
+        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;allocated=true;
         assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
         assert(calls==1&&R7CandidateResetInFlight==0);
         assert(PresentEpoch==(owned&&nested?1u:9u));
@@ -790,7 +796,7 @@ int main(){
         assert(ExternalAtomicAllocationAttemptEpoch==(owned?PresentEpoch:0));
         assert(resets==(owned?1u:0u)&&proof==(owned?3u:1u)&&allocated==!owned);
     }
-    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 256\n";
+    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 512\n";
 }
 '''
 assert "ResetExVtableIndex = 132;" in source
@@ -808,7 +814,7 @@ with tempfile.TemporaryDirectory() as temp:
 # Iter81: direct implicit chain Present and additional-chain creation are
 # independent physical owners. Execute production callbacks with COM mocks.
 chain_owner=source[source.index("HRESULT __stdcall R7CandidateAdditionalSwapChainDest("):
-                   source.index("// Direct ResetEx bypasses")]
+                   source.index("void ReleaseStereoResources();")]
 chain_stub=r'''
 #include <cassert>
 #include <atomic>
@@ -1016,5 +1022,60 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"r9_direct_reset.cpp"
     exe=Path(temp)/"r9_direct_reset"
     cpp.write_text(r9_stub+r9_retire+r9_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# Iter84: test actual R13 ACK view/handle retirement and overlay boundary.
+r13_source=Path("src/vr/d3d9/stereo_renderer_r13.cpp").read_text(encoding="utf-8")
+r13_retire=r13_source[r13_source.index("void R13ReleaseAckState()"):
+                     r13_source.index("bool R13EnsureAckState()")]
+r13_stub=r'''
+#include <cassert>
+#include <atomic>
+#include <iostream>
+using HRESULT=int;using HANDLE=void*;
+constexpr HRESULT D3D_OK=0;
+std::atomic<bool> R13OverlayReady{false};
+bool R13ForceMonoShadow=false,R13DirectCopyPathRejected=false;
+HRESULT R13DirectCopyRejectHr=D3D_OK;
+const void* R13AckState=nullptr;
+HANDLE R13AckMapping=nullptr;
+unsigned unmaps=0,closes=0;
+void UnmapViewOfFile(const void* p){assert(p==R13AckState&&p);++unmaps;}
+void CloseHandle(HANDLE h){assert(h==R13AckMapping&&h&&!R13AckState);++closes;}
+'''
+r13_cases=r'''
+int main(){
+    int view=1,handle=2;
+    for(unsigned mask=0;mask<64;++mask){
+        const bool armed=bool(mask&1);
+        R13OverlayReady=armed;
+        R13AckState=(mask&2)?&view:nullptr;
+        R13AckMapping=(mask&4)?&handle:nullptr;
+        R13ForceMonoShadow=bool(mask&8);
+        R13DirectCopyPathRejected=bool(mask&16);
+        R13DirectCopyRejectHr=(mask&32)?-1:0;
+        unmaps=closes=0;
+        for(int repeat=0;repeat<2;++repeat){
+            R13RetireDirectResetTransport();
+            assert(unmaps==unsigned(armed&&bool(mask&2)));
+            assert(closes==unsigned(armed&&bool(mask&4)));
+            assert(bool(R13AckState)==(!armed&&bool(mask&2)));
+            assert(bool(R13AckMapping)==(!armed&&bool(mask&4)));
+            assert(R13ForceMonoShadow==(!armed&&bool(mask&8)));
+            assert(R13DirectCopyPathRejected==(!armed&&bool(mask&16)));
+            assert(R13DirectCopyRejectHr==(!armed&&bool(mask&32)?-1:0));
+        }
+    }
+    std::cout<<"R13_DIRECT_RESET_TRANSPORT_PASS 64\n";
+}
+'''
+assert reset_callback.index("R7DirectResetTransportOwner.load(") < reset_callback.rindex("CandidateResetExHook.stdcall<HRESULT>")
+assert "R7DirectResetTransportOwner.store(\n                            R13RetireDirectResetTransport," in r13_source
+assert "R7DirectResetTransportOwner.store(nullptr," in r13_source
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"r13_direct_reset.cpp"
+    exe=Path(temp)/"r13_direct_reset"
+    cpp.write_text(r13_stub+r13_retire+r13_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)
