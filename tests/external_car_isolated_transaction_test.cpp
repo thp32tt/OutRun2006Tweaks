@@ -45,5 +45,15 @@ int main(){
         else assert(fences==0);
         ++cases;
     }
+    // Even a successful EVENT cannot certify a receipt invalidated during Issue.
+    for(unsigned mode=0;mode<3;++mode) {
+        bool owner=true,candidate=true;unsigned copies=0,fences=0;
+        const auto r=TransferIsolatedPair([&](){return owner;},[&](){return candidate;},
+            [&](bool external,unsigned){assert(external);++copies;return true;},
+            [&](){++fences;if(mode==1)candidate=false;if(mode==2)owner=false;return true;});
+        assert(copies==2&&fences==1);
+        assert(r==(mode==0?IsolatedPairTransfer::Candidate:mode==1?IsolatedPairTransfer::FenceFailed:IsolatedPairTransfer::Retired));
+        ++cases;
+    }
     std::cout<<"ISOLATED_WHOLE_VEHICLE_PAIR_PASS "<<cases<<"\n";
 }

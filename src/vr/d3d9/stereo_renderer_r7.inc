@@ -2533,7 +2533,8 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
                 DirectTransportGeneration==transport&&DirectTransportResourcesReady&&
                 !slot.published&&!slot.producerPending&&left&&right&&event&&
                 slot.leftSurface==left&&slot.rightSurface==right&&slot.fence==event&&
-                stockLeft==BackBuffer&&stockRight==RightEyeSurface;};
+                stockLeft==BackBuffer&&stockRight==RightEyeSurface&&
+                !FrameStereoIncomplete&&!FrameRightDrawFailed;};
             auto candidateCurrent=[&](){return R7StagedVehicleCurrent(device);};
             HRESULT last=E_FAIL;
             const auto result=TransferIsolatedPair(ownerCurrent,candidateCurrent,
@@ -4362,6 +4363,15 @@ if(WaitForEventQuery(slot.fence,1,0u))
             !MatrixFinite(input.world)||!TargetIsBackBuffer()||
             !DrawIndexedPrimitiveHook||!SetRenderTargetHook||!SetDepthStencilSurfaceHook)
             return IsolatedStageResult::Unavailable;
+        // A repeated native leaf in the same Present must not blend a
+        // second vehicle into the private depth/color pair. Until A4 proves
+        // exactly-once ownership, discard this ambiguous candidate.
+        if(R7StagedVehicle.present==PresentEpoch&&
+            R7StagedVehicle.resource==ExternalAtomicCandidates.generation&&
+            R7StagedVehicle.boundary==R7CandidateBoundarySerial){
+            R7StagedVehicle={};ExternalAtomicReplayEpoch=0;
+            return IsolatedStageResult::Unavailable;
+        }
         R7StagedVehicle={};
         struct StageScope { StageScope(){R7VehicleStageInFlight=true;}
             ~StageScope(){R7VehicleStageInFlight=false;} } stageScope;
@@ -4369,13 +4379,13 @@ if(WaitForEventQuery(slot.fence,1,0u))
         const auto generation=ExternalAtomicCandidates.generation;
         auto ownerCurrent=[&](){return ExternalAtomicCandidates.generation==generation&&
             ExternalAtomicCandidates.device==device&&!R7CandidateResetInFlight;};
-        auto current=[&](){return ownerCurrent()&&PresentEpoch==epoch&&
+        auto frameCurrent=[&](){return ownerCurrent()&&PresentEpoch==epoch&&
             R7CandidateBoundarySerial==boundary&&ExternalAtomicReplayEpoch==epoch&&
             FrameStereoPoseSequence==input.pose&&!FrameStereoIncomplete&&!FrameRightDrawFailed&&
             !AnyAuxRenderTargetActive()&&!OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)&&
             ActiveOcclusionQueries.load(std::memory_order_acquire)==0&&
-            !OutRunVR::State::StateBlockTracker::Recording()&&input.nativeCurrent(input)&&
-            ownerCurrent()&&PresentEpoch==epoch&&R7CandidateBoundarySerial==boundary;};
+            !OutRunVR::State::StateBlockTracker::Recording();};
+        auto current=[&](){return frameCurrent()&&input.nativeCurrent(input)&&frameCurrent();};
         auto abort=[&](IsolatedStageResult result){
             ExternalAtomicReplayEpoch=0;R7StagedVehicle={};
             if(result==IsolatedStageResult::DirtyRestore||!ownerCurrent()){
@@ -4401,16 +4411,22 @@ if(WaitForEventQuery(slot.fence,1,0u))
             return abort(IsolatedStageResult::Unavailable);
         const auto result=StageWholeIsolatedVehicle(current,[&](unsigned eye){
             using Check=decltype(current);
+            using OwnerCheck=decltype(ownerCurrent);
             struct RasterContext {
                 IDirect3DDevice9* device;
                 IDirect3DSurface9 *color,*depth;
                 Check* check;
+                OwnerCheck* owner;
             } ctx{device,ExternalAtomicCandidates.eyes[eye].color,
-                ExternalAtomicCandidates.eyes[eye].depth,&current};
+                ExternalAtomicCandidates.eyes[eye].depth,&current,&ownerCurrent};
             IsolatedEyeRaster raster{&ctx,
                 [](void* opaque) noexcept {
                     auto& c=*static_cast<RasterContext*>(opaque);
                     return (*c.check)();
+                },
+                [](void* opaque) noexcept {
+                    auto& c=*static_cast<RasterContext*>(opaque);
+                    return (*c.owner)();
                 },
                 [](void* opaque,UINT vertices,UINT triangles) noexcept -> HRESULT {
                     auto& c=*static_cast<RasterContext*>(opaque);

@@ -40,6 +40,9 @@ IsolatedPairTransfer TransferIsolatedPair(OwnerCurrent ownerCurrent,
             if(!candidateCurrent()){candidate=false;break;}
         }
     }
+    // A receipt can be retired without replacing the device. If that
+    // occurs before the fence, overwrite BOTH unpublished candidate eyes.
+    if(candidate&&!candidateCurrent())candidate=false;
     if(!candidate) {
         for(unsigned eye=0;eye<2;++eye) {
             if(!ownerCurrent())return IsolatedPairTransfer::Retired;
@@ -51,6 +54,9 @@ IsolatedPairTransfer TransferIsolatedPair(OwnerCurrent ownerCurrent,
     if(!ownerCurrent())return IsolatedPairTransfer::Retired;
     if(!fence())return ownerCurrent()?IsolatedPairTransfer::FenceFailed:IsolatedPairTransfer::Retired;
     if(!ownerCurrent())return IsolatedPairTransfer::Retired;
+    // The EVENT Issue itself may synchronously invalidate the scene
+    // receipt. Never certify that slot; its owner must quarantine it.
+    if(candidate&&!candidateCurrent())return IsolatedPairTransfer::FenceFailed;
     return candidate?IsolatedPairTransfer::Candidate:IsolatedPairTransfer::Stock;
 }
 } // namespace OutRunVR::DinoSidecar

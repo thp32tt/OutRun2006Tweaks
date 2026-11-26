@@ -93,8 +93,10 @@ enum class SidecarRole : unsigned char { Vehicle, DashboardOverlay };
 struct IsolatedEyeRaster {
     void* context=nullptr;
     bool (*current)(void*) noexcept=nullptr;
+    bool (*restoreCurrent)(void*) noexcept=nullptr;
     HRESULT (*draw)(void*,UINT,UINT) noexcept=nullptr;
-    bool Current() const noexcept {return current&&draw&&current(context);}
+    bool Current() const noexcept {return current&&restoreCurrent&&draw&&current(context);}
+    bool Restorable() const noexcept {return restoreCurrent&&restoreCurrent(context);}
 };
 struct ExternalVehicleStageInput {
     D3DMATRIX world{},view[2]{},projection[2]{};
@@ -721,6 +723,7 @@ public:
                      const IsolatedEyeRaster* isolated=nullptr) noexcept {
         GpuDrawResult result{};
         auto current=[&](){return !isolated||isolated->Current();};
+        auto restorable=[&](){return !isolated||isolated->Restorable();};
         // First-party safety gate, independent of whether R7/R30/R33
         // vtable hooks installed successfully. No whole-vehicle isolated
         // L/R color+depth stage and pair-atomic publication exists yet.
@@ -961,17 +964,19 @@ public:
             if(FAILED(hr))break;
         }
         const auto applySaved=[&]() {
-            if(!current())return E_FAIL;
+            // A logical frame/pose change aborts raster but does not retire
+            // a still-owned state block. Restore it unless Reset retired it.
+            if(!restorable())return E_FAIL;
             const HRESULT restore=saved->Apply();
             return restore;
         };
         const HRESULT restore=applySaved();
         saved->Release();
         if(isolated) {
-            const bool stateOk=SUCCEEDED(restore)&&current();
+            const bool stateOk=SUCCEEDED(restore)&&restorable();
             result.receipt.stateRestored=stateOk;
             result.receipt.stateMayBeDirty=!stateOk;
-            result.isolatedEyeComplete=stateOk&&SUCCEEDED(hr)&&
+            result.isolatedEyeComplete=stateOk&&current()&&SUCCEEDED(hr)&&
                 result.receipt.expectedMeshes!=0&&
                 result.receipt.attemptedMeshes==result.receipt.expectedMeshes&&
                 result.receipt.submittedMeshes==result.receipt.expectedMeshes;

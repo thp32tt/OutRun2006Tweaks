@@ -4465,7 +4465,7 @@
   "atomic_stereo_plan": {
     "revision": "20261126-P0-BATCH-IMPLEMENTATION",
     "operator_request": "Prioritize cohesive implementation over repeated verification and single tiny fixes. Develop A2/A3/A4 against existing inactive A1 backend now; preserve fail-closed runtime admission.",
-    "active_milestone": "A2",
+    "active_milestone": "A4",
     "milestones": [
       {
         "id": "A1",
@@ -4509,6 +4509,7 @@
         "iteration97_evidence": "Production R7 candidate Reset previously released COM members before clearing pair ownership or advancing generation, permitting nested retirement to release the same member again. Detach all four references and clear proof/device/descriptors before Release; return the retirement generation and abort device/descriptor replacement allocation if Release triggers newer retirement. Added 15 extracted allocator cases across normal reset, device replacement and descriptor replacement, with each of four Release callbacks reentering Reset; assert no duplicate release or allocation, and clean retry. Iter96 push CI not visible in PR-only connector; iter97 exact CI pending. A1 stays IN_PROGRESS; no activation/publication.",
         "iteration98_evidence": "Actual R7 allocator now takes the transaction's live ownership snapshot check, fences every borrowed descriptor, caps, create, created descriptor, and replacement Release boundary against same-generation Present/attachment changes, and stops before later driver calls. The real transaction captures attachments before swap-chain coverage and rechecks ownership/generation after it. Added 48 actual allocator positive/negative cases and 12 actual entrypoint cases. A1 remains IN_PROGRESS; no publication or activation. Exact SHA CI pending.",
         "deliverable": "Implement actual R7 isolated left/right color+depth candidate resource ownership, device/reset generation, descriptors, compatible MSAA and viewport. Reuse resources; no per-mesh allocation.",
+        "implementation_state": "PRIVATE_ATTACHMENTS_CONNECTED_TO_VEHICLE_TRANSACTION",
         "gate": "Compiled production D3D9 backend called by a real transaction entrypoint; failure injection on allocation/bind/restore; no mutation of live pair on abort. If depth cannot be copied with D3D9, use proven depth replay or frame-level isolation; never assume StretchRect copies depth.",
         "iteration99_evidence": "Actual R7 inactive pair capture/MRT preflight now distinguishes a clean decline from generation retirement during a getter or final saved COM Release. Return DirtyRestore when ownership has retired, so existing production replay callers veto same-call physical draw instead of falling through on stale attachments; same-generation Present remains Unavailable. Changed 16 existing actual capture boundary cases and added 30 actual cleanup fault cases. Exact-SHA CI pending; no publication or activation. A1 remains IN_PROGRESS. Exact initial source SHA 659ca9c4bd340a98edcbfcdfecbe59fe297d0b94: extracted allocator/capture matrix passed locally (minimal N100 g++ due local DNS), CI multicar 45779827157 confirmed A1 tests passed but failed at inherited stale swap-chain single-line assertion from iteration98. Updated assertion to require pre/post ownership plus generation fence and ordering before allocation, no test skipped. Iter98 Build 45776038149, package 45776038229, HUD 45776038384 success; multicar 45776038189 failed at same smoke step. Final exact SHA CI pending.",
         "iteration100_evidence": "Iter99 final exact SHA e3c5207960790014b48b00c805eeb43c8bda9db0 Build 45779958592, package 45779958549, multicar/HLSL 45779958617 all success; no separate HUD run returned by exact SHA query. Iter100 actual R7 raw R29/R30 replay owner snapshots generation, physical boundary and epoch before attachment capture, prevents further capture or replay on interruption, and vetoes live raster after retirement during capture, depth mask lookup, nested candidate replay or outer COM cleanup. Same-generation boundary keeps original stock call/HRESULT but retires receipt. Physical live call preserves HRESULT and invalidates interrupted receipt. 96 actual production owner fault cases plus existing wrapper regression locally compiled/pass on minimal N100 g++; exact SHA CI pending. No publication or activation.",
@@ -4524,12 +4525,14 @@
         "status": "IN_PROGRESS",
         "deliverable": "Implement whole-vehicle per-eye stage render with explicit matrices, one latched frame/pose/player, opaque PBR and ordered glass/dashboard meshes; avoid recursive automatic duplicate DIP or deferred R29/R30/R33 route.",
         "gate": "All required mesh receipts both eyes, fail-left/right/mid-mesh/reset/epoch mismatch abort; no live draws.",
-        "admission_note": "A1/A2/A3 implementation batch: real R7 private pair transaction uses full body and optional dashboard raw per-eye draw, separate actual mesh receipts and guarded PBR state writes; A3 actual R7/R13/R29 DirectGPU unpublished slot selection transfers the complete pair or both stock eyes before fence. Native body exclusion and ticket wiring (A4), full scene replay and runtime admission remain outstanding. No acceptance or activation; exact SHA CI pending."
+        "admission_note": "A1/A2/A3 batch 725c360840d4da88010bf47b3a029e52d6775d7e integrates the real R7 private attachment owner with the full body and optional dashboard raw per-eye draw and guarded PBR; R7/R13/R29 DirectGPU owners transfer the complete candidate pair or both stock eyes into an unpublished slot. Exact all-car CI 45910850265 success; local exact-header C++17 498 cases pass. Follow-up adds one stage per Present, independent still-owned StateBlock restore and final EVENT receipt fence, actual R7 integration fault test. A4 body-only callback and complete scene replay certification remain; no runtime activation or completion claim.",
+        "implementation_state": "BACKEND_INTEGRATED_INACTIVE"
       },
       {
         "id": "A3",
         "status": "IN_PROGRESS",
         "deliverable": "Implement pair publication at actual renderer/present ownership boundary using an inactive complete pair and single generation/descriptor selection; retain old stock pair on every failure. Preserve scene depth and subsequent occlusion. No two sequential live copies called atomic.",
+        "implementation_state": "DIRECTGPU_PAIR_TRANSFER_INTEGRATED_INACTIVE",
         "gate": "Both eyes and depth remain coherent including later world draws; failed publication cannot expose one eye; reset/restore failure discards candidate or frame, never certifies."
       },
       {
@@ -4582,13 +4585,13 @@
     ],
     "unrelated_validation_deferred_until": "A1-A4 feature integration; full real asset verification and final packaging after one-car renderer route exists",
     "implementation_frontier": {
-      "primary": "A2",
+      "primary": "A4",
       "parallel_dependencies": [
         "A1",
-        "A3",
-        "A4"
+        "A2",
+        "A3"
       ],
-      "note": "Active implementation milestone is A2. A1 remains IN_PROGRESS as an outstanding dependency; fix A1 only when directly needed to wire A2. A3/A4 can be developed inactive before dependency certification, but no activation or acceptance without actual gates."
+      "note": "A1-A3 production backend batch integrated inactive; next implement actual native body-only leaf and stock-only replay ownership. Do not restart micro-fix-only A1 loops. No activation/acceptance without A1-A4 integration and exact-SHA gates."
     }
   },
   "development_batch_policy": {
