@@ -32,6 +32,7 @@
 #include "external_car_pbr_stereo_scope.hpp"
 #include "external_car_stereo_receipt.hpp"
 #include "external_car_atomic_precommit.hpp"
+#include "external_car_isolated_transaction.hpp"
 #include "external_car_stereo_retry.hpp"
 #include "render_semantics.hpp"
 
@@ -87,9 +88,29 @@ inline bool PbrExternalStereoProbeActive() noexcept {
 }
 enum class FerrariModelSlot : unsigned char { F50, Gto288, F40, GenericId };
 enum class SidecarRole : unsigned char { Vehicle, DashboardOverlay };
+// Created by the R7 attachment transaction while its private eye is bound.
+// The raw raster callback bypasses recursive R29/R30/R33 stereo duplication.
+struct IsolatedEyeRaster {
+    void* context=nullptr;
+    bool (*current)(void*) noexcept=nullptr;
+    HRESULT (*draw)(void*,UINT,UINT) noexcept=nullptr;
+    bool Current() const noexcept {return current&&draw&&current(context);}
+};
+struct ExternalVehicleStageInput {
+    D3DMATRIX world{},view[2]{},projection[2]{};
+    DashboardTelemetry dashboard{};
+    FerrariModelSlot slot=FerrariModelSlot::F50;
+    unsigned char carId=255;
+    std::uint64_t nativeFrame=0,pose=0;
+    std::uintptr_t player=0;
+    // The future body-only native owner must validate the original ticket.
+    bool (*nativeCurrent)(const ExternalVehicleStageInput&) noexcept=nullptr;
+    bool includeDashboard=false;
+};
 struct GpuDrawResult final {
     HRESULT hr=E_FAIL;
     MeshDrawReceipt receipt{};
+    bool isolatedEyeComplete=false; // never a live per-mesh stereo receipt
 };
 class GpuOwner final {
     struct GpuMesh {
@@ -696,128 +717,141 @@ public:
                      unsigned embeddedNeedleMask=0u,
                      std::uint64_t expectedNativeFrame=0,
                      std::uint64_t expectedPose=0,
-                     unsigned embeddedGearMask=0u) noexcept {
+                     unsigned embeddedGearMask=0u,
+                     const IsolatedEyeRaster* isolated=nullptr) noexcept {
         GpuDrawResult result{};
+        auto current=[&](){return !isolated||isolated->Current();};
         // First-party safety gate, independent of whether R7/R30/R33
         // vtable hooks installed successfully. No whole-vehicle isolated
         // L/R color+depth stage and pair-atomic publication exists yet.
         // Return BEFORE D3D state setup, resource creation or any DIP so
         // the original 49F3E0 player callback remains the sole raster owner.
-        if(!RuntimeExternalCarAtomicStageReady())return result;
+        if(!isolated){if(!RuntimeExternalCarAtomicStageReady())return result;}
+        else if(!current())return result;
         // A stale/invalid ticket must not consume retry budget or start
         // any expensive DDS/mesh preparation.
         if(!device || expectedNativeFrame==0 || expectedPose==0)return result;
-        if(!stereoRetry_.AllowNativeAttempt())return result;
-        if(!EnsureResources(device))return result;
+        if(!isolated) {
+            if(!stereoRetry_.AllowNativeAttempt())return result;
+            if(!EnsureResources(device))return result;
+        } else if(owner_!=device||preparation_!=Preparation::Ready||!current())return result;
         for(const auto& mesh:meshes_) {
             const auto* binding=DashboardFor(mesh);
             if(DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask,embeddedGearMask))
                 ++result.receipt.expectedMeshes;
         }
         // Nothing drawable: do not mutate render state or quarantine GPU.
-        if(result.receipt.expectedMeshes==0)return result;
+        if(result.receipt.expectedMeshes==0) {
+            // A dashboard overlay with all needles/gear already embedded is
+            // a valid no-op. An empty vehicle body is never a valid stage.
+            if(isolated&&role_==SidecarRole::DashboardOverlay&&current()){
+                result.isolatedEyeComplete=true;result.receipt.stateRestored=true;result.hr=S_OK;
+            }
+            return result;
+        }
         IDirect3DStateBlock9* saved=nullptr;
         if(!CaptureExternalDrawState(saved,stereoRetry_,
             [&](IDirect3DStateBlock9** out) noexcept {
+                if(!current())return false;
                 return SUCCEEDED(device->CreateStateBlock(D3DSBT_ALL,out));
             },
-            [&]() noexcept {return SUCCEEDED(saved->Capture());},
+            [&]() noexcept {return current()&&SUCCEEDED(saved->Capture());},
             [&]() noexcept {saved->Release();}))
             return result;
         HRESULT hr=S_OK;
         bool eyeProofOnlyFailure=false;
         const DWORD fvf=D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1;
-        if(FAILED(device->SetVertexShader(nullptr)) ||
-           FAILED(device->SetPixelShader(nullptr)) ||
-           FAILED(device->SetFVF(fvf)) ||
-           FAILED(device->SetTransform(D3DTS_WORLD,&world)) ||
-           FAILED(device->SetTransform(D3DTS_VIEW,&view)) ||
-           FAILED(device->SetTransform(D3DTS_PROJECTION,&projection)) ||
-           FAILED(device->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE)) ||
-           FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,TRUE)) ||
-           FAILED(device->SetRenderState(D3DRS_ZFUNC,D3DCMP_LESSEQUAL)) ||
+        if(!current() || FAILED(device->SetVertexShader(nullptr)) ||
+           !current() || FAILED(device->SetPixelShader(nullptr)) ||
+           !current() || FAILED(device->SetFVF(fvf)) ||
+           !current() || FAILED(device->SetTransform(D3DTS_WORLD,&world)) ||
+           !current() || FAILED(device->SetTransform(D3DTS_VIEW,&view)) ||
+           !current() || FAILED(device->SetTransform(D3DTS_PROJECTION,&projection)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,TRUE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_ZFUNC,D3DCMP_LESSEQUAL)) ||
            // Native shadow/sky passes may leave a nonzero depth bias.
            // External car must use actual game depth; D3D9 FLOAT-as-DWORD zero.
-           FAILED(device->SetRenderState(D3DRS_DEPTHBIAS,0u)) ||
-           FAILED(device->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,0u)) ||
-           FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_DEPTHBIAS,0u)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,0u)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE)) ||
            // Transparent glass uses source-over ADD, independent of the
            // preceding flare/sky pass blend equation.
-           FAILED(device->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_ADD)) ||
-           FAILED(device->SetRenderState(D3DRS_SRGBWRITEENABLE,FALSE)) ||
-           FAILED(device->SetRenderState(D3DRS_ALPHATESTENABLE,FALSE)) ||
-           FAILED(device->SetRenderState(D3DRS_STENCILENABLE,FALSE)) ||
-           FAILED(device->SetRenderState(D3DRS_FOGENABLE,FALSE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_ADD)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_SRGBWRITEENABLE,FALSE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_ALPHATESTENABLE,FALSE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_STENCILENABLE,FALSE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_FOGENABLE,FALSE)) ||
            // The original fixed-function scene may leave a HUD/sky clipping
            // or matrix-blend state active. Our XYZ|NORMAL|TEX1 sidecar has
            // neither blend weights nor indices, and must clip at the stereo
            // frustum rather than rasterize behind-eye geometry.
            // These states are restored by the D3DSBT_ALL block below.
-           FAILED(device->SetRenderState(D3DRS_CLIPPING,TRUE)) ||
-           FAILED(device->SetRenderState(D3DRS_CLIPPLANEENABLE,0u)) ||
-           FAILED(device->SetRenderState(D3DRS_VERTEXBLEND,D3DVBF_DISABLE)) ||
-           FAILED(device->SetRenderState(D3DRS_INDEXEDVERTEXBLENDENABLE,FALSE)) ||
-           FAILED(device->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_CLIPPING,TRUE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_CLIPPLANEENABLE,0u)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_VERTEXBLEND,D3DVBF_DISABLE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_INDEXEDVERTEXBLENDENABLE,FALSE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE)) ||
            !ConfigureExternalRasterCoverage(
-               [&]() { return SUCCEEDED(device->SetRenderState(
+               [&]() { return current()&&SUCCEEDED(device->SetRenderState(
                    D3DRS_FILLMODE,D3DFILL_SOLID)); },
-               [&]() { return SUCCEEDED(device->SetRenderState(
+               [&]() { return current()&&SUCCEEDED(device->SetRenderState(
                    D3DRS_MULTISAMPLEMASK,0xffffffffu)); }) ||
-           FAILED(device->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE)) ||
-           FAILED(device->SetRenderState(D3DRS_LIGHTING,FALSE)) ||
-           FAILED(device->SetRenderState(D3DRS_COLORWRITEENABLE,
+           !current() || FAILED(device->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_LIGHTING,FALSE)) ||
+           !current() || FAILED(device->SetRenderState(D3DRS_COLORWRITEENABLE,
                   D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
                   D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA)) ||
            !ConfigureExternalTextureRouting(
-               [&]() { return SUCCEEDED(device->SetTextureStageState(
+               [&]() { return current()&&SUCCEEDED(device->SetTextureStageState(
                    0,D3DTSS_RESULTARG,D3DTA_CURRENT)); },
                [&](unsigned coordinate) {
                    constexpr D3DRENDERSTATETYPE states[]{
                        D3DRS_WRAP0,D3DRS_WRAP1,D3DRS_WRAP2};
-                   return SUCCEEDED(device->SetRenderState(states[coordinate],0u));
+                   return current()&&SUCCEEDED(device->SetRenderState(states[coordinate],0u));
                }) ||
-           FAILED(device->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_SELECTARG1)) ||
-           FAILED(device->SetTextureStageState(0,D3DTSS_COLORARG1,D3DTA_TEXTURE)) ||
-           FAILED(device->SetTextureStageState(0,D3DTSS_ALPHAOP,D3DTOP_SELECTARG1)) ||
-           FAILED(device->SetTextureStageState(0,D3DTSS_ALPHAARG1,D3DTA_TEXTURE)) ||
-           FAILED(device->SetTextureStageState(0,D3DTSS_TEXCOORDINDEX,0)) ||
-           FAILED(device->SetTextureStageState(0,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE)) ||
+           !current() || FAILED(device->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_SELECTARG1)) ||
+           !current() || FAILED(device->SetTextureStageState(0,D3DTSS_COLORARG1,D3DTA_TEXTURE)) ||
+           !current() || FAILED(device->SetTextureStageState(0,D3DTSS_ALPHAOP,D3DTOP_SELECTARG1)) ||
+           !current() || FAILED(device->SetTextureStageState(0,D3DTSS_ALPHAARG1,D3DTA_TEXTURE)) ||
+           !current() || FAILED(device->SetTextureStageState(0,D3DTSS_TEXCOORDINDEX,0)) ||
+           !current() || FAILED(device->SetTextureStageState(0,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE)) ||
            // A native car or sky shader may have enabled stages 1..7.
            // Stop the cascade explicitly after our textured stage 0.
-           FAILED(device->SetTextureStageState(1,D3DTSS_COLOROP,D3DTOP_DISABLE)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
+           !current() || FAILED(device->SetTextureStageState(1,D3DTSS_COLOROP,D3DTOP_DISABLE)) ||
+           !current() || FAILED(device->SetSamplerState(0,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
+           !current() || FAILED(device->SetSamplerState(0,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
+           !current() || FAILED(device->SetSamplerState(0,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
+           !current() || FAILED(device->SetSamplerState(0,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
+           !current() || FAILED(device->SetSamplerState(0,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
            // Game HUD/sky draws may leave a nonzero minimum mip-level.
            // A 1024px HQ albedo would otherwise be sampled as low-resolution.
-           FAILED(device->SetSamplerState(0,D3DSAMP_MAXMIPLEVEL,0u)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_MIPMAPLODBIAS,0u)) ||
-           FAILED(device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE)))
+           !current() || FAILED(device->SetSamplerState(0,D3DSAMP_MAXMIPLEVEL,0u)) ||
+           !current() || FAILED(device->SetSamplerState(0,D3DSAMP_MIPMAPLODBIAS,0u)) ||
+           !current() || FAILED(device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE)))
             hr=E_FAIL;
         if(SUCCEEDED(hr) && pbrReady_) {
-            if(FAILED(device->SetRenderState(D3DRS_SRGBWRITEENABLE,FALSE)) ||
-               FAILED(device->SetSamplerState(1,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
-               FAILED(device->SetSamplerState(1,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
-               FAILED(device->SetSamplerState(2,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
-               FAILED(device->SetSamplerState(2,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
-               FAILED(device->SetSamplerState(1,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
-               FAILED(device->SetSamplerState(1,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
-               FAILED(device->SetSamplerState(1,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
-               FAILED(device->SetSamplerState(2,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
-               FAILED(device->SetSamplerState(2,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
-               FAILED(device->SetSamplerState(2,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
+            if(!current() || FAILED(device->SetRenderState(D3DRS_SRGBWRITEENABLE,FALSE)) ||
+               !current() || FAILED(device->SetSamplerState(1,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
+               !current() || FAILED(device->SetSamplerState(1,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
+               !current() || FAILED(device->SetSamplerState(2,D3DSAMP_ADDRESSU,D3DTADDRESS_WRAP)) ||
+               !current() || FAILED(device->SetSamplerState(2,D3DSAMP_ADDRESSV,D3DTADDRESS_WRAP)) ||
+               !current() || FAILED(device->SetSamplerState(1,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
+               !current() || FAILED(device->SetSamplerState(1,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
+               !current() || FAILED(device->SetSamplerState(1,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
+               !current() || FAILED(device->SetSamplerState(2,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) ||
+               !current() || FAILED(device->SetSamplerState(2,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) ||
+               !current() || FAILED(device->SetSamplerState(2,D3DSAMP_MIPFILTER,D3DTEXF_LINEAR)) ||
                // Original sky/HUD shaders may have changed the inherited
                // min-mip/LOD bias on samplers 1 and 2. Explicitly reset
                // both normal and packed ORM samplers for crisp PBR details.
-               FAILED(device->SetSamplerState(1,D3DSAMP_MAXMIPLEVEL,0u)) ||
-               FAILED(device->SetSamplerState(2,D3DSAMP_MAXMIPLEVEL,0u)) ||
-               FAILED(device->SetSamplerState(1,D3DSAMP_MIPMAPLODBIAS,0u)) ||
-               FAILED(device->SetSamplerState(2,D3DSAMP_MIPMAPLODBIAS,0u)) ||
-               FAILED(device->SetSamplerState(1,D3DSAMP_SRGBTEXTURE,FALSE)) ||
-               FAILED(device->SetSamplerState(2,D3DSAMP_SRGBTEXTURE,FALSE)) ||
-               FAILED(pbrShaders_.Bind(device,world,view,projection))) {
+               !current() || FAILED(device->SetSamplerState(1,D3DSAMP_MAXMIPLEVEL,0u)) ||
+               !current() || FAILED(device->SetSamplerState(2,D3DSAMP_MAXMIPLEVEL,0u)) ||
+               !current() || FAILED(device->SetSamplerState(1,D3DSAMP_MIPMAPLODBIAS,0u)) ||
+               !current() || FAILED(device->SetSamplerState(2,D3DSAMP_MIPMAPLODBIAS,0u)) ||
+               !current() || FAILED(device->SetSamplerState(1,D3DSAMP_SRGBTEXTURE,FALSE)) ||
+               !current() || FAILED(device->SetSamplerState(2,D3DSAMP_SRGBTEXTURE,FALSE)) ||
+               !current() || FAILED(pbrShaders_.BindGuarded(device,world,view,projection,current))) {
                 // Never draw a broken normal map or silently switch a
                 // PBR asset to a different, unlit material path.
                 hr=E_FAIL;
@@ -833,7 +867,7 @@ public:
         // mesh limit, with no per-eye allocations or texture replacement.
         std::array<GlassDepthItem,MaxGroups> glassOrder{};
         unsigned glassCount=0u;
-        if(SUCCEEDED(hr))for(unsigned i=0;i<meshes_.size();++i) {
+        if(SUCCEEDED(hr)&&current())for(unsigned i=0;i<meshes_.size();++i) {
             const auto& m=meshes_[i];
             if(m.glass && glassCount<glassOrder.size()) {
                 const auto* binding=DashboardFor(m);
@@ -849,6 +883,7 @@ public:
         SortGlassBackToFront(glassOrder.data(),glassCount);
         if(SUCCEEDED(hr))for(unsigned pass=0;pass<2u && SUCCEEDED(hr);++pass)
           for(unsigned order=0;order<(pass?glassCount:meshes_.size());++order) {
+            if(!current()){hr=E_FAIL;break;}
             const auto& m=meshes_[pass?glassOrder[order].index:order];
             if(!MeshInDrawPass(m.glass,pass))continue;
             const DashboardBinding* binding=DashboardFor(m);
@@ -857,30 +892,41 @@ public:
             const D3DMATRIX meshWorld=AnimatedWorld(world,binding,dashboard);
             // Opaque first, then tagged translucent glass. Transparent glass
             // must not write the depth buffer or hide the track from cockpit.
-            if(FAILED(device->SetTransform(D3DTS_WORLD,&meshWorld)) ||
-               (pbrReady_ && FAILED(pbrShaders_.SetWorld(device,meshWorld))) ||
-               FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE)) ||
-               FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE)) ||
-               FAILED(device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA)) ||
-               FAILED(device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA)) ||
-               FAILED(device->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE,FALSE))) {
+            if(!current() || FAILED(device->SetTransform(D3DTS_WORLD,&meshWorld)) ||
+               (pbrReady_ && (!current() || FAILED(pbrShaders_.SetWorldGuarded(device,meshWorld,current)))) ||
+               !current() || FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE)) ||
+               !current() || FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE)) ||
+               !current() || FAILED(device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA)) ||
+               !current() || FAILED(device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA)) ||
+               !current() || FAILED(device->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE,FALSE))) {
                 hr=E_FAIL;break;
             }
-            if(FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||
-               FAILED(device->SetIndices(m.ib)) ||
-               FAILED(device->SetTexture(0,textures_[m.material]))) {hr=E_FAIL;break;}
+            if(!current() || FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||
+               !current() || FAILED(device->SetIndices(m.ib)) ||
+               !current() || FAILED(device->SetTexture(0,textures_[m.material]))) {hr=E_FAIL;break;}
             if(pbrReady_) {
                 const auto& p=cpu_.pbrMaterials[m.material];
                 const float factors[4]{p.roughness,p.metallic,p.normalScale,
                                        normals_[m.material]?1.f:0.f};
                 const float eyeOrm[4]{eye[0],eye[1],eye[2],
                                       orms_[m.material]?1.f:0.f};
-                if(FAILED(device->SetTexture(1,normals_[m.material])) ||
-                   FAILED(device->SetTexture(2,orms_[m.material])) ||
-                   FAILED(device->SetPixelShaderConstantF(0,factors,1)) ||
-                   FAILED(device->SetPixelShaderConstantF(1,eyeOrm,1))) {
+                if(!current() || FAILED(device->SetTexture(1,normals_[m.material])) ||
+                   !current() || FAILED(device->SetTexture(2,orms_[m.material])) ||
+                   !current() || FAILED(device->SetPixelShaderConstantF(0,factors,1)) ||
+                   !current() || FAILED(device->SetPixelShaderConstantF(1,eyeOrm,1))) {
                     hr=E_FAIL;break;
                 }
+            }
+            if(isolated) {
+                // Count real raw DIPs, without pretending each eye was a
+                // complete legacy stereo submission. No live-eye hook runs.
+                if(!current()){hr=E_FAIL;break;}
+                ++result.receipt.attemptedMeshes;
+                result.receipt.possiblySubmitted=true;
+                hr=isolated->draw(isolated->context,m.vertexCount,m.indexCount/3);
+                if(SUCCEEDED(hr)&&current())++result.receipt.submittedMeshes;
+                else {hr=E_FAIL;break;}
+                continue;
             }
             ExternalStereoMeshReceipt physical{};
             physical.expectedPose=expectedPose;
@@ -914,8 +960,24 @@ public:
             hr=stereoComplete?dipHr:E_FAIL;
             if(FAILED(hr))break;
         }
-        const HRESULT restore=saved->Apply();
+        const auto applySaved=[&]() {
+            if(!current())return E_FAIL;
+            const HRESULT restore=saved->Apply();
+            return restore;
+        };
+        const HRESULT restore=applySaved();
         saved->Release();
+        if(isolated) {
+            const bool stateOk=SUCCEEDED(restore)&&current();
+            result.receipt.stateRestored=stateOk;
+            result.receipt.stateMayBeDirty=!stateOk;
+            result.isolatedEyeComplete=stateOk&&SUCCEEDED(hr)&&
+                result.receipt.expectedMeshes!=0&&
+                result.receipt.attemptedMeshes==result.receipt.expectedMeshes&&
+                result.receipt.submittedMeshes==result.receipt.expectedMeshes;
+            result.hr=result.isolatedEyeComplete?S_OK:E_FAIL;
+            return result; // a discarded private eye is not corrupt OVC data
+        }
         result.receipt.drawSucceeded=SUCCEEDED(hr) &&
             result.receipt.expectedMeshes!=0 &&
             result.receipt.submittedMeshes==result.receipt.expectedMeshes &&
@@ -944,3 +1006,11 @@ inline GpuOwner& GlobalDashboardGpu() noexcept {
     static GpuOwner owner{SidecarRole::DashboardOverlay};return owner;
 }
 } // OutRunVR::DinoSidecar
+
+namespace OutRunVRStereo {
+// A1/A2: renders the selected body/optional dashboard into the existing
+// replayed private scene pair. Never changes the live render target pixels.
+OutRunVR::DinoSidecar::IsolatedStageResult StageExternalVehiclePair(
+    IDirect3DDevice9* device,
+    const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input) noexcept;
+}

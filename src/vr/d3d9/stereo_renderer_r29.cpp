@@ -1802,6 +1802,8 @@ namespace OutRunVRStereo
         auto& slot = DirectTransportSlots[index];
         if (!slot.leftSurface || !slot.rightSurface || !slot.fence)
             return {D3DERR_INVALIDCALL, true};
+        const auto staged=R7TransferStagedVehicle(device,slot,left,right,D3DTEXF_NONE);
+        if(staged.handled)return {staged.hr,staged.copyFailed};
         const HRESULT leftCopy = device->StretchRect(
             left, nullptr, slot.leftSurface, nullptr, D3DTEXF_NONE);
         const HRESULT rightCopy = SUCCEEDED(leftCopy)

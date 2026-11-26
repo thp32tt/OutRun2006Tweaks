@@ -348,9 +348,12 @@ namespace OutRunVRStereo
             auto& slot = DirectTransportSlots[selected];
             {
                 InternalPassScope guard;
-                const HRESULT leftCopy = StretchDirectEye(
-                    device, BackBuffer, slot.leftSurface);
-                const HRESULT rightCopy = SUCCEEDED(leftCopy)
+                const auto staged=R7TransferStagedVehicle(
+                    device,slot,BackBuffer,RightEyeSurface,D3DTEXF_LINEAR);
+                const HRESULT leftCopy = staged.handled ?
+                    (staged.copyFailed?staged.hr:S_OK) :
+                    StretchDirectEye(device, BackBuffer, slot.leftSurface);
+                const HRESULT rightCopy = staged.handled ? leftCopy : SUCCEEDED(leftCopy)
                     ? StretchDirectEye(device, RightEyeSurface, slot.rightSurface)
                     : leftCopy;
                 if (FAILED(leftCopy) || FAILED(rightCopy))
@@ -367,7 +370,7 @@ namespace OutRunVRStereo
                     return false;
                 }
 
-                const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);
+                const HRESULT issueHr = staged.handled?staged.hr:slot.fence->Issue(D3DISSUE_END);
                 if (FAILED(issueHr))
                 {
                     // Copies are already queued, so failure to arm the EVENT

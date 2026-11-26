@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test external_car_dds_upload_test external_car_mesh_upload_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test depth_clear_replay_stamp_test stereo_lower_draw_result_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test r84_fixed_sprite_preflight_test; do
+          for t in ferrari16_multicar_runtime_test ferrari14_lift_pose_contract_test external_car_draw_order_test external_car_ground_test external_car_gate_test external_car_dashboard_test external_car_sidecar_v4_test external_car_dds_upload_test external_car_mesh_upload_test game_reset_events_test external_car_selection_test external_car_legacy_fallback_test external_car_trace_budget_test external_car_runtime_policy_test ferrari14_trace_50_test external_car_stereo_receipt_test external_car_atomic_precommit_test external_car_isolated_transaction_test depth_clear_replay_stamp_test stereo_lower_draw_result_test external_car_original_wrapper_contract_test external_car_eye_transform_proof_test external_car_stereo_failure_diagnostics_test external_car_stereo_retry_test external_vehicle_semantic_isolation_test external_car_pbr_eye_math_test external_car_pbr_normal_math_test external_car_normal_repair_test r84_fixed_sprite_preflight_test; do
             g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic "tests/${t}.cpp" -o "/tmp/${t}"
             "/tmp/${t}"
           done
@@ -211,6 +211,20 @@ jobs:
           assert 'D3DRS_FILLMODE,D3DFILL_SOLID' in raster_setup
           assert 'D3DRS_MULTISAMPLEMASK,0xffffffffu' in raster_setup
           assert 'const HRESULT restore=saved->Apply();' in native
+          # The isolated draw must bypass the live DIP receipt and must be
+          # wired to the actual R7 private attachment transaction and transport.
+          assert 'if(!isolated){if(!RuntimeExternalCarAtomicStageReady())return result;}' in native
+          assert native.index('if(isolated) {', native.index('SortGlassBackToFront(')) < native.index('ExternalStereoMeshReceipt physical{};')
+          assert 'isolated->draw(isolated->context,m.vertexCount,m.indexCount/3)' in native
+          assert 'StageWholeIsolatedVehicle(current,' in r7
+          stage=r7[r7.index('IsolatedStageResult StageExternalVehiclePair('):r7.index('void R7SetDirectResetRasterOwner(')]
+          assert 'R7SeedInactivePair(ExternalAtomicCandidates,device,' in stage
+          assert 'DrawIndexedPrimitiveHook.stdcall<HRESULT>(' in stage
+          assert 'body.DrawNativeScene(' in stage and 'dash.DrawNativeScene(' in stage
+          assert 'R7StagedVehicle={generation,boundary,epoch,input.nativeFrame,input.pose,input.player};' in stage
+          assert 'TransferIsolatedPair(ownerCurrent,candidateCurrent,' in r7
+          assert 'R7TransferStagedVehicle(' in r13
+          assert 'R7TransferStagedVehicle(' in Path('src/vr/d3d9/stereo_renderer_r29.cpp').read_text()
           assert 'D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE' in native
           assert 'D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE' in native
           assert 'RuntimeExternalCarAtomicStageReady()' in native
@@ -415,7 +429,7 @@ jobs:
           # Iter88: exact reviewed R13 reset notification scope and pose-latch retirement, including
           # the prior clear receipt and automatic-depth invalidation changes.
           # Iter91: reviewed prior-generation capture and retained-depth recovery only.
-          assert subprocess.check_output(['git','hash-object',r13path]).strip() == b'46e65bc206cfa2bec587da7c21e926047129670b', 'Unreviewed R13 change'
+          assert subprocess.check_output(['git','hash-object',r13path]).strip() == b'4ad4d0ee40ad7703d82269b8c1f74a0aa54665e4', 'Unreviewed R13 change'
           # R29 raw wrappers bypass R7 ExecuteStereoDraw. Permit exactly
           # four calls to its existing LEFT receipt revocation helper.
           r29path = 'src/vr/d3d9/stereo_renderer_r29.cpp'
@@ -447,7 +461,8 @@ jobs:
               before, after = before.replace(b'\n',nl29), after.replace(b'\n',nl29)
               assert expected29.count(before) == 1
               expected29 = expected29.replace(before,after,1)
-          assert Path(r29path).read_bytes() == expected29, 'Unreviewed R29 change'
+          # A3 batch: pin the exact reviewed R29 direct-ring transfer integration.
+          assert subprocess.check_output(['git','hash-object',r29path]).strip() == b'f5985bded36a5017be6eaa83fbd60eca9a09f4e1', 'Unreviewed R29 change'
           paths = {
               'src/vr/d3d9/stereo_renderer_r32.cpp': ('R32Review', False),
               'src/vr/core/r32_review_api.hpp': ('R32Review', True),

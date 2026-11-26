@@ -4524,11 +4524,11 @@
         "status": "IN_PROGRESS",
         "deliverable": "Implement whole-vehicle per-eye stage render with explicit matrices, one latched frame/pose/player, opaque PBR and ordered glass/dashboard meshes; avoid recursive automatic duplicate DIP or deferred R29/R30/R33 route.",
         "gate": "All required mesh receipts both eyes, fail-left/right/mid-mesh/reset/epoch mismatch abort; no live draws.",
-        "admission_note": "Development opened by operator 2026-11-26; implementation not yet proven, A1 is an outstanding dependency. No completion or activation inferred."
+        "admission_note": "A1/A2/A3 implementation batch: real R7 private pair transaction uses full body and optional dashboard raw per-eye draw, separate actual mesh receipts and guarded PBR state writes; A3 actual R7/R13/R29 DirectGPU unpublished slot selection transfers the complete pair or both stock eyes before fence. Native body exclusion and ticket wiring (A4), full scene replay and runtime admission remain outstanding. No acceptance or activation; exact SHA CI pending."
       },
       {
         "id": "A3",
-        "status": "PENDING",
+        "status": "IN_PROGRESS",
         "deliverable": "Implement pair publication at actual renderer/present ownership boundary using an inactive complete pair and single generation/descriptor selection; retain old stock pair on every failure. Preserve scene depth and subsequent occlusion. No two sequential live copies called atomic.",
         "gate": "Both eyes and depth remain coherent including later world draws; failed publication cannot expose one eye; reset/restore failure discards candidate or frame, never certifies."
       },

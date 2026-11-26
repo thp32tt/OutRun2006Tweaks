@@ -30,6 +30,7 @@
 #include "vr/ui/vr_mirror_aspect_fit.hpp"
 #include "vr/state/state_block_tracker.hpp"
 #include "vr/d3d9/direct_gpu_hold_policy.hpp"
+#include "../game/dino_external_d3d9.hpp"
 
 // True-stereo D3D9 renderer.
 //
@@ -1861,6 +1862,9 @@ namespace OutRunVRStereo
         std::uint64_t ExternalAtomicAllocationAttemptEpoch=0;
         // Physical presentation may not advance the stock PresentEpoch.
         std::uint64_t R7CandidateBoundarySerial=0;
+        OutRunVR::DinoSidecar::IsolatedVehicleKey R7StagedVehicle{};
+        bool R7VehicleStageInFlight=false;
+        std::uint64_t R7StagedTransportFaultGeneration=0;
 
         // Resolve the implicit chain's actual Present entrypoint each seed.
         // Reset can replace the chain. Never assume a cached COM pointer or
@@ -2491,9 +2495,67 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
 		{
 			if(!device||!BackBufferDesc.Width||!BackBufferDesc.Height||!EnsureRenderFrameState()||!EnsureDirectInteropProbe(device))return false;UINT targetWidth=0,targetHeight=0;if(!DirectTransportTargetSize(device,targetWidth,targetHeight))return false;if(DirectTransportResourcesReady&&DirectEyeExtentGeneration.Matches({targetWidth,targetHeight})&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true;if(DirectTransportResourcesReady)ReleaseDirectTransportSlots();DirectTransportFormat=ChooseDirectTransportFormat(BackBufferDesc.Format);if(!CanConvertForDirectTransport(device,BackBufferDesc.Format,DirectTransportFormat))return false;for(auto&slot:DirectTransportSlots){HANDLE leftHandle=nullptr,rightHandle=nullptr;const HRESULT leftHr=device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.leftTexture,&leftHandle);const HRESULT rightHr=SUCCEEDED(leftHr)?device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.rightTexture,&rightHandle):E_FAIL;if(FAILED(leftHr)||FAILED(rightHr)||!leftHandle||!rightHandle||FAILED(slot.leftTexture->GetSurfaceLevel(0,&slot.leftSurface))||FAILED(slot.rightTexture->GetSurfaceLevel(0,&slot.rightSurface))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&slot.fence))||!slot.fence){ReleaseDirectTransportSlots();return false;}slot.leftHandle=leftHandle;slot.rightHandle=rightHandle;}DirectTransportWidth=targetWidth;DirectTransportHeight=targetHeight;DirectEyeExtentGeneration.Commit({targetWidth,targetHeight});if(!DirectTransportGeneration)DirectTransportGeneration=RenderFrameRunGeneration;if(++DirectTransportGeneration==0)++DirectTransportGeneration;DirectTransportResourcesReady=true;spdlog::info("VR stereo: verified 4-slot D3D9Ex shared eye ring ready {}x{} from desktop {}x{} (VDXR/OpenXR recommended) format={} generation={}",DirectTransportWidth,DirectTransportHeight,BackBufferDesc.Width,BackBufferDesc.Height,static_cast<int>(DirectTransportFormat),DirectTransportGeneration);return true;
 		}
+        // A3: select the entire private pair only at the existing unpublished
+        // DirectGPU slot boundary. No StretchRect to either live eye.
+        struct R7StagedTransfer {bool handled=false;HRESULT hr=E_FAIL;bool copyFailed=true;};
+        bool R7StagedVehicleCurrent(IDirect3DDevice9* device) noexcept
+        {
+            using namespace OutRunVR::DinoSidecar;
+            const auto& key=R7StagedVehicle;
+            // A4 still owns live admission and stock-only native-body replay.
+            // A stage receipt by itself must not enable the external model.
+            return RuntimeExternalCarAtomicStageReady()&&
+                key.Same({ExternalAtomicCandidates.generation,R7CandidateBoundarySerial,
+                    PresentEpoch,key.nativeFrame,FrameStereoPoseSequence,key.player})&&
+                ExternalAtomicReplayEpoch==PresentEpoch&&!R7VehicleStageInFlight&&
+                ExternalAtomicCandidates.device==device&&!FrameStereoIncomplete&&!FrameRightDrawFailed&&
+                ExternalAtomicCandidates.provenLiveColor[0]==BackBuffer&&
+                ExternalAtomicCandidates.provenLiveColor[1]==RightEyeSurface&&
+                ExternalAtomicCandidates.provenLiveDepth[0]==TrackedDepthStencil&&
+                ExternalAtomicCandidates.provenLiveDepth[1]==RightEyeDepth&&
+                ExternalAtomicCandidates.eyes[0].color&&ExternalAtomicCandidates.eyes[0].depth&&
+                ExternalAtomicCandidates.eyes[1].color&&ExternalAtomicCandidates.eyes[1].depth;
+        }
+        R7StagedTransfer R7TransferStagedVehicle(IDirect3DDevice9* device,
+            DirectTransportSlot& slot,IDirect3DSurface9* stockLeft,
+            IDirect3DSurface9* stockRight,D3DTEXTUREFILTERTYPE filter) noexcept
+        {
+            using namespace OutRunVR::DinoSidecar;
+            if(stockLeft!=BackBuffer||stockRight!=RightEyeSurface||
+                !R7StagedVehicleCurrent(device))return {};
+            const auto generation=ExternalAtomicCandidates.generation;
+            const auto boundary=R7CandidateBoundarySerial,epoch=PresentEpoch;
+            const auto transport=DirectTransportGeneration;
+            auto* const left=slot.leftSurface;auto* const right=slot.rightSurface;
+            auto* const event=slot.fence;
+            auto ownerCurrent=[&](){return ExternalAtomicCandidates.generation==generation&&
+                R7CandidateBoundarySerial==boundary&&PresentEpoch==epoch&&
+                DirectTransportGeneration==transport&&DirectTransportResourcesReady&&
+                !slot.published&&!slot.producerPending&&left&&right&&event&&
+                slot.leftSurface==left&&slot.rightSurface==right&&slot.fence==event&&
+                stockLeft==BackBuffer&&stockRight==RightEyeSurface;};
+            auto candidateCurrent=[&](){return R7StagedVehicleCurrent(device);};
+            HRESULT last=E_FAIL;
+            const auto result=TransferIsolatedPair(ownerCurrent,candidateCurrent,
+                [&](bool candidate,unsigned eye){
+                    auto* src=candidate?ExternalAtomicCandidates.eyes[eye].color:
+                        (eye?stockRight:stockLeft);
+                    auto* dst=eye?right:left;
+                    last=StretchRectHook.stdcall<HRESULT>(device,src,nullptr,dst,nullptr,filter);
+                    if(FAILED(last)&&filter!=D3DTEXF_NONE&&ownerCurrent()&&
+                        (!candidate||candidateCurrent()))
+                        last=StretchRectHook.stdcall<HRESULT>(device,src,nullptr,dst,nullptr,D3DTEXF_NONE);
+                    return SUCCEEDED(last);
+                },
+                [&](){last=event->Issue(D3DISSUE_END);return SUCCEEDED(last);});
+            if(result==IsolatedPairTransfer::Candidate||result==IsolatedPairTransfer::Stock)
+                return {true,S_OK,false};
+            return {true,FAILED(last)?last:E_FAIL,result!=IsolatedPairTransfer::FenceFailed};
+        }
 		bool ResolveDirectTransport(IDirect3DDevice9* device,std::uint32_t frameId)
 		{
 			if(!frameId||!EnsureDirectTransportResources(device)||!BackBuffer||!RightEyeSurface)return false;
+            if(R7StagedTransportFaultGeneration==DirectTransportGeneration)return false;
 			const std::uint32_t consumed=SharedState?SharedState->hostDirectConsumedFrameId:0;
 			const std::uint32_t preferred=(frameId-1u)%OutRunVR::RenderFrameRingSize;
 			std::uint32_t selected=OutRunVR::RenderFrameRingSize;
@@ -2550,9 +2612,12 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
 			auto&slot=DirectTransportSlots[selected];
 			{
 				InternalPassScope guard;
-				if(FAILED(StretchDirectEye(device,BackBuffer,slot.leftSurface))||
-					FAILED(StretchDirectEye(device,RightEyeSurface,slot.rightSurface))||
-					FAILED(slot.fence->Issue(D3DISSUE_END)))return false;
+                const auto staged=R7TransferStagedVehicle(device,slot,BackBuffer,RightEyeSurface,D3DTEXF_LINEAR);
+                if(staged.handled){
+                    if(FAILED(staged.hr)){R7StagedTransportFaultGeneration=DirectTransportGeneration;return false;}
+                } else if(FAILED(StretchDirectEye(device,BackBuffer,slot.leftSurface))||
+                    FAILED(StretchDirectEye(device,RightEyeSurface,slot.rightSurface))||
+                    FAILED(slot.fence->Issue(D3DISSUE_END)))return false;
 			}
 			slot.producerPending=true;
 			slot.pendingFrameId=frameId;
@@ -4278,6 +4343,118 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		}
 
 	}
+
+    // A1/A2 production transaction: use the already replayed scene pair,
+    // run the ENTIRE body (and requested dashboard) once per explicit eye,
+    // then retain both private depth attachments for subsequent scene replay.
+    OutRunVR::DinoSidecar::IsolatedStageResult StageExternalVehiclePair(
+        IDirect3DDevice9* device,
+        const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input) noexcept
+    {
+        using namespace OutRunVR::DinoSidecar;
+        if(R7VehicleStageInFlight||InternalStereoPass||!IsGameDevice(device)||
+            !input.nativeCurrent||!input.nativeFrame||!input.pose||!input.player||
+            !input.nativeCurrent(input)||FrameStereoIncomplete||FrameRightDrawFailed||
+            FrameStereoPoseSequence!=input.pose||!FrameStereoMetadata.valid||
+            !ExternalAtomicReplayEpoch||ExternalAtomicReplayEpoch!=PresentEpoch||
+            !DistinctFiniteExternalEyeTransforms(&input.view[0].m[0][0],
+                &input.view[1].m[0][0],&input.projection[0].m[0][0],&input.projection[1].m[0][0])||
+            !MatrixFinite(input.world)||!TargetIsBackBuffer()||
+            !DrawIndexedPrimitiveHook||!SetRenderTargetHook||!SetDepthStencilSurfaceHook)
+            return IsolatedStageResult::Unavailable;
+        R7StagedVehicle={};
+        struct StageScope { StageScope(){R7VehicleStageInFlight=true;}
+            ~StageScope(){R7VehicleStageInFlight=false;} } stageScope;
+        const auto epoch=PresentEpoch,boundary=R7CandidateBoundarySerial;
+        const auto generation=ExternalAtomicCandidates.generation;
+        auto ownerCurrent=[&](){return ExternalAtomicCandidates.generation==generation&&
+            ExternalAtomicCandidates.device==device&&!R7CandidateResetInFlight;};
+        auto current=[&](){return ownerCurrent()&&PresentEpoch==epoch&&
+            R7CandidateBoundarySerial==boundary&&ExternalAtomicReplayEpoch==epoch&&
+            FrameStereoPoseSequence==input.pose&&!FrameStereoIncomplete&&!FrameRightDrawFailed&&
+            !AnyAuxRenderTargetActive()&&!OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)&&
+            ActiveOcclusionQueries.load(std::memory_order_acquire)==0&&
+            !OutRunVR::State::StateBlockTracker::Recording()&&input.nativeCurrent(input)&&
+            ownerCurrent()&&PresentEpoch==epoch&&R7CandidateBoundarySerial==boundary;};
+        auto abort=[&](IsolatedStageResult result){
+            ExternalAtomicReplayEpoch=0;R7StagedVehicle={};
+            if(result==IsolatedStageResult::DirtyRestore||!ownerCurrent()){
+                LastMainDepthClearStamp.Invalidate();
+                RightDepthSynchronized=false;RightStencilSynchronized=false;
+                NoteRestoreFailure("external whole vehicle private stage");
+                return IsolatedStageResult::DirtyRestore;
+            }
+            return IsolatedStageResult::Unavailable;
+        };
+        auto& body=GlobalGpu();auto& dash=GlobalDashboardGpu();
+        if(!current()||!body.SelectionMatches(input.slot,input.carId)||
+            !body.EnsureResources(device)||!current()||
+            (input.includeDashboard&&(!dash.SelectionMatches(FerrariModelSlot::GenericId,input.carId)||
+                !dash.EnsureResources(device)||!current())))
+            return abort(IsolatedStageResult::Unavailable);
+        auto* const liveColor=TrackedRenderTarget;
+        auto* const liveDepth=TrackedDepthStencil;
+        if(!liveColor||!liveDepth||liveColor!=ExternalAtomicCandidates.provenLiveColor[0]||
+            liveDepth!=ExternalAtomicCandidates.provenLiveDepth[0]||
+            RightEyeSurface!=ExternalAtomicCandidates.provenLiveColor[1]||
+            RightEyeDepth!=ExternalAtomicCandidates.provenLiveDepth[1])
+            return abort(IsolatedStageResult::Unavailable);
+        const auto result=StageWholeIsolatedVehicle(current,[&](unsigned eye){
+            using Check=decltype(current);
+            struct RasterContext {
+                IDirect3DDevice9* device;
+                IDirect3DSurface9 *color,*depth;
+                Check* check;
+            } ctx{device,ExternalAtomicCandidates.eyes[eye].color,
+                ExternalAtomicCandidates.eyes[eye].depth,&current};
+            IsolatedEyeRaster raster{&ctx,
+                [](void* opaque) noexcept {
+                    auto& c=*static_cast<RasterContext*>(opaque);
+                    return (*c.check)();
+                },
+                [](void* opaque,UINT vertices,UINT triangles) noexcept -> HRESULT {
+                    auto& c=*static_cast<RasterContext*>(opaque);
+                    if(!(*c.check)()||!vertices||!triangles)return E_FAIL;
+                    IDirect3DSurface9* rt=nullptr;IDirect3DSurface9* depth=nullptr;
+                    const bool bound=SUCCEEDED(c.device->GetRenderTarget(0,&rt))&&
+                        (*c.check)()&&rt==c.color&&
+                        SUCCEEDED(c.device->GetDepthStencilSurface(&depth))&&
+                        (*c.check)()&&depth==c.depth;
+                    ReleaseCom(depth);ReleaseCom(rt);
+                    if(!bound||!(*c.check)())return E_FAIL;
+                    return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                        c.device,D3DPT_TRIANGLELIST,0,0,vertices,0,triangles);
+                }};
+            bool stateDirty=false;
+            InternalPassScope guard;
+            const auto seeded=R7SeedInactivePair(ExternalAtomicCandidates,device,
+                liveColor,liveDepth,
+                [&](IDirect3DSurface9* s){return SetRenderTargetHook.stdcall<HRESULT>(device,0u,s);},
+                [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
+                [&]() -> HRESULT {
+                    if(!current())return E_FAIL;
+                    const auto drawn=body.DrawNativeScene(device,input.world,input.view[eye],
+                        input.projection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster);
+                    stateDirty=drawn.receipt.stateMayBeDirty;
+                    if(!drawn.isolatedEyeComplete||!current())return E_FAIL;
+                    if(input.includeDashboard){
+                        const auto overlay=dash.DrawNativeScene(device,input.world,input.view[eye],
+                            input.projection[eye],input.dashboard,body.HasEmbeddedSpeedAndRpm(),
+                            input.nativeFrame,input.pose,body.EmbeddedGearMask(),&raster);
+                        stateDirty=stateDirty||overlay.receipt.stateMayBeDirty;
+                        if(!overlay.isolatedEyeComplete||!current())return E_FAIL;
+                    }
+                    return S_OK;
+                },eye,1,false);
+            if(stateDirty||seeded==R7CandidateSeedResult::DirtyRestore)
+                return IsolatedStageResult::DirtyRestore;
+            return seeded==R7CandidateSeedResult::Seeded&&current()?
+                IsolatedStageResult::Complete:IsolatedStageResult::Unavailable;
+        });
+        if(result!=IsolatedStageResult::Complete||!current())return abort(result);
+        R7StagedVehicle={generation,boundary,epoch,input.nativeFrame,input.pose,input.player};
+        return IsolatedStageResult::Complete;
+    }
 
     void R7SetDirectResetRasterOwner(void(*owner)() noexcept) noexcept
     {
