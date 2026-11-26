@@ -99,7 +99,9 @@ struct IsolatedEyeRaster {
     bool Restorable() const noexcept {return restoreCurrent&&restoreCurrent(context);}
 };
 struct ExternalVehicleStageInput {
-    D3DMATRIX world{},view[2]{},projection[2]{};
+    // Native center matrices from the prepared player ticket. R7 derives
+    // both eyes from its exact Quest eye-pair latch and the same pose FOV.
+    D3DMATRIX world{},centerView{},centerProjection{};
     DashboardTelemetry dashboard{};
     FerrariModelSlot slot=FerrariModelSlot::F50;
     unsigned char carId=255;

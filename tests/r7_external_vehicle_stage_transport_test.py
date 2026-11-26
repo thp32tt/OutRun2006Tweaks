@@ -22,6 +22,7 @@ stub=r'''
 #include <cassert>
 #include <atomic>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include "src/vr/game/external_car_isolated_transaction.hpp"
 #include "src/vr/game/external_car_eye_transform_proof.hpp"
@@ -34,6 +35,10 @@ struct RECT {int left=0,top=0,right=800,bottom=600;};
 struct D3DVIEWPORT9 {UINT X=0,Y=0,Width=800,Height=600;};
 struct D3DMATRIX {float m[4][4]{};};
 bool MatrixFinite(const D3DMATRIX& m){for(auto& row:m.m)for(float f:row)if(!std::isfinite(f))return false;return true;}
+D3DMATRIX MultiplyMatrix(const D3DMATRIX& a,const D3DMATRIX& b){
+    D3DMATRIX m{};for(unsigned i=0;i<4;++i)for(unsigned j=0;j<4;++j)for(unsigned k=0;k<4;++k)m.m[i][j]+=a.m[i][k]*b.m[k][j];return m;
+}
+D3DMATRIX ProjectionFromFov(const D3DMATRIX& base,int fov){auto m=base;m.m[2][0]=float(fov);return m;}
 struct IDirect3DSurface9 {unsigned refs=0,draws=0,pixels=0;void Release(){assert(refs);--refs;}};
 template<class T>void ReleaseCom(T*& p){if(p){p->Release();p=nullptr;}}
 struct IDirect3DDevice9 {
@@ -56,7 +61,13 @@ struct R7AtomicCandidatePair {
 } ExternalAtomicCandidates;
 std::uint64_t PresentEpoch=9,ExternalAtomicReplayEpoch=9,R7CandidateBoundarySerial=0,FrameStereoPoseSequence=7,DirectTransportGeneration=4;
 bool FrameStereoIncomplete=false,FrameRightDrawFailed=false,R7CandidateResetInFlight=false,InternalStereoPass=false,R7VehicleStageInFlight=false,DirectTransportResourcesReady=true;
-struct {bool valid=true;} FrameStereoMetadata;
+struct {bool valid=true;std::uint32_t poseSequence=7;int eyeFov[2]{-1,1};} FrameStereoMetadata;
+using NativeEyeMatrices=float[2][16];
+NativeEyeMatrices nativeEyes{};
+bool nativeEyesAvailable=true;
+const NativeEyeMatrices* GetQuestNativeEyePairForPresent(std::uint32_t pose){
+    return nativeEyesAvailable&&pose==FrameStereoPoseSequence?&nativeEyes:nullptr;
+}
 std::atomic<bool> OcclusionQueryTrackingUnavailable{false};std::atomic<unsigned> ActiveOcclusionQueries{0};
 IDirect3DSurface9 *BackBuffer=nullptr,*TrackedRenderTarget=nullptr,*TrackedDepthStencil=nullptr,*RightEyeSurface=nullptr,*RightEyeDepth=nullptr;
 struct Stamp {unsigned invalidated=0;void Invalidate(){++invalidated;}} LastMainDepthClearStamp;
@@ -64,6 +75,7 @@ bool RightDepthSynchronized=true,RightStencilSynchronized=true;
 unsigned restoreErrors=0,rawCalls=0,rawFail=0,rawReset=0,rawPresent=0,copyCalls=0,copyFail=0,fenceCalls=0,fenceRevoke=0;
 bool nativeValid=true,allowPublication=true,overlayDirty=false;
 bool IsGameDevice(IDirect3DDevice9* d){return d&&d==ExternalAtomicCandidates.device;}
+bool GameplayActive(){return true;}
 bool AnyAuxRenderTargetActive(){return false;}
 bool TargetIsBackBuffer(){return BackBuffer&&TrackedRenderTarget==BackBuffer;}
 void NoteRestoreFailure(const char*){++restoreErrors;}
@@ -110,8 +122,11 @@ gpu_stub=r'''
         bool SelectionMatches(FerrariModelSlot,unsigned char){return true;}
         bool EnsureResources(IDirect3DDevice9*){return true;}
         unsigned HasEmbeddedSpeedAndRpm(){return 0;}unsigned EmbeddedGearMask(){return 0;}
-        GpuDrawResult DrawNativeScene(IDirect3DDevice9*,const D3DMATRIX&,const D3DMATRIX&,const D3DMATRIX&,const DashboardTelemetry&,unsigned,std::uint64_t,std::uint64_t,unsigned,const IsolatedEyeRaster* raster){
+        GpuDrawResult DrawNativeScene(IDirect3DDevice9* d,const D3DMATRIX&,const D3DMATRIX& view,const D3DMATRIX& projection,const DashboardTelemetry&,unsigned,std::uint64_t,std::uint64_t,unsigned,const IsolatedEyeRaster* raster){
             GpuDrawResult r{};
+            const bool right=d->rt==ExternalAtomicCandidates.eyes[1].color;
+            assert(view.m[3][0]==(right?0.06f:0.f));
+            assert(projection.m[2][0]==(right?1.f:-1.f));
             for(unsigned i=0;i<count;++i){
                 if(!raster->Current()||FAILED(raster->draw(raster->context,3,1))) {
                     r.receipt.stateMayBeDirty=!raster->Restorable();return r;
@@ -140,14 +155,16 @@ struct Fixture {
             ExternalAtomicCandidates.provenLiveColor[i]=&stock[i];
             ExternalAtomicCandidates.provenLiveDepth[i]=&stockZ[i];
             stock[i].pixels=1;priv[i].pixels=2;
-            for(unsigned j=0;j<4;++j){input.world.m[j][j]=1;input.view[i].m[j][j]=1;input.projection[i].m[j][j]=1;}
+            for(unsigned j=0;j<16;++j)nativeEyes[i][j]=0.f;
+            for(unsigned j=0;j<4;++j)nativeEyes[i][j*5]=1.f;
         }
-        input.view[1].m[3][0]=0.06f;
+        for(unsigned j=0;j<4;++j){input.world.m[j][j]=1;input.centerView.m[j][j]=1;input.centerProjection.m[j][j]=1;}
+        nativeEyes[1][12]=0.06f;nativeEyesAvailable=true;
         BackBuffer=TrackedRenderTarget=d.rt=&stock[0];TrackedDepthStencil=d.depth=&stockZ[0];
         RightEyeSurface=&stock[1];RightEyeDepth=&stockZ[1];
         PresentEpoch=ExternalAtomicReplayEpoch=9;R7CandidateBoundarySerial=0;FrameStereoPoseSequence=7;R7StagedVehicle={};
         FrameStereoIncomplete=FrameRightDrawFailed=R7CandidateResetInFlight=InternalStereoPass=R7VehicleStageInFlight=false;
-        FrameStereoMetadata.valid=true;DirectTransportResourcesReady=true;
+        FrameStereoMetadata.valid=true;FrameStereoMetadata.poseSequence=7;DirectTransportResourcesReady=true;
         rawCalls=rawFail=rawReset=rawPresent=copyCalls=copyFail=fenceCalls=fenceRevoke=restoreErrors=0;
         nativeValid=allowPublication=true;overlayDirty=false;
         input.nativeFrame=12;input.pose=7;input.player=55;input.includeDashboard=true;
@@ -167,7 +184,8 @@ int main(){
     for(unsigned failure=1;failure<=10;++failure)for(unsigned mode=0;mode<3;++mode){
         Fixture f;if(mode==0)rawFail=failure;if(mode==1)rawReset=failure;if(mode==2)rawPresent=failure;
         const auto r=f.Stage();assert(r!=IsolatedStageResult::Complete&&rawCalls==failure&&!ExternalAtomicReplayEpoch);
-        if(mode!=1)f.Restored();if(mode==1)assert(r==IsolatedStageResult::DirtyRestore&&restoreErrors==1);
+        if(mode!=1)f.Restored();
+        if(mode==1)assert(r==IsolatedStageResult::DirtyRestore&&restoreErrors==1);
         f.LiveUnchanged();assert(!f.Transfer().handled&&!fenceCalls);++cases;
     }
     {Fixture f;overlayDirty=true;assert(f.Stage()==IsolatedStageResult::DirtyRestore&&rawCalls==5&&restoreErrors==1);f.Restored();++cases;}
@@ -179,7 +197,9 @@ int main(){
         f.LiveUnchanged();++cases;
     }
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete);fenceRevoke=1;auto t=f.Transfer();assert(t.handled&&FAILED(t.hr)&&!t.copyFailed&&fenceCalls==1);++cases;}
-    {Fixture f;f.input.view[1]=f.input.view[0];assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;nativeEyes[1][12]=0.f;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;nativeEyesAvailable=false;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;FrameStereoMetadata.poseSequence=8;assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
     std::cout<<"R7_ACTUAL_ISOLATED_STAGE_TRANSPORT_PASS "<<cases<<"\n";
 }
 '''

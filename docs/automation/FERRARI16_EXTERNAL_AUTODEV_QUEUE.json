@@ -4525,7 +4525,7 @@
         "status": "IN_PROGRESS",
         "deliverable": "Implement whole-vehicle per-eye stage render with explicit matrices, one latched frame/pose/player, opaque PBR and ordered glass/dashboard meshes; avoid recursive automatic duplicate DIP or deferred R29/R30/R33 route.",
         "gate": "All required mesh receipts both eyes, fail-left/right/mid-mesh/reset/epoch mismatch abort; no live draws.",
-        "admission_note": "A1/A2/A3 batch 725c360840d4da88010bf47b3a029e52d6775d7e integrates the real R7 private attachment owner with the full body and optional dashboard raw per-eye draw and guarded PBR; R7/R13/R29 DirectGPU owners transfer the complete candidate pair or both stock eyes into an unpublished slot. Exact all-car CI 45910850265 success; local exact-header C++17 498 cases pass. Follow-up adds one stage per Present, independent still-owned StateBlock restore and final EVENT receipt fence, actual R7 integration fault test. A4 body-only callback and complete scene replay certification remain; no runtime activation or completion claim.",
+        "admission_note": "A1/A2/A3 batch 725c360840d4da88010bf47b3a029e52d6775d7e integrates the real R7 private attachment owner with the full body and optional dashboard raw per-eye draw and guarded PBR; R7/R13/R29 DirectGPU owners transfer the complete candidate pair or both stock eyes into an unpublished slot. Exact all-car CI 45910850265 success; local exact-header C++17 498 cases pass. Follow-up 4b3eadb74bed2ed01d969961f791e9c3a6d3006e adds one stage per Present, independent still-owned StateBlock restore and final EVENT receipt fence. Its all-car 45911066844 failed solely on -Werror=misleading-indentation in new R7 mock; previous A1 tests and portable pair tests passed. This batch fixes the test formatting without suppressing warnings and derives explicit eye transforms inside R7 from the latched native Quest pair and same-pose FOV, rejecting missing or mono pairs. A4 body-only callback and complete scene replay certification remain; no runtime activation or completion claim.",
         "implementation_state": "BACKEND_INTEGRATED_INACTIVE"
       },
       {
@@ -4577,7 +4577,7 @@
       "priority_rule": "No docs-only loops. First real code/model conversion, changed-area tests, then one exact-SHA end-to-end gate; duplicate SHA repeat forbidden."
     },
     "execution_contract": [
-      "OVERRIDE previous single-slice workflow: every dispatch executes queue.development_batch_policy; start actual A2 feature work and A1 direct dependencies, not exhaustive A1 review.",
+      "OVERRIDE previous single-slice workflow: A1-A3 backend implementation batch is integrated inactive. Start actual A4 body-only leaf and stock-only replay integration next; fix A1-A3 only where directly blocking A4, no exhaustive A1 review.",
       "Do not finish after one small fix; continue the dependent production code/caller integration and next feasible substep in the same turn. If genuinely blocked, switch to another independent implementation substep of A2/A3/A4.",
       "Separate development readiness from final acceptance: unfinished A1 cannot block writing inactive A2/A3/A4 code. No live activation or claimed milestone pass until actual dependency gates and final exact-SHA CI are met.",
       "Targeted changed-area test/compile once per cohesive batch, full CI at feature integration checkpoints; existing automated CI remains enabled. Do not wait/recheck unrelated full asset gates on each edit.",

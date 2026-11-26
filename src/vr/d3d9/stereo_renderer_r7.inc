@@ -4353,14 +4353,13 @@ if(WaitForEventQuery(slot.fence,1,0u))
         const OutRunVR::DinoSidecar::ExternalVehicleStageInput& input) noexcept
     {
         using namespace OutRunVR::DinoSidecar;
-        if(R7VehicleStageInFlight||InternalStereoPass||!IsGameDevice(device)||
+        if(R7VehicleStageInFlight||InternalStereoPass||!IsGameDevice(device)||!GameplayActive()||
             !input.nativeCurrent||!input.nativeFrame||!input.pose||!input.player||
             !input.nativeCurrent(input)||FrameStereoIncomplete||FrameRightDrawFailed||
             FrameStereoPoseSequence!=input.pose||!FrameStereoMetadata.valid||
             !ExternalAtomicReplayEpoch||ExternalAtomicReplayEpoch!=PresentEpoch||
-            !DistinctFiniteExternalEyeTransforms(&input.view[0].m[0][0],
-                &input.view[1].m[0][0],&input.projection[0].m[0][0],&input.projection[1].m[0][0])||
-            !MatrixFinite(input.world)||!TargetIsBackBuffer()||
+            !MatrixFinite(input.world)||!MatrixFinite(input.centerView)||
+            !MatrixFinite(input.centerProjection)||!TargetIsBackBuffer()||
             !DrawIndexedPrimitiveHook||!SetRenderTargetHook||!SetDepthStencilSurfaceHook)
             return IsolatedStageResult::Unavailable;
         // A repeated native leaf in the same Present must not blend a
@@ -4396,6 +4395,25 @@ if(WaitForEventQuery(slot.fence,1,0u))
             }
             return IsolatedStageResult::Unavailable;
         };
+        // The prepared callback supplies only native center matrices.
+        // Reuse R7's verified Quest native inverse pair for the SAME pose,
+        // not caller-supplied arbitrary eye offsets or per-mesh relatching.
+        const auto stereo=FrameStereoMetadata;
+        if(!current()||!stereo.valid||stereo.poseSequence!=input.pose)
+            return abort(IsolatedStageResult::Unavailable);
+        const auto* nativePair=GetQuestNativeEyePairForPresent(stereo.poseSequence);
+        if(!nativePair||!current())return abort(IsolatedStageResult::Unavailable);
+        D3DMATRIX eyeView[2]{},eyeProjection[2]{};
+        for(unsigned eye=0;eye<2;++eye){
+            D3DMATRIX nativeView{};
+            std::memcpy(&nativeView,(*nativePair)[eye],sizeof(nativeView));
+            if(!MatrixFinite(nativeView))return abort(IsolatedStageResult::Unavailable);
+            eyeView[eye]=MultiplyMatrix(input.centerView,nativeView);
+            eyeProjection[eye]=ProjectionFromFov(input.centerProjection,stereo.eyeFov[eye]);
+        }
+        if(!DistinctFiniteExternalEyeTransforms(&eyeView[0].m[0][0],&eyeView[1].m[0][0],
+            &eyeProjection[0].m[0][0],&eyeProjection[1].m[0][0])||!current())
+            return abort(IsolatedStageResult::Unavailable);
         auto& body=GlobalGpu();auto& dash=GlobalDashboardGpu();
         if(!current()||!body.SelectionMatches(input.slot,input.carId)||
             !body.EnsureResources(device)||!current()||
@@ -4449,13 +4467,13 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
                 [&]() -> HRESULT {
                     if(!current())return E_FAIL;
-                    const auto drawn=body.DrawNativeScene(device,input.world,input.view[eye],
-                        input.projection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster);
+                    const auto drawn=body.DrawNativeScene(device,input.world,eyeView[eye],
+                        eyeProjection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster);
                     stateDirty=drawn.receipt.stateMayBeDirty;
                     if(!drawn.isolatedEyeComplete||!current())return E_FAIL;
                     if(input.includeDashboard){
-                        const auto overlay=dash.DrawNativeScene(device,input.world,input.view[eye],
-                            input.projection[eye],input.dashboard,body.HasEmbeddedSpeedAndRpm(),
+                        const auto overlay=dash.DrawNativeScene(device,input.world,eyeView[eye],
+                            eyeProjection[eye],input.dashboard,body.HasEmbeddedSpeedAndRpm(),
                             input.nativeFrame,input.pose,body.EmbeddedGearMask(),&raster);
                         stateDirty=stateDirty||overlay.receipt.stateMayBeDirty;
                         if(!overlay.isolatedEyeComplete||!current())return E_FAIL;
