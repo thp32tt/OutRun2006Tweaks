@@ -265,5 +265,39 @@ class ContinuousDebugCycleTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(sends.await_count, 6)
 
 
+
+class FeatureBatchPromptTests(unittest.TestCase):
+    def test_feature_batch_overrides_single_defect_and_repeated_ci_contract(self):
+        q = fixture()
+        work = {"id": "EXT16-011", "stage": "source_fix", "status": "ACTIVE",
+                "title": "A2 whole-vehicle stage", "continuous_debug": True,
+                "acceptance": ["obsolete single-defect check"]}
+        q["work"].append(work)
+        q["active_work_id"] = work["id"]
+        q["development_batch_policy"] = {"enabled": True, "work_id": work["id"]}
+        p = _module.make_external_prompt(work, q, "a"*40, True, 107, "A2 stage")
+        self.assertIn("MODE=FEATURE_BATCH", p)
+        self.assertIn("ITERATION=107", p)
+        self.assertIn("FOCUS=A2 stage", p)
+        self.assertIn("첫 커밋으로 종료하지 마", p)
+        self.assertIn("개발 80%", p)
+        self.assertIn("최종 exact-SHA 필수 검증은 유지", p)
+        self.assertIn("guard 해제 금지", p)
+        self.assertIn("HMD는 UNTESTED", p)
+        self.assertNotIn("결함을 1개 찾아", p)
+        self.assertNotIn("obsolete single-defect check", p)
+        self.assertLess(len(p), 1900)
+
+    def test_feature_batch_is_opt_in_and_scoped(self):
+        q = fixture()
+        work = q["work"][0]
+        q["development_batch_policy"] = {"enabled": True, "work_id": "EXT16-011"}
+        self.assertNotIn("MODE=FEATURE_BATCH",
+                         _module.make_external_prompt(work, q, "b"*40, True))
+        work["continuous_debug"] = True
+        self.assertNotIn("MODE=FEATURE_BATCH",
+                         _module.make_external_prompt(work, q, "b"*40, True))
+
+
 if __name__ == "__main__":
     unittest.main()
