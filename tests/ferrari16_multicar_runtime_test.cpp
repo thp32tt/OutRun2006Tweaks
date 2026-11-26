@@ -30,7 +30,10 @@ int main() {
             static_cast<unsigned char>(id))==slot);
         const auto* fallback=LegacyFerrariCarSuffix(
             static_cast<unsigned char>(id));
-        if(slot==7)
+        if(slot==2)
+            assert(fallback && std::wcscmp(fallback,
+                                           L"F50_External_Test.ovc")==0);
+        else if(slot==7)
             assert(fallback && std::wcscmp(fallback,
                                            L"ExternalCars\\288gto.ovc")==0);
         else if(slot==11)
