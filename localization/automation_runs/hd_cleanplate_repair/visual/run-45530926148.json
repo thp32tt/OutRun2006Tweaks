@@ -1,0 +1,14 @@
+{
+  "manifest_sha256": "73abf37db92a44fc470358e19e5fd43fd14d99259b4883e4320c882b0e9f7977",
+  "records": {
+    "HDAT-7153fa31b865ab6ccaafc147": {
+      "candidate_dds_sha256": "fbd31c135d05a46de4e5b6bda46e6a7dca96fb0889a5a5b033144eb70b07af02",
+      "review_key": "433c7c85ed43c68e5dbc537607af94db2fbf0e7a2e9cdc7171eb7eddb91a71ae",
+      "source_dds_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "status": "CLAIMED",
+      "target": "textures/load/Keyboard/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    }
+  },
+  "run_id": 45530926148,
+  "schema": "outrun.hd.atlas-vision-state.v1"
+}
