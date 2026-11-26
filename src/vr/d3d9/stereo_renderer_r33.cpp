@@ -68,6 +68,8 @@ namespace OutRunVRStereo
     inline void FailClosedDepthStencilState() noexcept;
     // R7 owns the physical ResetEx hook; this ABI also works in split builds.
     void R7SetDirectResetRasterOwner(void(*owner)() noexcept) noexcept;
+    void R7SetDirectResetLifecycleOwner(void(*owner)(bool,HRESULT) noexcept) noexcept;
+    void R32ReviewDirectResetLifecycle(bool before, HRESULT hr) noexcept;
 
     namespace
     {
@@ -2478,6 +2480,7 @@ namespace OutRunVRStereo
 
         void R33RollbackHooks() noexcept
         {
+            R7SetDirectResetLifecycleOwner(nullptr);
             R7SetDirectResetRasterOwner(nullptr);
             R33RightViewport = {};
             R33SavedViewport = {};
@@ -2563,6 +2566,7 @@ namespace OutRunVRStereo
                         R33SynchronizeResetReplayGuardState(installedDevice);
 
                     R7SetDirectResetRasterOwner(R33RetireDirectResetRaster);
+                    R7SetDirectResetLifecycleOwner(R32ReviewDirectResetLifecycle);
                     R33ReportInstallResult(true);
                     spdlog::info(
                         "VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY; R32 is hook-free functional owner with no async install shim; top-level telemetry counted once when enabled; direct R31/R22/R13 prerequisite ownership + R22 Reset + R13 Present/DirectGPU + R30 draw dispatch ACTIVE");

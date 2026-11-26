@@ -124,6 +124,8 @@ namespace OutRunVRStereo
         std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetTransportOwner{nullptr};
         std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetBaselineOwner{nullptr};
         std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetRasterOwner{nullptr};
+        using R7DirectResetLifecycleOwnerFn=void(*)(bool,HRESULT) noexcept;
+        std::atomic<R7DirectResetLifecycleOwnerFn> R7DirectResetLifecycleOwner{nullptr};
         SafetyHookInline CandidateSwapChainPresentHook{},CandidateAdditionalSwapChainHook{};
         void* R7CandidateSwapChainPresentTarget=nullptr;
         bool R7CandidateAdditionalChainSeen=false;
@@ -1898,6 +1900,8 @@ namespace OutRunVRStereo
             // the physical call; callbacks during ResetEx may refill them.
             const auto retireRaster=R7DirectResetRasterOwner.load(std::memory_order_acquire);
             if(retireRaster)retireRaster();
+            const auto lifecycle=R7DirectResetLifecycleOwner.load(std::memory_order_acquire);
+            if(lifecycle)lifecycle(true,D3D_OK);
             ExternalAtomicReplayEpoch=0;
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             R7ForgetAutomaticDepthProof();
@@ -1919,6 +1923,7 @@ namespace OutRunVRStereo
             ExternalAtomicAllocationAttemptEpoch=PresentEpoch;
             R7ForgetAutomaticDepthProof();
             if(retireRaster)retireRaster();
+            if(lifecycle)lifecycle(false,hr);
             --R7CandidateResetInFlight;
             return hr;
         }
@@ -3847,6 +3852,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
     void R7SetDirectResetRasterOwner(void(*owner)() noexcept) noexcept
     {
         R7DirectResetRasterOwner.store(owner,std::memory_order_release);
+    }
+
+    void R7SetDirectResetLifecycleOwner(void(*owner)(bool,HRESULT) noexcept) noexcept
+    {
+        R7DirectResetLifecycleOwner.store(owner,std::memory_order_release);
     }
 
 	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept

@@ -760,6 +760,17 @@ std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetBaselineOwner{nullptr};
 unsigned rasterRetires=0;bool rasterValid=true;
 void RetireRaster() noexcept {assert(R7CandidateResetInFlight==1);assert(rasterRetires==calls);++rasterRetires;rasterValid=false;}
 std::atomic<R7DirectResetTransportOwnerFn> R7DirectResetRasterOwner{nullptr};
+constexpr HRESULT D3D_OK=0;
+unsigned lifecycleCalls=0;HRESULT lifecycleResult=0;
+void Lifecycle(bool before,HRESULT hr) noexcept {
+    assert(R7CandidateResetInFlight==1);
+    assert(before?calls==0:calls==1);
+    assert(lifecycleCalls==unsigned(!before));
+    if(before)assert(hr==D3D_OK);else lifecycleResult=hr;
+    ++lifecycleCalls;
+}
+using R7DirectResetLifecycleOwnerFn=void(*)(bool,HRESULT) noexcept;
+std::atomic<R7DirectResetLifecycleOwnerFn> R7DirectResetLifecycleOwner{nullptr};
 bool R7RetireDirectResetCore(){assert(r9Retires==1);assert(transportRetires==unsigned(bool(R7DirectResetTransportOwner.load())));return false;}
 struct Pair{void Reset(){++resets;allocated=false;}} ExternalAtomicCandidates;
 IDirect3DDevice9Ex* expectedDevice=nullptr;
@@ -770,6 +781,7 @@ struct Hook{
     template<class R> R stdcall(IDirect3DDevice9Ex* d,D3DPRESENT_PARAMETERS* p,D3DDISPLAYMODEEX* m){
         ++calls;assert(d==expectedDevice&&p==expectedParams&&m==expectedMode);
         const bool rasterOwned=owned&&bool(R7DirectResetRasterOwner.load());
+        assert(lifecycleCalls==unsigned(owned&&bool(R7DirectResetLifecycleOwner.load())));
         assert(rasterRetires==unsigned(rasterOwned)&&rasterValid!=rasterOwned);
         // Simulate a reentrant getter repopulating old borrowed identities.
         rasterValid=true;
@@ -791,7 +803,8 @@ reset_ex_cases=r'''
 int main(){
     IDirect3DDevice9Ex game,other;other.game=false;
     D3DPRESENT_PARAMETERS pp{7};D3DDISPLAYMODEEX mode{8};
-    for(unsigned mask=0;mask<2048;++mask){
+    for(unsigned mask=0;mask<4096;++mask){
+        R7DirectResetLifecycleOwner=(mask&2048)?Lifecycle:nullptr;
         R7DirectResetRasterOwner=(mask&1024)?RetireRaster:nullptr;
         R7DirectResetBaselineOwner=(mask&512)?RetireBaseline:nullptr;
         R7DirectResetTransportOwner=(mask&256)?RetireTransport:nullptr;
@@ -802,17 +815,20 @@ int main(){
         nested=mask&32;result=(mask&64)?-1:0;owned=!(mask&7);
         const std::uint64_t initialReplay=(mask&128)?9:0;
         PresentEpoch=9;ExternalAtomicAllocationAttemptEpoch=0;ExternalAtomicReplayEpoch=initialReplay;
-        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;baselineRetires=0;rasterRetires=0;rasterValid=true;allocated=true;
+        R7CandidateResetInFlight=0;proof=1;resets=0;calls=0;r9Retires=0;transportRetires=0;baselineRetires=0;rasterRetires=0;rasterValid=true;allocated=true;lifecycleCalls=0;lifecycleResult=123;
         assert(R7CandidateResetExDest(expectedDevice,expectedParams,expectedMode)==result);
         assert(calls==1&&R7CandidateResetInFlight==0);
         const bool rasterOwned=owned&&bool(R7DirectResetRasterOwner.load());
         assert(rasterRetires==(rasterOwned?2u:0u)&&rasterValid!=rasterOwned);
+        const bool lifecycleOwned=owned&&bool(R7DirectResetLifecycleOwner.load());
+        assert(lifecycleCalls==(lifecycleOwned?2u:0u));
+        assert(lifecycleResult==(lifecycleOwned?result:123));
         assert(PresentEpoch==(owned&&nested?1u:9u));
         assert(ExternalAtomicReplayEpoch==(owned?0:initialReplay));
         assert(ExternalAtomicAllocationAttemptEpoch==(owned?PresentEpoch:0));
         assert(resets==(owned?1u:0u)&&proof==(owned?3u:1u)&&allocated==!owned);
     }
-    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 2048\n";
+    std::cout<<"R7_DIRECT_RESETEX_BOUNDARY_PASS 4096\n";
 }
 '''
 assert "ResetExVtableIndex = 132;" in source
@@ -1250,5 +1266,105 @@ with tempfile.TemporaryDirectory() as temp:
     cpp=Path(temp)/"r33_direct_reset.cpp"
     exe=Path(temp)/"r33_direct_reset"
     cpp.write_text(r33_stub+r33_view+r33_retire+r33_cases)
+    subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
+
+# Iter87: exercise the actual R32 reset owner and split-TU callback body.
+r32_source=Path("src/vr/d3d9/stereo_renderer_r32.cpp").read_text(encoding="utf-8")
+r32_reset=r32_source[r32_source.index("thread_local unsigned R32ClassicResetDepth"):
+                      r32_source.index("void R32LogPerfWindow(")]
+r32_direct=r32_source[r32_source.index("void R32ReviewDirectResetLifecycle("):
+                       r32_source.index("HRESULT R32ReviewRunResetLifecycleCallback(")]
+r32_identity=r32_source[r32_source.index("void R32ForgetDirectIdentity()"):
+                         r32_source.index("}",r32_source.index("void R32ForgetDirectIdentity()"))+1]
+r32_stub=r'''
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+using HRESULT=int;
+constexpr HRESULT D3D_OK=0;
+bool SUCCEEDED(HRESULT hr){return hr>=0;}
+struct IDirect3DDevice9{bool game=true;};
+bool R30SupportIsGameDevice(IDirect3DDevice9* d){return d&&d->game;}
+unsigned effect=0,fast=0,live=0,renderer=0,arms=0;
+bool telemetry=false;
+void R30SupportInvalidateEffectStateCache(){++effect;}
+void R31SupportResetFastPathState(){++fast;}
+void R30SupportInvalidateLiveStateSample(){++live;}
+void R30SupportInvalidateRendererStateAfterExternalRestore(){++renderer;}
+std::uint32_t R32DirectHostPid=0,R32DirectHostLuidLow=0,R32DirectHostLuidHigh=0;
+bool R32DirectCopyPathRejected=false,R32PerfWindowActive=false,R32FirstResetRearmLogged=false;
+HRESULT R32DirectCopyRejectHr=D3D_OK;
+unsigned R32FrameWorkloadCounters=0,R32PerfWindowCounters=0,R32PerfBaselineUs=0,
+    R32LastPresentEndQpc=0,R32Counters=0,R32ResetEpochRearms=0,R32ResetFailures=0;
+std::uint64_t R30SupportPresentEpoch(){return 19;}
+namespace OutRunVR::R32 { std::uint64_t RearmMonoSafetyEpoch(std::uint64_t e){return e+2;} }
+void R30SupportSetStereoRecoverySafetyThroughEpoch(std::uint64_t e){assert(e==21);++arms;}
+bool R30SupportTelemetryEnabled(){return telemetry;}
+namespace spdlog { void info(const char*){} }
+'''
+r32_cases=r'''
+void dirty(){
+    R32DirectHostPid=1;R32DirectHostLuidLow=2;R32DirectHostLuidHigh=3;
+    R32DirectCopyPathRejected=true;R32DirectCopyRejectHr=-3;
+    R32FrameWorkloadCounters=R32PerfWindowCounters=R32PerfBaselineUs=
+        R32LastPresentEndQpc=R32Counters=7;
+    R32PerfWindowActive=true;
+}
+void checkClean(){
+    assert(!R32DirectHostPid&&!R32DirectHostLuidLow&&!R32DirectHostLuidHigh);
+    assert(!R32DirectCopyPathRejected&&R32DirectCopyRejectHr==D3D_OK);
+    assert(!R32FrameWorkloadCounters&&!R32PerfWindowCounters&&!R32PerfBaselineUs&&
+        !R32LastPresentEndQpc&&!R32Counters&&!R32PerfWindowActive);
+}
+int main(){
+    IDirect3DDevice9 game,other{false};
+    for(unsigned mask=0;mask<64;++mask){
+        const bool classic=mask&1,gameOwned=!(mask&2),nestedPhysical=mask&4;
+        telemetry=bool(mask&8);
+        const HRESULT hr=(mask&16)?-1:((mask&32)?1:0);
+        effect=fast=live=renderer=arms=R32ResetEpochRearms=R32ResetFailures=0;
+        dirty();unsigned physical=0;
+        if(classic){
+            const HRESULT got=R32WithResetLifecycle(gameOwned?&game:&other,[&](){
+                ++physical;
+                if(nestedPhysical&&gameOwned){
+                    assert(R32ClassicResetDepth==1);
+                    R32ReviewDirectResetLifecycle(true,D3D_OK);
+                    assert(effect==0&&R32DirectHostPid==1);
+                    R32ReviewDirectResetLifecycle(false,hr);
+                    assert(effect==0&&arms==0);
+                }
+                return hr;
+            });
+            assert(got==hr&&R32ClassicResetDepth==0);
+        }else{
+            if(gameOwned){
+                R32ReviewDirectResetLifecycle(true,D3D_OK);
+                checkClean();assert(effect==1&&arms==0);
+            }
+            ++physical;dirty();
+            if(gameOwned)R32ReviewDirectResetLifecycle(false,hr);
+        }
+        assert(physical==1);
+        const unsigned expected=gameOwned?(classic?1:2):0;
+        assert(effect==expected&&fast==expected&&live==expected&&renderer==expected);
+        assert(arms==unsigned(gameOwned&&SUCCEEDED(hr)));
+        assert(R32ResetEpochRearms==unsigned(gameOwned&&telemetry&&SUCCEEDED(hr)));
+        assert(R32ResetFailures==unsigned(gameOwned&&telemetry&&!SUCCEEDED(hr)));
+        if(gameOwned)checkClean();else assert(R32DirectHostPid==1);
+    }
+    std::cout<<"R32_DIRECT_RESET_LIFECYCLE_PASS 64\n";
+}
+'''
+assert "R7SetDirectResetLifecycleOwner(R32ReviewDirectResetLifecycle);" in r33_source
+assert "R7SetDirectResetLifecycleOwner(nullptr);" in r33_source
+assert "R7DirectResetLifecycleOwner.store(owner,std::memory_order_release);" in source
+assert reset_callback.index("if(lifecycle)lifecycle(true,D3D_OK);") < reset_callback.rindex("CandidateResetExHook.stdcall<HRESULT>")
+assert reset_callback.index("if(lifecycle)lifecycle(false,hr);") > reset_callback.rindex("CandidateResetExHook.stdcall<HRESULT>")
+with tempfile.TemporaryDirectory() as temp:
+    cpp=Path(temp)/"r32_direct_reset.cpp"
+    exe=Path(temp)/"r32_direct_reset"
+    cpp.write_text(r32_stub+r32_identity+r32_reset+r32_direct+r32_cases)
     subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pedantic",str(cpp),"-o",str(exe)],check=True)
     subprocess.run([str(exe)],check=True)

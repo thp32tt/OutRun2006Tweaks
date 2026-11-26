@@ -635,6 +635,8 @@ namespace OutRunVRStereo
             return true;
         }
 
+        thread_local unsigned R32ClassicResetDepth = 0;
+
         void R32InvalidateResetCaches() noexcept
         {
             R30SupportInvalidateEffectStateCache();
@@ -666,21 +668,28 @@ namespace OutRunVRStereo
             }
         }
 
+        void R32CompleteResetLifecycle(HRESULT hr) noexcept
+        {
+            if (SUCCEEDED(hr))
+                R32ResetAfterGameReset();
+            else
+            {
+                R32InvalidateResetCaches();
+                if (R30SupportTelemetryEnabled()) ++R32ResetFailures;
+            }
+        }
+
         template <typename LowerReset>
         HRESULT R32WithResetLifecycle(IDirect3DDevice9* device,
             LowerReset&& lowerReset) noexcept
         {
-            const HRESULT hr = lowerReset();
             const bool gameDevice = R30SupportIsGameDevice(device);
+            if (gameDevice) ++R32ClassicResetDepth;
+            const HRESULT hr = lowerReset();
             if (gameDevice)
             {
-                if (SUCCEEDED(hr))
-                    R32ResetAfterGameReset();
-                else
-                {
-                    R32InvalidateResetCaches();
-                    if (R30SupportTelemetryEnabled()) ++R32ResetFailures;
-                }
+                --R32ClassicResetDepth;
+                R32CompleteResetLifecycle(hr);
             }
             return hr;
         }
@@ -905,6 +914,16 @@ namespace OutRunVRStereo
             device, frameId, [callback, context]() noexcept {
                 return callback(context);
             });
+    }
+
+    // The R7 physical ResetEx owner may be called outside the classic R33/R22
+    // chain. Retire upper caches before the driver and finish with its exact
+    // result. A nested physical ResetEx leaves completion to the outer owner.
+    void R32ReviewDirectResetLifecycle(bool before, HRESULT hr) noexcept
+    {
+        if (R32ClassicResetDepth != 0) return;
+        if (before) R32InvalidateResetCaches();
+        else R32CompleteResetLifecycle(hr);
     }
 
     HRESULT R32ReviewRunResetLifecycleCallback(
