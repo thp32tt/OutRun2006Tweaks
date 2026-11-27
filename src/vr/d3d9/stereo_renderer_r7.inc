@@ -2077,7 +2077,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* d,IDirect3DSurface9* expectedRt,
             IDirect3DSurface9* expectedDepth,BindColor bindColor,
             BindDepth bindDepth,ClearEye clearEye,unsigned firstEye=0,unsigned eyeCount=2,
-            bool requireFullViewport=true) noexcept
+            bool requireFullViewport=true,bool omitRaster=false) noexcept
         {
             if(firstEye>=2||!eyeCount||eyeCount>2-firstEye||
                 !d||pair.device!=d||!expectedRt||!expectedDepth||
@@ -2122,6 +2122,16 @@ namespace OutRunVRStereo
                 isolated=isolated&&rasterCurrent();
             }
             if(!isolated||!rasterCurrent())return declineCapture();
+            // Stock-only PMT omission is a read-only proof, not a private
+            // raster. Both private attachments were created and seeded for
+            // this generation. Do not bind or restore any state when no
+            // pixels will be written. The live draw still executes once.
+            if(omitRaster){
+                if(requireFullViewport||eyeCount!=1)return declineCapture();
+                ReleaseCom(depth);ReleaseCom(rt);
+                if(!current())return R7CandidateSeedResult::DirtyRestore;
+                return rasterCurrent()?R7CandidateSeedResult::Seeded:R7CandidateSeedResult::Unavailable;
+            }
             bool seeded=true;
             for(unsigned i=firstEye;i<firstEye+eyeCount;++i){
                 const auto& eye=pair.eyes[i];
@@ -2327,7 +2337,7 @@ namespace OutRunVRStereo
         template<class DrawCall>
         R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9* device,
             unsigned eye,IDirect3DSurface9* liveColor,IDirect3DSurface9* liveDepth,
-            DrawCall& drawCall) noexcept
+            DrawCall& drawCall,bool omitRaster=false) noexcept
         {
             if(ExternalAtomicReplayEpoch!=PresentEpoch)
                 return R7CandidateSeedResult::Unavailable;
@@ -2345,7 +2355,7 @@ namespace OutRunVRStereo
                 liveColor,liveDepth,
                 [&](IDirect3DSurface9* s){return SetRenderTargetHook.stdcall<HRESULT>(device,0u,s);},
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
-                [&](){return drawCall();},eye,1,false);
+                [&](){return drawCall();},eye,1,false,omitRaster);
             if(result!=R7CandidateSeedResult::Seeded){
                 ExternalAtomicReplayEpoch=0;
                 return result;
@@ -3012,10 +3022,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
             const bool stockOnly=allowStockOnly&&R7NativeStockOnlyDraw();
             bool inputRestoreFailed=false;
             auto candidateDraw=[&]() -> HRESULT {
-                // The physical live draw still runs below the caller. Use
-                // the actual attachment transaction to prove both bindings
-                // and restoration, but omit native model triangles privately.
-                if(stockOnly)return S_OK;
+                // Defense in depth: the stock-only read-only path above
+                // never invokes this raster callback.
+                if(stockOnly)return E_FAIL;
                 if(!up)return drawCall();
                 IDirect3DVertexBuffer9* vb=nullptr;
                 IDirect3DIndexBuffer9* ib=nullptr;
@@ -3044,7 +3053,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 ReleaseCom(ib);ReleaseCom(vb);
                 return inputRestoreFailed?E_FAIL:hr;
             };
-            const auto result=R7ReplayInactiveEye(device,eye,color,depth,candidateDraw);
+            const auto result=R7ReplayInactiveEye(device,eye,color,depth,candidateDraw,stockOnly);
             if(stockOnly)R7RecordNativeStockOmission(eye,result);
             if(inputRestoreFailed||result!=R7CandidateSeedResult::Seeded)
                 ExternalAtomicReplayEpoch=0;

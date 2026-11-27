@@ -273,6 +273,22 @@ int main(){
         assert(result==R7CandidateSeedResult::Seeded&&draws==1);
         assert(d.rt==&lc&&d.depth==&ld&&d.liveWrites==0);
     }
+    // Omission needs the same getters and ownership/MRT checks, but
+    // never changes attachments, viewport, scissor or invokes the draw.
+    for(unsigned eye=0;eye<2;++eye){
+        for(unsigned fail=0;fail<=4;++fail){
+            d.io=0;d.ioFail=fail;unsigned writes=0;
+            auto noDraw=[&](){++writes;return E_FAIL;};
+            const auto result=R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,
+                noDraw,eye,1,false,true);
+            assert(result==(fail?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded));
+            assert(writes==0&&d.io==(fail?fail:4)&&d.rt==&lc&&d.depth==&ld);
+            assert(lc.refs==0&&ld.refs==0);
+        }
+    }
+    d.ioFail=0;
+    assert(R7SeedInactivePair(pair,&d,&lc,&ld,color,depth,[&](){return E_FAIL;},
+        0,2,false,true)==R7CandidateSeedResult::Unavailable);
     // A partial viewport is valid for a replay, not for a full seed.
     d.viewport={20,30,640,480};d.scissor={21,31,600,400};
     unsigned partialDraws=0;
@@ -909,8 +925,8 @@ unsigned interruptRaster=0;
 R7CandidateSeedResult seedResult=R7CandidateSeedResult::Seeded;
 template<class C,class D,class R>R7CandidateSeedResult R7SeedInactivePair(
     Pair&,IDirect3DDevice9*,IDirect3DSurface9*,IDirect3DSurface9*,C,D,R raster,
-    unsigned=0,unsigned=2,bool=true){
-    ++rasterCalls;if(seedResult==R7CandidateSeedResult::Seeded)raster();
+    unsigned=0,unsigned=2,bool=true,bool omit=false){
+    ++rasterCalls;if(seedResult==R7CandidateSeedResult::Seeded&&!omit)raster();
     if(interruptRaster==1)++PresentEpoch;
     if(interruptRaster==2)ExternalAtomicCandidates.Reset();
     if(interruptRaster==3)TrackedRenderTarget=&rc;
@@ -2020,9 +2036,9 @@ struct IDirect3DDevice9{
     }
 };
 template<class DrawCall>R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9* d,unsigned,
-    IDirect3DSurface9*,IDirect3DSurface9*,DrawCall& draw){
+    IDirect3DSurface9*,IDirect3DSurface9*,DrawCall& draw,bool omit=false){
     const auto gen=ExternalAtomicCandidates.generation,serial=R7CandidateBoundarySerial;
-    const auto hr=draw();
+    const auto hr=omit?S_OK:draw();
     if(ExternalAtomicCandidates.generation!=gen||ExternalAtomicCandidates.device!=d)
         return R7CandidateSeedResult::DirtyRestore;
     if(FAILED(hr)||R7CandidateBoundarySerial!=serial)return R7CandidateSeedResult::Unavailable;
