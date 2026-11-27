@@ -531,10 +531,11 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('if not verified:', body)
         self.assertIn('active["terminal_verification"] = reason', body)
 
-    def test_vr_compose_pins_v2_and_three_slots(self):
+    def test_vr_compose_pins_v2_and_single_headless_slot(self):
         compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
         self.assertIn('dockerfile: Dockerfile.portainer-vr', compose)
-        self.assertIn('CHAT_SLOTS: "3"', compose)
+        self.assertIn('CHAT_SLOTS: "1"', compose)
+        self.assertIn('VR_BROWSER_MODE: "${VR_BROWSER_MODE:-headless}"', compose)
         self.assertIn('RECYCLE_ENABLED: "true"', compose)
         self.assertIn('RECYCLE_INTERVAL_MINUTES: "180"', compose)
         self.assertIn('RECYCLE_MEMORY_PERCENT: "70"', compose)

@@ -60,7 +60,7 @@ class HeadlessModeTests(unittest.TestCase):
         self.assertIn("--max-time 4", ENTRY)
 
     def test_headless_rollover_closes_old_tab_before_navigation(self):
-        source = (ROOT / "src-vr-v2/controller.py.part02").read_text()
+        source = "".join((ROOT / "src-vr-v2" / f"controller.py.part{i:02d}").read_text() for i in range(4))
         fn = next(n for n in ast.parse(source).body
                   if isinstance(n, ast.AsyncFunctionDef) and n.name == "hard_replace_slot_page")
         events = []
