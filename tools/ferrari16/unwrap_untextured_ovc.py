@@ -187,7 +187,7 @@ def planar_patches(entries,groups):
     return charts
 
 def main(src,dst,mode="triangle"):
-    if mode not in ("triangle","paired","patch"):raise ValueError("mode must be triangle, paired or patch")
+    if mode not in ("triangle","paired","patch","hybrid"):raise ValueError("mode must be triangle, paired, patch or hybrid")
     src,dst=pathlib.Path(src),pathlib.Path(dst)
     raw=src.read_bytes()
     magic,version,ng,nm,nv,nt,size,crc=HEAD.unpack_from(raw)
@@ -256,7 +256,11 @@ def main(src,dst,mode="triangle"):
         # Retain the same face-count grid as the original triangle atlas.
         # This lets the baker independently reconstruct and validate tile ownership.
         tiles=math.ceil(math.sqrt(len(entries)))
-        charts=planar_patches(entries,groups) if mode=="patch" else paired_charts(entries,groups) if mode=="paired" else [[e] for e in entries]
+        # Bound expensive chart growth on very large materials. Hybrid
+        # keeps validated paired charts there, without reducing geometry
+        # or skipping AO; smaller materials get the 8-face improvement.
+        method="patch" if mode=="patch" or (mode=="hybrid" and len(entries)<=16000) else "paired" if mode in ("paired","hybrid") else "triangle"
+        charts=planar_patches(entries,groups) if method=="patch" else paired_charts(entries,groups) if method=="paired" else [[e] for e in entries]
         pergroup=defaultdict(dict);valid=invalid=0
         for ordinal,chart in enumerate(charts):
             row,col=divmod(ordinal,tiles)
@@ -289,7 +293,7 @@ def main(src,dst,mode="triangle"):
             width=4 if g["w"]==4 or len(out)>65535 else 2
             fmt=struct.Struct("<I" if width==4 else "<H")
             g.update(n=len(out),vb=vb,w=width,ib=b"".join(fmt.pack(v) for v in newidx))
-        report.append(dict(material=mat,valid_uv_triangles=valid,collapsed_nondegenerate_triangles=invalid,source_zero_area_triangles=degenerate,atlas_tiles_per_axis=tiles,charts=len(charts),paired_charts=sum(len(c)==2 for c in charts),max_chart_faces=max(map(len,charts))))
+        report.append(dict(material=mat,valid_uv_triangles=valid,collapsed_nondegenerate_triangles=invalid,source_zero_area_triangles=degenerate,atlas_tiles_per_axis=tiles,charts=len(charts),paired_charts=sum(len(c)==2 for c in charts),max_chart_faces=max(map(len,charts)),method=method))
         print("UV_MATERIAL",mat,valid,invalid,flush=True)
     vertices=sum(g["n"] for g in groups)
     body=b"".join(GROUP.pack(len(g["name"]),g["mat"],g["n"],g["ic"],g["w"])+g["name"]+g["vb"]+g["ib"] for g in groups)+raw[tail:]
@@ -298,7 +302,7 @@ def main(src,dst,mode="triangle"):
     tmp=dst.with_suffix(dst.suffix+".part")
     if tmp.exists():raise ValueError("temporary exists")
     tmp.write_bytes(output);tmp.replace(dst)
-    details=dict(source_sha256=hashlib.sha256(raw).hexdigest(),output_sha256=hashlib.sha256(output).hexdigest(),groups=ng,materials=nm,triangles=nt,source_vertices=nv,output_vertices=vertices,generated_uv_materials=len(report),materials_detail=report,source_geometry_corner_bytes_preserved=True,material_tail_preserved=True,authored_uv=False,chart_method="connected_planar_patches" if mode=="patch" else "paired_nearplanar_geometric_projection" if mode=="paired" else "per_triangle_geometric_projection",release_install=False)
+    details=dict(source_sha256=hashlib.sha256(raw).hexdigest(),output_sha256=hashlib.sha256(output).hexdigest(),groups=ng,materials=nm,triangles=nt,source_vertices=nv,output_vertices=vertices,generated_uv_materials=len(report),materials_detail=report,source_geometry_corner_bytes_preserved=True,material_tail_preserved=True,authored_uv=False,chart_method="bounded_hybrid_planar_patches" if mode=="hybrid" else "connected_planar_patches" if mode=="patch" else "paired_nearplanar_geometric_projection" if mode=="paired" else "per_triangle_geometric_projection",release_install=False)
     dst.with_suffix(dst.suffix+".json").write_text(json.dumps(details,indent=2)+"\n")
     print("UV_REBUILD",json.dumps(details),flush=True)
 if __name__=="__main__":
