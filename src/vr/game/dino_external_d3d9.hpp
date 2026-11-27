@@ -146,6 +146,7 @@ class GpuOwner final {
     unsigned glassMeshCount_=0;
     std::vector<IDirect3DTexture9*> textures_{};
     std::vector<IDirect3DTexture9*> normals_{},orms_{};
+    std::vector<bool> ormLuminance_{};
     PbrShaders pbrShaders_{};
     bool pbrReady_=false;
     IDirect3DDevice9* owner_=nullptr; // borrowed, never AddRef
@@ -204,11 +205,13 @@ class GpuOwner final {
     }
     template<class Current>
     static bool UploadDDS(IDirect3DDevice9* dev,const Texture& texture,
-                          IDirect3DTexture9** out,Current current) noexcept {
+                          IDirect3DTexture9** out,Current current,bool aoLuminance=false) noexcept {
         if(!current() || !dev || !out || texture.dds.size()<128 || !texture.width ||
            !texture.height || !texture.mips)return false;
         *out=nullptr;
-        const D3DFORMAT format=texture.format==TextureFormat::DXT1?D3DFMT_DXT1:
+        if(aoLuminance&&texture.format!=TextureFormat::ARGB32)return false;
+        const D3DFORMAT format=aoLuminance?D3DFMT_L8:
+            texture.format==TextureFormat::DXT1?D3DFMT_DXT1:
             texture.format==TextureFormat::DXT5?D3DFMT_DXT5:D3DFMT_A8R8G8B8;
         const unsigned blockBytes=texture.format==TextureFormat::DXT1?8u:
             texture.format==TextureFormat::DXT5?16u:0u;
@@ -239,7 +242,7 @@ class GpuOwner final {
             if(!CopyAndUnlockDdsMip(current()?locked.pBits:nullptr,locked.Pitch,
                     texture.dds.data()+pos,rows,row,[&]() noexcept {
                         return SUCCEEDED(staging->UnlockRect(mip));
-                    })||!current()) {
+                    },aoLuminance)||!current()) {
                 staging->Release();return false;
             }
             pos+=std::size_t(rows)*row;
@@ -268,6 +271,7 @@ class GpuOwner final {
         retiredTextures.swap(textures_);
         retiredNormals.swap(normals_);
         retiredOrms.swap(orms_);
+        ormLuminance_.clear();
         pbrReady_=false;
         pbrPrepared_=false;
         nextTexture_=nextMesh_=nextPbrMap_=0;
@@ -402,6 +406,11 @@ class GpuOwner final {
                     if(!Parse(bytes.data(),bytes.size(),result.model,result.error))
                         return result;
                     result.normalStats=RepairExternalModelNormals(result.model);
+                    for(auto& mat:result.model.pbrMaterials){
+                        const auto& map=mat.orm;
+                        mat.ormAoOnly=map.format==TextureFormat::ARGB32&&map.dds.size()>128u&&
+                            IsAoOnlyBgraPixels(map.dds.data()+128u,map.dds.size()-128u);
+                    }
                     if(batchOpaque)BatchExternalOpaqueMeshes(result.model);
                     float lowest=10000.f;
                     for(const auto& mesh:result.model.meshes) {
@@ -495,6 +504,7 @@ class GpuOwner final {
             const auto count=cpu_.pbrMaterials.size();
             if(normals_.size()!=count)normals_.resize(count,nullptr);
             if(orms_.size()!=count)orms_.resize(count,nullptr);
+            if(ormLuminance_.size()!=count)ormLuminance_.resize(count,false);
             // Only one actual PBR map upload per player callback.
             while(nextPbrMap_<count*2u) {
                 const std::size_t index=nextPbrMap_;
@@ -504,10 +514,14 @@ class GpuOwner final {
                                        : cpu_.pbrMaterials[material].orm;
                 if(src.dds.empty()){++nextPbrMap_;continue;}
                 IDirect3DTexture9* pending=nullptr;
-                if(!UploadDDS(dev,src,&pending,current))
+                // Optional L8; preserve exact RGBA if the driver rejects it.
+                bool compact=!normal&&cpu_.pbrMaterials[material].ormAoOnly;
+                if(compact&&!UploadDDS(dev,src,&pending,current,true))compact=false;
+                if(!compact&&(!current()||!UploadDDS(dev,src,&pending,current)))
                     return reject(normal?"NORMAL_DDS_UPLOAD_FAILED":"ORM_DDS_UPLOAD_FAILED");
                 PublishExternalGpuResource(pending,current,[&](auto* texture){
                     (normal?normals_[material]:orms_[material])=texture;
+                    if(!normal)ormLuminance_[material]=compact;
                     ++nextPbrMap_;
                 });
                 return false;
@@ -1036,7 +1050,7 @@ public:
                 const float factors[4]{p.roughness,p.metallic,p.normalScale,
                                        normals_[m.material]?1.f:0.f};
                 const float eyeOrm[4]{eye[0],eye[1],eye[2],
-                                      orms_[m.material]?1.f:0.f};
+                                      orms_[m.material]?(ormLuminance_[m.material]?2.f:1.f):0.f};
                 if(!current() || FAILED(device->SetTexture(1,normals_[m.material])) ||
                    !current() || FAILED(device->SetTexture(2,orms_[m.material])) ||
                    !current() || FAILED(device->SetPixelShaderConstantF(0,factors,1)) ||

@@ -61,7 +61,7 @@ sampler2D normalMap : register(s1);
 sampler2D ormMap : register(s2);
 // (roughness, metallic, normal strength, has normal map)
 float4 factors : register(c0);
-// (eye position xyz, has packed ORM map)
+// (eye position xyz, ORM mode: 0 absent, 1 RGB, 2 lossless L8 AO only)
 float4 eyeAndOrm : register(c1);
 struct PixelIn {
     float3 worldPosition : TEXCOORD0;
@@ -78,8 +78,10 @@ float4 mainPS(PixelIn input) : COLOR0 {
     if (eyeAndOrm.w > 0.5) {
         float3 orm = tex2D(ormMap,input.uv).rgb;
         ao = orm.r;
-        roughness = clamp(orm.g * factors.x,0.045,1.0);
-        metallic = saturate(orm.b * factors.y);
+        if(eyeAndOrm.w<1.5) {
+            roughness = clamp(orm.g * factors.x,0.045,1.0);
+            metallic = saturate(orm.b * factors.y);
+        } // L8 replicates luminance; keep neutral G/B scalar factors
     }
     // Some imported models have zero-length normals (including genuinely
     // degenerate topology which the CPU cannot repair). Derive a geometric

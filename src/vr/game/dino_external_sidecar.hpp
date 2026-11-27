@@ -65,6 +65,7 @@ struct PbrMaterial {
     Texture normal,orm;
     // No ORM: opaque nonmetal by default. Packed ORM uses unity multipliers.
     float roughness=0.75f,metallic=0.0f,normalScale=1.0f;
+    bool ormAoOnly=false; // CPU worker classification, not serialized
 };
 struct Model {
     std::vector<Mesh> meshes;
