@@ -17,6 +17,13 @@
       "source_dds_sha256": "68ae256333e45edf6504169f33dcd93c41855bbd3d86f2212f298b2c3a98ee67",
       "status": "HOLD_SEND_UNCERTAIN",
       "target": "textures/load/PlayStation/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+    },
+    "HDAT-d5067444d26aa2508ebea81b": {
+      "candidate_dds_sha256": "3ccc6002d3da26bd929869d92d8d3b5f3473644d340bacf650e9a9426fcb79ef",
+      "review_key": "314d52f32806bc7e967d6eb869b1e1c32851bdd2182c155caa035aa8b52ebdad",
+      "source_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "status": "CLAIMED",
+      "target": "textures/load/Switch/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
     }
   },
   "run_id": 45530926148,
