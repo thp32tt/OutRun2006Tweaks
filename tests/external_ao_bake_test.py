@@ -53,4 +53,28 @@ with tempfile.TemporaryDirectory() as tmp:
   else:assert result==data
   assert subprocess.run([str(exe),str(src),str(dst),"64"],capture_output=True).returncode!=0
   assert dst.read_bytes()==result
+ # Compile the same production baker with a small test-only budget.
+ # No giant synthetic OVC or memory-heavy GPU test is needed.
+ harness=root/"budget.cpp"
+ harness.write_text('#define main original_baker_main\n#include "'+
+                    str(ROOT/"tools/ferrari16/bake_external_ao.cpp")+
+                    '"\n#undef main\n'
+                    'int main(int argc,char**argv){if(argc!=4)return 2;'
+                    'auto b=read(argv[1]);auto out=bake(b,64,std::stoull(argv[3]));'
+                    'std::ofstream f(argv[2],std::ios::binary);'
+                    'f.write(reinterpret_cast<const char*>(out.data()),out.size());'
+                    'return f?0:1;}\n')
+ budget_exe=root/"budget"
+ subprocess.run(["g++","-std=c++17","-O2",str(harness),"-o",str(budget_exe)],check=True)
+ data,off=make([(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1)))])
+ src=root/"budget_src.ovc";src.write_bytes(data)
+ source_gpu=3*32+3*2+132
+ map_gpu=128+sum((64>>k)**2*4 for k in range(7))
+ for delta in (-1,0,1):
+  out=root/("budget_"+str(delta)+".ovc")
+  subprocess.run([str(budget_exe),str(src),str(out),str(source_gpu+map_gpu+delta)],check=True)
+  result=out.read_bytes()
+  if delta<0:assert result==data
+  else:assert struct.unpack_from("<I",result,off)[0]==map_gpu
+  assert src.read_bytes()==data
 print("EXTERNAL_AO_BAKE_PASS valid/degenerate/mixed/wrapped/shared/authored and no-overwrite")
