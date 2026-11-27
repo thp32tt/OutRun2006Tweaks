@@ -12,6 +12,7 @@
     },
     "HDAT-9c86fb7f65f6264b4a681ba9": {
       "candidate_dds_sha256": "03a415b17a2cea8835608339b65a9c0732f8cb60783c2c6109b3e7a2f99d9506",
+      "recovery_attempts": 1,
       "review_key": "bbeaf7091bae967d91114a4d21a3e90a910b96a47c4dff2786e9d870e4507095",
       "source_dds_sha256": "68ae256333e45edf6504169f33dcd93c41855bbd3d86f2212f298b2c3a98ee67",
       "status": "HOLD_SEND_UNCERTAIN",
