@@ -117,7 +117,9 @@ def main() -> None:
                 assert basis_handedness((0., 0., 1.), (0., 0., 0.), (0., scale, 0.)) == 0
     assert "mapN.xy *= factors.z;" in shader
     strength_gate = shader.index("if (factors.w > 0.5 && factors.z > 0.0 &&")
-    sample_pos = shader.index("tex2D(normalMap,input.uv)")
+    sample_pos = shader.index("tex2Dgrad(normalMap,input.uv,dtdx,dtdy)")
+    assert shader.index("float2 dtdx = ddx(input.uv);") < strength_gate
+    assert shader.index("float2 dtdy = ddy(input.uv);") < strength_gate
     orientation_gate = shader.index("orientation*orientation > tangentSq*bitangentSq*1.e-8")
     assert strength_gate < orientation_gate < sample_pos
     assert "float3 mappedN = mapN.x*T+mapN.y*B+mapN.z*N;" in shader
@@ -140,7 +142,8 @@ def main() -> None:
         assert perturbed[0] > 0. and perturbed[1] > 0.
         assert mirrored == (perturbed[0], -perturbed[1], perturbed[2])
         assert stronger[0] > perturbed[0]
-    assert "tex2D(normalMap,input.uv)" in shader
+    assert "tex2Dgrad(normalMap,input.uv,dtdx,dtdy)" in shader
+    assert "tex2D(normalMap,input.uv)" not in shader
     assert "tex2D(ormMap,input.uv)" in shader
 
     cases = (
