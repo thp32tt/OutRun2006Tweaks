@@ -105,7 +105,7 @@ static Bytes bake(const Bytes& input,unsigned size){
  for(auto& mesh:m.meshes)if(!glass(mesh)&&!transparent[mesh.material]&&m.pbrMaterials[mesh.material].orm.dds.empty()){
   auto& atlas=atlases[mesh.material];
   for(size_t i=0;i<mesh.indices.size();i+=3){
-   if(atlas.capped)break;
+   if(atlas.capped||atlas.skipped)break;
    const auto &a=mesh.vertices[mesh.indices[i]],&b=mesh.vertices[mesh.indices[i+1]],&c=mesh.vertices[mesh.indices[i+2]];
    double du=b.u-a.u,dv=b.v-a.v,eu=c.u-a.u,ev=c.v-a.v,det=du*ev-dv*eu;
    V n=unit(normal(a)+normal(b)+normal(c)),face=unit(cross(pos(b)-pos(a),pos(c)-pos(a)));
@@ -145,7 +145,9 @@ static Bytes bake(const Bytes& input,unsigned size){
   out.insert(out.end(),input.begin()+start,input.begin()+end);
   auto& a=atlases[i];
   if(old){out.insert(out.end(),input.begin()+end,input.begin()+p);if(opaque[i])++existing;continue;}
-  if(!opaque[i]||transparent[i]||!a.valid||a.capped){put(out,0);if(opaque[i])++missing;continue;}
+  if(!opaque[i]||transparent[i]||!a.valid||a.skipped||a.capped){put(out,0);if(opaque[i])++missing;continue;}
+  // Never claim a material has AO coverage when any of its triangles could
+  // not be mapped: the untouched source remains eligible for UV repair.
   auto image=make_image(a,size);auto map=dds(image,size);
   if(out.size()+map.size()+input.size()-p+4>MaxSidecarBytes){put(out,0);++missing;continue;}
   put(out,static_cast<unsigned>(map.size()));out.insert(out.end(),map.begin(),map.end());
