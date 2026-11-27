@@ -22,6 +22,19 @@ int main() {
     };
     assert(ExternalPbrEyeConstants(rotated,1.f,eye));
     assert(eye[0]==7.f && eye[1]==5.f && eye[2]==2.f && eye[3]==1.f);
+    // Nonuniform scale plus shear: transform the recovered eye back to
+    // view space; it must map to the camera origin for both eyes.
+    const float affine[16]{2,.25f,0,0, 0,3,.5f,0, 0,0,4,0, -4,-9,-16,1};
+    assert(ExternalPbrEyeConstants(affine,1.f,eye));
+    for(unsigned col=0;col<3;++col){
+        float p=affine[12+col];
+        for(unsigned row=0;row<3;++row)p+=eye[row]*affine[4*row+col];
+        assert(std::abs(p)<0.00001f);
+    }
+    float singular[16]{1,0,0,0, 1,0,0,0, 0,0,1,0, 0,0,0,1};
+    assert(!ExternalPbrEyeConstants(singular,1.f,eye));
+    float projective[16]{1,0,0,.5f, 0,1,0,0, 0,0,1,0, 0,0,0,1};
+    assert(!ExternalPbrEyeConstants(projective,1.f,eye));
     float invalid[16]{};
     for(int i=0;i<16;++i)invalid[i]=left[i];
     invalid[4]=std::numeric_limits<float>::quiet_NaN();

@@ -946,10 +946,12 @@ public:
                 hr=E_FAIL;
             }
         }
-        const float eye[3]{
-            -(view._41*view._11+view._42*view._12+view._43*view._13),
-            -(view._41*view._21+view._42*view._22+view._43*view._23),
-            -(view._41*view._31+view._42*view._32+view._43*view._33)};
+        float eye[4]{};
+        // Use the identical affine inverse as shader bind and R7 stereo
+        // updates. Do not overwrite the correct eye with the old rigid-only
+        // transpose approximation during the first material bind.
+        if(pbrReady_&&SUCCEEDED(hr)&&
+            !ExternalPbrEyeConstants(&view.m[0][0],0.f,eye))hr=E_FAIL;
         // Imported OVC mesh order is not depth order. Keep opaque input
         // order; sort only transparent meshes far-to-near in the latched
         // center camera. This stack buffer is bounded by the parser's 512
