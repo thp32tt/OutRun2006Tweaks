@@ -165,13 +165,22 @@ with tempfile.TemporaryDirectory() as tmp:
  # exercise the independent native AO chart verifier, with no overwrite.
  native=root/"native_unwrap"
  subprocess.run(["g++","-std=c++17","-O2",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.cpp"),"-o",str(native)],check=True)
+ strip_src=root/"strip.ovc"
  nuv=root/"native_strip.ovc";nao=root/"native_strip_ao.ovc"
- subprocess.run([str(native),str(src),str(nuv)],check=True)
+ subprocess.run([str(native),str(strip_src),str(nuv)],check=True)
  assert struct.unpack_from("<II",nuv.read_bytes(),20)==(6,4)
  subprocess.run([str(exe),str(nuv),str(nao),"patch-atlas"],check=True)
- assert nao.stat().st_size>nuv.stat().st_size and src.read_bytes()==strip
- assert subprocess.run([str(native),str(src),str(nuv)],capture_output=True).returncode!=0
+ assert nao.stat().st_size>nuv.stat().st_size and strip_src.read_bytes()==strip
+ assert subprocess.run([str(native),str(strip_src),str(nuv)],capture_output=True).returncode!=0
  assert subprocess.run([str(native),str(nuv),str(root/"reunwrap.ovc")],capture_output=True).returncode!=0
+ # The same native production path handles actual in-bounds BC3
+ # mip selectors and rejects nonuniform albedo, not just the ARGB strip.
+ bc_uv=root/"native_padded_bc3.ovc";bc_ao=root/"native_padded_bc3_ao.ovc"
+ subprocess.run([str(native),str(root/"padded_bc3.ovc"),str(bc_uv)],check=True)
+ subprocess.run([str(exe),str(bc_uv),str(bc_ao),"patch-atlas"],check=True)
+ assert bc_ao.stat().st_size>bc_uv.stat().st_size
+ assert subprocess.run([str(native),str(root/"nonuniform_bc3.ovc"),
+                         str(root/"native_bad_bc3.ovc")],capture_output=True).returncode!=0
  # Compile the same production baker with a small test-only budget.
  # No giant synthetic OVC or memory-heavy GPU test is needed.
  harness=root/"budget.cpp"
