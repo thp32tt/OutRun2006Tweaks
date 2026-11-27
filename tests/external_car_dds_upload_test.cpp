@@ -1,10 +1,33 @@
 #include "../src/vr/game/external_car_dds_upload.hpp"
+#include "../src/vr/game/external_car_texture_alias.hpp"
 #include <array>
 #include <cassert>
 #include <cstdint>
 
 int main() {
     using namespace OutRunVR::DinoSidecar;
+    Model model{};
+    Texture tx{};tx.width=4;tx.height=4;tx.mips=2;tx.dds={1,2,3,4,5,6};
+    auto different=tx;different.dds.back()=9;
+    auto extent=tx;extent.width=8;
+    auto format=tx;format.format=TextureFormat::DXT5;
+    model.textures={tx,tx,different,tx,extent,format};
+    model.pbrMaterials.resize(6);
+    model.pbrMaterials[0].normal=tx;model.pbrMaterials[2].normal=tx;
+    model.pbrMaterials[0].orm=tx;model.pbrMaterials[3].orm=tx;
+    const auto plan=BuildExternalTextureAliasPlan(model);
+    assert((plan.albedo==std::vector<unsigned>{0,0,2,0,4,5}));
+    assert((plan.normal==std::vector<unsigned>{0,1,0,3,4,5}));
+    assert((plan.orm==std::vector<unsigned>{0,1,2,0,4,5}));
+    int resource=5,other=7;
+    std::vector<int*> owners{&resource,nullptr,&other,nullptr,nullptr,nullptr};
+    assert(ResolveExternalTexture(owners,plan.albedo,3)==&resource);
+    assert(ResolveExternalTexture(owners,plan.albedo,2)==&other);
+    assert(!ResolveExternalTexture(owners,plan.albedo,6));
+    auto invalid=plan.albedo;invalid[3]=1;
+    assert(!ResolveExternalTexture(owners,invalid,3));
+    owners.clear();
+    assert(!ResolveExternalTexture(owners,plan.albedo,1));
     const std::array<std::uint8_t,16> ao{255,255,0,255,255,255,42,255,
                                        255,255,128,255,255,255,255,255};
     assert(IsAoOnlyBgraPixels(ao.data(),ao.size()));

@@ -20,6 +20,7 @@
 #include <vector>
 #include "dino_external_sidecar.hpp"
 #include "external_car_dds_upload.hpp"
+#include "external_car_texture_alias.hpp"
 #include "external_car_mesh_upload.hpp"
 #include "external_car_normal_repair.hpp"
 #include "external_car_mesh_batch.hpp"
@@ -139,6 +140,7 @@ class GpuOwner final {
         float glassCenter[3]{0.f,0.f,0.f}; // local bbox centre, calculated on upload
     };
     Model cpu_{};
+    ExternalTextureAliasPlan textureAliases_{};
     NormalRepairStats normalRepairStats_{};
     std::string cpuLoadFailure_{};
     const char* gpuFailure_="NONE";
@@ -161,6 +163,7 @@ class GpuOwner final {
     bool loaded_=false,loadAttempted_=false;
     struct CpuLoad {
         Model model{};
+        ExternalTextureAliasPlan textureAliases{};
         NormalRepairStats normalStats{};
         std::string error{};
         float lowest=0.f;
@@ -407,6 +410,7 @@ class GpuOwner final {
                     if(!Parse(bytes.data(),bytes.size(),result.model,result.error))
                         return result;
                     result.normalStats=RepairExternalModelNormals(result.model);
+                    result.textureAliases=BuildExternalTextureAliasPlan(result.model);
                     for(auto& mat:result.model.pbrMaterials){
                         const auto& map=mat.orm;
                         mat.ormAoOnly=map.format==TextureFormat::ARGB32&&map.dds.size()>128u&&
@@ -473,6 +477,7 @@ class GpuOwner final {
         modelMinLocalY_=result.lowest;
         modelBoundsReady_=true;
         cpu_=std::move(result.model);
+        textureAliases_=std::move(result.textureAliases);
         cpuLoadFailure_.clear();
         normalRepairStats_=result.normalStats;
         loaded_=true;
@@ -502,8 +507,13 @@ class GpuOwner final {
         if(cpu_.pbrEnabled&&!fixedFunctionStereoProbe)PbrShaders::Prewarm();
         // The original car stays active until the LAST upload succeeds.
         // Keep each frame's preparation to one DDS or one mesh allocation.
-        if(nextTexture_<cpu_.textures.size()) {
+        while(nextTexture_<cpu_.textures.size()) {
             const auto material=nextTexture_;
+            if(textureAliases_.albedo[material]!=material){
+                if(!ResolveExternalTexture(textures_,textureAliases_.albedo,
+                    static_cast<unsigned>(material)))return reject("ALBEDO_ALIAS_OWNER_MISSING");
+                ++nextTexture_;continue;
+            }
             IDirect3DTexture9* pending=nullptr;
             if(!UploadDDS(dev,cpu_.textures[material],&pending,current))
                 return reject("ALBEDO_DDS_UPLOAD_FAILED");
@@ -527,6 +537,13 @@ class GpuOwner final {
                 const auto& src=normal ? cpu_.pbrMaterials[material].normal
                                        : cpu_.pbrMaterials[material].orm;
                 if(src.dds.empty()){++nextPbrMap_;continue;}
+                const auto& aliases=normal?textureAliases_.normal:textureAliases_.orm;
+                const auto& resources=normal?normals_:orms_;
+                if(aliases[material]!=material){
+                    if(!ResolveExternalTexture(resources,aliases,
+                        static_cast<unsigned>(material)))return reject("PBR_ALIAS_OWNER_MISSING");
+                    ++nextPbrMap_;continue;
+                }
                 IDirect3DTexture9* pending=nullptr;
                 // Optional L8; preserve exact RGBA if the driver rejects it.
                 bool compact=!normal&&cpu_.pbrMaterials[material].ormAoOnly;
@@ -668,6 +685,7 @@ public:
         const auto retired=ReleaseGpu();
         if(gpuGeneration_!=retired)return false;
         cpu_=Model{};
+        textureAliases_={};
         normalRepairStats_={};
         cpuLoadFailure_.clear();
         gpuFailure_="NONE";
@@ -750,13 +768,15 @@ public:
     unsigned NormalMapsOnGpu() const noexcept {
         if(!pbrReady_)return 0;
         unsigned count=0;
-        for(const auto* p:normals_)if(p)++count;
+        for(unsigned i=0;i<textureAliases_.normal.size();++i)
+            if(ResolveExternalTexture(normals_,textureAliases_.normal,i))++count;
         return count;
     }
     unsigned OrmMapsOnGpu() const noexcept {
         if(!pbrReady_)return 0;
         unsigned count=0;
-        for(const auto* p:orms_)if(p)++count;
+        for(unsigned i=0;i<textureAliases_.orm.size();++i)
+            if(ResolveExternalTexture(orms_,textureAliases_.orm,i))++count;
         return count;
     }
     bool Loaded() const noexcept {return loaded_;}
@@ -1056,17 +1076,23 @@ public:
             if(!current() || FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||
                !current() || FAILED(device->SetIndices(m.ib))) {hr=E_FAIL;break;}
             const bool bindMaterial=!isolated||lastMaterial!=m.material;
-            if(bindMaterial&&(!current()||FAILED(device->SetTexture(0,textures_[m.material])))){
+            auto* albedo=ResolveExternalTexture(textures_,textureAliases_.albedo,m.material);
+            if(bindMaterial&&(!albedo||!current()||FAILED(device->SetTexture(0,albedo)))){
                 hr=E_FAIL;break;
             }
             if(bindMaterial&&pbrReady_) {
                 const auto& p=cpu_.pbrMaterials[m.material];
+                auto* normal=ResolveExternalTexture(normals_,textureAliases_.normal,m.material);
+                auto* orm=ResolveExternalTexture(orms_,textureAliases_.orm,m.material);
+                if((!p.normal.dds.empty()&&!normal)||(!p.orm.dds.empty()&&!orm)){
+                    hr=E_FAIL;break;
+                }
                 const float factors[4]{p.roughness,p.metallic,p.normalScale,
-                                       normals_[m.material]?1.f:0.f};
+                                       normal?1.f:0.f};
                 const float eyeOrm[4]{eye[0],eye[1],eye[2],
-                                      orms_[m.material]?(ormLuminance_[m.material]?2.f:1.f):0.f};
-                if(!current() || FAILED(device->SetTexture(1,normals_[m.material])) ||
-                   !current() || FAILED(device->SetTexture(2,orms_[m.material])) ||
+                                      orm?(ormLuminance_[textureAliases_.orm[m.material]]?2.f:1.f):0.f};
+                if(!current() || FAILED(device->SetTexture(1,normal)) ||
+                   !current() || FAILED(device->SetTexture(2,orm)) ||
                    !current() || FAILED(device->SetPixelShaderConstantF(0,factors,1)) ||
                    !current() || FAILED(device->SetPixelShaderConstantF(1,eyeOrm,1))) {
                     hr=E_FAIL;break;
