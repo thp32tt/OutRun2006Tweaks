@@ -265,6 +265,10 @@ jobs:
           assert 'TransferIsolatedPair(ownerCurrent,candidateCurrent,' in r7
           assert 'R7TransferStagedVehicle(' in r13
           assert 'R7TransferStagedVehicle(' in Path('src/vr/d3d9/stereo_renderer_r29.cpp').read_text()
+          assert 'const auto m=meshes_[pass?glassOrder[order].index:order];' in native
+          assert 'const auto& m=meshes_[pass?glassOrder[order].index:order];' not in native
+          assert 'FAILED(device->SetIndices(m.ib)) || !current()' in native
+          assert 'if(!current()){hr=E_FAIL;break;}\n            lastMaterial=m.material;' in native
           assert 'D3DMATRIX lastWorld=world;' in native
           assert 'if(!isolated||std::memcmp(&lastWorld,&meshWorld,sizeof(meshWorld))!=0)' in native
           assert 'if(!isolated||!passBound||lastGlass!=m.glass)' in native

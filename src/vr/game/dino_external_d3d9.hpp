@@ -1055,7 +1055,12 @@ public:
           }
           for(unsigned order=0;order<(pass?glassCount:meshes_.size());++order) {
             if(!current()){hr=E_FAIL;break;}
-            const auto& m=meshes_[pass?glassOrder[order].index:order];
+            // Reset/ResetEx can retire meshes_ synchronously inside any
+            // driver setter. Keep only a POD snapshot of the selected
+            // mesh (borrowed COM pointers, never dereferenced after loss
+            // of generation). Do not hold a vector element reference
+            // across driver calls, even if they return S_OK.
+            const auto m=meshes_[pass?glassOrder[order].index:order];
             if(!MeshInDrawPass(m.glass,pass))continue;
             const DashboardBinding* binding=DashboardFor(m);
             if(!DashboardOverlayMeshVisible(binding,dashboard,embeddedNeedleMask,embeddedGearMask))
@@ -1068,6 +1073,7 @@ public:
                    (pbrReady_ && (!current() || FAILED(pbrShaders_.SetWorldGuarded(device,meshWorld,current))))) {
                     hr=E_FAIL;break;
                 }
+                if(!current()){hr=E_FAIL;break;}
                 lastWorld=meshWorld;
             }
             if(!isolated||!passBound||lastGlass!=m.glass) {
@@ -1078,10 +1084,11 @@ public:
                    !current() || FAILED(device->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE,FALSE))) {
                     hr=E_FAIL;break;
                 }
+                if(!current()){hr=E_FAIL;break;}
                 lastGlass=m.glass;passBound=true;
             }
             if(!current() || FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||
-               !current() || FAILED(device->SetIndices(m.ib))) {hr=E_FAIL;break;}
+               !current() || FAILED(device->SetIndices(m.ib)) || !current()) {hr=E_FAIL;break;}
             const bool bindMaterial=!isolated||lastMaterial!=m.material;
             auto* albedo=ResolveExternalTexture(textures_,textureAliases_.albedo,m.material);
             if(bindMaterial&&(!albedo||!bindTexture(0,albedo))){
@@ -1104,6 +1111,7 @@ public:
                     hr=E_FAIL;break;
                 }
             }
+            if(!current()){hr=E_FAIL;break;}
             lastMaterial=m.material;
             if(isolated) {
                 // Count real raw DIPs, without pretending each eye was a
