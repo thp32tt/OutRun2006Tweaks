@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Offline Blender UV generation for untextured OVC3/4 material groups.
+"""Offline geometry-derived UV generation for untextured OVC3/4 material groups.
 Only uniform ARGB albedo, no authored PBR maps and entirely absent UV qualify.
 Preserve indexed source corner positions/normals and material/dashboard bytes.
-Usage: blender -b -t 2 --python-exit-code 1 --python this.py -- src.ovc dst.ovc
+Usage: python3 this.py src.ovc dst.ovc
+This deliberately uses disjoint per-triangle charts, not authored texture UVs.
 """
-import bpy,hashlib,json,math,pathlib,struct,sys,zlib
+import hashlib,json,math,pathlib,struct,sys,zlib
 from collections import defaultdict
 HEAD=struct.Struct("<8s7I")
 GROUP=struct.Struct("<HHIII")
@@ -49,76 +50,40 @@ def main(src,dst):
     if not eligible:raise ValueError("no eligible untextured material")
     report=[]
     for mat in eligible:
-        positions=[];faces=[];meta=[]
+        # Each nondegenerate source triangle owns its own padded atlas tile.
+        # Project in its geometric plane, selecting the longest edge for
+        # numerical stability. No source texture coordinates are overwritten
+        # and no overlap between unrelated faces can corrupt generated AO.
+        # This is a diagnostic UV atlas, not a production hand-authored unwrap.
+        entries=[];degenerate=0
         for gi in opaque[mat]:
-            g=groups[gi];base=len(positions);positions.extend(v[:3] for v in VERT.iter_unpack(g["vb"]))
-            seen=set()
+            g=groups[gi];verts=list(VERT.iter_unpack(g["vb"]))
             for t in range(0,g["ic"],3):
-                a,b,c=g["idx"][t:t+3]
-                pa,pb,pc=(positions[base+i] for i in (a,b,c))
-                u=[pb[k]-pa[k] for k in range(3)];v=[pc[k]-pa[k] for k in range(3)]
-                cross=(u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0])
-                # Preserve zero-area source triangles unchanged; they do not rasterize.
-                if sum(x*x for x in cross)<=1e-30:continue
-                key=tuple(sorted((a,b,c)))
-                face=tuple(base+i for i in (a,b,c))
-                if key in seen:
-                    # BMesh may remove duplicate faces; keep each as a separate chart.
-                    start=len(positions);positions.extend((pa,pb,pc));face=(start,start+1,start+2)
-                seen.add(key);faces.append(face);meta.append((gi,t,(a,b,c)))
-        if not faces:continue
-        # Blender's island packing can become quadratic on fragmented 60k+
-        # triangle materials. Unwrap bounded chunks, place them in disjoint
-        # padded tiles, and never decimate or discard the source geometry.
-        max_faces=2048
-        chunk_count=(len(faces)+max_faces-1)//max_faces
-        tiles=math.ceil(math.sqrt(chunk_count))
-        pergroup=defaultdict(dict);valid=invalid=0
-        for chunk,start in enumerate(range(0,len(faces),max_faces)):
-            end=min(start+max_faces,len(faces))
-            local_positions=[];local_map={};local_faces=[]
-            for face in faces[start:end]:
-                local=[]
-                for vi in face:
-                    if vi not in local_map:
-                        local_map[vi]=len(local_positions);local_positions.append(positions[vi])
-                    local.append(local_map[vi])
-                local_faces.append(tuple(local))
-            mesh=bpy.data.meshes.new("uv_material");mesh.from_pydata(local_positions,[],local_faces);mesh.update()
-            attr=mesh.attributes.new("source_face","INT","FACE")
-            for i,item in enumerate(attr.data):item.value=i
-            obj=bpy.data.objects.new("uv_material",mesh);bpy.context.collection.objects.link(obj)
-            bpy.ops.object.select_all(action="DESELECT");obj.select_set(True);bpy.context.view_layer.objects.active=obj
-            bpy.ops.object.mode_set(mode="EDIT");bpy.ops.mesh.select_all(action="SELECT")
-            result=bpy.ops.uv.smart_project(angle_limit=math.radians(66),island_margin=.002)
-            bpy.ops.object.mode_set(mode="OBJECT")
-            if "FINISHED" not in result or not mesh.uv_layers.active or len(mesh.polygons)!=len(local_faces):raise ValueError("unwrap face count")
-            ids=mesh.attributes["source_face"].data;uv=mesh.uv_layers.active.data
-            row,col=divmod(chunk,tiles)
-            for poly in mesh.polygons:
-                i=ids[poly.index].value
-                if i<0 or i>=len(local_faces):raise ValueError("face id")
-                gi,t,orig=meta[start+i]
-                loops=list(poly.loop_indices)
-                expected=local_faces[i]
-                if len(loops)!=3:raise ValueError("triangle shape")
+                p=[verts[i][:3] for i in g["idx"][t:t+3]]
+                edges=[sum((p[(i+1)%3][k]-p[i][k])**2 for k in range(3)) for i in range(3)]
+                i=max(range(3),key=edges.__getitem__);j=(i+1)%3;k=(i+2)%3
+                length=math.sqrt(edges[i])
+                if length<=1e-15:degenerate+=1;continue
+                e=[(p[j][axis]-p[i][axis])/length for axis in range(3)]
+                q=[p[k][axis]-p[i][axis] for axis in range(3)]
+                x=sum(a*b for a,b in zip(e,q))
+                h=math.sqrt(sum((q[axis]-e[axis]*x)**2 for axis in range(3)))
+                if h<=1e-15:degenerate+=1;continue
+                # Longest edge gives x in [0,length] and h <= length.
+                # Keep true triangle aspect and leave a 12.5% gutter.
                 coords=[None]*3
-                for li in loops:
-                    vi=mesh.loops[li].vertex_index
-                    if vi not in expected:raise ValueError("face topology changed")
-                    u,v=map(float,uv[li].uv)
-                    if not all(math.isfinite(x) and -.001<=x<=1.001 for x in (u,v)):raise ValueError("UV range")
-                    # Per-chunk tile padding prevents cross-chunk overlap.
-                    u=(col+.003+.994*min(1.,max(0.,u)))/tiles
-                    v=(row+.003+.994*min(1.,max(0.,1.-v)))/tiles
-                    coords[expected.index(vi)]=UV.pack(u,v)
-                if any(x is None for x in coords) or t in pergroup[gi]:raise ValueError("face mapping")
-                pergroup[gi][t]=coords
-                a,b,c=[UV.unpack(x) for x in coords];det=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
-                if abs(det)>1e-12:valid+=1
-                else:invalid+=1
-            bpy.data.objects.remove(obj,do_unlink=True);bpy.data.meshes.remove(mesh)
-        if sum(len(v) for v in pergroup.values())!=len(meta):raise ValueError("lost chart face")
+                coords[i]=(0.,0.);coords[j]=(1.,0.);coords[k]=(x/length,h/length)
+                entries.append((gi,t,coords))
+        if not entries:continue
+        tiles=math.ceil(math.sqrt(len(entries)))
+        pergroup=defaultdict(dict);valid=invalid=0
+        for ordinal,(gi,t,coords) in enumerate(entries):
+            row,col=divmod(ordinal,tiles)
+            uv=[UV.pack((col+.125+.75*u)/tiles,(row+.125+.75*v)/tiles) for u,v in coords]
+            a,b,c=[UV.unpack(x) for x in uv];det=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
+            if det:valid+=1
+            else:invalid+=1
+            pergroup[gi][t]=uv
         for gi in opaque[mat]:
             g=groups[gi];old=g["vb"];out=[old[i*32:(i+1)*32] for i in range(g["n"])]
             remap={};first=set();newidx=[]
@@ -141,7 +106,7 @@ def main(src,dst):
             width=4 if g["w"]==4 or len(out)>65535 else 2
             fmt=struct.Struct("<I" if width==4 else "<H")
             g.update(n=len(out),vb=vb,w=width,ib=b"".join(fmt.pack(v) for v in newidx))
-        report.append(dict(material=mat,valid_uv_triangles=valid,collapsed_nondegenerate_triangles=invalid,source_zero_area_triangles=sum(groups[i]["ic"]//3 for i in opaque[mat])-len(meta)))
+        report.append(dict(material=mat,valid_uv_triangles=valid,collapsed_nondegenerate_triangles=invalid,source_zero_area_triangles=degenerate,atlas_tiles_per_axis=tiles))
         print("UV_MATERIAL",mat,valid,invalid,flush=True)
     vertices=sum(g["n"] for g in groups)
     body=b"".join(GROUP.pack(len(g["name"]),g["mat"],g["n"],g["ic"],g["w"])+g["name"]+g["vb"]+g["ib"] for g in groups)+raw[tail:]
@@ -150,8 +115,8 @@ def main(src,dst):
     tmp=dst.with_suffix(dst.suffix+".part")
     if tmp.exists():raise ValueError("temporary exists")
     tmp.write_bytes(output);tmp.replace(dst)
-    details=dict(source_sha256=hashlib.sha256(raw).hexdigest(),output_sha256=hashlib.sha256(output).hexdigest(),groups=ng,materials=nm,triangles=nt,source_vertices=nv,output_vertices=vertices,generated_uv_materials=len(report),materials_detail=report,source_geometry_corner_bytes_preserved=True,material_tail_preserved=True,authored_uv=False,release_install=False)
+    details=dict(source_sha256=hashlib.sha256(raw).hexdigest(),output_sha256=hashlib.sha256(output).hexdigest(),groups=ng,materials=nm,triangles=nt,source_vertices=nv,output_vertices=vertices,generated_uv_materials=len(report),materials_detail=report,source_geometry_corner_bytes_preserved=True,material_tail_preserved=True,authored_uv=False,chart_method="per_triangle_geometric_projection",release_install=False)
     dst.with_suffix(dst.suffix+".json").write_text(json.dumps(details,indent=2)+"\n")
     print("UV_REBUILD",json.dumps(details),flush=True)
 if __name__=="__main__":
-    main(*sys.argv[sys.argv.index("--")+1:])
+    main(*sys.argv[1:])
