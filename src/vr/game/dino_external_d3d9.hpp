@@ -963,6 +963,12 @@ public:
             }
         }
         SortGlassBackToFront(glassOrder.data(),glassCount);
+        // Cache only within one isolated eye/phase StateBlock. Raw DIPs do
+        // not mutate D3D9 transforms, textures or blend state. Never carry
+        // these keys across an Apply, Reset, eye, or legacy hooked draw.
+        D3DMATRIX lastWorld=world;
+        unsigned lastMaterial=MaxMaterials;
+        bool lastGlass=false,passBound=false;
         if(SUCCEEDED(hr))for(unsigned pass=phase==IsolatedMeshPass::GlassOnly?1u:0u;
             pass<(phase==IsolatedMeshPass::OpaqueOnly?1u:2u)&&SUCCEEDED(hr);++pass)
           for(unsigned order=0;order<(pass?glassCount:meshes_.size());++order) {
@@ -975,19 +981,30 @@ public:
             const D3DMATRIX meshWorld=AnimatedWorld(world,binding,dashboard);
             // Opaque first, then tagged translucent glass. Transparent glass
             // must not write the depth buffer or hide the track from cockpit.
-            if(!current() || FAILED(device->SetTransform(D3DTS_WORLD,&meshWorld)) ||
-               (pbrReady_ && (!current() || FAILED(pbrShaders_.SetWorldGuarded(device,meshWorld,current)))) ||
-               !current() || FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE)) ||
-               !current() || FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE)) ||
-               !current() || FAILED(device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA)) ||
-               !current() || FAILED(device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA)) ||
-               !current() || FAILED(device->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE,FALSE))) {
-                hr=E_FAIL;break;
+            if(!isolated||std::memcmp(&lastWorld,&meshWorld,sizeof(meshWorld))!=0) {
+                if(!current() || FAILED(device->SetTransform(D3DTS_WORLD,&meshWorld)) ||
+                   (pbrReady_ && (!current() || FAILED(pbrShaders_.SetWorldGuarded(device,meshWorld,current))))) {
+                    hr=E_FAIL;break;
+                }
+                lastWorld=meshWorld;
+            }
+            if(!isolated||!passBound||lastGlass!=m.glass) {
+                if(!current() || FAILED(device->SetRenderState(D3DRS_ZWRITEENABLE,m.glass?FALSE:TRUE)) ||
+                   !current() || FAILED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,m.glass?TRUE:FALSE)) ||
+                   !current() || FAILED(device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA)) ||
+                   !current() || FAILED(device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA)) ||
+                   !current() || FAILED(device->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE,FALSE))) {
+                    hr=E_FAIL;break;
+                }
+                lastGlass=m.glass;passBound=true;
             }
             if(!current() || FAILED(device->SetStreamSource(0,m.vb,0,sizeof(Vertex))) ||
-               !current() || FAILED(device->SetIndices(m.ib)) ||
-               !current() || FAILED(device->SetTexture(0,textures_[m.material]))) {hr=E_FAIL;break;}
-            if(pbrReady_) {
+               !current() || FAILED(device->SetIndices(m.ib))) {hr=E_FAIL;break;}
+            const bool bindMaterial=!isolated||lastMaterial!=m.material;
+            if(bindMaterial&&(!current()||FAILED(device->SetTexture(0,textures_[m.material])))){
+                hr=E_FAIL;break;
+            }
+            if(bindMaterial&&pbrReady_) {
                 const auto& p=cpu_.pbrMaterials[m.material];
                 const float factors[4]{p.roughness,p.metallic,p.normalScale,
                                        normals_[m.material]?1.f:0.f};
@@ -1000,6 +1017,7 @@ public:
                     hr=E_FAIL;break;
                 }
             }
+            lastMaterial=m.material;
             if(isolated) {
                 // Count real raw DIPs, without pretending each eye was a
                 // complete legacy stereo submission. No live-eye hook runs.
