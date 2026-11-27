@@ -124,10 +124,10 @@ struct Hook {
 };
 Hook DrawPrimitiveHook{0}, DrawIndexedPrimitiveHook{1},
      DrawPrimitiveUPHook{2}, DrawIndexedPrimitiveUPHook{3};
-template<class DrawCall> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9* d,unsigned eye,IDirect3DSurface9* rt,IDirect3DSurface9* depth,DrawCall& draw){
+template<class DrawCall> R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevice9* d,unsigned eye,IDirect3DSurface9* rt,IDirect3DSurface9* depth,DrawCall& draw,bool omit=false){
     assert(d->rt==rt&&d->depth==depth);++replayCalls;replayEye=eye;
     ExternalAtomicCandidates.device=d;
-    if(replayResult==R7CandidateSeedResult::Seeded){
+    if(replayResult==R7CandidateSeedResult::Seeded&&!omit){
         inReplay=true;const HRESULT hr=draw();inReplay=false;
         if(FAILED(hr))return R7CandidateSeedResult::Unavailable;
     }
