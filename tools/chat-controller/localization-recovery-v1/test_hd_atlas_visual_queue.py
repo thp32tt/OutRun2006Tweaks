@@ -64,4 +64,34 @@ class AtlasQueueTests(unittest.TestCase):
         self.assertEqual(result["status"],"REPAIR_RUNNING_OR_QUEUED")
         self.assertEqual(call.call_count,1)
 
+class AtlasReceiptRecoveryTests(unittest.IsolatedAsyncioTestCase):
+    async def test_read_only_recovery_requires_attachment_receipt(self):
+        t=task()
+        t["images"]={k:{"name":k+".png"} for k in ("source","clean","final")}
+        url="https://chatgpt.com/c/12345678-1234-1234-1234-123456789abc"
+        page=MagicMock(url=url)
+        page.is_closed.return_value=False
+        worker=MagicMock()
+        worker.ensure_context=AsyncMock()
+        worker.context.pages=[page]
+        worker.page=AsyncMock()
+        worker.send_with_png=AsyncMock()
+        for outcome,expected in (("SEND_UNVERIFIED",None),
+                ("PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED",url)):
+            with patch("controller_png_attach.verify_submission_receipt",new=AsyncMock(return_value=outcome)) as verify:
+                self.assertEqual(await q.recover_uncertain_receipt(worker,t,{},bridge.is_saved_chat_url),expected)
+                verify.assert_awaited_once_with(page,t["task_id"],["source.png","clean.png","final.png"],timeout_ms=3000)
+        worker.page.assert_not_awaited()
+        worker.send_with_png.assert_not_awaited()
+
+    async def test_receipt_probe_is_throttled_and_fails_closed(self):
+        from controller_png_attach import verify_submission_receipt
+        page=MagicMock()
+        page.wait_for_function=AsyncMock(side_effect=TimeoutError())
+        self.assertEqual(await verify_submission_receipt(page,"task",["a","b","c"],timeout_ms=3000),"SEND_UNVERIFIED")
+        kwargs=page.wait_for_function.call_args.kwargs
+        self.assertEqual(kwargs["polling"],1000)
+        self.assertEqual(kwargs["timeout"],3000)
+        self.assertEqual(kwargs["arg"],{"task":"task","count":3})
+
 if __name__=="__main__":unittest.main()
