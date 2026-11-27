@@ -217,6 +217,8 @@ async def recover_slot_composer(context: BrowserContext, pages: dict[str, Page],
 
 async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
     """Start each scheduled N100 run in a brand-new tab/chat and close the previous one."""
+    if globals().get("VR_BROWSER_MODE") == "headless" and globals().get("CHAT_SLOTS") == 1:
+        return await hard_replace_slot_page(context, pages, slot)
     old = pages.get(slot.name)
     if old is not None and not old.is_closed():
         try:
@@ -245,13 +247,27 @@ async def hard_replace_slot_page(context: BrowserContext, pages: dict[str, Page]
     existing controller watchdog restart/recover the persistent profile.
     """
     old = pages.get(slot.name)
-    if old is not None:
+    single_headless = globals().get("VR_BROWSER_MODE") == "headless" and globals().get("CHAT_SLOTS") == 1
+    if single_headless:
+        # Create a blank tab before closing the last one (Chrome may exit when
+        # its last window closes). Never navigate while a stale renderer remains.
+        page = await asyncio.wait_for(context.new_page(), timeout=20.0)
         try:
-            if not old.is_closed():
-                await asyncio.wait_for(old.close(run_before_unload=False), timeout=4.0)
+            for stale in list(context.pages):
+                if stale is not page and not stale.is_closed():
+                    await asyncio.wait_for(stale.close(run_before_unload=False), timeout=4.0)
+            if any(p is not page and not p.is_closed() for p in context.pages):
+                raise RuntimeError("surplus tab survived close")
         except Exception as exc:
-            log.warning("hard 60m slot=%s abandoned frozen tab: %s", slot.name, type(exc).__name__)
-    page = await asyncio.wait_for(context.new_page(), timeout=20.0)
+            raise RuntimeError("headless single-tab recycle required: stale renderer") from exc
+    else:
+        if old is not None:
+            try:
+                if not old.is_closed():
+                    await asyncio.wait_for(old.close(run_before_unload=False), timeout=4.0)
+            except Exception as exc:
+                log.warning("hard 60m slot=%s abandoned frozen tab: %s", slot.name, type(exc).__name__)
+        page = await asyncio.wait_for(context.new_page(), timeout=20.0)
     pages[slot.name] = page
     slot.url = None
     slot.last_assistant_hash = None

@@ -140,10 +140,11 @@ async def external_model_cycle(context, pages: dict, q: dict, now: datetime, hos
         g("save_registry")(reg)
         g("save_queue_state")(q)
 
-    if now.minute in (0, 30):
-        window = now.replace(second=0, microsecond=0).isoformat()
-        if state.get("last_sent_window") != window:
-            state["pending_window"] = window
+    # Recover the current half-hour window after a restart or a slow browser
+    # operation instead of requiring a poll during the exact boundary minute.
+    window = now.replace(minute=(now.minute // 30) * 30, second=0, microsecond=0).isoformat()
+    if state.get("last_sent_window") != window:
+        state["pending_window"] = window
     pending = state.get("pending_window")
     if not pending or pending == state.get("last_sent_window"):
         return False

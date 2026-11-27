@@ -4564,9 +4564,11 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         try:
             await car_model_simple_cycle(context, pages, q, datetime.now(TZ), slot_name=car_slot)
         except Exception as exc:
+            if EXTERNAL_MODEL_AUTODEV_ENABLED and fatal_browser_disconnect(exc):
+                raise
             log.warning("Ferrari cockpit %s deferred: %s", car_slot, type(exc).__name__)
             write_runtime(status="car_model_simple_cycle_error",
-                          last_action=f"Ferrari cockpit {car_slot} deferred: {type(exc).__name__}")
+                          last_action=f"Ferrari {'external' if EXTERNAL_MODEL_AUTODEV_ENABLED else 'cockpit'} {car_slot} deferred: {type(exc).__name__}: {str(exc)[:200]}")
 
     if UW2_WEB_PORT_ENABLED:
         # C has no TASK_ID and never enters the conversion production queue.
@@ -5143,6 +5145,7 @@ def fatal_browser_disconnect(exc: BaseException) -> bool:
         "websocket is closed",
         "websocket closed",
         "browsercontext has been closed",
+        "headless single-tab recycle required",
     )
     if any(marker in message for marker in fatal_markers):
         return True
@@ -5349,6 +5352,10 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
         state["last_recovered"][slot.name] = time.monotonic()
         target = slot.url if slot.url and is_project_scoped_chat_url(slot.url, slot.name) else slot_project_home(slot.name)
         log.error("slot tab recovery slot=%s reason=%s target=%s", slot.name, reason, target)
+        if globals().get("VR_BROWSER_MODE") == "headless" and globals().get("CHAT_SLOTS") == 1:
+            # A broken headless renderer should not accumulate old tabs. Let the
+            # Docker restart policy recycle the complete browser/profile owner.
+            raise RuntimeError(f"headless single-tab recycle required: {reason}")
         # Preserve a visual diagnostic where Chromium still permits screenshots.
         if not closed:
             try:
@@ -5421,6 +5428,17 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
 
         if mono - last_tab_health_check >= TAB_HEALTH_CHECK_SECONDS:
             last_tab_health_check = mono
+            if VR_BROWSER_MODE == "headless" and CHAT_SLOTS == 1:
+                owner = pages.get("A")
+                surplus = [p for p in context.pages if p is not owner and not p.is_closed()]
+                for page in surplus:
+                    try:
+                        await asyncio.wait_for(page.close(run_before_unload=False), timeout=4.0)
+                    except Exception as exc:
+                        raise RuntimeError("headless single-tab recycle required: surplus tab") from exc
+                if owner is None or owner.is_closed():
+                    raise RuntimeError("headless single-tab recycle required: missing owner")
+                write_runtime(browser_live_tab_count=sum(not p.is_closed() for p in context.pages))
             await monitor_slot_tab_health(context, pages, tab_health_state)
 
         if mono - last_heartbeat >= HEARTBEAT_SECONDS:

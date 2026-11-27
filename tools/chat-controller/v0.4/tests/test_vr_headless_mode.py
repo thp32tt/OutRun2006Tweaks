@@ -1,9 +1,11 @@
 """VR headless launch contracts; no real browser, no network and no credentials."""
 import ast
+import asyncio
 import io
 import subprocess
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY = (ROOT / "entrypoint.vr.sh").read_text()
@@ -56,6 +58,49 @@ class HeadlessModeTests(unittest.TestCase):
         self.assertIn('if [[ "$VR_BROWSER_MODE" == "gui" ]]; then', ENTRY)
         self.assertIn("misses >= 3", ENTRY)
         self.assertIn("--max-time 4", ENTRY)
+
+    def test_headless_rollover_closes_old_tab_before_navigation(self):
+        source = (ROOT / "src-vr-v2/controller.py.part02").read_text()
+        fn = next(n for n in ast.parse(source).body
+                  if isinstance(n, ast.AsyncFunctionDef) and n.name == "hard_replace_slot_page")
+        events = []
+        class Page:
+            def __init__(self, name, fail=False):
+                self.name, self.fail, self.closed = name, fail, False
+            def is_closed(self):
+                return self.closed
+            async def close(self, **kwargs):
+                events.append("close:" + self.name)
+                if self.fail:
+                    raise TimeoutError("hung")
+                self.closed = True
+            async def goto(self, url, **kwargs):
+                events.append("navigate:" + self.name)
+            async def wait_for_timeout(self, ms):
+                pass
+        class Context:
+            def __init__(self, old):
+                self.pages = [old]
+            async def new_page(self):
+                events.append("new")
+                p = Page("new")
+                self.pages.append(p)
+                return p
+        env = {"BrowserContext": object, "Page": object, "Slot": object,
+               "asyncio": asyncio, "VR_BROWSER_MODE": "headless", "CHAT_SLOTS": 1,
+               "slot_project_home": lambda name: "https://chatgpt.com/project"}
+        exec(compile(ast.Module(body=[fn], type_ignores=[]), "<rollover>", "exec"), env)
+        old = Page("old")
+        pages = {"A": old}
+        slot = SimpleNamespace(name="A", url="old")
+        result = asyncio.run(env["hard_replace_slot_page"](Context(old), pages, slot))
+        self.assertIs(pages["A"], result)
+        self.assertEqual(events, ["new", "close:old", "navigate:new"])
+        events.clear()
+        old = Page("hung", fail=True)
+        with self.assertRaisesRegex(RuntimeError, "headless single-tab recycle required"):
+            asyncio.run(env["hard_replace_slot_page"](Context(old), {"A": old}, slot))
+        self.assertEqual(events, ["new", "close:hung"])
 
     def test_healthz_never_loads_queue_or_registry(self):
         from http.server import BaseHTTPRequestHandler

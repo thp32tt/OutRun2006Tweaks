@@ -263,6 +263,15 @@ class ContinuousDebugCycleTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(await _module.external_model_cycle(
             None, {}, state, now + timedelta(minutes=150), host))  # no double send
         self.assertEqual(sends.await_count, 6)
+        # Simulate restart/slow browser missing the boundary minute entirely.
+        self.assertTrue(await _module.external_model_cycle(
+            None, {}, state, now + timedelta(minutes=188), host))
+        self.assertEqual(sends.await_count, 7)
+        self.assertEqual(state["ferrari_external_simple_A"]["last_sent_window"],
+                         (now + timedelta(minutes=180)).isoformat())
+        self.assertFalse(await _module.external_model_cycle(
+            None, {}, state, now + timedelta(minutes=190), host))
+        self.assertEqual(sends.await_count, 7)
 
 
 
