@@ -86,7 +86,7 @@ static std::vector<std::uint8_t> make_image(const Atlas& a,unsigned size){
 // geometry-derived AO, including the gutter, rather than undersampling
 // 60k+ tiny UV islands in the ordinary 64/128 atlas.
 template<class GridPos>
-static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,GridPos gridPos,bool paired=false){
+static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,GridPos gridPos,bool paired=false,bool patches=false){
  const auto& texture=m.textures[material];
  const auto& base=texture.dds;
  if(texture.format!=TextureFormat::ARGB32||base.size()<132||
@@ -117,7 +117,7 @@ static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,Gr
  unsigned size=64;while(size<tiles*4u&&size<2048u)size*=2;
  if(size<tiles*4u)return {};
  std::vector<std::uint8_t> image(std::size_t(size)*size,255);
- struct Tile {std::array<unsigned,2> faces{};unsigned count=0;};
+ struct Tile {std::array<unsigned,8> faces{};unsigned count=0;};
  std::vector<Tile> chart(std::size_t(tiles)*tiles);
  for(unsigned i=0;i<samples.size();++i){
   const auto& s=samples[i];
@@ -126,7 +126,7 @@ static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,Gr
   if(cx<0||cy<0||cx>=tiles||cy>=tiles)return {};
   const auto x=static_cast<unsigned>(cx),y=static_cast<unsigned>(cy);
   const unsigned index=y*tiles+x;
-  if(!paired&&index!=i)return {};
+  if(!paired&&!patches&&index!=i)return {};
   for(const auto* v:{s.a,s.b,s.c}){
    const double u=double(v->u)*tiles-x,w=double(v->v)*tiles-y;
    if(u<.124||u>.876||w<.124||w>.876)return {};
@@ -135,7 +135,7 @@ static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,Gr
       eu=s.c->u-s.a->u,ev=s.c->v-s.a->v;
   if(du*ev-dv*eu==0)return {};
   auto& tile=chart[index];
-  if(tile.count>=(paired?2u:1u))return {};
+  if(tile.count>=(patches?8u:paired?2u:1u))return {};
   tile.faces[tile.count++]=i;
  }
  auto valueFor=[&](const Sample& s){
@@ -162,6 +162,63 @@ static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,Gr
   auto sign=[&](double u,double v){
      return (double(e1->u)-e0->u)*(v-e0->v)-(double(e1->v)-e0->v)*(u-e0->u);
   };
+  if(patches){
+   // Independently prove each patch is connected by exact source corners
+   // and contains no overlapping projected interiors. The converter's
+   // report is not trusted. Fill gutters from the nearest triangle.
+   struct Point {double u,v;};
+   auto verts=[](const Sample& s){return std::array<const Vertex*,3>{s.a,s.b,s.c};};
+   auto points=[&](const Sample& s){return std::array<Point,3>{{{s.a->u,s.a->v},{s.b->u,s.b->v},{s.c->u,s.c->v}}};};
+   auto projection=[](Point p,Point n){return p.u*n.u+p.v*n.v;};
+   auto overlap=[&](const auto& x,const auto& y){
+    for(const auto* tri:{&x,&y})for(unsigned k=0;k<3;++k){
+     const auto p=(*tri)[k],q=(*tri)[(k+1)%3];const Point n{p.v-q.v,q.u-p.u};
+     double loX=projection(x[0],n),hiX=loX,loY=projection(y[0],n),hiY=loY;
+     for(unsigned l=1;l<3;++l){const auto a=projection(x[l],n),b=projection(y[l],n);
+      loX=std::min(loX,a);hiX=std::max(hiX,a);loY=std::min(loY,b);hiY=std::max(hiY,b);}
+     if(std::min(hiX,hiY)-std::max(loX,loY)<=1e-9*std::max({hiX-loX,hiY-loY,1e-30}))return false;
+    }
+    return true;
+   };
+   unsigned connections[8]{};
+   std::array<std::array<Point,3>,8> polygons{};
+   std::array<std::uint8_t,8> values{};
+   for(unsigned k=0;k<tile.count;++k){
+    const auto& s=samples[tile.faces[k]];polygons[k]=points(s);values[k]=valueFor(s);
+    for(unsigned l=0;l<k;++l){
+     const auto& other=samples[tile.faces[l]];
+     if(overlap(polygons[k],polygons[l])||dot(s.face,other.face)<.98)return {};
+     unsigned shared=0;
+     for(auto* v:verts(s))for(auto* w:verts(other))if(same(v,w))++shared;
+     if(shared==2){connections[k]|=1u<<l;connections[l]|=1u<<k;}
+     if(shared>2)return {};
+    }
+   }
+   unsigned seen=1;
+   for(unsigned k=0;k<tile.count;++k)for(unsigned l=0;l<tile.count;++l)
+    if(seen&(1u<<l))seen|=connections[l];
+   if(seen!=((1u<<tile.count)-1u))return {};
+   auto distance=[](Point p,const std::array<Point,3>& tri){
+    double best=1e30;bool positive=false,negative=false;
+    for(unsigned k=0;k<3;++k){
+     const auto a=tri[k],b=tri[(k+1)%3];
+     const double u=b.u-a.u,v=b.v-a.v,x=p.u-a.u,y=p.v-a.v;
+     const double side=u*y-v*x;positive|=side>0;negative|=side<0;
+     const double d=u*u+v*v;
+     const double t=d>0?std::clamp((x*u+y*v)/d,0.,1.):0.;
+     best=std::min(best,(x-u*t)*(x-u*t)+(y-v*t)*(y-v*t));
+    }
+    return positive&&negative?best:0.;
+   };
+   const unsigned x=index%tiles,y=index/tiles;
+   for(unsigned row=edge(y);row<edge(y+1);++row)
+    for(unsigned col=edge(x);col<edge(x+1);++col){
+     const Point p{(col+.5)/size,(row+.5)/size};unsigned best=0;double d=1e30;
+     for(unsigned k=0;k<tile.count;++k){const auto next=distance(p,polygons[k]);if(next<d){d=next;best=k;}}
+     image[std::size_t(row)*size+col]=values[best];
+    }
+   continue;
+  }
   if(tile.count==2){
     const auto& b=samples[tile.faces[1]];
     const Vertex* other=nullptr;
@@ -187,7 +244,7 @@ static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,Gr
  return dds(std::move(image),size);
 }
 static Bytes bake(const Bytes& input,unsigned size,
-                  std::size_t gpuBudget=MaxGpuPayloadBytes,bool triangleAtlas=false,bool pairedAtlas=false){
+                  std::size_t gpuBudget=MaxGpuPayloadBytes,bool triangleAtlas=false,bool pairedAtlas=false,bool patchAtlas=false){
  gpuBudget=(std::min)(gpuBudget,MaxGpuPayloadBytes);
  Model m;std::string err;if(!Parse(input.data(),input.size(),m,err)||!m.pbrEnabled)throw std::runtime_error("source parser: "+err);
  const unsigned nm=static_cast<unsigned>(m.pbrMaterials.size());
@@ -271,7 +328,7 @@ static Bytes bake(const Bytes& input,unsigned size,
   if(old){out.insert(out.end(),input.begin()+end,input.begin()+p);if(opaque[i])++existing;continue;}
   if(!opaque[i]||transparent[i]){put(out,0);if(opaque[i])++missing;continue;}
   Bytes map;
-  if(triangleAtlas)map=triangle_atlas(m,i,g,gridPos,pairedAtlas);
+  if(triangleAtlas)map=triangle_atlas(m,i,g,gridPos,pairedAtlas,patchAtlas);
   else{
    auto& a=atlases[i];
    if(a.valid&&!a.skipped&&!a.capped)map=dds(make_image(a,size),size);
@@ -297,13 +354,14 @@ static Bytes bake(const Bytes& input,unsigned size,
 }
 int main(int argc,char** argv){
  try{
-  if(argc!=4)throw std::runtime_error("usage: bake_external_ao input.ovc output.ovc 64|128|triangle-atlas|paired-atlas");
+  if(argc!=4)throw std::runtime_error("usage: bake_external_ao input.ovc output.ovc 64|128|triangle-atlas|paired-atlas|patch-atlas");
   const bool pairedAtlas=std::strcmp(argv[3],"paired-atlas")==0;
-  const bool triangleAtlas=pairedAtlas||std::strcmp(argv[3],"triangle-atlas")==0;
+  const bool patchAtlas=std::strcmp(argv[3],"patch-atlas")==0;
+  const bool triangleAtlas=patchAtlas||pairedAtlas||std::strcmp(argv[3],"triangle-atlas")==0;
   const auto size=triangleAtlas?64ul:std::stoul(argv[3]);
   if(size!=64&&size!=128)throw std::runtime_error("size");
   std::filesystem::path src=argv[1],dst=argv[2];if(std::filesystem::exists(dst))throw std::runtime_error("refuse existing output");
-  auto b=read(src);auto output=bake(b,static_cast<unsigned>(size),MaxGpuPayloadBytes,triangleAtlas,pairedAtlas);
+  auto b=read(src);auto output=bake(b,static_cast<unsigned>(size),MaxGpuPayloadBytes,triangleAtlas,pairedAtlas,patchAtlas);
   auto tmp=dst;tmp+=".part";if(std::filesystem::exists(tmp))throw std::runtime_error("refuse existing temporary");
   std::ofstream f(tmp,std::ios::binary);f.write(reinterpret_cast<const char*>(output.data()),output.size());f.close();if(!f)throw std::runtime_error("write");
   std::filesystem::rename(tmp,dst);std::cout<<dst.filename().string()<<" PASS\n";return 0;

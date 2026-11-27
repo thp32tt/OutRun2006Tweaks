@@ -92,7 +92,7 @@ with tempfile.TemporaryDirectory() as tmp:
      struct.pack("<8f",*v) for v in vertices)+struct.pack("<6H",0,1,2,1,3,2)+tail
  raw=b"OVRCABH4"+struct.pack("<7I",4,1,1,4,2,len(payload),zlib.crc32(payload))+payload
  quad=root/"quad.ovc";quad.write_bytes(raw)
- for mode,expected_vertices in (("triangle",6),("paired",4)):
+ for mode,expected_vertices in (("triangle",6),("paired",4),("patch",4)):
   uv=root/(mode+"_quad.ovc");ao=root/(mode+"_quad_ao.ovc")
   subprocess.run(["python3",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.py"),
                   str(quad),str(uv),mode],check=True)
@@ -112,6 +112,20 @@ with tempfile.TemporaryDirectory() as tmp:
    out=root/"bad_pair_ao.ovc"
    subprocess.run([str(exe),str(bad),str(out),"paired-atlas"],check=True)
    assert out.read_bytes()==broken
+ # Four coplanar triangles sharing edges, should remain six vertices in
+ # patch mode (pairing alone must split the shared inter-pair boundary).
+ vertices=[(x,y,0,0,0,1,0,0) for y in range(2) for x in range(3)]
+ indices=(0,1,3,1,4,3,1,2,4,2,5,4)
+ payload=struct.pack("<HHIII",nlen,0,6,12,2)+raw[52:start]+b"".join(
+     struct.pack("<8f",*v) for v in vertices)+struct.pack("<12H",*indices)+tail
+ strip=b"OVRCABH4"+struct.pack("<7I",4,1,1,6,4,len(payload),zlib.crc32(payload))+payload
+ src=root/"strip.ovc";src.write_bytes(strip)
+ uv=root/"patch_strip.ovc";ao=root/"patch_strip_ao.ovc"
+ subprocess.run(["python3",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.py"),str(src),str(uv),"patch"],check=True)
+ assert struct.unpack_from("<II",uv.read_bytes(),20)==(6,4)
+ subprocess.run([str(exe),str(uv),str(ao),"patch-atlas"],check=True)
+ assert ao.stat().st_size>uv.stat().st_size
+ assert src.read_bytes()==strip
  # Compile the same production baker with a small test-only budget.
  # No giant synthetic OVC or memory-heavy GPU test is needed.
  harness=root/"budget.cpp"
