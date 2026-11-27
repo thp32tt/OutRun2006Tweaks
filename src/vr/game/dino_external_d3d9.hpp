@@ -22,6 +22,7 @@
 #include "external_car_dds_upload.hpp"
 #include "external_car_mesh_upload.hpp"
 #include "external_car_normal_repair.hpp"
+#include "external_car_mesh_batch.hpp"
 #include "external_car_ground.hpp"
 #include "external_car_draw_order.hpp"
 #include "external_car_selection.hpp"
@@ -383,7 +384,8 @@ class GpuOwner final {
             // Worker accesses only local path/model values, never live game
             // state or D3D9 device resources.
             const std::wstring pathCopy(path);
-            cpuLoad_=std::async(std::launch::async,[pathCopy]() -> CpuLoad {
+            const bool batchOpaque=role_==SidecarRole::Vehicle;
+            cpuLoad_=std::async(std::launch::async,[pathCopy,batchOpaque]() -> CpuLoad {
                 CpuLoad result{};
                 try {
                     std::vector<std::uint8_t> bytes;
@@ -394,6 +396,7 @@ class GpuOwner final {
                     if(!Parse(bytes.data(),bytes.size(),result.model,result.error))
                         return result;
                     result.normalStats=RepairExternalModelNormals(result.model);
+                    if(batchOpaque)BatchExternalOpaqueMeshes(result.model);
                     float lowest=10000.f;
                     for(const auto& mesh:result.model.meshes) {
                         IndexedMeshBounds bounds{};
@@ -519,8 +522,7 @@ class GpuOwner final {
                     next.dashboardBinding=static_cast<int>(binding);
                     break;
                 }
-            next.glass=m.name.compare(0,10,"F50_GLASS_")==0 ||
-                m.name.compare(0,10,"EXT_GLASS_")==0;
+            next.glass=IsExternalGlassMesh(m);
             if(next.glass) {
                 IndexedMeshBounds bounds{};
                 if(!ComputeIndexedMeshBounds(m,bounds))

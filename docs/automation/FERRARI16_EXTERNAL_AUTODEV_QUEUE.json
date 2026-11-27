@@ -4389,7 +4389,7 @@
       ],
       "latest_material_sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
       "latest_static_ci": "Iteration60 strict dashboard PBR test amended after initial exact CI legacy missing-body assertion failure; final exact SHA CI as recorded. Iteration59 all four applicable exact workflows success and credited once.",
-      "next_focus": "A2 actual whole-vehicle staged render entrypoint + explicit eye/pose/mesh receipt and inactive RT/depth binding; implement caller/lifetime/fallback in one batch; A1 prerequisite fixes only."
+      "next_focus": "P0 native scene publication and physical replay dependencies; P1/P2 missing asset/UV/dashboard fixes; P3 lossless batching and further draw overhead optimization; continue until P0-P3 accepted."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
@@ -4596,7 +4596,7 @@
         "A3",
         "A4"
       ],
-      "note": "A4 source/multicar exact SHA 81b1e0359ed8b86d086b9ec8aeb98f18a69aba4f run 45912210055 SUCCESS; Windows x86/host pending at handoff. A5 F50-only PBR launcher and actual stage/fallback/shared-pair publication diagnostics. Continue first F50 physical admission failures rather than repeating A1 checks; no HMD PASS."
+      "note": "Continue real P0-P3 feature batches using operator_priority_completion; P0 native pair and auxiliary ownership, P1 vehicle dashboards and glass, P2 real asset recovery, P3 lossless batching and frame pacing. No validation-only dispatch. User requests continue through P3."
     }
   },
   "development_batch_policy": {
@@ -4654,6 +4654,35 @@
       "focus_rotation": [
         "P0 ATOMIC_STEREO_BACKEND: implement first unfinished A1-A6 milestone in queue.atomic_stereo_plan; A1 real R7 isolated L/R color+depth ownership -> A2 whole vehicle staging -> A3 atomic pair publication -> A4 native callback integration. No unrelated validation rotation until A1-A4 done."
       ]
+    },
+    "operator_priority_completion": {
+      "revision": "20261127-P0-P3-UNTIL-DONE",
+      "stop_before_all_priorities_complete": false,
+      "dispatch_policy": "Implement actual production code/assets first; continue next independent actionable dependency in the same dispatch. No repeated CI-only or audit-only dispatch while implementation remains. Existing controller :00/:30 cadence remains.",
+      "priorities": [
+        {
+          "id": "P0",
+          "status": "IN_PROGRESS",
+          "acceptance": "Actual isolated stereo pair, stock fallback, native model ownership and safe publication; A1-A5 integrated and tested."
+        },
+        {
+          "id": "P1",
+          "status": "IN_PROGRESS",
+          "acceptance": "All 16 installed vehicle paths, glass/depth/animated dashboard, preserve native passengers/shadows/HUD, no absent model shown."
+        },
+        {
+          "id": "P2",
+          "status": "IN_PROGRESS",
+          "acceptance": "Restore 328 exact private candidate, repair F40 UV using real source, complete functional normal/ORM materials and exact-variant rights/quality checks; do not substitute invented data."
+        },
+        {
+          "id": "P3",
+          "status": "IN_PROGRESS",
+          "acceptance": "Eliminate redundant raster/state/resource work without loss of geometry or quality; Quest 3 VDXR measured target 120fps / 8.33ms, no unmeasured performance PASS."
+        }
+      ],
+      "when_hardware_or_asset_blocked": "Continue other implementation work and prepare exact-SHA test package. Keep hardware-dependent acceptance WAITING_USER_HMD; never falsely mark P3 done. No repetitive validation-only cycles.",
+      "latest_code_batch": "Lossless adjacent opaque CPU mesh batching, index remap and dashboard binding preservation; previous dashboard/aux shadow renderer fixes."
     }
   }
 }
