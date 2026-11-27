@@ -98,6 +98,7 @@ namespace OutRunVRStereo
 		constexpr std::size_t CreateDepthStencilSurfaceVtableIndex = 29;
 		constexpr std::size_t CreateDepthStencilSurfaceExVtableIndex = 131;
 		constexpr std::size_t UpdateSurfaceVtableIndex = 30;
+        constexpr std::size_t GetRenderTargetDataVtableIndex = 32;
 		constexpr std::size_t StretchRectVtableIndex = 34;
 		constexpr std::size_t ColorFillVtableIndex = 35;
 		constexpr std::size_t SetRenderTargetVtableIndex = 37;
@@ -135,6 +136,8 @@ namespace OutRunVRStereo
 		SafetyHookInline CreateDepthRetentionHook{};
 		SafetyHookInline CreateDepthRetentionExHook{};
 		SafetyHookInline UpdateSurfaceHook{};
+        SafetyHookInline CandidateReadbackHook{};
+        bool R7CandidateReadbackCovered=false;
 		SafetyHookInline StretchRectHook{};
 		SafetyHookInline ColorFillHook{};
 		SafetyHookInline SetRenderTargetHook{};
@@ -2149,6 +2152,13 @@ namespace OutRunVRStereo
 
         // A successful seed is ONLY the initial clear, not the current scene
         // depth or a publication receipt. Later world draws must be replayed.
+        bool R7NativeAssetsSeedReady(IDirect3DDevice9* device) noexcept
+        {
+            using namespace OutRunVR::DinoSidecar;
+            return NativeVehicleModelEdgesReady.load(std::memory_order_acquire)&&
+                NativeVehiclePmtConsumerReady.load(std::memory_order_acquire)&&
+                GlobalGpu().ReadyForCandidateSeed(device);
+        }
         R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
             const D3DVIEWPORT9& viewport,DWORD flags,D3DCOLOR color,float z,DWORD stencil) noexcept
         {
@@ -2156,7 +2166,7 @@ namespace OutRunVRStereo
                 R7CandidateResetInFlight||ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
             // Only allocate/replay for a configuration capable of native publication.
             if(!Settings::VRExternalFerrariNativeCallbackReplacement||
-                !Settings::VRDirectGpuOnly||!GameplayActive())
+                !Settings::VRDirectGpuOnly||!GameplayActive()||!R7NativeAssetsSeedReady(device))
                 return R7CandidateSeedResult::Unavailable;
             const auto epoch=PresentEpoch;
             const auto boundary=R7CandidateBoundarySerial;
@@ -2228,15 +2238,17 @@ namespace OutRunVRStereo
         }
 
         // A verified auxiliary pass may preserve a still-identical scene pair.
-        // Never assume a tracked bind proves actual attachments. Once a stock
-        // vehicle draw was omitted, an auxiliary read dependency is unknown.
+        // Live color targets are standalone render targets/backbuffer; the seed
+        // requires creation-proven standalone depth. After vehicle omission,
+        // retain only if explicit stock-surface copy/readback owners are armed.
         bool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9* device) noexcept
         {
             auto& pair=ExternalAtomicCandidates;
             if(!device||InternalStereoPass||TargetIsBackBuffer()||
                 ExternalAtomicReplayEpoch!=PresentEpoch||pair.device!=device||
                 AnyAuxRenderTargetActive()||R7CandidateResetInFlight||
-                R7VehicleStageInFlight||R7StagedVehicle.present==PresentEpoch||
+                R7VehicleStageInFlight||
+                (R7StagedVehicle.present==PresentEpoch&&!R7CandidateReadbackCovered)||
                 OutRunVR::DinoSidecar::ActiveNativeVehicleStockReplay||
                 !pair.provenLiveColor[0]||!pair.provenLiveDepth[0]||
                 !pair.simultaneousTargets||pair.simultaneousTargets>4)
@@ -2348,7 +2360,15 @@ namespace OutRunVRStereo
             const bool privateWrite=destination&&
                 (destination==pair.eyes[0].color||destination==pair.eyes[1].color||
                  destination==pair.eyes[0].depth||destination==pair.eyes[1].depth);
-            if(protectedDepth||privateWrite)ExternalAtomicReplayEpoch=0;
+            // A stock/private scene read into an unrelated texture/surface
+            // may feed a later composite after vehicle replacement. It is not
+            // equivalent to a private-eye read, so retire even on failure.
+            const bool protectedSource=source&&(srcEye>=0||
+                source==pair.provenLiveDepth[0]||source==pair.provenLiveDepth[1]||
+                source==pair.eyes[0].color||source==pair.eyes[1].color||
+                source==pair.eyes[0].depth||source==pair.eyes[1].depth);
+            if(protectedDepth||privateWrite||(!fill&&protectedSource&&dstEye<0))
+                ExternalAtomicReplayEpoch=0;
             // Preserve the original operation and HRESULT exactly once. The
             // private replay cannot change bindings, viewport or input state.
             const HRESULT hr=write(source,destination);
@@ -2390,6 +2410,22 @@ namespace OutRunVRStereo
         // source may itself be a readback of stock pixels; never assume it is
         // equivalent to a future externally staged candidate. Retire the
         // receipt before the original call, including on ambiguous failures.
+        HRESULT __stdcall CandidateReadbackDest(IDirect3DDevice9* device,
+            IDirect3DSurface9* source,IDirect3DSurface9* destination)
+        {
+            if(StereoBaseCallbacksArmed.load(std::memory_order_acquire)&&
+                IsGameDevice(device)&&source&&ExternalAtomicReplayEpoch==PresentEpoch)
+            {
+                const auto& pair=ExternalAtomicCandidates;
+                if(source==pair.provenLiveColor[0]||source==pair.provenLiveColor[1]||
+                    source==pair.provenLiveDepth[0]||source==pair.provenLiveDepth[1]||
+                    source==pair.eyes[0].color||source==pair.eyes[1].color||
+                    source==pair.eyes[0].depth||source==pair.eyes[1].depth)
+                    ExternalAtomicReplayEpoch=0;
+            }
+            return CandidateReadbackHook.stdcall<HRESULT>(device,source,destination);
+        }
+
         HRESULT __stdcall UpdateSurfaceDest(IDirect3DDevice9* device,
             IDirect3DSurface9* source,const RECT* sourceRect,
             IDirect3DSurface9* destination,const POINT* destinationPoint)
@@ -4014,7 +4050,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr))
 			{
 				const bool changed=TrackedDepthStencil!=surface;
-                if(changed)ExternalAtomicReplayEpoch=0;
+                if(changed&&TargetIsBackBuffer())ExternalAtomicReplayEpoch=0;
 				LastMainDepthClearStamp.OnBindingChange(changed);
 				if(changed) TrackedStencilFormatKnown=false;
 				ReplaceSurfaceRef(TrackedDepthStencil,surface);
@@ -4286,6 +4322,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			ColorFillHook = {};
 			StretchRectHook = {};
 			UpdateSurfaceHook = {};
+            R7CandidateReadbackCovered=false;CandidateReadbackHook={};
 			CreateDepthRetentionExHook = {};
 			CreateDepthRetentionHook = {};
 			SetRenderTargetHook = {};
@@ -4357,6 +4394,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
             // Candidate provenance is optional: failure must not disable
             // the established stock stereo renderer. No new hook in v0.03 mode.
             if(Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel){
+                CandidateReadbackHook=safetyhook::create_inline(
+                    vtable[GetRenderTargetDataVtableIndex],CandidateReadbackDest,disabled);
+                if(CandidateReadbackHook&&CandidateReadbackHook.enable().has_value())
+                    R7CandidateReadbackCovered=true;
+                else CandidateReadbackHook={};
                 CreateDepthRetentionHook=safetyhook::create_inline(
                     vtable[CreateDepthStencilSurfaceVtableIndex],CreateDepthRetentionDest,disabled);
                 if(CreateDepthRetentionHook&&!CreateDepthRetentionHook.enable().has_value())

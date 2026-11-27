@@ -653,7 +653,8 @@ int main(){
         };
         const auto hr=R7ExecuteAtomicSurfaceWrite(device,s,d,mode!=0,write);
         assert(hr==(liveFail?E_FAIL:S_OK)&&calls==1u+unsigned(mirror));
-        const bool invalid=active&&(protectedWrite||(eye&&(!mirror||replayFail)));
+        const bool escapingRead=!mode&&si>=1&&si<=8&&!eye;
+        const bool invalid=active&&(protectedWrite||escapingRead||(eye&&(!mirror||replayFail)));
         assert(ExternalAtomicReplayEpoch==((mask&4)||invalid?0u:9u));
         assert(LastMainDepthClearStamp.count==unsigned(enabled&&di==3));
         ++cases;
@@ -871,6 +872,8 @@ struct ExHook{
 entry_stub=r'''
 namespace Settings { bool VRExternalFerrariNativeCallbackReplacement=true,VRDirectGpuOnly=true; }
 bool GameplayActive(){return true;}
+bool seedAssetsReady=true;
+bool R7NativeAssetsSeedReady(IDirect3DDevice9*) noexcept {return seedAssetsReady;}
 enum class R7CandidateSeedResult{Unavailable,Seeded,DirtyRestore};
 IDirect3DSurface9 left,right,color,rc;
 IDirect3DSurface9 *TrackedDepthStencil=&left,*RightEyeDepth=&right,
@@ -934,6 +937,10 @@ int main(){
         assert(R7BeginExternalAtomicResourceTransaction(&d,vp,0,0,1,0)==R7CandidateSeedResult::Unavailable);
         assert(ExternalAtomicCandidates.allocations==before);
         Settings::VRDirectGpuOnly=true;
+        seedAssetsReady=false;
+        assert(R7BeginExternalAtomicResourceTransaction(&d,vp,0,0,1,0)==R7CandidateSeedResult::Unavailable);
+        assert(ExternalAtomicCandidates.allocations==before);
+        seedAssetsReady=true;
         ExternalAtomicAllocationAttemptEpoch=0;
         ExternalAtomicCandidates.allocations=0;rasterCalls=0;left.marked=false;left.writes=0;
     }

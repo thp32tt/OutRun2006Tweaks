@@ -1411,6 +1411,38 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if((player->flags_4&0xc000u)!=0x4000u){fallback("NATIVE_MODE_NOT_ONE");return;}
         if(!NativeModelQueueEmpty()){fallback("NATIVE_QUEUE_NOT_EMPTY");return;}
         if(const char* reason=OutRunVRStereo::NativeVehicleReplacementBlockReason()){
+            // Seed occurs before this native leaf. Load/upload on stock-only
+            // frames, then allow the NEXT full Clear to allocate/replay.
+            // Missing/corrupt assets never incur a duplicate scene every frame.
+            if(std::strcmp(reason,"PRIVATE_SCENE_NOT_SEEDED_OR_REVOKED")==0&&
+                Settings::VRExternalFerrariNativeCallbackReplacement&&
+                Settings::VREnabled&&Settings::VRStereo&&Settings::VRQuestCockpitV2Enabled&&
+                Game::current_mode&&*Game::current_mode==STATE_GAME&&
+                player==Game::pl_car()&&!InSceneEffect()){
+                const auto carId=player->car_id_10;
+                const bool legacy=Settings::VRF50ExternalModel&&IsF50RetailCarId(carId);
+                const bool selected=legacy||(Settings::VRExternalFerrariTest&&
+                    MatchesFerrariSelection(carId,Settings::VRExternalFerrariTestCarId.get()));
+                const auto* camera=Game::camera();
+                auto* device=Game::D3DDevice();
+                if(selected&&camera&&camera->cam_mode_34A==1&&device&&
+                    PermitGenericSidecar(true,FixedFunctionExternalStereoProbeActive(),
+                        PbrExternalStereoProbeActive(),
+                        Settings::VRExternalFerrariNativeCallbackReplacement.get())){
+                    const auto slot=legacy?FerrariModelSlot::F50:FerrariModelSlot::GenericId;
+                    auto& body=GlobalGpu();
+                    if(body.SelectSidecar(slot,carId))GlobalF50PoseFilter().Reset();
+                    if(body.SelectionMatches(slot,carId)){
+                        float lift=0.f;
+                        if(body.SafeFloorLift(legacy?Settings::VRF50ExternalLift.get():0.f,lift))
+                            body.EnsureResources(device);
+                        auto& dash=GlobalDashboardGpu();
+                        dash.SelectSidecar(FerrariModelSlot::GenericId,carId);
+                        if(dash.SelectionMatches(FerrariModelSlot::GenericId,carId)&&dash.Installed())
+                            dash.EnsureResources(device);
+                    }
+                }
+            }
             fallback(reason);return;
         }
         auto ticket=PrepareF50External(player);
@@ -1464,9 +1496,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         if(Settings::VRExternalFerrariDiag){
             static thread_local unsigned reports=0;
             if(reports++<32u||reports%180u==0u)
-                spdlog::info("VR EXTERNAL ATOMIC NATIVE F50: frame={} pose={} model={} groups={}/{} "
+                spdlog::info("VR EXTERNAL ATOMIC NATIVE F50: frame={} pose={} model={} car={} groups={}/{} "
                     "stockOnlyL={} stockOnlyR={} privateStage={} material={} normalGpu={} ormGpu={} stockCpuMs={:.3f} stageCpuMs={:.3f} original=RETAINED",
-                    input.nativeFrame,input.pose,model,replay.opened,replay.closed,
+                    input.nativeFrame,input.pose,model,static_cast<unsigned>(input.carId),replay.opened,replay.closed,
                     replay.omitted[0],replay.omitted[1],static_cast<unsigned>(result),
                     GlobalGpu().MaterialModeName(),GlobalGpu().NormalMapsOnGpu(),GlobalGpu().OrmMapsOnGpu(),
                     timing&&stockQpc.QuadPart>=beginQpc.QuadPart?

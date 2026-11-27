@@ -720,6 +720,10 @@ public:
         return count;
     }
     bool Loaded() const noexcept {return loaded_;}
+    bool ReadyForCandidateSeed(IDirect3DDevice9* device) const noexcept {
+        return device&&owner_==device&&loaded_&&preparation_==Preparation::Ready&&
+            !gpuBusy_&&!gpuRetirementDepth_;
+    }
     bool HasGlassMeshes() const noexcept {
         for(const auto& mesh:meshes_)if(mesh.glass)return true;
         return false;

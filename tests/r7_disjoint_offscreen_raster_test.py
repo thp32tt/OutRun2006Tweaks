@@ -15,6 +15,7 @@ bool SUCCEEDED(HRESULT h){return h>=0;}
 struct IDirect3DSurface9{int refs=0;};
 IDirect3DSurface9 lc,rc,ld,rd,pc[2],pd[2],aux,auxDepth;
 std::uint64_t PresentEpoch=3,ExternalAtomicReplayEpoch=3,R7CandidateBoundarySerial=0;
+bool R7CandidateReadbackCovered=false;
 bool InternalStereoPass=false,R7CandidateResetInFlight=false,R7VehicleStageInFlight=false,mainTarget=false,mrt=false;
 struct Key{std::uint64_t present=0;} R7StagedVehicle;
 namespace OutRunVR::DinoSidecar{void* ActiveNativeVehicleStockReplay=nullptr;}
@@ -54,7 +55,9 @@ int main(){
   game.calls=0;game.retireAt=i;assert(!R7CandidateDisjointOffscreenRaster(&game));
   game.calls=0;game.retireAt=0;game.failAt=i;assert(!R7CandidateDisjointOffscreenRaster(&game));game.failAt=0;
  }
- R7StagedVehicle.present=PresentEpoch;assert(!R7CandidateDisjointOffscreenRaster(&game));R7StagedVehicle.present=0;
+ R7StagedVehicle.present=PresentEpoch;assert(!R7CandidateDisjointOffscreenRaster(&game));
+ R7CandidateReadbackCovered=true;assert(R7CandidateDisjointOffscreenRaster(&game));
+ R7StagedVehicle.present=0;
  game.depth=TrackedDepthStencil=nullptr;assert(R7CandidateDisjointOffscreenRaster(&game));
  assert(!lc.refs&&!rc.refs&&!ld.refs&&!rd.refs&&!aux.refs&&!auxDepth.refs);
  std::cout<<"R7_DISJOINT_OFFSCREEN_PASS\n";
