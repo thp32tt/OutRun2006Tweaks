@@ -81,8 +81,68 @@ static std::vector<std::uint8_t> make_image(const Atlas& a,unsigned size){
  }
  return image;
 }
+// Dedicated mode for the generated per-triangle diagnostic atlas. Each
+// actual opaque face has its own tile. Fill the entire tile with its
+// geometry-derived AO, including the gutter, rather than undersampling
+// 60k+ tiny UV islands in the ordinary 64/128 atlas.
+template<class GridPos>
+static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,GridPos gridPos){
+ const auto& texture=m.textures[material];
+ const auto& base=texture.dds;
+ if(texture.format!=TextureFormat::ARGB32||base.size()<132||
+    (base.size()-128)%4||!m.pbrMaterials[material].normal.dds.empty())return {};
+ for(size_t i=132;i<base.size();i+=4)
+  if(std::memcmp(base.data()+i,base.data()+128,4)!=0)return {};
+ struct Sample {const Vertex *a,*b,*c;V face;};
+ std::vector<Sample> samples;
+ for(const auto& mesh:m.meshes)if(mesh.material==material){
+  if(glass(mesh))return {};
+  for(size_t i=0;i<mesh.indices.size();i+=3){
+   const auto &a=mesh.vertices[mesh.indices[i]],&b=mesh.vertices[mesh.indices[i+1]],&c=mesh.vertices[mesh.indices[i+2]];
+   auto n=cross(pos(b)-pos(a),pos(c)-pos(a));
+   double len2=dot(n,n);
+   if(!(len2>0)){
+    // Non-rasterizing source faces are preserved but have no AO texels.
+    if(a.u||a.v||b.u||b.v||c.u||c.v)return {};
+    continue;
+   }
+   samples.push_back({&a,&b,&c,n*(1/std::sqrt(len2))});
+  }
+ }
+ if(samples.empty())return {};
+ unsigned tiles=1;
+ while(std::uint64_t(tiles)*tiles<samples.size())++tiles;
+ // Bounded diagnostic texture footprint. Every tile has at least four
+ // texels along each axis at mip zero; lower mips remain approximate.
+ unsigned size=64;while(size<tiles*4u&&size<2048u)size*=2;
+ if(size<tiles*4u)return {};
+ std::vector<std::uint8_t> image(std::size_t(size)*size,255);
+ for(unsigned i=0;i<samples.size();++i){
+  const auto& s=samples[i];const unsigned x=i%tiles,y=i/tiles;
+  for(const auto* v:{s.a,s.b,s.c}){
+   const double u=double(v->u)*tiles-x,w=double(v->v)*tiles-y;
+   // Admit only the known generated chart with one ordered face per tile.
+   // Refuse ordinary authored/wrapped/overlapping UVs in this special mode.
+   if(u<.124||u>.876||w<.124||w>.876)return {};
+  }
+  const double du=s.b->u-s.a->u,dv=s.b->v-s.a->v,
+      eu=s.c->u-s.a->u,ev=s.c->v-s.a->v;
+  if(du*ev-dv*eu==0)return {};
+  V n=unit(normal(*s.a)+normal(*s.b)+normal(*s.c));
+  if(dot(n,n)<.5)n=s.face;
+  const auto value=static_cast<std::uint8_t>(shade(gridPos((pos(*s.a)+pos(*s.b)+pos(*s.c))*(1./3)),n,grid));
+  // Tile boundaries use texel centres; fill exactly the disjoint cells.
+  auto edge=[&](unsigned cell){return static_cast<unsigned>(
+      (std::max)(0.0,std::ceil(double(cell)*size/tiles-.5)));};
+  const unsigned x0=edge(x),x1=edge(x+1),y0=edge(y),y1=edge(y+1);
+  for(unsigned row=y0;row<y1;++row)
+   std::fill(image.begin()+std::size_t(row)*size+x0,
+             image.begin()+std::size_t(row)*size+x1,value);
+ }
+ return dds(std::move(image),size);
+}
 static Bytes bake(const Bytes& input,unsigned size,
-                  std::size_t gpuBudget=MaxGpuPayloadBytes){
+                  std::size_t gpuBudget=MaxGpuPayloadBytes,bool triangleAtlas=false){
  gpuBudget=(std::min)(gpuBudget,MaxGpuPayloadBytes);
  Model m;std::string err;if(!Parse(input.data(),input.size(),m,err)||!m.pbrEnabled)throw std::runtime_error("source parser: "+err);
  const unsigned nm=static_cast<unsigned>(m.pbrMaterials.size());
@@ -105,14 +165,15 @@ static Bytes bake(const Bytes& input,unsigned size,
  }
  double extent=std::max({hi.x-lo.x,hi.y-lo.y,hi.z-lo.z});if(!(extent>1e-6))throw std::runtime_error("opaque bounds");
  auto gridPos=[&](V p){return (p-lo)*(48/extent)+V{3,3,3};};
- Grid g;std::vector<Atlas> atlases;for(unsigned i=0;i<nm;++i)atlases.emplace_back(size);
+ Grid g;std::vector<Atlas> atlases;
+ if(!triangleAtlas)for(unsigned i=0;i<nm;++i)atlases.emplace_back(size);
  // Geometry occupancy from the actual opaque indexed triangles, not AABB fill.
  for(auto& mesh:m.meshes)if(!glass(mesh))for(size_t i=0;i<mesh.indices.size();i+=3){
   V a=gridPos(pos(mesh.vertices[mesh.indices[i]])),b=gridPos(pos(mesh.vertices[mesh.indices[i+1]])),c=gridPos(pos(mesh.vertices[mesh.indices[i+2]]));
   V e=b-a,f=c-a;unsigned steps=std::min(48u,std::max(1u,unsigned(std::ceil(std::sqrt(std::max({dot(e,e),dot(f,f),dot(c-b,c-b)}))))));
   for(unsigned x=0;x<=steps;++x)for(unsigned y=0;y+x<=steps;++y)g.mark(a+e*(double(x)/steps)+f*(double(y)/steps));
  }
- for(auto& mesh:m.meshes)if(!glass(mesh)&&!transparent[mesh.material]&&m.pbrMaterials[mesh.material].orm.dds.empty()){
+ if(!triangleAtlas)for(auto& mesh:m.meshes)if(!glass(mesh)&&!transparent[mesh.material]&&m.pbrMaterials[mesh.material].orm.dds.empty()){
   auto& atlas=atlases[mesh.material];
   for(size_t i=0;i<mesh.indices.size();i+=3){
    if(atlas.capped||atlas.skipped)break;
@@ -153,12 +214,16 @@ static Bytes bake(const Bytes& input,unsigned size,
   size_t start=p;p+=12;p+=4+U32(input.data()+p);size_t end=p;
   unsigned old=U32(input.data()+p);p+=4+old;
   out.insert(out.end(),input.begin()+start,input.begin()+end);
-  auto& a=atlases[i];
   if(old){out.insert(out.end(),input.begin()+end,input.begin()+p);if(opaque[i])++existing;continue;}
-  if(!opaque[i]||transparent[i]||!a.valid||a.skipped||a.capped){put(out,0);if(opaque[i])++missing;continue;}
-  // Never claim a material has AO coverage when any of its triangles could
-  // not be mapped: the untouched source remains eligible for UV repair.
-  auto image=make_image(a,size);auto map=dds(image,size);
+  if(!opaque[i]||transparent[i]){put(out,0);if(opaque[i])++missing;continue;}
+  Bytes map;
+  if(triangleAtlas)map=triangle_atlas(m,i,g,gridPos);
+  else{
+   auto& a=atlases[i];
+   if(a.valid&&!a.skipped&&!a.capped)map=dds(make_image(a,size),size);
+  }
+  // Never claim AO coverage when a drawable face could not be mapped.
+  if(map.empty()){put(out,0);++missing;continue;}
   if(map.size()>gpuBudget-gpuBytes||
      out.size()+map.size()+input.size()-p+4>MaxSidecarBytes){
    put(out,0);++missing;continue;
@@ -178,10 +243,12 @@ static Bytes bake(const Bytes& input,unsigned size,
 }
 int main(int argc,char** argv){
  try{
-  if(argc!=4)throw std::runtime_error("usage: bake_external_ao input.ovc output.ovc 64|128");
-  auto size=std::stoul(argv[3]);if(size!=64&&size!=128)throw std::runtime_error("size");
+  if(argc!=4)throw std::runtime_error("usage: bake_external_ao input.ovc output.ovc 64|128|triangle-atlas");
+  const bool triangleAtlas=std::strcmp(argv[3],"triangle-atlas")==0;
+  const auto size=triangleAtlas?64ul:std::stoul(argv[3]);
+  if(size!=64&&size!=128)throw std::runtime_error("size");
   std::filesystem::path src=argv[1],dst=argv[2];if(std::filesystem::exists(dst))throw std::runtime_error("refuse existing output");
-  auto b=read(src);auto output=bake(b,static_cast<unsigned>(size));
+  auto b=read(src);auto output=bake(b,static_cast<unsigned>(size),MaxGpuPayloadBytes,triangleAtlas);
   auto tmp=dst;tmp+=".part";if(std::filesystem::exists(tmp))throw std::runtime_error("refuse existing temporary");
   std::ofstream f(tmp,std::ios::binary);f.write(reinterpret_cast<const char*>(output.data()),output.size());f.close();if(!f)throw std::runtime_error("write");
   std::filesystem::rename(tmp,dst);std::cout<<dst.filename().string()<<" PASS\n";return 0;

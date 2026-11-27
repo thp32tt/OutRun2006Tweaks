@@ -53,6 +53,21 @@ with tempfile.TemporaryDirectory() as tmp:
   else:assert result==data
   assert subprocess.run([str(exe),str(src),str(dst),"64"],capture_output=True).returncode!=0
   assert dst.read_bytes()==result
+ # Generated atlas mode only accepts the actual one-face-per-tile layout.
+ for kind,uvs,expected in [
+  ("atlas_good",[((.125,.125),(.875,.125),(.125,.875))],True),
+  ("atlas_bad",[((0,0),(1,0),(0,1))],False),
+  ("atlas_overlap",[((.0625,.0625),(.4375,.0625),(.0625,.4375))]*2,False),
+  ("atlas_two",[((.0625,.0625),(.4375,.0625),(.0625,.4375)),
+                 ((.5625,.0625),(.9375,.0625),(.5625,.4375))],True),
+ ]:
+  data,off=make([(b"EXT_OPAQUE_00",uv) for uv in uvs])
+  src=root/(kind+".ovc");dst=root/(kind+"_out.ovc");src.write_bytes(data)
+  subprocess.run([str(exe),str(src),str(dst),"triangle-atlas"],check=True)
+  result=dst.read_bytes()
+  assert src.read_bytes()==data and result[36:off]==data[36:off]
+  if expected:assert struct.unpack_from("<I",result,off)[0]>0
+  else:assert result==data
  # Compile the same production baker with a small test-only budget.
  # No giant synthetic OVC or memory-heavy GPU test is needed.
  harness=root/"budget.cpp"
