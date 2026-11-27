@@ -36,6 +36,7 @@ jobs:
           python3 tools/ferrari16/v003_parity_gate.py --self-test
           python3 tests/ferrari16_exact_variant_quality_gate_test.py
           python3 tools/ferrari16/verify_all_car_ovc.py --self-test
+          python3 tests/external_ao_bake_test.py
       - name: Assert exact sixteen-car routing and per-car diagnostics in production source
         shell: bash
         run: |

@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "date": "2026-11-27",
+  "base": "212f7b8195e887f845fe51c31d1ceed44f98166e",
+  "status": "PRIVATE_CANDIDATES_STATIC_ONLY_NO_RELEASE_INSTALL",
+  "source_ovc_native_parser_pass": 15,
+  "source_ovc_glass_tagged": 15,
+  "missing_exact_car_ids": [
+    8
+  ],
+  "new_orm": 278,
+  "nonneutral_orm": 275,
+  "missing_opaque_orm": 81,
+  "rows": [
+    {
+      "file": "car_id_00.ovc",
+      "source_sha256": "d416ca3bdca429a1c598da2ba636ae8c7852a54cb745f0beb3aa6119447ad24b",
+      "output_sha256": "57fcb665c0ddc5a9012b9a468c11422a080198ec105d6f6361ff7b20c07fe102",
+      "generated": 20,
+      "existing": 0,
+      "missing": 1,
+      "nonwhite": 20,
+      "bytes": 52951617
+    },
+    {
+      "file": "car_id_01.ovc",
+      "source_sha256": "946f21d9bdeebb53c39a9b1042cc2128dcc9a1ff4b33c8371a1442b13c530ca4",
+      "output_sha256": "505c08c4a94369f9de77437956f66cbb22785406c964286ae5c04dee86f6a163",
+      "generated": 11,
+      "existing": 3,
+      "missing": 3,
+      "nonwhite": 11,
+      "bytes": 5977895
+    },
+    {
+      "file": "car_id_02.ovc",
+      "source_sha256": "52cd180f8743ae9fd7e7e4e68a39aca49ec943e29c1cf7bc0d39239cb7b66799",
+      "output_sha256": "709051c0f2415ebf3ca1ebd675440730467c1f732b77ccff8c100eff3074e162",
+      "generated": 15,
+      "existing": 0,
+      "missing": 2,
+      "nonwhite": 15,
+      "bytes": 21338145
+    },
+    {
+      "file": "car_id_03.ovc",
+      "source_sha256": "24b18e6a958004cc435334da000b9367087bd616fc4b7a83907b65e1575ea49a",
+      "output_sha256": "0d23c45add1886c85a6a39ccc540412131657023c3e2d62a64dde92f582af197",
+      "generated": 13,
+      "existing": 0,
+      "missing": 8,
+      "nonwhite": 13,
+      "bytes": 19047776
+    },
+    {
+      "file": "car_id_04.ovc",
+      "source_sha256": "9429bca61dbbd8dcef401690d3a4f33dfc9ca2138c97641b70c32c154ede578b",
+      "output_sha256": "6317d6cd8f4fb804a8ea36c93a42ea8a1829c269025bf3fc3afe711a7cedcf64",
+      "generated": 22,
+      "existing": 1,
+      "missing": 9,
+      "nonwhite": 21,
+      "bytes": 100363641
+    },
+    {
+      "file": "car_id_05.ovc",
+      "source_sha256": "16c15b9bd05bc69b581fa1fddda73bb7c6461ab59ff121109ae29ff30fa87e71",
+      "output_sha256": "3edfe7de69138327ce62978afbed04f443176fa7605820b9c2f1b66c16399b4c",
+      "generated": 15,
+      "existing": 4,
+      "missing": 4,
+      "nonwhite": 15,
+      "bytes": 9507423
+    },
+    {
+      "file": "car_id_06.ovc",
+      "source_sha256": "58e141a5e5627c66aca6e14557d352d08c91be1f870fe2160039ecf8a588416a",
+      "output_sha256": "6f7fa9e472c77adec31808a08d5bbd532e84bfffc0426fac9f5b2aaa949ea041",
+      "generated": 43,
+      "existing": 0,
+      "missing": 3,
+      "nonwhite": 43,
+      "bytes": 51539352
+    },
+    {
+      "file": "car_id_07.ovc",
+      "source_sha256": "903a1ca9eb3fc77761c3dd1e43b6f19e10f4387796575a4db9227141b6f8682a",
+      "output_sha256": "90dfa8488e86f8faa43c5b511564a03b9a29ecc62c42a3d7c09e8e5e65c70c20",
+      "generated": 1,
+      "existing": 0,
+      "missing": 6,
+      "nonwhite": 1,
+      "bytes": 6985607
+    },
+    {
+      "file": "car_id_09.ovc",
+      "source_sha256": "fb6c3b827d6981f736f35f808c8c208bb2f4dbc36bd94a1eddd0676f84cfbb99",
+      "output_sha256": "0690c041de869df9b8f5f449e9e053bd5468c8e3b8b28e93644eb44bdd047297",
+      "generated": 2,
+      "existing": 7,
+      "missing": 0,
+      "nonwhite": 2,
+      "bytes": 41515037
+    },
+    {
+      "file": "car_id_10.ovc",
+      "source_sha256": "33b8a6e5fb9e763b87feae5154f651f4879c4eb75e280dcdde18a3f03dda00ef",
+      "output_sha256": "b3082831946eafa1b0f8334aa1dd01a4ad54328986284427d624f3a8c8a3fad6",
+      "generated": 85,
+      "existing": 0,
+      "missing": 9,
+      "nonwhite": 84,
+      "bytes": 83517741
+    },
+    {
+      "file": "car_id_11.ovc",
+      "source_sha256": "c15e3fb298ee9f3c4bc8c2f28dba7d1d72ae04c2b7f97277dd29c3e97f6bbeb8",
+      "output_sha256": "c15e3fb298ee9f3c4bc8c2f28dba7d1d72ae04c2b7f97277dd29c3e97f6bbeb8",
+      "generated": 0,
+      "existing": 0,
+      "missing": 28,
+      "nonwhite": 0,
+      "bytes": 5711417
+    },
+    {
+      "file": "car_id_12.ovc",
+      "source_sha256": "17fa6bc91c8ad5b0c7d61cb5ea6cf389a97138c9443f93526a9868ca440b3d30",
+      "output_sha256": "62004253bd66dc6771e632bc910595c70247f940aff7c49b2c3d906a6d1b329d",
+      "generated": 18,
+      "existing": 0,
+      "missing": 7,
+      "nonwhite": 17,
+      "bytes": 25495934
+    },
+    {
+      "file": "car_id_13.ovc",
+      "source_sha256": "7fbba9d121d0c3bdea74b0427abc52647189514ff2d5042560b04570bacef19a",
+      "output_sha256": "6aeb064ee6e87d8c76d772af395909ef42a4581e36bc9579eff70b51ad57d542",
+      "generated": 3,
+      "existing": 10,
+      "missing": 0,
+      "nonwhite": 3,
+      "bytes": 109818154
+    },
+    {
+      "file": "car_id_14.ovc",
+      "source_sha256": "3abcb66901ad115a772085eaa8642965b931dc9576e3132e0bde3871dfdc9e26",
+      "output_sha256": "9c983fa7f5ba54febd64f61ad353455aac5657513fa17d11f565c11d8daa8596",
+      "generated": 3,
+      "existing": 11,
+      "missing": 0,
+      "nonwhite": 3,
+      "bytes": 88246566
+    },
+    {
+      "file": "car_id_28.ovc",
+      "source_sha256": "474dc3d088bb684a7d10d278aca981a80899cb6aa181be40b7c72d31fae2cb9b",
+      "output_sha256": "2da461819325a35ebcb46034afb9a316b3a62466c7da1b7e32ed6212a305e378",
+      "generated": 27,
+      "existing": 0,
+      "missing": 1,
+      "nonwhite": 27,
+      "bytes": 8411705
+    }
+  ],
+  "gear_overlay_candidates": [
+    {
+      "id": 5,
+      "sha256": "9e5eaff3f8f054e7c319b2b953a0ee74a66f7077da89907d715738c0b47c1e6f",
+      "gear_mask": 127
+    },
+    {
+      "id": 28,
+      "sha256": "a30e11bcf42687214a3915d60d4c96ecfcefed23e71e6f084807583b094a02c5",
+      "gear_mask": 127
+    }
+  ],
+  "notes": [
+    "All generated outputs passed actual native parser in baker; independent byte-splice verification passed for 15.",
+    "No mesh, albedo, normal or existing ORM modifications; geometry AO only with neutral roughness/metalness multipliers.",
+    "F40 original retained byte-identically, all 28 opaque material UV bases invalid.",
+    "Gear overlay 05/28 are diagnostic approximations anchored to opaque embedded speed/RPM needle pivots; HMD visibility and fit untested.",
+    "Testarossa exact Spider variant unverified; no claim of 16 exact sources.",
+    "Source-authored normal texture gaps remain; no fake normals or UV remapping.",
+    "No game installation, release promotion, or Quest3/120Hz measurements."
+  ]
+}
