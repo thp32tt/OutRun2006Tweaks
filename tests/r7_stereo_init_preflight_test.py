@@ -930,7 +930,7 @@ int main(){
         assert(ExternalAtomicCandidates.allocations==before);
         Settings::VRDirectGpuOnly=true;
         ExternalAtomicAllocationAttemptEpoch=0;
-        ExternalAtomicCandidates.allocations=0;rasterCalls=0;
+        ExternalAtomicCandidates.allocations=0;rasterCalls=0;left.marked=false;left.writes=0;
     }
 
     unsigned cases=0;
