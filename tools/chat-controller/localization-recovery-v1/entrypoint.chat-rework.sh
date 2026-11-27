@@ -22,7 +22,14 @@ if ! x11vnc -storepasswd "${OUTRUN_REWORK_VNC_PASSWORD}" /data/hd-rework/.vncpas
   exit 2
 fi
 
-Xvfb :99 -screen 0 1440x900x24 -ac -noreset >/logs/hd-rework-xvfb.log 2>&1 &
+# Smaller desktop reduces software compositing and VNC pixel traffic.
+# Keep override bounded to known usable sizes; no login/profile changes.
+screen_size="${OUTRUN_REWORK_VNC_SCREEN:-1280x800}"
+case "$screen_size" in
+  1024x768|1280x800|1440x900) ;;
+  *) echo "HOLD_VNC_SCREEN_SIZE_INVALID" >&2; exit 2 ;;
+esac
+Xvfb :99 -screen 0 "${screen_size}x24" -ac -noreset >/logs/hd-rework-xvfb.log 2>&1 &
 xvfb_pid=$!
 for _ in $(seq 1 40); do
   if [[ -S /tmp/.X11-unix/X99 ]]; then break; fi
