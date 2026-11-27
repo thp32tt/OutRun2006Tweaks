@@ -18,7 +18,10 @@ std::uint64_t PresentEpoch=3,ExternalAtomicReplayEpoch=3,R7CandidateBoundarySeri
 bool R7CandidateReadbackCovered=false;
 bool InternalStereoPass=false,R7CandidateResetInFlight=false,R7VehicleStageInFlight=false,mainTarget=false,mrt=false;
 struct Key{std::uint64_t present=0;} R7StagedVehicle;
-namespace OutRunVR::DinoSidecar{void* ActiveNativeVehicleStockReplay=nullptr;}
+namespace OutRunVR::DinoSidecar{
+struct Replay{bool group=false,failed=false;unsigned physicalDepth=0,omitted[2]{};};
+Replay* ActiveNativeVehicleStockReplay=nullptr;
+}
 struct IDirect3DDevice9{
  IDirect3DSurface9* rt[4]{&aux,nullptr,nullptr,nullptr};IDirect3DSurface9* depth=&auxDepth;
  unsigned calls=0,retireAt=0,failAt=0;
@@ -55,6 +58,17 @@ int main(){
   game.calls=0;game.retireAt=i;assert(!R7CandidateDisjointOffscreenRaster(&game));
   game.calls=0;game.retireAt=0;game.failAt=i;assert(!R7CandidateDisjointOffscreenRaster(&game));game.failAt=0;
  }
+ using namespace OutRunVR::DinoSidecar;
+ Replay native;ActiveNativeVehicleStockReplay=&native;
+ for(unsigned mask=0;mask<64;++mask){
+  native.group=(mask&1)!=0;native.failed=(mask&2)!=0;native.physicalDepth=(mask&4)?1:0;
+  native.omitted[0]=(mask&8)?1:0;native.omitted[1]=(mask&16)?1:0;
+  R7CandidateReadbackCovered=(mask&32)!=0;
+  const bool expected=!native.group&&!native.failed&&!native.physicalDepth&&
+      ((!native.omitted[0]&&!native.omitted[1])||R7CandidateReadbackCovered);
+  assert(R7CandidateDisjointOffscreenRaster(&game)==expected);
+ }
+ ActiveNativeVehicleStockReplay=nullptr;R7CandidateReadbackCovered=false;
  R7StagedVehicle.present=PresentEpoch;assert(!R7CandidateDisjointOffscreenRaster(&game));
  R7CandidateReadbackCovered=true;assert(R7CandidateDisjointOffscreenRaster(&game));
  R7StagedVehicle.present=0;

@@ -2276,12 +2276,19 @@ namespace OutRunVRStereo
         bool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9* device) noexcept
         {
             auto& pair=ExternalAtomicCandidates;
+            const auto* nativeReplay=OutRunVR::DinoSidecar::ActiveNativeVehicleStockReplay;
+            // Between closed native model queues, independent shadows may
+            // execute once. Inside a queue, or after an untracked readback
+            // risk, the candidate cannot survive an unrelated physical draw.
+            const bool nativeAuxBlocked=nativeReplay&&
+                (nativeReplay->group||nativeReplay->physicalDepth||nativeReplay->failed||
+                 ((nativeReplay->omitted[0]||nativeReplay->omitted[1])&&!R7CandidateReadbackCovered));
             if(!device||InternalStereoPass||TargetIsBackBuffer()||
                 ExternalAtomicReplayEpoch!=PresentEpoch||pair.device!=device||
                 AnyAuxRenderTargetActive()||R7CandidateResetInFlight||
                 R7VehicleStageInFlight||
                 (R7StagedVehicle.present==PresentEpoch&&!R7CandidateReadbackCovered)||
-                OutRunVR::DinoSidecar::ActiveNativeVehicleStockReplay||
+                nativeAuxBlocked||
                 !pair.provenLiveColor[0]||!pair.provenLiveDepth[0]||
                 !pair.simultaneousTargets||pair.simultaneousTargets>4)
                 return false;
