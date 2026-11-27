@@ -132,7 +132,7 @@ gpu_stub=r'''
         bool SelectionMatches(FerrariModelSlot,unsigned char){return true;}
         bool ReadyForCandidateSeed(IDirect3DDevice9*,FerrariModelSlot,unsigned char) const {return true;}
         unsigned HasEmbeddedSpeedAndRpm(){return 0;}unsigned EmbeddedGearMask(){return 0;}
-        GpuDrawResult DrawNativeScene(IDirect3DDevice9* d,const D3DMATRIX&,const D3DMATRIX& view,const D3DMATRIX& projection,const DashboardTelemetry&,unsigned,std::uint64_t,std::uint64_t,unsigned,const IsolatedEyeRaster* raster,IsolatedMeshPass phase=IsolatedMeshPass::All){
+        GpuDrawResult DrawNativeScene(IDirect3DDevice9* d,const D3DMATRIX&,const D3DMATRIX& view,const D3DMATRIX& projection,const DashboardTelemetry&,unsigned,std::uint64_t,std::uint64_t,unsigned,const IsolatedEyeRaster* raster,IsolatedMeshPass phase=IsolatedMeshPass::All,const IsolatedMeshInterleave* between=nullptr){
             GpuDrawResult r{};
             const bool right=d->rt==ExternalAtomicCandidates.eyes[1].color;
             assert(view.m[3][0]==(right?0.06f:0.f));
@@ -140,8 +140,14 @@ gpu_stub=r'''
             const unsigned draws=phase==IsolatedMeshPass::All?count:
                 phase==IsolatedMeshPass::OpaqueOnly?count-1:1;
             for(unsigned i=0;i<draws;++i){
+                if(between&&i==draws-1){
+                    bool dirty=false;
+                    if(!between->draw(between->context,dirty)||dirty){
+                        r.receipt.stateMayBeDirty=dirty||!raster->Restorable();return r;
+                    }
+                }
                 assert(stageTagCount<16);
-                stageTags[stageTagCount++]=dashboard?1u:phase==IsolatedMeshPass::GlassOnly?2u:0u;
+                stageTags[stageTagCount++]=dashboard?1u:((between&&i==draws-1)||phase==IsolatedMeshPass::GlassOnly)?2u:0u;
                 if(!raster->Current()||FAILED(raster->draw(raster->context,3,1))) {
                     r.receipt.stateMayBeDirty=!raster->Restorable();return r;
                 }

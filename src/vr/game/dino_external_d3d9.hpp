@@ -101,6 +101,12 @@ struct IsolatedEyeRaster {
     bool Current() const noexcept {return current&&restoreCurrent&&draw&&current(context);}
     bool Restorable() const noexcept {return restoreCurrent&&restoreCurrent(context);}
 };
+// Execute an independently state-restored opaque dashboard between the
+// body's opaque and transparent passes, without reinitializing the body.
+struct IsolatedMeshInterleave {
+    void* context=nullptr;
+    bool (*draw)(void*,bool&) noexcept=nullptr;
+};
 struct ExternalVehicleStageInput {
     // Native center matrices from the prepared player ticket. R7 derives
     // both eyes from its exact Quest eye-pair latch and the same pose FOV.
@@ -795,9 +801,12 @@ public:
                      std::uint64_t expectedPose=0,
                      unsigned embeddedGearMask=0u,
                      const IsolatedEyeRaster* isolated=nullptr,
-                     IsolatedMeshPass phase=IsolatedMeshPass::All) noexcept {
+                     IsolatedMeshPass phase=IsolatedMeshPass::All,
+                     const IsolatedMeshInterleave* between=nullptr) noexcept {
         GpuDrawResult result{};
         if(gpuBusy_||gpuRetirementDepth_)return result;
+        if(between&&(!isolated||!between->draw||phase!=IsolatedMeshPass::All||
+            role_!=SidecarRole::Vehicle))return result;
         // First-party safety gate, independent of whether R7/R30/R33
         // vtable hooks installed successfully. No whole-vehicle isolated
         // L/R color+depth stage and pair-atomic publication exists yet.
@@ -977,9 +986,18 @@ public:
         // these keys across an Apply, Reset, eye, or legacy hooked draw.
         D3DMATRIX lastWorld=world;
         unsigned lastMaterial=MaxMaterials;
-        bool lastGlass=false,passBound=false;
+        bool lastGlass=false,passBound=false,interleaveDirty=false;
         if(SUCCEEDED(hr))for(unsigned pass=phase==IsolatedMeshPass::GlassOnly?1u:0u;
-            pass<(phase==IsolatedMeshPass::OpaqueOnly?1u:2u)&&SUCCEEDED(hr);++pass)
+            pass<(phase==IsolatedMeshPass::OpaqueOnly?1u:2u)&&SUCCEEDED(hr);++pass) {
+          if(pass==1u&&between){
+            // The nested dashboard uses its own StateBlock and restores
+            // the body state. Any nested failure vetoes both private eyes.
+            if(!current()||!between->draw(between->context,interleaveDirty)||
+                interleaveDirty||!current()){hr=E_FAIL;break;}
+            // Rebind material/blend at the first glass mesh after the
+            // nested Apply; never reuse a material across an owner boundary.
+            lastMaterial=MaxMaterials;passBound=false;
+          }
           for(unsigned order=0;order<(pass?glassCount:meshes_.size());++order) {
             if(!current()){hr=E_FAIL;break;}
             const auto& m=meshes_[pass?glassOrder[order].index:order];
@@ -1069,6 +1087,7 @@ public:
                     !physical.deviceRestoreFailed;
             hr=stereoComplete?dipHr:E_FAIL;
             if(FAILED(hr))break;
+          }
         }
         const auto applySaved=[&]() {
             // A logical frame/pose change aborts raster but does not retire
@@ -1080,7 +1099,7 @@ public:
         const HRESULT restore=applySaved();
         saved->Release();
         if(isolated) {
-            const bool stateOk=SUCCEEDED(restore)&&restorable();
+            const bool stateOk=SUCCEEDED(restore)&&restorable()&&!interleaveDirty;
             result.receipt.stateRestored=stateOk;
             result.receipt.stateMayBeDirty=!stateOk;
             result.isolatedEyeComplete=stateOk&&current()&&SUCCEEDED(hr)&&

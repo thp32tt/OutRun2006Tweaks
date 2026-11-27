@@ -4731,25 +4731,25 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 [&](IDirect3DSurface9* s){return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,s);},
                 [&]() -> HRESULT {
                     if(!current())return E_FAIL;
-                    // All opaque parts (including animated instruments)
-                    // must populate color/depth before translucent body glass.
-                    const auto drawn=body.DrawNativeScene(device,input.world,eyeView[eye],
-                        eyeProjection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster,
-                        input.includeDashboard?IsolatedMeshPass::OpaqueOnly:IsolatedMeshPass::All);
-                    stateDirty=drawn.receipt.stateMayBeDirty;
-                    if(!drawn.isolatedEyeComplete||!current())return E_FAIL;
-                    if(input.includeDashboard){
+                    // Keep one body state block across opaque and glass.
+                    // The dashboard is independently saved/restored while
+                    // the same isolated eye attachments remain bound.
+                    auto drawDashboard=[&](bool& dirty) noexcept {
                         const auto overlay=dash.DrawNativeScene(device,input.world,eyeView[eye],
                             eyeProjection[eye],input.dashboard,body.HasEmbeddedSpeedAndRpm(),
                             input.nativeFrame,input.pose,body.EmbeddedGearMask(),&raster);
-                        stateDirty=stateDirty||overlay.receipt.stateMayBeDirty;
-                        if(!overlay.isolatedEyeComplete||!current())return E_FAIL;
-                        const auto glass=body.DrawNativeScene(device,input.world,eyeView[eye],
-                            eyeProjection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster,
-                            IsolatedMeshPass::GlassOnly);
-                        stateDirty=stateDirty||glass.receipt.stateMayBeDirty;
-                        if(!glass.isolatedEyeComplete||!current())return E_FAIL;
-                    }
+                        dirty=overlay.receipt.stateMayBeDirty;
+                        return overlay.isolatedEyeComplete&&current();
+                    };
+                    const IsolatedMeshInterleave between{&drawDashboard,
+                        [](void* context,bool& dirty) noexcept {
+                            return (*static_cast<decltype(drawDashboard)*>(context))(dirty);
+                        }};
+                    const auto drawn=body.DrawNativeScene(device,input.world,eyeView[eye],
+                        eyeProjection[eye],input.dashboard,0,input.nativeFrame,input.pose,0,&raster,
+                        IsolatedMeshPass::All,input.includeDashboard?&between:nullptr);
+                    stateDirty=drawn.receipt.stateMayBeDirty;
+                    if(!drawn.isolatedEyeComplete||!current())return E_FAIL;
                     return S_OK;
                 },eye,1,false);
             if(stateDirty||seeded==R7CandidateSeedResult::DirtyRestore)

@@ -256,7 +256,9 @@ jobs:
           seed_ready=r7[r7.index('bool R7NativeAssetsSeedReady('):r7.index('R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(')]
           assert 'camera->cam_mode_34A!=1' in seed_ready and 'MatchesFerrariSelection' in seed_ready
           assert 'DashboardCoverageComplete(needles,gears,' in seed_ready and 'HostDirectTransportReady()' in seed_ready
-          assert stage.index('IsolatedMeshPass::OpaqueOnly') < stage.index('dash.DrawNativeScene(') < stage.index('IsolatedMeshPass::GlassOnly')
+          assert stage.index('dash.DrawNativeScene(') < stage.index('const IsolatedMeshInterleave between') < stage.index('body.DrawNativeScene(')
+          assert 'IsolatedMeshPass::All,input.includeDashboard?&between:nullptr' in stage
+          assert native.index('pass==1u&&between') < native.index('between->draw(between->context,interleaveDirty)') < native.index('for(unsigned order=0;order<')
           assert 'input.publishCurrent(input)' in r7
           assert 'NativeEpochCounter.load(std::memory_order_acquire)!=input.nativeFrame' in source
           assert 'R7StagedVehicle={generation,boundary,epoch,input.nativeFrame,input.pose,input.player};' in stage
