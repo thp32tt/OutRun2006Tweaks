@@ -239,7 +239,8 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
     # Recover at most one uncertain receipt per ordinary poll. An unresolved
     # send is never submitted again; after three probes it remains an explicit HOLD.
     for tid,rec in records.items():
-        if rec.get("status")=="HOLD_SEND_UNCERTAIN" and rec.get("recovery_attempts",0)<3:
+        if (rec.get("status")=="HOLD_SEND_UNCERTAIN" and rec.get("recovery_attempts",0)<3
+            and not any(x.get("status") in ("SENT","CLAIMED") for x in records.values())):
             url=await recover_uncertain_receipt(bridge,byid[tid],rec,is_saved_chat_url)
             rec["recovery_attempts"]=rec.get("recovery_attempts",0)+1
             if url:
