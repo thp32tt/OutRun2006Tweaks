@@ -607,7 +607,7 @@ assert "ExecuteStereoDraw(device,call,true,true,true);" in iup
 assert "R7ExecuteRawCandidateVb(device,call,true);" in up
 assert "R7ExecuteRawCandidateVb(device,call,true,true);" in iup
 assert "InternalStereoPass&&!OutRunVR::DinoSidecar::ActiveExternalStereoMesh" in up and "InternalStereoPass&&!OutRunVR::DinoSidecar::ActiveExternalStereoMesh" in iup
-assert "[&](){return drawCall();},eye,1,false);" in source
+assert "[&](){return drawCall();},eye,1,false,omitRaster);" in source
 assert "if(changed&&TargetIsBackBuffer())ExternalAtomicReplayEpoch=0;" in source
 assert "ExternalAtomicReplayEpoch=0;" in clear
 
