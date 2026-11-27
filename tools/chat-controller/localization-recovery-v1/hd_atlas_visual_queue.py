@@ -178,6 +178,31 @@ def prompt_for(t):
             +json.dumps({k:t[k] for k in ("task_id","target","source_dds_sha256","candidate_dds_sha256","native_size","orientation","roi_count","painted_count","hold_count")},ensure_ascii=False)
             +"\nHOLD_SOURCE_ROIS="+json.dumps(rows,ensure_ascii=False))
 
+async def recover_uncertain_receipt(bridge,task,record,is_saved_chat_url):
+    """Read-only recovery: exact persisted marker + three attachments; never re-send."""
+    from controller_png_attach import verify_submission_receipt
+    try:
+        await bridge.ensure_context()
+        url=record.get("chat_url")
+        pages=list(bridge.context.pages)
+        if is_saved_chat_url(url):
+            page=next((p for p in pages if not p.is_closed() and p.url==url),None)
+            if page is None:
+                page=await bridge.page("C1",url,read_only=True)
+            pages=[page] if page is not None else []
+        # An old uncertain receipt may lack a URL. Inspect only currently open
+        # saved conversations, without navigation or creating another tab.
+        for pg in pages[:6]:
+            if pg.is_closed() or not is_saved_chat_url(pg.url):continue
+            receipt=await verify_submission_receipt(
+                pg,task["task_id"],[task["images"][k]["name"] for k in ("source","clean","final")],
+                timeout_ms=3000)
+            if receipt=="PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED":
+                return pg.url
+    except Exception:
+        pass
+    return None
+
 async def atlas_cycle(bridge,home,token,is_saved_chat_url):
     gh=bridge.gh
     pointer,_=await asyncio.to_thread(gh.read_json,QROOT+"/latest.json",BRANCH)
@@ -190,8 +215,8 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
     if state.get("run_id")!=pointer["run_id"] or state.get("manifest_sha256")!=pointer["manifest_sha256"]:
         raise ValueError("ATLAS_STATE_POINTER_MISMATCH")
     records=state["records"]
-    terminal={"DONE","HOLD_SEND_UNCERTAIN","HOLD_RESPONSE_TIMEOUT"}
-    if len(records)==104 and all(x.get("status") in terminal for x in records.values()):
+    terminal={"DONE","HOLD_RESPONSE_TIMEOUT"}
+    if len(records)==104 and all(x.get("status") in terminal or (x.get("status")=="HOLD_SEND_UNCERTAIN" and x.get("recovery_attempts",0)>=3) for x in records.values()):
         return None
     archive,doc=await asyncio.to_thread(fetch_evidence,pointer,home,token)
     byid={t["task_id"]:t for t in doc["tasks"]}
@@ -211,6 +236,16 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
                 await save()
                 if len(records)==104:
                     return {"status":"ATLAS_ALL_IDENTICAL_REVIEWS_REUSED","completed":104,"total":104}
+    # Recover at most one uncertain receipt per ordinary poll. An unresolved
+    # send is never submitted again; after three probes it remains an explicit HOLD.
+    for tid,rec in records.items():
+        if rec.get("status")=="HOLD_SEND_UNCERTAIN" and rec.get("recovery_attempts",0)<3:
+            url=await recover_uncertain_receipt(bridge,byid[tid],rec,is_saved_chat_url)
+            rec["recovery_attempts"]=rec.get("recovery_attempts",0)+1
+            if url:
+                rec.update(status="SENT",chat_url=url,receipt_recovered=True,wait_polls=0)
+            await save()
+            break
     for tid,rec in records.items():
         if rec.get("status")=="CLAIMED":
             # Crash between claim and verified send: never silently re-send.
@@ -252,6 +287,8 @@ async def atlas_cycle(bridge,home,token,is_saved_chat_url):
     elif outcome in ("HOLD_C1_IMAGE_TOOL_SELECTED","HOLD_COMPOSER_ATTACHMENTS_NOT_CLEAR","HOLD_CHAT_UPLOAD_NOT_VERIFIED","HOLD_CHAT_COMPOSER_MARKER_MISSING"):
         # These outcomes occur strictly before Enter; safe to retry next cycle.
         del records[tid]
-    else:rec.update(status="HOLD_SEND_UNCERTAIN",send_outcome=outcome)
+    else:
+        rec.update(status="HOLD_SEND_UNCERTAIN",send_outcome=outcome)
+        if is_saved_chat_url(pg.url):rec["chat_url"]=pg.url
     await save()
     return {"status":"ATLAS_"+outcome,"task_id":tid,"reviewed":reviewed,"completed":sum(x["status"]=="DONE" for x in records.values()),"total":104}
