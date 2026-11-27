@@ -11,6 +11,43 @@ HEAD=struct.Struct("<8s7I")
 GROUP=struct.Struct("<HHIII")
 VERT=struct.Struct("<8f")
 UV=struct.Struct("<2f")
+def uniform_albedo(dds):
+    """Conservative exact constant-color proof across the complete mip chain."""
+    if len(dds)<132 or dds[:4]!=b"DDS ":return False
+    kind=dds[84:88]
+    if kind==b"\0"*4:
+        return (struct.unpack_from("<6I",dds,84)==(0,32,0xff0000,0xff00,0xff,0xff000000)
+                and len(dds[128:])%4==0 and dds[128:]==dds[128:132]*((len(dds)-128)//4))
+    if kind not in (b"DXT1",b"DXT5"):return False
+    block=8 if kind==b"DXT1" else 16
+    if (len(dds)-128)%block:return False
+    color=alpha=None
+    for off in range(128,len(dds),block):
+        at=off+(8 if block==16 else 0)
+        c0,c1,indices=struct.unpack_from("<HHI",dds,at)
+        if c0!=c1 or (color is not None and c0!=color):return False
+        color=c0
+        if block==8:
+            if any((indices>>(2*i))&3==3 for i in range(16)):return False
+        else:
+            a0,a1=dds[off:off+2]
+            if a0!=a1 or (alpha is not None and a0!=alpha):return False
+            alpha=a0
+            bits=int.from_bytes(dds[off+2:off+8],"little")
+            for i in range(16):
+                index=(bits>>(3*i))&7
+                if (index==6 and a0!=0) or (index==7 and a0!=255):return False
+    return color is not None
+
+def constant_uv(groups, indices):
+    value=None
+    for i in indices:
+        for vertex in VERT.iter_unpack(groups[i]["vb"]):
+            uv=vertex[6:8]
+            if value is None:value=uv
+            elif uv!=value:return False
+    return value is not None
+
 def paired_charts(entries, groups):
     """Pair adjacent consistently wound, nearly planar triangles without overlap.
     Use exact shared vertex indices; leave seams, curved and unmatched faces separate.
@@ -177,8 +214,10 @@ def main(src,dst,mode="triangle"):
         n=struct.unpack_from("<I",raw,p)[0];p+=4
         dds=raw[p:p+n];p+=n
         if mat not in opaque or mat in glass:continue
-        if len(dds)<132 or dds[:4]!=b"DDS " or struct.unpack_from("<6I",dds,84)!=(0,32,0xff0000,0xff00,0xff,0xff000000) or len(dds[128:])%4 or dds[128:]!=dds[128:132]*((len(dds)-128)//4):continue
-        if all(all(v[6]==0 and v[7]==0 for v in VERT.iter_unpack(groups[i]["vb"])) for i in opaque[mat]):eligible.append(mat)
+        if not uniform_albedo(dds):continue
+        # A uniform nonzero source UV (e.g. F50 v=1) is equally
+        # nonfunctional. Preserve all nonconstant authored UV sets.
+        if constant_uv(groups,opaque[mat]):eligible.append(mat)
     if raw[p:p+8]!=b"OVCPBR3!":raise ValueError("PBR magic")
     p+=8
     for mat in range(nm):

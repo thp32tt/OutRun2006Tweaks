@@ -81,6 +81,41 @@ static std::vector<std::uint8_t> make_image(const Atlas& a,unsigned size){
  }
  return image;
 }
+// Exact flat-color proof for the preserved albedo. All BC mip blocks
+// must use equal color endpoints, and BC3 alpha must decode to one value.
+static bool uniform_albedo(const Texture& texture){
+ const auto& d=texture.dds;
+ if(d.size()<132)return false;
+ if(texture.format==TextureFormat::ARGB32){
+  if((d.size()-128)%4)return false;
+  for(size_t i=132;i<d.size();i+=4)
+   if(std::memcmp(d.data()+i,d.data()+128,4)!=0)return false;
+  return true;
+ }
+ const unsigned block=texture.format==TextureFormat::DXT1?8u:16u;
+ if((d.size()-128)%block)return false;
+ unsigned color=0,alpha=0;bool first=true;
+ for(size_t off=128;off<d.size();off+=block){
+  const auto* p=d.data()+off+(block==16u?8u:0u);
+  const unsigned c0=U16(p),c1=U16(p+2),indices=U32(p+4);
+  if(c0!=c1||(!first&&c0!=color))return false;
+  color=c0;
+  if(block==8u){
+   for(unsigned i=0;i<16;++i)if(((indices>>(2*i))&3u)==3u)return false;
+  }else{
+   const unsigned a0=d[off],a1=d[off+1];
+   if(a0!=a1||(!first&&a0!=alpha))return false;
+   alpha=a0;std::uint64_t bits=0;
+   for(unsigned i=0;i<6;++i)bits|=std::uint64_t(d[off+2+i])<<(8*i);
+   for(unsigned i=0;i<16;++i){
+    const auto index=(bits>>(3*i))&7u;
+    if((index==6u&&a0!=0u)||(index==7u&&a0!=255u))return false;
+   }
+  }
+  first=false;
+ }
+ return !first;
+}
 // Dedicated mode for the generated per-triangle diagnostic atlas. Each
 // actual opaque face has its own tile. Fill the entire tile with its
 // geometry-derived AO, including the gutter, rather than undersampling
@@ -88,11 +123,7 @@ static std::vector<std::uint8_t> make_image(const Atlas& a,unsigned size){
 template<class GridPos>
 static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,GridPos gridPos,bool paired=false,bool patches=false){
  const auto& texture=m.textures[material];
- const auto& base=texture.dds;
- if(texture.format!=TextureFormat::ARGB32||base.size()<132||
-    (base.size()-128)%4||!m.pbrMaterials[material].normal.dds.empty())return {};
- for(size_t i=132;i<base.size();i+=4)
-  if(std::memcmp(base.data()+i,base.data()+128,4)!=0)return {};
+ if(!uniform_albedo(texture)||!m.pbrMaterials[material].normal.dds.empty())return {};
  struct Sample {const Vertex *a,*b,*c;V face;};
  std::vector<Sample> samples;
  for(const auto& mesh:m.meshes)if(mesh.material==material){

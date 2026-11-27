@@ -126,6 +126,30 @@ with tempfile.TemporaryDirectory() as tmp:
  subprocess.run([str(exe),str(uv),str(ao),"patch-atlas"],check=True)
  assert ao.stat().st_size>uv.stat().st_size
  assert src.read_bytes()==strip
+ # The source may encode a solid color as BC3; all mip blocks must
+ # remain byte-identical and all UVs must be constant before rebuilding.
+ raw,off=make([(b"EXT_OPAQUE_00",((0,1),(0,1),(0,1)))])
+ nlen=struct.unpack_from("<H",raw,36)[0];start=52+nlen+3*32+6
+ oldlen=struct.unpack_from("<I",raw,start)[0]
+ bc=bytearray(raw[start+4:start+4+128])
+ struct.pack_into("<II",bc,12,4,4)
+ struct.pack_into("<I",bc,80,4)
+ bc[84:88]=b"DXT5";bc[88:108]=bytes(20)
+ bc.extend(bytes.fromhex("ffffffffffffffff8a528a5200000000"))
+ payload=raw[36:start]+struct.pack("<I",len(bc))+bc+raw[start+4+oldlen:]
+ raw=b"OVRCABH4"+struct.pack("<7I",4,1,1,3,1,len(payload),zlib.crc32(payload))+payload
+ src=root/"constant_bc3.ovc";uv=root/"constant_bc3_uv.ovc";ao=root/"constant_bc3_ao.ovc";src.write_bytes(raw)
+ subprocess.run(["python3",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.py"),
+                 str(src),str(uv),"paired"],check=True)
+ assert uv.read_bytes()[start:]==raw[start:]
+ subprocess.run([str(exe),str(uv),str(ao),"paired-atlas"],check=True)
+ assert ao.stat().st_size>uv.stat().st_size and src.read_bytes()==raw
+ # A varying alpha selector in a constant-endpoint block is NOT uniform.
+ invalid=bytearray(raw);invalid[start+4+128]=128;invalid[start+4+129]=128;invalid[start+4+130]=248
+ struct.pack_into("<I",invalid,32,zlib.crc32(invalid[36:]))
+ bad=root/"nonuniform_bc3.ovc";bad.write_bytes(invalid)
+ assert subprocess.run(["python3",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.py"),
+     str(bad),str(root/"bad_bc3_uv.ovc"),"paired"],capture_output=True).returncode!=0
  # Compile the same production baker with a small test-only budget.
  # No giant synthetic OVC or memory-heavy GPU test is needed.
  harness=root/"budget.cpp"
