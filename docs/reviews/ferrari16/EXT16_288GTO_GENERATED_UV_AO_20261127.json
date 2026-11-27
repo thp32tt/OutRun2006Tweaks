@@ -1,0 +1,28 @@
+{
+  "status": "PRIVATE_DIAGNOSTIC_ASSET_NATIVE_PARSE_PASS_NOT_RELEASE_INSTALL",
+  "source_sha256": "90dfa8488e86f8faa43c5b511564a03b9a29ecc62c42a3d7c09e8e5e65c70c20",
+  "uv_sha256": "68fc1716a8fc7039d1c4bf02ff4b11540388ff61549ffd72865456d4e5df0e1b",
+  "output_sha256": "94eca13e65790cddff556cb0b167b37290ac28018680395fd43dd4c4677b9dcf",
+  "output_bytes": 17913663,
+  "triangles": 52528,
+  "source_vertices": 74538,
+  "output_vertices": 106768,
+  "groups": 27,
+  "generated_uv_materials": 6,
+  "generated_orm": 6,
+  "existing_opaque_orm": 1,
+  "missing_opaque_orm": 0,
+  "missing_normal": 7,
+  "glass_triangles": 14482,
+  "partial_uv_materials": 4,
+  "source_geometry_corner_bytes_preserved": true,
+  "material_tail_preserved": true,
+  "native_parse": "PASS",
+  "quest3": "UNTESTED",
+  "private_file": "ext16_288gto_paired_20261127/car_id_07_paired_ao.ovc",
+  "limitations": [
+    "Generated diagnostic UV and geometry AO are not source-authored normal/roughness/metallic maps.",
+    "Four partial-UV materials remain; no performance or Quest3 acceptance claimed.",
+    "No release installation or third-party asset committed."
+  ]
+}
