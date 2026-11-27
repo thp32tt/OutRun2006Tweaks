@@ -19,10 +19,10 @@ CAR_IDS = dict(zip(("dino246gts","daytona365","f50","360spider","f355spider",
     "575superamerica","testarossa","288gto","328gts","250gto","512bb","f40",
     "550barchetta","f430","enzo","f430spider"), (*range(15),28)))
 def sha(b): return hashlib.sha256(b).hexdigest()
-def add(a,b): return tuple(x+y for x,y in zip(a,b))
-def sub(a,b): return tuple(x-y for x,y in zip(a,b))
-def scale(a,s): return tuple(x*s for x in a)
-def dot(a,b): return sum(x*y for x,y in zip(a,b))
+def add(a,b): return (a[0]+b[0],a[1]+b[1],a[2]+b[2])
+def sub(a,b): return (a[0]-b[0],a[1]-b[1],a[2]-b[2])
+def scale(a,s): return (a[0]*s,a[1]*s,a[2]*s)
+def dot(a,b): return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]
 def cross(a,b): return (a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0])
 def unit(a):
     n=math.sqrt(dot(a,a))
@@ -73,11 +73,11 @@ def ao_at(p,n,occupied,cell):
     # the containing voxel to reduce self-occlusion from the sampled face.
     t=unit(cross(n,(1,0,0) if abs(n[0])<.8 else (0,1,0)))
     b=cross(n,t);hits=0
-    for k in range(6):
-        a=k*math.pi/3
-        direction=add(scale(n,.8),add(scale(t,.6*math.cos(a)),scale(b,.6*math.sin(a))))
+    px,py,pz=p
+    for ca,sa in ((1.,0.),(.5,.8660254),(-.5,.8660254),(-1.,0.),(-.5,-.8660254),(.5,-.8660254)):
+        dx,dy,dz=add(scale(n,.8),add(scale(t,.6*ca),scale(b,.6*sa)))
         for step in (1.5,2.5,3.5,4.5,5.5):
-            if cell(add(p,scale(direction,step))) in occupied:
+            if (math.floor(px+dx*step),math.floor(py+dy*step),math.floor(pz+dz*step)) in occupied:
                 hits+=1;break
     return round(255*(1-.55*hits/6))
 def dds(ao):
@@ -104,7 +104,7 @@ def bake(data,size=128):
     if extent<=1e-6:raise ValueError("degenerate bounds")
     voxel=extent/48
     def normalized(p):return tuple((p[k]-lo[k])/voxel for k in range(3))
-    def cell(p):return tuple(math.floor(x) for x in p)
+    def cell(p):return (math.floor(p[0]),math.floor(p[1]),math.floor(p[2]))
     occupied=set()
     norm_tris=[]
     for mat,a,b,c,n,uv in tris:
