@@ -162,23 +162,57 @@ def bake(data,size=128):
         assert data[a:b]==result[x:y]
         if m:assert data[b:c]==result[y:z]
     return result,{"generated":len(report),"existing":len(records)-len(missing),"missing_after":len(missing)-len(report),"skipped_uv_triangles":skipped,"materials":report,"geometry_voxels":len(occupied)}
+def verify_existing(source, output):
+    _,a,old,end_a=parse(source); _,b,new,end_b=parse(output)
+    if source[:28]!=output[:28] or source[36:a]!=output[36:b] or source[end_a:]!=output[end_b:] or len(old)!=len(new):
+        raise ValueError("existing output geometry/albedo/tail mismatch")
+    report=[]
+    existing=missing=0
+    for i,((x,y,z,orm),(p,q,r,packed)) in enumerate(zip(old,new)):
+        if source[x:y]!=output[p:q] or (orm and source[y:z]!=output[q:r]):
+            raise ValueError("existing output source material mismatch")
+        if orm: existing+=1;continue
+        if not packed:missing+=1;continue
+        if packed[:4]!=b"DDS " or u32(packed,84)!=0 or u32(packed,88)!=32:
+            raise ValueError("existing output unexpected DDS")
+        width,height=u32(packed,16),u32(packed,12)
+        if width!=height or width not in (64,128,256) or u32(packed,28)!=width.bit_length():
+            raise ValueError("existing output mip shape")
+        expected=128;dim=width
+        while dim:
+            expected+=dim*dim*4;dim//=2
+        if expected!=len(packed) or any(v!=255 for offset in (0,1,3) for v in packed[128+offset::4]):
+            raise ValueError("existing output neutral channels/size")
+        pixels=packed[130:128+width*height*4:4]
+        report.append({"material":i,"covered_pixels":None,"ao_range":[min(pixels),max(pixels)]})
+    return {"generated":len(report),"existing":existing,"missing_after":missing,
+        "skipped_uv_triangles":None,"materials":report,"geometry_voxels":None,
+        "resumed_verified":True}
 def main():
     ap=argparse.ArgumentParser();ap.add_argument("--root",type=Path,required=True);ap.add_argument("--out",type=Path,required=True)
-    ap.add_argument("--size",type=int,choices=(64,128,256),default=128);ap.add_argument("--car",choices=sorted(CAR_IDS))
+    ap.add_argument("--size",type=int,choices=(64,128,256),default=128);ap.add_argument("--car",choices=sorted(CAR_IDS));ap.add_argument("--resume",action="store_true")
     args=ap.parse_args()
-    if args.out.exists():raise SystemExit("output directory must be new")
-    args.out.mkdir(parents=True)
+    if args.out.exists() and not args.resume:raise SystemExit("output directory must be new")
+    args.out.mkdir(parents=True,exist_ok=args.resume)
     results=[]
     for name,id in CAR_IDS.items():
         if args.car and args.car!=name:continue
         paths=list((args.root/name).glob("*.ovc"))
         if len(paths)!=1:raise ValueError("ambiguous/missing source "+name)
-        source=paths[0].read_bytes();output,report=bake(source,args.size)
-        target=args.out/("car_id_%02d.ovc"%id)
-        target.write_bytes(output)
+        source=paths[0].read_bytes();target=args.out/("car_id_%02d.ovc"%id)
+        if target.exists():
+            if not args.resume:raise ValueError("output already exists")
+            output=target.read_bytes();report=verify_existing(source,output)
+        else:
+            output,report=bake(source,args.size)
+            temp=target.with_suffix(".ovc.part")
+            temp.write_bytes(output);temp.replace(target)
         result={"car":name,"car_id":id,"input_sha256":sha(source),"output_sha256":sha(output),"bytes":len(output),**report}
         results.append(result)
         print(name,"ORM",report["generated"],"unresolved",report["missing_after"],flush=True)
+        partial=args.out/"geometry_orm_progress.json"
+        temp=partial.with_suffix(".json.part")
+        temp.write_text(json.dumps(results,indent=2)+"\n");temp.replace(partial)
     manifest={"method":"GEOMETRY_VOXEL_AO_APPROXIMATION","size":args.size,"roughness_metallic":"AUTHORED_SCALAR_FACTORS_NEUTRAL_MAP_MULTIPLIERS","source_quality":"NOT_PROMOTED","cars":results}
     (args.out/"geometry_orm_report.json").write_text(json.dumps(manifest,indent=2)+"\n")
 if __name__=="__main__":main()

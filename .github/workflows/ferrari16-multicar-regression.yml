@@ -338,7 +338,8 @@ jobs:
           test=Path('tests/external_car_runtime_policy_test.cpp').read_text()
           runner=Path('tools/ferrari16/RUN-FERRARI16-V003-PBR-TRACE.cmd').read_text()
           assert 'PbrExternalStereoProbeActive()' in gpu
-          assert source.count('PbrExternalStereoProbeActive()')==3
+          assert source.count('PbrExternalStereoProbeActive()')==4
+          assert 'PbrExternalStereoProbeActive(),' in model and 'body.SafeFloorLift(' in model
           assert 'fixedFunctionStereoA_B || pbrStereoDiagnostic' in policy
           assert 'for(int pbr=0;pbr<2;++pbr)' in test
           assert 'OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST=0' in runner
