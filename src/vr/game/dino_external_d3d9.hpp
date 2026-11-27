@@ -393,6 +393,7 @@ class GpuOwner final {
             // Run file IO, CRC and parsing away from the native player Draw.
             // Worker accesses only local path/model values, never live game
             // state or D3D9 device resources.
+            try {
             const std::wstring pathCopy(path);
             const bool batchOpaque=role_==SidecarRole::Vehicle;
             cpuLoad_=std::async(std::launch::async,[pathCopy,batchOpaque]() -> CpuLoad {
@@ -412,6 +413,7 @@ class GpuOwner final {
                             IsAoOnlyBgraPixels(map.dds.data()+128u,map.dds.size()-128u);
                     }
                     if(batchOpaque)BatchExternalOpaqueMeshes(result.model);
+                    DeduplicateExternalVertices(result.model);
                     float lowest=10000.f;
                     for(const auto& mesh:result.model.meshes) {
                         IndexedMeshBounds bounds{};
@@ -430,6 +432,12 @@ class GpuOwner final {
                 return result;
             });
             preparation_=Preparation::Reading;
+            }catch(...){
+                // Thread/resource exhaustion must become a visible stock
+                // fallback, not a permanently attempted but COLD selection.
+                preparation_=Preparation::Failed;
+                cpuLoadFailure_="OVC_CPU_WORKER_START_FAILED";
+            }
             return false;
         }
         if(!cpuLoad_.valid())return false;

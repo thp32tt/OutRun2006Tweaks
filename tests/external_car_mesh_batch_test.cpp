@@ -38,5 +38,25 @@ int main(){
     assert(BatchExternalOpaqueMeshes(legacy)==0&&legacy.meshes.size()==10);
     Model invalid=original;invalid.dashboardBindings[0].meshIndex=999;
     assert(BatchExternalOpaqueMeshes(invalid)==0&&invalid.meshes.size()==10);
+    // Identical vertices from adjacent meshes can share one VB entry;
+    // each triangle corner remains bit-identical, including signed zero.
+    auto compact=m;const auto before=compact;
+    const auto removed=DeduplicateExternalVertices(compact);
+    assert(removed==9&&compact.vertices==21&&compact.triangles==10);
+    for(unsigned i=0;i<compact.meshes.size();++i){
+        const auto& a=before.meshes[i];const auto& b=compact.meshes[i];
+        assert(a.indices.size()==b.indices.size()&&a.material==b.material&&
+               a.name==b.name&&a.index32==b.index32);
+        for(unsigned j=0;j<a.indices.size();++j)
+            assert(std::memcmp(&a.vertices[a.indices[j]],&b.vertices[b.indices[j]],sizeof(Vertex))==0);
+    }
+    assert(compact.dashboardBindings[0].meshIndex==before.dashboardBindings[0].meshIndex);
+    assert(DeduplicateExternalVertices(compact)==0);
+    Model seam{};seam.highQuality=true;seam.vertices=6;seam.triangles=2;
+    auto sm=mesh("seam",0);
+    for(unsigned i=0;i<3;++i)sm.vertices.push_back(sm.vertices[i]);
+    sm.vertices[3].u=.5f;sm.vertices[4].nx=.5f;sm.vertices[5].x=-0.f;
+    sm.indices={0,1,2,3,4,5};seam.meshes.push_back(sm);
+    assert(DeduplicateExternalVertices(seam)==0&&seam.vertices==6);
     std::cout<<"EXTERNAL_LOSSLESS_OPAQUE_BATCH_PASS\n";
 }
