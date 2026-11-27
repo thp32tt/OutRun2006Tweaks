@@ -92,6 +92,21 @@ static std::vector<std::uint8_t> Make(bool goodAxis=true,
 }
 
 int main() {
+    const std::uint8_t crcVector[]{'1','2','3','4','5','6','7','8','9'};
+    assert(Crc32(crcVector,sizeof(crcVector))==0xcbf43926u);
+    assert(Crc32(nullptr,0)==0u);
+    // Independent slow reference over every byte and many prefix lengths.
+    std::array<std::uint8_t,1024> crcData{};
+    std::uint32_t random=0x13579bdfu;
+    for(auto& byte:crcData){random=random*1664525u+1013904223u;byte=static_cast<std::uint8_t>(random>>24);}
+    for(std::size_t len=0;len<=crcData.size();++len){
+        std::uint32_t expected=0xffffffffu;
+        for(std::size_t i=0;i<len;++i){
+            expected^=crcData[i];
+            for(unsigned bit=0;bit<8;++bit)expected=(expected>>1)^(0xedb88320u&(0u-(expected&1u)));
+        }
+        assert(Crc32(crcData.data(),len)==~expected);
+    }
     static_assert(MaxMaterials==128,"external HQ material budget regression");
     std::string error;Model model;
     Texture compressedTexture;

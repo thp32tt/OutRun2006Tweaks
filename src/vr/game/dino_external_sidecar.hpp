@@ -87,12 +87,21 @@ inline float F32(const std::uint8_t* p) noexcept {
 inline bool Bounds(std::size_t p,std::size_t n,std::size_t limit) noexcept {
     return p<=limit && n<=limit-p;
 }
-inline unsigned Crc32(const std::uint8_t* p,std::size_t size) noexcept {
-    unsigned c=0xffffffffu;
-    for(std::size_t i=0;i<size;++i){
-        c^=p[i];
-        for(unsigned j=0;j<8;++j)c=(c>>1)^(0xedb88320u&(0u-(c&1u)));
+// Exact IEEE CRC32, table generated at compile time. Large OVC assets are
+// parsed on the worker; do not pay eight polynomial steps per byte.
+constexpr std::array<std::uint32_t,256> MakeOvcCrc32Table() noexcept {
+    std::array<std::uint32_t,256> table{};
+    for(unsigned i=0;i<table.size();++i){
+        std::uint32_t c=i;
+        for(unsigned bit=0;bit<8;++bit)c=(c>>1)^(0xedb88320u&(0u-(c&1u)));
+        table[i]=c;
     }
+    return table;
+}
+inline constexpr auto OvcCrc32Table=MakeOvcCrc32Table();
+inline unsigned Crc32(const std::uint8_t* p,std::size_t size) noexcept {
+    std::uint32_t c=0xffffffffu;
+    for(std::size_t i=0;i<size;++i)c=(c>>8)^OvcCrc32Table[(c^p[i])&0xffu];
     return ~c;
 }
 inline bool ParseDds(const std::uint8_t* d,std::size_t size,Texture& out,bool legacy) {
