@@ -473,5 +473,30 @@
     "release_install": false,
     "hmd": "UNTESTED",
     "note": "Actual private paired chart UV and AO rebuilt. Original position/normal per indexed corner, source triangle order and material tail preserved by converter. Native parser passed. No authored UV/normal maps invented; no LOD reduction."
+  },
+  "lossless_compact_revision": {
+    "source_sha256": "b4687a631d417a788108e0f52afbffd04775040eeae7715e9426cba6b59aa05d",
+    "output_sha256": "820abcd89f26d6dd2e6432644cada57aa477476490348861d38732224d46d78a",
+    "private_path": "ext16_f40_paired_v2_20261127/car_id_11_paired_compact_ao.ovc",
+    "source_vertices": 390753,
+    "vertices": 390702,
+    "triangles": 171765,
+    "groups": 42,
+    "glass_triangles": 2261,
+    "narrowed_groups": 41,
+    "source_bytes": 35810249,
+    "bytes": 35144231,
+    "bytes_saved": 666018,
+    "all_indexed_corner_bytes_preserved": true,
+    "all_material_and_dashboard_tail_bytes_preserved": true,
+    "native_parser": "PASS",
+    "missing_opaque_normal_maps": 28,
+    "missing_opaque_orm_maps": 0,
+    "source_runtime_optimization_commit": "25197ec28d54971710f417577c4ce85246b48cb1",
+    "patch_atlas_implementation": "bfab58e7c3f002d047d25b7e5fe4b59a4b647dd2",
+    "hybrid_atlas_implementation": "afd1225d0d64029fbd62d837e30a6b986c4c62fa",
+    "patch_hybrid_real_asset_status": "TIMEOUT_NO_PROMOTION; two 120s and one 150s N100 runs ended before complete conversion; small synthetic fixture CI PASS",
+    "hmd": "UNTESTED",
+    "release_install": false
   }
 }
