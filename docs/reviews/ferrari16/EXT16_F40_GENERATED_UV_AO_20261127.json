@@ -450,5 +450,28 @@
     "Vertex count increases from 112462 to 510483, so not a P3 performance pass; mip bleeding and visual calibration require further work.",
     "No installed asset overwritten, no third-party binary uploaded, no HMD/FPS test.",
     "Exact 328 GTS candidate still unavailable; 308 donor not silently substituted."
-  ]
+  ],
+  "paired_atlas_revision": {
+    "source_code": "6806f0ba869013f4da630500d8c094cf796dc476",
+    "source_ovc_sha256": "c15e3fb298ee9f3c4bc8c2f28dba7d1d72ae04c2b7f97277dd29c3e97f6bbeb8",
+    "uv_sha256": "d056a12c220aacf4e0b306427494df6fd2d592234e5cae983869b0bc12a176b0",
+    "ao_sha256": "b4687a631d417a788108e0f52afbffd04775040eeae7715e9426cba6b59aa05d",
+    "private_path": "ext16_f40_paired_v2_20261127/car_id_11_paired_ao.ovc",
+    "vertices": 390753,
+    "previous_generated_vertices": 510483,
+    "source_vertices": 112462,
+    "triangles": 171765,
+    "paired_charts": 59865,
+    "generated_opaque_orm": 28,
+    "collapsed_nondegenerate_uv_triangles": 0,
+    "output_bytes": 35810249,
+    "native_parser": "PASS",
+    "glass_triangles": 2261,
+    "missing_normal_maps": 28,
+    "missing_orm_maps": 0,
+    "legacy_absolute_threshold_partial_uv_materials": 6,
+    "release_install": false,
+    "hmd": "UNTESTED",
+    "note": "Actual private paired chart UV and AO rebuilt. Original position/normal per indexed corner, source triangle order and material tail preserved by converter. Native parser passed. No authored UV/normal maps invented; no LOD reduction."
+  }
 }

@@ -223,10 +223,19 @@ static Bytes bake(const Bytes& input,unsigned size,
   for(size_t i=0;i<mesh.indices.size();i+=3){
    if(atlas.capped||atlas.skipped)break;
    const auto &a=mesh.vertices[mesh.indices[i]],&b=mesh.vertices[mesh.indices[i+1]],&c=mesh.vertices[mesh.indices[i+2]];
-   double du=b.u-a.u,dv=b.v-a.v,eu=c.u-a.u,ev=c.v-a.v,det=du*ev-dv*eu;
-   V n=unit(normal(a)+normal(b)+normal(c)),face=unit(cross(pos(b)-pos(a),pos(c)-pos(a)));
-   if(std::abs(det)<=1e-7||dot(face,face)<.5){++atlas.skipped;continue;}
-   if(dot(n,n)<.5)n=face;
+   const V geometric=cross(pos(b)-pos(a),pos(c)-pos(a));
+   const double geomSq=dot(geometric,geometric);
+   // A truly zero-area helper never rasterizes; preserve its source
+   // bytes but do not veto AO for drawable faces of the same material.
+   if(!(geomSq>0.))continue;
+   const double du=double(b.u)-a.u,dv=double(b.v)-a.v,
+       eu=double(c.u)-a.u,ev=double(c.v)-a.v,det=du*ev-dv*eu;
+   // Relative UV conditioning, not an absolute area threshold. Tiny
+   // well-conditioned charts are legitimate (sample centroid if subpixel).
+   const double energy=(du*du+dv*dv)*(eu*eu+ev*ev);
+   if(!(energy>1e-30)||!(det*det>energy*1e-8)){++atlas.skipped;continue;}
+   V n=unit(normal(a)+normal(b)+normal(c));
+   if(dot(n,n)<.5)n=geometric*(1./std::sqrt(geomSq));
    double xmin=std::min({double(a.u),double(b.u),double(c.u)}),xmax=std::max({double(a.u),double(b.u),double(c.u)});
    double ymin=std::min({double(a.v),double(b.v),double(c.v)}),ymax=std::max({double(a.v),double(b.v),double(c.v)});
    if(std::floor(xmax)-std::floor(xmin)>4||std::floor(ymax)-std::floor(ymin)>4){++atlas.skipped;continue;}

@@ -33,6 +33,8 @@ with tempfile.TemporaryDirectory() as tmp:
   ("mixed_invalid_first",[(b"EXT_OPAQUE_00",((0,0),(0,0),(0,0))),(b"EXT_OPAQUE_01",((0,0),(1,0),(0,1)))],False,False),
   ("mixed_excessive_wrap",[(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1))),(b"EXT_OPAQUE_01",((0,0),(6,0),(0,1)))],False,False),
   ("wrapped_valid",[(b"EXT_OPAQUE_00",((-1,-1),(0,-1),(-1,0)))],False,True),
+  ("tiny_orthogonal",[(b"EXT_OPAQUE_00",((0,0),(1e-5,0),(0,1e-5)))],False,True),
+  ("near_parallel",[(b"EXT_OPAQUE_00",((0,0),(1,0),(1,1e-6)))],False,False),
   ("shared",[(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1))),(b"EXT_GLASS_00",((0,0),(1,0),(0,1)))],False,False),
   ("authored",[(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1)))],True,False),
  ]:
@@ -68,6 +70,16 @@ with tempfile.TemporaryDirectory() as tmp:
   assert src.read_bytes()==data and result[36:off]==data[36:off]
   if expected:assert struct.unpack_from("<I",result,off)[0]>0
   else:assert result==data
+ # A zero-area helper in an otherwise drawable mesh is not a UV failure.
+ raw,off=make([(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1)))])
+ nlen=struct.unpack_from("<H",raw,36)[0];start=52+nlen
+ payload=bytearray(raw[36:start+3*32+6]+struct.pack("<3H",0,0,0)+raw[start+3*32+6:])
+ struct.pack_into("<I",payload,8,6)
+ raw=b"OVRCABH4"+struct.pack("<7I",4,1,1,3,2,len(payload),zlib.crc32(payload))+payload
+ src=root/"helper_triangle.ovc";dst=root/"helper_triangle_ao.ovc";src.write_bytes(raw)
+ subprocess.run([str(exe),str(src),str(dst),"64"],check=True)
+ assert dst.stat().st_size>src.stat().st_size
+ assert src.read_bytes()==raw
  # Real two-face chart from a planar indexed quad; preserve vertex sharing,
  # reject overlap in the paired baker and keep the default triangle mode.
  raw,off=make([(b"EXT_OPAQUE_00",((0,0),(0,0),(0,0)))])
