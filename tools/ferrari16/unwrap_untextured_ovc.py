@@ -21,22 +21,33 @@ def uniform_albedo(dds):
     if kind not in (b"DXT1",b"DXT5"):return False
     block=8 if kind==b"DXT1" else 16
     if (len(dds)-128)%block:return False
+    height,width=struct.unpack_from("<II",dds,12)
+    mips=struct.unpack_from("<I",dds,28)[0]
+    if not (0<width<=2048 and 0<height<=2048 and 0<mips<=max(width,height).bit_length()):return False
     color=alpha=None
-    for off in range(128,len(dds),block):
-        at=off+(8 if block==16 else 0)
-        c0,c1,indices=struct.unpack_from("<HHI",dds,at)
-        if c0!=c1 or (color is not None and c0!=color):return False
-        color=c0
-        if block==8:
-            if any((indices>>(2*i))&3==3 for i in range(16)):return False
-        else:
-            a0,a1=dds[off:off+2]
-            if a0!=a1 or (alpha is not None and a0!=alpha):return False
-            alpha=a0
-            bits=int.from_bytes(dds[off+2:off+8],"little")
-            for i in range(16):
-                index=(bits>>(3*i))&7
-                if (index==6 and a0!=0) or (index==7 and a0!=255):return False
+    off=128
+    for level in range(mips):
+        w,h=max(1,width>>level),max(1,height>>level)
+        for by in range(0,h,4):
+            for bx in range(0,w,4):
+                if off+block>len(dds):return False
+                at=off+(8 if block==16 else 0)
+                c0,c1,indices=struct.unpack_from("<HHI",dds,at)
+                if c0!=c1 or (color is not None and c0!=color):return False
+                color=c0
+                valid=[y*4+x for y in range(min(4,h-by)) for x in range(min(4,w-bx))]
+                if block==8:
+                    if any((indices>>(2*i))&3==3 for i in valid):return False
+                else:
+                    a0,a1=dds[off:off+2]
+                    if a0!=a1 or (alpha is not None and a0!=alpha):return False
+                    alpha=a0
+                    bits=int.from_bytes(dds[off+2:off+8],"little")
+                    for i in valid:
+                        index=(bits>>(3*i))&7
+                        if (index==6 and a0!=0) or (index==7 and a0!=255):return False
+                off+=block
+    if off!=len(dds):return False
     return color is not None
 
 def constant_uv(groups, indices):

@@ -150,6 +150,17 @@ with tempfile.TemporaryDirectory() as tmp:
  bad=root/"nonuniform_bc3.ovc";bad.write_bytes(invalid)
  assert subprocess.run(["python3",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.py"),
      str(bad),str(root/"bad_bc3_uv.ovc"),"paired"],capture_output=True).returncode!=0
+ # Actual 16x16 BC3 flat gray mip chain with transparent out-of-bounds
+ # selectors in the 2x2 and 1x1 levels, matching private car assets.
+ padded=bytearray(bc[:128]);struct.pack_into("<II",padded,12,16,16);struct.pack_into("<I",padded,28,5)
+ padded.extend(bytes.fromhex("ffffffffffffffff8a528a5200000000")*21)
+ padded.extend(bytes.fromhex("ffffbffddbb66ddb8a528a5200000000ffffb76ddbb66ddb8a528a5200000000"))
+ payload=raw[36:start]+struct.pack("<I",len(padded))+padded+raw[start+4+len(bc):]
+ fixture=b"OVRCABH4"+struct.pack("<7I",4,1,1,3,1,len(payload),zlib.crc32(payload))+payload
+ src=root/"padded_bc3.ovc";uv=root/"padded_bc3_uv.ovc";ao=root/"padded_bc3_ao.ovc";src.write_bytes(fixture)
+ subprocess.run(["python3",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.py"),str(src),str(uv),"patch"],check=True)
+ subprocess.run([str(exe),str(uv),str(ao),"patch-atlas"],check=True)
+ assert ao.stat().st_size>uv.stat().st_size and src.read_bytes()==fixture
  # Compile the same production baker with a small test-only budget.
  # No giant synthetic OVC or memory-heavy GPU test is needed.
  harness=root/"budget.cpp"
