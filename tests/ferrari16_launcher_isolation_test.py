@@ -13,6 +13,8 @@ LAUNCHERS = (
     "RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd",
     "RUN-FERRARI16-V003-MODEL-OFF.cmd",
     "RUN-FERRARI16-V003-PBR-TRACE.cmd",
+    "RUN-FERRARI16-V003-ALL-CARS-PBR-TRACE.cmd",
+    "RUN-FERRARI16-V003-MODEL-OFF-TRACE.cmd",
 )
 MARKER = 'if not exist "%~dp0.ferrari16-isolated.json"'
 EXPECTED = {
@@ -20,6 +22,8 @@ EXPECTED = {
     "RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd": "-VR.ExternalFerrariTest=true",
     "RUN-FERRARI16-V003-MODEL-OFF.cmd": "-VR.ExternalFerrariTest=false",
     "RUN-FERRARI16-V003-PBR-TRACE.cmd": "OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=1",
+    "RUN-FERRARI16-V003-ALL-CARS-PBR-TRACE.cmd": "OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=1",
+    "RUN-FERRARI16-V003-MODEL-OFF-TRACE.cmd": "-VR.ExternalFerrariTest=false",
 }
 
 def is_isolated_launcher(source):
@@ -241,7 +245,7 @@ class LauncherIsolationTest(unittest.TestCase):
     def test_probe_modes_ignore_inherited_environment(self):
         fixed = "OUTRUN_VR_EXTERNAL_FIXED_FUNCTION_TEST"
         pbr = "OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST"
-        expected = ((1, 0), (1, 0), (0, 0), (0, 1))
+        expected = ((1, 0), (1, 0), (0, 0), (0, 1), (0, 1), (0, 0))
         for name, vr_expected in zip(LAUNCHERS, expected):
             source = (ROOT / name).read_text(encoding="utf-8")
             for f in (0, 1):
@@ -300,6 +304,20 @@ class LauncherIsolationTest(unittest.TestCase):
         self.assertIn("-VR.F50ExternalModel=false", vr)
         self.assertIn("-VR.ExternalFerrariNativeCallbackReplacement=true", vr)
         self.assertIn("OUTRUN_VR_EXTERNAL_PBR_STEREO_TEST=1", vr)
+
+    def test_matched_all_car_gpu_trace_pair(self):
+        for name, scene, enabled in (
+            ("RUN-FERRARI16-V003-ALL-CARS-PBR-TRACE.cmd", "FERRARI16_PBR_ON", True),
+            ("RUN-FERRARI16-V003-MODEL-OFF-TRACE.cmd", "FERRARI16_STOCK_OFF", False)):
+            source=(ROOT / name).read_text(encoding="utf-8")
+            flat=source.split(":MODE_2D\n",1)[1].split(":MODE_VR\n",1)[0]
+            vr=source.split(":MODE_VR\n",1)[1].split("\n:CHECK_HOST",1)[0]
+            self.assertIn('set "OUTRUN_VR_GPU_PROFILE=0"',flat)
+            self.assertIn('set "OUTRUN_VR_GPU_PROFILE=1"',vr)
+            self.assertIn('set "OUTRUN_VR_GPU_SCENE='+scene+'"',vr)
+            self.assertIn("-VR.FileLogging=true",vr)
+            self.assertIn("-VR.ExternalFerrariNativeCallbackReplacement="+str(enabled).lower(),vr)
+            if enabled:self.assertIn("-VR.ExternalFerrariTestCarId=-1",vr)
 
     def test_negative_global_host_kill(self):
         source = (ROOT / LAUNCHERS[0]).read_text(encoding="utf-8")

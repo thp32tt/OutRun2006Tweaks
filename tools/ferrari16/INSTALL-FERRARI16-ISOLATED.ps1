@@ -90,6 +90,8 @@ $expectedPackageFiles=@(
     'LAUNCHERS/RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
     'LAUNCHERS/RUN-FERRARI16-V003-MODEL-OFF.cmd',
     'LAUNCHERS/RUN-FERRARI16-V003-PBR-TRACE.cmd',
+    'LAUNCHERS/RUN-FERRARI16-V003-ALL-CARS-PBR-TRACE.cmd',
+    'LAUNCHERS/RUN-FERRARI16-V003-MODEL-OFF-TRACE.cmd',
     'PREPARE-FERRARI16-ISOLATED.ps1','INSTALL-FERRARI16-ISOLATED.ps1',
     'RESTORE-FERRARI16-ISOLATED.ps1','COLLECT-FERRARI16-LOGS.ps1',
     'COPYING.GPL3','THIRD_PARTY_NOTICES.md','README_FIRST_KO.txt'
@@ -130,7 +132,9 @@ foreach($name in @('OR2006C2C.exe','OutRun2006Tweaks.ini','dinput8.dll','outrun-
 $launchers=@('RUN-FERRARI16-V003-ALL-CARS.cmd',
              'RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
              'RUN-FERRARI16-V003-MODEL-OFF.cmd',
-             'RUN-FERRARI16-V003-PBR-TRACE.cmd')
+             'RUN-FERRARI16-V003-PBR-TRACE.cmd',
+             'RUN-FERRARI16-V003-ALL-CARS-PBR-TRACE.cmd',
+             'RUN-FERRARI16-V003-MODEL-OFF-TRACE.cmd')
 foreach($name in $launchers){
     if(Test-Path -LiteralPath (Join-Path $root $name)){
         throw "Launcher already exists at test target: $name"

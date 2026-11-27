@@ -15,6 +15,8 @@ LAUNCHERS = (
     "RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd",
     "RUN-FERRARI16-V003-MODEL-OFF.cmd",
     "RUN-FERRARI16-V003-PBR-TRACE.cmd",
+    "RUN-FERRARI16-V003-ALL-CARS-PBR-TRACE.cmd",
+    "RUN-FERRARI16-V003-MODEL-OFF-TRACE.cmd",
 )
 SCRIPTS = (
     "PREPARE-FERRARI16-ISOLATED.ps1",
@@ -40,8 +42,14 @@ no original PMT and no third-party GLB/OVC/DDS models.
    Also supply ExternalCars/Dashboard/car_id_02.ovc if required.
    Both speed/RPM and current gear
    must be covered. Tuned F50 ID 17 uses the same canonical files.
-   Other cars remain stock; ALL-CARS legacy runners do not certify 16 cars.
-   Compare both headset eyes and FPS with MODEL-OFF; collect private logs.
+   The F50-only launcher keeps other cars stock. For all 16, supply each
+   verified canonical car_id_XX.ovc and matching dashboard if required.
+   Use RUN-FERRARI16-V003-ALL-CARS-PBR-TRACE.cmd and
+   RUN-FERRARI16-V003-MODEL-OFF-TRACE.cmd for matched PBR/stock timing traces.
+   Both enable nonblocking GPU timestamp diagnostics; GPU span is measured
+   from first draw to pre-Present, not the full OpenXR/transport frame.
+   Compare identical track/car/camera/refresh and capture both headset eyes.
+   Do not interpret source CI or a queued candidate as a physical pass.
    Look for ATOMIC F50 FALLBACK, ATOMIC NATIVE F50 (CPU time), and
    CANDIDATE_PAIR_SHARED_FRAME_PUBLISHED; queued EVENT alone is not a pass.
 5. Restore using RESTORE-FERRARI16-ISOLATED.ps1 -GameRoot <test path> -BackupPath <printed backup>.

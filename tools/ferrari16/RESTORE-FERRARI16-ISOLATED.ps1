@@ -86,7 +86,9 @@ if(@(Get-Process -Name 'OR2006C2C','outrun-vr-host' -ErrorAction SilentlyContinu
 $launchers=@('RUN-FERRARI16-V003-ALL-CARS.cmd',
              'RUN-FERRARI16-V003-ALL-CARS-TRACE.cmd',
              'RUN-FERRARI16-V003-MODEL-OFF.cmd',
-             'RUN-FERRARI16-V003-PBR-TRACE.cmd')
+             'RUN-FERRARI16-V003-PBR-TRACE.cmd',
+             'RUN-FERRARI16-V003-ALL-CARS-PBR-TRACE.cmd',
+             'RUN-FERRARI16-V003-MODEL-OFF-TRACE.cmd')
 if($b.Launchers -isnot [pscustomobject] -or
    @($b.Launchers.PSObject.Properties).Count -ne $launchers.Count){
     throw 'Invalid rollback launcher map.'
