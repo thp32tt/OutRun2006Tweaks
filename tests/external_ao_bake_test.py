@@ -29,6 +29,10 @@ with tempfile.TemporaryDirectory() as tmp:
  for kind,specs,existing,expected in [
   ("valid",[(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1)))],False,True),
   ("degenerate",[(b"EXT_OPAQUE_00",((0,0),(0,0),(0,0)))],False,False),
+  ("mixed_valid_first",[(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1))),(b"EXT_OPAQUE_01",((0,0),(0,0),(0,0)))],False,False),
+  ("mixed_invalid_first",[(b"EXT_OPAQUE_00",((0,0),(0,0),(0,0))),(b"EXT_OPAQUE_01",((0,0),(1,0),(0,1)))],False,False),
+  ("mixed_excessive_wrap",[(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1))),(b"EXT_OPAQUE_01",((0,0),(6,0),(0,1)))],False,False),
+  ("wrapped_valid",[(b"EXT_OPAQUE_00",((-1,-1),(0,-1),(-1,0)))],False,True),
   ("shared",[(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1))),(b"EXT_GLASS_00",((0,0),(1,0),(0,1)))],False,False),
   ("authored",[(b"EXT_OPAQUE_00",((0,0),(1,0),(0,1)))],True,False),
  ]:
@@ -49,4 +53,4 @@ with tempfile.TemporaryDirectory() as tmp:
   else:assert result==data
   assert subprocess.run([str(exe),str(src),str(dst),"64"],capture_output=True).returncode!=0
   assert dst.read_bytes()==result
-print("EXTERNAL_AO_BAKE_PASS valid/degenerate/shared/authored and no-overwrite")
+print("EXTERNAL_AO_BAKE_PASS valid/degenerate/mixed/wrapped/shared/authored and no-overwrite")
