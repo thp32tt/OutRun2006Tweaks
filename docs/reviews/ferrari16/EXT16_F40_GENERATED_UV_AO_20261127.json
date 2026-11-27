@@ -1,0 +1,454 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-27",
+  "status": "PRIVATE_DIAGNOSTIC_CANDIDATE_NOT_RELEASE_PROMOTED",
+  "source_renderer_commit": "ff7e266a751fe9407b0eb935ff8388adfa8ccee5",
+  "unwrap_commit": "5e5926d7cac43bb002c549bdc3563b277bba6249",
+  "ao_commit": "1131f645cd968cd1767d382c00b82443e49d830b",
+  "source_glb": {
+    "sha256": "e4db68a469479dba381aee9ceb31424c05902d28521cf5f69445f9563fb93f28",
+    "meshes": 42,
+    "materials": 33,
+    "source_uv_sets": 0,
+    "authored_textures": 0
+  },
+  "uv": {
+    "source_sha256": "c15e3fb298ee9f3c4bc8c2f28dba7d1d72ae04c2b7f97277dd29c3e97f6bbeb8",
+    "output_sha256": "766cafceff9f34c924faa4dddf3cb409334180e51f02714e56f7aebb246c33b8",
+    "groups": 42,
+    "materials": 33,
+    "triangles": 171765,
+    "source_vertices": 112462,
+    "output_vertices": 510483,
+    "generated_uv_materials": 28,
+    "materials_detail": [
+      {
+        "material": 0,
+        "valid_uv_triangles": 6447,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 1,
+        "atlas_tiles_per_axis": 81
+      },
+      {
+        "material": 1,
+        "valid_uv_triangles": 840,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 29
+      },
+      {
+        "material": 2,
+        "valid_uv_triangles": 26,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 6
+      },
+      {
+        "material": 3,
+        "valid_uv_triangles": 4303,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 1,
+        "atlas_tiles_per_axis": 66
+      },
+      {
+        "material": 4,
+        "valid_uv_triangles": 66,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 9
+      },
+      {
+        "material": 5,
+        "valid_uv_triangles": 12714,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 113
+      },
+      {
+        "material": 6,
+        "valid_uv_triangles": 224,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 15
+      },
+      {
+        "material": 7,
+        "valid_uv_triangles": 1331,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 37
+      },
+      {
+        "material": 8,
+        "valid_uv_triangles": 602,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 25
+      },
+      {
+        "material": 9,
+        "valid_uv_triangles": 8,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 3
+      },
+      {
+        "material": 12,
+        "valid_uv_triangles": 49,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 7
+      },
+      {
+        "material": 13,
+        "valid_uv_triangles": 61034,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 248
+      },
+      {
+        "material": 15,
+        "valid_uv_triangles": 583,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 25
+      },
+      {
+        "material": 16,
+        "valid_uv_triangles": 10951,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 105
+      },
+      {
+        "material": 17,
+        "valid_uv_triangles": 8330,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 92
+      },
+      {
+        "material": 18,
+        "valid_uv_triangles": 132,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 12
+      },
+      {
+        "material": 19,
+        "valid_uv_triangles": 6749,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 83
+      },
+      {
+        "material": 20,
+        "valid_uv_triangles": 320,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 18
+      },
+      {
+        "material": 21,
+        "valid_uv_triangles": 1814,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 43
+      },
+      {
+        "material": 22,
+        "valid_uv_triangles": 20,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 5
+      },
+      {
+        "material": 23,
+        "valid_uv_triangles": 24,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 5
+      },
+      {
+        "material": 24,
+        "valid_uv_triangles": 75,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 9
+      },
+      {
+        "material": 27,
+        "valid_uv_triangles": 51282,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 227
+      },
+      {
+        "material": 28,
+        "valid_uv_triangles": 538,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 24
+      },
+      {
+        "material": 29,
+        "valid_uv_triangles": 339,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 19
+      },
+      {
+        "material": 30,
+        "valid_uv_triangles": 347,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 19
+      },
+      {
+        "material": 31,
+        "valid_uv_triangles": 72,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 9
+      },
+      {
+        "material": 32,
+        "valid_uv_triangles": 282,
+        "collapsed_nondegenerate_triangles": 0,
+        "source_zero_area_triangles": 0,
+        "atlas_tiles_per_axis": 17
+      }
+    ],
+    "source_geometry_corner_bytes_preserved": true,
+    "material_tail_preserved": true,
+    "authored_uv": false,
+    "chart_method": "per_triangle_geometric_projection",
+    "release_install": false
+  },
+  "ao": {
+    "uv_source_sha256": "766cafceff9f34c924faa4dddf3cb409334180e51f02714e56f7aebb246c33b8",
+    "ao_output_sha256": "673e7fb5854cb4d56c428b1477fc7c7dc37bb07ebc2e0feb7238b69ea9f9a89d",
+    "output_bytes": 39641609,
+    "maps": 28,
+    "nonneutral": 28,
+    "geometry_material_and_dashboard_bytes_preserved": true,
+    "vertices": 510483,
+    "triangles": 171765,
+    "groups": 42,
+    "details": [
+      {
+        "material": 0,
+        "size": 512,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 1,
+        "size": 128,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 2,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 3,
+        "size": 512,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 4,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 5,
+        "size": 512,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 6,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 7,
+        "size": 256,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 8,
+        "size": 128,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 9,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 208,
+        "max_ao": 255
+      },
+      {
+        "material": 12,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 138,
+        "max_ao": 255
+      },
+      {
+        "material": 13,
+        "size": 1024,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 15,
+        "size": 128,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 16,
+        "size": 512,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 17,
+        "size": 512,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 18,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 19,
+        "size": 512,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 20,
+        "size": 128,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 21,
+        "size": 256,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 22,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 23,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 24,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 27,
+        "size": 1024,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 28,
+        "size": 128,
+        "nonneutral": true,
+        "min_ao": 138,
+        "max_ao": 255
+      },
+      {
+        "material": 29,
+        "size": 128,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 30,
+        "size": 128,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      },
+      {
+        "material": 31,
+        "size": 64,
+        "nonneutral": true,
+        "min_ao": 208,
+        "max_ao": 255
+      },
+      {
+        "material": 32,
+        "size": 128,
+        "nonneutral": true,
+        "min_ao": 115,
+        "max_ao": 255
+      }
+    ]
+  },
+  "native_parser": {
+    "status": "PASS",
+    "glass_triangles": 2261,
+    "opaque_materials": 28,
+    "missing_normal_maps": 28,
+    "missing_orm_maps": 0,
+    "no_uv_materials": 0,
+    "legacy_absolute_threshold_partial_uv_materials": 5,
+    "ground_lift_m": 0.369088
+  },
+  "private_candidate_path": "ext16_f40_uv_generated_20261127/car_id_11_generated_ao.ovc",
+  "limitations": [
+    "New triangle-projection UV atlas is diagnostic; source-authored UV and texture details are absent. No invented authored normal maps.",
+    "Vertex count increases from 112462 to 510483, so not a P3 performance pass; mip bleeding and visual calibration require further work.",
+    "No installed asset overwritten, no third-party binary uploaded, no HMD/FPS test.",
+    "Exact 328 GTS candidate still unavailable; 308 donor not silently substituted."
+  ]
+}
