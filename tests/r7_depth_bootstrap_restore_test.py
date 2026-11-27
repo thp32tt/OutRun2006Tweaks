@@ -391,6 +391,19 @@ int main(){
         assert(ClearDest(&dev,0,nullptr,2,0,1.f,0)==D3D_OK);
         assert(!ExternalAtomicReplayEpoch&&!followupCalls[0]&&!followupCalls[1]);++cases;
     }
+    // A physical LEFT Clear or its subsequent viewport getter can retire
+    // the owner. Do not bind or clear any RIGHT surface from the new owner.
+    for(bool failing:{false,true}){
+        ResetProbe(failing?1:0);retireStep=1;
+        assert(ClearDest(&dev,0,nullptr,7,0,1.f,0)==(failing?E_FAIL:D3D_OK));
+        assert(step==1&&notes==1&&coverageCalls==0&&!ExternalAtomicReplayEpoch);
+        assert(!RightDepthSynchronized&&!RightStencilSynchronized&&!LastMainDepthClearStamp.Current(PresentEpoch));
+        retireStep=0;
+    }
+    ResetProbe(0);probeStep=0;retireProbe=1;
+    assert(ClearDest(&dev,0,nullptr,7,0,1.f,0)==D3D_OK);
+    assert(step==1&&notes==1&&!LastMainDepthClearStamp.Current(PresentEpoch));
+    retireProbe=0;
     unsigned retireCases=0;
     for(unsigned phase=2;phase<=8;++phase)
     for(bool failing:{false,true}){

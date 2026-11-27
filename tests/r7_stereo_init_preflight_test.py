@@ -1058,7 +1058,7 @@ int main(){
         assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::Seeded);
         interruptRaster=mode;
         const auto got=R7ReplayInactiveEye(&d,0,&color,&left,draw);
-        assert(got==R7CandidateSeedResult::Unavailable&&ExternalAtomicReplayEpoch==0);
+        assert(got==(mode==2?R7CandidateSeedResult::DirtyRestore:R7CandidateSeedResult::Unavailable)&&ExternalAtomicReplayEpoch==0);
         TrackedRenderTarget=&color;ExternalAtomicReplayEpoch=0;
         ++PresentEpoch;
         if(mode!=4){
@@ -1092,7 +1092,7 @@ int main(){
         const auto allocations=ExternalAtomicCandidates.allocations;
         const auto rasters=rasterCalls;
         const auto got=R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0);
-        assert(got==(readPhase?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded));
+        assert(got==(readPhase?(readMode==5?R7CandidateSeedResult::DirtyRestore:R7CandidateSeedResult::Unavailable):R7CandidateSeedResult::Seeded));
         assert(readCount==(readPhase?readPhase:3u));
         assert(ExternalAtomicCandidates.allocations==allocations+unsigned(readPhase!=1));
         assert(rasterCalls==rasters+unsigned(readPhase==0||readPhase==3));
@@ -1123,13 +1123,26 @@ int main(){
         ExternalAtomicCandidates.onEnsure=location?interruptOwnership:nullptr;
         const auto allocations=ExternalAtomicCandidates.allocations,rasters=rasterCalls;
         assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==
-            (ownershipMode?R7CandidateSeedResult::Unavailable:R7CandidateSeedResult::Seeded));
+            (ownershipMode?(ownershipMode==5?R7CandidateSeedResult::DirtyRestore:R7CandidateSeedResult::Unavailable):R7CandidateSeedResult::Seeded));
         assert(ExternalAtomicCandidates.allocations==allocations+unsigned(location||!ownershipMode));
         assert(rasterCalls==rasters+unsigned(!ownershipMode));
         assert(ExternalAtomicReplayEpoch==(ownershipMode?0u:PresentEpoch));
         ++entryOwnershipCases;
     }
     assert(entryOwnershipCases==12);
+    onChain=nullptr;ExternalAtomicCandidates.onEnsure=nullptr;
+    // A synchronous Reset can return with in-flight=false and recycled
+    // attachment identities. The depth generation must still retire it.
+    for(unsigned location=0;location<2;++location){
+        ++PresentEpoch;ExternalAtomicReplayEpoch=0;R7CandidateResetInFlight=0;
+        TrackedRenderTarget=&color;RightEyeDepth=&right;
+        auto reset=+[](){R7ForgetAutomaticDepthProof();};
+        onChain=location?nullptr:reset;
+        ExternalAtomicCandidates.onEnsure=location?reset:nullptr;
+        const auto before=rasterCalls;
+        assert(R7BeginExternalAtomicResourceTransaction(&d,vp,3,0,1,0)==R7CandidateSeedResult::DirtyRestore);
+        assert(rasterCalls==before&&!ExternalAtomicReplayEpoch);
+    }
     onChain=nullptr;ExternalAtomicCandidates.onEnsure=nullptr;
     TrackedRenderTarget=&color;RightEyeDepth=&right;R7CandidateResetInFlight=0;
     // Dirty restore retires only the pair owned by this transaction.

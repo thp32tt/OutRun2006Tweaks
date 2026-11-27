@@ -2192,9 +2192,17 @@ namespace OutRunVRStereo
             const auto epoch=PresentEpoch;
             const auto boundary=R7CandidateBoundarySerial;
             ExternalAtomicAllocationAttemptEpoch=epoch;
+            const auto depthGeneration=R7AutomaticDepthGeneration;
             // Clean failures may retry on a later full Clear. A physical
             // Present/Reset seal and dirty restore must never be reopened.
             auto cleanDecline=[&](){
+                // Reset may finish synchronously inside a descriptor/proof
+                // getter. Its automatic-depth generation is independent of
+                // intentional candidate-pair reallocation.
+                if(R7CandidateResetInFlight||R7AutomaticDepthGeneration!=depthGeneration){
+                    ExternalAtomicReplayEpoch=0;
+                    return R7CandidateSeedResult::DirtyRestore;
+                }
                 if(PresentEpoch==epoch&&R7CandidateBoundarySerial==boundary&&
                     !R7CandidateResetInFlight&&ExternalAtomicAllocationAttemptEpoch==epoch)
                     ExternalAtomicAllocationAttemptEpoch=0;
@@ -2210,7 +2218,7 @@ namespace OutRunVRStereo
             // attachments or certify a receipt after it changes ownership.
             auto ownershipCurrent=[&](){return PresentEpoch==epoch&&
                 R7CandidateBoundarySerial==boundary&&!R7CandidateResetInFlight&&
-                TrackedRenderTarget==lc&&TrackedDepthStencil==ld&&
+                R7AutomaticDepthGeneration==depthGeneration&&TrackedRenderTarget==lc&&TrackedDepthStencil==ld&&
                 RightEyeSurface==rc&&RightEyeDepth==rd;};
             const auto chainGeneration=ExternalAtomicCandidates.generation;
             if(!ownershipCurrent()||!R7CandidateSwapChainCovered(device)||
@@ -2337,7 +2345,8 @@ namespace OutRunVRStereo
                 liveColor!=(eye==0?TrackedRenderTarget:RightEyeSurface)||
                 liveDepth!=(eye==0?TrackedDepthStencil:RightEyeDepth)){
                 ExternalAtomicReplayEpoch=0;
-                return R7CandidateSeedResult::Unavailable;
+                return ExternalAtomicCandidates.generation!=generation?
+                    R7CandidateSeedResult::DirtyRestore:R7CandidateSeedResult::Unavailable;
             }
             return result;
         }
@@ -3977,8 +3986,22 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 auto call=[&](){return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);};
                 return R7ExecuteRawCandidateVb(device,call,false,false,flags);
             }
-            if(R7CandidateDisjointOffscreenRaster(device))
-                return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);
+            const auto admissionGeneration=ExternalAtomicCandidates.generation;
+            auto retiredClear=[&](){
+                ExternalAtomicReplayEpoch=0;
+                LastMainDepthClearStamp.Invalidate();
+                RightDepthSynchronized=false;RightStencilSynchronized=false;
+                NoteRestoreFailure("R7 Clear attachment owner retired");
+            };
+            if(R7CandidateDisjointOffscreenRaster(device)){
+                const HRESULT hr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);
+                if(FAILED(hr))ExternalAtomicReplayEpoch=0;
+                if(ExternalAtomicCandidates.generation!=admissionGeneration)retiredClear();
+                return hr;
+            }
+            if(ExternalAtomicCandidates.generation!=admissionGeneration){
+                retiredClear();return E_FAIL;
+            }
             // A subsequent eligible Clear must update the existing isolated pair.
             // Never reseed from a partial/color-only clear or discard a valid
             // scene solely because the game clears its depth between passes.
@@ -3995,6 +4018,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
             }
             if(!duplicate||FrameStereoIncomplete||FrameRightDrawFailed)
                 ExternalAtomicReplayEpoch=0;
+            const auto clearGeneration=ExternalAtomicCandidates.generation;
+            auto clearCurrent=[&](){return ExternalAtomicCandidates.generation==clearGeneration;};
             auto clearCall=[&](){return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);};
             if(ExternalAtomicReplayEpoch==PresentEpoch){
                 const auto replay=R7ReplayInactiveEye(device,0,TrackedRenderTarget,TrackedDepthStencil,clearCall);
@@ -4006,8 +4031,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
                     return E_FAIL;
                 }
             }
+            if(!clearCurrent()){retiredClear();return E_FAIL;}
             const HRESULT leftHr=clearCall();
+            if(!clearCurrent()){retiredClear();return leftHr;}
             if(SUCCEEDED(leftHr))RecordFullMainDepthClear(device,count,rects,flags,z,stencil);
+            if(!clearCurrent()){retiredClear();return leftHr;}
             if(!duplicate||FAILED(leftHr)){
                 ExternalAtomicReplayEpoch=0;
                 if(candidate&&FAILED(leftHr))PoisonFrame(OutRunVR::StereoFailureClearFailed);
@@ -4018,7 +4046,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 return leftHr;
             }
             D3DVIEWPORT9 savedViewport{};
-            if(FAILED(device->GetViewport(&savedViewport))){
+            const HRESULT viewportHr=device->GetViewport(&savedViewport);
+            if(!clearCurrent()){retiredClear();return leftHr;}
+            if(FAILED(viewportHr)){
                 ExternalAtomicReplayEpoch=0;
                 if(flags&D3DCLEAR_ZBUFFER)RightDepthSynchronized=false;
                 if((flags&D3DCLEAR_STENCIL)&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;
