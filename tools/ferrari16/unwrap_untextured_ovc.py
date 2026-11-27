@@ -23,7 +23,7 @@ def paired_charts(entries, groups):
     def unit(a):
         l=sqrt(dot(a,a))
         return tuple(x/l for x in a) if l>1e-15 else None
-    vertices={i:list(VERT.iter_unpack(g["vb"])) for i,g in enumerate(groups)}
+    vertices={i:list(VERT.iter_unpack(groups[i]["vb"])) for i in {e[0] for e in entries}}
     edge_map={}
     faces={}
     for gi,t,coords in entries:

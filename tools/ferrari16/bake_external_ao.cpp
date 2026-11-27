@@ -121,9 +121,10 @@ static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,Gr
  std::vector<Tile> chart(std::size_t(tiles)*tiles);
  for(unsigned i=0;i<samples.size();++i){
   const auto& s=samples[i];
-  const auto x=static_cast<unsigned>(std::floor((double(s.a->u)+s.b->u+s.c->u)*tiles/3));
-  const auto y=static_cast<unsigned>(std::floor((double(s.a->v)+s.b->v+s.c->v)*tiles/3));
-  if(x>=tiles||y>=tiles)return {};
+  const double cx=std::floor((double(s.a->u)+s.b->u+s.c->u)*tiles/3);
+  const double cy=std::floor((double(s.a->v)+s.b->v+s.c->v)*tiles/3);
+  if(cx<0||cy<0||cx>=tiles||cy>=tiles)return {};
+  const auto x=static_cast<unsigned>(cx),y=static_cast<unsigned>(cy);
   const unsigned index=y*tiles+x;
   if(!paired&&index!=i)return {};
   for(const auto* v:{s.a,s.b,s.c}){

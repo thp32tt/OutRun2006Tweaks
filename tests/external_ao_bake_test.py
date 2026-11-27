@@ -68,6 +68,38 @@ with tempfile.TemporaryDirectory() as tmp:
   assert src.read_bytes()==data and result[36:off]==data[36:off]
   if expected:assert struct.unpack_from("<I",result,off)[0]>0
   else:assert result==data
+ # Real two-face chart from a planar indexed quad; preserve vertex sharing,
+ # reject overlap in the paired baker and keep the default triangle mode.
+ raw,off=make([(b"EXT_OPAQUE_00",((0,0),(0,0),(0,0)))])
+ nlen=struct.unpack_from("<H",raw,36)[0]
+ start=52+nlen
+ vertices=[(0,0,0,0,0,1,0,0),(1,0,0,0,0,1,0,0),
+           (0,1,0,0,0,1,0,0),(1,1,0,0,0,1,0,0)]
+ tail=raw[start+3*32+6:]
+ payload=struct.pack("<HHIII",nlen,0,4,6,2)+raw[52:start]+b"".join(
+     struct.pack("<8f",*v) for v in vertices)+struct.pack("<6H",0,1,2,1,3,2)+tail
+ raw=b"OVRCABH4"+struct.pack("<7I",4,1,1,4,2,len(payload),zlib.crc32(payload))+payload
+ quad=root/"quad.ovc";quad.write_bytes(raw)
+ for mode,expected_vertices in (("triangle",6),("paired",4)):
+  uv=root/(mode+"_quad.ovc");ao=root/(mode+"_quad_ao.ovc")
+  subprocess.run(["python3",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.py"),
+                  str(quad),str(uv),mode],check=True)
+  u=uv.read_bytes()
+  assert struct.unpack_from("<II",u,20)==(expected_vertices,2)
+  subprocess.run([str(exe),str(uv),str(ao),mode+"-atlas"],check=True)
+  assert ao.stat().st_size>uv.stat().st_size
+  assert quad.read_bytes()==raw
+  if mode=="paired":
+   # Force second triangle's third corner across the shared UV edge.
+   broken=bytearray(u)
+   idx=start+3*32+24
+   first=broken[start+24:start+32]
+   broken[idx:idx+8]=first
+   struct.pack_into("<I",broken,32,zlib.crc32(broken[36:]))
+   bad=root/"bad_pair.ovc";bad.write_bytes(broken)
+   out=root/"bad_pair_ao.ovc"
+   subprocess.run([str(exe),str(bad),str(out),"paired-atlas"],check=True)
+   assert out.read_bytes()==broken
  # Compile the same production baker with a small test-only budget.
  # No giant synthetic OVC or memory-heavy GPU test is needed.
  harness=root/"budget.cpp"
