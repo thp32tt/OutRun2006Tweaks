@@ -28,6 +28,28 @@ int main() {
     assert(!ResolveExternalTexture(owners,invalid,3));
     owners.clear();
     assert(!ResolveExternalTexture(owners,plan.albedo,1));
+    ExternalTextureBindCache<int> cache;
+    unsigned setters=0;bool alive=true,accept=true;
+    auto current=[&](){return alive;};
+    auto setter=[&](unsigned,int*){++setters;return accept;};
+    assert(cache.Bind(0,&resource,true,current,setter));
+    assert(cache.Bind(0,&resource,true,current,setter)&&setters==1);
+    assert(cache.Bind(1,nullptr,true,current,setter)&&setters==2);
+    assert(cache.Bind(1,nullptr,true,current,setter)&&setters==2);
+    assert(cache.Bind(0,&resource,false,current,setter)&&setters==3);
+    cache.Invalidate();
+    assert(cache.Bind(0,&resource,true,current,setter)&&setters==4);
+    accept=false;
+    assert(!cache.Bind(0,&other,true,current,setter)&&setters==5);
+    accept=true;
+    assert(cache.Bind(0,&resource,true,current,setter)&&setters==6);
+    alive=false;
+    assert(!cache.Bind(0,&resource,true,current,setter)&&setters==6);
+    alive=true;
+    assert(!cache.Bind(3,&resource,true,current,setter)&&setters==6);
+    assert(!cache.Bind(0,&other,true,current,[&](unsigned,int*){alive=false;return true;}));
+    alive=true;
+    assert(cache.Bind(0,&resource,true,current,setter)&&setters==7);
     const std::array<std::uint8_t,16> ao{255,255,0,255,255,255,42,255,
                                        255,255,128,255,255,255,255,255};
     assert(IsAoOnlyBgraPixels(ao.data(),ao.size()));

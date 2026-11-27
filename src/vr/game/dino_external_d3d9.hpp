@@ -1034,6 +1034,13 @@ public:
         // these keys across an Apply, Reset, eye, or legacy hooked draw.
         D3DMATRIX lastWorld=world;
         unsigned lastMaterial=MaxMaterials;
+        ExternalTextureBindCache<IDirect3DTexture9> textureBinding{};
+        auto bindTexture=[&](unsigned slot,IDirect3DTexture9* texture) noexcept {
+            return textureBinding.Bind(slot,texture,isolated!=nullptr,current,
+                [&](unsigned stage,IDirect3DTexture9* value) noexcept {
+                    return SUCCEEDED(device->SetTexture(stage,value));
+                });
+        };
         bool lastGlass=false,passBound=false,interleaveDirty=false;
         if(SUCCEEDED(hr))for(unsigned pass=phase==IsolatedMeshPass::GlassOnly?1u:0u;
             pass<(phase==IsolatedMeshPass::OpaqueOnly?1u:2u)&&SUCCEEDED(hr);++pass) {
@@ -1044,7 +1051,7 @@ public:
                 interleaveDirty||!current()){hr=E_FAIL;break;}
             // Rebind material/blend at the first glass mesh after the
             // nested Apply; never reuse a material across an owner boundary.
-            lastMaterial=MaxMaterials;passBound=false;
+            lastMaterial=MaxMaterials;passBound=false;textureBinding.Invalidate();
           }
           for(unsigned order=0;order<(pass?glassCount:meshes_.size());++order) {
             if(!current()){hr=E_FAIL;break;}
@@ -1077,7 +1084,7 @@ public:
                !current() || FAILED(device->SetIndices(m.ib))) {hr=E_FAIL;break;}
             const bool bindMaterial=!isolated||lastMaterial!=m.material;
             auto* albedo=ResolveExternalTexture(textures_,textureAliases_.albedo,m.material);
-            if(bindMaterial&&(!albedo||!current()||FAILED(device->SetTexture(0,albedo)))){
+            if(bindMaterial&&(!albedo||!bindTexture(0,albedo))){
                 hr=E_FAIL;break;
             }
             if(bindMaterial&&pbrReady_) {
@@ -1091,8 +1098,7 @@ public:
                                        normal?1.f:0.f};
                 const float eyeOrm[4]{eye[0],eye[1],eye[2],
                                       orm?(ormLuminance_[textureAliases_.orm[m.material]]?2.f:1.f):0.f};
-                if(!current() || FAILED(device->SetTexture(1,normal)) ||
-                   !current() || FAILED(device->SetTexture(2,orm)) ||
+                if(!bindTexture(1,normal) || !bindTexture(2,orm) ||
                    !current() || FAILED(device->SetPixelShaderConstantF(0,factors,1)) ||
                    !current() || FAILED(device->SetPixelShaderConstantF(1,eyeOrm,1))) {
                     hr=E_FAIL;break;

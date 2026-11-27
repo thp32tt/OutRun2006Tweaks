@@ -43,4 +43,20 @@ inline Resource* ResolveExternalTexture(const std::vector<Resource*>& resources,
     if(i>material||i>=resources.size()||i>=aliases.size()||aliases[i]!=i)return nullptr;
     return resources[i];
 }
+// Cache only within the already-isolated raw raster owner. A nullptr
+// binding is meaningful (disable inherited texture), so track validity
+// separately. An unsuccessful setter never publishes a cached state.
+template<class Resource>
+struct ExternalTextureBindCache {
+    std::array<Resource*,3> bound{};
+    std::array<bool,3> known{};
+    void Invalidate() noexcept {known.fill(false);bound.fill(nullptr);}
+    template<class Current,class Setter>
+    bool Bind(unsigned slot,Resource* resource,bool isolated,Current current,Setter set) noexcept {
+        if(slot>=known.size()||!current())return false;
+        if(isolated&&known[slot]&&bound[slot]==resource)return true;
+        if(!set(slot,resource)||!current()){Invalidate();return false;}
+        known[slot]=true;bound[slot]=resource;return true;
+    }
+};
 } // namespace OutRunVR::DinoSidecar
