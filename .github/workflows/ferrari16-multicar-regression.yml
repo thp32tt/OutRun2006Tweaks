@@ -394,6 +394,9 @@ jobs:
           assert 'no_orm' in quality and 'no_normal' in quality
           assert 'degenerate_uv' in quality
           assert 'float3 faceN = cross(dpdx,dpdy)' in pbr
+          assert pbr.index('float2 dtdx = ddx(input.uv);') < pbr.index('tex2Dgrad(normalMap,input.uv,dtdx,dtdy)')
+          assert pbr.index('float2 dtdy = ddy(input.uv);') < pbr.index('tex2Dgrad(normalMap,input.uv,dtdx,dtdy)')
+          assert 'tex2D(normalMap,input.uv)' not in pbr
           assert 'ScopedExternalPbrStereo' in scope
           assert 'ExternalPbrEyeConstants(' in pbr
           assert 'ExternalCarPbrNormalMatrix(' in pbr
