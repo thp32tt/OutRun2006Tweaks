@@ -414,6 +414,12 @@ class GpuOwner final {
                     }
                     if(batchOpaque)BatchExternalOpaqueMeshes(result.model);
                     DeduplicateExternalVertices(result.model);
+                    // Narrow only after exact dedup has proved the new
+                    // vertex range. Newly compatible adjacent meshes can
+                    // merge without any extra runtime draw or 32-bit upload.
+                    if(NarrowExternalIndexBuffers(result.model)&&batchOpaque&&
+                        BatchExternalOpaqueMeshes(result.model))
+                        DeduplicateExternalVertices(result.model);
                     float lowest=10000.f;
                     for(const auto& mesh:result.model.meshes) {
                         IndexedMeshBounds bounds{};

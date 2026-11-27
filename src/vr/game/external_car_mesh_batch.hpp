@@ -100,4 +100,19 @@ inline unsigned DeduplicateExternalVertices(Model& model) {
     model.vertices-=removed;
     return removed;
 }
+// A lossless dedup may make a formerly wide index buffer fit D3DFMT_INDEX16.
+ // Reduce only the uploaded representation: all uint32 source indices
+ // remain exact and UploadExternalMeshBuffer performs checked narrowing.
+inline unsigned NarrowExternalIndexBuffers(Model& model) noexcept {
+    if(!model.highQuality)return 0;
+    unsigned narrowed=0;
+    for(auto& mesh:model.meshes){
+        if(!mesh.index32||mesh.vertices.size()>65535u||mesh.indices.empty())continue;
+        if(std::any_of(mesh.indices.begin(),mesh.indices.end(),[&](auto i){
+            return i>=mesh.vertices.size()||i>65535u;
+        }))continue;
+        mesh.index32=false;++narrowed;
+    }
+    return narrowed;
+}
 } // namespace OutRunVR::DinoSidecar

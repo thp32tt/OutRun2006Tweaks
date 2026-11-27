@@ -58,5 +58,17 @@ int main(){
     sm.vertices[3].u=.5f;sm.vertices[4].nx=.5f;sm.vertices[5].x=-0.f;
     sm.indices={0,1,2,3,4,5};seam.meshes.push_back(sm);
     assert(DeduplicateExternalVertices(seam)==0&&seam.vertices==6);
+    Model widths{};widths.highQuality=true; widths.vertices=9;widths.triangles=3;
+    widths.meshes={mesh("wide",0,true),mesh("narrow",0),mesh("invalid",1,true)};
+    widths.meshes[2].indices[2]=65536;
+    const auto originalIndices=widths.meshes[0].indices;
+    assert(NarrowExternalIndexBuffers(widths)==1);
+    assert(!widths.meshes[0].index32&&!widths.meshes[1].index32&&widths.meshes[2].index32);
+    assert(widths.meshes[0].indices==originalIndices);
+    assert(BatchExternalOpaqueMeshes(widths)==1);
+    assert(widths.meshes.size()==2&&widths.meshes[0].indices.size()==6);
+    Model large{};large.highQuality=true;large.meshes={mesh("large",0,true)};
+    large.meshes[0].vertices.resize(65536);
+    assert(NarrowExternalIndexBuffers(large)==0&&large.meshes[0].index32);
     std::cout<<"EXTERNAL_LOSSLESS_OPAQUE_BATCH_PASS\n";
 }
