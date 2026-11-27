@@ -5,6 +5,10 @@ on:
     paths:
       - ".github/workflows/outrun-hd-chat-rework-ci.yml"
       - "tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/hd_atlas_visual_queue.py"
+      - "tools/chat-controller/localization-recovery-v1/test_hd_atlas_visual_queue.py"
+      - "tools/chat-controller/localization-recovery-v1/github_actions_light_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/controller_png_attach.py"
       - "tools/chat-controller/localization-recovery-v1/chat_image_result_rescue.py"
       - "tools/chat-controller/localization-recovery-v1/test_github_chat_rework_controller.py"
       - "tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework"
@@ -22,13 +26,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: localization-controller-recovery-20260928
+          ref: ${{ github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
             tools/chat-controller/localization-recovery-v1/chat_image_result_rescue.py
             tools/chat-controller/localization-recovery-v1/test_github_chat_rework_controller.py
             tools/chat-controller/localization-recovery-v1/controller_png_attach.py
+            tools/chat-controller/localization-recovery-v1/hd_atlas_visual_queue.py
+            tools/chat-controller/localization-recovery-v1/test_hd_atlas_visual_queue.py
+            tools/chat-controller/localization-recovery-v1/github_actions_light_controller.py
             tools/chat-controller/localization-recovery-v1/text_roi_queue.py
             tools/chat-controller/localization-recovery-v1/tile_batch_queue.py
             tools/chat-controller/localization-recovery-v1/tile_orientation_policy.py
@@ -58,6 +65,7 @@ jobs:
         run: |
           python -m py_compile tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py
           python -m unittest discover -s tools/chat-controller/localization-recovery-v1 -p test_github_chat_rework_controller.py -v
+          python -m unittest discover -s tools/chat-controller/localization-recovery-v1 -p test_hd_atlas_visual_queue.py -v
       - name: Verify default-included VNC compose and isolated persistent Chrome profile
         run: |
           python - <<'PY'
