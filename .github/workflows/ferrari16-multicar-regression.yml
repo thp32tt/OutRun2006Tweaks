@@ -233,6 +233,9 @@ jobs:
           assert '!RuntimeExternalCarAtomicStageReady())return result;' in native
           raster_setup=native[native.index('HRESULT hr=S_OK;'):native.index('std::array<GlassDepthItem,MaxGroups>')]
           assert '!ConfigureExternalRasterCoverage(' in raster_setup
+          # A successful DIP receipt is not sufficient if stream 0 retained
+          # an instancing count. Normalize both stream dividers before FVF.
+          assert raster_setup.index('!current() || FAILED(device->SetStreamSourceFreq(0,1u))') < raster_setup.index('!current() || FAILED(device->SetStreamSourceFreq(1,1u))') < raster_setup.index('!current() || FAILED(device->SetFVF(fvf))')
           assert 'D3DRS_FILLMODE,D3DFILL_SOLID' in raster_setup
           assert 'D3DRS_MULTISAMPLEMASK,0xffffffffu' in raster_setup
           assert 'const HRESULT restore=saved->Apply();' in native
