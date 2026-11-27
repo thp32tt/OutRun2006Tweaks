@@ -3,6 +3,7 @@
   "records": {
     "HDAT-7153fa31b865ab6ccaafc147": {
       "candidate_dds_sha256": "fbd31c135d05a46de4e5b6bda46e6a7dca96fb0889a5a5b033144eb70b07af02",
+      "recovery_attempts": 1,
       "review_key": "433c7c85ed43c68e5dbc537607af94db2fbf0e7a2e9cdc7171eb7eddb91a71ae",
       "send_outcome": "HOLD_CHAT_SENT_UNVERIFIED",
       "source_dds_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
