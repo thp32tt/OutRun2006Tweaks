@@ -161,6 +161,17 @@ with tempfile.TemporaryDirectory() as tmp:
  subprocess.run(["python3",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.py"),str(src),str(uv),"patch"],check=True)
  subprocess.run([str(exe),str(uv),str(ao),"patch-atlas"],check=True)
  assert ao.stat().st_size>uv.stat().st_size and src.read_bytes()==fixture
+ # Native C++ converter must preserve the same connected strip and
+ # exercise the independent native AO chart verifier, with no overwrite.
+ native=root/"native_unwrap"
+ subprocess.run(["g++","-std=c++17","-O2",str(ROOT/"tools/ferrari16/unwrap_untextured_ovc.cpp"),"-o",str(native)],check=True)
+ nuv=root/"native_strip.ovc";nao=root/"native_strip_ao.ovc"
+ subprocess.run([str(native),str(src),str(nuv)],check=True)
+ assert struct.unpack_from("<II",nuv.read_bytes(),20)==(6,4)
+ subprocess.run([str(exe),str(nuv),str(nao),"patch-atlas"],check=True)
+ assert nao.stat().st_size>nuv.stat().st_size and src.read_bytes()==strip
+ assert subprocess.run([str(native),str(src),str(nuv)],capture_output=True).returncode!=0
+ assert subprocess.run([str(native),str(nuv),str(root/"reunwrap.ovc")],capture_output=True).returncode!=0
  # Compile the same production baker with a small test-only budget.
  # No giant synthetic OVC or memory-heavy GPU test is needed.
  harness=root/"budget.cpp"
