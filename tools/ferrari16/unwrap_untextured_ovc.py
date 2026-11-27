@@ -85,12 +85,18 @@ def planar_patches(entries,groups):
         length=math.sqrt(dot(a,a))
         return tuple(x/length for x in a) if length>1e-15 else None
     def interior_overlap(a,b):
-        # Separating-axis theorem, touching edges/vertices are allowed.
-        for tri in (a,b):
-            for p,q in zip(tri,tri[1:]+tri[:1]):
-                axis=(p[1]-q[1],q[0]-p[0])
-                x=[dot(v,axis) for v in a];y=[dot(v,axis) for v in b]
-                if min(max(x),max(y))-max(min(x),min(y))<=1e-12*max(max(x)-min(x),max(y)-min(y),1e-30):
+        # Both projected triangles are CCW. A supporting edge with the
+        # other triangle entirely on its exterior (or touching) separates
+        # interiors. This is the same convex SAT without 36 dot products
+        # and temporary interval lists per face pair.
+        for tri,other in ((a,b),(b,a)):
+            for i in range(3):
+                x,y=tri[i];qx,qy=tri[(i+1)%3];rx,ry=tri[(i+2)%3]
+                dx,dy=qx-x,qy-y
+                limit=1e-12*max(dx*(ry-y)-dy*(rx-x),1e-30)
+                if (dx*(other[0][1]-y)-dy*(other[0][0]-x)<=limit and
+                    dx*(other[1][1]-y)-dy*(other[1][0]-x)<=limit and
+                    dx*(other[2][1]-y)-dy*(other[2][0]-x)<=limit):
                     return False
         return True
     vertices={i:list(VERT.iter_unpack(groups[i]["vb"])) for i in {e[0] for e in entries}}
@@ -111,8 +117,13 @@ def planar_patches(entries,groups):
         if axis is None:
             charts.append([(gi,t,coords)]);done.add((gi,t));continue
         vertical=cross(normal,axis)
+        projected={}
         def project(i):
-            d=sub(v[i][:3],origin);return (dot(d,axis),dot(d,vertical))
+            if i not in projected:
+                x,y,z=v[i][0]-origin[0],v[i][1]-origin[1],v[i][2]-origin[2]
+                projected[i]=(x*axis[0]+y*axis[1]+z*axis[2],
+                              x*vertical[0]+y*vertical[1]+z*vertical[2])
+            return projected[i]
         accepted=[t];polys=[[project(i) for i in ids]]
         done.add((gi,t));cursor=0
         while cursor<len(accepted) and len(accepted)<8:
