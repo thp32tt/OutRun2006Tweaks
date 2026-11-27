@@ -2151,9 +2151,21 @@ namespace OutRunVRStereo
         {
             if(!R7CandidatePresentBoundaryCovered||!R7CandidateResetBoundaryCovered||
                 R7CandidateResetInFlight||ExternalAtomicAllocationAttemptEpoch==PresentEpoch)return R7CandidateSeedResult::Unavailable;
+            // Only allocate/replay for a configuration capable of native publication.
+            if(!Settings::VRExternalFerrariNativeCallbackReplacement||
+                !Settings::VRDirectGpuOnly||!GameplayActive())
+                return R7CandidateSeedResult::Unavailable;
             const auto epoch=PresentEpoch;
             const auto boundary=R7CandidateBoundarySerial;
             ExternalAtomicAllocationAttemptEpoch=epoch;
+            // Clean failures may retry on a later full Clear. A physical
+            // Present/Reset seal and dirty restore must never be reopened.
+            auto cleanDecline=[&](){
+                if(PresentEpoch==epoch&&R7CandidateBoundarySerial==boundary&&
+                    !R7CandidateResetInFlight&&ExternalAtomicAllocationAttemptEpoch==epoch)
+                    ExternalAtomicAllocationAttemptEpoch=0;
+                return R7CandidateSeedResult::Unavailable;
+            };
             // RightEyeDepth is exclusively created by R7 with Discard=FALSE.
             // For game-owned LEFT depth, no unbind without creation proof.
             auto* const lc=TrackedRenderTarget;
@@ -2169,21 +2181,21 @@ namespace OutRunVRStereo
             const auto chainGeneration=ExternalAtomicCandidates.generation;
             if(!ownershipCurrent()||!R7CandidateSwapChainCovered(device)||
                 !ownershipCurrent()||ExternalAtomicCandidates.generation!=chainGeneration)
-                return R7CandidateSeedResult::Unavailable;
+                return cleanDecline();
             auto current=[&](){
                 const auto proofGeneration=ExternalAtomicCandidates.generation;
                 return ownershipCurrent()&&R7DepthRetentionProven(ld)&&
                     ownershipCurrent()&&ExternalAtomicCandidates.generation==proofGeneration;
             };
-            if(!current())return R7CandidateSeedResult::Unavailable;
+            if(!current())return cleanDecline();
             if(!ExternalAtomicCandidates.Ensure(device,lc,ld,rc,rd,viewport,ownershipCurrent))
-                return R7CandidateSeedResult::Unavailable;
+                return cleanDecline();
             if(FormatHasStencil(ExternalAtomicCandidates.depthDesc.Format)&&
-                !(flags&D3DCLEAR_STENCIL))return R7CandidateSeedResult::Unavailable;
+                !(flags&D3DCLEAR_STENCIL))return cleanDecline();
             // Recheck ownership after allocation: it can call into the driver.
             const auto generation=ExternalAtomicCandidates.generation;
             if(!current()||ExternalAtomicCandidates.generation!=generation)
-                return R7CandidateSeedResult::Unavailable;
+                return cleanDecline();
             InternalPassScope guard;
             const auto result=R7SeedInactivePair(ExternalAtomicCandidates,device,
                 lc,ld,
@@ -2194,7 +2206,7 @@ namespace OutRunVRStereo
                 if(ExternalAtomicCandidates.generation!=generation||!current()||
                     ExternalAtomicCandidates.generation!=generation){
                     ExternalAtomicReplayEpoch=0;
-                    return R7CandidateSeedResult::Unavailable;
+                    return cleanDecline();
                 }
                 ExternalAtomicCandidates.provenLiveColor[0]=lc;
                 ExternalAtomicCandidates.provenLiveColor[1]=rc;
@@ -2209,7 +2221,7 @@ namespace OutRunVRStereo
                 if(ExternalAtomicCandidates.generation==generation)
                     ExternalAtomicCandidates.Reset();
             }
-            return result;
+            return result==R7CandidateSeedResult::Unavailable?cleanDecline():result;
         }
 
         // Replay one physical draw while its exact eye transforms and shaders are bound.
@@ -3942,7 +3954,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
             }return leftHr;
 		}
 
-		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9*device,DWORD index,IDirect3DSurface9*surface){const HRESULT hr=SetRenderTargetHook.stdcall<HRESULT>(device,index,surface);if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr)){if(index==0){if(TrackedRenderTarget!=surface)ExternalAtomicReplayEpoch=0;ReplaceSurfaceRef(TrackedRenderTarget,surface);}else if(index>=1&&index<=3){if(surface)ExternalAtomicReplayEpoch=0;AuxRenderTargetActive[index-1]=surface!=nullptr;}}return hr;}
+		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9*device,DWORD index,IDirect3DSurface9*surface){const HRESULT hr=SetRenderTargetHook.stdcall<HRESULT>(device,index,surface);if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr)){if(index==0){/* Binding alone does not mutate a candidate. Raster and copy owners validate actual attachments. */ReplaceSurfaceRef(TrackedRenderTarget,surface);}else if(index>=1&&index<=3){if(surface)ExternalAtomicReplayEpoch=0;AuxRenderTargetActive[index-1]=surface!=nullptr;}}return hr;}
 		HRESULT __stdcall SetDepthStencilSurfaceDest(IDirect3DDevice9*device,IDirect3DSurface9*surface)
 		{
 			const HRESULT hr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,surface);

@@ -23,14 +23,30 @@ int main(){
         assert(r.Ready()==(missing==0&&invalid==0&&mismatch==0));
         ++cases;
     }
-    for(int model:{2,17,5})for(unsigned group=1;group<=3;++group){
-        NativeVehicleStockReplay r{};r.model=model;r.opened=group;r.group=true;
-        const auto prefix=model==2?0x30000u:0x1500000u;
-        const unsigned part=group==1?0x11u:group==2?0u:1u;
-        assert(r.OwnsObject(prefix|part)==(model!=5));
-        assert(!r.OwnsObject(0x570008u));
-        assert(!r.OwnsObject(prefix|0xffffu));++cases;
+    for(int model=0;model<30;++model){
+        const auto& profile=NativeModelProfiles[model];
+        std::uint32_t layout[0x3e];for(auto& id:layout)id=0xffffffffu;
+        for(unsigned group=1;group<=3;++group){
+            NativeVehicleStockReplay r{};r.model=model;r.opened=group;r.group=true;
+            unsigned field=0;
+            for(unsigned part=0;part<32;++part){
+                const bool owned=(profile.parts[group-1]&(std::uint32_t{1}<<part))!=0;
+                assert(r.OwnsObject(profile.prefix|part)==owned);
+                assert(!r.OwnsObject((profile.prefix^0x80000000u)|part));
+                if(owned)layout[NativeModelFields[group-1][field++]]=profile.prefix|part;
+                ++cases;
+            }
+            assert(!r.OwnsObject(profile.prefix|0xffffu));
+            r.group=false;assert(!r.OwnsObject(profile.prefix));
+        }
+        assert(NativeModelLayoutMatches(model,layout,0x3e));
+        assert(!NativeModelLayoutMatches(model,layout,0x3d));
+        const auto original=layout[0xa];layout[0xa]^=0x10000u;
+        assert(!NativeModelLayoutMatches(model,layout,0x3e));layout[0xa]=original;
+        layout[0xa]=0xffffffffu;assert(!NativeModelLayoutMatches(model,layout,0x3e));
+        ++cases;
     }
+    assert(!NativeModelProfileFor(-1)&&!NativeModelProfileFor(30));
     for(unsigned count:{0u,1u,3u,256u,257u})for(unsigned index:{0u,1u,2u,255u,256u})
     for(unsigned offset:{0u,1u,59u}){
         const auto address=0x1000u+0x3cu*index+offset;

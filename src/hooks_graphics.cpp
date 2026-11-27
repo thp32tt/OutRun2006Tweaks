@@ -1376,9 +1376,12 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             OutRunVRStereo::RetireRepeatedNativeVehicle(reinterpret_cast<std::uintptr_t>(player));
         // Do not poll diagnostics or sidecar files for the OFF run.
         if(!NativeModelPlayer||NativeModelPlayer!=player||!player||variant!=0||
-            model!=static_cast<int>(player->car_kind_11)||(model!=2&&model!=17)||
-            !IsF50RetailCarId(player->car_id_10)||
-            !(Settings::VRExternalFerrariTest||Settings::VRF50ExternalModel)){
+            model!=static_cast<int>(player->car_kind_11)||!NativeModelProfileFor(model)||
+            player->car_id_10>=30||
+            CanonicalFerrariExternalCarId(static_cast<unsigned char>(model))!=
+                CanonicalFerrariExternalCarId(player->car_id_10)||
+            !(Settings::VRExternalFerrariTest||
+                (Settings::VRF50ExternalModel&&IsF50RetailCarId(player->car_id_10)))){
             original(player,model,variant);return;
         }
         auto fallback=[&](const char* reason){
@@ -1392,6 +1395,18 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             }
             original(player,model,variant);
         };
+        // Confirm the actual retail layout before any private omission.
+        const auto* layouts=Module::exe_ptr<const std::uint32_t>(0x1b2f68);
+        if(!QuestCockpitGlassLive::Memory(layouts,30u*sizeof(*layouts))){
+            fallback("NATIVE_LAYOUT_TABLE_UNREADABLE");return;
+        }
+        const auto* layout=reinterpret_cast<const std::uint32_t*>(
+            static_cast<std::uintptr_t>(layouts[model]));
+        if(layout!=Module::exe_ptr<const std::uint32_t>(0x1b0cb8+model*0x128)||
+            !QuestCockpitGlassLive::Memory(layout,0xf8u)||
+            !NativeModelLayoutMatches(model,layout,0x3eu)){
+            fallback("NATIVE_LAYOUT_MISMATCH");return;
+        }
         // Native mode-1 only. Unknown / faded alternate body remains stock.
         if((player->flags_4&0xc000u)!=0x4000u){fallback("NATIVE_MODE_NOT_ONE");return;}
         if(!NativeModelQueueEmpty()){fallback("NATIVE_QUEUE_NOT_EMPTY");return;}

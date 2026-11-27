@@ -864,6 +864,8 @@ struct ExHook{
 } CreateDepthRetentionExHook;
 '''
 entry_stub=r'''
+namespace Settings { bool VRExternalFerrariNativeCallbackReplacement=true,VRDirectGpuOnly=true; }
+bool GameplayActive(){return true;}
 enum class R7CandidateSeedResult{Unavailable,Seeded,DirtyRestore};
 IDirect3DSurface9 left,right,color,rc;
 IDirect3DSurface9 *TrackedDepthStencil=&left,*RightEyeDepth=&right,
@@ -911,6 +913,26 @@ template<class C,class D,class R>R7CandidateSeedResult R7SeedInactivePair(
 '''
 retention_cases=r'''
 int main(){
+    // Same-frame clean Clear failure is retryable, unlike a physical boundary.
+    {
+        IDirect3DDevice9 d; D3DVIEWPORT9 vp{};
+        R7MarkDepthRetention(&left,0);
+        seedResult=R7CandidateSeedResult::Unavailable;
+        assert(R7BeginExternalAtomicResourceTransaction(&d,vp,0,0,1,0)==R7CandidateSeedResult::Unavailable);
+        assert(ExternalAtomicAllocationAttemptEpoch==0);
+        seedResult=R7CandidateSeedResult::Seeded;
+        assert(R7BeginExternalAtomicResourceTransaction(&d,vp,0,0,1,0)==R7CandidateSeedResult::Seeded);
+        assert(R7BeginExternalAtomicResourceTransaction(&d,vp,0,0,1,0)==R7CandidateSeedResult::Unavailable);
+        ++PresentEpoch;ExternalAtomicReplayEpoch=0;
+        Settings::VRDirectGpuOnly=false;
+        auto before=ExternalAtomicCandidates.allocations;
+        assert(R7BeginExternalAtomicResourceTransaction(&d,vp,0,0,1,0)==R7CandidateSeedResult::Unavailable);
+        assert(ExternalAtomicCandidates.allocations==before);
+        Settings::VRDirectGpuOnly=true;
+        ExternalAtomicAllocationAttemptEpoch=0;
+        ExternalAtomicCandidates.allocations=0;rasterCalls=0;
+    }
+
     unsigned cases=0;
     for(unsigned mask=0;mask<512;++mask){
         IDirect3DDevice9 d;d.chains=(mask&1)?2:1;d.chainFail=mask&2;
