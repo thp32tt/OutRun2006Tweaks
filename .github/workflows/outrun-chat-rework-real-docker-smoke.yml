@@ -8,6 +8,8 @@ on:
       - "tools/chat-controller/localization-recovery-v1/entrypoint.chat-rework.sh"
       - "tools/chat-controller/localization-recovery-v1/github_chat_rework_controller.py"
       - "tools/chat-controller/localization-recovery-v1/hd_atlas_visual_queue.py"
+      - "tools/chat-controller/localization-recovery-v1/controller_png_attach.py"
+      - "tools/chat-controller/localization-recovery-v1/test_hd_atlas_visual_queue.py"
       - "tools/chat-controller/localization-recovery-v1/test_github_chat_rework_controller.py"
       - "tools/chat-controller/localization-recovery-v1/docker-compose.yml"
   workflow_dispatch:
@@ -26,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: localization-controller-recovery-20260928
+          ref: ${{ github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             tools/chat-controller/localization-recovery-v1/Dockerfile.chat-rework
