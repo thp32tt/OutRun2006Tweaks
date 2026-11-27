@@ -125,6 +125,13 @@ inline unsigned DashboardGearMask(
             mask|=1u<<bindings[i].gear;
     return mask;
 }
+// A complete embedded dashboard needs no separate state block or glass pass.
+constexpr bool DashboardCoverageComplete(unsigned needles,unsigned gears,
+    const DashboardTelemetry& telemetry) noexcept {
+    return telemetry.valid && telemetry.gear<=7u &&
+        (needles&DashboardBothNeedles)==DashboardBothNeedles &&
+        (gears&(1u<<telemetry.gear))!=0u;
+}
 inline bool DashboardOverlayMeshVisible(
     const DashboardBinding* binding,const DashboardTelemetry& telemetry,
     unsigned embeddedMask,unsigned embeddedGearMask=0u) noexcept

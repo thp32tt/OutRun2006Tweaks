@@ -1440,7 +1440,11 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                         }
                         auto& dash=GlobalDashboardGpu();
                         dash.SelectSidecar(FerrariModelSlot::GenericId,carId);
-                        if(dash.SelectionMatches(FerrariModelSlot::GenericId,carId)&&dash.Installed())
+                        // One asynchronous missing-file attempt per selection,
+                        // rather than a synchronous file attribute query per frame.
+                        if(dash.SelectionMatches(FerrariModelSlot::GenericId,carId)&&
+                            (body.DashboardNeedleCoverage()!=DashboardBothNeedles||
+                             (body.DashboardGearCoverage()&0xffu)!=0xffu))
                             dash.EnsureResources(device);
                     }
                 }
@@ -1456,20 +1460,16 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // Never remove a stock dashboard without available replacements.
         // Embedded bindings or a valid independent overlay are mandatory.
         auto& overlay=GlobalDashboardGpu();
-        // An installed but unavailable overlay must not suppress a complete
-        // embedded dashboard. Keep warming the overlay outside private raster.
-        const bool overlaySelected=overlay.SelectionMatches(FerrariModelSlot::GenericId,ticket.carId);
-        if(overlaySelected&&!overlay.ReadyForCandidateSeed(ticket.device,FerrariModelSlot::GenericId,ticket.carId)&&
-            overlay.Installed())overlay.EnsureResources(ticket.device);
-        // Only opaque overlays can be ordered ahead of body glass today.
-        const bool includeDashboard=overlay.ReadyForCandidateSeed(ticket.device,FerrariModelSlot::GenericId,ticket.carId)&&
+        // Do not upload into a seeded scene. A complete embedded dashboard
+        // needs no extra overlay/opaque/glass StateBlock round trips.
+        const unsigned bodyNeedles=GlobalGpu().DashboardNeedleCoverage();
+        const unsigned bodyGears=GlobalGpu().DashboardGearCoverage();
+        const bool includeDashboard=!DashboardCoverageComplete(bodyNeedles,bodyGears,ticket.dashboard)&&
+            overlay.ReadyForCandidateSeed(ticket.device,FerrariModelSlot::GenericId,ticket.carId)&&
             !overlay.HasGlassMeshes();
-        const unsigned needles=GlobalGpu().DashboardNeedleCoverage()|
-            (includeDashboard?overlay.DashboardNeedleCoverage():0u);
-        const unsigned gears=GlobalGpu().DashboardGearCoverage()|
-            (includeDashboard?overlay.DashboardGearCoverage():0u);
-        if(!ticket.dashboard.valid||needles!=DashboardBothNeedles||
-            ticket.dashboard.gear>7u||!(gears&(1u<<ticket.dashboard.gear))){
+        const unsigned needles=bodyNeedles|(includeDashboard?overlay.DashboardNeedleCoverage():0u);
+        const unsigned gears=bodyGears|(includeDashboard?overlay.DashboardGearCoverage():0u);
+        if(!DashboardCoverageComplete(needles,gears,ticket.dashboard)){
             fallback("DASHBOARD_COVERAGE_MISSING");return;
         }
         ExternalVehicleStageInput input{};

@@ -124,6 +124,17 @@ int main() {
         }
     }
 
+    // Cover every needle and gear combination, including invalid telemetry.
+    for(unsigned needles=0;needles<4;++needles)
+        for(unsigned gears=0;gears<256;++gears)
+            for(unsigned digit=0;digit<8;++digit){
+                const auto sample=SanitizeDashboardTelemetry(50.f,3000u,digit);
+                assert(DashboardCoverageComplete(needles,gears,sample)==
+                    (needles==DashboardBothNeedles&&(gears&(1u<<digit))!=0u));
+            }
+    assert(!DashboardCoverageComplete(3u,255u,DashboardTelemetry{}));
+    auto badSample=validGear;badSample.gear=32;
+    assert(!DashboardCoverageComplete(3u,255u,badSample));
     // A tolerated exporter length error must not scale/shear a needle.
     // Compare every element to the same pivot rotation about a unit axis.
     for(const auto kind : {DashboardKind::SpeedNeedle,DashboardKind::RpmNeedle}) {

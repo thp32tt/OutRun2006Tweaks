@@ -2178,7 +2178,10 @@ namespace OutRunVRStereo
                 (dashboardReady?dash.DashboardNeedleCoverage():0u);
             const unsigned gears=body.DashboardGearCoverage()|
                 (dashboardReady?dash.DashboardGearCoverage():0u);
-            return needles==DashboardBothNeedles&&gears!=0u;
+            // Avoid duplicating an entire scene for a known missing gear.
+            // Native callback rechecks its independently latched sample.
+            return DashboardCoverageComplete(needles,gears,
+                SanitizeDashboardTelemetry(player->field_1F8,player->dword20C,player->cur_gear_208));
         }
         R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
             const D3DVIEWPORT9& viewport,DWORD flags,D3DCOLOR color,float z,DWORD stencil) noexcept
