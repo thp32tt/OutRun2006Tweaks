@@ -793,6 +793,10 @@ retention=source[source.index("constexpr GUID R7DepthRetentionGuid"):
                  source.index("// EXT16-011 A1: an inactive")]
 entry=source[source.index("R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction("):
              source.index("// Copy/fill methods write explicit surfaces")]
+# The auxiliary raster owner has its own actual-body regression fixture.
+a=entry.index("// A verified auxiliary pass may preserve")
+b=entry.index("// Replay one physical draw",a)
+entry=entry[:a]+entry[b:]
 retention_stub=r'''
 #define __stdcall
 #include <cassert>
