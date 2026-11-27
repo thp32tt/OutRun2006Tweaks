@@ -119,7 +119,10 @@ float4 mainPS(PixelIn input) : COLOR0 {
             T *= rsqrt(tangentSq);
             float handedness = orientation < 0 ? -1.0 : 1.0;
             float3 B = normalize(cross(N,T))*handedness;
-            float3 mapN = tex2D(normalMap,input.uv).xyz*2.0-1.0;
+            // The TBN branch varies across neighboring pixels. Implicit
+            // texture derivatives here can select undefined mip levels.
+            // Use the gradients already evaluated before divergent flow.
+            float3 mapN = tex2Dgrad(normalMap,input.uv,dtdx,dtdy).xyz*2.0-1.0;
             mapN.xy *= factors.z;
             float3 mappedN = mapN.x*T+mapN.y*B+mapN.z*N;
             float mappedSq = dot(mappedN,mappedN);
