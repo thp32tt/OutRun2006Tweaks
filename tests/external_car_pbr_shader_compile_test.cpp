@@ -5,6 +5,8 @@
 #include <d3dcompiler.h>
 #include <cstdio>
 #include <cstring>
+#include <thread>
+#include <chrono>
 
 int main() {
     using OutRunVR::DinoSidecar::PbrShaders;
@@ -42,5 +44,17 @@ int main() {
         if(errors)errors->Release();
         bytes->Release();
     }
+    // Exercise the actual process-shared asynchronous compiler as well.
+    PbrShaders::Prewarm();
+    auto status=PbrShaders::BytecodePreparation();
+    for(unsigned i=0;i<3000&&status==PbrShaders::Preparation::Pending;++i){
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        status=PbrShaders::BytecodePreparation();
+    }
+    if(status!=PbrShaders::Preparation::Ready)return 2;
+    PbrShaders body,dash;
+    body.Release();dash.Release(); // GPU retirement must not discard bytecode.
+    if(PbrShaders::BytecodePreparation()!=PbrShaders::Preparation::Ready)return 3;
+    std::puts("PBR_ASYNC_SHARED_BYTECODE_PASS");
     return 0;
 }

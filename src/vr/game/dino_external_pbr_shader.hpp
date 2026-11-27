@@ -9,6 +9,9 @@
 #include <d3dcompiler.h>
 #include <cstring>
 #include <cstdint>
+#include <future>
+#include <chrono>
+#include <vector>
 #include "external_car_pbr_eye_math.hpp"
 #include "external_car_pbr_normal_math.hpp"
 
@@ -171,7 +174,69 @@ float4 mainPS(PixelIn input) : COLOR0 {
 }
 )HLSL";
     }
+    struct Bytecode {
+        std::vector<DWORD> vs,ps;
+        bool valid() const noexcept {return !vs.empty()&&!ps.empty();}
+    };
+    // D3DCompile is CPU-only. Share immutable bytecode across body/dashboard
+    // and every Reset; never move device/COM shader creation off render thread.
+    static Bytecode CompileBytecode() {
+        struct Resources {
+            HMODULE dll=nullptr;
+            ID3DBlob *vs=nullptr,*ps=nullptr,*errors=nullptr;
+            ~Resources(){
+                if(errors)errors->Release();
+                if(vs)vs->Release();
+                if(ps)ps->Release();
+                if(dll)FreeLibrary(dll);
+            }
+        } r;
+        r.dll=LoadLibraryW(L"d3dcompiler_47.dll");
+        if(!r.dll)return {};
+        using Compile=HRESULT (WINAPI *)(LPCVOID,SIZE_T,LPCSTR,
+            const D3D_SHADER_MACRO*,ID3DInclude*,LPCSTR,LPCSTR,
+            UINT,UINT,ID3DBlob**,ID3DBlob**);
+        const auto compile=reinterpret_cast<Compile>(GetProcAddress(r.dll,"D3DCompile"));
+        if(!compile)return {};
+        constexpr UINT flags=D3DCOMPILE_PACK_MATRIX_ROW_MAJOR|D3DCOMPILE_OPTIMIZATION_LEVEL3;
+        HRESULT hr=compile(VertexSource(),std::strlen(VertexSource()),"DinoPbrVS",
+            nullptr,nullptr,"mainVS","vs_3_0",flags,0,&r.vs,&r.errors);
+        if(r.errors){r.errors->Release();r.errors=nullptr;}
+        if(FAILED(hr)||!r.vs)return {};
+        hr=compile(PixelSource(),std::strlen(PixelSource()),"DinoPbrPS",
+            nullptr,nullptr,"mainPS","ps_3_0",flags,0,&r.ps,&r.errors);
+        if(FAILED(hr)||!r.ps)return {};
+        Bytecode code{};
+        auto copy=[](ID3DBlob* blob,std::vector<DWORD>& out){
+            const auto bytes=blob->GetBufferSize();
+            if(!bytes||bytes%sizeof(DWORD)||!blob->GetBufferPointer())return false;
+            out.resize(bytes/sizeof(DWORD));
+            std::memcpy(out.data(),blob->GetBufferPointer(),bytes);
+            return true;
+        };
+        if(!copy(r.vs,code.vs)||!copy(r.ps,code.ps))return {};
+        return code;
+    }
+    static const std::shared_future<Bytecode>& SharedBytecode() {
+        static const auto task=std::async(std::launch::async,[]{
+            try{return CompileBytecode();}catch(...){return Bytecode{};}
+        }).share();
+        return task;
+    }
 public:
+    enum class Preparation { Pending, Ready, Failed };
+    static void Prewarm() noexcept {
+        try{(void)SharedBytecode();}catch(...){}
+    }
+    // Exposed for the Windows compiler regression without requiring a GPU.
+    static Preparation BytecodePreparation() noexcept {
+        try{
+            const auto& task=SharedBytecode();
+            if(task.wait_for(std::chrono::seconds(0))!=std::future_status::ready)
+                return Preparation::Pending;
+            return task.get().valid()?Preparation::Ready:Preparation::Failed;
+        }catch(...){return Preparation::Failed;}
+    }
     static constexpr const char* VertexHlsl() noexcept {return VertexSource();}
     static constexpr const char* PixelHlsl() noexcept {return PixelSource();}
     IDirect3DVertexShader9* VertexShader() const noexcept {return vs_;}
@@ -187,52 +252,32 @@ public:
         if(vs)vs->Release();
         if(ps)ps->Release();
     }
-    bool Ensure(IDirect3DDevice9* device) noexcept {
-        if(!device)return false;
-        if(attempted_)return vs_ && ps_;
-        attempted_=true; // never retry shader compilation every stereo eye
+    Preparation Ensure(IDirect3DDevice9* device) noexcept {
+        if(!device)return Preparation::Failed;
+        if(attempted_)return vs_&&ps_?Preparation::Ready:Preparation::Failed;
+        const auto status=BytecodePreparation();
+        if(status==Preparation::Pending)return status;
+        attempted_=true;
+        if(status!=Preparation::Ready)return Preparation::Failed;
         const auto generation=generation_;
         const auto current=[&](){return generation_==generation;};
         D3DCAPS9 caps{};
-        if(FAILED(device->GetDeviceCaps(&caps)) || !current() ||
-           caps.VertexShaderVersion<D3DVS_VERSION(3,0) ||
-           caps.PixelShaderVersion<D3DPS_VERSION(3,0))return false;
-        HMODULE dll=LoadLibraryW(L"d3dcompiler_47.dll");
-        if(!dll)return false; // clean fixed-function fallback
-        using Compile=HRESULT (WINAPI *)(LPCVOID,SIZE_T,LPCSTR,
-            const D3D_SHADER_MACRO*,ID3DInclude*,LPCSTR,LPCSTR,
-            UINT,UINT,ID3DBlob**,ID3DBlob**);
-        const auto compile=reinterpret_cast<Compile>(GetProcAddress(dll,"D3DCompile"));
-        if(!compile){FreeLibrary(dll);return false;}
-        ID3DBlob *vsCode=nullptr,*psCode=nullptr,*errors=nullptr;
-        constexpr UINT flags=D3DCOMPILE_PACK_MATRIX_ROW_MAJOR|D3DCOMPILE_OPTIMIZATION_LEVEL3;
-        HRESULT hr=compile(VertexSource(),std::strlen(VertexSource()),
-                           "DinoPbrVS",nullptr,nullptr,"mainVS","vs_3_0",
-                           flags,0,&vsCode,&errors);
-        if(errors){errors->Release();errors=nullptr;}
-        if(SUCCEEDED(hr))
-            hr=compile(PixelSource(),std::strlen(PixelSource()),
-                       "DinoPbrPS",nullptr,nullptr,"mainPS","ps_3_0",
-                       flags,0,&psCode,&errors);
-        if(errors)errors->Release();
+        if(FAILED(device->GetDeviceCaps(&caps))||!current()||
+            caps.VertexShaderVersion<D3DVS_VERSION(3,0)||
+            caps.PixelShaderVersion<D3DPS_VERSION(3,0))return Preparation::Failed;
+        const auto& code=SharedBytecode().get();
         IDirect3DVertexShader9* pendingVs=nullptr;
         IDirect3DPixelShader9* pendingPs=nullptr;
-        if(SUCCEEDED(hr) && vsCode && psCode&&current())
-            hr=device->CreateVertexShader(
-                static_cast<const DWORD*>(vsCode->GetBufferPointer()),&pendingVs);
-        if(SUCCEEDED(hr) && pendingVs && psCode&&current())
-            hr=device->CreatePixelShader(
-                static_cast<const DWORD*>(psCode->GetBufferPointer()),&pendingPs);
-        if(vsCode)vsCode->Release();
-        if(psCode)psCode->Release();
-        FreeLibrary(dll);
-        if(FAILED(hr)||!pendingVs||!pendingPs||!current()) {
+        HRESULT hr=device->CreateVertexShader(code.vs.data(),&pendingVs);
+        if(SUCCEEDED(hr)&&pendingVs&&current())
+            hr=device->CreatePixelShader(code.ps.data(),&pendingPs);
+        if(FAILED(hr)||!pendingVs||!pendingPs||!current()){
             if(pendingVs)pendingVs->Release();
             if(pendingPs)pendingPs->Release();
-            return false;
+            return Preparation::Failed;
         }
         vs_=pendingVs;ps_=pendingPs;
-        return true;
+        return Preparation::Ready;
     }
     template<class Current>
     HRESULT SetWorldGuarded(IDirect3DDevice9* device,const D3DMATRIX& world,Current current) noexcept {

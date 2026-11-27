@@ -467,6 +467,10 @@ class GpuOwner final {
         const auto generation=gpuGeneration_;
         const auto current=[&](){return gpuGeneration_==generation&&owner_==dev&&!gpuRetirementDepth_;};
         const auto reject=[&](const char* reason){return current()?RejectGpu(dev,reason):false;};
+        const bool fixedFunctionStereoProbe=ForceFixedFunctionStereoProbe();
+        // Start the shared CPU compile in parallel with incremental texture
+        // upload. Pending bytecode is not a GPU failure or a reset request.
+        if(cpu_.pbrEnabled&&!fixedFunctionStereoProbe)PbrShaders::Prewarm();
         // The original car stays active until the LAST upload succeeds.
         // Keep each frame's preparation to one DDS or one mesh allocation.
         if(nextTexture_<cpu_.textures.size()) {
@@ -479,11 +483,8 @@ class GpuOwner final {
             });
             return false;
         }
-        // Optional PBR allocations must never prevent a working legacy draw.
-        // On any map/shader failure fall back to textured fixed-function once
-        // per device generation, not once per eye/frame.
-        const bool fixedFunctionStereoProbe=
-            ForceFixedFunctionStereoProbe();
+        // An opted-in PBR car stays stock until its maps and shaders are ready.
+        // Never silently fall back to unlit textures for a failed PBR upload.
         if(!pbrPrepared_ && cpu_.pbrEnabled && !fixedFunctionStereoProbe) {
             const auto count=cpu_.pbrMaterials.size();
             if(normals_.size()!=count)normals_.resize(count,nullptr);
@@ -506,9 +507,9 @@ class GpuOwner final {
                 return false;
             }
             // Bind only after every normal/ORM allocation succeeded.
-            const bool shaderReady=pbrShaders_.Ensure(dev);
-            if(!current())return false;
-            pbrReady_=shaderReady;
+            const auto shaderReady=pbrShaders_.Ensure(dev);
+            if(!current()||shaderReady==PbrShaders::Preparation::Pending)return false;
+            pbrReady_=shaderReady==PbrShaders::Preparation::Ready;
             if(!pbrReady_)return reject("PBR_SHADER_UNAVAILABLE");
         }
         pbrPrepared_=true;
