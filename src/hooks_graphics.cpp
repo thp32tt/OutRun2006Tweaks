@@ -1434,8 +1434,10 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                     if(body.SelectSidecar(slot,carId))GlobalF50PoseFilter().Reset();
                     if(body.SelectionMatches(slot,carId)){
                         float lift=0.f;
-                        if(body.SafeFloorLift(legacy?Settings::VRF50ExternalLift.get():0.f,lift))
-                            body.EnsureResources(device);
+                        if(body.SafeFloorLift(legacy?Settings::VRF50ExternalLift.get():0.f,lift)&&
+                            body.EnsureResources(device)&&!body.HasGlassMeshes()){
+                            fallback("BODY_GLASS_NOT_TAGGED");return;
+                        }
                         auto& dash=GlobalDashboardGpu();
                         dash.SelectSidecar(FerrariModelSlot::GenericId,carId);
                         if(dash.SelectionMatches(FerrariModelSlot::GenericId,carId)&&dash.Installed())
@@ -1448,6 +1450,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         auto ticket=PrepareF50External(player);
         if(!ticket.valid){fallback("TICKET_OR_ASSET_NOT_READY");return;}
         if(!GlobalGpu().EnsureResources(ticket.device)){fallback("BODY_GPU_NOT_READY");return;}
+        // The native model leaf owns the complete vehicle. An opaque-only
+        // cockpit/old native remaster is not a valid body replacement.
+        if(!GlobalGpu().HasGlassMeshes()){fallback("BODY_GLASS_NOT_TAGGED");return;}
         // Never remove a stock dashboard without available replacements.
         // Embedded bindings or a valid independent overlay are mandatory.
         auto& overlay=GlobalDashboardGpu();

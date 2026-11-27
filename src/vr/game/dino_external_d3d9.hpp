@@ -136,6 +136,7 @@ class GpuOwner final {
     std::string cpuLoadFailure_{};
     const char* gpuFailure_="NONE";
     std::vector<GpuMesh> meshes_{};
+    unsigned glassMeshCount_=0;
     std::vector<IDirect3DTexture9*> textures_{};
     std::vector<IDirect3DTexture9*> normals_{},orms_{};
     PbrShaders pbrShaders_{};
@@ -256,6 +257,7 @@ class GpuOwner final {
         std::vector<GpuMesh> retiredMeshes;
         std::vector<IDirect3DTexture9*> retiredTextures,retiredNormals,retiredOrms;
         retiredMeshes.swap(meshes_);
+        glassMeshCount_=0;
         retiredTextures.swap(textures_);
         retiredNormals.swap(normals_);
         retiredOrms.swap(orms_);
@@ -571,6 +573,7 @@ class GpuOwner final {
             // Both buffers are local and their final Unlock was fenced.
             // No driver call occurs before this owner-local publication.
             meshes_.push_back(next);
+            if(next.glass)++glassMeshCount_;
             ++nextMesh_;
             return false;
         }
@@ -725,10 +728,7 @@ public:
         return device&&owner_==device&&loaded_&&preparation_==Preparation::Ready&&
             !gpuBusy_&&!gpuRetirementDepth_&&SelectionMatches(slot,carId);
     }
-    bool HasGlassMeshes() const noexcept {
-        for(const auto& mesh:meshes_)if(mesh.glass)return true;
-        return false;
-    }
+    bool HasGlassMeshes() const noexcept {return glassMeshCount_!=0;}
     // API name retained for the existing large game-hook call site: return
     // individual bit coverage (1=speed, 2=RPM), NOT a boolean pair flag.
     unsigned HasEmbeddedSpeedAndRpm() const noexcept {

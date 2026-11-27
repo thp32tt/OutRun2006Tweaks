@@ -2171,7 +2171,7 @@ namespace OutRunVRStereo
                 !MatchesFerrariSelection(id,Settings::VRExternalFerrariTestCarId.get())))return false;
             const auto slot=legacy?FerrariModelSlot::F50:FerrariModelSlot::GenericId;
             const auto& body=GlobalGpu();const auto& dash=GlobalDashboardGpu();
-            if(!body.ReadyForCandidateSeed(device,slot,id))return false;
+            if(!body.ReadyForCandidateSeed(device,slot,id)||!body.HasGlassMeshes())return false;
             const bool dashboardReady=dash.ReadyForCandidateSeed(device,FerrariModelSlot::GenericId,id)&&
                 !dash.HasGlassMeshes();
             const unsigned needles=body.DashboardNeedleCoverage()|
@@ -4661,7 +4661,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
         auto& body=GlobalGpu();auto& dash=GlobalDashboardGpu();
         // Asset loading is forbidden after original body omission. A stale
         // selection or GPU generation aborts, never starts a new upload here.
-        if(!current()||!body.ReadyForCandidateSeed(device,input.slot,input.carId)||
+        if(!current()||!body.ReadyForCandidateSeed(device,input.slot,input.carId)||!body.HasGlassMeshes()||
             (input.includeDashboard&&(!dash.ReadyForCandidateSeed(device,FerrariModelSlot::GenericId,input.carId)||
                 dash.HasGlassMeshes()))||!current())
             return abort(IsolatedStageResult::Unavailable);

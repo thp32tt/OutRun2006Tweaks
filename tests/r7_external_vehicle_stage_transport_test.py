@@ -128,7 +128,7 @@ namespace OutRunVR::DinoSidecar {
 gpu_stub=r'''
     struct MockGpu {
         unsigned count=3;bool dashboard=false;
-        bool HasGlassMeshes(){return dashboard&&overlayGlass;}
+        bool HasGlassMeshes(){return dashboard?overlayGlass:true;}
         bool SelectionMatches(FerrariModelSlot,unsigned char){return true;}
         bool ReadyForCandidateSeed(IDirect3DDevice9*,FerrariModelSlot,unsigned char) const {return true;}
         unsigned HasEmbeddedSpeedAndRpm(){return 0;}unsigned EmbeddedGearMask(){return 0;}

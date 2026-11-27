@@ -246,6 +246,8 @@ jobs:
           assert 'DrawIndexedPrimitiveHook.stdcall<HRESULT>(' in stage
           assert 'body.DrawNativeScene(' in stage and 'dash.DrawNativeScene(' in stage
           assert 'ReadyForCandidateSeed(device,input.slot,input.carId)' in stage
+          assert '!body.HasGlassMeshes()' in stage and '!GlobalGpu().HasGlassMeshes()' in model
+          assert 'BODY_GLASS_NOT_TAGGED' in model
           assert 'EnsureResources(' not in stage
           seed_ready=r7[r7.index('bool R7NativeAssetsSeedReady('):r7.index('R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(')]
           assert 'camera->cam_mode_34A!=1' in seed_ready and 'MatchesFerrariSelection' in seed_ready
