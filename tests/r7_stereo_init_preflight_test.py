@@ -592,7 +592,7 @@ assert "R7ExecuteRawCandidateVb(device,call,true);" in up
 assert "R7ExecuteRawCandidateVb(device,call,true,true);" in iup
 assert "InternalStereoPass&&!OutRunVR::DinoSidecar::ActiveExternalStereoMesh" in up and "InternalStereoPass&&!OutRunVR::DinoSidecar::ActiveExternalStereoMesh" in iup
 assert "[&](){return drawCall();},eye,1,false);" in source
-assert "if(changed)ExternalAtomicReplayEpoch=0;" in source
+assert "if(changed&&TargetIsBackBuffer())ExternalAtomicReplayEpoch=0;" in source
 assert "ExternalAtomicReplayEpoch=0;" in clear
 
 # Iter72: execute the actual raw explicit-surface write owner with fault
