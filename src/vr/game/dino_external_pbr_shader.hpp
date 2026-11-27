@@ -155,6 +155,15 @@ float4 mainPS(PixelIn input) : COLOR0 {
     float3 diffuse = (1-fresnel)*(1-metallic)*albedo/pi;
     float3 radiance = (diffuse+specular)*NL*2.0;
     float3 ambient = ao*(albedo*(1-metallic)*0.16+F0*0.045);
+    // Source assets without authored ORM still have material factors.
+    // Approximate environment reflection with roughness-aware Fresnel;
+    // do not invent spatial AO/metalness from albedo or normal textures.
+    if (eyeAndOrm.w <= 0.5 && eyeSq > 1.e-12) {
+        float edge = 1.0-roughness;
+        float3 ambientF = F0+(max(float3(edge,edge,edge),F0)-F0)*pow(1-NV,5);
+        ambient = (1-ambientF)*albedo*(1-metallic)*0.16+
+                  ambientF*lerp(0.045,0.02,roughness);
+    }
     float3 linearColor = saturate(radiance+ambient);
     return float4(pow(linearColor,1.0/2.2),base.a);
 }

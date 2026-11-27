@@ -474,7 +474,7 @@ int main() {
 '''
 with tempfile.TemporaryDirectory() as directory:
     p = Path(directory)
-    (p / "probe.cpp").write_text(prefix + helper + "bool R7NativeStockOnlyDraw(){return false;}\nvoid R7RecordNativeStockOmission(unsigned,R7CandidateSeedResult){}\n"+raw_vb + raw + base_dispatch_stub + base_entrypoints + suffix)
+    (p / "probe.cpp").write_text(prefix + "bool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9*){return false;}\n" + helper + "bool R7NativeStockOnlyDraw(){return false;}\nvoid R7RecordNativeStockOmission(unsigned,R7CandidateSeedResult){}\n"+raw_vb + raw + base_dispatch_stub + base_entrypoints + suffix)
     subprocess.run(["g++", "-std=c++17", "-O2", "-Wall", "-Wextra",
                     "-Werror", "-pedantic", "-I", str(root / "src/vr/d3d9"),
                     str(p / "probe.cpp"), "-o", str(p / "probe")], check=True)
@@ -567,7 +567,7 @@ int main(){
 '''
 with tempfile.TemporaryDirectory() as directory:
     p=Path(directory)
-    (p/"probe.cpp").write_text(r22stub+helper+r22owner+r22cases)
+    (p/"probe.cpp").write_text(r22stub+"bool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9*){return false;}\n"+helper+r22owner+r22cases)
     subprocess.run(["g++","-std=c++17","-O2","-Wall","-Wextra","-Werror","-pedantic",
                     "-I",str(root/"src/vr/d3d9"),str(p/"probe.cpp"),"-o",str(p/"probe")],check=True)
     subprocess.run([str(p/"probe")],check=True)

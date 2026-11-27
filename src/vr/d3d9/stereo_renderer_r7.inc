@@ -1530,12 +1530,14 @@ namespace OutRunVRStereo
         // A recent full clear can be replayed only until the next potential
         // LEFT depth/stencil write. Keep the no-receipt hot path free of
         // render-state probes. Internal RIGHT replay must not revoke LEFT.
+        bool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9* device) noexcept;
         void RevokeDepthClearReplayBeforeLeftDraw(IDirect3DDevice9* device,
             bool mirrorCandidate=false)
         {
             // R29 raw wrappers also enter here, including internal routes.
             // Any unmirrored physical draw may change color or depth.
-            if(ExternalAtomicReplayEpoch && !mirrorCandidate && IsGameDevice(device))
+            if(ExternalAtomicReplayEpoch && !mirrorCandidate && IsGameDevice(device) &&
+                !R7CandidateDisjointOffscreenRaster(device))
                 ExternalAtomicReplayEpoch=0;
             if(InternalStereoPass || !LastMainDepthClearStamp.Current(PresentEpoch) ||
                 !IsGameDevice(device))return;
@@ -1554,7 +1556,7 @@ namespace OutRunVRStereo
         {
             if(IsGameDevice(device)){
                 if(clear){
-                    ExternalAtomicReplayEpoch=0;
+                    if(!R7CandidateDisjointOffscreenRaster(device))ExternalAtomicReplayEpoch=0;
                     LastMainDepthClearStamp.OnPotentialWrite(flags&(D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL));
                 }else{
                     RevokeDepthClearReplayBeforeLeftDraw(device);
@@ -2224,6 +2226,48 @@ namespace OutRunVRStereo
             return result==R7CandidateSeedResult::Unavailable?cleanDecline():result;
         }
 
+        // A verified auxiliary pass may preserve a still-identical scene pair.
+        // Never assume a tracked bind proves actual attachments. Once a stock
+        // vehicle draw was omitted, an auxiliary read dependency is unknown.
+        bool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9* device) noexcept
+        {
+            auto& pair=ExternalAtomicCandidates;
+            if(!device||InternalStereoPass||TargetIsBackBuffer()||
+                ExternalAtomicReplayEpoch!=PresentEpoch||pair.device!=device||
+                AnyAuxRenderTargetActive()||R7CandidateResetInFlight||
+                R7VehicleStageInFlight||R7StagedVehicle.present==PresentEpoch||
+                OutRunVR::DinoSidecar::ActiveNativeVehicleStockReplay||
+                !pair.provenLiveColor[0]||!pair.provenLiveDepth[0]||
+                !pair.simultaneousTargets||pair.simultaneousTargets>4)
+                return false;
+            const auto epoch=PresentEpoch,generation=pair.generation,boundary=R7CandidateBoundarySerial;
+            auto current=[&](){return PresentEpoch==epoch&&ExternalAtomicReplayEpoch==epoch&&
+                pair.generation==generation&&R7CandidateBoundarySerial==boundary&&
+                pair.device==device&&!R7CandidateResetInFlight;};
+            auto distinct=[&](IDirect3DSurface9* surface){
+                if(!surface)return true;
+                for(unsigned eye=0;eye<2;++eye)
+                    if(surface==pair.provenLiveColor[eye]||surface==pair.provenLiveDepth[eye]||
+                        surface==pair.eyes[eye].color||surface==pair.eyes[eye].depth)return false;
+                return true;
+            };
+            IDirect3DSurface9* rt=nullptr;
+            auto hr=device->GetRenderTarget(0,&rt);
+            bool ok=SUCCEEDED(hr)&&rt&&current()&&rt==TrackedRenderTarget&&distinct(rt);
+            ReleaseCom(rt);if(!ok||!current())return false;
+            for(UINT i=1;i<pair.simultaneousTargets;++i){
+                hr=device->GetRenderTarget(i,&rt);
+                ok=hr==D3DERR_NOTFOUND&&!rt&&current();
+                ReleaseCom(rt);if(!ok||!current())return false;
+            }
+            IDirect3DSurface9* depth=nullptr;
+            hr=device->GetDepthStencilSurface(&depth);
+            ok=current()&&((SUCCEEDED(hr)&&depth&&depth==TrackedDepthStencil&&distinct(depth))||
+                (hr==D3DERR_NOTFOUND&&!depth&&!TrackedDepthStencil));
+            ReleaseCom(depth);
+            return ok&&current();
+        }
+
         // Replay one physical draw while its exact eye transforms and shaders are bound.
         // UP callers must isolate input state via R7ReplayInactiveDraw.
         // A missing route invalidates the seed; this is NOT a complete scene
@@ -2298,7 +2342,8 @@ namespace OutRunVRStereo
                 return eye>=0&&pair.provenLiveColor[eye]==surface&&eyeFor(surface)==eye;
             };
             const bool protectedDepth=destination&&
-                (destination==TrackedDepthStencil||destination==RightEyeDepth);
+                (destination==TrackedDepthStencil||destination==RightEyeDepth||
+                 destination==pair.provenLiveDepth[0]||destination==pair.provenLiveDepth[1]);
             const bool privateWrite=destination&&
                 (destination==pair.eyes[0].color||destination==pair.eyes[1].color||
                  destination==pair.eyes[0].depth||destination==pair.eyes[1].depth);
@@ -2356,6 +2401,7 @@ namespace OutRunVRStereo
                 const auto& pair=ExternalAtomicCandidates;
                 if(destination==BackBuffer||destination==RightEyeSurface||
                     destination==TrackedDepthStencil||destination==RightEyeDepth||
+                    destination==pair.provenLiveDepth[0]||destination==pair.provenLiveDepth[1]||
                     destination==pair.eyes[0].color||destination==pair.eyes[1].color||
                     destination==pair.eyes[0].depth||destination==pair.eyes[1].depth)
                     ExternalAtomicReplayEpoch=0;
@@ -2665,7 +2711,11 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
 			auto&slot=DirectTransportSlots[selected];
 			{
 				InternalPassScope guard;
-                const auto staged=R7TransferStagedVehicle(device,slot,BackBuffer,RightEyeSurface,D3DTEXF_LINEAR);
+                // Exact-size transfers do not need a scaling filter. Keep
+                // the existing linear path for genuinely different extents.
+                const auto stagedFilter=DirectTransportWidth==BackBufferDesc.Width&&
+                    DirectTransportHeight==BackBufferDesc.Height?D3DTEXF_NONE:D3DTEXF_LINEAR;
+                const auto staged=R7TransferStagedVehicle(device,slot,BackBuffer,RightEyeSurface,stagedFilter);
                 if(staged.handled){
                     if(FAILED(staged.hr)){R7StagedTransportFaultGeneration=DirectTransportGeneration;return false;}
                 } else if(FAILED(StretchDirectEye(device,BackBuffer,slot.leftSurface))||
@@ -3862,6 +3912,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 auto call=[&](){return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);};
                 return R7ExecuteRawCandidateVb(device,call,false,false,flags);
             }
+            if(R7CandidateDisjointOffscreenRaster(device))
+                return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);
             // A subsequent eligible Clear must update the existing isolated pair.
             // Never reseed from a partial/color-only clear or discard a valid
             // scene solely because the game clears its depth between passes.

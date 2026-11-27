@@ -615,6 +615,7 @@ struct Pair{struct Eye{IDirect3DSurface9* color;IDirect3DSurface9* depth;};
     Eye eyes[2]{{&cl,&czl},{&cr,&czr}};IDirect3DDevice9* device=&game;
     std::uint64_t generation=1;
     IDirect3DSurface9* provenLiveColor[2]{&left,&right};
+    IDirect3DSurface9* provenLiveDepth[2]{&ld,&rd};
 } ExternalAtomicCandidates;
 struct Stamp{unsigned count=0;void Invalidate(){++count;}} LastMainDepthClearStamp;
 std::atomic<bool> StereoBaseCallbacksArmed{true};
