@@ -498,5 +498,58 @@
     "patch_hybrid_real_asset_status": "TIMEOUT_NO_PROMOTION; two 120s and one 150s N100 runs ended before complete conversion; small synthetic fixture CI PASS",
     "hmd": "UNTESTED",
     "release_install": false
+  },
+  "native_connected_patch_revision": {
+    "source_sha256": "c15e3fb298ee9f3c4bc8c2f28dba7d1d72ae04c2b7f97277dd29c3e97f6bbeb8",
+    "uv_sha256": "baab9d61efdd88ba3804e98f6f34a9b0e538dc4117e76edf27b908e25f685ae6",
+    "ao_sha256": "242b01c229f15c833aeb1acf6f28f376ef738899daede40e7c956a83db745a5c",
+    "private_path": "ext16_f40_paired_v2_20261127/car_id_11_native_patch_ao.ovc",
+    "source_vertices": 112462,
+    "previous_candidate_vertices": 390702,
+    "vertices": 368887,
+    "triangles": 171765,
+    "groups": 42,
+    "charts": 98726,
+    "max_chart_faces": 8,
+    "drawable_opaque_triangles": 169502,
+    "glass_triangles": 2261,
+    "output_bytes": 34459717,
+    "previous_candidate_bytes": 35144231,
+    "generated_opaque_orm": 28,
+    "nonneutral_ao": 28,
+    "missing_opaque_normal_maps": 28,
+    "missing_opaque_orm_maps": 0,
+    "native_parser": "PASS",
+    "indexed_position_normal_corners_verified": 515295,
+    "source_uv_material_tail_equal": true,
+    "uv_ao_geometry_equal": true,
+    "albedo_normal_factors_dashboard_preserved": true,
+    "glass_mesh_bytes_preserved": true,
+    "conversion_seconds": 2.138966514961794,
+    "bake_seconds": 5.192808566964231,
+    "compile_seconds": 34.34516542905476,
+    "previous_python_attempt": "TIMEOUT_120_TO_150_SECONDS",
+    "code_commit": "7008f0c23854cf62e7815a265cf9c014b7d63919",
+    "fixture_fix_commit": "bd37116499fbf3fcef1d285be5e3ebb3a081c0b1",
+    "hmd": "UNTESTED",
+    "release_install": false,
+    "limitations": "Geometry-derived diagnostic UV/AO, not source-authored textures; no fabricated detail normal maps. Full mip/visual quality and frame timing require runtime."
+  },
+  "gpu_texture_alias_actual_examples": {
+    "source_commit": "fc08083686ebc5be8525000aa5f9afb13e0a7949",
+    "bind_cache_commit": "acdde71993d454c790646cdcebda249541f70c19",
+    "F50": {
+      "albedo_material_slots": 20,
+      "unique_albedo_dds": 17,
+      "duplicate_allocations_avoided": 3,
+      "dds_payload_bytes_saved": 352252
+    },
+    "F40_previous_compact_candidate": {
+      "albedo_material_slots": 33,
+      "unique_albedo_dds": 26,
+      "duplicate_allocations_avoided": 7,
+      "dds_payload_bytes_saved": 9548
+    },
+    "physical_gpu_measurement": "UNTESTED; exact DDS identity estimate only"
   }
 }
