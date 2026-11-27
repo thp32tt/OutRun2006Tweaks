@@ -1418,7 +1418,7 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
                 Settings::VRExternalFerrariNativeCallbackReplacement&&
                 Settings::VREnabled&&Settings::VRStereo&&Settings::VRQuestCockpitV2Enabled&&
                 Game::current_mode&&*Game::current_mode==STATE_GAME&&
-                player==Game::pl_car()&&!InSceneEffect()){
+                player==Game::pl_car()&&!OutRunVR::QuestCockpitV2::InSceneEffect()){
                 const auto carId=player->car_id_10;
                 const bool legacy=Settings::VRF50ExternalModel&&IsF50RetailCarId(carId);
                 const bool selected=legacy||(Settings::VRExternalFerrariTest&&
