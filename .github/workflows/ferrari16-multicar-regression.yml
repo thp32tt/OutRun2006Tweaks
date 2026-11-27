@@ -25,6 +25,7 @@ jobs:
           python3 tools/ferrari16/verify_original_player_callback_abi.py --self-test
           python3 tests/r29_raw_depth_receipt_test.py
           python3 tests/r30_shadow_descriptor_cache_test.py
+          python3 tests/r7_disjoint_offscreen_raster_test.py
           python3 tests/r7_depth_bootstrap_restore_test.py
           python3 tests/r7_stereo_init_preflight_test.py
           python3 tests/r7_external_vehicle_stage_transport_test.py

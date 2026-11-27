@@ -70,6 +70,7 @@ namespace Settings
     extern Setting<bool> VRExternalFerrariTest;
     extern Setting<bool> VRF50ExternalModel;
     extern Setting<bool> VRExternalFerrariDiag;
+    extern Setting<bool> VRExternalFerrariNativeCallbackReplacement;
 }
 
 #ifndef OUTRUN_VR_BUILD_SHA

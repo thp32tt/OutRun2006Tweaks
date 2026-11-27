@@ -262,6 +262,7 @@ template<class Call> HRESULT R7ExecuteRawCandidateVb(IDirect3DDevice9*,Call&& ca
     assert(!up&&!indexed);++internalClearCalls;internalClearFlags=flags;
     return call();
 }
+bool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9*) noexcept {return false;}
 namespace Settings { bool VRExternalFerrariTest=false,VRF50ExternalModel=false; }
 R7CandidateSeedResult candidateResult=R7CandidateSeedResult::Unavailable;
 R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9*,
