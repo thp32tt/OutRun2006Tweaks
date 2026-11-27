@@ -84,6 +84,14 @@ static std::vector<std::uint8_t> make_image(const Atlas& a,unsigned size){
 static Bytes bake(const Bytes& input,unsigned size){
  Model m;std::string err;if(!Parse(input.data(),input.size(),m,err)||!m.pbrEnabled)throw std::runtime_error("source parser: "+err);
  const unsigned nm=static_cast<unsigned>(m.pbrMaterials.size());
+ // Match the runtime parser's independent GPU payload budget, not just
+ // the outer OVC envelope. Preserve existing source bytes if no room.
+ std::size_t gpuBytes=0;
+ for(const auto& mesh:m.meshes)
+  gpuBytes+=mesh.vertices.size()*sizeof(Vertex)+mesh.indices.size()*(mesh.index32?4u:2u);
+ for(const auto& tex:m.textures)gpuBytes+=tex.dds.size();
+ for(const auto& mat:m.pbrMaterials)gpuBytes+=mat.normal.dds.size()+mat.orm.dds.size();
+ if(gpuBytes>MaxGpuPayloadBytes)throw std::runtime_error("source GPU budget");
  std::vector<bool> opaque(nm),transparent(nm);
  V lo{1e20,1e20,1e20},hi{-1e20,-1e20,-1e20};
  for(auto& mesh:m.meshes){
@@ -149,7 +157,11 @@ static Bytes bake(const Bytes& input,unsigned size){
   // Never claim a material has AO coverage when any of its triangles could
   // not be mapped: the untouched source remains eligible for UV repair.
   auto image=make_image(a,size);auto map=dds(image,size);
-  if(out.size()+map.size()+input.size()-p+4>MaxSidecarBytes){put(out,0);++missing;continue;}
+  if(map.size()>MaxGpuPayloadBytes-gpuBytes||
+     out.size()+map.size()+input.size()-p+4>MaxSidecarBytes){
+   put(out,0);++missing;continue;
+  }
+  gpuBytes+=map.size();
   put(out,static_cast<unsigned>(map.size()));out.insert(out.end(),map.begin(),map.end());
   ++generated;
  }
