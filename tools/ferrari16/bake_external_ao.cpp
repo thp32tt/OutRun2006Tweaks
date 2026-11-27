@@ -86,7 +86,7 @@ static std::vector<std::uint8_t> make_image(const Atlas& a,unsigned size){
 // geometry-derived AO, including the gutter, rather than undersampling
 // 60k+ tiny UV islands in the ordinary 64/128 atlas.
 template<class GridPos>
-static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,GridPos gridPos){
+static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,GridPos gridPos,bool paired=false){
  const auto& texture=m.textures[material];
  const auto& base=texture.dds;
  if(texture.format!=TextureFormat::ARGB32||base.size()<132||
@@ -117,32 +117,76 @@ static Bytes triangle_atlas(const Model& m,unsigned material,const Grid& grid,Gr
  unsigned size=64;while(size<tiles*4u&&size<2048u)size*=2;
  if(size<tiles*4u)return {};
  std::vector<std::uint8_t> image(std::size_t(size)*size,255);
+ struct Tile {std::array<unsigned,2> faces{};unsigned count=0;};
+ std::vector<Tile> chart(std::size_t(tiles)*tiles);
  for(unsigned i=0;i<samples.size();++i){
-  const auto& s=samples[i];const unsigned x=i%tiles,y=i/tiles;
+  const auto& s=samples[i];
+  const auto x=static_cast<unsigned>(std::floor((double(s.a->u)+s.b->u+s.c->u)*tiles/3));
+  const auto y=static_cast<unsigned>(std::floor((double(s.a->v)+s.b->v+s.c->v)*tiles/3));
+  if(x>=tiles||y>=tiles)return {};
+  const unsigned index=y*tiles+x;
+  if(!paired&&index!=i)return {};
   for(const auto* v:{s.a,s.b,s.c}){
    const double u=double(v->u)*tiles-x,w=double(v->v)*tiles-y;
-   // Admit only the known generated chart with one ordered face per tile.
-   // Refuse ordinary authored/wrapped/overlapping UVs in this special mode.
    if(u<.124||u>.876||w<.124||w>.876)return {};
   }
   const double du=s.b->u-s.a->u,dv=s.b->v-s.a->v,
       eu=s.c->u-s.a->u,ev=s.c->v-s.a->v;
   if(du*ev-dv*eu==0)return {};
+  auto& tile=chart[index];
+  if(tile.count>=(paired?2u:1u))return {};
+  tile.faces[tile.count++]=i;
+ }
+ auto valueFor=[&](const Sample& s){
   V n=unit(normal(*s.a)+normal(*s.b)+normal(*s.c));
   if(dot(n,n)<.5)n=s.face;
-  const auto value=static_cast<std::uint8_t>(shade(gridPos((pos(*s.a)+pos(*s.b)+pos(*s.c))*(1./3)),n,grid));
-  // Tile boundaries use texel centres; fill exactly the disjoint cells.
-  auto edge=[&](unsigned cell){return static_cast<unsigned>(
-      (std::max)(0.0,std::ceil(double(cell)*size/tiles-.5)));};
-  const unsigned x0=edge(x),x1=edge(x+1),y0=edge(y),y1=edge(y+1);
-  for(unsigned row=y0;row<y1;++row)
-   std::fill(image.begin()+std::size_t(row)*size+x0,
-             image.begin()+std::size_t(row)*size+x1,value);
+  return static_cast<std::uint8_t>(shade(gridPos((pos(*s.a)+pos(*s.b)+pos(*s.c))*(1./3)),n,grid));
+ };
+ auto edge=[&](unsigned cell){return static_cast<unsigned>(
+    (std::max)(0.0,std::ceil(double(cell)*size/tiles-.5)));};
+ auto same=[](const Vertex* a,const Vertex* b){
+    return a->u==b->u&&a->v==b->v&&
+           std::memcmp(a,b,6*sizeof(float))==0;
+ };
+ bool ended=false;
+ for(unsigned index=0;index<chart.size();++index){
+  const auto& tile=chart[index];
+  if(!tile.count){ended=true;continue;}
+  if(ended)return {}; // generated charts must occupy contiguous tiles
+  const auto& a=samples[tile.faces[0]];
+  const auto first=valueFor(a);
+  auto second=first;
+  const Vertex *e0=nullptr,*e1=nullptr,*third=nullptr;
+  double side=0;
+  auto sign=[&](double u,double v){
+     return (double(e1->u)-e0->u)*(v-e0->v)-(double(e1->v)-e0->v)*(u-e0->u);
+  };
+  if(tile.count==2){
+    const auto& b=samples[tile.faces[1]];
+    const Vertex* other=nullptr;
+    for(auto* av:{a.a,a.b,a.c}){
+      bool shared=false;
+      for(auto* bv:{b.a,b.b,b.c})if(same(av,bv)){shared=true;break;}
+      if(shared){if(!e0)e0=av;else if(!e1)e1=av;else return {};}
+      else third=av;
+    }
+    if(!e0||!e1||!third)return {};
+    for(auto* bv:{b.a,b.b,b.c})if(!same(e0,bv)&&!same(e1,bv)){if(other)return {};other=bv;}
+    if(!other)return {};
+    side=sign(third->u,third->v);
+    if(!(side*sign(other->u,other->v)<0))return {};
+    second=valueFor(b);
+  }
+  const unsigned x=index%tiles,y=index/tiles;
+  for(unsigned row=edge(y);row<edge(y+1);++row)
+   for(unsigned col=edge(x);col<edge(x+1);++col)
+    image[std::size_t(row)*size+col]=
+       tile.count==1||sign((col+.5)/size,(row+.5)/size)*side>=0?first:second;
  }
  return dds(std::move(image),size);
 }
 static Bytes bake(const Bytes& input,unsigned size,
-                  std::size_t gpuBudget=MaxGpuPayloadBytes,bool triangleAtlas=false){
+                  std::size_t gpuBudget=MaxGpuPayloadBytes,bool triangleAtlas=false,bool pairedAtlas=false){
  gpuBudget=(std::min)(gpuBudget,MaxGpuPayloadBytes);
  Model m;std::string err;if(!Parse(input.data(),input.size(),m,err)||!m.pbrEnabled)throw std::runtime_error("source parser: "+err);
  const unsigned nm=static_cast<unsigned>(m.pbrMaterials.size());
@@ -217,7 +261,7 @@ static Bytes bake(const Bytes& input,unsigned size,
   if(old){out.insert(out.end(),input.begin()+end,input.begin()+p);if(opaque[i])++existing;continue;}
   if(!opaque[i]||transparent[i]){put(out,0);if(opaque[i])++missing;continue;}
   Bytes map;
-  if(triangleAtlas)map=triangle_atlas(m,i,g,gridPos);
+  if(triangleAtlas)map=triangle_atlas(m,i,g,gridPos,pairedAtlas);
   else{
    auto& a=atlases[i];
    if(a.valid&&!a.skipped&&!a.capped)map=dds(make_image(a,size),size);
@@ -243,12 +287,13 @@ static Bytes bake(const Bytes& input,unsigned size,
 }
 int main(int argc,char** argv){
  try{
-  if(argc!=4)throw std::runtime_error("usage: bake_external_ao input.ovc output.ovc 64|128|triangle-atlas");
-  const bool triangleAtlas=std::strcmp(argv[3],"triangle-atlas")==0;
+  if(argc!=4)throw std::runtime_error("usage: bake_external_ao input.ovc output.ovc 64|128|triangle-atlas|paired-atlas");
+  const bool pairedAtlas=std::strcmp(argv[3],"paired-atlas")==0;
+  const bool triangleAtlas=pairedAtlas||std::strcmp(argv[3],"triangle-atlas")==0;
   const auto size=triangleAtlas?64ul:std::stoul(argv[3]);
   if(size!=64&&size!=128)throw std::runtime_error("size");
   std::filesystem::path src=argv[1],dst=argv[2];if(std::filesystem::exists(dst))throw std::runtime_error("refuse existing output");
-  auto b=read(src);auto output=bake(b,static_cast<unsigned>(size),MaxGpuPayloadBytes,triangleAtlas);
+  auto b=read(src);auto output=bake(b,static_cast<unsigned>(size),MaxGpuPayloadBytes,triangleAtlas,pairedAtlas);
   auto tmp=dst;tmp+=".part";if(std::filesystem::exists(tmp))throw std::runtime_error("refuse existing temporary");
   std::ofstream f(tmp,std::ios::binary);f.write(reinterpret_cast<const char*>(output.data()),output.size());f.close();if(!f)throw std::runtime_error("write");
   std::filesystem::rename(tmp,dst);std::cout<<dst.filename().string()<<" PASS\n";return 0;

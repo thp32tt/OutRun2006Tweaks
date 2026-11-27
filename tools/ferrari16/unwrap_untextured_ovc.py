@@ -11,7 +11,70 @@ HEAD=struct.Struct("<8s7I")
 GROUP=struct.Struct("<HHIII")
 VERT=struct.Struct("<8f")
 UV=struct.Struct("<2f")
-def main(src,dst):
+def paired_charts(entries, groups):
+    """Pair adjacent consistently wound, nearly planar triangles without overlap.
+    Use exact shared vertex indices; leave seams, curved and unmatched faces separate.
+    Each chart occupies one disjoint tile; all original corner bytes are preserved.
+    """
+    from math import sqrt
+    def sub(a,b):return tuple(x-y for x,y in zip(a,b))
+    def dot(a,b):return sum(x*y for x,y in zip(a,b))
+    def cross(a,b):return (a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0])
+    def unit(a):
+        l=sqrt(dot(a,a))
+        return tuple(x/l for x in a) if l>1e-15 else None
+    vertices={i:list(VERT.iter_unpack(g["vb"])) for i,g in enumerate(groups)}
+    edge_map={}
+    faces={}
+    for gi,t,coords in entries:
+        ids=groups[gi]["idx"][t:t+3]
+        faces[gi,t]=(ids,coords)
+        for a,b in zip(ids,ids[1:]+ids[:1]):
+            key=(gi,min(a,b),max(a,b))
+            edge_map.setdefault(key,[]).append(t)
+    done=set()
+    charts=[]
+    for gi,t,coords in entries:
+        if (gi,t) in done:continue
+        ids,_=faces[gi,t]
+        v=vertices[gi]
+        normal=unit(cross(sub(v[ids[1]][:3],v[ids[0]][:3]),sub(v[ids[2]][:3],v[ids[0]][:3])))
+        paired=False
+        if normal is not None:
+            for a,b in zip(ids,ids[1:]+ids[:1]):
+                neighbors=edge_map[gi,min(a,b),max(a,b)]
+                if len(neighbors)!=2:continue
+                other=neighbors[0] if neighbors[1]==t else neighbors[1]
+                if other==t or (gi,other) in done:continue
+                ids2,_=faces[gi,other]
+                if len(set(ids+ids2))!=4:continue
+                if not any(x==b and y==a for x,y in zip(ids2,ids2[1:]+ids2[:1])):continue
+                normal2=unit(cross(sub(v[ids2[1]][:3],v[ids2[0]][:3]),sub(v[ids2[2]][:3],v[ids2[0]][:3])))
+                if normal2 is None or dot(normal,normal2)<.995:continue
+                origin=v[a][:3];axis=unit(sub(v[b][:3],origin))
+                if axis is None:continue
+                vertical=cross(normal,axis)
+                points={}
+                for i in set(ids+ids2):
+                    delta=sub(v[i][:3],origin)
+                    points[i]=(dot(delta,axis),dot(delta,vertical))
+                third=next(i for i in ids if i not in (a,b))
+                third2=next(i for i in ids2 if i not in (a,b))
+                # Opposite halfplanes prove no projected interior overlap.
+                if points[third][1]*points[third2][1]>=-1e-24:continue
+                lo=[min(x[k] for x in points.values()) for k in range(2)]
+                span=[max(x[k] for x in points.values())-lo[k] for k in range(2)]
+                scale=max(span)
+                if scale<=1e-15:continue
+                uv={i:tuple((p[k]-lo[k])/scale for k in range(2)) for i,p in points.items()}
+                charts.append([(gi,t,[uv[i] for i in ids]),(gi,other,[uv[i] for i in ids2])])
+                done.update(((gi,t),(gi,other)));paired=True;break
+        if not paired:
+            charts.append([(gi,t,coords)]);done.add((gi,t))
+    return charts
+
+def main(src,dst,mode="triangle"):
+    if mode not in ("triangle","paired"):raise ValueError("mode must be triangle or paired")
     src,dst=pathlib.Path(src),pathlib.Path(dst)
     raw=src.read_bytes()
     magic,version,ng,nm,nv,nt,size,crc=HEAD.unpack_from(raw)
@@ -75,15 +138,20 @@ def main(src,dst):
                 coords[i]=(0.,0.);coords[j]=(1.,0.);coords[k]=(x/length,h/length)
                 entries.append((gi,t,coords))
         if not entries:continue
+        # Retain the same face-count grid as the original triangle atlas.
+        # This lets the baker independently reconstruct and validate tile ownership.
         tiles=math.ceil(math.sqrt(len(entries)))
+        charts=paired_charts(entries,groups) if mode=="paired" else [[e] for e in entries]
         pergroup=defaultdict(dict);valid=invalid=0
-        for ordinal,(gi,t,coords) in enumerate(entries):
+        for ordinal,chart in enumerate(charts):
             row,col=divmod(ordinal,tiles)
-            uv=[UV.pack((col+.125+.75*u)/tiles,(row+.125+.75*v)/tiles) for u,v in coords]
-            a,b,c=[UV.unpack(x) for x in uv];det=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
-            if det:valid+=1
-            else:invalid+=1
-            pergroup[gi][t]=uv
+            for gi,t,coords in chart:
+                uv=[UV.pack((col+.125+.75*u)/tiles,(row+.125+.75*v)/tiles) for u,v in coords]
+                a,b,c=[UV.unpack(x) for x in uv];det=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
+                if det:valid+=1
+                else:invalid+=1
+                pergroup[gi][t]=uv
+        if invalid:raise ValueError("projected UV collapsed")
         for gi in opaque[mat]:
             g=groups[gi];old=g["vb"];out=[old[i*32:(i+1)*32] for i in range(g["n"])]
             remap={};first=set();newidx=[]
@@ -106,7 +174,7 @@ def main(src,dst):
             width=4 if g["w"]==4 or len(out)>65535 else 2
             fmt=struct.Struct("<I" if width==4 else "<H")
             g.update(n=len(out),vb=vb,w=width,ib=b"".join(fmt.pack(v) for v in newidx))
-        report.append(dict(material=mat,valid_uv_triangles=valid,collapsed_nondegenerate_triangles=invalid,source_zero_area_triangles=degenerate,atlas_tiles_per_axis=tiles))
+        report.append(dict(material=mat,valid_uv_triangles=valid,collapsed_nondegenerate_triangles=invalid,source_zero_area_triangles=degenerate,atlas_tiles_per_axis=tiles,charts=len(charts),paired_charts=sum(len(c)==2 for c in charts)))
         print("UV_MATERIAL",mat,valid,invalid,flush=True)
     vertices=sum(g["n"] for g in groups)
     body=b"".join(GROUP.pack(len(g["name"]),g["mat"],g["n"],g["ic"],g["w"])+g["name"]+g["vb"]+g["ib"] for g in groups)+raw[tail:]
@@ -115,7 +183,7 @@ def main(src,dst):
     tmp=dst.with_suffix(dst.suffix+".part")
     if tmp.exists():raise ValueError("temporary exists")
     tmp.write_bytes(output);tmp.replace(dst)
-    details=dict(source_sha256=hashlib.sha256(raw).hexdigest(),output_sha256=hashlib.sha256(output).hexdigest(),groups=ng,materials=nm,triangles=nt,source_vertices=nv,output_vertices=vertices,generated_uv_materials=len(report),materials_detail=report,source_geometry_corner_bytes_preserved=True,material_tail_preserved=True,authored_uv=False,chart_method="per_triangle_geometric_projection",release_install=False)
+    details=dict(source_sha256=hashlib.sha256(raw).hexdigest(),output_sha256=hashlib.sha256(output).hexdigest(),groups=ng,materials=nm,triangles=nt,source_vertices=nv,output_vertices=vertices,generated_uv_materials=len(report),materials_detail=report,source_geometry_corner_bytes_preserved=True,material_tail_preserved=True,authored_uv=False,chart_method="paired_nearplanar_geometric_projection" if mode=="paired" else "per_triangle_geometric_projection",release_install=False)
     dst.with_suffix(dst.suffix+".json").write_text(json.dumps(details,indent=2)+"\n")
     print("UV_REBUILD",json.dumps(details),flush=True)
 if __name__=="__main__":
