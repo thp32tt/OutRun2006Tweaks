@@ -1451,16 +1451,14 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // Never remove a stock dashboard without available replacements.
         // Embedded bindings or a valid independent overlay are mandatory.
         auto& overlay=GlobalDashboardGpu();
-        const bool includeDashboard=overlay.SelectionMatches(FerrariModelSlot::GenericId,ticket.carId)&&
-            overlay.Installed();
-        if(includeDashboard&&!overlay.EnsureResources(ticket.device)){
-            fallback("DASHBOARD_GPU_NOT_READY");return;
-        }
-        // The one-car backend can order all opaque dashboard parts before
-        // body glass. An overlay with glass would require a merged sort.
-        if(includeDashboard&&overlay.HasGlassMeshes()){
-            fallback("DASHBOARD_GLASS_REQUIRES_MERGED_SORT");return;
-        }
+        // An installed but unavailable overlay must not suppress a complete
+        // embedded dashboard. Keep warming the overlay outside private raster.
+        const bool overlaySelected=overlay.SelectionMatches(FerrariModelSlot::GenericId,ticket.carId);
+        if(overlaySelected&&!overlay.ReadyForCandidateSeed(ticket.device,FerrariModelSlot::GenericId,ticket.carId)&&
+            overlay.Installed())overlay.EnsureResources(ticket.device);
+        // Only opaque overlays can be ordered ahead of body glass today.
+        const bool includeDashboard=overlay.ReadyForCandidateSeed(ticket.device,FerrariModelSlot::GenericId,ticket.carId)&&
+            !overlay.HasGlassMeshes();
         const unsigned needles=GlobalGpu().DashboardNeedleCoverage()|
             (includeDashboard?overlay.DashboardNeedleCoverage():0u);
         const unsigned gears=GlobalGpu().DashboardGearCoverage()|

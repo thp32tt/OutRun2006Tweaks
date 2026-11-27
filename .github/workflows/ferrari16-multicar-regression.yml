@@ -245,6 +245,11 @@ jobs:
           assert 'R7SeedInactivePair(ExternalAtomicCandidates,device,' in stage
           assert 'DrawIndexedPrimitiveHook.stdcall<HRESULT>(' in stage
           assert 'body.DrawNativeScene(' in stage and 'dash.DrawNativeScene(' in stage
+          assert 'ReadyForCandidateSeed(device,input.slot,input.carId)' in stage
+          assert 'EnsureResources(' not in stage
+          seed_ready=r7[r7.index('bool R7NativeAssetsSeedReady('):r7.index('R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(')]
+          assert 'camera->cam_mode_34A!=1' in seed_ready and 'MatchesFerrariSelection' in seed_ready
+          assert 'DashboardBothNeedles' in seed_ready and 'HostDirectTransportReady()' in seed_ready
           assert stage.index('IsolatedMeshPass::OpaqueOnly') < stage.index('dash.DrawNativeScene(') < stage.index('IsolatedMeshPass::GlassOnly')
           assert 'input.publishCurrent(input)' in r7
           assert 'NativeEpochCounter.load(std::memory_order_acquire)!=input.nativeFrame' in source

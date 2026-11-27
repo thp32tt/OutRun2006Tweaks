@@ -130,7 +130,7 @@ gpu_stub=r'''
         unsigned count=3;bool dashboard=false;
         bool HasGlassMeshes(){return dashboard&&overlayGlass;}
         bool SelectionMatches(FerrariModelSlot,unsigned char){return true;}
-        bool EnsureResources(IDirect3DDevice9*){return true;}
+        bool ReadyForCandidateSeed(IDirect3DDevice9*,FerrariModelSlot,unsigned char) const {return true;}
         unsigned HasEmbeddedSpeedAndRpm(){return 0;}unsigned EmbeddedGearMask(){return 0;}
         GpuDrawResult DrawNativeScene(IDirect3DDevice9* d,const D3DMATRIX&,const D3DMATRIX& view,const D3DMATRIX& projection,const DashboardTelemetry&,unsigned,std::uint64_t,std::uint64_t,unsigned,const IsolatedEyeRaster* raster,IsolatedMeshPass phase=IsolatedMeshPass::All){
             GpuDrawResult r{};

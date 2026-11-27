@@ -720,9 +720,10 @@ public:
         return count;
     }
     bool Loaded() const noexcept {return loaded_;}
-    bool ReadyForCandidateSeed(IDirect3DDevice9* device) const noexcept {
+    bool ReadyForCandidateSeed(IDirect3DDevice9* device,FerrariModelSlot slot,
+                               unsigned char carId) const noexcept {
         return device&&owner_==device&&loaded_&&preparation_==Preparation::Ready&&
-            !gpuBusy_&&!gpuRetirementDepth_;
+            !gpuBusy_&&!gpuRetirementDepth_&&SelectionMatches(slot,carId);
     }
     bool HasGlassMeshes() const noexcept {
         for(const auto& mesh:meshes_)if(mesh.glass)return true;

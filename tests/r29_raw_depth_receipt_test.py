@@ -442,6 +442,21 @@ int main() {
     assert(boundaryCases==96);
     std::cout<<"R7_RAW_CAPTURE_GENERATION_PASS "<<boundaryCases<<"\n";
     PresentEpoch=77;
+    // Independent offscreen raw writes preserve a current candidate, but a
+    // failed write or retirement cannot retain the old receipt.
+    unsigned auxCases=0;
+    for(bool fail:{false,true})for(bool retire:{false,true}){
+        disjointRaw=true;
+        ExternalAtomicReplayEpoch=PresentEpoch=77;
+        const auto hr=R7ExecuteRawCandidateVb(&game,[&](){
+            if(retire)++R7CandidateBoundarySerial;
+            return fail?E_FAIL:0;
+        });
+        assert(hr==(fail?E_FAIL:0));
+        assert(ExternalAtomicReplayEpoch==((fail||retire)?0u:77u));
+        disjointRaw=false;++auxCases;
+    }
+    assert(auxCases==4);
     // Actual unmirrored raster helper, including failing stock calls.
     unsigned fallbackCases=0;
     for(bool gameDevice:{false,true})
@@ -474,7 +489,7 @@ int main() {
 '''
 with tempfile.TemporaryDirectory() as directory:
     p = Path(directory)
-    (p / "probe.cpp").write_text(prefix + "bool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9*){return false;}\n" + helper + "bool R7NativeStockOnlyDraw(){return false;}\nvoid R7RecordNativeStockOmission(unsigned,R7CandidateSeedResult){}\n"+raw_vb + raw + base_dispatch_stub + base_entrypoints + suffix)
+    (p / "probe.cpp").write_text(prefix + "bool disjointRaw=false;\nbool R7CandidateDisjointOffscreenRaster(IDirect3DDevice9*){return disjointRaw;}\n" + helper + "bool R7NativeStockOnlyDraw(){return false;}\nvoid R7RecordNativeStockOmission(unsigned,R7CandidateSeedResult){}\n"+raw_vb + raw + base_dispatch_stub + base_entrypoints + suffix)
     subprocess.run(["g++", "-std=c++17", "-O2", "-Wall", "-Wextra",
                     "-Werror", "-pedantic", "-I", str(root / "src/vr/d3d9"),
                     str(p / "probe.cpp"), "-o", str(p / "probe")], check=True)

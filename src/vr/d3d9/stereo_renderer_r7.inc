@@ -68,6 +68,7 @@ namespace Settings
     extern Setting<bool> VRQuestCockpitV2Enabled;
     extern Setting<bool> VRQuestCockpitV2SkyProbe;
     extern Setting<bool> VRExternalFerrariTest;
+    extern Setting<int> VRExternalFerrariTestCarId;
     extern Setting<bool> VRF50ExternalModel;
     extern Setting<bool> VRExternalFerrariDiag;
     extern Setting<bool> VRExternalFerrariNativeCallbackReplacement;
@@ -2155,9 +2156,29 @@ namespace OutRunVRStereo
         bool R7NativeAssetsSeedReady(IDirect3DDevice9* device) noexcept
         {
             using namespace OutRunVR::DinoSidecar;
-            return NativeVehicleModelEdgesReady.load(std::memory_order_acquire)&&
-                NativeVehiclePmtConsumerReady.load(std::memory_order_acquire)&&
-                GlobalGpu().ReadyForCandidateSeed(device);
+            if(!IsGameDevice(device)||!Game::current_mode||
+                *Game::current_mode!=GameState::STATE_GAME||
+                !Settings::VREnabled||!Settings::VRStereo||!Settings::VRQuestCockpitV2Enabled||
+                !HostDirectTransportReady()||
+                !NativeVehicleModelEdgesReady.load(std::memory_order_acquire)||
+                !NativeVehiclePmtConsumerReady.load(std::memory_order_acquire))return false;
+            const auto* player=Game::pl_car();
+            const auto* camera=Game::camera();
+            if(!player||!camera||camera->cam_mode_34A!=1||player->car_id_10>=30u)return false;
+            const auto id=player->car_id_10;
+            const bool legacy=Settings::VRF50ExternalModel&&IsF50RetailCarId(id);
+            if(!legacy&&(!Settings::VRExternalFerrariTest||
+                !MatchesFerrariSelection(id,Settings::VRExternalFerrariTestCarId.get())))return false;
+            const auto slot=legacy?FerrariModelSlot::F50:FerrariModelSlot::GenericId;
+            const auto& body=GlobalGpu();const auto& dash=GlobalDashboardGpu();
+            if(!body.ReadyForCandidateSeed(device,slot,id))return false;
+            const bool dashboardReady=dash.ReadyForCandidateSeed(device,FerrariModelSlot::GenericId,id)&&
+                !dash.HasGlassMeshes();
+            const unsigned needles=body.DashboardNeedleCoverage()|
+                (dashboardReady?dash.DashboardNeedleCoverage():0u);
+            const unsigned gears=body.DashboardGearCoverage()|
+                (dashboardReady?dash.DashboardGearCoverage():0u);
+            return needles==DashboardBothNeedles&&gears!=0u;
         }
         R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
             const D3DVIEWPORT9& viewport,DWORD flags,D3DCOLOR color,float z,DWORD stencil) noexcept
@@ -3029,10 +3050,17 @@ if(WaitForEventQuery(slot.fence,1,0u))
             auto current=[&](){return ExternalAtomicCandidates.generation==generation;};
             auto rasterCurrent=[&](){return current()&&R7CandidateBoundarySerial==boundary&&
                 PresentEpoch==epoch&&ExternalAtomicReplayEpoch==epoch;};
+            // Raw owners may render a genuinely independent auxiliary pass.
+            // Never bypass the ownership fence if the getters retired a pair.
+            if(R7CandidateDisjointOffscreenRaster(device)){
+                const HRESULT hr=drawCall();
+                if(FAILED(hr)||!rasterCurrent())ExternalAtomicReplayEpoch=0;
+                return hr;
+            }
             IDirect3DSurface9* rt=nullptr;
             IDirect3DSurface9* depth=nullptr;
             int eye=-1;
-            if(!FrameStereoIncomplete&&!FrameRightDrawFailed&&
+            if(rasterCurrent()&&!FrameStereoIncomplete&&!FrameRightDrawFailed&&
                 !AnyAuxRenderTargetActive()&&
                 !OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)&&
                 ActiveOcclusionQueries.load(std::memory_order_acquire)==0&&
@@ -4601,10 +4629,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
             &eyeProjection[0].m[0][0],&eyeProjection[1].m[0][0])||!current())
             return abort(IsolatedStageResult::Unavailable);
         auto& body=GlobalGpu();auto& dash=GlobalDashboardGpu();
-        if(!current()||!body.SelectionMatches(input.slot,input.carId)||
-            !body.EnsureResources(device)||!current()||
-            (input.includeDashboard&&(!dash.SelectionMatches(FerrariModelSlot::GenericId,input.carId)||
-                !dash.EnsureResources(device)||!current()||dash.HasGlassMeshes())))
+        // Asset loading is forbidden after original body omission. A stale
+        // selection or GPU generation aborts, never starts a new upload here.
+        if(!current()||!body.ReadyForCandidateSeed(device,input.slot,input.carId)||
+            (input.includeDashboard&&(!dash.ReadyForCandidateSeed(device,FerrariModelSlot::GenericId,input.carId)||
+                dash.HasGlassMeshes()))||!current())
             return abort(IsolatedStageResult::Unavailable);
         auto* const liveColor=TrackedRenderTarget;
         auto* const liveDepth=TrackedDepthStencil;
