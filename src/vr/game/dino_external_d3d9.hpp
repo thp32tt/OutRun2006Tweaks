@@ -845,6 +845,10 @@ public:
         const DWORD fvf=D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1;
         if(!current() || FAILED(device->SetVertexShader(nullptr)) ||
            !current() || FAILED(device->SetPixelShader(nullptr)) ||
+           // A private raw DIP represents exactly one mesh, never native
+           // hardware instances. D3DSBT_ALL restores the original dividers.
+           !current() || FAILED(device->SetStreamSourceFreq(0,1u)) ||
+           !current() || FAILED(device->SetStreamSourceFreq(1,1u)) ||
            !current() || FAILED(device->SetFVF(fvf)) ||
            !current() || FAILED(device->SetTransform(D3DTS_WORLD,&world)) ||
            !current() || FAILED(device->SetTransform(D3DTS_VIEW,&view)) ||
