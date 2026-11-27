@@ -59,7 +59,8 @@ services:
       MODEL2_HARD_NEW_CHAT_SECONDS: "3600"
       CONVERSION_ONLY_SLOT: ""
       QUEUE_CHECK_SECONDS: "15"
-      # GUI Chrome/noVNC stays enabled; only failed tabs are replaced.
+      # Headless Chromium engine by default; GUI is an explicit login/maintenance mode.
+      VR_BROWSER_MODE: "${VR_BROWSER_MODE:-headless}"
       TAB_HEALTH_CHECK_SECONDS: "30"
       TAB_HEALTH_PROBE_TIMEOUT_SECONDS: "6"
       TAB_HEALTH_FAILURE_THRESHOLD: "3"
@@ -92,7 +93,7 @@ services:
       SCHEDULE_MINUTES: "30"
       # Model2 disabled. Keep historical Model2 settings for a future explicit opt-in only.
       # DX11/DX9Ex/DXVK remain disabled; geometry A/C use separate per-slot state and chats.
-      CHAT_SLOTS: "3"
+      CHAT_SLOTS: "1"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
       VR_RUNTIME_WATCHDOG_STALE_SECONDS: "720"
@@ -126,12 +127,13 @@ services:
       MIN_SEND_GAP_SECONDS: "5"
       SLOT_DEDUP_SECONDS: "5"
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8787/status >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS --max-time 4 http://127.0.0.1:8787/healthz >/dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 90s
     ports:
+      # Reserved for VR_BROWSER_MODE=gui only; no VNC/noVNC process in headless mode.
       - "6080:6080"
       - "8787:8787"
     volumes:
