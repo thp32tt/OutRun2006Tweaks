@@ -261,7 +261,8 @@ jobs:
           assert 'dash.AllowIsolatedCandidateSeed(PresentEpoch)' in seed_ready
           assert 'return bodyAllowed&&(bodyComplete||dashAllowed);' in seed_ready
           assert 'if(isolated&&current())isolatedRetry_.OnCleanStageFailure();' in gpu
-          assert 'if(stateOk&&!result.isolatedEyeComplete&&current())' in gpu
+          assert 'if(stateOk&&!interleaveFailed&&!result.isolatedEyeComplete&&current())' in gpu
+          assert 'IsolatedCandidateSeedAdmitted(epoch)' in stage
           assert stage.index('dash.DrawNativeScene(') < stage.index('const IsolatedMeshInterleave between') < stage.index('body.DrawNativeScene(')
           assert 'IsolatedMeshPass::All,input.includeDashboard?&between:nullptr' in stage
           assert native.index('pass==1u&&between') < native.index('between->draw(between->context,interleaveDirty)') < native.index('for(unsigned order=0;order<')

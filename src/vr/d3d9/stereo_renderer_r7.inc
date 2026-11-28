@@ -4717,8 +4717,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
         // Asset loading is forbidden after original body omission. A stale
         // selection or GPU generation aborts, never starts a new upload here.
         if(!current()||!body.ReadyForCandidateSeed(device,input.slot,input.carId)||!body.HasGlassMeshes()||
+            !body.IsolatedCandidateSeedAdmitted(epoch)||
             (input.includeDashboard&&(!dash.ReadyForCandidateSeed(device,FerrariModelSlot::GenericId,input.carId)||
-                dash.HasGlassMeshes()))||!current())
+                !dash.IsolatedCandidateSeedAdmitted(epoch)||dash.HasGlassMeshes()))||!current())
             return abort(IsolatedStageResult::Unavailable);
         auto* const liveColor=TrackedRenderTarget;
         auto* const liveDepth=TrackedDepthStencil;
@@ -4847,6 +4848,15 @@ if(WaitForEventQuery(slot.fence,1,0u))
             (R7StagedVehicle.present==PresentEpoch&&
              R7StagedVehicle.resource==ExternalAtomicCandidates.generation&&
              R7StagedVehicle.boundary==R7CandidateBoundarySerial))return false;
+        // The native sample may need a gear overlay that the initial Clear
+        // did not need. Never start stock omission when either participating
+        // asset was not admitted at the same Present's seed.
+        if(!GlobalGpu().ReadyForCandidateSeed(device,input.slot,input.carId)||
+            !GlobalGpu().IsolatedCandidateSeedAdmitted(PresentEpoch)||
+            (input.includeDashboard&&(!GlobalDashboardGpu().ReadyForCandidateSeed(
+                device,FerrariModelSlot::GenericId,input.carId)||
+                !GlobalDashboardGpu().IsolatedCandidateSeedAdmitted(PresentEpoch))))
+            return false;
         replay={};
         replay.key={ExternalAtomicCandidates.generation,R7CandidateBoundarySerial,
             PresentEpoch,input.nativeFrame,input.pose,input.player};

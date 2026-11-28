@@ -81,6 +81,7 @@ struct Stamp {unsigned invalidated=0;void Invalidate(){++invalidated;}} LastMain
 bool RightDepthSynchronized=true,RightStencilSynchronized=true;
 unsigned restoreErrors=0,rawCalls=0,rawFail=0,rawReset=0,rawPresent=0,copyCalls=0,copyFail=0,fenceCalls=0,fenceRevoke=0;
 bool nativeValid=true,allowPublication=true,overlayDirty=false,overlayGlass=false,publishValid=true;
+bool bodyAdmission=true,dashAdmission=true;
 unsigned stageTags[16]{},stageTagCount=0;
 bool IsGameDevice(IDirect3DDevice9* d){return d&&d==ExternalAtomicCandidates.device;}
 bool GameplayActive(){return true;}
@@ -131,6 +132,7 @@ gpu_stub=r'''
         bool HasGlassMeshes(){return dashboard?overlayGlass:true;}
         bool SelectionMatches(FerrariModelSlot,unsigned char){return true;}
         bool ReadyForCandidateSeed(IDirect3DDevice9*,FerrariModelSlot,unsigned char) const {return true;}
+        bool IsolatedCandidateSeedAdmitted(std::uint64_t epoch) const {return epoch==PresentEpoch&&(dashboard?dashAdmission:bodyAdmission);}
         unsigned HasEmbeddedSpeedAndRpm(){return 0;}unsigned EmbeddedGearMask(){return 0;}
         GpuDrawResult DrawNativeScene(IDirect3DDevice9* d,const D3DMATRIX&,const D3DMATRIX& view,const D3DMATRIX& projection,const DashboardTelemetry&,unsigned,std::uint64_t,std::uint64_t,unsigned,const IsolatedEyeRaster* raster,IsolatedMeshPass phase=IsolatedMeshPass::All,const IsolatedMeshInterleave* between=nullptr){
             GpuDrawResult r{};
@@ -187,7 +189,7 @@ struct Fixture {
         FrameStereoIncomplete=FrameRightDrawFailed=R7CandidateResetInFlight=InternalStereoPass=R7VehicleStageInFlight=false;
         FrameStereoMetadata.valid=true;FrameStereoMetadata.poseSequence=7;DirectTransportResourcesReady=true;
         rawCalls=rawFail=rawReset=rawPresent=copyCalls=copyFail=fenceCalls=fenceRevoke=restoreErrors=0;
-        nativeValid=allowPublication=publishValid=true;overlayDirty=overlayGlass=false;stageTagCount=0;R7NativePublicationInput={};
+        nativeValid=allowPublication=publishValid=bodyAdmission=dashAdmission=true;overlayDirty=overlayGlass=false;stageTagCount=0;R7NativePublicationInput={};
         NativeVehicleModelEdgesReady=true;NativeVehiclePmtConsumerReady=true;R7NativeCompletedVehicle={};
         input.nativeFrame=12;input.pose=7;input.player=55;input.includeDashboard=true;
         input.nativeCurrent=[](const ExternalVehicleStageInput&) noexcept {return nativeValid;};
@@ -229,6 +231,16 @@ struct Fixture {
 };
 int main(){
     unsigned cases=0;
+    {Fixture f;bodyAdmission=false;NativeVehicleStockReplay receipt{};
+     assert(!BeginNativeVehicleReplacement(&f.d,f.input,receipt));
+     assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;dashAdmission=false;NativeVehicleStockReplay receipt{};
+     assert(!BeginNativeVehicleReplacement(&f.d,f.input,receipt));
+     assert(f.Stage()==IsolatedStageResult::Unavailable&&!rawCalls);++cases;}
+    {Fixture f;dashAdmission=false;f.input.includeDashboard=false;
+     NativeVehicleStockReplay receipt{};
+     assert(BeginNativeVehicleReplacement(&f.d,f.input,receipt));
+     assert(f.Stage()==IsolatedStageResult::Complete&&rawCalls==6);++cases;}
     // An omission proof from another native queue entry, owner, or
     // presentation may never be credited to the active transaction.
     for(unsigned fault=0;fault<5;++fault){

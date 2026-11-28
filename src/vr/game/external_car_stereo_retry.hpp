@@ -36,6 +36,7 @@ struct ExternalIsolatedRetryPolicy final {
         if(remaining)--remaining;
         return admitted;
     }
+    bool Admitted(std::uint64_t frame) const noexcept {return frame&&epoch==frame&&admitted;}
     void OnCleanStageFailure() noexcept {
         if(!epoch||!admitted)return;
         admitted=false;

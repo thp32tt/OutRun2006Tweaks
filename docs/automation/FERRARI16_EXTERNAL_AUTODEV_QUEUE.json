@@ -4389,7 +4389,7 @@
       ],
       "latest_material_sha": "e4c6087fb4c0e8deae8c218ec906b2f6794b2466",
       "latest_static_ci": "Iteration60 strict dashboard PBR test amended after initial exact CI legacy missing-body assertion failure; final exact SHA CI as recorded. Iteration59 all four applicable exact workflows success and credited once.",
-      "next_focus": "P0 native scene publication and physical replay dependencies; P1/P2 missing asset/UV/dashboard fixes; P3 lossless batching and further draw overhead optimization; continue until P0-P3 accepted."
+      "next_focus": "P0 continue native replay/state ownership from omission ticket and per-Present clean stage cooldown, inspect private scene admission and capture failures; P1/P2 recover 328 GTS, dashboard coverage and functional material maps; P3 optimize redundant replay without geometry loss. Continue actual implementation until P0-P3 accepted."
     }
   ],
   "completion_rule": "Mark work item COMPLETE_STATIC only with material source/artifact evidence and passing appropriate CI. Advance active_work_id to next queued actionable task in the same GitHub commit. Use WAITING_USER_HMD for untestable headset acceptance; never claim all 16 visually complete without proof.",
@@ -4682,7 +4682,7 @@
         }
       ],
       "when_hardware_or_asset_blocked": "Continue other implementation work and prepare exact-SHA test package. Keep hardware-dependent acceptance WAITING_USER_HMD; never falsely mark P3 done. No repetitive validation-only cycles.",
-      "latest_code_batch": "Lossless adjacent opaque CPU mesh batching, index remap and dashboard binding preservation; previous dashboard/aux shadow renderer fixes."
+      "latest_code_batch": "2026-11-28: disjoint MRT exact CI success (84e4dacf); per-Present isolated stage retry (d6658bd9), native queue omission ticket (8ffe1b6d), same-seed body/dashboard admission and independent failure attribution. Do not redo completed source changes; continue remaining work and check new exact SHA CI."
     }
   }
 }

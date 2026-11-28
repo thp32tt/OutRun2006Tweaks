@@ -53,8 +53,9 @@ static void TestIsolatedRetry() {
     ExternalIsolatedRetryPolicy p{};
     assert(!p.AllowSeed(0));
     assert(p.AllowSeed(7)&&p.AllowSeed(7));
+    assert(p.Admitted(7)&&!p.Admitted(6)&&!p.Admitted(0));
     p.OnCleanStageFailure();
-    assert(!p.AllowSeed(7)&&p.remaining==120);
+    assert(!p.AllowSeed(7)&&!p.Admitted(7)&&p.remaining==120);
     p.OnCleanStageFailure(); // no extension on repeated failed callbacks
     for(std::uint64_t frame=8;frame<128;++frame){
         assert(!p.AllowSeed(frame));

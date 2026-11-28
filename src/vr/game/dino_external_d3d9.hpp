@@ -793,6 +793,9 @@ public:
     bool AllowIsolatedCandidateSeed(std::uint64_t epoch) noexcept {
         return isolatedRetry_.AllowSeed(epoch);
     }
+    bool IsolatedCandidateSeedAdmitted(std::uint64_t epoch) const noexcept {
+        return isolatedRetry_.Admitted(epoch);
+    }
     bool HasGlassMeshes() const noexcept {return glassMeshCount_!=0;}
     // API name retained for the existing large game-hook call site: return
     // individual bit coverage (1=speed, 2=RPM), NOT a boolean pair flag.
@@ -1051,14 +1054,14 @@ public:
                     return SUCCEEDED(device->SetTexture(stage,value));
                 });
         };
-        bool lastGlass=false,passBound=false,interleaveDirty=false;
+        bool lastGlass=false,passBound=false,interleaveDirty=false,interleaveFailed=false;
         if(SUCCEEDED(hr))for(unsigned pass=phase==IsolatedMeshPass::GlassOnly?1u:0u;
             pass<(phase==IsolatedMeshPass::OpaqueOnly?1u:2u)&&SUCCEEDED(hr);++pass) {
           if(pass==1u&&between){
             // The nested dashboard uses its own StateBlock and restores
             // the body state. Any nested failure vetoes both private eyes.
             if(!current()||!between->draw(between->context,interleaveDirty)||
-                interleaveDirty||!current()){hr=E_FAIL;break;}
+                interleaveDirty||!current()){interleaveFailed=true;hr=E_FAIL;break;}
             // Rebind material/blend at the first glass mesh after the
             // nested Apply; never reuse a material across an owner boundary.
             lastMaterial=MaxMaterials;passBound=false;textureBinding.Invalidate();
@@ -1188,7 +1191,7 @@ public:
             // Only a real, clean failure of this still-current private
             // draw is retryable. Present/Reset/selection retirement must
             // not penalize a newer owner, and dirty state is handled by R7.
-            if(stateOk&&!result.isolatedEyeComplete&&current())
+            if(stateOk&&!interleaveFailed&&!result.isolatedEyeComplete&&current())
                 isolatedRetry_.OnCleanStageFailure();
             return result; // a discarded private eye is not corrupt OVC data
         }
