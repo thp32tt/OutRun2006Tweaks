@@ -2045,7 +2045,7 @@ template<class DrawCall>R7CandidateSeedResult R7ReplayInactiveEye(IDirect3DDevic
     return R7CandidateSeedResult::Seeded;
 }
 '''
-up_input_stub += "bool R7NativeStockOnlyDraw(){return false;}\nvoid R7RecordNativeStockOmission(unsigned,R7CandidateSeedResult){}\n"
+up_input_stub += "struct R7NativeOmissionTicket {void* owner=nullptr;};\nR7NativeOmissionTicket R7CaptureNativeStockOmission(){return {};}\nvoid R7RecordNativeStockOmission(const R7NativeOmissionTicket&,unsigned,R7CandidateSeedResult){}\n"
 up_input_cases=r'''
 int main(){
     unsigned cases=0;
