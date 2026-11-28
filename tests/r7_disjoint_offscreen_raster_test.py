@@ -13,7 +13,7 @@ using UINT=unsigned;using HRESULT=int;
 constexpr HRESULT S_OK=0,D3DERR_NOTFOUND=-1,E_FAIL=-2;
 bool SUCCEEDED(HRESULT h){return h>=0;}
 struct IDirect3DSurface9{int refs=0;};
-IDirect3DSurface9 lc,rc,ld,rd,pc[2],pd[2],aux,auxDepth;
+IDirect3DSurface9 lc,rc,ld,rd,pc[2],pd[2],aux,aux2,aux3,auxDepth;
 std::uint64_t PresentEpoch=3,ExternalAtomicReplayEpoch=3,R7CandidateBoundarySerial=0;
 bool R7CandidateReadbackCovered=false;
 bool InternalStereoPass=false,R7CandidateResetInFlight=false,R7VehicleStageInFlight=false,mainTarget=false,mrt=false;
@@ -53,6 +53,19 @@ int main(){
   game.depth=TrackedDepthStencil=surface;assert(!R7CandidateDisjointOffscreenRaster(&game));
  }
  game.depth=TrackedDepthStencil=&auxDepth;
+ // Independent MRT writes must survive; any protected attachment in
+ // any MRT slot still revokes, regardless of the shadow flags.
+ game.rt[1]=&aux2;game.rt[2]=&aux3;mrt=true;
+ assert(R7CandidateDisjointOffscreenRaster(&game));
+ for(unsigned slot=1;slot<4;++slot){
+  auto* before=game.rt[slot];
+  for(auto* surface:{&lc,&rc,&ld,&rd,&pc[0],&pc[1],&pd[0],&pd[1]}){
+   game.rt[slot]=surface;assert(!R7CandidateDisjointOffscreenRaster(&game));
+  }
+  game.rt[slot]=before;
+ }
+ mainTarget=true;assert(!R7CandidateDisjointOffscreenRaster(&game));mainTarget=false;
+ game.rt[1]=game.rt[2]=nullptr;mrt=false;
  for(unsigned i=1;i<4;++i){game.rt[i]=&lc;assert(!R7CandidateDisjointOffscreenRaster(&game));game.rt[i]=nullptr;}
  for(unsigned i=1;i<=5;++i){
   game.calls=0;game.retireAt=i;assert(!R7CandidateDisjointOffscreenRaster(&game));
@@ -73,7 +86,7 @@ int main(){
  R7CandidateReadbackCovered=true;assert(R7CandidateDisjointOffscreenRaster(&game));
  R7StagedVehicle.present=0;
  game.depth=TrackedDepthStencil=nullptr;assert(R7CandidateDisjointOffscreenRaster(&game));
- assert(!lc.refs&&!rc.refs&&!ld.refs&&!rd.refs&&!aux.refs&&!auxDepth.refs);
+ assert(!lc.refs&&!rc.refs&&!ld.refs&&!rd.refs&&!aux.refs&&!aux2.refs&&!aux3.refs&&!auxDepth.refs);
  std::cout<<"R7_DISJOINT_OFFSCREEN_PASS\n";
 }
 '''

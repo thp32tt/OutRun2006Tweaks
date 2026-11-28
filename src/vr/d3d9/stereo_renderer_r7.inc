@@ -2295,7 +2295,7 @@ namespace OutRunVRStereo
                  ((nativeReplay->omitted[0]||nativeReplay->omitted[1])&&!R7CandidateReadbackCovered));
             if(!device||InternalStereoPass||TargetIsBackBuffer()||
                 ExternalAtomicReplayEpoch!=PresentEpoch||pair.device!=device||
-                AnyAuxRenderTargetActive()||R7CandidateResetInFlight||
+                R7CandidateResetInFlight||
                 R7VehicleStageInFlight||
                 (R7StagedVehicle.present==PresentEpoch&&!R7CandidateReadbackCovered)||
                 nativeAuxBlocked||
@@ -2319,7 +2319,11 @@ namespace OutRunVRStereo
             ReleaseCom(rt);if(!ok||!current())return false;
             for(UINT i=1;i<pair.simultaneousTargets;++i){
                 hr=device->GetRenderTarget(i,&rt);
-                ok=hr==D3DERR_NOTFOUND&&!rt&&current();
+                // An offscreen MRT is independent only if EVERY actually
+                // bound color attachment is disjoint from both stock and
+                // private eye pairs. Do not trust the MRT shadow flags.
+                ok=current()&&((SUCCEEDED(hr)&&rt&&distinct(rt))||
+                    (hr==D3DERR_NOTFOUND&&!rt));
                 ReleaseCom(rt);if(!ok||!current())return false;
             }
             IDirect3DSurface9* depth=nullptr;
@@ -4120,7 +4124,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
             }return leftHr;
 		}
 
-		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9*device,DWORD index,IDirect3DSurface9*surface){const HRESULT hr=SetRenderTargetHook.stdcall<HRESULT>(device,index,surface);if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr)){if(index==0){/* Binding alone does not mutate a candidate. Raster and copy owners validate actual attachments. */ReplaceSurfaceRef(TrackedRenderTarget,surface);}else if(index>=1&&index<=3){if(surface)ExternalAtomicReplayEpoch=0;AuxRenderTargetActive[index-1]=surface!=nullptr;}}return hr;}
+		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9*device,DWORD index,IDirect3DSurface9*surface){const HRESULT hr=SetRenderTargetHook.stdcall<HRESULT>(device,index,surface);if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr)){if(index==0){/* Binding alone does not mutate a candidate. Raster and copy owners validate actual attachments. */ReplaceSurfaceRef(TrackedRenderTarget,surface);}else if(index>=1&&index<=3){/* A binding alone is not a raster. Preserve only offscreen MRT admission; the draw/Clear owner checks every actual attachment. */if(surface&&TargetIsBackBuffer())ExternalAtomicReplayEpoch=0;AuxRenderTargetActive[index-1]=surface!=nullptr;}}return hr;}
 		HRESULT __stdcall SetDepthStencilSurfaceDest(IDirect3DDevice9*device,IDirect3DSurface9*surface)
 		{
 			const HRESULT hr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,surface);
