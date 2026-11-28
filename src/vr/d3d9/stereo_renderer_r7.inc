@@ -3018,12 +3018,35 @@ if(WaitForEventQuery(slot.fence,1,0u))
             }
             return true;
         }
-        void R7RecordNativeStockOmission(unsigned eye,R7CandidateSeedResult result) noexcept
+        struct R7NativeOmissionTicket {
+            OutRunVR::DinoSidecar::NativeVehicleStockReplay* owner=nullptr;
+            OutRunVR::DinoSidecar::IsolatedVehicleKey key{};
+            unsigned group=0,entry=0;
+        };
+        R7NativeOmissionTicket R7CaptureNativeStockOmission() noexcept
         {
-            auto* replay=OutRunVR::DinoSidecar::ActiveNativeVehicleStockReplay;
-            if(!replay)return;
+            using namespace OutRunVR::DinoSidecar;
+            if(!R7NativeStockOnlyDraw())return {};
+            auto* replay=ActiveNativeVehicleStockReplay;
+            return {replay,replay->key,replay->opened,replay->physicalEntries};
+        }
+        void R7RecordNativeStockOmission(const R7NativeOmissionTicket& ticket,
+            unsigned eye,R7CandidateSeedResult result) noexcept
+        {
+            using namespace OutRunVR::DinoSidecar;
+            auto* replay=ActiveNativeVehicleStockReplay;
+            // Driver getters/Release can synchronously cross native callback
+            // or Present boundaries. Credit only the exact PMT entry captured
+            // BEFORE that proof, never whichever receipt is active afterward.
+            if(!ticket.owner||replay!=ticket.owner){
+                ExternalAtomicReplayEpoch=0;return;
+            }
             if(eye>=2||result!=R7CandidateSeedResult::Seeded||
-                !R7NativeStockOnlyDraw()){replay->failed=true;return;}
+                !replay->key.Same(ticket.key)||replay->opened!=ticket.group||
+                replay->physicalEntries!=ticket.entry||!R7NativeStockOnlyDraw()||
+                ExternalAtomicReplayEpoch!=PresentEpoch){
+                replay->failed=true;ExternalAtomicReplayEpoch=0;return;
+            }
             ++replay->omitted[eye];
         }
         template<class DrawCall>
@@ -3031,7 +3054,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
             unsigned eye,IDirect3DSurface9* color,IDirect3DSurface9* depth,
             DrawCall& drawCall,bool up,bool indexedUp,bool allowStockOnly=true) noexcept
         {
-            const bool stockOnly=allowStockOnly&&R7NativeStockOnlyDraw();
+            const auto omission=allowStockOnly?R7CaptureNativeStockOmission():R7NativeOmissionTicket{};
+            const bool stockOnly=omission.owner!=nullptr;
             bool inputRestoreFailed=false;
             auto candidateDraw=[&]() -> HRESULT {
                 // Defense in depth: the stock-only read-only path above
@@ -3066,7 +3090,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
                 return inputRestoreFailed?E_FAIL:hr;
             };
             const auto result=R7ReplayInactiveEye(device,eye,color,depth,candidateDraw,stockOnly);
-            if(stockOnly)R7RecordNativeStockOmission(eye,result);
+            if(stockOnly)R7RecordNativeStockOmission(omission,eye,result);
             if(inputRestoreFailed||result!=R7CandidateSeedResult::Seeded)
                 ExternalAtomicReplayEpoch=0;
             return inputRestoreFailed?R7CandidateSeedResult::DirtyRestore:result;

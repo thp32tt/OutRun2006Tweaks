@@ -210,8 +210,9 @@ struct Fixture {
                 {
                     ScopedNativeVehiclePhysical p(receipt.OwnsObject(0x30000u|(group==1?0x11u:group==2?0u:1u))&&!(fault==1&&group==2));
                     for(unsigned eye=0;eye<2;++eye){
-                        if(R7NativeStockOnlyDraw()&&!(fault==2&&group==2&&eye==1))
-                            R7RecordNativeStockOmission(eye,R7CandidateSeedResult::Seeded);
+                        const auto omission=R7CaptureNativeStockOmission();
+                        if(omission.owner&&!(fault==2&&group==2&&eye==1))
+                            R7RecordNativeStockOmission(omission,eye,R7CandidateSeedResult::Seeded);
                         ++stock[eye].draws;++stockZ[eye].draws;
                     }
                 }
@@ -228,6 +229,24 @@ struct Fixture {
 };
 int main(){
     unsigned cases=0;
+    // An omission proof from another native queue entry, owner, or
+    // presentation may never be credited to the active transaction.
+    for(unsigned fault=0;fault<5;++fault){
+        Fixture f;NativeVehicleStockReplay replay{},other{};
+        assert(BeginNativeVehicleReplacement(&f.d,f.input,replay));
+        ScopedNativeVehicleStockReplay scope(replay);
+        replay.Open(true);replay.EnterPhysical(true);
+        const auto ticket=R7CaptureNativeStockOmission();assert(ticket.owner==&replay);
+        if(fault==1)++replay.physicalEntries;
+        if(fault==2)++replay.opened;
+        if(fault==3)++R7CandidateBoundarySerial;
+        if(fault==4){other=replay;ActiveNativeVehicleStockReplay=&other;}
+        R7RecordNativeStockOmission(ticket,0,R7CandidateSeedResult::Seeded);
+        if(!fault)assert(replay.omitted[0]==1&&!replay.failed);
+        else assert(!replay.omitted[0]&&!other.omitted[0]&&!ExternalAtomicReplayEpoch);
+        if(fault==4)ActiveNativeVehicleStockReplay=&replay;
+        ++cases;
+    }
     {Fixture f;assert(f.Stage()==IsolatedStageResult::Complete&&rawCalls==10);
      assert(f.priv[0].draws==5&&f.priv[1].draws==5&&f.privZ[0].draws==5&&f.privZ[1].draws==5);
      const unsigned order[]{0,0,1,1,2,0,0,1,1,2};

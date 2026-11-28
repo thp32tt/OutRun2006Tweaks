@@ -115,7 +115,8 @@ jobs:
           assert 'Module::exe_ptr(0x5BE4)' in source
           assert 'TraceNativeVehicleSortedAlpha,Memory::HookType::Call' in source
           assert 'R7NativeCompletedVehicle.Same(key)' in r7
-          assert 'R7RecordNativeStockOmission(eye,result)' in r7
+          assert 'R7RecordNativeStockOmission(omission,eye,result)' in r7
+          assert 'replay->physicalEntries!=ticket.entry' in r7 and 'replay!=ticket.owner' in r7
           safe=Path('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp').read_text()
           assert safe.count('return R30SafeCandidateRaw(device,') == 17
           assert 'return R7ExecuteRawCandidateVb(device,draw,up,indexedUp);' in safe
