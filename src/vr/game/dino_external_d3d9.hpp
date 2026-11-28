@@ -185,6 +185,7 @@ class GpuOwner final {
     // textures on every eye Draw. Retry only after Reset/device change.
     GpuRetryPolicy gpuRetry_{};
     ExternalStereoRetryPolicy stereoRetry_{};
+    ExternalIsolatedRetryPolicy isolatedRetry_{};
     static bool ReadFile(const wchar_t* path,std::vector<std::uint8_t>& out) {
         HANDLE f=CreateFileW(path,GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,
                             FILE_ATTRIBUTE_NORMAL,nullptr);
@@ -694,6 +695,7 @@ public:
         loadAttempted_=false;
         gpuRetry_.OnReset();
         stereoRetry_.OnSelectionOrDeviceReset();
+        isolatedRetry_.Reset();
         selectedSlot_=next;
         selectedCarId_=nextCarId;
         modelBoundsReady_=false;
@@ -711,6 +713,7 @@ public:
         ReleaseGpu();
         gpuRetry_.OnReset();
         stereoRetry_.OnSelectionOrDeviceReset();
+        isolatedRetry_.Reset();
         // A missing/corrupt sidecar is not retried on every eye draw.
         // Re-arm only after a real device reset or race->menu boundary so a
         // corrected OVC can be picked up next race without restarting the EXE.
@@ -784,6 +787,11 @@ public:
                                unsigned char carId) const noexcept {
         return device&&owner_==device&&loaded_&&preparation_==Preparation::Ready&&
             !gpuBusy_&&!gpuRetirementDepth_&&SelectionMatches(slot,carId);
+    }
+    // Only the full-scene seed owner consumes a frame. DrawNativeScene
+    // never decrements this budget on either private eye.
+    bool AllowIsolatedCandidateSeed(std::uint64_t epoch) noexcept {
+        return isolatedRetry_.AllowSeed(epoch);
     }
     bool HasGlassMeshes() const noexcept {return glassMeshCount_!=0;}
     // API name retained for the existing large game-hook call site: return
@@ -898,8 +906,10 @@ public:
                 return SUCCEEDED(device->CreateStateBlock(D3DSBT_ALL,out));
             },
             [&]() noexcept {return current()&&SUCCEEDED(saved->Capture());},
-            [&]() noexcept {saved->Release();}))
+            [&]() noexcept {saved->Release();})){
+            if(isolated&&current())isolatedRetry_.OnCleanStageFailure();
             return result;
+        }
         HRESULT hr=S_OK;
         bool eyeProofOnlyFailure=false;
         const DWORD fvf=D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1;
@@ -1175,6 +1185,11 @@ public:
                 result.receipt.attemptedMeshes==result.receipt.expectedMeshes&&
                 result.receipt.submittedMeshes==result.receipt.expectedMeshes;
             result.hr=result.isolatedEyeComplete?S_OK:E_FAIL;
+            // Only a real, clean failure of this still-current private
+            // draw is retryable. Present/Reset/selection retirement must
+            // not penalize a newer owner, and dirty state is handled by R7.
+            if(stateOk&&!result.isolatedEyeComplete&&current())
+                isolatedRetry_.OnCleanStageFailure();
             return result; // a discarded private eye is not corrupt OVC data
         }
         result.receipt.drawSucceeded=SUCCEEDED(hr) &&

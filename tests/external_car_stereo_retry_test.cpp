@@ -48,8 +48,34 @@ static void TestCaptureRetry() {
         }
     }
 }
+static void TestIsolatedRetry() {
+    using OutRunVR::DinoSidecar::ExternalIsolatedRetryPolicy;
+    ExternalIsolatedRetryPolicy p{};
+    assert(!p.AllowSeed(0));
+    assert(p.AllowSeed(7)&&p.AllowSeed(7));
+    p.OnCleanStageFailure();
+    assert(!p.AllowSeed(7)&&p.remaining==120);
+    p.OnCleanStageFailure(); // no extension on repeated failed callbacks
+    for(std::uint64_t frame=8;frame<128;++frame){
+        assert(!p.AllowSeed(frame));
+        const auto remaining=p.remaining;
+        for(unsigned clear=0;clear<4;++clear)assert(!p.AllowSeed(frame));
+        assert(p.remaining==remaining);
+        p.OnCleanStageFailure();
+        assert(p.remaining==remaining);
+    }
+    assert(p.remaining==0&&p.AllowSeed(128));
+    p.OnCleanStageFailure();
+    p.Reset(); // selection or Reset/ResetEx
+    assert(p.AllowSeed(128));
+    assert(p.AllowSeed(UINT64_MAX));
+    p.OnCleanStageFailure();
+    assert(!p.AllowSeed(1)); // Present wrap, zero is reserved
+    assert(p.remaining==119);
+}
 int main() {
     TestCaptureRetry();
+    TestIsolatedRetry();
     ExternalStereoRetryPolicy p{};
     assert(p.AllowNativeAttempt());
     p.OnSoftStereoFailure();

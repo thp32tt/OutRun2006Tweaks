@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 // A failed per-eye draw does not imply damaged DDS, VB/IB or shader resources.
 // Skip a bounded number of native callbacks (original PMT remains visible)
 // before retrying the same installed sidecar. Actual GPU allocation or
@@ -16,6 +17,31 @@ struct ExternalStereoRetryPolicy final {
         return true;
     }
     void OnSelectionOrDeviceReset() noexcept { remaining=0; }
+};
+// Private scene replay is expensive even if the final vehicle stage fails
+// cleanly. Charge cooldown once per *distinct Present epoch*, not per eye,
+// Clear, mesh, or native callback. The whole stock stereo pair remains live.
+// Separate from legacy live-DIP retry: no private-eye failure quarantines
+// validated assets. Selection/device reset immediately rearms the owner.
+struct ExternalIsolatedRetryPolicy final {
+    static constexpr unsigned CooldownFrames=120u;
+    unsigned remaining=0;
+    std::uint64_t epoch=0;
+    bool admitted=false;
+    bool AllowSeed(std::uint64_t next) noexcept {
+        if(!next)return false;
+        if(epoch==next)return admitted;
+        epoch=next;
+        admitted=remaining==0;
+        if(remaining)--remaining;
+        return admitted;
+    }
+    void OnCleanStageFailure() noexcept {
+        if(!epoch||!admitted)return;
+        admitted=false;
+        remaining=CooldownFrames;
+    }
+    void Reset() noexcept {*this={};}
 };
 // Creation/capture failure occurs before render state changes or raster.
 // Retain the uploaded model, but avoid allocating another full state block

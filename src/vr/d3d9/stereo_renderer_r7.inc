@@ -2180,7 +2180,7 @@ namespace OutRunVRStereo
             if(!legacy&&(!Settings::VRExternalFerrariTest||
                 !MatchesFerrariSelection(id,Settings::VRExternalFerrariTestCarId.get())))return false;
             const auto slot=legacy?FerrariModelSlot::F50:FerrariModelSlot::GenericId;
-            const auto& body=GlobalGpu();const auto& dash=GlobalDashboardGpu();
+            auto& body=GlobalGpu();auto& dash=GlobalDashboardGpu();
             if(!body.ReadyForCandidateSeed(device,slot,id)||!body.HasGlassMeshes())return false;
             const bool dashboardReady=dash.ReadyForCandidateSeed(device,FerrariModelSlot::GenericId,id)&&
                 !dash.HasGlassMeshes();
@@ -2190,8 +2190,16 @@ namespace OutRunVRStereo
                 (dashboardReady?dash.DashboardGearCoverage():0u);
             // Avoid duplicating an entire scene for a known missing gear.
             // Native callback rechecks its independently latched sample.
-            return DashboardCoverageComplete(needles,gears,
-                SanitizeDashboardTelemetry(player->field_1F8,player->dword20C,player->cur_gear_208));
+            const auto telemetry=SanitizeDashboardTelemetry(player->field_1F8,player->dword20C,player->cur_gear_208);
+            if(!DashboardCoverageComplete(needles,gears,telemetry))return false;
+            // No private replay allocation during a clean stage cooldown.
+            // Advance both ready owners once per Present, even when one
+            // blocks the pair, so their cooldowns do not add sequentially.
+            const bool bodyAllowed=body.AllowIsolatedCandidateSeed(PresentEpoch);
+            const bool dashAllowed=!dashboardReady||dash.AllowIsolatedCandidateSeed(PresentEpoch);
+            const bool bodyComplete=DashboardCoverageComplete(body.DashboardNeedleCoverage(),
+                body.DashboardGearCoverage(),telemetry);
+            return bodyAllowed&&(bodyComplete||dashAllowed);
         }
         R7CandidateSeedResult R7BeginExternalAtomicResourceTransaction(IDirect3DDevice9* device,
             const D3DVIEWPORT9& viewport,DWORD flags,D3DCOLOR color,float z,DWORD stencil) noexcept
